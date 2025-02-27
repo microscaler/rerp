@@ -1,13 +1,3 @@
-# rerp
-musings on an erp
-
-## Introduction
-
-This is a collection of thoughts on what might be included in a new ERP built on top of Rust Loco and either SoldJS or Flutter. 
-
-It is not a complete system, but rather a collection of ideas that could be used to build one.
-
-
 ```mermaid
 mindmap
   root((Rust ERP System))
