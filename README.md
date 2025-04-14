@@ -1,6 +1,6 @@
 # Rust ERP
 
-The following are my musings on an ERP and the modules that might be included.
+The following are musings on an ERP and the modules that might be included.
 
 ## Introduction
 
