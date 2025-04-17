@@ -1,0 +1,409 @@
+openapi: 3.1.0
+info:
+  title: Data API Gateway
+  description: 'Data cleaning, deduplication, and quality management.. This aggregates and proxies requests to Data microservices.
+    This is the single entry point for the Data system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/data/cleaning/*` → Cleaning Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/data/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/data
+  description: Data API Gateway
+tags: []
+paths:
+  /data-records:
+    get:
+      operationId: listDataRecords
+      summary: List data-records
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of data-records
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DataRecord'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    post:
+      operationId: createDataRecord
+      summary: Create data-record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDataRecordRequest'
+      responses:
+        '201':
+          description: DataRecord created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataRecord'
+        '400':
+          description: Invalid request
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+  /data-records/{id}:
+    get:
+      operationId: getDataRecord
+      summary: Get data-record by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: DataRecord details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataRecord'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    put:
+      operationId: updateDataRecord
+      summary: Update data-record
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDataRecordRequest'
+      responses:
+        '200':
+          description: DataRecord updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataRecord'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    delete:
+      operationId: deleteDataRecord
+      summary: Delete data-record
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: DataRecord deleted
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+  /duplicates:
+    get:
+      operationId: listDuplicates
+      summary: List duplicates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of duplicates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Duplicate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    post:
+      operationId: createDuplicate
+      summary: Create duplicate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDuplicateRequest'
+      responses:
+        '201':
+          description: Duplicate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Duplicate'
+        '400':
+          description: Invalid request
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+  /duplicates/{id}:
+    get:
+      operationId: getDuplicate
+      summary: Get duplicate by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Duplicate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Duplicate'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    put:
+      operationId: updateDuplicate
+      summary: Update duplicate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDuplicateRequest'
+      responses:
+        '200':
+          description: Duplicate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Duplicate'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    delete:
+      operationId: deleteDuplicate
+      summary: Delete duplicate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Duplicate deleted
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+  /merges:
+    get:
+      operationId: listMerges
+      summary: List merges
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of merges
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Merge'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    post:
+      operationId: createMerge
+      summary: Create merge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMergeRequest'
+      responses:
+        '201':
+          description: Merge created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merge'
+        '400':
+          description: Invalid request
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+  /merges/{id}:
+    get:
+      operationId: getMerge
+      summary: Get merge by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Merge details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merge'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    put:
+      operationId: updateMerge
+      summary: Update merge
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMergeRequest'
+      responses:
+        '200':
+          description: Merge updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merge'
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+    delete:
+      operationId: deleteMerge
+      summary: Delete merge
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Merge deleted
+        '404':
+          description: Not found
+      x-service: cleaning
+      x-service-base-path: /api/v1/data/cleaning
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

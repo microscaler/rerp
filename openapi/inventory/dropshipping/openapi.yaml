@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Dropshipping
+  version: 1.0.0
+  description: Dropshipping service managing vendor dropship orders.
+servers:
+- url: /api/v1/inventory/dropshipping
+  description: Dropshipping API
+tags: []
+paths:
+  /dropship-orders:
+    get:
+      operationId: listDropshipOrders
+      summary: List dropship-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of dropship-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DropshipOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDropshipOrder
+      summary: Create dropship-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDropshipOrderRequest'
+      responses:
+        '201':
+          description: DropshipOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '400':
+          description: Invalid request
+  /dropship-orders/{id}:
+    get:
+      operationId: getDropshipOrder
+      summary: Get dropship-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: DropshipOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDropshipOrder
+      summary: Update dropship-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDropshipOrderRequest'
+      responses:
+        '200':
+          description: DropshipOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDropshipOrder
+      summary: Delete dropship-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: DropshipOrder deleted
+        '404':
+          description: Not found
+  /vendor-orders:
+    get:
+      operationId: listVendorOrders
+      summary: List vendor-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of vendor-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VendorOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createVendorOrder
+      summary: Create vendor-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorOrderRequest'
+      responses:
+        '201':
+          description: VendorOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '400':
+          description: Invalid request
+  /vendor-orders/{id}:
+    get:
+      operationId: getVendorOrder
+      summary: Get vendor-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: VendorOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateVendorOrder
+      summary: Update vendor-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorOrderRequest'
+      responses:
+        '200':
+          description: VendorOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteVendorOrder
+      summary: Delete vendor-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: VendorOrder deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

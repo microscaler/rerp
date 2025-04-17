@@ -1,0 +1,19 @@
+[package]
+name = "rerp_infrastructure_integration_platform_impl"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "integration_platform"
+path = "src/main.rs"
+
+[dependencies]
+rerp_infrastructure_integration_platform = { path = "../integration-platform" }
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true }
+rerp_common = { path = "../../common" }
+
+# Add your additional dependencies here

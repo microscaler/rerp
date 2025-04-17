@@ -1,0 +1,1443 @@
+openapi: 3.1.0
+info:
+  title: Manufacturing API Gateway
+  description: 'Manufacturing operations from BOM management to production planning and repair.. This aggregates and proxies
+    requests to Manufacturing microservices. This is the single entry point for the Manufacturing system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/manufacturing/bom/*` → Bom Service
+
+    - `/api/v1/manufacturing/core/*` → Core Service
+
+    - `/api/v1/manufacturing/production-planning/*` → ProductionPlanning Service
+
+    - `/api/v1/manufacturing/repair/*` → Repair Service
+
+    - `/api/v1/manufacturing/subcontracting/*` → Subcontracting Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/manufacturing/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/manufacturing
+  description: Manufacturing API Gateway
+tags: []
+paths:
+  /bom-lines:
+    get:
+      operationId: listBomLines
+      summary: List bom-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bom-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BomLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    post:
+      operationId: createBomLine
+      summary: Create bom-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomLineRequest'
+      responses:
+        '201':
+          description: BomLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '400':
+          description: Invalid request
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+  /bom-lines/{id}:
+    get:
+      operationId: getBomLine
+      summary: Get bom-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BomLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    put:
+      operationId: updateBomLine
+      summary: Update bom-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomLineRequest'
+      responses:
+        '200':
+          description: BomLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    delete:
+      operationId: deleteBomLine
+      summary: Delete bom-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BomLine deleted
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+  /bom-versions:
+    get:
+      operationId: listBomVersions
+      summary: List bom-versions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bom-versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BomVersion'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    post:
+      operationId: createBomVersion
+      summary: Create bom-version
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomVersionRequest'
+      responses:
+        '201':
+          description: BomVersion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '400':
+          description: Invalid request
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+  /bom-versions/{id}:
+    get:
+      operationId: getBomVersion
+      summary: Get bom-version by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BomVersion details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    put:
+      operationId: updateBomVersion
+      summary: Update bom-version
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomVersionRequest'
+      responses:
+        '200':
+          description: BomVersion updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+    delete:
+      operationId: deleteBomVersion
+      summary: Delete bom-version
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BomVersion deleted
+        '404':
+          description: Not found
+      x-service: bom
+      x-service-base-path: /api/v1/manufacturing/bom
+  /boms:
+    get:
+      operationId: listBoms
+      summary: List boms
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of boms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bom'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    post:
+      operationId: createBom
+      summary: Create bom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomRequest'
+      responses:
+        '201':
+          description: Bom created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+  /boms/{id}:
+    get:
+      operationId: getBom
+      summary: Get bom by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Bom details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    put:
+      operationId: updateBom
+      summary: Update bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomRequest'
+      responses:
+        '200':
+          description: Bom updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    delete:
+      operationId: deleteBom
+      summary: Delete bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Bom deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+  /capacity-plans:
+    get:
+      operationId: listCapacityPlans
+      summary: List capacity-plans
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of capacity-plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CapacityPlan'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    post:
+      operationId: createCapacityPlan
+      summary: Create capacity-plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCapacityPlanRequest'
+      responses:
+        '201':
+          description: CapacityPlan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '400':
+          description: Invalid request
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /capacity-plans/{id}:
+    get:
+      operationId: getCapacityPlan
+      summary: Get capacity-plan by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: CapacityPlan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    put:
+      operationId: updateCapacityPlan
+      summary: Update capacity-plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCapacityPlanRequest'
+      responses:
+        '200':
+          description: CapacityPlan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    delete:
+      operationId: deleteCapacityPlan
+      summary: Delete capacity-plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: CapacityPlan deleted
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /mrp-runs:
+    get:
+      operationId: listMrpRuns
+      summary: List mrp-runs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of mrp-runs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MrpRun'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    post:
+      operationId: createMrpRun
+      summary: Create mrp-run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMrpRunRequest'
+      responses:
+        '201':
+          description: MrpRun created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '400':
+          description: Invalid request
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /mrp-runs/{id}:
+    get:
+      operationId: getMrpRun
+      summary: Get mrp-run by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: MrpRun details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    put:
+      operationId: updateMrpRun
+      summary: Update mrp-run
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMrpRunRequest'
+      responses:
+        '200':
+          description: MrpRun updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    delete:
+      operationId: deleteMrpRun
+      summary: Delete mrp-run
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: MrpRun deleted
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /production-orders:
+    get:
+      operationId: listProductionOrders
+      summary: List production-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of production-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductionOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    post:
+      operationId: createProductionOrder
+      summary: Create production-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductionOrderRequest'
+      responses:
+        '201':
+          description: ProductionOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+  /production-orders/{id}:
+    get:
+      operationId: getProductionOrder
+      summary: Get production-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ProductionOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    put:
+      operationId: updateProductionOrder
+      summary: Update production-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductionOrderRequest'
+      responses:
+        '200':
+          description: ProductionOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    delete:
+      operationId: deleteProductionOrder
+      summary: Delete production-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ProductionOrder deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+  /production-schedules:
+    get:
+      operationId: listProductionSchedules
+      summary: List production-schedules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of production-schedules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductionSchedule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    post:
+      operationId: createProductionSchedule
+      summary: Create production-schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductionScheduleRequest'
+      responses:
+        '201':
+          description: ProductionSchedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '400':
+          description: Invalid request
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /production-schedules/{id}:
+    get:
+      operationId: getProductionSchedule
+      summary: Get production-schedule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ProductionSchedule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    put:
+      operationId: updateProductionSchedule
+      summary: Update production-schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductionScheduleRequest'
+      responses:
+        '200':
+          description: ProductionSchedule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+    delete:
+      operationId: deleteProductionSchedule
+      summary: Delete production-schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ProductionSchedule deleted
+        '404':
+          description: Not found
+      x-service: production-planning
+      x-service-base-path: /api/v1/manufacturing/production-planning
+  /repair-lines:
+    get:
+      operationId: listRepairLines
+      summary: List repair-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of repair-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    post:
+      operationId: createRepairLine
+      summary: Create repair-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRepairLineRequest'
+      responses:
+        '201':
+          description: RepairLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '400':
+          description: Invalid request
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+  /repair-lines/{id}:
+    get:
+      operationId: getRepairLine
+      summary: Get repair-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: RepairLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    put:
+      operationId: updateRepairLine
+      summary: Update repair-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRepairLineRequest'
+      responses:
+        '200':
+          description: RepairLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    delete:
+      operationId: deleteRepairLine
+      summary: Delete repair-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: RepairLine deleted
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+  /repair-orders:
+    get:
+      operationId: listRepairOrders
+      summary: List repair-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of repair-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    post:
+      operationId: createRepairOrder
+      summary: Create repair-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRepairOrderRequest'
+      responses:
+        '201':
+          description: RepairOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '400':
+          description: Invalid request
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+  /repair-orders/{id}:
+    get:
+      operationId: getRepairOrder
+      summary: Get repair-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: RepairOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    put:
+      operationId: updateRepairOrder
+      summary: Update repair-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRepairOrderRequest'
+      responses:
+        '200':
+          description: RepairOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+    delete:
+      operationId: deleteRepairOrder
+      summary: Delete repair-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: RepairOrder deleted
+        '404':
+          description: Not found
+      x-service: repair
+      x-service-base-path: /api/v1/manufacturing/repair
+  /subcontract-orders:
+    get:
+      operationId: listSubcontractOrders
+      summary: List subcontract-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of subcontract-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubcontractOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    post:
+      operationId: createSubcontractOrder
+      summary: Create subcontract-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubcontractOrderRequest'
+      responses:
+        '201':
+          description: SubcontractOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '400':
+          description: Invalid request
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+  /subcontract-orders/{id}:
+    get:
+      operationId: getSubcontractOrder
+      summary: Get subcontract-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SubcontractOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    put:
+      operationId: updateSubcontractOrder
+      summary: Update subcontract-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubcontractOrderRequest'
+      responses:
+        '200':
+          description: SubcontractOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    delete:
+      operationId: deleteSubcontractOrder
+      summary: Delete subcontract-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SubcontractOrder deleted
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+  /subcontractor-pos:
+    get:
+      operationId: listSubcontractorPos
+      summary: List subcontractor-pos
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of subcontractor-pos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubcontractorPo'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    post:
+      operationId: createSubcontractorPo
+      summary: Create subcontractor-po
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubcontractorPoRequest'
+      responses:
+        '201':
+          description: SubcontractorPo created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '400':
+          description: Invalid request
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+  /subcontractor-pos/{id}:
+    get:
+      operationId: getSubcontractorPo
+      summary: Get subcontractor-po by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SubcontractorPo details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    put:
+      operationId: updateSubcontractorPo
+      summary: Update subcontractor-po
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubcontractorPoRequest'
+      responses:
+        '200':
+          description: SubcontractorPo updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+    delete:
+      operationId: deleteSubcontractorPo
+      summary: Delete subcontractor-po
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SubcontractorPo deleted
+        '404':
+          description: Not found
+      x-service: subcontracting
+      x-service-base-path: /api/v1/manufacturing/subcontracting
+  /work-orders:
+    get:
+      operationId: listWorkOrders
+      summary: List work-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of work-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    post:
+      operationId: createWorkOrder
+      summary: Create work-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkOrderRequest'
+      responses:
+        '201':
+          description: WorkOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+  /work-orders/{id}:
+    get:
+      operationId: getWorkOrder
+      summary: Get work-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: WorkOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    put:
+      operationId: updateWorkOrder
+      summary: Update work-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkOrderRequest'
+      responses:
+        '200':
+          description: WorkOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+    delete:
+      operationId: deleteWorkOrder
+      summary: Delete work-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: WorkOrder deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/manufacturing/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,5 @@
+# Configuration for product/pricing service
+# Service-specific configuration goes here
+
+port: 8080
+# Add service-specific config as needed

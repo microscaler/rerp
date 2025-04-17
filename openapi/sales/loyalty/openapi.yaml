@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Loyalty Programs
+  version: 1.0.0
+  description: Customer loyalty program service managing points and rewards.
+servers:
+- url: /api/v1/sales/loyalty
+  description: Loyalty Programs API
+tags: []
+paths:
+  /loyalty-programs:
+    get:
+      operationId: listLoyaltyPrograms
+      summary: List loyalty-programs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of loyalty-programs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LoyaltyProgram'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createLoyaltyProgram
+      summary: Create loyalty-program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoyaltyProgramRequest'
+      responses:
+        '201':
+          description: LoyaltyProgram created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '400':
+          description: Invalid request
+  /loyalty-programs/{id}:
+    get:
+      operationId: getLoyaltyProgram
+      summary: Get loyalty-program by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LoyaltyProgram details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '404':
+          description: Not found
+    put:
+      operationId: updateLoyaltyProgram
+      summary: Update loyalty-program
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLoyaltyProgramRequest'
+      responses:
+        '200':
+          description: LoyaltyProgram updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteLoyaltyProgram
+      summary: Delete loyalty-program
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LoyaltyProgram deleted
+        '404':
+          description: Not found
+  /rewards:
+    get:
+      operationId: listRewards
+      summary: List rewards
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createReward
+      summary: Create reward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRewardRequest'
+      responses:
+        '201':
+          description: Reward created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '400':
+          description: Invalid request
+  /rewards/{id}:
+    get:
+      operationId: getReward
+      summary: Get reward by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Reward details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Not found
+    put:
+      operationId: updateReward
+      summary: Update reward
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRewardRequest'
+      responses:
+        '200':
+          description: Reward updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteReward
+      summary: Delete reward
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Reward deleted
+        '404':
+          description: Not found
+  /points-transactions:
+    get:
+      operationId: listPointsTransactions
+      summary: List points-transactions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of points-transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PointsTransaction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPointsTransaction
+      summary: Create points-transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePointsTransactionRequest'
+      responses:
+        '201':
+          description: PointsTransaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '400':
+          description: Invalid request
+  /points-transactions/{id}:
+    get:
+      operationId: getPointsTransaction
+      summary: Get points-transaction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PointsTransaction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePointsTransaction
+      summary: Update points-transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePointsTransactionRequest'
+      responses:
+        '200':
+          description: PointsTransaction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePointsTransaction
+      summary: Delete points-transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PointsTransaction deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

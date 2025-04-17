@@ -1,0 +1,1097 @@
+openapi: 3.1.0
+info:
+  title: Crm API Gateway
+  description: 'Customer relationship management with lead tracking, automation, and live chat.. This aggregates and proxies
+    requests to Crm microservices. This is the single entry point for the Crm system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/crm/automation/*` → Automation Service
+
+    - `/api/v1/crm/core/*` → Core Service
+
+    - `/api/v1/crm/livechat/*` → Livechat Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/crm/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/crm
+  description: Crm API Gateway
+tags: []
+paths:
+  /agents:
+    get:
+      operationId: listAgents
+      summary: List agents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Agent'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    post:
+      operationId: createAgent
+      summary: Create agent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '400':
+          description: Invalid request
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /agents/{id}:
+    get:
+      operationId: getAgent
+      summary: Get agent by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    put:
+      operationId: updateAgent
+      summary: Update agent
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAgentRequest'
+      responses:
+        '200':
+          description: Agent updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    delete:
+      operationId: deleteAgent
+      summary: Delete agent
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Agent deleted
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /chats:
+    get:
+      operationId: listChats
+      summary: List chats
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of chats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Chat'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    post:
+      operationId: createChat
+      summary: Create chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRequest'
+      responses:
+        '201':
+          description: Chat created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          description: Invalid request
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /chats/{id}:
+    get:
+      operationId: getChat
+      summary: Get chat by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Chat details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    put:
+      operationId: updateChat
+      summary: Update chat
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChatRequest'
+      responses:
+        '200':
+          description: Chat updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    delete:
+      operationId: deleteChat
+      summary: Delete chat
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Chat deleted
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /contacts:
+    get:
+      operationId: listContacts
+      summary: List contacts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Contact'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    post:
+      operationId: createContact
+      summary: Create contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /contacts/{id}:
+    get:
+      operationId: getContact
+      summary: Get contact by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    put:
+      operationId: updateContact
+      summary: Update contact
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    delete:
+      operationId: deleteContact
+      summary: Delete contact
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Contact deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /leads:
+    get:
+      operationId: listLeads
+      summary: List leads
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lead'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    post:
+      operationId: createLead
+      summary: Create lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeadRequest'
+      responses:
+        '201':
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /leads/{id}:
+    get:
+      operationId: getLead
+      summary: Get lead by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lead details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    put:
+      operationId: updateLead
+      summary: Update lead
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeadRequest'
+      responses:
+        '200':
+          description: Lead updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    delete:
+      operationId: deleteLead
+      summary: Delete lead
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Lead deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /messages:
+    get:
+      operationId: listMessages
+      summary: List messages
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    post:
+      operationId: createMessage
+      summary: Create message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+      responses:
+        '201':
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Invalid request
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /messages/{id}:
+    get:
+      operationId: getMessage
+      summary: Get message by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    put:
+      operationId: updateMessage
+      summary: Update message
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMessageRequest'
+      responses:
+        '200':
+          description: Message updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+    delete:
+      operationId: deleteMessage
+      summary: Delete message
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Message deleted
+        '404':
+          description: Not found
+      x-service: livechat
+      x-service-base-path: /api/v1/crm/livechat
+  /opportunitys:
+    get:
+      operationId: listOpportunitys
+      summary: List opportunitys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of opportunitys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Opportunity'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    post:
+      operationId: createOpportunity
+      summary: Create opportunity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOpportunityRequest'
+      responses:
+        '201':
+          description: Opportunity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /opportunitys/{id}:
+    get:
+      operationId: getOpportunity
+      summary: Get opportunity by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Opportunity details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    put:
+      operationId: updateOpportunity
+      summary: Update opportunity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOpportunityRequest'
+      responses:
+        '200':
+          description: Opportunity updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Opportunity'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+    delete:
+      operationId: deleteOpportunity
+      summary: Delete opportunity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Opportunity deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/crm/core
+  /rules:
+    get:
+      operationId: listRules
+      summary: List rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Rule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    post:
+      operationId: createRule
+      summary: Create rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleRequest'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+  /rules/{id}:
+    get:
+      operationId: getRule
+      summary: Get rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    put:
+      operationId: updateRule
+      summary: Update rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleRequest'
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    delete:
+      operationId: deleteRule
+      summary: Delete rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Rule deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+  /triggers:
+    get:
+      operationId: listTriggers
+      summary: List triggers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of triggers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trigger'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    post:
+      operationId: createTrigger
+      summary: Create trigger
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTriggerRequest'
+      responses:
+        '201':
+          description: Trigger created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+  /triggers/{id}:
+    get:
+      operationId: getTrigger
+      summary: Get trigger by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Trigger details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    put:
+      operationId: updateTrigger
+      summary: Update trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTriggerRequest'
+      responses:
+        '200':
+          description: Trigger updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    delete:
+      operationId: deleteTrigger
+      summary: Delete trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Trigger deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+  /workflows:
+    get:
+      operationId: listWorkflows
+      summary: List workflows
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workflow'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    post:
+      operationId: createWorkflow
+      summary: Create workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkflowRequest'
+      responses:
+        '201':
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+  /workflows/{id}:
+    get:
+      operationId: getWorkflow
+      summary: Get workflow by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    put:
+      operationId: updateWorkflow
+      summary: Update workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowRequest'
+      responses:
+        '200':
+          description: Workflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+    delete:
+      operationId: deleteWorkflow
+      summary: Delete workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Workflow deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/crm/automation
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,19 @@
+[package]
+name = "rerp_accounting_accounts_payable_impl"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "accounts_payable"
+path = "src/main.rs"
+
+[dependencies]
+rerp_accounting_accounts_payable = { path = "../accounts-payable" }
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true }
+rerp_common = { path = "../../common" }
+
+# Add your additional dependencies here

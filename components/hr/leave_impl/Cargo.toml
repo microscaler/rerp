@@ -1,0 +1,19 @@
+[package]
+name = "rerp_hr_leave_impl"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "leave"
+path = "src/main.rs"
+
+[dependencies]
+rerp_hr_leave = { path = "../leave" }
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true }
+rerp_common = { path = "../../common" }
+
+# Add your additional dependencies here

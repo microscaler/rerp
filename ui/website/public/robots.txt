@@ -1,0 +1,46 @@
+# robots.txt for PriceWhisperer
+# https://pricewhisperer.microscaler.io/robots.txt
+
+User-agent: *
+Allow: /
+
+# Disallow admin or private areas (if any)
+# Disallow: /admin/
+# Disallow: /private/
+# Disallow: /trader/
+# Disallow: /platform/
+
+# Allow all important pages
+Allow: /#features
+Allow: /#pricing
+Allow: /#faq
+Allow: /#how-it-works-page
+Allow: /#blogs
+
+# Allow feature pages
+Allow: /#feature-smart-trading-alerts
+Allow: /#feature-options-strategy-finder
+Allow: /#feature-pattern-recognition
+Allow: /#feature-global-market-coverage
+Allow: /#feature-live-trading-dashboard
+Allow: /#feature-built-in-risk-management
+Allow: /#feature-financial-trading-education
+Allow: /#feature-execution-options
+
+# Allow blog posts
+Allow: /#blog-iron-condor-strategy
+Allow: /#blog-pattern-recognition-guide
+Allow: /#blog-risk-management-basics
+Allow: /#blog-options-greeks-explained
+Allow: /#blog-paper-trading-guide
+Allow: /#blog-multi-exchange-trading
+
+# Allow FTE posts
+Allow: /fte/#/page/index
+
+# Crawl-delay (optional, adjust based on server capacity)
+# Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://pricewhisperer.microscaler.io/sitemap.xml
+

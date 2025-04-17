@@ -1,0 +1,19 @@
+[package]
+name = "rerp_accounting_general_ledger_impl"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "general_ledger"
+path = "src/main.rs"
+
+[dependencies]
+rerp_accounting_general_ledger = { path = "../general-ledger" }
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true }
+rerp_common = { path = "../../common" }
+
+# Add your additional dependencies here

@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Marketing Automation
+  version: 1.0.0
+  description: Marketing automation service providing workflow automation and lead nurturing.
+servers:
+- url: /api/v1/marketing/automation
+  description: Marketing Automation API
+tags: []
+paths:
+  /automation-workflows:
+    get:
+      operationId: listAutomationWorkflows
+      summary: List automation-workflows
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of automation-workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AutomationWorkflow'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createAutomationWorkflow
+      summary: Create automation-workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAutomationWorkflowRequest'
+      responses:
+        '201':
+          description: AutomationWorkflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '400':
+          description: Invalid request
+  /automation-workflows/{id}:
+    get:
+      operationId: getAutomationWorkflow
+      summary: Get automation-workflow by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AutomationWorkflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '404':
+          description: Not found
+    put:
+      operationId: updateAutomationWorkflow
+      summary: Update automation-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAutomationWorkflowRequest'
+      responses:
+        '200':
+          description: AutomationWorkflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteAutomationWorkflow
+      summary: Delete automation-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AutomationWorkflow deleted
+        '404':
+          description: Not found
+  /triggers:
+    get:
+      operationId: listTriggers
+      summary: List triggers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of triggers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trigger'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createTrigger
+      summary: Create trigger
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTriggerRequest'
+      responses:
+        '201':
+          description: Trigger created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Invalid request
+  /triggers/{id}:
+    get:
+      operationId: getTrigger
+      summary: Get trigger by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Trigger details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+    put:
+      operationId: updateTrigger
+      summary: Update trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTriggerRequest'
+      responses:
+        '200':
+          description: Trigger updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteTrigger
+      summary: Delete trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Trigger deleted
+        '404':
+          description: Not found
+  /actions:
+    get:
+      operationId: listActions
+      summary: List actions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Action'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createAction
+      summary: Create action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActionRequest'
+      responses:
+        '201':
+          description: Action created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '400':
+          description: Invalid request
+  /actions/{id}:
+    get:
+      operationId: getAction
+      summary: Get action by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Action details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '404':
+          description: Not found
+    put:
+      operationId: updateAction
+      summary: Update action
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActionRequest'
+      responses:
+        '200':
+          description: Action updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteAction
+      summary: Delete action
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Action deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

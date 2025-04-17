@@ -1,0 +1,753 @@
+openapi: 3.1.0
+info:
+  title: Localization API Gateway
+  description: 'Country-specific configurations and compliance management.. This aggregates and proxies requests to Localization
+    microservices. This is the single entry point for the Localization system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/localization/compliance/*` → Compliance Service
+
+    - `/api/v1/localization/core/*` → Core Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/localization/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/localization
+  description: Localization API Gateway
+tags: []
+paths:
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      summary: List audit-logs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of audit-logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLog'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    post:
+      operationId: createAuditLog
+      summary: Create audit-log
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuditLogRequest'
+      responses:
+        '201':
+          description: AuditLog created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+        '400':
+          description: Invalid request
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /audit-logs/{id}:
+    get:
+      operationId: getAuditLog
+      summary: Get audit-log by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AuditLog details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    put:
+      operationId: updateAuditLog
+      summary: Update audit-log
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAuditLogRequest'
+      responses:
+        '200':
+          description: AuditLog updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    delete:
+      operationId: deleteAuditLog
+      summary: Delete audit-log
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AuditLog deleted
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /compliance-rules:
+    get:
+      operationId: listComplianceRules
+      summary: List compliance-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of compliance-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComplianceRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    post:
+      operationId: createComplianceRule
+      summary: Create compliance-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComplianceRuleRequest'
+      responses:
+        '201':
+          description: ComplianceRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceRule'
+        '400':
+          description: Invalid request
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /compliance-rules/{id}:
+    get:
+      operationId: getComplianceRule
+      summary: Get compliance-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ComplianceRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceRule'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    put:
+      operationId: updateComplianceRule
+      summary: Update compliance-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateComplianceRuleRequest'
+      responses:
+        '200':
+          description: ComplianceRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceRule'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    delete:
+      operationId: deleteComplianceRule
+      summary: Delete compliance-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ComplianceRule deleted
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /currencys:
+    get:
+      operationId: listCurrencys
+      summary: List currencys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of currencys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Currency'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    post:
+      operationId: createCurrency
+      summary: Create currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCurrencyRequest'
+      responses:
+        '201':
+          description: Currency created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+  /currencys/{id}:
+    get:
+      operationId: getCurrency
+      summary: Get currency by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Currency details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    put:
+      operationId: updateCurrency
+      summary: Update currency
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCurrencyRequest'
+      responses:
+        '200':
+          description: Currency updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    delete:
+      operationId: deleteCurrency
+      summary: Delete currency
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Currency deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+  /locales:
+    get:
+      operationId: listLocales
+      summary: List locales
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of locales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Locale'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    post:
+      operationId: createLocale
+      summary: Create locale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocaleRequest'
+      responses:
+        '201':
+          description: Locale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+  /locales/{id}:
+    get:
+      operationId: getLocale
+      summary: Get locale by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Locale details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    put:
+      operationId: updateLocale
+      summary: Update locale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocaleRequest'
+      responses:
+        '200':
+          description: Locale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    delete:
+      operationId: deleteLocale
+      summary: Delete locale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Locale deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+  /policys:
+    get:
+      operationId: listPolicys
+      summary: List policys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of policys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Policy'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    post:
+      operationId: createPolicy
+      summary: Create policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyRequest'
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '400':
+          description: Invalid request
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /policys/{id}:
+    get:
+      operationId: getPolicy
+      summary: Get policy by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Policy details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    put:
+      operationId: updatePolicy
+      summary: Update policy
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePolicyRequest'
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+    delete:
+      operationId: deletePolicy
+      summary: Delete policy
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Policy deleted
+        '404':
+          description: Not found
+      x-service: compliance
+      x-service-base-path: /api/v1/localization/compliance
+  /translations:
+    get:
+      operationId: listTranslations
+      summary: List translations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of translations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Translation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    post:
+      operationId: createTranslation
+      summary: Create translation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTranslationRequest'
+      responses:
+        '201':
+          description: Translation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+  /translations/{id}:
+    get:
+      operationId: getTranslation
+      summary: Get translation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Translation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    put:
+      operationId: updateTranslation
+      summary: Update translation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTranslationRequest'
+      responses:
+        '200':
+          description: Translation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+    delete:
+      operationId: deleteTranslation
+      summary: Delete translation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Translation deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/localization/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Invoice Management
+  version: 1.0.0
+  description: Invoice management service handling invoice creation and approval workflows.
+servers:
+- url: /api/v1/accounting/invoice
+  description: Invoice Management API
+tags: []
+paths:
+  /invoices:
+    get:
+      operationId: listInvoices
+      summary: List invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createInvoice
+      summary: Create invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        '201':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid request
+  /invoices/{id}:
+    get:
+      operationId: getInvoice
+      summary: Get invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: Not found
+    put:
+      operationId: updateInvoice
+      summary: Update invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '200':
+          description: Invoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteInvoice
+      summary: Delete invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Invoice deleted
+        '404':
+          description: Not found
+  /invoice-lines:
+    get:
+      operationId: listInvoiceLines
+      summary: List invoice-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of invoice-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createInvoiceLine
+      summary: Create invoice-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceLineRequest'
+      responses:
+        '201':
+          description: InvoiceLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '400':
+          description: Invalid request
+  /invoice-lines/{id}:
+    get:
+      operationId: getInvoiceLine
+      summary: Get invoice-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: InvoiceLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateInvoiceLine
+      summary: Update invoice-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceLineRequest'
+      responses:
+        '200':
+          description: InvoiceLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteInvoiceLine
+      summary: Delete invoice-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: InvoiceLine deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

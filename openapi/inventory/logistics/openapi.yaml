@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Logistics & Shipping
+  version: 1.0.0
+  description: Logistics and shipping service integrating with carriers.
+servers:
+- url: /api/v1/inventory/logistics
+  description: Logistics & Shipping API
+tags: []
+paths:
+  /shipments:
+    get:
+      operationId: listShipments
+      summary: List shipments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of shipments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shipment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createShipment
+      summary: Create shipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentRequest'
+      responses:
+        '201':
+          description: Shipment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '400':
+          description: Invalid request
+  /shipments/{id}:
+    get:
+      operationId: getShipment
+      summary: Get shipment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Shipment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '404':
+          description: Not found
+    put:
+      operationId: updateShipment
+      summary: Update shipment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShipmentRequest'
+      responses:
+        '200':
+          description: Shipment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteShipment
+      summary: Delete shipment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Shipment deleted
+        '404':
+          description: Not found
+  /carriers:
+    get:
+      operationId: listCarriers
+      summary: List carriers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of carriers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Carrier'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createCarrier
+      summary: Create carrier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCarrierRequest'
+      responses:
+        '201':
+          description: Carrier created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '400':
+          description: Invalid request
+  /carriers/{id}:
+    get:
+      operationId: getCarrier
+      summary: Get carrier by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Carrier details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '404':
+          description: Not found
+    put:
+      operationId: updateCarrier
+      summary: Update carrier
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCarrierRequest'
+      responses:
+        '200':
+          description: Carrier updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteCarrier
+      summary: Delete carrier
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Carrier deleted
+        '404':
+          description: Not found
+  /shipping-rates:
+    get:
+      operationId: listShippingRates
+      summary: List shipping-rates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of shipping-rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShippingRate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createShippingRate
+      summary: Create shipping-rate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShippingRateRequest'
+      responses:
+        '201':
+          description: ShippingRate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '400':
+          description: Invalid request
+  /shipping-rates/{id}:
+    get:
+      operationId: getShippingRate
+      summary: Get shipping-rate by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ShippingRate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '404':
+          description: Not found
+    put:
+      operationId: updateShippingRate
+      summary: Update shipping-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShippingRateRequest'
+      responses:
+        '200':
+          description: ShippingRate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteShippingRate
+      summary: Delete shipping-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ShippingRate deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

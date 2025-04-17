@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Payroll
+  version: 1.0.0
+  description: Payroll service processing salary calculations and payslip generation.
+servers:
+- url: /api/v1/hr/payroll
+  description: Payroll API
+tags: []
+paths:
+  /payslips:
+    get:
+      operationId: listPayslips
+      summary: List payslips
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payslips
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payslip'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPayslip
+      summary: Create payslip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePayslipRequest'
+      responses:
+        '201':
+          description: Payslip created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '400':
+          description: Invalid request
+  /payslips/{id}:
+    get:
+      operationId: getPayslip
+      summary: Get payslip by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payslip details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePayslip
+      summary: Update payslip
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePayslipRequest'
+      responses:
+        '200':
+          description: Payslip updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePayslip
+      summary: Delete payslip
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payslip deleted
+        '404':
+          description: Not found
+  /salary-rules:
+    get:
+      operationId: listSalaryRules
+      summary: List salary-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of salary-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SalaryRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSalaryRule
+      summary: Create salary-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSalaryRuleRequest'
+      responses:
+        '201':
+          description: SalaryRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '400':
+          description: Invalid request
+  /salary-rules/{id}:
+    get:
+      operationId: getSalaryRule
+      summary: Get salary-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SalaryRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSalaryRule
+      summary: Update salary-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSalaryRuleRequest'
+      responses:
+        '200':
+          description: SalaryRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSalaryRule
+      summary: Delete salary-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SalaryRule deleted
+        '404':
+          description: Not found
+  /deductions:
+    get:
+      operationId: listDeductions
+      summary: List deductions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of deductions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deduction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDeduction
+      summary: Create deduction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeductionRequest'
+      responses:
+        '201':
+          description: Deduction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '400':
+          description: Invalid request
+  /deductions/{id}:
+    get:
+      operationId: getDeduction
+      summary: Get deduction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Deduction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDeduction
+      summary: Update deduction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeductionRequest'
+      responses:
+        '200':
+          description: Deduction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDeduction
+      summary: Delete deduction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deduction deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

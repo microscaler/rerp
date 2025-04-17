@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: EDI & Compliance
+  version: 1.0.0
+  description: Electronic Data Interchange service supporting PEPPOL and UBL formats.
+servers:
+- url: /api/v1/accounting/edi
+  description: EDI & Compliance API
+tags: []
+paths:
+  /edi-documents:
+    get:
+      operationId: listEdiDocuments
+      summary: List edi-documents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of edi-documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EdiDocument'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createEdiDocument
+      summary: Create edi-document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiDocumentRequest'
+      responses:
+        '201':
+          description: EdiDocument created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '400':
+          description: Invalid request
+  /edi-documents/{id}:
+    get:
+      operationId: getEdiDocument
+      summary: Get edi-document by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EdiDocument details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '404':
+          description: Not found
+    put:
+      operationId: updateEdiDocument
+      summary: Update edi-document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEdiDocumentRequest'
+      responses:
+        '200':
+          description: EdiDocument updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteEdiDocument
+      summary: Delete edi-document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EdiDocument deleted
+        '404':
+          description: Not found
+  /edi-mappings:
+    get:
+      operationId: listEdiMappings
+      summary: List edi-mappings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of edi-mappings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EdiMapping'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createEdiMapping
+      summary: Create edi-mapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiMappingRequest'
+      responses:
+        '201':
+          description: EdiMapping created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '400':
+          description: Invalid request
+  /edi-mappings/{id}:
+    get:
+      operationId: getEdiMapping
+      summary: Get edi-mapping by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EdiMapping details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '404':
+          description: Not found
+    put:
+      operationId: updateEdiMapping
+      summary: Update edi-mapping
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEdiMappingRequest'
+      responses:
+        '200':
+          description: EdiMapping updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteEdiMapping
+      summary: Delete edi-mapping
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EdiMapping deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

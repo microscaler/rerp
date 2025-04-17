@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Approval Workflows
+  version: 1.0.0
+  description: Approval workflow service managing multi-level approval processes.
+servers:
+- url: /api/v1/approvals/core
+  description: Approval Workflows API
+tags: []
+paths:
+  /approval-requests:
+    get:
+      operationId: listApprovalRequests
+      summary: List approval-requests
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of approval-requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApprovalRequest'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createApprovalRequest
+      summary: Create approval-request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApprovalRequestRequest'
+      responses:
+        '201':
+          description: ApprovalRequest created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '400':
+          description: Invalid request
+  /approval-requests/{id}:
+    get:
+      operationId: getApprovalRequest
+      summary: Get approval-request by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ApprovalRequest details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '404':
+          description: Not found
+    put:
+      operationId: updateApprovalRequest
+      summary: Update approval-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApprovalRequestRequest'
+      responses:
+        '200':
+          description: ApprovalRequest updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteApprovalRequest
+      summary: Delete approval-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ApprovalRequest deleted
+        '404':
+          description: Not found
+  /approval-workflows:
+    get:
+      operationId: listApprovalWorkflows
+      summary: List approval-workflows
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of approval-workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApprovalWorkflow'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createApprovalWorkflow
+      summary: Create approval-workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApprovalWorkflowRequest'
+      responses:
+        '201':
+          description: ApprovalWorkflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalWorkflow'
+        '400':
+          description: Invalid request
+  /approval-workflows/{id}:
+    get:
+      operationId: getApprovalWorkflow
+      summary: Get approval-workflow by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ApprovalWorkflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalWorkflow'
+        '404':
+          description: Not found
+    put:
+      operationId: updateApprovalWorkflow
+      summary: Update approval-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApprovalWorkflowRequest'
+      responses:
+        '200':
+          description: ApprovalWorkflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalWorkflow'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteApprovalWorkflow
+      summary: Delete approval-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ApprovalWorkflow deleted
+        '404':
+          description: Not found
+  /delegations:
+    get:
+      operationId: listDelegations
+      summary: List delegations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of delegations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Delegation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDelegation
+      summary: Create delegation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDelegationRequest'
+      responses:
+        '201':
+          description: Delegation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delegation'
+        '400':
+          description: Invalid request
+  /delegations/{id}:
+    get:
+      operationId: getDelegation
+      summary: Get delegation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Delegation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delegation'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDelegation
+      summary: Update delegation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDelegationRequest'
+      responses:
+        '200':
+          description: Delegation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Delegation'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDelegation
+      summary: Delete delegation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Delegation deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

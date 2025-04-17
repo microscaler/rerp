@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Asset Management
+  version: 1.0.0
+  description: Fixed asset management service tracking asset acquisition and depreciation.
+servers:
+- url: /api/v1/accounting/asset
+  description: Asset Management API
+tags: []
+paths:
+  /assets:
+    get:
+      operationId: listAssets
+      summary: List assets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createAsset
+      summary: Create asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      responses:
+        '201':
+          description: Asset created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: Invalid request
+  /assets/{id}:
+    get:
+      operationId: getAsset
+      summary: Get asset by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Not found
+    put:
+      operationId: updateAsset
+      summary: Update asset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetRequest'
+      responses:
+        '200':
+          description: Asset updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteAsset
+      summary: Delete asset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Asset deleted
+        '404':
+          description: Not found
+  /depreciations:
+    get:
+      operationId: listDepreciations
+      summary: List depreciations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of depreciations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Depreciation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDepreciation
+      summary: Create depreciation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepreciationRequest'
+      responses:
+        '201':
+          description: Depreciation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '400':
+          description: Invalid request
+  /depreciations/{id}:
+    get:
+      operationId: getDepreciation
+      summary: Get depreciation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Depreciation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDepreciation
+      summary: Update depreciation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepreciationRequest'
+      responses:
+        '200':
+          description: Depreciation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDepreciation
+      summary: Delete depreciation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Depreciation deleted
+        '404':
+          description: Not found
+  /asset-registers:
+    get:
+      operationId: listAssetRegisters
+      summary: List asset-registers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of asset-registers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssetRegister'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createAssetRegister
+      summary: Create asset-register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRegisterRequest'
+      responses:
+        '201':
+          description: AssetRegister created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '400':
+          description: Invalid request
+  /asset-registers/{id}:
+    get:
+      operationId: getAssetRegister
+      summary: Get asset-register by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AssetRegister details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '404':
+          description: Not found
+    put:
+      operationId: updateAssetRegister
+      summary: Update asset-register
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetRegisterRequest'
+      responses:
+        '200':
+          description: AssetRegister updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteAssetRegister
+      summary: Delete asset-register
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AssetRegister deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

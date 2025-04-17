@@ -1,0 +1,37 @@
+[package]
+name = "rerp_common"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rerp_common"
+path = "src/lib.rs"
+
+[dependencies]
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# UUID for IDs
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# HTTP client for external APIs
+reqwest = { version = "0.12.25", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1.45.1", features = ["full"] }
+
+# Database clients (add as needed)
+# may_postgres = { git = "https://github.com/Xudong-Huang/may_postgres" }
+
+# Redis client (if needed)
+# redis = { version = "0.24", features = ["tokio-comp", "connection-manager"] }
+
+# JWT handling (if needed)
+# jsonwebtoken = "10"

@@ -1,0 +1,180 @@
+[workspace]
+members = [
+    # Phase 1: Core Foundation
+    "auth/idam",
+    "auth/idam_impl",
+    "auth/rbac",
+    "auth/rbac_impl",
+    "infrastructure/gateway",
+    "infrastructure/gateway_impl",
+    "infrastructure/integration-platform",
+    "infrastructure/integration-platform_impl",
+    "product/catalog",
+    "product/catalog_impl",
+    "product/pricing",
+    "product/pricing_impl",
+    "product/tax",
+    "product/tax_impl",
+    
+    # Phase 2: Business Operations
+    "crm/core",
+    "crm/core_impl",
+    "crm/automation",
+    "crm/automation_impl",
+    "crm/livechat",
+    "crm/livechat_impl",
+    "sales/core",
+    "sales/core_impl",
+    "sales/quotation",
+    "sales/quotation_impl",
+    "sales/order",
+    "sales/order_impl",
+    "sales/subscription",
+    "sales/subscription_impl",
+    "sales/loyalty",
+    "sales/loyalty_impl",
+    "purchase/core",
+    "purchase/core_impl",
+    "purchase/vendor",
+    "purchase/vendor_impl",
+    "inventory/core",
+    "inventory/core_impl",
+    "inventory/warehouse",
+    "inventory/warehouse_impl",
+    "inventory/logistics",
+    "inventory/logistics_impl",
+    "inventory/dropshipping",
+    "inventory/dropshipping_impl",
+    
+    # Phase 3: Financial & HR
+    "accounting/general-ledger",
+    "accounting/general-ledger_impl",
+    "accounting/accounts-payable",
+    "accounting/accounts-payable_impl",
+    "accounting/accounts-receivable",
+    "accounting/accounts-receivable_impl",
+    "accounting/financial-reports",
+    "accounting/financial-reports_impl",
+    "accounting/asset",
+    "accounting/asset_impl",
+    "accounting/budget",
+    "accounting/budget_impl",
+    "accounting/invoice",
+    "accounting/invoice_impl",
+    "accounting/edi",
+    "accounting/edi_impl",
+    "accounting/bank-sync",
+    "accounting/bank-sync_impl",
+    "hr/core",
+    "hr/core_impl",
+    "hr/attendance",
+    "hr/attendance_impl",
+    "hr/leave",
+    "hr/leave_impl",
+    "hr/payroll",
+    "hr/payroll_impl",
+    "hr/recruitment",
+    "hr/recruitment_impl",
+    "hr/appraisal",
+    "hr/appraisal_impl",
+    "hr/skills",
+    "hr/skills_impl",
+    
+    # Phase 4: Advanced Operations
+    "manufacturing/core",
+    "manufacturing/core_impl",
+    "manufacturing/bom",
+    "manufacturing/bom_impl",
+    "manufacturing/production-planning",
+    "manufacturing/production-planning_impl",
+    "manufacturing/repair",
+    "manufacturing/repair_impl",
+    "manufacturing/subcontracting",
+    "manufacturing/subcontracting_impl",
+    "project/core",
+    "project/core_impl",
+    "project/timesheet",
+    "project/timesheet_impl",
+    
+    # Phase 5: Customer-Facing
+    "marketing/email",
+    "marketing/email_impl",
+    "marketing/automation",
+    "marketing/automation_impl",
+    "marketing/social-media",
+    "marketing/social-media_impl",
+    "website/builder",
+    "website/builder_impl",
+    "website/ecommerce",
+    "website/ecommerce_impl",
+    "website/cms",
+    "website/cms_impl",
+    "pos/core",
+    "pos/core_impl",
+    "pos/payment-gateway",
+    "pos/payment-gateway_impl",
+    "helpdesk/core",
+    "helpdesk/core_impl",
+    "helpdesk/knowledge-base",
+    "helpdesk/knowledge-base_impl",
+    "field-service/core",
+    "field-service/core_impl",
+    
+    # Phase 6: Extensions
+    "marketplace/core",
+    "marketplace/core_impl",
+    "marketplace/integration-hub",
+    "marketplace/integration-hub_impl",
+    "analytics/dashboards",
+    "analytics/dashboards_impl",
+    "analytics/reporting",
+    "analytics/reporting_impl",
+    "analytics/bi",
+    "analytics/bi_impl",
+    
+    # Additional Enterprise Services
+    "localization/core",
+    "localization/core_impl",
+    "localization/compliance",
+    "localization/compliance_impl",
+    "ai/core",
+    "ai/core_impl",
+    "ai/document",
+    "ai/document_impl",
+    "automation/core",
+    "automation/core_impl",
+    "documents/core",
+    "documents/core_impl",
+    "appointments/core",
+    "appointments/core_impl",
+    "approvals/core",
+    "approvals/core_impl",
+    "data/cleaning",
+    "data/cleaning_impl",
+    "esg/core",
+    "esg/core_impl",
+    "iot/core",
+    "iot/core_impl",
+    
+    # Common utilities
+    "common",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+brrtrouter = { path = "../../BRRTRouter" }
+brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+config = "0.14"
+http = "1.0"
+may = "0.3"
+may_minihttp = { git = "https://github.com/microscaler/may_minihttp.git", branch = "feat/configurable-max-headers" }
+anyhow = "1.0"
+clap = { version = "4.5.39", features = ["derive"] }
+tikv-jemallocator = { version = "0.6", features = ["profiling"] }

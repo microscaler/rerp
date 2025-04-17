@@ -1,0 +1,19 @@
+[package]
+name = "rerp_documents_core_impl"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "core"
+path = "src/main.rs"
+
+[dependencies]
+rerp_documents_core = { path = "../core" }
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true }
+rerp_common = { path = "../../common" }
+
+# Add your additional dependencies here

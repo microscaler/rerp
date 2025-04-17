@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Repair Service
+  version: 1.0.0
+  description: Repair service managing product repairs and repair orders.
+servers:
+- url: /api/v1/manufacturing/repair
+  description: Repair Service API
+tags: []
+paths:
+  /repair-orders:
+    get:
+      operationId: listRepairOrders
+      summary: List repair-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of repair-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createRepairOrder
+      summary: Create repair-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRepairOrderRequest'
+      responses:
+        '201':
+          description: RepairOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '400':
+          description: Invalid request
+  /repair-orders/{id}:
+    get:
+      operationId: getRepairOrder
+      summary: Get repair-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: RepairOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateRepairOrder
+      summary: Update repair-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRepairOrderRequest'
+      responses:
+        '200':
+          description: RepairOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteRepairOrder
+      summary: Delete repair-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: RepairOrder deleted
+        '404':
+          description: Not found
+  /repair-lines:
+    get:
+      operationId: listRepairLines
+      summary: List repair-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of repair-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createRepairLine
+      summary: Create repair-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRepairLineRequest'
+      responses:
+        '201':
+          description: RepairLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '400':
+          description: Invalid request
+  /repair-lines/{id}:
+    get:
+      operationId: getRepairLine
+      summary: Get repair-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: RepairLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateRepairLine
+      summary: Update repair-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRepairLineRequest'
+      responses:
+        '200':
+          description: RepairLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepairLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteRepairLine
+      summary: Delete repair-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: RepairLine deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

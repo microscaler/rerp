@@ -1,0 +1,275 @@
+openapi: 3.1.0
+info:
+  title: Tax Calculation
+  version: 1.0.0
+  description: Tax calculation service handling complex tax rules, multi-level taxes, country-specific tax logic, and tax
+    reporting compliance.
+servers:
+- url: /api/v1/product/tax
+  description: Tax Calculation API
+tags: []
+paths:
+  /tax-rules:
+    get:
+      operationId: listTaxRules
+      summary: List tax-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tax-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaxRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createTaxRule
+      summary: Create tax-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRuleRequest'
+      responses:
+        '201':
+          description: TaxRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '400':
+          description: Invalid request
+  /tax-rules/{id}:
+    get:
+      operationId: getTaxRule
+      summary: Get tax-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TaxRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '404':
+          description: Not found
+    put:
+      operationId: updateTaxRule
+      summary: Update tax-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxRuleRequest'
+      responses:
+        '200':
+          description: TaxRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteTaxRule
+      summary: Delete tax-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TaxRule deleted
+        '404':
+          description: Not found
+  /tax-rates:
+    get:
+      operationId: listTaxRates
+      summary: List tax-rates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tax-rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaxRate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createTaxRate
+      summary: Create tax-rate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRateRequest'
+      responses:
+        '201':
+          description: TaxRate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '400':
+          description: Invalid request
+  /tax-rates/{id}:
+    get:
+      operationId: getTaxRate
+      summary: Get tax-rate by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TaxRate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '404':
+          description: Not found
+    put:
+      operationId: updateTaxRate
+      summary: Update tax-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxRateRequest'
+      responses:
+        '200':
+          description: TaxRate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteTaxRate
+      summary: Delete tax-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TaxRate deleted
+        '404':
+          description: Not found
+  /calculate:
+    post:
+      operationId: calculateTax
+      summary: Calculate tax for transaction
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /rules/by-location:
+    get:
+      operationId: getTaxRulesByLocation
+      summary: Get tax rules by location
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

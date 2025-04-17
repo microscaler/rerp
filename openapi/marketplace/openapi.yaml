@@ -1,0 +1,639 @@
+openapi: 3.1.0
+info:
+  title: Marketplace API Gateway
+  description: 'App marketplace and integration hub.. This aggregates and proxies requests to Marketplace microservices. This
+    is the single entry point for the Marketplace system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/marketplace/core/*` → Core Service
+
+    - `/api/v1/marketplace/integration-hub/*` → IntegrationHub Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/marketplace/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/marketplace
+  description: Marketplace API Gateway
+tags: []
+paths:
+  /apps:
+    get:
+      operationId: listApps
+      summary: List apps
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of apps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/App'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    post:
+      operationId: createApp
+      summary: Create app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppRequest'
+      responses:
+        '201':
+          description: App created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /apps/{id}:
+    get:
+      operationId: getApp
+      summary: Get app by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: App details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    put:
+      operationId: updateApp
+      summary: Update app
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppRequest'
+      responses:
+        '200':
+          description: App updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    delete:
+      operationId: deleteApp
+      summary: Delete app
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: App deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /connectors:
+    get:
+      operationId: listConnectors
+      summary: List connectors
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of connectors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Connector'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    post:
+      operationId: createConnector
+      summary: Create connector
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConnectorRequest'
+      responses:
+        '201':
+          description: Connector created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '400':
+          description: Invalid request
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+  /connectors/{id}:
+    get:
+      operationId: getConnector
+      summary: Get connector by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Connector details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    put:
+      operationId: updateConnector
+      summary: Update connector
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConnectorRequest'
+      responses:
+        '200':
+          description: Connector updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    delete:
+      operationId: deleteConnector
+      summary: Delete connector
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Connector deleted
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+  /extensions:
+    get:
+      operationId: listExtensions
+      summary: List extensions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of extensions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Extension'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    post:
+      operationId: createExtension
+      summary: Create extension
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExtensionRequest'
+      responses:
+        '201':
+          description: Extension created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /extensions/{id}:
+    get:
+      operationId: getExtension
+      summary: Get extension by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extension details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    put:
+      operationId: updateExtension
+      summary: Update extension
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExtensionRequest'
+      responses:
+        '200':
+          description: Extension updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    delete:
+      operationId: deleteExtension
+      summary: Delete extension
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Extension deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /installations:
+    get:
+      operationId: listInstallations
+      summary: List installations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of installations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Installation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    post:
+      operationId: createInstallation
+      summary: Create installation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstallationRequest'
+      responses:
+        '201':
+          description: Installation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Installation'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /installations/{id}:
+    get:
+      operationId: getInstallation
+      summary: Get installation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Installation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Installation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    put:
+      operationId: updateInstallation
+      summary: Update installation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstallationRequest'
+      responses:
+        '200':
+          description: Installation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Installation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+    delete:
+      operationId: deleteInstallation
+      summary: Delete installation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Installation deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/marketplace/core
+  /integration-templates:
+    get:
+      operationId: listIntegrationTemplates
+      summary: List integration-templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of integration-templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IntegrationTemplate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    post:
+      operationId: createIntegrationTemplate
+      summary: Create integration-template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIntegrationTemplateRequest'
+      responses:
+        '201':
+          description: IntegrationTemplate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '400':
+          description: Invalid request
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+  /integration-templates/{id}:
+    get:
+      operationId: getIntegrationTemplate
+      summary: Get integration-template by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: IntegrationTemplate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    put:
+      operationId: updateIntegrationTemplate
+      summary: Update integration-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIntegrationTemplateRequest'
+      responses:
+        '200':
+          description: IntegrationTemplate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+    delete:
+      operationId: deleteIntegrationTemplate
+      summary: Delete integration-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: IntegrationTemplate deleted
+        '404':
+          description: Not found
+      x-service: integration-hub
+      x-service-base-path: /api/v1/marketplace/integration-hub
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Localization
+  version: 1.0.0
+  description: Localization service providing country-specific configurations.
+servers:
+- url: /api/v1/localization/core
+  description: Localization API
+tags: []
+paths:
+  /locales:
+    get:
+      operationId: listLocales
+      summary: List locales
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of locales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Locale'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createLocale
+      summary: Create locale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocaleRequest'
+      responses:
+        '201':
+          description: Locale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '400':
+          description: Invalid request
+  /locales/{id}:
+    get:
+      operationId: getLocale
+      summary: Get locale by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Locale details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '404':
+          description: Not found
+    put:
+      operationId: updateLocale
+      summary: Update locale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocaleRequest'
+      responses:
+        '200':
+          description: Locale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Locale'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteLocale
+      summary: Delete locale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Locale deleted
+        '404':
+          description: Not found
+  /translations:
+    get:
+      operationId: listTranslations
+      summary: List translations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of translations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Translation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createTranslation
+      summary: Create translation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTranslationRequest'
+      responses:
+        '201':
+          description: Translation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '400':
+          description: Invalid request
+  /translations/{id}:
+    get:
+      operationId: getTranslation
+      summary: Get translation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Translation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '404':
+          description: Not found
+    put:
+      operationId: updateTranslation
+      summary: Update translation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTranslationRequest'
+      responses:
+        '200':
+          description: Translation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Translation'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteTranslation
+      summary: Delete translation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Translation deleted
+        '404':
+          description: Not found
+  /currencys:
+    get:
+      operationId: listCurrencys
+      summary: List currencys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of currencys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Currency'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createCurrency
+      summary: Create currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCurrencyRequest'
+      responses:
+        '201':
+          description: Currency created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '400':
+          description: Invalid request
+  /currencys/{id}:
+    get:
+      operationId: getCurrency
+      summary: Get currency by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Currency details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '404':
+          description: Not found
+    put:
+      operationId: updateCurrency
+      summary: Update currency
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCurrencyRequest'
+      responses:
+        '200':
+          description: Currency updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Currency'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteCurrency
+      summary: Delete currency
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Currency deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

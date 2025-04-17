@@ -1,0 +1,5 @@
+# Configuration for accounting/accounts-payable service
+# Service-specific configuration goes here
+
+port: 8080
+# Add service-specific config as needed

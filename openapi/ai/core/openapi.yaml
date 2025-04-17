@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: AI Core
+  version: 1.0.0
+  description: Core AI service providing AI capabilities across modules.
+servers:
+- url: /api/v1/ai/core
+  description: AI Core API
+tags: []
+paths:
+  /ai-models:
+    get:
+      operationId: listAiModels
+      summary: List ai-models
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ai-models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AiModel'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createAiModel
+      summary: Create ai-model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAiModelRequest'
+      responses:
+        '201':
+          description: AiModel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '400':
+          description: Invalid request
+  /ai-models/{id}:
+    get:
+      operationId: getAiModel
+      summary: Get ai-model by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AiModel details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '404':
+          description: Not found
+    put:
+      operationId: updateAiModel
+      summary: Update ai-model
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAiModelRequest'
+      responses:
+        '200':
+          description: AiModel updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteAiModel
+      summary: Delete ai-model
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AiModel deleted
+        '404':
+          description: Not found
+  /predictions:
+    get:
+      operationId: listPredictions
+      summary: List predictions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of predictions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Prediction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPrediction
+      summary: Create prediction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePredictionRequest'
+      responses:
+        '201':
+          description: Prediction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '400':
+          description: Invalid request
+  /predictions/{id}:
+    get:
+      operationId: getPrediction
+      summary: Get prediction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prediction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePrediction
+      summary: Update prediction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePredictionRequest'
+      responses:
+        '200':
+          description: Prediction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePrediction
+      summary: Delete prediction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Prediction deleted
+        '404':
+          description: Not found
+  /insights:
+    get:
+      operationId: listInsights
+      summary: List insights
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of insights
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Insight'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createInsight
+      summary: Create insight
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInsightRequest'
+      responses:
+        '201':
+          description: Insight created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '400':
+          description: Invalid request
+  /insights/{id}:
+    get:
+      operationId: getInsight
+      summary: Get insight by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Insight details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '404':
+          description: Not found
+    put:
+      operationId: updateInsight
+      summary: Update insight
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInsightRequest'
+      responses:
+        '200':
+          description: Insight updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteInsight
+      summary: Delete insight
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Insight deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

@@ -1,0 +1,1097 @@
+openapi: 3.1.0
+info:
+  title: Website API Gateway
+  description: 'Website builder, content management, and e-commerce storefront.. This aggregates and proxies requests to Website
+    microservices. This is the single entry point for the Website system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/website/builder/*` → Builder Service
+
+    - `/api/v1/website/cms/*` → Cms Service
+
+    - `/api/v1/website/ecommerce/*` → Ecommerce Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/website/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/website
+  description: Website API Gateway
+tags: []
+paths:
+  /carts:
+    get:
+      operationId: listCarts
+      summary: List carts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of carts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cart'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    post:
+      operationId: createCart
+      summary: Create cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCartRequest'
+      responses:
+        '201':
+          description: Cart created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '400':
+          description: Invalid request
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /carts/{id}:
+    get:
+      operationId: getCart
+      summary: Get cart by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Cart details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    put:
+      operationId: updateCart
+      summary: Update cart
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCartRequest'
+      responses:
+        '200':
+          description: Cart updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    delete:
+      operationId: deleteCart
+      summary: Delete cart
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Cart deleted
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /checkouts:
+    get:
+      operationId: listCheckouts
+      summary: List checkouts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of checkouts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Checkout'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    post:
+      operationId: createCheckout
+      summary: Create checkout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCheckoutRequest'
+      responses:
+        '201':
+          description: Checkout created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checkout'
+        '400':
+          description: Invalid request
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /checkouts/{id}:
+    get:
+      operationId: getCheckout
+      summary: Get checkout by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Checkout details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checkout'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    put:
+      operationId: updateCheckout
+      summary: Update checkout
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCheckoutRequest'
+      responses:
+        '200':
+          description: Checkout updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Checkout'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    delete:
+      operationId: deleteCheckout
+      summary: Delete checkout
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Checkout deleted
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /contents:
+    get:
+      operationId: listContents
+      summary: List contents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of contents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Content'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    post:
+      operationId: createContent
+      summary: Create content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContentRequest'
+      responses:
+        '201':
+          description: Content created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+        '400':
+          description: Invalid request
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /contents/{id}:
+    get:
+      operationId: getContent
+      summary: Get content by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Content details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    put:
+      operationId: updateContent
+      summary: Update content
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContentRequest'
+      responses:
+        '200':
+          description: Content updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    delete:
+      operationId: deleteContent
+      summary: Delete content
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Content deleted
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /medias:
+    get:
+      operationId: listMedias
+      summary: List medias
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of medias
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Media'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    post:
+      operationId: createMedia
+      summary: Create media
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMediaRequest'
+      responses:
+        '201':
+          description: Media created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: Invalid request
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /medias/{id}:
+    get:
+      operationId: getMedia
+      summary: Get media by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Media details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    put:
+      operationId: updateMedia
+      summary: Update media
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMediaRequest'
+      responses:
+        '200':
+          description: Media updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    delete:
+      operationId: deleteMedia
+      summary: Delete media
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Media deleted
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /pages:
+    get:
+      operationId: listPages
+      summary: List pages
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of pages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Page'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    post:
+      operationId: createPage
+      summary: Create page
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePageRequest'
+      responses:
+        '201':
+          description: Page created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '400':
+          description: Invalid request
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+  /pages/{id}:
+    get:
+      operationId: getPage
+      summary: Get page by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Page details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    put:
+      operationId: updatePage
+      summary: Update page
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePageRequest'
+      responses:
+        '200':
+          description: Page updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    delete:
+      operationId: deletePage
+      summary: Delete page
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Page deleted
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+  /seos:
+    get:
+      operationId: listSeos
+      summary: List seos
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of seos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Seo'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    post:
+      operationId: createSeo
+      summary: Create seo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSeoRequest'
+      responses:
+        '201':
+          description: Seo created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seo'
+        '400':
+          description: Invalid request
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /seos/{id}:
+    get:
+      operationId: getSeo
+      summary: Get seo by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Seo details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seo'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    put:
+      operationId: updateSeo
+      summary: Update seo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSeoRequest'
+      responses:
+        '200':
+          description: Seo updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seo'
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+    delete:
+      operationId: deleteSeo
+      summary: Delete seo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Seo deleted
+        '404':
+          description: Not found
+      x-service: cms
+      x-service-base-path: /api/v1/website/cms
+  /stores:
+    get:
+      operationId: listStores
+      summary: List stores
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Store'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    post:
+      operationId: createStore
+      summary: Create store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStoreRequest'
+      responses:
+        '201':
+          description: Store created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '400':
+          description: Invalid request
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /stores/{id}:
+    get:
+      operationId: getStore
+      summary: Get store by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Store details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    put:
+      operationId: updateStore
+      summary: Update store
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoreRequest'
+      responses:
+        '200':
+          description: Store updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+    delete:
+      operationId: deleteStore
+      summary: Delete store
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Store deleted
+        '404':
+          description: Not found
+      x-service: ecommerce
+      x-service-base-path: /api/v1/website/ecommerce
+  /templates:
+    get:
+      operationId: listTemplates
+      summary: List templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Template'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    post:
+      operationId: createTemplate
+      summary: Create template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          description: Invalid request
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+  /templates/{id}:
+    get:
+      operationId: getTemplate
+      summary: Get template by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Template details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    put:
+      operationId: updateTemplate
+      summary: Update template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    delete:
+      operationId: deleteTemplate
+      summary: Delete template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Template deleted
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+  /widgets:
+    get:
+      operationId: listWidgets
+      summary: List widgets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of widgets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Widget'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    post:
+      operationId: createWidget
+      summary: Create widget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWidgetRequest'
+      responses:
+        '201':
+          description: Widget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '400':
+          description: Invalid request
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+  /widgets/{id}:
+    get:
+      operationId: getWidget
+      summary: Get widget by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Widget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    put:
+      operationId: updateWidget
+      summary: Update widget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWidgetRequest'
+      responses:
+        '200':
+          description: Widget updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+    delete:
+      operationId: deleteWidget
+      summary: Delete widget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Widget deleted
+        '404':
+          description: Not found
+      x-service: builder
+      x-service-base-path: /api/v1/website/builder
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true
