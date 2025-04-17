@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Document AI
+  version: 1.0.0
+  description: Document AI service using machine learning for document extraction.
+servers:
+- url: /api/v1/ai/document
+  description: Document AI API
+tags: []
+paths:
+  /documents:
+    get:
+      operationId: listDocuments
+      summary: List documents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDocument
+      summary: Create document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentRequest'
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Invalid request
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      summary: Get document by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Document details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDocument
+      summary: Update document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentRequest'
+      responses:
+        '200':
+          description: Document updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDocument
+      summary: Delete document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Document deleted
+        '404':
+          description: Not found
+  /extractions:
+    get:
+      operationId: listExtractions
+      summary: List extractions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of extractions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Extraction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createExtraction
+      summary: Create extraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExtractionRequest'
+      responses:
+        '201':
+          description: Extraction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '400':
+          description: Invalid request
+  /extractions/{id}:
+    get:
+      operationId: getExtraction
+      summary: Get extraction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extraction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '404':
+          description: Not found
+    put:
+      operationId: updateExtraction
+      summary: Update extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExtractionRequest'
+      responses:
+        '200':
+          description: Extraction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteExtraction
+      summary: Delete extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Extraction deleted
+        '404':
+          description: Not found
+  /classifications:
+    get:
+      operationId: listClassifications
+      summary: List classifications
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of classifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Classification'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createClassification
+      summary: Create classification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationRequest'
+      responses:
+        '201':
+          description: Classification created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '400':
+          description: Invalid request
+  /classifications/{id}:
+    get:
+      operationId: getClassification
+      summary: Get classification by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Classification details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '404':
+          description: Not found
+    put:
+      operationId: updateClassification
+      summary: Update classification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationRequest'
+      responses:
+        '200':
+          description: Classification updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteClassification
+      summary: Delete classification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Classification deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

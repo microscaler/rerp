@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Financial Reports
+  version: 1.0.0
+  description: Financial reporting service generating P&L and balance sheets.
+servers:
+- url: /api/v1/accounting/financial-reports
+  description: Financial Reports API
+tags: []
+paths:
+  /reports:
+    get:
+      operationId: listReports
+      summary: List reports
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createReport
+      summary: Create report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '201':
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          description: Invalid request
+  /reports/{id}:
+    get:
+      operationId: getReport
+      summary: Get report by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+    put:
+      operationId: updateReport
+      summary: Update report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportRequest'
+      responses:
+        '200':
+          description: Report updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteReport
+      summary: Delete report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Report deleted
+        '404':
+          description: Not found
+  /financial-statements:
+    get:
+      operationId: listFinancialStatements
+      summary: List financial-statements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of financial-statements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FinancialStatement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createFinancialStatement
+      summary: Create financial-statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFinancialStatementRequest'
+      responses:
+        '201':
+          description: FinancialStatement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '400':
+          description: Invalid request
+  /financial-statements/{id}:
+    get:
+      operationId: getFinancialStatement
+      summary: Get financial-statement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FinancialStatement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '404':
+          description: Not found
+    put:
+      operationId: updateFinancialStatement
+      summary: Update financial-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFinancialStatementRequest'
+      responses:
+        '200':
+          description: FinancialStatement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteFinancialStatement
+      summary: Delete financial-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: FinancialStatement deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

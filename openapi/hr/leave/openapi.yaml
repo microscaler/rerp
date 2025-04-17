@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Leave Management
+  version: 1.0.0
+  description: Leave management service handling leave requests and approval workflows.
+servers:
+- url: /api/v1/hr/leave
+  description: Leave Management API
+tags: []
+paths:
+  /leave-requests:
+    get:
+      operationId: listLeaveRequests
+      summary: List leave-requests
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of leave-requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaveRequest'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createLeaveRequest
+      summary: Create leave-request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveRequestRequest'
+      responses:
+        '201':
+          description: LeaveRequest created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          description: Invalid request
+  /leave-requests/{id}:
+    get:
+      operationId: getLeaveRequest
+      summary: Get leave-request by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LeaveRequest details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '404':
+          description: Not found
+    put:
+      operationId: updateLeaveRequest
+      summary: Update leave-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeaveRequestRequest'
+      responses:
+        '200':
+          description: LeaveRequest updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteLeaveRequest
+      summary: Delete leave-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LeaveRequest deleted
+        '404':
+          description: Not found
+  /leave-balances:
+    get:
+      operationId: listLeaveBalances
+      summary: List leave-balances
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of leave-balances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaveBalance'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createLeaveBalance
+      summary: Create leave-balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveBalanceRequest'
+      responses:
+        '201':
+          description: LeaveBalance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '400':
+          description: Invalid request
+  /leave-balances/{id}:
+    get:
+      operationId: getLeaveBalance
+      summary: Get leave-balance by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LeaveBalance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '404':
+          description: Not found
+    put:
+      operationId: updateLeaveBalance
+      summary: Update leave-balance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeaveBalanceRequest'
+      responses:
+        '200':
+          description: LeaveBalance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteLeaveBalance
+      summary: Delete leave-balance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LeaveBalance deleted
+        '404':
+          description: Not found
+  /holiday-calendars:
+    get:
+      operationId: listHolidayCalendars
+      summary: List holiday-calendars
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of holiday-calendars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HolidayCalendar'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createHolidayCalendar
+      summary: Create holiday-calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHolidayCalendarRequest'
+      responses:
+        '201':
+          description: HolidayCalendar created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '400':
+          description: Invalid request
+  /holiday-calendars/{id}:
+    get:
+      operationId: getHolidayCalendar
+      summary: Get holiday-calendar by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: HolidayCalendar details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '404':
+          description: Not found
+    put:
+      operationId: updateHolidayCalendar
+      summary: Update holiday-calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHolidayCalendarRequest'
+      responses:
+        '200':
+          description: HolidayCalendar updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteHolidayCalendar
+      summary: Delete holiday-calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: HolidayCalendar deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

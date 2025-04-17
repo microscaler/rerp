@@ -1,0 +1,753 @@
+openapi: 3.1.0
+info:
+  title: Helpdesk API Gateway
+  description: 'Customer support ticket management and knowledge base.. This aggregates and proxies requests to Helpdesk microservices.
+    This is the single entry point for the Helpdesk system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/helpdesk/core/*` → Core Service
+
+    - `/api/v1/helpdesk/knowledge-base/*` → KnowledgeBase Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/helpdesk/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/helpdesk
+  description: Helpdesk API Gateway
+tags: []
+paths:
+  /articles:
+    get:
+      operationId: listArticles
+      summary: List articles
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of articles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Article'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    post:
+      operationId: createArticle
+      summary: Create article
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArticleRequest'
+      responses:
+        '201':
+          description: Article created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Invalid request
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /articles/{id}:
+    get:
+      operationId: getArticle
+      summary: Get article by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Article details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    put:
+      operationId: updateArticle
+      summary: Update article
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArticleRequest'
+      responses:
+        '200':
+          description: Article updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    delete:
+      operationId: deleteArticle
+      summary: Delete article
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Article deleted
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /categorys:
+    get:
+      operationId: listCategorys
+      summary: List categorys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of categorys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    post:
+      operationId: createCategory
+      summary: Create category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid request
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /categorys/{id}:
+    get:
+      operationId: getCategory
+      summary: Get category by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    put:
+      operationId: updateCategory
+      summary: Update category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    delete:
+      operationId: deleteCategory
+      summary: Delete category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Category deleted
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /searchs:
+    get:
+      operationId: listSearchs
+      summary: List searchs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of searchs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Search'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    post:
+      operationId: createSearch
+      summary: Create search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSearchRequest'
+      responses:
+        '201':
+          description: Search created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+        '400':
+          description: Invalid request
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /searchs/{id}:
+    get:
+      operationId: getSearch
+      summary: Get search by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Search details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    put:
+      operationId: updateSearch
+      summary: Update search
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSearchRequest'
+      responses:
+        '200':
+          description: Search updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Search'
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+    delete:
+      operationId: deleteSearch
+      summary: Delete search
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Search deleted
+        '404':
+          description: Not found
+      x-service: knowledge-base
+      x-service-base-path: /api/v1/helpdesk/knowledge-base
+  /slas:
+    get:
+      operationId: listSlas
+      summary: List slas
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of slas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sla'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    post:
+      operationId: createSla
+      summary: Create sla
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSlaRequest'
+      responses:
+        '201':
+          description: Sla created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sla'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+  /slas/{id}:
+    get:
+      operationId: getSla
+      summary: Get sla by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Sla details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sla'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    put:
+      operationId: updateSla
+      summary: Update sla
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSlaRequest'
+      responses:
+        '200':
+          description: Sla updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sla'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    delete:
+      operationId: deleteSla
+      summary: Delete sla
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Sla deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+  /ticket-comments:
+    get:
+      operationId: listTicketComments
+      summary: List ticket-comments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ticket-comments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TicketComment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    post:
+      operationId: createTicketComment
+      summary: Create ticket-comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketCommentRequest'
+      responses:
+        '201':
+          description: TicketComment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketComment'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+  /ticket-comments/{id}:
+    get:
+      operationId: getTicketComment
+      summary: Get ticket-comment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TicketComment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketComment'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    put:
+      operationId: updateTicketComment
+      summary: Update ticket-comment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketCommentRequest'
+      responses:
+        '200':
+          description: TicketComment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketComment'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    delete:
+      operationId: deleteTicketComment
+      summary: Delete ticket-comment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TicketComment deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+  /tickets:
+    get:
+      operationId: listTickets
+      summary: List tickets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tickets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ticket'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    post:
+      operationId: createTicket
+      summary: Create ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTicketRequest'
+      responses:
+        '201':
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+  /tickets/{id}:
+    get:
+      operationId: getTicket
+      summary: Get ticket by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Ticket details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    put:
+      operationId: updateTicket
+      summary: Update ticket
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketRequest'
+      responses:
+        '200':
+          description: Ticket updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+    delete:
+      operationId: deleteTicket
+      summary: Delete ticket
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Ticket deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/helpdesk/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

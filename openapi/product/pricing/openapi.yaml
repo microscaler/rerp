@@ -1,0 +1,386 @@
+openapi: 3.1.0
+info:
+  title: Dynamic Pricing
+  version: 1.0.0
+  description: Dynamic pricing engine supporting multiple price lists, customer-specific pricing, volume discounts, and margin
+    calculations.
+servers:
+- url: /api/v1/product/pricing
+  description: Dynamic Pricing API
+tags: []
+paths:
+  /price-lists:
+    get:
+      operationId: listPriceLists
+      summary: List price-lists
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of price-lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PriceList'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPriceList
+      summary: Create price-list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePriceListRequest'
+      responses:
+        '201':
+          description: PriceList created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '400':
+          description: Invalid request
+  /price-lists/{id}:
+    get:
+      operationId: getPriceList
+      summary: Get price-list by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PriceList details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePriceList
+      summary: Update price-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePriceListRequest'
+      responses:
+        '200':
+          description: PriceList updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePriceList
+      summary: Delete price-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PriceList deleted
+        '404':
+          description: Not found
+  /price-rules:
+    get:
+      operationId: listPriceRules
+      summary: List price-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of price-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PriceRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPriceRule
+      summary: Create price-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePriceRuleRequest'
+      responses:
+        '201':
+          description: PriceRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '400':
+          description: Invalid request
+  /price-rules/{id}:
+    get:
+      operationId: getPriceRule
+      summary: Get price-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PriceRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePriceRule
+      summary: Update price-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePriceRuleRequest'
+      responses:
+        '200':
+          description: PriceRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePriceRule
+      summary: Delete price-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PriceRule deleted
+        '404':
+          description: Not found
+  /discounts:
+    get:
+      operationId: listDiscounts
+      summary: List discounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of discounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Discount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createDiscount
+      summary: Create discount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDiscountRequest'
+      responses:
+        '201':
+          description: Discount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '400':
+          description: Invalid request
+  /discounts/{id}:
+    get:
+      operationId: getDiscount
+      summary: Get discount by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Discount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '404':
+          description: Not found
+    put:
+      operationId: updateDiscount
+      summary: Update discount
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDiscountRequest'
+      responses:
+        '200':
+          description: Discount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteDiscount
+      summary: Delete discount
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Discount deleted
+        '404':
+          description: Not found
+  /calculate:
+    post:
+      operationId: calculatePrice
+      summary: Calculate price for product
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+  /price-lists/{priceListId}/rules:
+    get:
+      operationId: getPriceRules
+      summary: Get price rules for price list
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: priceListId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

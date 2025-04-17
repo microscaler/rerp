@@ -1,0 +1,1097 @@
+openapi: 3.1.0
+info:
+  title: Marketing API Gateway
+  description: 'Marketing automation, email campaigns, and social media management.. This aggregates and proxies requests
+    to Marketing microservices. This is the single entry point for the Marketing system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/marketing/automation/*` → Automation Service
+
+    - `/api/v1/marketing/email/*` → Email Service
+
+    - `/api/v1/marketing/social-media/*` → SocialMedia Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/marketing/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/marketing
+  description: Marketing API Gateway
+tags: []
+paths:
+  /actions:
+    get:
+      operationId: listActions
+      summary: List actions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Action'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    post:
+      operationId: createAction
+      summary: Create action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActionRequest'
+      responses:
+        '201':
+          description: Action created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+  /actions/{id}:
+    get:
+      operationId: getAction
+      summary: Get action by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Action details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    put:
+      operationId: updateAction
+      summary: Update action
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActionRequest'
+      responses:
+        '200':
+          description: Action updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Action'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    delete:
+      operationId: deleteAction
+      summary: Delete action
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Action deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+  /automation-workflows:
+    get:
+      operationId: listAutomationWorkflows
+      summary: List automation-workflows
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of automation-workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AutomationWorkflow'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    post:
+      operationId: createAutomationWorkflow
+      summary: Create automation-workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAutomationWorkflowRequest'
+      responses:
+        '201':
+          description: AutomationWorkflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+  /automation-workflows/{id}:
+    get:
+      operationId: getAutomationWorkflow
+      summary: Get automation-workflow by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AutomationWorkflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    put:
+      operationId: updateAutomationWorkflow
+      summary: Update automation-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAutomationWorkflowRequest'
+      responses:
+        '200':
+          description: AutomationWorkflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationWorkflow'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    delete:
+      operationId: deleteAutomationWorkflow
+      summary: Delete automation-workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AutomationWorkflow deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      summary: List campaigns
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    post:
+      operationId: createCampaign
+      summary: Create campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '201':
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          description: Invalid request
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /campaigns/{id}:
+    get:
+      operationId: getCampaign
+      summary: Get campaign by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    put:
+      operationId: updateCampaign
+      summary: Update campaign
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Campaign updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    delete:
+      operationId: deleteCampaign
+      summary: Delete campaign
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Campaign deleted
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /email-templates:
+    get:
+      operationId: listEmailTemplates
+      summary: List email-templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of email-templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailTemplate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    post:
+      operationId: createEmailTemplate
+      summary: Create email-template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmailTemplateRequest'
+      responses:
+        '201':
+          description: EmailTemplate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '400':
+          description: Invalid request
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /email-templates/{id}:
+    get:
+      operationId: getEmailTemplate
+      summary: Get email-template by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EmailTemplate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    put:
+      operationId: updateEmailTemplate
+      summary: Update email-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmailTemplateRequest'
+      responses:
+        '200':
+          description: EmailTemplate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    delete:
+      operationId: deleteEmailTemplate
+      summary: Delete email-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EmailTemplate deleted
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /engagements:
+    get:
+      operationId: listEngagements
+      summary: List engagements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of engagements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Engagement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    post:
+      operationId: createEngagement
+      summary: Create engagement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEngagementRequest'
+      responses:
+        '201':
+          description: Engagement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '400':
+          description: Invalid request
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /engagements/{id}:
+    get:
+      operationId: getEngagement
+      summary: Get engagement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Engagement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    put:
+      operationId: updateEngagement
+      summary: Update engagement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEngagementRequest'
+      responses:
+        '200':
+          description: Engagement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    delete:
+      operationId: deleteEngagement
+      summary: Delete engagement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Engagement deleted
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /mailing-lists:
+    get:
+      operationId: listMailingLists
+      summary: List mailing-lists
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of mailing-lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MailingList'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    post:
+      operationId: createMailingList
+      summary: Create mailing-list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMailingListRequest'
+      responses:
+        '201':
+          description: MailingList created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '400':
+          description: Invalid request
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /mailing-lists/{id}:
+    get:
+      operationId: getMailingList
+      summary: Get mailing-list by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: MailingList details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    put:
+      operationId: updateMailingList
+      summary: Update mailing-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailingListRequest'
+      responses:
+        '200':
+          description: MailingList updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+    delete:
+      operationId: deleteMailingList
+      summary: Delete mailing-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: MailingList deleted
+        '404':
+          description: Not found
+      x-service: email
+      x-service-base-path: /api/v1/marketing/email
+  /social-accounts:
+    get:
+      operationId: listSocialAccounts
+      summary: List social-accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of social-accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialAccount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    post:
+      operationId: createSocialAccount
+      summary: Create social-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialAccountRequest'
+      responses:
+        '201':
+          description: SocialAccount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '400':
+          description: Invalid request
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /social-accounts/{id}:
+    get:
+      operationId: getSocialAccount
+      summary: Get social-account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SocialAccount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    put:
+      operationId: updateSocialAccount
+      summary: Update social-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialAccountRequest'
+      responses:
+        '200':
+          description: SocialAccount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    delete:
+      operationId: deleteSocialAccount
+      summary: Delete social-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SocialAccount deleted
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /social-posts:
+    get:
+      operationId: listSocialPosts
+      summary: List social-posts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of social-posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialPost'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    post:
+      operationId: createSocialPost
+      summary: Create social-post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialPostRequest'
+      responses:
+        '201':
+          description: SocialPost created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          description: Invalid request
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /social-posts/{id}:
+    get:
+      operationId: getSocialPost
+      summary: Get social-post by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SocialPost details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    put:
+      operationId: updateSocialPost
+      summary: Update social-post
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialPostRequest'
+      responses:
+        '200':
+          description: SocialPost updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+    delete:
+      operationId: deleteSocialPost
+      summary: Delete social-post
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SocialPost deleted
+        '404':
+          description: Not found
+      x-service: social-media
+      x-service-base-path: /api/v1/marketing/social-media
+  /triggers:
+    get:
+      operationId: listTriggers
+      summary: List triggers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of triggers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trigger'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    post:
+      operationId: createTrigger
+      summary: Create trigger
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTriggerRequest'
+      responses:
+        '201':
+          description: Trigger created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Invalid request
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+  /triggers/{id}:
+    get:
+      operationId: getTrigger
+      summary: Get trigger by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Trigger details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    put:
+      operationId: updateTrigger
+      summary: Update trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTriggerRequest'
+      responses:
+        '200':
+          description: Trigger updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+    delete:
+      operationId: deleteTrigger
+      summary: Delete trigger
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Trigger deleted
+        '404':
+          description: Not found
+      x-service: automation
+      x-service-base-path: /api/v1/marketing/automation
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

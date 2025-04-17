@@ -1,0 +1,937 @@
+openapi: 3.1.0
+info:
+  title: Auth API Gateway
+  description: 'Secure authentication and role-based access control for all RERP services.. This aggregates and proxies requests
+    to Auth microservices. This is the single entry point for the Auth system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/auth/idam/*` → Idam Service
+
+    - `/api/v1/auth/rbac/*` → Rbac Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/auth/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/auth
+  description: Auth API Gateway
+tags: []
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      summary: Authenticate user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Logout user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /auth/password/reset:
+    post:
+      operationId: requestPasswordReset
+      summary: Request password reset
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /auth/password/reset/confirm:
+    post:
+      operationId: confirmPasswordReset
+      summary: Confirm password reset
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      summary: Refresh access token
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /auth/register:
+    post:
+      operationId: register
+      summary: Register new user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /check:
+    post:
+      operationId: checkPermission
+      summary: Check if user has permission
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /mfa/enable:
+    post:
+      operationId: enableMfa
+      summary: Enable MFA for user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /mfa/verify:
+    post:
+      operationId: verifyMfa
+      summary: Verify MFA code
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /permissions:
+    get:
+      operationId: listPermissions
+      summary: List permissions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Permission'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    post:
+      operationId: createPermission
+      summary: Create permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePermissionRequest'
+      responses:
+        '201':
+          description: Permission created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '400':
+          description: Invalid request
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /permissions/{id}:
+    get:
+      operationId: getPermission
+      summary: Get permission by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Permission details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    put:
+      operationId: updatePermission
+      summary: Update permission
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePermissionRequest'
+      responses:
+        '200':
+          description: Permission updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    delete:
+      operationId: deletePermission
+      summary: Delete permission
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Permission deleted
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /roles:
+    get:
+      operationId: listRoles
+      summary: List roles
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Role'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    post:
+      operationId: createRole
+      summary: Create role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleRequest'
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          description: Invalid request
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /roles/{id}:
+    get:
+      operationId: getRole
+      summary: Get role by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Role details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    put:
+      operationId: updateRole
+      summary: Update role
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleRequest'
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    delete:
+      operationId: deleteRole
+      summary: Delete role
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Role deleted
+        '404':
+          description: Not found
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /roles/{roleId}/permissions:
+    get:
+      operationId: getRolePermissions
+      summary: Get permissions for role
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    post:
+      operationId: assignPermission
+      summary: Assign permission to role
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /roles/{roleId}/permissions/{permissionId}:
+    delete:
+      operationId: revokePermission
+      summary: Revoke permission from role
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: permissionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /sessions:
+    get:
+      operationId: listSessions
+      summary: List sessions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Session'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    post:
+      operationId: createSession
+      summary: Create session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: Invalid request
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /sessions/{id}:
+    get:
+      operationId: getSession
+      summary: Get session by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    put:
+      operationId: updateSession
+      summary: Update session
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSessionRequest'
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    delete:
+      operationId: deleteSession
+      summary: Delete session
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Session deleted
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /users:
+    get:
+      operationId: listUsers
+      summary: List users
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    post:
+      operationId: createUser
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /users/{id}:
+    get:
+      operationId: getUser
+      summary: Get user by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    put:
+      operationId: updateUser
+      summary: Update user
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+    delete:
+      operationId: deleteUser
+      summary: Delete user
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: Not found
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /users/{userId}/roles:
+    get:
+      operationId: getUserRoles
+      summary: Get roles for user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+    post:
+      operationId: assignRole
+      summary: Assign role to user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /users/{userId}/roles/{roleId}:
+    delete:
+      operationId: revokeRole
+      summary: Revoke role from user
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: rbac
+      x-service-base-path: /api/v1/auth/rbac
+  /users/{userId}/verify/email:
+    post:
+      operationId: verifyEmail
+      summary: Verify email address
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+  /users/{userId}/verify/phone:
+    post:
+      operationId: verifyPhone
+      summary: Verify phone number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: idam
+      x-service-base-path: /api/v1/auth/idam
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Budgeting
+  version: 1.0.0
+  description: Budgeting service for budget creation and budget vs actual analysis.
+servers:
+- url: /api/v1/accounting/budget
+  description: Budgeting API
+tags: []
+paths:
+  /budgets:
+    get:
+      operationId: listBudgets
+      summary: List budgets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Budget'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBudget
+      summary: Create budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetRequest'
+      responses:
+        '201':
+          description: Budget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '400':
+          description: Invalid request
+  /budgets/{id}:
+    get:
+      operationId: getBudget
+      summary: Get budget by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBudget
+      summary: Update budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetRequest'
+      responses:
+        '200':
+          description: Budget updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBudget
+      summary: Delete budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Budget deleted
+        '404':
+          description: Not found
+  /budget-lines:
+    get:
+      operationId: listBudgetLines
+      summary: List budget-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budget-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BudgetLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBudgetLine
+      summary: Create budget-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetLineRequest'
+      responses:
+        '201':
+          description: BudgetLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          description: Invalid request
+  /budget-lines/{id}:
+    get:
+      operationId: getBudgetLine
+      summary: Get budget-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BudgetLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBudgetLine
+      summary: Update budget-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetLineRequest'
+      responses:
+        '200':
+          description: BudgetLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBudgetLine
+      summary: Delete budget-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BudgetLine deleted
+        '404':
+          description: Not found
+  /budget-variances:
+    get:
+      operationId: listBudgetVariances
+      summary: List budget-variances
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budget-variances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BudgetVariance'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBudgetVariance
+      summary: Create budget-variance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetVarianceRequest'
+      responses:
+        '201':
+          description: BudgetVariance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '400':
+          description: Invalid request
+  /budget-variances/{id}:
+    get:
+      operationId: getBudgetVariance
+      summary: Get budget-variance by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BudgetVariance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBudgetVariance
+      summary: Update budget-variance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetVarianceRequest'
+      responses:
+        '200':
+          description: BudgetVariance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBudgetVariance
+      summary: Delete budget-variance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BudgetVariance deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

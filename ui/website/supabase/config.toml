@@ -1,0 +1,21 @@
+# Supabase CLI configuration
+# This file is used by Supabase CLI for local development and migrations
+
+[project]
+# Project reference ID (from Supabase dashboard)
+# For production, this should be set via environment variable or CLI
+# ref = "your-project-ref"
+
+[auth]
+# Auth configuration
+enabled = true
+
+[db]
+# Database configuration
+major_version = 15
+
+[studio]
+# Studio configuration
+enabled = true
+port = 54323
+

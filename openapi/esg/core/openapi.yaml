@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: ESG
+  version: 1.0.0
+  description: ESG service tracking sustainability metrics and ESG reporting.
+servers:
+- url: /api/v1/esg/core
+  description: ESG API
+tags: []
+paths:
+  /esg-metrics:
+    get:
+      operationId: listEsgMetrics
+      summary: List esg-metrics
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of esg-metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EsgMetric'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createEsgMetric
+      summary: Create esg-metric
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEsgMetricRequest'
+      responses:
+        '201':
+          description: EsgMetric created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '400':
+          description: Invalid request
+  /esg-metrics/{id}:
+    get:
+      operationId: getEsgMetric
+      summary: Get esg-metric by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EsgMetric details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '404':
+          description: Not found
+    put:
+      operationId: updateEsgMetric
+      summary: Update esg-metric
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEsgMetricRequest'
+      responses:
+        '200':
+          description: EsgMetric updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteEsgMetric
+      summary: Delete esg-metric
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EsgMetric deleted
+        '404':
+          description: Not found
+  /sustainability-reports:
+    get:
+      operationId: listSustainabilityReports
+      summary: List sustainability-reports
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of sustainability-reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SustainabilityReport'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSustainabilityReport
+      summary: Create sustainability-report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSustainabilityReportRequest'
+      responses:
+        '201':
+          description: SustainabilityReport created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '400':
+          description: Invalid request
+  /sustainability-reports/{id}:
+    get:
+      operationId: getSustainabilityReport
+      summary: Get sustainability-report by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SustainabilityReport details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSustainabilityReport
+      summary: Update sustainability-report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSustainabilityReportRequest'
+      responses:
+        '200':
+          description: SustainabilityReport updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSustainabilityReport
+      summary: Delete sustainability-report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SustainabilityReport deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

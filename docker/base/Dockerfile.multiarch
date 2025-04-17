@@ -1,0 +1,33 @@
+# Multi-architecture base runtime image for RERP microservices
+# This Dockerfile uses buildx to support multiple architectures
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
+FROM --platform=${TARGETPLATFORM} alpine:3.19
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    libgcc \
+    tzdata
+
+# Create app directory with proper permissions for live updates
+WORKDIR /app
+
+# Create standard directories
+RUN mkdir -p /app/config /app/doc /app/static_site && \
+    chmod -R 777 /app
+
+# Set timezone to UTC
+ENV TZ=UTC
+
+# Default environment variables
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=info
+
+# Labels for identification
+LABEL org.opencontainers.image.title="RERP Base Runtime"
+LABEL org.opencontainers.image.description="Base runtime image for RERP microservices (multi-arch)"
+LABEL org.opencontainers.image.vendor="Microscaler"
+LABEL org.opencontainers.image.architecture="${TARGETPLATFORM}"

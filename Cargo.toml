@@ -1,0 +1,10 @@
+[workspace]
+members = ["components"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+# This workspace references the components workspace
+# All actual crate members are defined in components/Cargo.toml

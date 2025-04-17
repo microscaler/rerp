@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Integration Hub
+  version: 1.0.0
+  description: Integration hub service providing pre-built connectors.
+servers:
+- url: /api/v1/marketplace/integration-hub
+  description: Integration Hub API
+tags: []
+paths:
+  /connectors:
+    get:
+      operationId: listConnectors
+      summary: List connectors
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of connectors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Connector'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createConnector
+      summary: Create connector
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConnectorRequest'
+      responses:
+        '201':
+          description: Connector created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '400':
+          description: Invalid request
+  /connectors/{id}:
+    get:
+      operationId: getConnector
+      summary: Get connector by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Connector details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '404':
+          description: Not found
+    put:
+      operationId: updateConnector
+      summary: Update connector
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConnectorRequest'
+      responses:
+        '200':
+          description: Connector updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connector'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteConnector
+      summary: Delete connector
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Connector deleted
+        '404':
+          description: Not found
+  /integration-templates:
+    get:
+      operationId: listIntegrationTemplates
+      summary: List integration-templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of integration-templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IntegrationTemplate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createIntegrationTemplate
+      summary: Create integration-template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIntegrationTemplateRequest'
+      responses:
+        '201':
+          description: IntegrationTemplate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '400':
+          description: Invalid request
+  /integration-templates/{id}:
+    get:
+      operationId: getIntegrationTemplate
+      summary: Get integration-template by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: IntegrationTemplate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '404':
+          description: Not found
+    put:
+      operationId: updateIntegrationTemplate
+      summary: Update integration-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIntegrationTemplateRequest'
+      responses:
+        '200':
+          description: IntegrationTemplate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationTemplate'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteIntegrationTemplate
+      summary: Delete integration-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: IntegrationTemplate deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

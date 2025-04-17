@@ -1,0 +1,2359 @@
+openapi: 3.1.0
+info:
+  title: Hr API Gateway
+  description: 'Complete HR management from employee records to payroll, recruitment, and performance management.. This aggregates
+    and proxies requests to Hr microservices. This is the single entry point for the Hr system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/hr/appraisal/*` → Appraisal Service
+
+    - `/api/v1/hr/attendance/*` → Attendance Service
+
+    - `/api/v1/hr/core/*` → Core Service
+
+    - `/api/v1/hr/leave/*` → Leave Service
+
+    - `/api/v1/hr/payroll/*` → Payroll Service
+
+    - `/api/v1/hr/recruitment/*` → Recruitment Service
+
+    - `/api/v1/hr/skills/*` → Skills Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/hr/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/hr
+  description: Hr API Gateway
+tags: []
+paths:
+  /applicants:
+    get:
+      operationId: listApplicants
+      summary: List applicants
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of applicants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Applicant'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    post:
+      operationId: createApplicant
+      summary: Create applicant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplicantRequest'
+      responses:
+        '201':
+          description: Applicant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applicant'
+        '400':
+          description: Invalid request
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /applicants/{id}:
+    get:
+      operationId: getApplicant
+      summary: Get applicant by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Applicant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applicant'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    put:
+      operationId: updateApplicant
+      summary: Update applicant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApplicantRequest'
+      responses:
+        '200':
+          description: Applicant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Applicant'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    delete:
+      operationId: deleteApplicant
+      summary: Delete applicant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Applicant deleted
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /appraisals:
+    get:
+      operationId: listAppraisals
+      summary: List appraisals
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of appraisals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Appraisal'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    post:
+      operationId: createAppraisal
+      summary: Create appraisal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppraisalRequest'
+      responses:
+        '201':
+          description: Appraisal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+        '400':
+          description: Invalid request
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /appraisals/{id}:
+    get:
+      operationId: getAppraisal
+      summary: Get appraisal by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Appraisal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    put:
+      operationId: updateAppraisal
+      summary: Update appraisal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppraisalRequest'
+      responses:
+        '200':
+          description: Appraisal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appraisal'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    delete:
+      operationId: deleteAppraisal
+      summary: Delete appraisal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Appraisal deleted
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /attendances:
+    get:
+      operationId: listAttendances
+      summary: List attendances
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of attendances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attendance'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    post:
+      operationId: createAttendance
+      summary: Create attendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttendanceRequest'
+      responses:
+        '201':
+          description: Attendance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+        '400':
+          description: Invalid request
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+  /attendances/{id}:
+    get:
+      operationId: getAttendance
+      summary: Get attendance by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Attendance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    put:
+      operationId: updateAttendance
+      summary: Update attendance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAttendanceRequest'
+      responses:
+        '200':
+          description: Attendance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    delete:
+      operationId: deleteAttendance
+      summary: Delete attendance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Attendance deleted
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+  /deductions:
+    get:
+      operationId: listDeductions
+      summary: List deductions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of deductions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deduction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    post:
+      operationId: createDeduction
+      summary: Create deduction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeductionRequest'
+      responses:
+        '201':
+          description: Deduction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '400':
+          description: Invalid request
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /deductions/{id}:
+    get:
+      operationId: getDeduction
+      summary: Get deduction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Deduction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    put:
+      operationId: updateDeduction
+      summary: Update deduction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeductionRequest'
+      responses:
+        '200':
+          description: Deduction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deduction'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    delete:
+      operationId: deleteDeduction
+      summary: Delete deduction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Deduction deleted
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /departments:
+    get:
+      operationId: listDepartments
+      summary: List departments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Department'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    post:
+      operationId: createDepartment
+      summary: Create department
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepartmentRequest'
+      responses:
+        '201':
+          description: Department created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /departments/{id}:
+    get:
+      operationId: getDepartment
+      summary: Get department by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Department details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    put:
+      operationId: updateDepartment
+      summary: Update department
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepartmentRequest'
+      responses:
+        '200':
+          description: Department updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    delete:
+      operationId: deleteDepartment
+      summary: Delete department
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Department deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /employees:
+    get:
+      operationId: listEmployees
+      summary: List employees
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Employee'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    post:
+      operationId: createEmployee
+      summary: Create employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+      responses:
+        '201':
+          description: Employee created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /employees/{id}:
+    get:
+      operationId: getEmployee
+      summary: Get employee by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    put:
+      operationId: updateEmployee
+      summary: Update employee
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmployeeRequest'
+      responses:
+        '200':
+          description: Employee updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    delete:
+      operationId: deleteEmployee
+      summary: Delete employee
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Employee deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /goals:
+    get:
+      operationId: listGoals
+      summary: List goals
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Goal'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    post:
+      operationId: createGoal
+      summary: Create goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGoalRequest'
+      responses:
+        '201':
+          description: Goal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid request
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /goals/{id}:
+    get:
+      operationId: getGoal
+      summary: Get goal by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Goal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    put:
+      operationId: updateGoal
+      summary: Update goal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGoalRequest'
+      responses:
+        '200':
+          description: Goal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    delete:
+      operationId: deleteGoal
+      summary: Delete goal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Goal deleted
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /holiday-calendars:
+    get:
+      operationId: listHolidayCalendars
+      summary: List holiday-calendars
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of holiday-calendars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HolidayCalendar'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    post:
+      operationId: createHolidayCalendar
+      summary: Create holiday-calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHolidayCalendarRequest'
+      responses:
+        '201':
+          description: HolidayCalendar created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '400':
+          description: Invalid request
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /holiday-calendars/{id}:
+    get:
+      operationId: getHolidayCalendar
+      summary: Get holiday-calendar by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: HolidayCalendar details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    put:
+      operationId: updateHolidayCalendar
+      summary: Update holiday-calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHolidayCalendarRequest'
+      responses:
+        '200':
+          description: HolidayCalendar updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendar'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    delete:
+      operationId: deleteHolidayCalendar
+      summary: Delete holiday-calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: HolidayCalendar deleted
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /interviews:
+    get:
+      operationId: listInterviews
+      summary: List interviews
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of interviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Interview'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    post:
+      operationId: createInterview
+      summary: Create interview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInterviewRequest'
+      responses:
+        '201':
+          description: Interview created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interview'
+        '400':
+          description: Invalid request
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /interviews/{id}:
+    get:
+      operationId: getInterview
+      summary: Get interview by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Interview details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interview'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    put:
+      operationId: updateInterview
+      summary: Update interview
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInterviewRequest'
+      responses:
+        '200':
+          description: Interview updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Interview'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    delete:
+      operationId: deleteInterview
+      summary: Delete interview
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Interview deleted
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /job-postings:
+    get:
+      operationId: listJobPostings
+      summary: List job-postings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of job-postings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JobPosting'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    post:
+      operationId: createJobPosting
+      summary: Create job-posting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobPostingRequest'
+      responses:
+        '201':
+          description: JobPosting created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          description: Invalid request
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /job-postings/{id}:
+    get:
+      operationId: getJobPosting
+      summary: Get job-posting by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: JobPosting details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    put:
+      operationId: updateJobPosting
+      summary: Update job-posting
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobPostingRequest'
+      responses:
+        '200':
+          description: JobPosting updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+    delete:
+      operationId: deleteJobPosting
+      summary: Delete job-posting
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: JobPosting deleted
+        '404':
+          description: Not found
+      x-service: recruitment
+      x-service-base-path: /api/v1/hr/recruitment
+  /leave-balances:
+    get:
+      operationId: listLeaveBalances
+      summary: List leave-balances
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of leave-balances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaveBalance'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    post:
+      operationId: createLeaveBalance
+      summary: Create leave-balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveBalanceRequest'
+      responses:
+        '201':
+          description: LeaveBalance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '400':
+          description: Invalid request
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /leave-balances/{id}:
+    get:
+      operationId: getLeaveBalance
+      summary: Get leave-balance by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LeaveBalance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    put:
+      operationId: updateLeaveBalance
+      summary: Update leave-balance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeaveBalanceRequest'
+      responses:
+        '200':
+          description: LeaveBalance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalance'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    delete:
+      operationId: deleteLeaveBalance
+      summary: Delete leave-balance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LeaveBalance deleted
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /leave-requests:
+    get:
+      operationId: listLeaveRequests
+      summary: List leave-requests
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of leave-requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LeaveRequest'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    post:
+      operationId: createLeaveRequest
+      summary: Create leave-request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaveRequestRequest'
+      responses:
+        '201':
+          description: LeaveRequest created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '400':
+          description: Invalid request
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /leave-requests/{id}:
+    get:
+      operationId: getLeaveRequest
+      summary: Get leave-request by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LeaveRequest details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    put:
+      operationId: updateLeaveRequest
+      summary: Update leave-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLeaveRequestRequest'
+      responses:
+        '200':
+          description: LeaveRequest updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+    delete:
+      operationId: deleteLeaveRequest
+      summary: Delete leave-request
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LeaveRequest deleted
+        '404':
+          description: Not found
+      x-service: leave
+      x-service-base-path: /api/v1/hr/leave
+  /payslips:
+    get:
+      operationId: listPayslips
+      summary: List payslips
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payslips
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payslip'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    post:
+      operationId: createPayslip
+      summary: Create payslip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePayslipRequest'
+      responses:
+        '201':
+          description: Payslip created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '400':
+          description: Invalid request
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /payslips/{id}:
+    get:
+      operationId: getPayslip
+      summary: Get payslip by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payslip details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    put:
+      operationId: updatePayslip
+      summary: Update payslip
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePayslipRequest'
+      responses:
+        '200':
+          description: Payslip updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payslip'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    delete:
+      operationId: deletePayslip
+      summary: Delete payslip
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payslip deleted
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /positions:
+    get:
+      operationId: listPositions
+      summary: List positions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of positions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Position'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    post:
+      operationId: createPosition
+      summary: Create position
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePositionRequest'
+      responses:
+        '201':
+          description: Position created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Position'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /positions/{id}:
+    get:
+      operationId: getPosition
+      summary: Get position by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Position details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Position'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    put:
+      operationId: updatePosition
+      summary: Update position
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePositionRequest'
+      responses:
+        '200':
+          description: Position updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Position'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+    delete:
+      operationId: deletePosition
+      summary: Delete position
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Position deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/hr/core
+  /reviews:
+    get:
+      operationId: listReviews
+      summary: List reviews
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    post:
+      operationId: createReview
+      summary: Create review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Invalid request
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /reviews/{id}:
+    get:
+      operationId: getReview
+      summary: Get review by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Review details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    put:
+      operationId: updateReview
+      summary: Update review
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReviewRequest'
+      responses:
+        '200':
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+    delete:
+      operationId: deleteReview
+      summary: Delete review
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Review deleted
+        '404':
+          description: Not found
+      x-service: appraisal
+      x-service-base-path: /api/v1/hr/appraisal
+  /salary-rules:
+    get:
+      operationId: listSalaryRules
+      summary: List salary-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of salary-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SalaryRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    post:
+      operationId: createSalaryRule
+      summary: Create salary-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSalaryRuleRequest'
+      responses:
+        '201':
+          description: SalaryRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '400':
+          description: Invalid request
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /salary-rules/{id}:
+    get:
+      operationId: getSalaryRule
+      summary: Get salary-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SalaryRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    put:
+      operationId: updateSalaryRule
+      summary: Update salary-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSalaryRuleRequest'
+      responses:
+        '200':
+          description: SalaryRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalaryRule'
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+    delete:
+      operationId: deleteSalaryRule
+      summary: Delete salary-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SalaryRule deleted
+        '404':
+          description: Not found
+      x-service: payroll
+      x-service-base-path: /api/v1/hr/payroll
+  /skill-assessments:
+    get:
+      operationId: listSkillAssessments
+      summary: List skill-assessments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of skill-assessments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SkillAssessment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    post:
+      operationId: createSkillAssessment
+      summary: Create skill-assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillAssessmentRequest'
+      responses:
+        '201':
+          description: SkillAssessment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillAssessment'
+        '400':
+          description: Invalid request
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /skill-assessments/{id}:
+    get:
+      operationId: getSkillAssessment
+      summary: Get skill-assessment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SkillAssessment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillAssessment'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    put:
+      operationId: updateSkillAssessment
+      summary: Update skill-assessment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkillAssessmentRequest'
+      responses:
+        '200':
+          description: SkillAssessment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillAssessment'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    delete:
+      operationId: deleteSkillAssessment
+      summary: Delete skill-assessment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SkillAssessment deleted
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /skill-requirements:
+    get:
+      operationId: listSkillRequirements
+      summary: List skill-requirements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of skill-requirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SkillRequirement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    post:
+      operationId: createSkillRequirement
+      summary: Create skill-requirement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillRequirementRequest'
+      responses:
+        '201':
+          description: SkillRequirement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillRequirement'
+        '400':
+          description: Invalid request
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /skill-requirements/{id}:
+    get:
+      operationId: getSkillRequirement
+      summary: Get skill-requirement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SkillRequirement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillRequirement'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    put:
+      operationId: updateSkillRequirement
+      summary: Update skill-requirement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkillRequirementRequest'
+      responses:
+        '200':
+          description: SkillRequirement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillRequirement'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    delete:
+      operationId: deleteSkillRequirement
+      summary: Delete skill-requirement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SkillRequirement deleted
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /skills:
+    get:
+      operationId: listSkills
+      summary: List skills
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of skills
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Skill'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    post:
+      operationId: createSkill
+      summary: Create skill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillRequest'
+      responses:
+        '201':
+          description: Skill created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '400':
+          description: Invalid request
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /skills/{id}:
+    get:
+      operationId: getSkill
+      summary: Get skill by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Skill details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    put:
+      operationId: updateSkill
+      summary: Update skill
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkillRequest'
+      responses:
+        '200':
+          description: Skill updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+    delete:
+      operationId: deleteSkill
+      summary: Delete skill
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Skill deleted
+        '404':
+          description: Not found
+      x-service: skills
+      x-service-base-path: /api/v1/hr/skills
+  /timesheets:
+    get:
+      operationId: listTimesheets
+      summary: List timesheets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Timesheet'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    post:
+      operationId: createTimesheet
+      summary: Create timesheet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTimesheetRequest'
+      responses:
+        '201':
+          description: Timesheet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          description: Invalid request
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+  /timesheets/{id}:
+    get:
+      operationId: getTimesheet
+      summary: Get timesheet by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Timesheet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    put:
+      operationId: updateTimesheet
+      summary: Update timesheet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTimesheetRequest'
+      responses:
+        '200':
+          description: Timesheet updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+    delete:
+      operationId: deleteTimesheet
+      summary: Delete timesheet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Timesheet deleted
+        '404':
+          description: Not found
+      x-service: attendance
+      x-service-base-path: /api/v1/hr/attendance
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

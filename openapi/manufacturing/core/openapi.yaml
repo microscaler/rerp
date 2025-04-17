@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Manufacturing Core
+  version: 1.0.0
+  description: Core manufacturing service orchestrating production orders and BOM management.
+servers:
+- url: /api/v1/manufacturing/core
+  description: Manufacturing Core API
+tags: []
+paths:
+  /production-orders:
+    get:
+      operationId: listProductionOrders
+      summary: List production-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of production-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductionOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createProductionOrder
+      summary: Create production-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductionOrderRequest'
+      responses:
+        '201':
+          description: ProductionOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '400':
+          description: Invalid request
+  /production-orders/{id}:
+    get:
+      operationId: getProductionOrder
+      summary: Get production-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ProductionOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateProductionOrder
+      summary: Update production-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductionOrderRequest'
+      responses:
+        '200':
+          description: ProductionOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteProductionOrder
+      summary: Delete production-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ProductionOrder deleted
+        '404':
+          description: Not found
+  /work-orders:
+    get:
+      operationId: listWorkOrders
+      summary: List work-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of work-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createWorkOrder
+      summary: Create work-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkOrderRequest'
+      responses:
+        '201':
+          description: WorkOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '400':
+          description: Invalid request
+  /work-orders/{id}:
+    get:
+      operationId: getWorkOrder
+      summary: Get work-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: WorkOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateWorkOrder
+      summary: Update work-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkOrderRequest'
+      responses:
+        '200':
+          description: WorkOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteWorkOrder
+      summary: Delete work-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: WorkOrder deleted
+        '404':
+          description: Not found
+  /boms:
+    get:
+      operationId: listBoms
+      summary: List boms
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of boms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bom'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBom
+      summary: Create bom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomRequest'
+      responses:
+        '201':
+          description: Bom created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '400':
+          description: Invalid request
+  /boms/{id}:
+    get:
+      operationId: getBom
+      summary: Get bom by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Bom details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBom
+      summary: Update bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomRequest'
+      responses:
+        '200':
+          description: Bom updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBom
+      summary: Delete bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Bom deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

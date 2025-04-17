@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Accounts Payable
+  version: 1.0.0
+  description: Accounts payable service managing vendor invoices and payments.
+servers:
+- url: /api/v1/accounting/accounts-payable
+  description: Accounts Payable API
+tags: []
+paths:
+  /vendor-invoices:
+    get:
+      operationId: listVendorInvoices
+      summary: List vendor-invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of vendor-invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VendorInvoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createVendorInvoice
+      summary: Create vendor-invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorInvoiceRequest'
+      responses:
+        '201':
+          description: VendorInvoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '400':
+          description: Invalid request
+  /vendor-invoices/{id}:
+    get:
+      operationId: getVendorInvoice
+      summary: Get vendor-invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: VendorInvoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '404':
+          description: Not found
+    put:
+      operationId: updateVendorInvoice
+      summary: Update vendor-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorInvoiceRequest'
+      responses:
+        '200':
+          description: VendorInvoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteVendorInvoice
+      summary: Delete vendor-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: VendorInvoice deleted
+        '404':
+          description: Not found
+  /payments:
+    get:
+      operationId: listPayments
+      summary: List payments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPayment
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid request
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Get payment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePayment
+      summary: Update payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+      responses:
+        '200':
+          description: Payment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePayment
+      summary: Delete payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payment deleted
+        '404':
+          description: Not found
+  /ap-agings:
+    get:
+      operationId: listApAgings
+      summary: List ap-agings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ap-agings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApAging'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createApAging
+      summary: Create ap-aging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApAgingRequest'
+      responses:
+        '201':
+          description: ApAging created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '400':
+          description: Invalid request
+  /ap-agings/{id}:
+    get:
+      operationId: getApAging
+      summary: Get ap-aging by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ApAging details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '404':
+          description: Not found
+    put:
+      operationId: updateApAging
+      summary: Update ap-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApAgingRequest'
+      responses:
+        '200':
+          description: ApAging updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteApAging
+      summary: Delete ap-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ApAging deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

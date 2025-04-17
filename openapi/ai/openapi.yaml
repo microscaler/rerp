@@ -1,0 +1,753 @@
+openapi: 3.1.0
+info:
+  title: Ai API Gateway
+  description: 'AI capabilities and document processing.. This aggregates and proxies requests to Ai microservices. This is
+    the single entry point for the Ai system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/ai/core/*` → Core Service
+
+    - `/api/v1/ai/document/*` → Document Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/ai/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/ai
+  description: Ai API Gateway
+tags: []
+paths:
+  /ai-models:
+    get:
+      operationId: listAiModels
+      summary: List ai-models
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ai-models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AiModel'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    post:
+      operationId: createAiModel
+      summary: Create ai-model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAiModelRequest'
+      responses:
+        '201':
+          description: AiModel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+  /ai-models/{id}:
+    get:
+      operationId: getAiModel
+      summary: Get ai-model by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AiModel details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    put:
+      operationId: updateAiModel
+      summary: Update ai-model
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAiModelRequest'
+      responses:
+        '200':
+          description: AiModel updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiModel'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    delete:
+      operationId: deleteAiModel
+      summary: Delete ai-model
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AiModel deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+  /classifications:
+    get:
+      operationId: listClassifications
+      summary: List classifications
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of classifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Classification'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    post:
+      operationId: createClassification
+      summary: Create classification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClassificationRequest'
+      responses:
+        '201':
+          description: Classification created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '400':
+          description: Invalid request
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /classifications/{id}:
+    get:
+      operationId: getClassification
+      summary: Get classification by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Classification details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    put:
+      operationId: updateClassification
+      summary: Update classification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClassificationRequest'
+      responses:
+        '200':
+          description: Classification updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classification'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    delete:
+      operationId: deleteClassification
+      summary: Delete classification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Classification deleted
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /documents:
+    get:
+      operationId: listDocuments
+      summary: List documents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    post:
+      operationId: createDocument
+      summary: Create document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentRequest'
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Invalid request
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      summary: Get document by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Document details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    put:
+      operationId: updateDocument
+      summary: Update document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentRequest'
+      responses:
+        '200':
+          description: Document updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    delete:
+      operationId: deleteDocument
+      summary: Delete document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Document deleted
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /extractions:
+    get:
+      operationId: listExtractions
+      summary: List extractions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of extractions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Extraction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    post:
+      operationId: createExtraction
+      summary: Create extraction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExtractionRequest'
+      responses:
+        '201':
+          description: Extraction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '400':
+          description: Invalid request
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /extractions/{id}:
+    get:
+      operationId: getExtraction
+      summary: Get extraction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extraction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    put:
+      operationId: updateExtraction
+      summary: Update extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExtractionRequest'
+      responses:
+        '200':
+          description: Extraction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extraction'
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+    delete:
+      operationId: deleteExtraction
+      summary: Delete extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Extraction deleted
+        '404':
+          description: Not found
+      x-service: document
+      x-service-base-path: /api/v1/ai/document
+  /insights:
+    get:
+      operationId: listInsights
+      summary: List insights
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of insights
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Insight'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    post:
+      operationId: createInsight
+      summary: Create insight
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInsightRequest'
+      responses:
+        '201':
+          description: Insight created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+  /insights/{id}:
+    get:
+      operationId: getInsight
+      summary: Get insight by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Insight details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    put:
+      operationId: updateInsight
+      summary: Update insight
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInsightRequest'
+      responses:
+        '200':
+          description: Insight updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Insight'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    delete:
+      operationId: deleteInsight
+      summary: Delete insight
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Insight deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+  /predictions:
+    get:
+      operationId: listPredictions
+      summary: List predictions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of predictions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Prediction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    post:
+      operationId: createPrediction
+      summary: Create prediction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePredictionRequest'
+      responses:
+        '201':
+          description: Prediction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+  /predictions/{id}:
+    get:
+      operationId: getPrediction
+      summary: Get prediction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prediction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    put:
+      operationId: updatePrediction
+      summary: Update prediction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePredictionRequest'
+      responses:
+        '200':
+          description: Prediction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prediction'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+    delete:
+      operationId: deletePrediction
+      summary: Delete prediction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Prediction deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/ai/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

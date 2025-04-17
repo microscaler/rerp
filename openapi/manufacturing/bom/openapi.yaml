@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Bill of Materials
+  version: 1.0.0
+  description: Bill of Materials service managing product structures and multi-level BOMs.
+servers:
+- url: /api/v1/manufacturing/bom
+  description: Bill of Materials API
+tags: []
+paths:
+  /boms:
+    get:
+      operationId: listBoms
+      summary: List boms
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of boms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bom'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBom
+      summary: Create bom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomRequest'
+      responses:
+        '201':
+          description: Bom created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '400':
+          description: Invalid request
+  /boms/{id}:
+    get:
+      operationId: getBom
+      summary: Get bom by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Bom details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBom
+      summary: Update bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomRequest'
+      responses:
+        '200':
+          description: Bom updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bom'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBom
+      summary: Delete bom
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Bom deleted
+        '404':
+          description: Not found
+  /bom-lines:
+    get:
+      operationId: listBomLines
+      summary: List bom-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bom-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BomLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBomLine
+      summary: Create bom-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomLineRequest'
+      responses:
+        '201':
+          description: BomLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '400':
+          description: Invalid request
+  /bom-lines/{id}:
+    get:
+      operationId: getBomLine
+      summary: Get bom-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BomLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBomLine
+      summary: Update bom-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomLineRequest'
+      responses:
+        '200':
+          description: BomLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBomLine
+      summary: Delete bom-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BomLine deleted
+        '404':
+          description: Not found
+  /bom-versions:
+    get:
+      operationId: listBomVersions
+      summary: List bom-versions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bom-versions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BomVersion'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBomVersion
+      summary: Create bom-version
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBomVersionRequest'
+      responses:
+        '201':
+          description: BomVersion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '400':
+          description: Invalid request
+  /bom-versions/{id}:
+    get:
+      operationId: getBomVersion
+      summary: Get bom-version by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BomVersion details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBomVersion
+      summary: Update bom-version
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBomVersionRequest'
+      responses:
+        '200':
+          description: BomVersion updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BomVersion'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBomVersion
+      summary: Delete bom-version
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BomVersion deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

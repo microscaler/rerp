@@ -1,0 +1,639 @@
+openapi: 3.1.0
+info:
+  title: Project API Gateway
+  description: 'Project and task management with timesheet tracking.. This aggregates and proxies requests to Project microservices.
+    This is the single entry point for the Project system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/project/core/*` → Core Service
+
+    - `/api/v1/project/timesheet/*` → Timesheet Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/project/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/project
+  description: Project API Gateway
+tags: []
+paths:
+  /milestones:
+    get:
+      operationId: listMilestones
+      summary: List milestones
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of milestones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Milestone'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    post:
+      operationId: createMilestone
+      summary: Create milestone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMilestoneRequest'
+      responses:
+        '201':
+          description: Milestone created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /milestones/{id}:
+    get:
+      operationId: getMilestone
+      summary: Get milestone by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Milestone details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    put:
+      operationId: updateMilestone
+      summary: Update milestone
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMilestoneRequest'
+      responses:
+        '200':
+          description: Milestone updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    delete:
+      operationId: deleteMilestone
+      summary: Delete milestone
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Milestone deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /projects:
+    get:
+      operationId: listProjects
+      summary: List projects
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    post:
+      operationId: createProject
+      summary: Create project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /projects/{id}:
+    get:
+      operationId: getProject
+      summary: Get project by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    put:
+      operationId: updateProject
+      summary: Update project
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectRequest'
+      responses:
+        '200':
+          description: Project updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    delete:
+      operationId: deleteProject
+      summary: Delete project
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Project deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /tasks:
+    get:
+      operationId: listTasks
+      summary: List tasks
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    post:
+      operationId: createTask
+      summary: Create task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      summary: Get task by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Task details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    put:
+      operationId: updateTask
+      summary: Update task
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+    delete:
+      operationId: deleteTask
+      summary: Delete task
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Task deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/project/core
+  /timesheet-lines:
+    get:
+      operationId: listTimesheetLines
+      summary: List timesheet-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of timesheet-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimesheetLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    post:
+      operationId: createTimesheetLine
+      summary: Create timesheet-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTimesheetLineRequest'
+      responses:
+        '201':
+          description: TimesheetLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetLine'
+        '400':
+          description: Invalid request
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+  /timesheet-lines/{id}:
+    get:
+      operationId: getTimesheetLine
+      summary: Get timesheet-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TimesheetLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetLine'
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    put:
+      operationId: updateTimesheetLine
+      summary: Update timesheet-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTimesheetLineRequest'
+      responses:
+        '200':
+          description: TimesheetLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimesheetLine'
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    delete:
+      operationId: deleteTimesheetLine
+      summary: Delete timesheet-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TimesheetLine deleted
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+  /timesheets:
+    get:
+      operationId: listTimesheets
+      summary: List timesheets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of timesheets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Timesheet'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    post:
+      operationId: createTimesheet
+      summary: Create timesheet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTimesheetRequest'
+      responses:
+        '201':
+          description: Timesheet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '400':
+          description: Invalid request
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+  /timesheets/{id}:
+    get:
+      operationId: getTimesheet
+      summary: Get timesheet by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Timesheet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    put:
+      operationId: updateTimesheet
+      summary: Update timesheet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTimesheetRequest'
+      responses:
+        '200':
+          description: Timesheet updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timesheet'
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+    delete:
+      operationId: deleteTimesheet
+      summary: Delete timesheet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Timesheet deleted
+        '404':
+          description: Not found
+      x-service: timesheet
+      x-service-base-path: /api/v1/project/timesheet
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

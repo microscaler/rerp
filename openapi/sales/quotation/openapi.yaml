@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Quotation Management
+  version: 1.0.0
+  description: Quotation management service handling quote creation and approval workflows.
+servers:
+- url: /api/v1/sales/quotation
+  description: Quotation Management API
+tags: []
+paths:
+  /quotations:
+    get:
+      operationId: listQuotations
+      summary: List quotations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of quotations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Quotation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createQuotation
+      summary: Create quotation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuotationRequest'
+      responses:
+        '201':
+          description: Quotation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '400':
+          description: Invalid request
+  /quotations/{id}:
+    get:
+      operationId: getQuotation
+      summary: Get quotation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Quotation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '404':
+          description: Not found
+    put:
+      operationId: updateQuotation
+      summary: Update quotation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuotationRequest'
+      responses:
+        '200':
+          description: Quotation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteQuotation
+      summary: Delete quotation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Quotation deleted
+        '404':
+          description: Not found
+  /quote-lines:
+    get:
+      operationId: listQuoteLines
+      summary: List quote-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of quote-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuoteLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createQuoteLine
+      summary: Create quote-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuoteLineRequest'
+      responses:
+        '201':
+          description: QuoteLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '400':
+          description: Invalid request
+  /quote-lines/{id}:
+    get:
+      operationId: getQuoteLine
+      summary: Get quote-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: QuoteLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateQuoteLine
+      summary: Update quote-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuoteLineRequest'
+      responses:
+        '200':
+          description: QuoteLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteQuoteLine
+      summary: Delete quote-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: QuoteLine deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

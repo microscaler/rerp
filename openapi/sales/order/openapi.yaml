@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Order Management
+  version: 1.0.0
+  description: Sales order management service processing orders and fulfillment.
+servers:
+- url: /api/v1/sales/order
+  description: Order Management API
+tags: []
+paths:
+  /orders:
+    get:
+      operationId: listOrders
+      summary: List orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createOrder
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid request
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      summary: Get order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Not found
+    put:
+      operationId: updateOrder
+      summary: Update order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderRequest'
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteOrder
+      summary: Delete order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Order deleted
+        '404':
+          description: Not found
+  /order-lines:
+    get:
+      operationId: listOrderLines
+      summary: List order-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of order-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createOrderLine
+      summary: Create order-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderLineRequest'
+      responses:
+        '201':
+          description: OrderLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '400':
+          description: Invalid request
+  /order-lines/{id}:
+    get:
+      operationId: getOrderLine
+      summary: Get order-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OrderLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '404':
+          description: Not found
+    put:
+      operationId: updateOrderLine
+      summary: Update order-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderLineRequest'
+      responses:
+        '200':
+          description: OrderLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteOrderLine
+      summary: Delete order-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: OrderLine deleted
+        '404':
+          description: Not found
+  /fulfillments:
+    get:
+      operationId: listFulfillments
+      summary: List fulfillments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of fulfillments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Fulfillment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createFulfillment
+      summary: Create fulfillment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFulfillmentRequest'
+      responses:
+        '201':
+          description: Fulfillment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '400':
+          description: Invalid request
+  /fulfillments/{id}:
+    get:
+      operationId: getFulfillment
+      summary: Get fulfillment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Fulfillment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '404':
+          description: Not found
+    put:
+      operationId: updateFulfillment
+      summary: Update fulfillment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFulfillmentRequest'
+      responses:
+        '200':
+          description: Fulfillment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteFulfillment
+      summary: Delete fulfillment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Fulfillment deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

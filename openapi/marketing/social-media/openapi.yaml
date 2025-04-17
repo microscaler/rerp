@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Social Media
+  version: 1.0.0
+  description: Social media service managing multi-platform social media posting.
+servers:
+- url: /api/v1/marketing/social-media
+  description: Social Media API
+tags: []
+paths:
+  /social-posts:
+    get:
+      operationId: listSocialPosts
+      summary: List social-posts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of social-posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialPost'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSocialPost
+      summary: Create social-post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialPostRequest'
+      responses:
+        '201':
+          description: SocialPost created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          description: Invalid request
+  /social-posts/{id}:
+    get:
+      operationId: getSocialPost
+      summary: Get social-post by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SocialPost details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSocialPost
+      summary: Update social-post
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialPostRequest'
+      responses:
+        '200':
+          description: SocialPost updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSocialPost
+      summary: Delete social-post
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SocialPost deleted
+        '404':
+          description: Not found
+  /social-accounts:
+    get:
+      operationId: listSocialAccounts
+      summary: List social-accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of social-accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialAccount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSocialAccount
+      summary: Create social-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialAccountRequest'
+      responses:
+        '201':
+          description: SocialAccount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '400':
+          description: Invalid request
+  /social-accounts/{id}:
+    get:
+      operationId: getSocialAccount
+      summary: Get social-account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SocialAccount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSocialAccount
+      summary: Update social-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialAccountRequest'
+      responses:
+        '200':
+          description: SocialAccount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSocialAccount
+      summary: Delete social-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SocialAccount deleted
+        '404':
+          description: Not found
+  /engagements:
+    get:
+      operationId: listEngagements
+      summary: List engagements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of engagements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Engagement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createEngagement
+      summary: Create engagement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEngagementRequest'
+      responses:
+        '201':
+          description: Engagement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '400':
+          description: Invalid request
+  /engagements/{id}:
+    get:
+      operationId: getEngagement
+      summary: Get engagement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Engagement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '404':
+          description: Not found
+    put:
+      operationId: updateEngagement
+      summary: Update engagement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEngagementRequest'
+      responses:
+        '200':
+          description: Engagement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Engagement'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteEngagement
+      summary: Delete engagement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Engagement deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

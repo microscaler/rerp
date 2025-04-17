@@ -1,0 +1,1557 @@
+openapi: 3.1.0
+info:
+  title: Sales API Gateway
+  description: 'Complete sales management from quotations to orders, subscriptions, and loyalty programs.. This aggregates
+    and proxies requests to Sales microservices. This is the single entry point for the Sales system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/sales/core/*` → Core Service
+
+    - `/api/v1/sales/loyalty/*` → Loyalty Service
+
+    - `/api/v1/sales/order/*` → Order Service
+
+    - `/api/v1/sales/quotation/*` → Quotation Service
+
+    - `/api/v1/sales/subscription/*` → Subscription Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/sales/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/sales
+  description: Sales API Gateway
+tags: []
+paths:
+  /fulfillments:
+    get:
+      operationId: listFulfillments
+      summary: List fulfillments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of fulfillments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Fulfillment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    post:
+      operationId: createFulfillment
+      summary: Create fulfillment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFulfillmentRequest'
+      responses:
+        '201':
+          description: Fulfillment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '400':
+          description: Invalid request
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /fulfillments/{id}:
+    get:
+      operationId: getFulfillment
+      summary: Get fulfillment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Fulfillment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    put:
+      operationId: updateFulfillment
+      summary: Update fulfillment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFulfillmentRequest'
+      responses:
+        '200':
+          description: Fulfillment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fulfillment'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    delete:
+      operationId: deleteFulfillment
+      summary: Delete fulfillment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Fulfillment deleted
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /loyalty-programs:
+    get:
+      operationId: listLoyaltyPrograms
+      summary: List loyalty-programs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of loyalty-programs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LoyaltyProgram'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    post:
+      operationId: createLoyaltyProgram
+      summary: Create loyalty-program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLoyaltyProgramRequest'
+      responses:
+        '201':
+          description: LoyaltyProgram created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '400':
+          description: Invalid request
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /loyalty-programs/{id}:
+    get:
+      operationId: getLoyaltyProgram
+      summary: Get loyalty-program by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: LoyaltyProgram details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    put:
+      operationId: updateLoyaltyProgram
+      summary: Update loyalty-program
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLoyaltyProgramRequest'
+      responses:
+        '200':
+          description: LoyaltyProgram updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyProgram'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    delete:
+      operationId: deleteLoyaltyProgram
+      summary: Delete loyalty-program
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: LoyaltyProgram deleted
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /order-lines:
+    get:
+      operationId: listOrderLines
+      summary: List order-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of order-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    post:
+      operationId: createOrderLine
+      summary: Create order-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderLineRequest'
+      responses:
+        '201':
+          description: OrderLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '400':
+          description: Invalid request
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /order-lines/{id}:
+    get:
+      operationId: getOrderLine
+      summary: Get order-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OrderLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    put:
+      operationId: updateOrderLine
+      summary: Update order-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderLineRequest'
+      responses:
+        '200':
+          description: OrderLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderLine'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    delete:
+      operationId: deleteOrderLine
+      summary: Delete order-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: OrderLine deleted
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /orders:
+    get:
+      operationId: listOrders
+      summary: List orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    post:
+      operationId: createOrder
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid request
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      summary: Get order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    put:
+      operationId: updateOrder
+      summary: Update order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderRequest'
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+    delete:
+      operationId: deleteOrder
+      summary: Delete order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Order deleted
+        '404':
+          description: Not found
+      x-service: order
+      x-service-base-path: /api/v1/sales/order
+  /plans:
+    get:
+      operationId: listPlans
+      summary: List plans
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Plan'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    post:
+      operationId: createPlan
+      summary: Create plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlanRequest'
+      responses:
+        '201':
+          description: Plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '400':
+          description: Invalid request
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+  /plans/{id}:
+    get:
+      operationId: getPlan
+      summary: Get plan by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    put:
+      operationId: updatePlan
+      summary: Update plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePlanRequest'
+      responses:
+        '200':
+          description: Plan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    delete:
+      operationId: deletePlan
+      summary: Delete plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Plan deleted
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+  /points-transactions:
+    get:
+      operationId: listPointsTransactions
+      summary: List points-transactions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of points-transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PointsTransaction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    post:
+      operationId: createPointsTransaction
+      summary: Create points-transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePointsTransactionRequest'
+      responses:
+        '201':
+          description: PointsTransaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '400':
+          description: Invalid request
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /points-transactions/{id}:
+    get:
+      operationId: getPointsTransaction
+      summary: Get points-transaction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PointsTransaction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    put:
+      operationId: updatePointsTransaction
+      summary: Update points-transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePointsTransactionRequest'
+      responses:
+        '200':
+          description: PointsTransaction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsTransaction'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    delete:
+      operationId: deletePointsTransaction
+      summary: Delete points-transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PointsTransaction deleted
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /quotations:
+    get:
+      operationId: listQuotations
+      summary: List quotations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of quotations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Quotation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    post:
+      operationId: createQuotation
+      summary: Create quotation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuotationRequest'
+      responses:
+        '201':
+          description: Quotation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '400':
+          description: Invalid request
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+  /quotations/{id}:
+    get:
+      operationId: getQuotation
+      summary: Get quotation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Quotation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    put:
+      operationId: updateQuotation
+      summary: Update quotation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuotationRequest'
+      responses:
+        '200':
+          description: Quotation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    delete:
+      operationId: deleteQuotation
+      summary: Delete quotation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Quotation deleted
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+  /quote-lines:
+    get:
+      operationId: listQuoteLines
+      summary: List quote-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of quote-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuoteLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    post:
+      operationId: createQuoteLine
+      summary: Create quote-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuoteLineRequest'
+      responses:
+        '201':
+          description: QuoteLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '400':
+          description: Invalid request
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+  /quote-lines/{id}:
+    get:
+      operationId: getQuoteLine
+      summary: Get quote-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: QuoteLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    put:
+      operationId: updateQuoteLine
+      summary: Update quote-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuoteLineRequest'
+      responses:
+        '200':
+          description: QuoteLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteLine'
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+    delete:
+      operationId: deleteQuoteLine
+      summary: Delete quote-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: QuoteLine deleted
+        '404':
+          description: Not found
+      x-service: quotation
+      x-service-base-path: /api/v1/sales/quotation
+  /quotes:
+    get:
+      operationId: listQuotes
+      summary: List quotes
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of quotes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Quote'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    post:
+      operationId: createQuote
+      summary: Create quote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuoteRequest'
+      responses:
+        '201':
+          description: Quote created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+  /quotes/{id}:
+    get:
+      operationId: getQuote
+      summary: Get quote by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Quote details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    put:
+      operationId: updateQuote
+      summary: Update quote
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuoteRequest'
+      responses:
+        '200':
+          description: Quote updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    delete:
+      operationId: deleteQuote
+      summary: Delete quote
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Quote deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+  /renewals:
+    get:
+      operationId: listRenewals
+      summary: List renewals
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of renewals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Renewal'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    post:
+      operationId: createRenewal
+      summary: Create renewal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRenewalRequest'
+      responses:
+        '201':
+          description: Renewal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Renewal'
+        '400':
+          description: Invalid request
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+  /renewals/{id}:
+    get:
+      operationId: getRenewal
+      summary: Get renewal by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Renewal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Renewal'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    put:
+      operationId: updateRenewal
+      summary: Update renewal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRenewalRequest'
+      responses:
+        '200':
+          description: Renewal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Renewal'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    delete:
+      operationId: deleteRenewal
+      summary: Delete renewal
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Renewal deleted
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+  /rewards:
+    get:
+      operationId: listRewards
+      summary: List rewards
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of rewards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reward'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    post:
+      operationId: createReward
+      summary: Create reward
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRewardRequest'
+      responses:
+        '201':
+          description: Reward created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '400':
+          description: Invalid request
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /rewards/{id}:
+    get:
+      operationId: getReward
+      summary: Get reward by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Reward details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    put:
+      operationId: updateReward
+      summary: Update reward
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRewardRequest'
+      responses:
+        '200':
+          description: Reward updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reward'
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+    delete:
+      operationId: deleteReward
+      summary: Delete reward
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Reward deleted
+        '404':
+          description: Not found
+      x-service: loyalty
+      x-service-base-path: /api/v1/sales/loyalty
+  /sales:
+    get:
+      operationId: listSales
+      summary: List sales
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of sales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sale'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    post:
+      operationId: createSale
+      summary: Create sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSaleRequest'
+      responses:
+        '201':
+          description: Sale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+  /sales/{id}:
+    get:
+      operationId: getSale
+      summary: Get sale by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Sale details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    put:
+      operationId: updateSale
+      summary: Update sale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSaleRequest'
+      responses:
+        '200':
+          description: Sale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+    delete:
+      operationId: deleteSale
+      summary: Delete sale
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Sale deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/sales/core
+  /subscriptions:
+    get:
+      operationId: listSubscriptions
+      summary: List subscriptions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    post:
+      operationId: createSubscription
+      summary: Create subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid request
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+  /subscriptions/{id}:
+    get:
+      operationId: getSubscription
+      summary: Get subscription by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    put:
+      operationId: updateSubscription
+      summary: Update subscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+    delete:
+      operationId: deleteSubscription
+      summary: Delete subscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Subscription deleted
+        '404':
+          description: Not found
+      x-service: subscription
+      x-service-base-path: /api/v1/sales/subscription
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

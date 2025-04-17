@@ -1,0 +1,16 @@
+/**
+ * Shared Styles
+ * 
+ * Base styles shared across website and FTE applications
+ */
+
+/* Scrollbar hiding (if needed) */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Base font family */
+body {
+  font-family: 'Inter', sans-serif;
+}
+

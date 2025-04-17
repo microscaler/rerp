@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Bank Synchronization
+  version: 1.0.0
+  description: Bank synchronization service importing bank statements and reconciliation.
+servers:
+- url: /api/v1/accounting/bank-sync
+  description: Bank Synchronization API
+tags: []
+paths:
+  /bank-accounts:
+    get:
+      operationId: listBankAccounts
+      summary: List bank-accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bank-accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankAccount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBankAccount
+      summary: Create bank-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankAccountRequest'
+      responses:
+        '201':
+          description: BankAccount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '400':
+          description: Invalid request
+  /bank-accounts/{id}:
+    get:
+      operationId: getBankAccount
+      summary: Get bank-account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BankAccount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBankAccount
+      summary: Update bank-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBankAccountRequest'
+      responses:
+        '200':
+          description: BankAccount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBankAccount
+      summary: Delete bank-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BankAccount deleted
+        '404':
+          description: Not found
+  /bank-statements:
+    get:
+      operationId: listBankStatements
+      summary: List bank-statements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bank-statements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankStatement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createBankStatement
+      summary: Create bank-statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankStatementRequest'
+      responses:
+        '201':
+          description: BankStatement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '400':
+          description: Invalid request
+  /bank-statements/{id}:
+    get:
+      operationId: getBankStatement
+      summary: Get bank-statement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BankStatement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '404':
+          description: Not found
+    put:
+      operationId: updateBankStatement
+      summary: Update bank-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBankStatementRequest'
+      responses:
+        '200':
+          description: BankStatement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteBankStatement
+      summary: Delete bank-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BankStatement deleted
+        '404':
+          description: Not found
+  /reconciliations:
+    get:
+      operationId: listReconciliations
+      summary: List reconciliations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reconciliations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reconciliation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createReconciliation
+      summary: Create reconciliation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReconciliationRequest'
+      responses:
+        '201':
+          description: Reconciliation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '400':
+          description: Invalid request
+  /reconciliations/{id}:
+    get:
+      operationId: getReconciliation
+      summary: Get reconciliation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Reconciliation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '404':
+          description: Not found
+    put:
+      operationId: updateReconciliation
+      summary: Update reconciliation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReconciliationRequest'
+      responses:
+        '200':
+          description: Reconciliation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteReconciliation
+      summary: Delete reconciliation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Reconciliation deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

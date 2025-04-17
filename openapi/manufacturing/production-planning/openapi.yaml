@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Production Planning
+  version: 1.0.0
+  description: Production planning service handling production scheduling and MRP.
+servers:
+- url: /api/v1/manufacturing/production-planning
+  description: Production Planning API
+tags: []
+paths:
+  /production-schedules:
+    get:
+      operationId: listProductionSchedules
+      summary: List production-schedules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of production-schedules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductionSchedule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createProductionSchedule
+      summary: Create production-schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductionScheduleRequest'
+      responses:
+        '201':
+          description: ProductionSchedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '400':
+          description: Invalid request
+  /production-schedules/{id}:
+    get:
+      operationId: getProductionSchedule
+      summary: Get production-schedule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ProductionSchedule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '404':
+          description: Not found
+    put:
+      operationId: updateProductionSchedule
+      summary: Update production-schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductionScheduleRequest'
+      responses:
+        '200':
+          description: ProductionSchedule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductionSchedule'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteProductionSchedule
+      summary: Delete production-schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ProductionSchedule deleted
+        '404':
+          description: Not found
+  /mrp-runs:
+    get:
+      operationId: listMrpRuns
+      summary: List mrp-runs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of mrp-runs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MrpRun'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createMrpRun
+      summary: Create mrp-run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMrpRunRequest'
+      responses:
+        '201':
+          description: MrpRun created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '400':
+          description: Invalid request
+  /mrp-runs/{id}:
+    get:
+      operationId: getMrpRun
+      summary: Get mrp-run by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: MrpRun details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '404':
+          description: Not found
+    put:
+      operationId: updateMrpRun
+      summary: Update mrp-run
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMrpRunRequest'
+      responses:
+        '200':
+          description: MrpRun updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MrpRun'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteMrpRun
+      summary: Delete mrp-run
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: MrpRun deleted
+        '404':
+          description: Not found
+  /capacity-plans:
+    get:
+      operationId: listCapacityPlans
+      summary: List capacity-plans
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of capacity-plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CapacityPlan'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createCapacityPlan
+      summary: Create capacity-plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCapacityPlanRequest'
+      responses:
+        '201':
+          description: CapacityPlan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '400':
+          description: Invalid request
+  /capacity-plans/{id}:
+    get:
+      operationId: getCapacityPlan
+      summary: Get capacity-plan by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: CapacityPlan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          description: Not found
+    put:
+      operationId: updateCapacityPlan
+      summary: Update capacity-plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCapacityPlanRequest'
+      responses:
+        '200':
+          description: CapacityPlan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPlan'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteCapacityPlan
+      summary: Delete capacity-plan
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: CapacityPlan deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

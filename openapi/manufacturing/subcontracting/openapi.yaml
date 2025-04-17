@@ -1,0 +1,241 @@
+openapi: 3.1.0
+info:
+  title: Subcontracting
+  version: 1.0.0
+  description: Subcontracting service managing outsourced production.
+servers:
+- url: /api/v1/manufacturing/subcontracting
+  description: Subcontracting API
+tags: []
+paths:
+  /subcontract-orders:
+    get:
+      operationId: listSubcontractOrders
+      summary: List subcontract-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of subcontract-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubcontractOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSubcontractOrder
+      summary: Create subcontract-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubcontractOrderRequest'
+      responses:
+        '201':
+          description: SubcontractOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '400':
+          description: Invalid request
+  /subcontract-orders/{id}:
+    get:
+      operationId: getSubcontractOrder
+      summary: Get subcontract-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SubcontractOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSubcontractOrder
+      summary: Update subcontract-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubcontractOrderRequest'
+      responses:
+        '200':
+          description: SubcontractOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractOrder'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSubcontractOrder
+      summary: Delete subcontract-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SubcontractOrder deleted
+        '404':
+          description: Not found
+  /subcontractor-pos:
+    get:
+      operationId: listSubcontractorPos
+      summary: List subcontractor-pos
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of subcontractor-pos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubcontractorPo'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createSubcontractorPo
+      summary: Create subcontractor-po
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubcontractorPoRequest'
+      responses:
+        '201':
+          description: SubcontractorPo created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '400':
+          description: Invalid request
+  /subcontractor-pos/{id}:
+    get:
+      operationId: getSubcontractorPo
+      summary: Get subcontractor-po by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SubcontractorPo details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '404':
+          description: Not found
+    put:
+      operationId: updateSubcontractorPo
+      summary: Update subcontractor-po
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubcontractorPoRequest'
+      responses:
+        '200':
+          description: SubcontractorPo updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcontractorPo'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteSubcontractorPo
+      summary: Delete subcontractor-po
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SubcontractorPo deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

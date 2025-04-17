@@ -1,0 +1,1097 @@
+openapi: 3.1.0
+info:
+  title: Analytics API Gateway
+  description: 'Business intelligence, dashboards, and reporting tools.. This aggregates and proxies requests to Analytics
+    microservices. This is the single entry point for the Analytics system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/analytics/bi/*` → Bi Service
+
+    - `/api/v1/analytics/dashboards/*` → Dashboards Service
+
+    - `/api/v1/analytics/reporting/*` → Reporting Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/analytics/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/analytics
+  description: Analytics API Gateway
+tags: []
+paths:
+  /dashboards:
+    get:
+      operationId: listDashboards
+      summary: List dashboards
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of dashboards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dashboard'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    post:
+      operationId: createDashboard
+      summary: Create dashboard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDashboardRequest'
+      responses:
+        '201':
+          description: Dashboard created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '400':
+          description: Invalid request
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+  /dashboards/{id}:
+    get:
+      operationId: getDashboard
+      summary: Get dashboard by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Dashboard details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    put:
+      operationId: updateDashboard
+      summary: Update dashboard
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDashboardRequest'
+      responses:
+        '200':
+          description: Dashboard updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    delete:
+      operationId: deleteDashboard
+      summary: Delete dashboard
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Dashboard deleted
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+  /datasets:
+    get:
+      operationId: listDatasets
+      summary: List datasets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of datasets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dataset'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    post:
+      operationId: createDataset
+      summary: Create dataset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDatasetRequest'
+      responses:
+        '201':
+          description: Dataset created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '400':
+          description: Invalid request
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /datasets/{id}:
+    get:
+      operationId: getDataset
+      summary: Get dataset by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Dataset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    put:
+      operationId: updateDataset
+      summary: Update dataset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatasetRequest'
+      responses:
+        '200':
+          description: Dataset updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    delete:
+      operationId: deleteDataset
+      summary: Delete dataset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Dataset deleted
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /kpis:
+    get:
+      operationId: listKpis
+      summary: List kpis
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of kpis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Kpi'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    post:
+      operationId: createKpi
+      summary: Create kpi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKpiRequest'
+      responses:
+        '201':
+          description: Kpi created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kpi'
+        '400':
+          description: Invalid request
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+  /kpis/{id}:
+    get:
+      operationId: getKpi
+      summary: Get kpi by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Kpi details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kpi'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    put:
+      operationId: updateKpi
+      summary: Update kpi
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKpiRequest'
+      responses:
+        '200':
+          description: Kpi updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kpi'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    delete:
+      operationId: deleteKpi
+      summary: Delete kpi
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Kpi deleted
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+  /querys:
+    get:
+      operationId: listQuerys
+      summary: List querys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of querys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Query'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    post:
+      operationId: createQuery
+      summary: Create query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQueryRequest'
+      responses:
+        '201':
+          description: Query created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+        '400':
+          description: Invalid request
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /querys/{id}:
+    get:
+      operationId: getQuery
+      summary: Get query by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Query details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    put:
+      operationId: updateQuery
+      summary: Update query
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQueryRequest'
+      responses:
+        '200':
+          description: Query updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    delete:
+      operationId: deleteQuery
+      summary: Delete query
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Query deleted
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /report-templates:
+    get:
+      operationId: listReportTemplates
+      summary: List report-templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of report-templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReportTemplate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    post:
+      operationId: createReportTemplate
+      summary: Create report-template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportTemplateRequest'
+      responses:
+        '201':
+          description: ReportTemplate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportTemplate'
+        '400':
+          description: Invalid request
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /report-templates/{id}:
+    get:
+      operationId: getReportTemplate
+      summary: Get report-template by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ReportTemplate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportTemplate'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    put:
+      operationId: updateReportTemplate
+      summary: Update report-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportTemplateRequest'
+      responses:
+        '200':
+          description: ReportTemplate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportTemplate'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    delete:
+      operationId: deleteReportTemplate
+      summary: Delete report-template
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ReportTemplate deleted
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /reports:
+    get:
+      operationId: listReports
+      summary: List reports
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    post:
+      operationId: createReport
+      summary: Create report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '201':
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          description: Invalid request
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /reports/{id}:
+    get:
+      operationId: getReport
+      summary: Get report by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    put:
+      operationId: updateReport
+      summary: Update report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportRequest'
+      responses:
+        '200':
+          description: Report updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    delete:
+      operationId: deleteReport
+      summary: Delete report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Report deleted
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /schedules:
+    get:
+      operationId: listSchedules
+      summary: List schedules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of schedules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Schedule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    post:
+      operationId: createSchedule
+      summary: Create schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduleRequest'
+      responses:
+        '201':
+          description: Schedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '400':
+          description: Invalid request
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /schedules/{id}:
+    get:
+      operationId: getSchedule
+      summary: Get schedule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Schedule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    put:
+      operationId: updateSchedule
+      summary: Update schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduleRequest'
+      responses:
+        '200':
+          description: Schedule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+    delete:
+      operationId: deleteSchedule
+      summary: Delete schedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Schedule deleted
+        '404':
+          description: Not found
+      x-service: reporting
+      x-service-base-path: /api/v1/analytics/reporting
+  /visualizations:
+    get:
+      operationId: listVisualizations
+      summary: List visualizations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of visualizations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Visualization'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    post:
+      operationId: createVisualization
+      summary: Create visualization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVisualizationRequest'
+      responses:
+        '201':
+          description: Visualization created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visualization'
+        '400':
+          description: Invalid request
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /visualizations/{id}:
+    get:
+      operationId: getVisualization
+      summary: Get visualization by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Visualization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visualization'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    put:
+      operationId: updateVisualization
+      summary: Update visualization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVisualizationRequest'
+      responses:
+        '200':
+          description: Visualization updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visualization'
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+    delete:
+      operationId: deleteVisualization
+      summary: Delete visualization
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Visualization deleted
+        '404':
+          description: Not found
+      x-service: bi
+      x-service-base-path: /api/v1/analytics/bi
+  /widgets:
+    get:
+      operationId: listWidgets
+      summary: List widgets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of widgets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Widget'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    post:
+      operationId: createWidget
+      summary: Create widget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWidgetRequest'
+      responses:
+        '201':
+          description: Widget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '400':
+          description: Invalid request
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+  /widgets/{id}:
+    get:
+      operationId: getWidget
+      summary: Get widget by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Widget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    put:
+      operationId: updateWidget
+      summary: Update widget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWidgetRequest'
+      responses:
+        '200':
+          description: Widget updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+    delete:
+      operationId: deleteWidget
+      summary: Delete widget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Widget deleted
+        '404':
+          description: Not found
+      x-service: dashboards
+      x-service-base-path: /api/v1/analytics/dashboards
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,1228 @@
+openapi: 3.1.0
+info:
+  title: Product API Gateway
+  description: 'Product catalog, pricing, and tax calculation services.. This aggregates and proxies requests to Product microservices.
+    This is the single entry point for the Product system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/product/catalog/*` → Catalog Service
+
+    - `/api/v1/product/pricing/*` → Pricing Service
+
+    - `/api/v1/product/tax/*` → Tax Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/product/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/product
+  description: Product API Gateway
+tags: []
+paths:
+  /attributes:
+    get:
+      operationId: listAttributes
+      summary: List attributes
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of attributes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attribute'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    post:
+      operationId: createAttribute
+      summary: Create attribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttributeRequest'
+      responses:
+        '201':
+          description: Attribute created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+        '400':
+          description: Invalid request
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /attributes/{id}:
+    get:
+      operationId: getAttribute
+      summary: Get attribute by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Attribute details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    put:
+      operationId: updateAttribute
+      summary: Update attribute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAttributeRequest'
+      responses:
+        '200':
+          description: Attribute updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    delete:
+      operationId: deleteAttribute
+      summary: Delete attribute
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Attribute deleted
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /calculate:
+    post:
+      operationId: calculateTax
+      summary: Calculate tax for transaction
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /categories/{categoryId}/products:
+    get:
+      operationId: getCategoryProducts
+      summary: Get products in category
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /categorys:
+    get:
+      operationId: listCategorys
+      summary: List categorys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of categorys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    post:
+      operationId: createCategory
+      summary: Create category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Invalid request
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /categorys/{id}:
+    get:
+      operationId: getCategory
+      summary: Get category by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    put:
+      operationId: updateCategory
+      summary: Update category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    delete:
+      operationId: deleteCategory
+      summary: Delete category
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Category deleted
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /discounts:
+    get:
+      operationId: listDiscounts
+      summary: List discounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of discounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Discount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    post:
+      operationId: createDiscount
+      summary: Create discount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDiscountRequest'
+      responses:
+        '201':
+          description: Discount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '400':
+          description: Invalid request
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /discounts/{id}:
+    get:
+      operationId: getDiscount
+      summary: Get discount by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Discount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    put:
+      operationId: updateDiscount
+      summary: Update discount
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDiscountRequest'
+      responses:
+        '200':
+          description: Discount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Discount'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    delete:
+      operationId: deleteDiscount
+      summary: Delete discount
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Discount deleted
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /price-lists:
+    get:
+      operationId: listPriceLists
+      summary: List price-lists
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of price-lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PriceList'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    post:
+      operationId: createPriceList
+      summary: Create price-list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePriceListRequest'
+      responses:
+        '201':
+          description: PriceList created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '400':
+          description: Invalid request
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /price-lists/{id}:
+    get:
+      operationId: getPriceList
+      summary: Get price-list by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PriceList details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    put:
+      operationId: updatePriceList
+      summary: Update price-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePriceListRequest'
+      responses:
+        '200':
+          description: PriceList updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceList'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    delete:
+      operationId: deletePriceList
+      summary: Delete price-list
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PriceList deleted
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /price-lists/{priceListId}/rules:
+    get:
+      operationId: getPriceRules
+      summary: Get price rules for price list
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: priceListId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /price-rules:
+    get:
+      operationId: listPriceRules
+      summary: List price-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of price-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PriceRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    post:
+      operationId: createPriceRule
+      summary: Create price-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePriceRuleRequest'
+      responses:
+        '201':
+          description: PriceRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '400':
+          description: Invalid request
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /price-rules/{id}:
+    get:
+      operationId: getPriceRule
+      summary: Get price-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PriceRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    put:
+      operationId: updatePriceRule
+      summary: Update price-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePriceRuleRequest'
+      responses:
+        '200':
+          description: PriceRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceRule'
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+    delete:
+      operationId: deletePriceRule
+      summary: Delete price-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PriceRule deleted
+        '404':
+          description: Not found
+      x-service: pricing
+      x-service-base-path: /api/v1/product/pricing
+  /products:
+    get:
+      operationId: listProducts
+      summary: List products
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    post:
+      operationId: createProduct
+      summary: Create product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid request
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /products/{id}:
+    get:
+      operationId: getProduct
+      summary: Get product by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    put:
+      operationId: updateProduct
+      summary: Update product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    delete:
+      operationId: deleteProduct
+      summary: Delete product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Product deleted
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /products/{productId}/variants:
+    get:
+      operationId: getProductVariants
+      summary: Get product variants
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    post:
+      operationId: createVariant
+      summary: Create product variant
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /rules/by-location:
+    get:
+      operationId: getTaxRulesByLocation
+      summary: Get tax rules by location
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /tax-rates:
+    get:
+      operationId: listTaxRates
+      summary: List tax-rates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tax-rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaxRate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    post:
+      operationId: createTaxRate
+      summary: Create tax-rate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRateRequest'
+      responses:
+        '201':
+          description: TaxRate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '400':
+          description: Invalid request
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /tax-rates/{id}:
+    get:
+      operationId: getTaxRate
+      summary: Get tax-rate by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TaxRate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    put:
+      operationId: updateTaxRate
+      summary: Update tax-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxRateRequest'
+      responses:
+        '200':
+          description: TaxRate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRate'
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    delete:
+      operationId: deleteTaxRate
+      summary: Delete tax-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TaxRate deleted
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /tax-rules:
+    get:
+      operationId: listTaxRules
+      summary: List tax-rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of tax-rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TaxRule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    post:
+      operationId: createTaxRule
+      summary: Create tax-rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRuleRequest'
+      responses:
+        '201':
+          description: TaxRule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '400':
+          description: Invalid request
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /tax-rules/{id}:
+    get:
+      operationId: getTaxRule
+      summary: Get tax-rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TaxRule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    put:
+      operationId: updateTaxRule
+      summary: Update tax-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxRuleRequest'
+      responses:
+        '200':
+          description: TaxRule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+    delete:
+      operationId: deleteTaxRule
+      summary: Delete tax-rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TaxRule deleted
+        '404':
+          description: Not found
+      x-service: tax
+      x-service-base-path: /api/v1/product/tax
+  /variants:
+    get:
+      operationId: listVariants
+      summary: List variants
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of variants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Variant'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    post:
+      operationId: createVariant
+      summary: Create variant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVariantRequest'
+      responses:
+        '201':
+          description: Variant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variant'
+        '400':
+          description: Invalid request
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+  /variants/{id}:
+    get:
+      operationId: getVariant
+      summary: Get variant by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Variant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variant'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    put:
+      operationId: updateVariant
+      summary: Update variant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVariantRequest'
+      responses:
+        '200':
+          description: Variant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variant'
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+    delete:
+      operationId: deleteVariant
+      summary: Delete variant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Variant deleted
+        '404':
+          description: Not found
+      x-service: catalog
+      x-service-base-path: /api/v1/product/catalog
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

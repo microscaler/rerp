@@ -1,0 +1,2706 @@
+openapi: 3.1.0
+info:
+  title: Accounting API Gateway
+  description: 'Comprehensive financial management including general ledger, accounts payable/receivable, financial reporting,
+    and compliance.. This aggregates and proxies requests to Accounting microservices. This is the single entry point for
+    the Accounting system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/accounting/accounts-payable/*` → AccountsPayable Service
+
+    - `/api/v1/accounting/accounts-receivable/*` → AccountsReceivable Service
+
+    - `/api/v1/accounting/asset/*` → Asset Service
+
+    - `/api/v1/accounting/bank-sync/*` → BankSync Service
+
+    - `/api/v1/accounting/budget/*` → Budget Service
+
+    - `/api/v1/accounting/edi/*` → Edi Service
+
+    - `/api/v1/accounting/financial-reports/*` → FinancialReports Service
+
+    - `/api/v1/accounting/general-ledger/*` → GeneralLedger Service
+
+    - `/api/v1/accounting/invoice/*` → Invoice Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/accounting/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/accounting
+  description: Accounting API Gateway
+tags: []
+paths:
+  /accounts:
+    get:
+      operationId: listAccounts
+      summary: List accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Account'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    post:
+      operationId: createAccount
+      summary: Create account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Invalid request
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /accounts/{id}:
+    get:
+      operationId: getAccount
+      summary: Get account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    put:
+      operationId: updateAccount
+      summary: Update account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    delete:
+      operationId: deleteAccount
+      summary: Delete account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Account deleted
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /ap-agings:
+    get:
+      operationId: listApAgings
+      summary: List ap-agings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ap-agings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApAging'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    post:
+      operationId: createApAging
+      summary: Create ap-aging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApAgingRequest'
+      responses:
+        '201':
+          description: ApAging created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '400':
+          description: Invalid request
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+  /ap-agings/{id}:
+    get:
+      operationId: getApAging
+      summary: Get ap-aging by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ApAging details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    put:
+      operationId: updateApAging
+      summary: Update ap-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateApAgingRequest'
+      responses:
+        '200':
+          description: ApAging updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApAging'
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    delete:
+      operationId: deleteApAging
+      summary: Delete ap-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ApAging deleted
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+  /ar-agings:
+    get:
+      operationId: listArAgings
+      summary: List ar-agings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ar-agings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArAging'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    post:
+      operationId: createArAging
+      summary: Create ar-aging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArAgingRequest'
+      responses:
+        '201':
+          description: ArAging created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '400':
+          description: Invalid request
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /ar-agings/{id}:
+    get:
+      operationId: getArAging
+      summary: Get ar-aging by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ArAging details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    put:
+      operationId: updateArAging
+      summary: Update ar-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArAgingRequest'
+      responses:
+        '200':
+          description: ArAging updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    delete:
+      operationId: deleteArAging
+      summary: Delete ar-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ArAging deleted
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /asset-registers:
+    get:
+      operationId: listAssetRegisters
+      summary: List asset-registers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of asset-registers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AssetRegister'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    post:
+      operationId: createAssetRegister
+      summary: Create asset-register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRegisterRequest'
+      responses:
+        '201':
+          description: AssetRegister created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '400':
+          description: Invalid request
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /asset-registers/{id}:
+    get:
+      operationId: getAssetRegister
+      summary: Get asset-register by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: AssetRegister details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    put:
+      operationId: updateAssetRegister
+      summary: Update asset-register
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetRegisterRequest'
+      responses:
+        '200':
+          description: AssetRegister updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRegister'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    delete:
+      operationId: deleteAssetRegister
+      summary: Delete asset-register
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: AssetRegister deleted
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /assets:
+    get:
+      operationId: listAssets
+      summary: List assets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of assets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Asset'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    post:
+      operationId: createAsset
+      summary: Create asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      responses:
+        '201':
+          description: Asset created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: Invalid request
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /assets/{id}:
+    get:
+      operationId: getAsset
+      summary: Get asset by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    put:
+      operationId: updateAsset
+      summary: Update asset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAssetRequest'
+      responses:
+        '200':
+          description: Asset updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    delete:
+      operationId: deleteAsset
+      summary: Delete asset
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Asset deleted
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /bank-accounts:
+    get:
+      operationId: listBankAccounts
+      summary: List bank-accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bank-accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankAccount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    post:
+      operationId: createBankAccount
+      summary: Create bank-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankAccountRequest'
+      responses:
+        '201':
+          description: BankAccount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '400':
+          description: Invalid request
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /bank-accounts/{id}:
+    get:
+      operationId: getBankAccount
+      summary: Get bank-account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BankAccount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    put:
+      operationId: updateBankAccount
+      summary: Update bank-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBankAccountRequest'
+      responses:
+        '200':
+          description: BankAccount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    delete:
+      operationId: deleteBankAccount
+      summary: Delete bank-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BankAccount deleted
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /bank-statements:
+    get:
+      operationId: listBankStatements
+      summary: List bank-statements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of bank-statements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankStatement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    post:
+      operationId: createBankStatement
+      summary: Create bank-statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankStatementRequest'
+      responses:
+        '201':
+          description: BankStatement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '400':
+          description: Invalid request
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /bank-statements/{id}:
+    get:
+      operationId: getBankStatement
+      summary: Get bank-statement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BankStatement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    put:
+      operationId: updateBankStatement
+      summary: Update bank-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBankStatementRequest'
+      responses:
+        '200':
+          description: BankStatement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankStatement'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    delete:
+      operationId: deleteBankStatement
+      summary: Delete bank-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BankStatement deleted
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /budget-lines:
+    get:
+      operationId: listBudgetLines
+      summary: List budget-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budget-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BudgetLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    post:
+      operationId: createBudgetLine
+      summary: Create budget-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetLineRequest'
+      responses:
+        '201':
+          description: BudgetLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '400':
+          description: Invalid request
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /budget-lines/{id}:
+    get:
+      operationId: getBudgetLine
+      summary: Get budget-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BudgetLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    put:
+      operationId: updateBudgetLine
+      summary: Update budget-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetLineRequest'
+      responses:
+        '200':
+          description: BudgetLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetLine'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    delete:
+      operationId: deleteBudgetLine
+      summary: Delete budget-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BudgetLine deleted
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /budget-variances:
+    get:
+      operationId: listBudgetVariances
+      summary: List budget-variances
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budget-variances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BudgetVariance'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    post:
+      operationId: createBudgetVariance
+      summary: Create budget-variance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetVarianceRequest'
+      responses:
+        '201':
+          description: BudgetVariance created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '400':
+          description: Invalid request
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /budget-variances/{id}:
+    get:
+      operationId: getBudgetVariance
+      summary: Get budget-variance by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BudgetVariance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    put:
+      operationId: updateBudgetVariance
+      summary: Update budget-variance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetVarianceRequest'
+      responses:
+        '200':
+          description: BudgetVariance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetVariance'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    delete:
+      operationId: deleteBudgetVariance
+      summary: Delete budget-variance
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: BudgetVariance deleted
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /budgets:
+    get:
+      operationId: listBudgets
+      summary: List budgets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of budgets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Budget'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    post:
+      operationId: createBudget
+      summary: Create budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetRequest'
+      responses:
+        '201':
+          description: Budget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '400':
+          description: Invalid request
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /budgets/{id}:
+    get:
+      operationId: getBudget
+      summary: Get budget by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    put:
+      operationId: updateBudget
+      summary: Update budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetRequest'
+      responses:
+        '200':
+          description: Budget updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+    delete:
+      operationId: deleteBudget
+      summary: Delete budget
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Budget deleted
+        '404':
+          description: Not found
+      x-service: budget
+      x-service-base-path: /api/v1/accounting/budget
+  /chart-of-accounts:
+    get:
+      operationId: listChartOfAccounts
+      summary: List chart-of-accounts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of chart-of-accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChartOfAccount'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    post:
+      operationId: createChartOfAccount
+      summary: Create chart-of-account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChartOfAccountRequest'
+      responses:
+        '201':
+          description: ChartOfAccount created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartOfAccount'
+        '400':
+          description: Invalid request
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /chart-of-accounts/{id}:
+    get:
+      operationId: getChartOfAccount
+      summary: Get chart-of-account by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ChartOfAccount details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartOfAccount'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    put:
+      operationId: updateChartOfAccount
+      summary: Update chart-of-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChartOfAccountRequest'
+      responses:
+        '200':
+          description: ChartOfAccount updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartOfAccount'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    delete:
+      operationId: deleteChartOfAccount
+      summary: Delete chart-of-account
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ChartOfAccount deleted
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /customer-invoices:
+    get:
+      operationId: listCustomerInvoices
+      summary: List customer-invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of customer-invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerInvoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    post:
+      operationId: createCustomerInvoice
+      summary: Create customer-invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
+      responses:
+        '201':
+          description: CustomerInvoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '400':
+          description: Invalid request
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /customer-invoices/{id}:
+    get:
+      operationId: getCustomerInvoice
+      summary: Get customer-invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: CustomerInvoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    put:
+      operationId: updateCustomerInvoice
+      summary: Update customer-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
+      responses:
+        '200':
+          description: CustomerInvoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    delete:
+      operationId: deleteCustomerInvoice
+      summary: Delete customer-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: CustomerInvoice deleted
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /depreciations:
+    get:
+      operationId: listDepreciations
+      summary: List depreciations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of depreciations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Depreciation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    post:
+      operationId: createDepreciation
+      summary: Create depreciation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepreciationRequest'
+      responses:
+        '201':
+          description: Depreciation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '400':
+          description: Invalid request
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /depreciations/{id}:
+    get:
+      operationId: getDepreciation
+      summary: Get depreciation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Depreciation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    put:
+      operationId: updateDepreciation
+      summary: Update depreciation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepreciationRequest'
+      responses:
+        '200':
+          description: Depreciation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Depreciation'
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+    delete:
+      operationId: deleteDepreciation
+      summary: Delete depreciation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Depreciation deleted
+        '404':
+          description: Not found
+      x-service: asset
+      x-service-base-path: /api/v1/accounting/asset
+  /edi-documents:
+    get:
+      operationId: listEdiDocuments
+      summary: List edi-documents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of edi-documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EdiDocument'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    post:
+      operationId: createEdiDocument
+      summary: Create edi-document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiDocumentRequest'
+      responses:
+        '201':
+          description: EdiDocument created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '400':
+          description: Invalid request
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+  /edi-documents/{id}:
+    get:
+      operationId: getEdiDocument
+      summary: Get edi-document by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EdiDocument details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    put:
+      operationId: updateEdiDocument
+      summary: Update edi-document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEdiDocumentRequest'
+      responses:
+        '200':
+          description: EdiDocument updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiDocument'
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    delete:
+      operationId: deleteEdiDocument
+      summary: Delete edi-document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EdiDocument deleted
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+  /edi-mappings:
+    get:
+      operationId: listEdiMappings
+      summary: List edi-mappings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of edi-mappings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EdiMapping'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    post:
+      operationId: createEdiMapping
+      summary: Create edi-mapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiMappingRequest'
+      responses:
+        '201':
+          description: EdiMapping created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '400':
+          description: Invalid request
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+  /edi-mappings/{id}:
+    get:
+      operationId: getEdiMapping
+      summary: Get edi-mapping by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EdiMapping details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    put:
+      operationId: updateEdiMapping
+      summary: Update edi-mapping
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEdiMappingRequest'
+      responses:
+        '200':
+          description: EdiMapping updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiMapping'
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+    delete:
+      operationId: deleteEdiMapping
+      summary: Delete edi-mapping
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EdiMapping deleted
+        '404':
+          description: Not found
+      x-service: edi
+      x-service-base-path: /api/v1/accounting/edi
+  /financial-statements:
+    get:
+      operationId: listFinancialStatements
+      summary: List financial-statements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of financial-statements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FinancialStatement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    post:
+      operationId: createFinancialStatement
+      summary: Create financial-statement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFinancialStatementRequest'
+      responses:
+        '201':
+          description: FinancialStatement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '400':
+          description: Invalid request
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+  /financial-statements/{id}:
+    get:
+      operationId: getFinancialStatement
+      summary: Get financial-statement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FinancialStatement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    put:
+      operationId: updateFinancialStatement
+      summary: Update financial-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFinancialStatementRequest'
+      responses:
+        '200':
+          description: FinancialStatement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialStatement'
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    delete:
+      operationId: deleteFinancialStatement
+      summary: Delete financial-statement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: FinancialStatement deleted
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+  /invoice-lines:
+    get:
+      operationId: listInvoiceLines
+      summary: List invoice-lines
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of invoice-lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceLine'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    post:
+      operationId: createInvoiceLine
+      summary: Create invoice-line
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceLineRequest'
+      responses:
+        '201':
+          description: InvoiceLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '400':
+          description: Invalid request
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+  /invoice-lines/{id}:
+    get:
+      operationId: getInvoiceLine
+      summary: Get invoice-line by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: InvoiceLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    put:
+      operationId: updateInvoiceLine
+      summary: Update invoice-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceLineRequest'
+      responses:
+        '200':
+          description: InvoiceLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceLine'
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    delete:
+      operationId: deleteInvoiceLine
+      summary: Delete invoice-line
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: InvoiceLine deleted
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+  /invoices:
+    get:
+      operationId: listInvoices
+      summary: List invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    post:
+      operationId: createInvoice
+      summary: Create invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        '201':
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Invalid request
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+  /invoices/{id}:
+    get:
+      operationId: getInvoice
+      summary: Get invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    put:
+      operationId: updateInvoice
+      summary: Update invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceRequest'
+      responses:
+        '200':
+          description: Invoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+    delete:
+      operationId: deleteInvoice
+      summary: Delete invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Invoice deleted
+        '404':
+          description: Not found
+      x-service: invoice
+      x-service-base-path: /api/v1/accounting/invoice
+  /journal-entrys:
+    get:
+      operationId: listJournalEntrys
+      summary: List journal-entrys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of journal-entrys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JournalEntry'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    post:
+      operationId: createJournalEntry
+      summary: Create journal-entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalEntryRequest'
+      responses:
+        '201':
+          description: JournalEntry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Invalid request
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /journal-entrys/{id}:
+    get:
+      operationId: getJournalEntry
+      summary: Get journal-entry by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: JournalEntry details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    put:
+      operationId: updateJournalEntry
+      summary: Update journal-entry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJournalEntryRequest'
+      responses:
+        '200':
+          description: JournalEntry updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+    delete:
+      operationId: deleteJournalEntry
+      summary: Delete journal-entry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: JournalEntry deleted
+        '404':
+          description: Not found
+      x-service: general-ledger
+      x-service-base-path: /api/v1/accounting/general-ledger
+  /payments:
+    get:
+      operationId: listPayments
+      summary: List payments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    post:
+      operationId: createPayment
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid request
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Get payment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    put:
+      operationId: updatePayment
+      summary: Update payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+      responses:
+        '200':
+          description: Payment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+    delete:
+      operationId: deletePayment
+      summary: Delete payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payment deleted
+        '404':
+          description: Not found
+      x-service: accounts-receivable
+      x-service-base-path: /api/v1/accounting/accounts-receivable
+  /reconciliations:
+    get:
+      operationId: listReconciliations
+      summary: List reconciliations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reconciliations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Reconciliation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    post:
+      operationId: createReconciliation
+      summary: Create reconciliation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReconciliationRequest'
+      responses:
+        '201':
+          description: Reconciliation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '400':
+          description: Invalid request
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /reconciliations/{id}:
+    get:
+      operationId: getReconciliation
+      summary: Get reconciliation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Reconciliation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    put:
+      operationId: updateReconciliation
+      summary: Update reconciliation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReconciliationRequest'
+      responses:
+        '200':
+          description: Reconciliation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reconciliation'
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+    delete:
+      operationId: deleteReconciliation
+      summary: Delete reconciliation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Reconciliation deleted
+        '404':
+          description: Not found
+      x-service: bank-sync
+      x-service-base-path: /api/v1/accounting/bank-sync
+  /reports:
+    get:
+      operationId: listReports
+      summary: List reports
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    post:
+      operationId: createReport
+      summary: Create report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '201':
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          description: Invalid request
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+  /reports/{id}:
+    get:
+      operationId: getReport
+      summary: Get report by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Report details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    put:
+      operationId: updateReport
+      summary: Update report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReportRequest'
+      responses:
+        '200':
+          description: Report updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+    delete:
+      operationId: deleteReport
+      summary: Delete report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Report deleted
+        '404':
+          description: Not found
+      x-service: financial-reports
+      x-service-base-path: /api/v1/accounting/financial-reports
+  /vendor-invoices:
+    get:
+      operationId: listVendorInvoices
+      summary: List vendor-invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of vendor-invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VendorInvoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    post:
+      operationId: createVendorInvoice
+      summary: Create vendor-invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorInvoiceRequest'
+      responses:
+        '201':
+          description: VendorInvoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '400':
+          description: Invalid request
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+  /vendor-invoices/{id}:
+    get:
+      operationId: getVendorInvoice
+      summary: Get vendor-invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: VendorInvoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    put:
+      operationId: updateVendorInvoice
+      summary: Update vendor-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorInvoiceRequest'
+      responses:
+        '200':
+          description: VendorInvoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorInvoice'
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+    delete:
+      operationId: deleteVendorInvoice
+      summary: Delete vendor-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: VendorInvoice deleted
+        '404':
+          description: Not found
+      x-service: accounts-payable
+      x-service-base-path: /api/v1/accounting/accounts-payable
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

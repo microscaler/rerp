@@ -1,0 +1,753 @@
+openapi: 3.1.0
+info:
+  title: Pos API Gateway
+  description: 'Point of sale and payment gateway services.. This aggregates and proxies requests to Pos microservices. This
+    is the single entry point for the Pos system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/pos/core/*` → Core Service
+
+    - `/api/v1/pos/payment-gateway/*` → PaymentGateway Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/pos/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/pos
+  description: Pos API Gateway
+tags: []
+paths:
+  /payment-methods:
+    get:
+      operationId: listPaymentMethods
+      summary: List payment-methods
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payment-methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    post:
+      operationId: createPaymentMethod
+      summary: Create payment-method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentMethodRequest'
+      responses:
+        '201':
+          description: PaymentMethod created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '400':
+          description: Invalid request
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+  /payment-methods/{id}:
+    get:
+      operationId: getPaymentMethod
+      summary: Get payment-method by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PaymentMethod details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    put:
+      operationId: updatePaymentMethod
+      summary: Update payment-method
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentMethodRequest'
+      responses:
+        '200':
+          description: PaymentMethod updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    delete:
+      operationId: deletePaymentMethod
+      summary: Delete payment-method
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PaymentMethod deleted
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+  /payments:
+    get:
+      operationId: listPayments
+      summary: List payments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    post:
+      operationId: createPayment
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid request
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Get payment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    put:
+      operationId: updatePayment
+      summary: Update payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+      responses:
+        '200':
+          description: Payment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    delete:
+      operationId: deletePayment
+      summary: Delete payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payment deleted
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+  /pos-orders:
+    get:
+      operationId: listPosOrders
+      summary: List pos-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of pos-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PosOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    post:
+      operationId: createPosOrder
+      summary: Create pos-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePosOrderRequest'
+      responses:
+        '201':
+          description: PosOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosOrder'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /pos-orders/{id}:
+    get:
+      operationId: getPosOrder
+      summary: Get pos-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PosOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    put:
+      operationId: updatePosOrder
+      summary: Update pos-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePosOrderRequest'
+      responses:
+        '200':
+          description: PosOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosOrder'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    delete:
+      operationId: deletePosOrder
+      summary: Delete pos-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PosOrder deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /pos-sessions:
+    get:
+      operationId: listPosSessions
+      summary: List pos-sessions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of pos-sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PosSession'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    post:
+      operationId: createPosSession
+      summary: Create pos-session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePosSessionRequest'
+      responses:
+        '201':
+          description: PosSession created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosSession'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /pos-sessions/{id}:
+    get:
+      operationId: getPosSession
+      summary: Get pos-session by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PosSession details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosSession'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    put:
+      operationId: updatePosSession
+      summary: Update pos-session
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePosSessionRequest'
+      responses:
+        '200':
+          description: PosSession updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PosSession'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    delete:
+      operationId: deletePosSession
+      summary: Delete pos-session
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PosSession deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /receipts:
+    get:
+      operationId: listReceipts
+      summary: List receipts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of receipts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Receipt'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    post:
+      operationId: createReceipt
+      summary: Create receipt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReceiptRequest'
+      responses:
+        '201':
+          description: Receipt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /receipts/{id}:
+    get:
+      operationId: getReceipt
+      summary: Get receipt by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Receipt details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    put:
+      operationId: updateReceipt
+      summary: Update receipt
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReceiptRequest'
+      responses:
+        '200':
+          description: Receipt updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+    delete:
+      operationId: deleteReceipt
+      summary: Delete receipt
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Receipt deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/pos/core
+  /transactions:
+    get:
+      operationId: listTransactions
+      summary: List transactions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    post:
+      operationId: createTransaction
+      summary: Create transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+  /transactions/{id}:
+    get:
+      operationId: getTransaction
+      summary: Get transaction by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Transaction details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    put:
+      operationId: updateTransaction
+      summary: Update transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransactionRequest'
+      responses:
+        '200':
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+    delete:
+      operationId: deleteTransaction
+      summary: Delete transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Transaction deleted
+        '404':
+          description: Not found
+      x-service: payment-gateway
+      x-service-base-path: /api/v1/pos/payment-gateway
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -1,0 +1,295 @@
+openapi: 3.1.0
+info:
+  title: Esg API Gateway
+  description: 'Environmental, Social, and Governance tracking and reporting.. This aggregates and proxies requests to Esg
+    microservices. This is the single entry point for the Esg system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/esg/core/*` → Core Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/esg/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/esg
+  description: Esg API Gateway
+tags: []
+paths:
+  /esg-metrics:
+    get:
+      operationId: listEsgMetrics
+      summary: List esg-metrics
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of esg-metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EsgMetric'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    post:
+      operationId: createEsgMetric
+      summary: Create esg-metric
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEsgMetricRequest'
+      responses:
+        '201':
+          description: EsgMetric created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+  /esg-metrics/{id}:
+    get:
+      operationId: getEsgMetric
+      summary: Get esg-metric by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EsgMetric details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    put:
+      operationId: updateEsgMetric
+      summary: Update esg-metric
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEsgMetricRequest'
+      responses:
+        '200':
+          description: EsgMetric updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EsgMetric'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    delete:
+      operationId: deleteEsgMetric
+      summary: Delete esg-metric
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: EsgMetric deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+  /sustainability-reports:
+    get:
+      operationId: listSustainabilityReports
+      summary: List sustainability-reports
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of sustainability-reports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SustainabilityReport'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    post:
+      operationId: createSustainabilityReport
+      summary: Create sustainability-report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSustainabilityReportRequest'
+      responses:
+        '201':
+          description: SustainabilityReport created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+  /sustainability-reports/{id}:
+    get:
+      operationId: getSustainabilityReport
+      summary: Get sustainability-report by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: SustainabilityReport details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    put:
+      operationId: updateSustainabilityReport
+      summary: Update sustainability-report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSustainabilityReportRequest'
+      responses:
+        '200':
+          description: SustainabilityReport updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SustainabilityReport'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+    delete:
+      operationId: deleteSustainabilityReport
+      summary: Delete sustainability-report
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: SustainabilityReport deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/esg/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

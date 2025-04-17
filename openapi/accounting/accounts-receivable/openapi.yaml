@@ -1,0 +1,345 @@
+openapi: 3.1.0
+info:
+  title: Accounts Receivable
+  version: 1.0.0
+  description: Accounts receivable service managing customer invoices and collections.
+servers:
+- url: /api/v1/accounting/accounts-receivable
+  description: Accounts Receivable API
+tags: []
+paths:
+  /customer-invoices:
+    get:
+      operationId: listCustomerInvoices
+      summary: List customer-invoices
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of customer-invoices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerInvoice'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createCustomerInvoice
+      summary: Create customer-invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
+      responses:
+        '201':
+          description: CustomerInvoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '400':
+          description: Invalid request
+  /customer-invoices/{id}:
+    get:
+      operationId: getCustomerInvoice
+      summary: Get customer-invoice by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: CustomerInvoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '404':
+          description: Not found
+    put:
+      operationId: updateCustomerInvoice
+      summary: Update customer-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
+      responses:
+        '200':
+          description: CustomerInvoice updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerInvoice'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteCustomerInvoice
+      summary: Delete customer-invoice
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: CustomerInvoice deleted
+        '404':
+          description: Not found
+  /payments:
+    get:
+      operationId: listPayments
+      summary: List payments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createPayment
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid request
+  /payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Get payment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+    put:
+      operationId: updatePayment
+      summary: Update payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+      responses:
+        '200':
+          description: Payment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          description: Not found
+    delete:
+      operationId: deletePayment
+      summary: Delete payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Payment deleted
+        '404':
+          description: Not found
+  /ar-agings:
+    get:
+      operationId: listArAgings
+      summary: List ar-agings
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of ar-agings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArAging'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+    post:
+      operationId: createArAging
+      summary: Create ar-aging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArAgingRequest'
+      responses:
+        '201':
+          description: ArAging created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '400':
+          description: Invalid request
+  /ar-agings/{id}:
+    get:
+      operationId: getArAging
+      summary: Get ar-aging by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ArAging details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '404':
+          description: Not found
+    put:
+      operationId: updateArAging
+      summary: Update ar-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArAgingRequest'
+      responses:
+        '200':
+          description: ArAging updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArAging'
+        '404':
+          description: Not found
+    delete:
+      operationId: deleteArAging
+      summary: Delete ar-aging
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ArAging deleted
+        '404':
+          description: Not found
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas: {}

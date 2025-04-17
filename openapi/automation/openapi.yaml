@@ -1,0 +1,409 @@
+openapi: 3.1.0
+info:
+  title: Automation API Gateway
+  description: 'Rule-based workflow automation across all modules.. This aggregates and proxies requests to Automation microservices.
+    This is the single entry point for the Automation system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/automation/core/*` → Core Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/automation/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/automation
+  description: Automation API Gateway
+tags: []
+paths:
+  /executions:
+    get:
+      operationId: listExecutions
+      summary: List executions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of executions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Execution'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    post:
+      operationId: createExecution
+      summary: Create execution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExecutionRequest'
+      responses:
+        '201':
+          description: Execution created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+  /executions/{id}:
+    get:
+      operationId: getExecution
+      summary: Get execution by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Execution details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    put:
+      operationId: updateExecution
+      summary: Update execution
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExecutionRequest'
+      responses:
+        '200':
+          description: Execution updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    delete:
+      operationId: deleteExecution
+      summary: Delete execution
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Execution deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+  /rules:
+    get:
+      operationId: listRules
+      summary: List rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Rule'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    post:
+      operationId: createRule
+      summary: Create rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleRequest'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+  /rules/{id}:
+    get:
+      operationId: getRule
+      summary: Get rule by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    put:
+      operationId: updateRule
+      summary: Update rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleRequest'
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    delete:
+      operationId: deleteRule
+      summary: Delete rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Rule deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+  /workflows:
+    get:
+      operationId: listWorkflows
+      summary: List workflows
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workflow'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    post:
+      operationId: createWorkflow
+      summary: Create workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkflowRequest'
+      responses:
+        '201':
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+  /workflows/{id}:
+    get:
+      operationId: getWorkflow
+      summary: Get workflow by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    put:
+      operationId: updateWorkflow
+      summary: Update workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowRequest'
+      responses:
+        '200':
+          description: Workflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+    delete:
+      operationId: deleteWorkflow
+      summary: Delete workflow
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Workflow deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/automation/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true
