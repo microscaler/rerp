@@ -171,7 +171,7 @@ def create_microservice_lint(name, spec_file):
             './openapi/%s' % spec_file,
         ],
         resource_deps=[],
-        labels=['microservices-lint'],
+        labels=['acc_' + name],
         allow_parallel=True,
     )
 
@@ -211,12 +211,27 @@ def create_microservice_gen(name, spec_file, output_dir):
             './microservices/accounting/%s/static_site' % output_dir,
         ],
         resource_deps=['%s-lint' % name],  # Wait for linting to pass before generating code
-        labels=['microservices-codegen'],
+        labels=['acc_' + name],
         allow_parallel=True,
     )
 
-# Binary name mappings
-# These match the package names in Cargo.toml (BRRTRouter uses package name as binary name)
+# Cargo [package] names from brrtrouter-gen (for cargo -p and for binary output path)
+# BFF: brrtrouter-gen derives "rerp_accounting_backend_for_frontend_api" from OpenAPI info.title
+PACKAGE_NAMES = {
+    'general-ledger': 'general_ledger',
+    'invoice': 'invoice_management',
+    'accounts-receivable': 'accounts_receivable',
+    'accounts-payable': 'accounts_payable',
+    'bank-sync': 'bank_synchronization',
+    'asset': 'asset_management',
+    'budget': 'budgeting',
+    'edi': 'edi___compliance',
+    'financial-reports': 'financial_reports',
+    'bff': 'rerp_accounting_backend_for_frontend_api',
+}
+
+# Artifact and container binary names (build_artifacts/, /app/, Helm app.binaryName)
+# These match Dockerfiles and values/*.yaml; may differ from package name.
 BINARY_NAMES = {
     'general-ledger': 'general_ledger',
     'invoice': 'invoice',
@@ -225,6 +240,9 @@ BINARY_NAMES = {
     'bank-sync': 'bank_sync',
     'asset': 'asset',
     'budget': 'budget',
+    'edi': 'edi',
+    'financial-reports': 'financial_reports',
+    'bff': 'bff',
 }
 
 # Port mappings
@@ -237,6 +255,9 @@ def get_service_port(name):
         'bank-sync': '8005',
         'asset': '8006',
         'budget': '8007',
+        'edi': '8008',
+        'financial-reports': '8009',
+        'bff': '8010',
     }
     return ports.get(name, '8080')
 
@@ -261,8 +282,8 @@ def create_microservice_build_resource(name):
             './microservices/target',
             './build_artifacts',
         ],
-        resource_deps=['%s-service-gen' % name],  # Wait for code generation
-        labels=['microservices-build'],
+        resource_deps=['accounting-all-gens'],  # Wait for all accounting codegen (so workspace members exist)
+        labels=['acc_' + name],
         allow_parallel=True,
     )
     
@@ -270,20 +291,23 @@ def create_microservice_build_resource(name):
 
 # Helper function to create deployment resource for a microservice
 def create_microservice_deployment(name):
+    package_name = PACKAGE_NAMES.get(name, BINARY_NAMES.get(name, name.replace('-', '_')))
     binary_name = BINARY_NAMES.get(name, '%s_service_api' % name.replace('-', '_'))
-    target_path = 'microservices/target/x86_64-unknown-linux-musl/debug/%s' % binary_name
-    artifact_path = 'build_artifacts/%s' % binary_name
+    # Binary on disk uses Cargo [package] name; copy dest uses BINARY_NAMES for Docker/Helm.
+    # Use build_artifacts/amd64/ so Dockerfile build_artifacts/${TARGETARCH}/ works (Tilt = amd64).
+    target_path = 'microservices/target/x86_64-unknown-linux-musl/debug/%s' % package_name
+    artifact_path = 'build_artifacts/amd64/%s' % binary_name
     dockerfile = 'docker/microservices/Dockerfile.%s' % name
     image_name = 'localhost:5001/rerp-%s' % name
-    
+
     # 1. Copy binary from workspace build to artifacts and create SHA256 hash
-    hash_path = 'build_artifacts/%s.sha256' % binary_name
+    hash_path = 'build_artifacts/amd64/%s.sha256' % binary_name
     local_resource(
         'copy-%s' % name,
         './scripts/copy-microservice-binary-simple.sh %s %s %s' % (target_path, artifact_path, binary_name),
         deps=[target_path, './scripts/copy-microservice-binary-simple.sh'],
         resource_deps=['build-%s' % name],
-        labels=['microservices-build'],
+        labels=['acc_' + name],
         allow_parallel=True,
     )
     
@@ -293,15 +317,18 @@ def create_microservice_deployment(name):
         './scripts/build-microservice-docker-simple.sh %s %s %s %s' % (image_name, dockerfile, hash_path, artifact_path),
         deps=[hash_path, artifact_path, dockerfile, './scripts/build-microservice-docker-simple.sh'],
         resource_deps=['copy-%s' % name],
-        labels=['microservices-build'],
+        labels=['acc_' + name],
         allow_parallel=False,
     )
     
     # 3. Custom build for Tilt live updates
+    # Ensure image exists (build if custom_build runs before docker-%s), then push to localhost:5001
+    # or, if registry is not running, use kind load (no registry needed)
     custom_build(
         image_name,
-        'docker tag %s:tilt $EXPECTED_REF && docker push $EXPECTED_REF' % image_name,
-        deps=[artifact_path, 'microservices/accounting/%s/config' % name, 'microservices/accounting/%s/doc' % name, 'microservices/accounting/%s/static_site' % name],
+        ('(docker image inspect %s:tilt >/dev/null 2>&1) || ./scripts/build-microservice-docker-simple.sh %s %s %s %s' % (image_name, image_name, dockerfile, hash_path, artifact_path)
+         + ' && (docker push $EXPECTED_REF 2>/dev/null || kind load docker-image $EXPECTED_REF --name rerp)'),
+        deps=[artifact_path, hash_path, 'microservices/accounting/%s/config' % name, 'microservices/accounting/%s/doc' % name, 'microservices/accounting/%s/static_site' % name],
         tag='tilt',
         live_update=[
             sync(artifact_path, '/app/%s' % binary_name),
@@ -320,44 +347,71 @@ def create_microservice_deployment(name):
         name,
         port_forwards=['%s:%s' % (get_service_port(name), get_service_port(name))],
         resource_deps=['docker-%s' % name],
-        labels=['accounting'],
+        labels=['acc_' + name],
         auto_init=True,
         trigger_mode=TRIGGER_MODE_AUTO,
     )
 
 # ====================
-# Load Kubernetes Namespace
+# Kubernetes Namespace
 # ====================
-
-# Load microservices namespace
-k8s_yaml(kustomize('./k8s/microservices'))
+# The "rerp" namespace is created at cluster creation (e.g. just dev-up applies
+# k8s/microservices/namespace.yaml). Tilt does not manage it.
 
 # ====================
 # Accounting Microservices
 # ====================
+# All accounting components: each has lint, gen, build, deploy. One label per resource with
+# acc_ prefix (e.g. acc_general-ledger, acc_accounts-receivable, acc_bff, acc_all_gens).
 
-# General Ledger Service
-create_microservice_lint('general-ledger', 'accounting/general-ledger/openapi.yaml')
-create_microservice_gen('general-ledger', 'accounting/general-ledger/openapi.yaml', 'general-ledger')
-create_microservice_build_resource('general-ledger')
-create_microservice_deployment('general-ledger')
+ACCOUNTING_SERVICES = [
+    'general-ledger',
+    'invoice',
+    'accounts-receivable',
+    'accounts-payable',
+    'bank-sync',
+    'asset',
+    'budget',
+    'edi',
+    'financial-reports',
+]
+
+for name in ACCOUNTING_SERVICES:
+    create_microservice_lint(name, 'accounting/%s/openapi.yaml' % name)
+    create_microservice_gen(name, 'accounting/%s/openapi.yaml' % name, name)
+
+# All accounting gens must complete before any build (so microservices/Cargo.toml members exist)
+# Includes bff-service-gen (BFF spec is generated by bff-spec-gen, then bff-lint, then bff-service-gen)
+local_resource(
+    'accounting-all-gens',
+    'echo "✅ All accounting codegen complete"',
+    resource_deps=['%s-service-gen' % name for name in ACCOUNTING_SERVICES] + ['bff-service-gen'],
+    labels=['acc_all_gens'],
+    allow_parallel=False,
+)
+
+for name in ACCOUNTING_SERVICES:
+    create_microservice_build_resource(name)
+    create_microservice_deployment(name)
 
 # ====================
 # Backend for Frontend (BFF) Spec Generation
 # ====================
 # The BFF spec aggregates all accounting microservice paths and is automatically
 # regenerated whenever any microservice OpenAPI spec changes.
+# Uses the standalone bff-generator (pip install bff-generator).
 
 local_resource(
     'bff-spec-gen',
     cmd='''
-        echo "🔄 Regenerating Accounting BFF OpenAPI spec from accounting microservice specs (idempotent clobber)..."
-        python3 ./scripts/generate_bff_spec.py accounting
-        
-        echo "✅ Accounting BFF spec regeneration complete (file clobbered)"
+        echo "🔄 Regenerating Accounting BFF OpenAPI spec (bff-generator)..."
+        bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
+        echo "✅ Accounting BFF spec regeneration complete"
     ''',
     deps=[
-        # Accounting services - list all accounting service OpenAPI specs
+        # Suite config
+        './openapi/accounting/bff-suite-config.yaml',
+        # Accounting service OpenAPI specs
         './openapi/accounting/general-ledger/openapi.yaml',
         './openapi/accounting/invoice/openapi.yaml',
         './openapi/accounting/accounts-receivable/openapi.yaml',
@@ -367,22 +421,35 @@ local_resource(
         './openapi/accounting/budget/openapi.yaml',
         './openapi/accounting/edi/openapi.yaml',
         './openapi/accounting/financial-reports/openapi.yaml',
-        # Script itself
-        './scripts/generate_bff_spec.py',
     ],
     ignore=[
-        './openapi/accounting/openapi_bff.yaml',  # Don't watch the generated file (clobbered each run)
+        './openapi/accounting/openapi_bff.yaml',  # Don't watch the generated file
     ],
-    resource_deps=[],  # No dependencies - runs when any microservice spec changes
-    labels=['microservices-codegen'],
+    resource_deps=[],
+    labels=['acc_bff'],
     allow_parallel=True,
 )
 
-# ====================
-# Example: Additional Services
-# ====================
-# Uncomment as services are bootstrapped:
-# create_microservice_lint('invoice', 'accounting/invoice/openapi.yaml')
-# create_microservice_gen('invoice', 'accounting/invoice/openapi.yaml', 'invoice')
-# create_microservice_build_resource('invoice')
-# create_microservice_deployment('invoice')
+# BFF microservice: lint generated spec, gen from openapi_bff.yaml, build, deploy
+# Lint depends on bff-spec-gen so openapi_bff.yaml exists
+local_resource(
+    'bff-lint',
+    cmd='''
+        echo "🔍 Linting BFF OpenAPI spec..."
+        ../BRRTRouter/target/debug/brrtrouter-gen lint \
+            --spec ./openapi/accounting/openapi_bff.yaml \
+            --fail-on-error || \
+        cargo run --manifest-path ../BRRTRouter/Cargo.toml --bin brrtrouter-gen -- \
+            lint \
+            --spec ./openapi/accounting/openapi_bff.yaml \
+            --fail-on-error
+        echo "✅ BFF OpenAPI spec linting passed"
+    ''',
+    deps=['./openapi/accounting/openapi_bff.yaml'],
+    resource_deps=['bff-spec-gen'],
+    labels=['acc_bff'],
+    allow_parallel=True,
+)
+create_microservice_gen('bff', 'accounting/openapi_bff.yaml', 'bff')
+create_microservice_build_resource('bff')
+create_microservice_deployment('bff')

@@ -27,7 +27,7 @@ tags: []
 paths:
   /documents:
     get:
-      operationId: listDocuments
+      operationId: list_documents
       summary: List documents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -54,7 +54,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     post:
-      operationId: createDocument
+      operationId: create_document
       summary: Create document
       requestBody:
         required: true
@@ -75,7 +75,7 @@ paths:
       x-service-base-path: /api/v1/documents/core
   /documents/{id}:
     get:
-      operationId: getDocument
+      operationId: get_document
       summary: Get document by id
       parameters:
       - name: id
@@ -96,7 +96,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     put:
-      operationId: updateDocument
+      operationId: update_document
       summary: Update document
       parameters:
       - name: id
@@ -123,7 +123,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     delete:
-      operationId: deleteDocument
+      operationId: delete_document
       summary: Delete document
       parameters:
       - name: id
@@ -141,7 +141,7 @@ paths:
       x-service-base-path: /api/v1/documents/core
   /folders:
     get:
-      operationId: listFolders
+      operationId: list_folders
       summary: List folders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -168,7 +168,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     post:
-      operationId: createFolder
+      operationId: create_folder
       summary: Create folder
       requestBody:
         required: true
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/documents/core
   /folders/{id}:
     get:
-      operationId: getFolder
+      operationId: get_folder
       summary: Get folder by id
       parameters:
       - name: id
@@ -210,7 +210,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     put:
-      operationId: updateFolder
+      operationId: update_folder
       summary: Update folder
       parameters:
       - name: id
@@ -237,7 +237,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     delete:
-      operationId: deleteFolder
+      operationId: delete_folder
       summary: Delete folder
       parameters:
       - name: id
@@ -255,7 +255,7 @@ paths:
       x-service-base-path: /api/v1/documents/core
   /versions:
     get:
-      operationId: listVersions
+      operationId: list_versions
       summary: List versions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -282,7 +282,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     post:
-      operationId: createVersion
+      operationId: create_version
       summary: Create version
       requestBody:
         required: true
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/documents/core
   /versions/{id}:
     get:
-      operationId: getVersion
+      operationId: get_version
       summary: Get version by id
       parameters:
       - name: id
@@ -324,7 +324,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     put:
-      operationId: updateVersion
+      operationId: update_version
       summary: Update version
       parameters:
       - name: id
@@ -351,7 +351,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/documents/core
     delete:
-      operationId: deleteVersion
+      operationId: delete_version
       summary: Delete version
       parameters:
       - name: id

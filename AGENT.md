@@ -101,7 +101,7 @@ This automatically:
 
 ### CI/CD
 
-- `.github/workflows/generate-bff-specs.yml` - Auto-generates BFF specs on changes
+- `.github/workflows/ci.yml` - Validate OpenAPI (incl. BFF generation dry run), build, test, multi-arch
 
 ---
 

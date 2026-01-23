@@ -11,7 +11,7 @@ tags: []
 paths:
   /roles:
     get:
-      operationId: listRoles
+      operationId: list_roles
       summary: List roles
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRole
+      operationId: create_role
       summary: Create role
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /roles/{id}:
     get:
-      operationId: getRole
+      operationId: get_role
       summary: Get role by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRole
+      operationId: update_role
       summary: Update role
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRole
+      operationId: delete_role
       summary: Delete role
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /permissions:
     get:
-      operationId: listPermissions
+      operationId: list_permissions
       summary: List permissions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPermission
+      operationId: create_permission
       summary: Create permission
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /permissions/{id}:
     get:
-      operationId: getPermission
+      operationId: get_permission
       summary: Get permission by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePermission
+      operationId: update_permission
       summary: Update permission
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePermission
+      operationId: delete_permission
       summary: Delete permission
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /roles/{roleId}/permissions:
     get:
-      operationId: getRolePermissions
+      operationId: get_role_permissions
       summary: Get permissions for role
       responses:
         '200':
@@ -238,7 +238,7 @@ paths:
           type: string
           format: uuid
     post:
-      operationId: assignPermission
+      operationId: assign_permission
       summary: Assign permission to role
       responses:
         '200':
@@ -265,7 +265,7 @@ paths:
           format: uuid
   /roles/{roleId}/permissions/{permissionId}:
     delete:
-      operationId: revokePermission
+      operationId: revoke_permission
       summary: Revoke permission from role
       responses:
         '200':
@@ -291,7 +291,7 @@ paths:
           format: uuid
   /users/{userId}/roles:
     get:
-      operationId: getUserRoles
+      operationId: get_user_roles
       summary: Get roles for user
       responses:
         '200':
@@ -310,7 +310,7 @@ paths:
           type: string
           format: uuid
     post:
-      operationId: assignRole
+      operationId: assign_role
       summary: Assign role to user
       responses:
         '200':
@@ -337,7 +337,7 @@ paths:
           format: uuid
   /users/{userId}/roles/{roleId}:
     delete:
-      operationId: revokeRole
+      operationId: revoke_role
       summary: Revoke role from user
       responses:
         '200':
@@ -363,7 +363,7 @@ paths:
           format: uuid
   /check:
     post:
-      operationId: checkPermission
+      operationId: check_permission
       summary: Check if user has permission
       responses:
         '200':

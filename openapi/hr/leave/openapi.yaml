@@ -10,7 +10,7 @@ tags: []
 paths:
   /leave-requests:
     get:
-      operationId: listLeaveRequests
+      operationId: list_leave_requests
       summary: List leave-requests
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLeaveRequest
+      operationId: create_leave_request
       summary: Create leave-request
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /leave-requests/{id}:
     get:
-      operationId: getLeaveRequest
+      operationId: get_leave_request
       summary: Get leave-request by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLeaveRequest
+      operationId: update_leave_request
       summary: Update leave-request
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLeaveRequest
+      operationId: delete_leave_request
       summary: Delete leave-request
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /leave-balances:
     get:
-      operationId: listLeaveBalances
+      operationId: list_leave_balances
       summary: List leave-balances
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLeaveBalance
+      operationId: create_leave_balance
       summary: Create leave-balance
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /leave-balances/{id}:
     get:
-      operationId: getLeaveBalance
+      operationId: get_leave_balance
       summary: Get leave-balance by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLeaveBalance
+      operationId: update_leave_balance
       summary: Update leave-balance
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLeaveBalance
+      operationId: delete_leave_balance
       summary: Delete leave-balance
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /holiday-calendars:
     get:
-      operationId: listHolidayCalendars
+      operationId: list_holiday_calendars
       summary: List holiday-calendars
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createHolidayCalendar
+      operationId: create_holiday_calendar
       summary: Create holiday-calendar
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /holiday-calendars/{id}:
     get:
-      operationId: getHolidayCalendar
+      operationId: get_holiday_calendar
       summary: Get holiday-calendar by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateHolidayCalendar
+      operationId: update_holiday_calendar
       summary: Update holiday-calendar
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteHolidayCalendar
+      operationId: delete_holiday_calendar
       summary: Delete holiday-calendar
       parameters:
       - name: id

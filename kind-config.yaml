@@ -12,35 +12,9 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         node-labels: "ingress-ready=true"
+  # Microservice ports 8001–8010 are forwarded by Tilt (port_forwards). Do NOT add
+  # hostPort for 8001–8010 here or it will conflict with Tilt binding "address already in use".
   extraPortMappings:
-  # General Ledger Service
-  - containerPort: 31001
-    hostPort: 8001
-    protocol: TCP
-  # Invoice Service
-  - containerPort: 31002
-    hostPort: 8002
-    protocol: TCP
-  # Accounts Receivable Service
-  - containerPort: 31003
-    hostPort: 8003
-    protocol: TCP
-  # Accounts Payable Service
-  - containerPort: 31004
-    hostPort: 8004
-    protocol: TCP
-  # Bank Sync Service
-  - containerPort: 31005
-    hostPort: 8005
-    protocol: TCP
-  # Asset Service
-  - containerPort: 31006
-    hostPort: 8006
-    protocol: TCP
-  # Budget Service
-  - containerPort: 31007
-    hostPort: 8007
-    protocol: TCP
   # PostgreSQL (using 5433 to avoid conflict with local postgres on 5432)
   - containerPort: 30432
     hostPort: 5433

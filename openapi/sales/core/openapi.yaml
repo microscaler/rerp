@@ -10,7 +10,7 @@ tags: []
 paths:
   /sales:
     get:
-      operationId: listSales
+      operationId: list_sales
       summary: List sales
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSale
+      operationId: create_sale
       summary: Create sale
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /sales/{id}:
     get:
-      operationId: getSale
+      operationId: get_sale
       summary: Get sale by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSale
+      operationId: update_sale
       summary: Update sale
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSale
+      operationId: delete_sale
       summary: Delete sale
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /quotes:
     get:
-      operationId: listQuotes
+      operationId: list_quotes
       summary: List quotes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createQuote
+      operationId: create_quote
       summary: Create quote
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /quotes/{id}:
     get:
-      operationId: getQuote
+      operationId: get_quote
       summary: Get quote by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateQuote
+      operationId: update_quote
       summary: Update quote
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteQuote
+      operationId: delete_quote
       summary: Delete quote
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /orders:
     get:
-      operationId: listOrders
+      operationId: list_orders
       summary: List orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createOrder
+      operationId: create_order
       summary: Create order
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /orders/{id}:
     get:
-      operationId: getOrder
+      operationId: get_order
       summary: Get order by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateOrder
+      operationId: update_order
       summary: Update order
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteOrder
+      operationId: delete_order
       summary: Delete order
       parameters:
       - name: id

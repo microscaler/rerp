@@ -10,7 +10,7 @@ tags: []
 paths:
   /contents:
     get:
-      operationId: listContents
+      operationId: list_contents
       summary: List contents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createContent
+      operationId: create_content
       summary: Create content
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /contents/{id}:
     get:
-      operationId: getContent
+      operationId: get_content
       summary: Get content by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateContent
+      operationId: update_content
       summary: Update content
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteContent
+      operationId: delete_content
       summary: Delete content
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /medias:
     get:
-      operationId: listMedias
+      operationId: list_medias
       summary: List medias
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createMedia
+      operationId: create_media
       summary: Create media
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /medias/{id}:
     get:
-      operationId: getMedia
+      operationId: get_media
       summary: Get media by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateMedia
+      operationId: update_media
       summary: Update media
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteMedia
+      operationId: delete_media
       summary: Delete media
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /seos:
     get:
-      operationId: listSeos
+      operationId: list_seos
       summary: List seos
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSeo
+      operationId: create_seo
       summary: Create seo
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /seos/{id}:
     get:
-      operationId: getSeo
+      operationId: get_seo
       summary: Get seo by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSeo
+      operationId: update_seo
       summary: Update seo
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSeo
+      operationId: delete_seo
       summary: Delete seo
       parameters:
       - name: id

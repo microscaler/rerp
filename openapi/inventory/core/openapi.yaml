@@ -10,7 +10,7 @@ tags: []
 paths:
   /stocks:
     get:
-      operationId: listStocks
+      operationId: list_stocks
       summary: List stocks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createStock
+      operationId: create_stock
       summary: Create stock
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /stocks/{id}:
     get:
-      operationId: getStock
+      operationId: get_stock
       summary: Get stock by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateStock
+      operationId: update_stock
       summary: Update stock
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteStock
+      operationId: delete_stock
       summary: Delete stock
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /stock-movements:
     get:
-      operationId: listStockMovements
+      operationId: list_stock_movements
       summary: List stock-movements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createStockMovement
+      operationId: create_stock_movement
       summary: Create stock-movement
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /stock-movements/{id}:
     get:
-      operationId: getStockMovement
+      operationId: get_stock_movement
       summary: Get stock-movement by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateStockMovement
+      operationId: update_stock_movement
       summary: Update stock-movement
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteStockMovement
+      operationId: delete_stock_movement
       summary: Delete stock-movement
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /stock-valuations:
     get:
-      operationId: listStockValuations
+      operationId: list_stock_valuations
       summary: List stock-valuations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createStockValuation
+      operationId: create_stock_valuation
       summary: Create stock-valuation
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /stock-valuations/{id}:
     get:
-      operationId: getStockValuation
+      operationId: get_stock_valuation
       summary: Get stock-valuation by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateStockValuation
+      operationId: update_stock_valuation
       summary: Update stock-valuation
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteStockValuation
+      operationId: delete_stock_valuation
       summary: Delete stock-valuation
       parameters:
       - name: id

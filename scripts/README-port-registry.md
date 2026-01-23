@@ -76,8 +76,7 @@ When you assign a port with `--update-configs`, the script automatically updates
    - `app.serviceName`
    - `app.binaryName`
 
-2. **Kind Config** (`kind-config.yaml`):
-   - Adds port mapping entry
+2. **Kind Config** (`kind-config.yaml`): Adds port mapping only for ports **outside** 8001–8099 (Tilt-managed range). See "Kind and Tilt: Avoid Port Conflicts" below.
 
 3. **Port Registry** (`scripts/port-registry.json`):
    - Records the assignment
@@ -139,9 +138,9 @@ Output:
 ```
 Port Assignments:
 --------------------------------------------------
-  general-ledger              Port: 8001  NodePort: 30801
-  invoice                     Port: 8002  NodePort: 30802
-  accounts-receivable         Port: 8003  NodePort: 30803
+  general-ledger              Port: 8001  NodePort: 31001
+  invoice                     Port: 8002  NodePort: 31002
+  accounts-receivable         Port: 8003  NodePort: 31003
 --------------------------------------------------
 
 Total: 3 services
@@ -175,16 +174,61 @@ If Helm values file doesn't exist, the script will warn you:
 
 Create the service first, then assign the port.
 
+## Validate and Reconcile
+
+### Scan All Sources for Conflicts
+
+```bash
+./scripts/assign-port.py validate
+./scripts/assign-port.py validate --json   # machine-readable
+```
+
+**Scans:** `port-registry.json`, `helm/rerp-microservice/values/*.yaml`, `kind-config.yaml` (hostPort), `Tiltfile` (get_service_port), `openapi/accounting/bff-suite-config.yaml`, `scripts/generate_bff_spec.py`.
+
+**Reports:** Duplicate `service.port` in helm, duplicate `hostPort` in kind, kind `hostPort` in 8001–8099 (conflicts with Tilt port-forwards), registry/helm/Tiltfile mismatches.
+
+Run before `just dev-up` or in CI to catch conflicts.
+
+### Reconcile Registry from Helm
+
+```bash
+./scripts/assign-port.py reconcile
+./scripts/assign-port.py reconcile --update-configs
+```
+
+Adds any service in `helm/.../values/*.yaml` that is missing from the registry, using the port from helm. If that port is already taken, skips with a warning.
+
+### Fix Duplicate Ports (Dedup)
+
+When several services share the same `service.port` in helm (e.g. `invoice` and `ftebe` on 8002), use:
+
+```bash
+./scripts/assign-port.py fix-duplicates
+./scripts/assign-port.py fix-duplicates --dry-run   # show plan only
+```
+
+- **Accounting** services (from `openapi/accounting/bff-suite-config.yaml` and `bff`) **keep** their port.
+- **Others** (idam, amd, marketing, billing, ftebe, etc.) are assigned the next free port and their **helm values are updated** (`service.port`, `service.containerPort`, `service.nodePort` only; `app.binaryName`, `image`, etc. are left as-is).
+- Run `validate` after to confirm.
+
+## Kind and Tilt: Avoid Port Conflicts
+
+**Tilt** sets `port_forwards` (e.g. `8001:8001`) so you can reach services on `localhost:8001`.  
+**Kind** `extraPortMappings` with `hostPort: 8001` also binds the host. If both exist, you get **"address already in use"**.
+
+- Ports **8001–8099** are **Tilt-managed**: only Tilt’s port-forwards bind them. `kind-config.yaml` must **not** use `hostPort` in that range.
+- `assign-port.py update-configs` **does not** add kind `hostPort` for 8001–8099.
+- `assign-port.py validate` warns if kind has `hostPort` in 8001–8099.
+
 ## Best Practices
 
 1. **Always use `--update-configs`** when assigning ports to automatically update config files
-2. **Check assignments** with `list` before creating new services
-3. **Don't manually edit** port numbers in config files - use the script
-4. **Release ports** when removing services to keep the registry clean
+2. **Run `validate`** before `just dev-up` and in CI
+3. **Check assignments** with `list` before creating new services
+4. **Don't manually edit** port numbers in config files - use the script
+5. **Release ports** when removing services to keep the registry clean
 
 ## Future Enhancements
 
 - Integration with `bootstrap_microservice.py` for automatic port assignment
-- Port conflict detection across all config files
-- Port range validation
 - Export to documentation (e.g., update RERP_PREPARATION_PLAN.md automatically)

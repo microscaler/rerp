@@ -1,0 +1,67 @@
+# BFF Generator suite config for RERP Accounting.
+# Use: bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
+# Run from the repo root. Requires: pip install bff-generator (or -e /path/to/bff-generator)
+
+suite: accounting
+architecture: multi-suite
+openapi_base_dir: openapi/accounting
+output_path: openapi/accounting/openapi_bff.yaml
+
+services:
+  general-ledger:
+    base_path: /api/general-ledger
+    port: 8001
+    spec_path: general-ledger/openapi.yaml
+  invoice:
+    base_path: /api/invoice
+    port: 8002
+    spec_path: invoice/openapi.yaml
+  accounts-receivable:
+    base_path: /api/accounts-receivable
+    port: 8003
+    spec_path: accounts-receivable/openapi.yaml
+  accounts-payable:
+    base_path: /api/accounts-payable
+    port: 8004
+    spec_path: accounts-payable/openapi.yaml
+  bank-sync:
+    base_path: /api/bank-sync
+    port: 8005
+    spec_path: bank-sync/openapi.yaml
+  asset:
+    base_path: /api/asset
+    port: 8006
+    spec_path: asset/openapi.yaml
+  budget:
+    base_path: /api/budget
+    port: 8007
+    spec_path: budget/openapi.yaml
+  edi:
+    base_path: /api/edi
+    port: 8008
+    spec_path: edi/openapi.yaml
+  financial-reports:
+    base_path: /api/financial-reports
+    port: 8009
+    spec_path: financial-reports/openapi.yaml
+
+metadata:
+  title: "RERP Accounting Backend for Frontend API"
+  version: "1.0.0"
+  description: |
+    Backend for Frontend (BFF) API for the Accounting Suite.
+    This aggregates and proxies requests to RERP microservices.
+    This is the single entry point for the frontend application.
+
+    All requests are proxied to the appropriate microservice.
+    This spec is automatically generated - do not edit manually.
+
+    **Generation**: bff-generator (standalone). Service discovery from openapi/accounting/.
+  contact:
+    name: "RERP API Support"
+    email: "api-support@rerp.ai"
+  servers:
+    - url: "https://api.rerp.ai"
+      description: "Production server"
+    - url: "http://localhost:8000"
+      description: "Local development server (BFF)"

@@ -35,7 +35,7 @@ tags: []
 paths:
   /bom-lines:
     get:
-      operationId: listBomLines
+      operationId: list_bom_lines
       summary: List bom-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -62,7 +62,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     post:
-      operationId: createBomLine
+      operationId: create_bom_line
       summary: Create bom-line
       requestBody:
         required: true
@@ -83,7 +83,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/bom
   /bom-lines/{id}:
     get:
-      operationId: getBomLine
+      operationId: get_bom_line
       summary: Get bom-line by id
       parameters:
       - name: id
@@ -104,7 +104,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     put:
-      operationId: updateBomLine
+      operationId: update_bom_line
       summary: Update bom-line
       parameters:
       - name: id
@@ -131,7 +131,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     delete:
-      operationId: deleteBomLine
+      operationId: delete_bom_line
       summary: Delete bom-line
       parameters:
       - name: id
@@ -149,7 +149,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/bom
   /bom-versions:
     get:
-      operationId: listBomVersions
+      operationId: list_bom_versions
       summary: List bom-versions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -176,7 +176,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     post:
-      operationId: createBomVersion
+      operationId: create_bom_version
       summary: Create bom-version
       requestBody:
         required: true
@@ -197,7 +197,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/bom
   /bom-versions/{id}:
     get:
-      operationId: getBomVersion
+      operationId: get_bom_version
       summary: Get bom-version by id
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     put:
-      operationId: updateBomVersion
+      operationId: update_bom_version
       summary: Update bom-version
       parameters:
       - name: id
@@ -245,7 +245,7 @@ paths:
       x-service: bom
       x-service-base-path: /api/v1/manufacturing/bom
     delete:
-      operationId: deleteBomVersion
+      operationId: delete_bom_version
       summary: Delete bom-version
       parameters:
       - name: id
@@ -263,7 +263,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/bom
   /boms:
     get:
-      operationId: listBoms
+      operationId: list_boms
       summary: List boms
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -290,7 +290,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     post:
-      operationId: createBom
+      operationId: create_bom
       summary: Create bom
       requestBody:
         required: true
@@ -311,7 +311,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/core
   /boms/{id}:
     get:
-      operationId: getBom
+      operationId: get_bom
       summary: Get bom by id
       parameters:
       - name: id
@@ -332,7 +332,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     put:
-      operationId: updateBom
+      operationId: update_bom
       summary: Update bom
       parameters:
       - name: id
@@ -359,7 +359,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     delete:
-      operationId: deleteBom
+      operationId: delete_bom
       summary: Delete bom
       parameters:
       - name: id
@@ -377,7 +377,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/core
   /capacity-plans:
     get:
-      operationId: listCapacityPlans
+      operationId: list_capacity_plans
       summary: List capacity-plans
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -404,7 +404,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     post:
-      operationId: createCapacityPlan
+      operationId: create_capacity_plan
       summary: Create capacity-plan
       requestBody:
         required: true
@@ -425,7 +425,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /capacity-plans/{id}:
     get:
-      operationId: getCapacityPlan
+      operationId: get_capacity_plan
       summary: Get capacity-plan by id
       parameters:
       - name: id
@@ -446,7 +446,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     put:
-      operationId: updateCapacityPlan
+      operationId: update_capacity_plan
       summary: Update capacity-plan
       parameters:
       - name: id
@@ -473,7 +473,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     delete:
-      operationId: deleteCapacityPlan
+      operationId: delete_capacity_plan
       summary: Delete capacity-plan
       parameters:
       - name: id
@@ -491,7 +491,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /mrp-runs:
     get:
-      operationId: listMrpRuns
+      operationId: list_mrp_runs
       summary: List mrp-runs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -518,7 +518,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     post:
-      operationId: createMrpRun
+      operationId: create_mrp_run
       summary: Create mrp-run
       requestBody:
         required: true
@@ -539,7 +539,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /mrp-runs/{id}:
     get:
-      operationId: getMrpRun
+      operationId: get_mrp_run
       summary: Get mrp-run by id
       parameters:
       - name: id
@@ -560,7 +560,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     put:
-      operationId: updateMrpRun
+      operationId: update_mrp_run
       summary: Update mrp-run
       parameters:
       - name: id
@@ -587,7 +587,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     delete:
-      operationId: deleteMrpRun
+      operationId: delete_mrp_run
       summary: Delete mrp-run
       parameters:
       - name: id
@@ -605,7 +605,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /production-orders:
     get:
-      operationId: listProductionOrders
+      operationId: list_production_orders
       summary: List production-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -632,7 +632,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     post:
-      operationId: createProductionOrder
+      operationId: create_production_order
       summary: Create production-order
       requestBody:
         required: true
@@ -653,7 +653,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/core
   /production-orders/{id}:
     get:
-      operationId: getProductionOrder
+      operationId: get_production_order
       summary: Get production-order by id
       parameters:
       - name: id
@@ -674,7 +674,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     put:
-      operationId: updateProductionOrder
+      operationId: update_production_order
       summary: Update production-order
       parameters:
       - name: id
@@ -701,7 +701,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     delete:
-      operationId: deleteProductionOrder
+      operationId: delete_production_order
       summary: Delete production-order
       parameters:
       - name: id
@@ -719,7 +719,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/core
   /production-schedules:
     get:
-      operationId: listProductionSchedules
+      operationId: list_production_schedules
       summary: List production-schedules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -746,7 +746,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     post:
-      operationId: createProductionSchedule
+      operationId: create_production_schedule
       summary: Create production-schedule
       requestBody:
         required: true
@@ -767,7 +767,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /production-schedules/{id}:
     get:
-      operationId: getProductionSchedule
+      operationId: get_production_schedule
       summary: Get production-schedule by id
       parameters:
       - name: id
@@ -788,7 +788,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     put:
-      operationId: updateProductionSchedule
+      operationId: update_production_schedule
       summary: Update production-schedule
       parameters:
       - name: id
@@ -815,7 +815,7 @@ paths:
       x-service: production-planning
       x-service-base-path: /api/v1/manufacturing/production-planning
     delete:
-      operationId: deleteProductionSchedule
+      operationId: delete_production_schedule
       summary: Delete production-schedule
       parameters:
       - name: id
@@ -833,7 +833,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/production-planning
   /repair-lines:
     get:
-      operationId: listRepairLines
+      operationId: list_repair_lines
       summary: List repair-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -860,7 +860,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     post:
-      operationId: createRepairLine
+      operationId: create_repair_line
       summary: Create repair-line
       requestBody:
         required: true
@@ -881,7 +881,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/repair
   /repair-lines/{id}:
     get:
-      operationId: getRepairLine
+      operationId: get_repair_line
       summary: Get repair-line by id
       parameters:
       - name: id
@@ -902,7 +902,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     put:
-      operationId: updateRepairLine
+      operationId: update_repair_line
       summary: Update repair-line
       parameters:
       - name: id
@@ -929,7 +929,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     delete:
-      operationId: deleteRepairLine
+      operationId: delete_repair_line
       summary: Delete repair-line
       parameters:
       - name: id
@@ -947,7 +947,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/repair
   /repair-orders:
     get:
-      operationId: listRepairOrders
+      operationId: list_repair_orders
       summary: List repair-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -974,7 +974,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     post:
-      operationId: createRepairOrder
+      operationId: create_repair_order
       summary: Create repair-order
       requestBody:
         required: true
@@ -995,7 +995,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/repair
   /repair-orders/{id}:
     get:
-      operationId: getRepairOrder
+      operationId: get_repair_order
       summary: Get repair-order by id
       parameters:
       - name: id
@@ -1016,7 +1016,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     put:
-      operationId: updateRepairOrder
+      operationId: update_repair_order
       summary: Update repair-order
       parameters:
       - name: id
@@ -1043,7 +1043,7 @@ paths:
       x-service: repair
       x-service-base-path: /api/v1/manufacturing/repair
     delete:
-      operationId: deleteRepairOrder
+      operationId: delete_repair_order
       summary: Delete repair-order
       parameters:
       - name: id
@@ -1061,7 +1061,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/repair
   /subcontract-orders:
     get:
-      operationId: listSubcontractOrders
+      operationId: list_subcontract_orders
       summary: List subcontract-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1088,7 +1088,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     post:
-      operationId: createSubcontractOrder
+      operationId: create_subcontract_order
       summary: Create subcontract-order
       requestBody:
         required: true
@@ -1109,7 +1109,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/subcontracting
   /subcontract-orders/{id}:
     get:
-      operationId: getSubcontractOrder
+      operationId: get_subcontract_order
       summary: Get subcontract-order by id
       parameters:
       - name: id
@@ -1130,7 +1130,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     put:
-      operationId: updateSubcontractOrder
+      operationId: update_subcontract_order
       summary: Update subcontract-order
       parameters:
       - name: id
@@ -1157,7 +1157,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     delete:
-      operationId: deleteSubcontractOrder
+      operationId: delete_subcontract_order
       summary: Delete subcontract-order
       parameters:
       - name: id
@@ -1175,7 +1175,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/subcontracting
   /subcontractor-pos:
     get:
-      operationId: listSubcontractorPos
+      operationId: list_subcontractor_pos
       summary: List subcontractor-pos
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1202,7 +1202,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     post:
-      operationId: createSubcontractorPo
+      operationId: create_subcontractor_po
       summary: Create subcontractor-po
       requestBody:
         required: true
@@ -1223,7 +1223,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/subcontracting
   /subcontractor-pos/{id}:
     get:
-      operationId: getSubcontractorPo
+      operationId: get_subcontractor_po
       summary: Get subcontractor-po by id
       parameters:
       - name: id
@@ -1244,7 +1244,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     put:
-      operationId: updateSubcontractorPo
+      operationId: update_subcontractor_po
       summary: Update subcontractor-po
       parameters:
       - name: id
@@ -1271,7 +1271,7 @@ paths:
       x-service: subcontracting
       x-service-base-path: /api/v1/manufacturing/subcontracting
     delete:
-      operationId: deleteSubcontractorPo
+      operationId: delete_subcontractor_po
       summary: Delete subcontractor-po
       parameters:
       - name: id
@@ -1289,7 +1289,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/subcontracting
   /work-orders:
     get:
-      operationId: listWorkOrders
+      operationId: list_work_orders
       summary: List work-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1316,7 +1316,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     post:
-      operationId: createWorkOrder
+      operationId: create_work_order
       summary: Create work-order
       requestBody:
         required: true
@@ -1337,7 +1337,7 @@ paths:
       x-service-base-path: /api/v1/manufacturing/core
   /work-orders/{id}:
     get:
-      operationId: getWorkOrder
+      operationId: get_work_order
       summary: Get work-order by id
       parameters:
       - name: id
@@ -1358,7 +1358,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     put:
-      operationId: updateWorkOrder
+      operationId: update_work_order
       summary: Update work-order
       parameters:
       - name: id
@@ -1385,7 +1385,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/manufacturing/core
     delete:
-      operationId: deleteWorkOrder
+      operationId: delete_work_order
       summary: Delete work-order
       parameters:
       - name: id

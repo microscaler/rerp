@@ -1,5 +1,9 @@
 # Minimal runtime-only Dockerfile for GeneralLedger Service (Tilt development)
-# Binary is cross-compiled on host (Apple Silicon -> x86_64 Linux) and copied in
+# Binary is cross-compiled on host and copied in.
+#
+# Multi-arch (amd64, arm64/Apple Silicon, arm/v7): use buildx with
+#   --platform linux/amd64,linux/arm64,linux/arm/v7
+# Buildx sets TARGETPLATFORM and TARGETARCH per platform. Defaults are for local single-arch.
 
 ARG TARGETPLATFORM=linux/amd64
 FROM --platform=${TARGETPLATFORM} alpine:3.19
@@ -12,8 +16,9 @@ RUN apk add --no-cache \
 # Create app directory with proper permissions for live updates
 WORKDIR /app
 
-# Copy pre-built binary from staging directory (x86_64 Linux musl target)
-COPY ./build_artifacts/general_ledger /app/general_ledger
+# TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7). Set by buildx when using --platform.
+ARG TARGETARCH=amd64
+COPY ./build_artifacts/${TARGETARCH}/general_ledger /app/general_ledger
 RUN chmod +x /app/general_ledger
 
 # Create directories for configuration and assets with write permissions

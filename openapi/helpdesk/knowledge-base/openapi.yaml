@@ -10,7 +10,7 @@ tags: []
 paths:
   /articles:
     get:
-      operationId: listArticles
+      operationId: list_articles
       summary: List articles
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createArticle
+      operationId: create_article
       summary: Create article
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /articles/{id}:
     get:
-      operationId: getArticle
+      operationId: get_article
       summary: Get article by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateArticle
+      operationId: update_article
       summary: Update article
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteArticle
+      operationId: delete_article
       summary: Delete article
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /categorys:
     get:
-      operationId: listCategorys
+      operationId: list_categorys
       summary: List categorys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCategory
+      operationId: create_category
       summary: Create category
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /categorys/{id}:
     get:
-      operationId: getCategory
+      operationId: get_category
       summary: Get category by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCategory
+      operationId: update_category
       summary: Update category
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCategory
+      operationId: delete_category
       summary: Delete category
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /searchs:
     get:
-      operationId: listSearchs
+      operationId: list_searchs
       summary: List searchs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSearch
+      operationId: create_search
       summary: Create search
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /searchs/{id}:
     get:
-      operationId: getSearch
+      operationId: get_search
       summary: Get search by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSearch
+      operationId: update_search
       summary: Update search
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSearch
+      operationId: delete_search
       summary: Delete search
       parameters:
       - name: id

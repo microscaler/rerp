@@ -29,7 +29,7 @@ tags: []
 paths:
   /milestones:
     get:
-      operationId: listMilestones
+      operationId: list_milestones
       summary: List milestones
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
-      operationId: createMilestone
+      operationId: create_milestone
       summary: Create milestone
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /milestones/{id}:
     get:
-      operationId: getMilestone
+      operationId: get_milestone
       summary: Get milestone by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     put:
-      operationId: updateMilestone
+      operationId: update_milestone
       summary: Update milestone
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     delete:
-      operationId: deleteMilestone
+      operationId: delete_milestone
       summary: Delete milestone
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /projects:
     get:
-      operationId: listProjects
+      operationId: list_projects
       summary: List projects
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
-      operationId: createProject
+      operationId: create_project
       summary: Create project
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /projects/{id}:
     get:
-      operationId: getProject
+      operationId: get_project
       summary: Get project by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     put:
-      operationId: updateProject
+      operationId: update_project
       summary: Update project
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     delete:
-      operationId: deleteProject
+      operationId: delete_project
       summary: Delete project
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /tasks:
     get:
-      operationId: listTasks
+      operationId: list_tasks
       summary: List tasks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
-      operationId: createTask
+      operationId: create_task
       summary: Create task
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /tasks/{id}:
     get:
-      operationId: getTask
+      operationId: get_task
       summary: Get task by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     put:
-      operationId: updateTask
+      operationId: update_task
       summary: Update task
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/project/core
     delete:
-      operationId: deleteTask
+      operationId: delete_task
       summary: Delete task
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/project/core
   /timesheet-lines:
     get:
-      operationId: listTimesheetLines
+      operationId: list_timesheet_lines
       summary: List timesheet-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     post:
-      operationId: createTimesheetLine
+      operationId: create_timesheet_line
       summary: Create timesheet-line
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/project/timesheet
   /timesheet-lines/{id}:
     get:
-      operationId: getTimesheetLine
+      operationId: get_timesheet_line
       summary: Get timesheet-line by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     put:
-      operationId: updateTimesheetLine
+      operationId: update_timesheet_line
       summary: Update timesheet-line
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     delete:
-      operationId: deleteTimesheetLine
+      operationId: delete_timesheet_line
       summary: Delete timesheet-line
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/project/timesheet
   /timesheets:
     get:
-      operationId: listTimesheets
+      operationId: list_timesheets
       summary: List timesheets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     post:
-      operationId: createTimesheet
+      operationId: create_timesheet
       summary: Create timesheet
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/project/timesheet
   /timesheets/{id}:
     get:
-      operationId: getTimesheet
+      operationId: get_timesheet
       summary: Get timesheet by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     put:
-      operationId: updateTimesheet
+      operationId: update_timesheet
       summary: Update timesheet
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     delete:
-      operationId: deleteTimesheet
+      operationId: delete_timesheet
       summary: Delete timesheet
       parameters:
       - name: id

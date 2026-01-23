@@ -18,7 +18,7 @@ spec:
         version: {{ .Values.deployment.namespace | default "dev" }}
       annotations:
         # Force pod restart when config changes
-        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum | trunc 8 }}
+        checksum/config: "{{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum | trunc 8 }}"
     spec:
       containers:
         - name: {{ .Values.service.name }}

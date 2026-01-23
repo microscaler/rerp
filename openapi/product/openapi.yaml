@@ -31,7 +31,7 @@ tags: []
 paths:
   /attributes:
     get:
-      operationId: listAttributes
+      operationId: list_attributes
       summary: List attributes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -58,7 +58,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
-      operationId: createAttribute
+      operationId: create_attribute
       summary: Create attribute
       requestBody:
         required: true
@@ -79,7 +79,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /attributes/{id}:
     get:
-      operationId: getAttribute
+      operationId: get_attribute
       summary: Get attribute by id
       parameters:
       - name: id
@@ -100,7 +100,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     put:
-      operationId: updateAttribute
+      operationId: update_attribute
       summary: Update attribute
       parameters:
       - name: id
@@ -127,7 +127,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     delete:
-      operationId: deleteAttribute
+      operationId: delete_attribute
       summary: Delete attribute
       parameters:
       - name: id
@@ -145,7 +145,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /calculate:
     post:
-      operationId: calculateTax
+      operationId: calculate_tax
       summary: Calculate tax for transaction
       responses:
         '200':
@@ -167,7 +167,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /categories/{categoryId}/products:
     get:
-      operationId: getCategoryProducts
+      operationId: get_category_products
       summary: Get products in category
       responses:
         '200':
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /categorys:
     get:
-      operationId: listCategorys
+      operationId: list_categorys
       summary: List categorys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -216,7 +216,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
-      operationId: createCategory
+      operationId: create_category
       summary: Create category
       requestBody:
         required: true
@@ -237,7 +237,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /categorys/{id}:
     get:
-      operationId: getCategory
+      operationId: get_category
       summary: Get category by id
       parameters:
       - name: id
@@ -258,7 +258,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     put:
-      operationId: updateCategory
+      operationId: update_category
       summary: Update category
       parameters:
       - name: id
@@ -285,7 +285,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     delete:
-      operationId: deleteCategory
+      operationId: delete_category
       summary: Delete category
       parameters:
       - name: id
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /discounts:
     get:
-      operationId: listDiscounts
+      operationId: list_discounts
       summary: List discounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -330,7 +330,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
-      operationId: createDiscount
+      operationId: create_discount
       summary: Create discount
       requestBody:
         required: true
@@ -351,7 +351,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /discounts/{id}:
     get:
-      operationId: getDiscount
+      operationId: get_discount
       summary: Get discount by id
       parameters:
       - name: id
@@ -372,7 +372,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     put:
-      operationId: updateDiscount
+      operationId: update_discount
       summary: Update discount
       parameters:
       - name: id
@@ -399,7 +399,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     delete:
-      operationId: deleteDiscount
+      operationId: delete_discount
       summary: Delete discount
       parameters:
       - name: id
@@ -417,7 +417,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /price-lists:
     get:
-      operationId: listPriceLists
+      operationId: list_price_lists
       summary: List price-lists
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -444,7 +444,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
-      operationId: createPriceList
+      operationId: create_price_list
       summary: Create price-list
       requestBody:
         required: true
@@ -465,7 +465,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /price-lists/{id}:
     get:
-      operationId: getPriceList
+      operationId: get_price_list
       summary: Get price-list by id
       parameters:
       - name: id
@@ -486,7 +486,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     put:
-      operationId: updatePriceList
+      operationId: update_price_list
       summary: Update price-list
       parameters:
       - name: id
@@ -513,7 +513,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     delete:
-      operationId: deletePriceList
+      operationId: delete_price_list
       summary: Delete price-list
       parameters:
       - name: id
@@ -531,7 +531,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /price-lists/{priceListId}/rules:
     get:
-      operationId: getPriceRules
+      operationId: get_price_rules
       summary: Get price rules for price list
       responses:
         '200':
@@ -553,7 +553,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /price-rules:
     get:
-      operationId: listPriceRules
+      operationId: list_price_rules
       summary: List price-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -580,7 +580,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
-      operationId: createPriceRule
+      operationId: create_price_rule
       summary: Create price-rule
       requestBody:
         required: true
@@ -601,7 +601,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /price-rules/{id}:
     get:
-      operationId: getPriceRule
+      operationId: get_price_rule
       summary: Get price-rule by id
       parameters:
       - name: id
@@ -622,7 +622,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     put:
-      operationId: updatePriceRule
+      operationId: update_price_rule
       summary: Update price-rule
       parameters:
       - name: id
@@ -649,7 +649,7 @@ paths:
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     delete:
-      operationId: deletePriceRule
+      operationId: delete_price_rule
       summary: Delete price-rule
       parameters:
       - name: id
@@ -667,7 +667,7 @@ paths:
       x-service-base-path: /api/v1/product/pricing
   /products:
     get:
-      operationId: listProducts
+      operationId: list_products
       summary: List products
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -694,7 +694,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
-      operationId: createProduct
+      operationId: create_product
       summary: Create product
       requestBody:
         required: true
@@ -715,7 +715,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /products/{id}:
     get:
-      operationId: getProduct
+      operationId: get_product
       summary: Get product by id
       parameters:
       - name: id
@@ -736,7 +736,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     put:
-      operationId: updateProduct
+      operationId: update_product
       summary: Update product
       parameters:
       - name: id
@@ -763,7 +763,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     delete:
-      operationId: deleteProduct
+      operationId: delete_product
       summary: Delete product
       parameters:
       - name: id
@@ -781,7 +781,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /products/{productId}/variants:
     get:
-      operationId: getProductVariants
+      operationId: get_product_variants
       summary: Get product variants
       responses:
         '200':
@@ -802,7 +802,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
-      operationId: createVariant
+      operationId: create_variant
       summary: Create product variant
       responses:
         '200':
@@ -831,7 +831,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /rules/by-location:
     get:
-      operationId: getTaxRulesByLocation
+      operationId: get_tax_rules_by_location
       summary: Get tax rules by location
       responses:
         '200':
@@ -846,7 +846,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /tax-rates:
     get:
-      operationId: listTaxRates
+      operationId: list_tax_rates
       summary: List tax-rates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -873,7 +873,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     post:
-      operationId: createTaxRate
+      operationId: create_tax_rate
       summary: Create tax-rate
       requestBody:
         required: true
@@ -894,7 +894,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /tax-rates/{id}:
     get:
-      operationId: getTaxRate
+      operationId: get_tax_rate
       summary: Get tax-rate by id
       parameters:
       - name: id
@@ -915,7 +915,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     put:
-      operationId: updateTaxRate
+      operationId: update_tax_rate
       summary: Update tax-rate
       parameters:
       - name: id
@@ -942,7 +942,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     delete:
-      operationId: deleteTaxRate
+      operationId: delete_tax_rate
       summary: Delete tax-rate
       parameters:
       - name: id
@@ -960,7 +960,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /tax-rules:
     get:
-      operationId: listTaxRules
+      operationId: list_tax_rules
       summary: List tax-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -987,7 +987,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     post:
-      operationId: createTaxRule
+      operationId: create_tax_rule
       summary: Create tax-rule
       requestBody:
         required: true
@@ -1008,7 +1008,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /tax-rules/{id}:
     get:
-      operationId: getTaxRule
+      operationId: get_tax_rule
       summary: Get tax-rule by id
       parameters:
       - name: id
@@ -1029,7 +1029,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     put:
-      operationId: updateTaxRule
+      operationId: update_tax_rule
       summary: Update tax-rule
       parameters:
       - name: id
@@ -1056,7 +1056,7 @@ paths:
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     delete:
-      operationId: deleteTaxRule
+      operationId: delete_tax_rule
       summary: Delete tax-rule
       parameters:
       - name: id
@@ -1074,7 +1074,7 @@ paths:
       x-service-base-path: /api/v1/product/tax
   /variants:
     get:
-      operationId: listVariants
+      operationId: list_variants
       summary: List variants
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1101,7 +1101,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
-      operationId: createVariant
+      operationId: create_variant
       summary: Create variant
       requestBody:
         required: true
@@ -1122,7 +1122,7 @@ paths:
       x-service-base-path: /api/v1/product/catalog
   /variants/{id}:
     get:
-      operationId: getVariant
+      operationId: get_variant
       summary: Get variant by id
       parameters:
       - name: id
@@ -1143,7 +1143,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     put:
-      operationId: updateVariant
+      operationId: update_variant
       summary: Update variant
       parameters:
       - name: id
@@ -1170,7 +1170,7 @@ paths:
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     delete:
-      operationId: deleteVariant
+      operationId: delete_variant
       summary: Delete variant
       parameters:
       - name: id

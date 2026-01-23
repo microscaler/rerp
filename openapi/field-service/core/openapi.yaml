@@ -10,7 +10,7 @@ tags: []
 paths:
   /work-orders:
     get:
-      operationId: listWorkOrders
+      operationId: list_work_orders
       summary: List work-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWorkOrder
+      operationId: create_work_order
       summary: Create work-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /work-orders/{id}:
     get:
-      operationId: getWorkOrder
+      operationId: get_work_order
       summary: Get work-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWorkOrder
+      operationId: update_work_order
       summary: Update work-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWorkOrder
+      operationId: delete_work_order
       summary: Delete work-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /technicians:
     get:
-      operationId: listTechnicians
+      operationId: list_technicians
       summary: List technicians
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTechnician
+      operationId: create_technician
       summary: Create technician
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /technicians/{id}:
     get:
-      operationId: getTechnician
+      operationId: get_technician
       summary: Get technician by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTechnician
+      operationId: update_technician
       summary: Update technician
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTechnician
+      operationId: delete_technician
       summary: Delete technician
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /routes:
     get:
-      operationId: listRoutes
+      operationId: list_routes
       summary: List routes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRoute
+      operationId: create_route
       summary: Create route
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /routes/{id}:
     get:
-      operationId: getRoute
+      operationId: get_route
       summary: Get route by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRoute
+      operationId: update_route
       summary: Update route
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRoute
+      operationId: delete_route
       summary: Delete route
       parameters:
       - name: id

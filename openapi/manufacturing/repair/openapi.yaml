@@ -10,7 +10,7 @@ tags: []
 paths:
   /repair-orders:
     get:
-      operationId: listRepairOrders
+      operationId: list_repair_orders
       summary: List repair-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRepairOrder
+      operationId: create_repair_order
       summary: Create repair-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /repair-orders/{id}:
     get:
-      operationId: getRepairOrder
+      operationId: get_repair_order
       summary: Get repair-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRepairOrder
+      operationId: update_repair_order
       summary: Update repair-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRepairOrder
+      operationId: delete_repair_order
       summary: Delete repair-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /repair-lines:
     get:
-      operationId: listRepairLines
+      operationId: list_repair_lines
       summary: List repair-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRepairLine
+      operationId: create_repair_line
       summary: Create repair-line
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /repair-lines/{id}:
     get:
-      operationId: getRepairLine
+      operationId: get_repair_line
       summary: Get repair-line by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRepairLine
+      operationId: update_repair_line
       summary: Update repair-line
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRepairLine
+      operationId: delete_repair_line
       summary: Delete repair-line
       parameters:
       - name: id

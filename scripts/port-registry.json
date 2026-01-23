@@ -1,15 +1,29 @@
 {
   "version": "1.0",
-  "next_port": 8002,
+  "next_port": 8016,
   "reserved_ports": [
     8080
   ],
   "assignments": {
-    "general-ledger": 8001
+    "general-ledger": 8001,
+    "accounts-payable": 8004,
+    "accounts-receivable": 8003,
+    "asset": 8006,
+    "bank-sync": 8005,
+    "bff": 8010,
+    "budget": 8007,
+    "edi": 8008,
+    "financial-reports": 8009,
+    "invoice": 8002,
+    "ftebe": 8011,
+    "idam": 8012,
+    "amd": 8013,
+    "marketing": 8014,
+    "billing": 8015
   },
   "metadata": {
     "description": "Port registry for RERP microservices",
-    "last_updated": "2026-01-23T11:20:18.828715",
+    "last_updated": "2026-01-24T02:42:39.708365",
     "notes": "Ports start at 8001. Port 8080 is reserved due to conflicts."
   }
 }

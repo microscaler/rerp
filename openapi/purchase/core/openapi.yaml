@@ -10,7 +10,7 @@ tags: []
 paths:
   /purchase-orders:
     get:
-      operationId: listPurchaseOrders
+      operationId: list_purchase_orders
       summary: List purchase-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPurchaseOrder
+      operationId: create_purchase_order
       summary: Create purchase-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /purchase-orders/{id}:
     get:
-      operationId: getPurchaseOrder
+      operationId: get_purchase_order
       summary: Get purchase-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePurchaseOrder
+      operationId: update_purchase_order
       summary: Update purchase-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePurchaseOrder
+      operationId: delete_purchase_order
       summary: Delete purchase-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /requisitions:
     get:
-      operationId: listRequisitions
+      operationId: list_requisitions
       summary: List requisitions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRequisition
+      operationId: create_requisition
       summary: Create requisition
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /requisitions/{id}:
     get:
-      operationId: getRequisition
+      operationId: get_requisition
       summary: Get requisition by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRequisition
+      operationId: update_requisition
       summary: Update requisition
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRequisition
+      operationId: delete_requisition
       summary: Delete requisition
       parameters:
       - name: id

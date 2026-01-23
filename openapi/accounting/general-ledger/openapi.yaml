@@ -10,7 +10,7 @@ tags: []
 paths:
   /accounts:
     get:
-      operationId: listAccounts
+      operationId: list_accounts
       summary: List accounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -117,7 +117,7 @@ paths:
                     page: 1
                     limit: 20
     post:
-      operationId: createAccount
+      operationId: create_account
       summary: Create account
       requestBody:
         required: true
@@ -216,7 +216,7 @@ paths:
           description: Invalid request
   /accounts/{id}:
     get:
-      operationId: getAccount
+      operationId: get_account
       summary: Get account by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateAccount
+      operationId: update_account
       summary: Update account
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteAccount
+      operationId: delete_account
       summary: Delete account
       parameters:
       - name: id
@@ -387,7 +387,7 @@ paths:
           description: Not found
   /journal-entrys:
     get:
-      operationId: listJournalEntrys
+      operationId: list_journal_entrys
       summary: List journal-entrys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -490,7 +490,7 @@ paths:
                     page: 1
                     limit: 20
     post:
-      operationId: createJournalEntry
+      operationId: create_journal_entry
       summary: Create journal-entry
       requestBody:
         required: true
@@ -589,7 +589,7 @@ paths:
           description: Invalid request
   /journal-entrys/{id}:
     get:
-      operationId: getJournalEntry
+      operationId: get_journal_entry
       summary: Get journal-entry by id
       parameters:
       - name: id
@@ -659,7 +659,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateJournalEntry
+      operationId: update_journal_entry
       summary: Update journal-entry
       parameters:
       - name: id
@@ -755,7 +755,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteJournalEntry
+      operationId: delete_journal_entry
       summary: Delete journal-entry
       parameters:
       - name: id
@@ -771,7 +771,7 @@ paths:
           description: Not found
   /chart-of-accounts:
     get:
-      operationId: listChartOfAccounts
+      operationId: list_chart_of_accounts
       summary: List chart-of-accounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -864,7 +864,7 @@ paths:
                     page: 1
                     limit: 20
     post:
-      operationId: createChartOfAccount
+      operationId: create_chart_of_account
       summary: Create chart-of-account
       requestBody:
         required: true
@@ -947,7 +947,7 @@ paths:
           description: Invalid request
   /chart-of-accounts/{id}:
     get:
-      operationId: getChartOfAccount
+      operationId: get_chart_of_account
       summary: Get chart-of-account by id
       parameters:
       - name: id
@@ -1003,7 +1003,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateChartOfAccount
+      operationId: update_chart_of_account
       summary: Update chart-of-account
       parameters:
       - name: id
@@ -1084,7 +1084,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteChartOfAccount
+      operationId: delete_chart_of_account
       summary: Delete chart-of-account
       parameters:
       - name: id

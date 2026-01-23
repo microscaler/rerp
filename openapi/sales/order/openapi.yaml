@@ -10,7 +10,7 @@ tags: []
 paths:
   /orders:
     get:
-      operationId: listOrders
+      operationId: list_orders
       summary: List orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createOrder
+      operationId: create_order
       summary: Create order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /orders/{id}:
     get:
-      operationId: getOrder
+      operationId: get_order
       summary: Get order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateOrder
+      operationId: update_order
       summary: Update order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteOrder
+      operationId: delete_order
       summary: Delete order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /order-lines:
     get:
-      operationId: listOrderLines
+      operationId: list_order_lines
       summary: List order-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createOrderLine
+      operationId: create_order_line
       summary: Create order-line
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /order-lines/{id}:
     get:
-      operationId: getOrderLine
+      operationId: get_order_line
       summary: Get order-line by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateOrderLine
+      operationId: update_order_line
       summary: Update order-line
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteOrderLine
+      operationId: delete_order_line
       summary: Delete order-line
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /fulfillments:
     get:
-      operationId: listFulfillments
+      operationId: list_fulfillments
       summary: List fulfillments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createFulfillment
+      operationId: create_fulfillment
       summary: Create fulfillment
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /fulfillments/{id}:
     get:
-      operationId: getFulfillment
+      operationId: get_fulfillment
       summary: Get fulfillment by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateFulfillment
+      operationId: update_fulfillment
       summary: Update fulfillment
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteFulfillment
+      operationId: delete_fulfillment
       summary: Delete fulfillment
       parameters:
       - name: id
