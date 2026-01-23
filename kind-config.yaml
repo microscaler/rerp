@@ -1,0 +1,65 @@
+# Kind cluster configuration for RERP
+# Based on PriceWhisperer's working configuration
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: rerp
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  # General Ledger Service
+  - containerPort: 31001
+    hostPort: 8001
+    protocol: TCP
+  # Invoice Service
+  - containerPort: 31002
+    hostPort: 8002
+    protocol: TCP
+  # Accounts Receivable Service
+  - containerPort: 31003
+    hostPort: 8003
+    protocol: TCP
+  # Accounts Payable Service
+  - containerPort: 31004
+    hostPort: 8004
+    protocol: TCP
+  # Bank Sync Service
+  - containerPort: 31005
+    hostPort: 8005
+    protocol: TCP
+  # Asset Service
+  - containerPort: 31006
+    hostPort: 8006
+    protocol: TCP
+  # Budget Service
+  - containerPort: 31007
+    hostPort: 8007
+    protocol: TCP
+  # PostgreSQL (using 5433 to avoid conflict with local postgres on 5432)
+  - containerPort: 30432
+    hostPort: 5433
+    protocol: TCP
+  # Redis
+  - containerPort: 30379
+    hostPort: 6379
+    protocol: TCP
+  # Prometheus (NodePort 30091)
+  - containerPort: 30091
+    hostPort: 9091
+    protocol: TCP
+  # Grafana
+  - containerPort: 30002
+    hostPort: 3002
+    protocol: TCP
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+    endpoint = ["http://kind-registry:5000"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5001"]
+    endpoint = ["http://kind-registry:5000"]

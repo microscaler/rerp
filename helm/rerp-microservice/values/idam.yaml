@@ -1,0 +1,23 @@
+# ⚠️ PORT CONFIGURATION REFERENCE:
+# Values file for IDAM Service
+
+service:
+  name: idam
+  port: 8003
+  containerPort: 8003
+  nodePort: 30803
+
+image:
+  repository: localhost:5001
+  name: pricewhisperer-idam
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+
+app:
+  binaryName: identity_and_access_management_service_api
+  serviceName: idam
+

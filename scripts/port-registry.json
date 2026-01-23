@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "next_port": 8002,
+  "reserved_ports": [
+    8080
+  ],
+  "assignments": {
+    "general-ledger": 8001
+  },
+  "metadata": {
+    "description": "Port registry for RERP microservices",
+    "last_updated": "2026-01-23T11:20:18.828715",
+    "notes": "Ports start at 8001. Port 8080 is reserved due to conflicts."
+  }
+}

@@ -34,6 +34,61 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation - Customer invoices
+                  value:
+                    items:
+                      - id: "a0030e8400-e29b-41d4-a716-446655440000"
+                        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                        original_amount: 11000.00
+                        outstanding_amount: 11000.00
+                        currency_code: "USD"
+                        status: "OUTSTANDING"
+                        aging_bucket: "CURRENT"
+                        company_id: "550e8400-e29b-41d4-a716-446655440000"
+                        created_at: "2024-01-15T09:00:00Z"
+                        updated_at: "2024-01-15T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                techStartExample:
+                  summary: TechStart Inc - Customer invoices
+                  value:
+                    items:
+                      - id: "b0030e8400-e29b-41d4-a716-446655440000"
+                        invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                        original_amount: 550.00
+                        outstanding_amount: 550.00
+                        currency_code: "USD"
+                        status: "OUTSTANDING"
+                        aging_bucket: "CURRENT"
+                        company_id: "660e8400-e29b-41d4-a716-446655440001"
+                        created_at: "2024-01-20T09:00:00Z"
+                        updated_at: "2024-01-20T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                globalManufacturingExample:
+                  summary: Global Manufacturing - Multi-currency customer invoices
+                  value:
+                    items:
+                      - id: "c0030e8400-e29b-41d4-a716-446655440000"
+                        invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                        original_amount: 11000.00
+                        outstanding_amount: 11000.00
+                        currency_code: "EUR"
+                        status: "OUTSTANDING"
+                        aging_bucket: "CURRENT"
+                        company_id: "770e8400-e29b-41d4-a716-446655440002"
+                        created_at: "2024-01-25T07:00:00Z"
+                        updated_at: "2024-01-25T07:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
     post:
       operationId: createCustomerInvoice
       summary: Create customer-invoice
@@ -43,6 +98,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create customer invoice for Acme Corporation
+                value:
+                  invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                  customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                  currency_code: "USD"
+                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+              techStartRequest:
+                summary: Create customer invoice for TechStart Inc
+                value:
+                  invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                  customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                  currency_code: "USD"
+                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+              globalManufacturingRequest:
+                summary: Create multi-currency customer invoice
+                value:
+                  invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                  customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                  currency_code: "EUR"
+                  company_id: "770e8400-e29b-41d4-a716-446655440002"
       responses:
         '201':
           description: CustomerInvoice created
@@ -50,6 +127,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerInvoice'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation customer invoice created
+                  value:
+                    id: "a0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 0.00
+                    outstanding_amount: 0.00
+                    currency_code: "USD"
+                    status: "OUTSTANDING"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T09:00:00Z"
+                    updated_at: "2024-01-15T09:00:00Z"
+                techStartResponse:
+                  summary: TechStart customer invoice created
+                  value:
+                    id: "b0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 0.00
+                    outstanding_amount: 0.00
+                    currency_code: "USD"
+                    status: "OUTSTANDING"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing customer invoice created
+                  value:
+                    id: "c0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 0.00
+                    outstanding_amount: 0.00
+                    currency_code: "EUR"
+                    status: "OUTSTANDING"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T07:00:00Z"
+                    updated_at: "2024-01-25T07:00:00Z"
         '400':
           description: Invalid request
   /customer-invoices/{id}:
@@ -70,6 +187,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerInvoice'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation customer invoice
+                  value:
+                    id: "a0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 11000.00
+                    outstanding_amount: 11000.00
+                    currency_code: "USD"
+                    status: "OUTSTANDING"
+                    aging_bucket: "CURRENT"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T09:00:00Z"
+                    updated_at: "2024-01-15T09:00:00Z"
+                techStartExample:
+                  summary: TechStart customer invoice
+                  value:
+                    id: "b0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 550.00
+                    outstanding_amount: 550.00
+                    currency_code: "USD"
+                    status: "OUTSTANDING"
+                    aging_bucket: "CURRENT"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing customer invoice
+                  value:
+                    id: "c0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 11000.00
+                    outstanding_amount: 11000.00
+                    currency_code: "EUR"
+                    status: "OUTSTANDING"
+                    aging_bucket: "CURRENT"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T07:00:00Z"
+                    updated_at: "2024-01-25T07:00:00Z"
         '404':
           description: Not found
     put:
@@ -88,6 +248,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation customer invoice
+                value:
+                  status: "PARTIAL"
+                  aging_bucket: "1-30"
+              techStartUpdate:
+                summary: Update TechStart customer invoice
+                value:
+                  status: "PARTIAL"
+                  aging_bucket: "1-30"
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing customer invoice
+                value:
+                  status: "PARTIAL"
+                  aging_bucket: "1-30"
       responses:
         '200':
           description: CustomerInvoice updated
@@ -95,6 +271,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerInvoice'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation customer invoice updated
+                  value:
+                    id: "a0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 11000.00
+                    outstanding_amount: 5500.00
+                    currency_code: "USD"
+                    status: "PARTIAL"
+                    aging_bucket: "1-30"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T09:00:00Z"
+                    updated_at: "2024-01-15T11:00:00Z"
+                techStartResponse:
+                  summary: TechStart customer invoice updated
+                  value:
+                    id: "b0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 550.00
+                    outstanding_amount: 275.00
+                    currency_code: "USD"
+                    status: "PARTIAL"
+                    aging_bucket: "1-30"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T10:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing customer invoice updated
+                  value:
+                    id: "c0030e8400-e29b-41d4-a716-446655440000"
+                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    original_amount: 11000.00
+                    outstanding_amount: 5500.00
+                    currency_code: "EUR"
+                    status: "PARTIAL"
+                    aging_bucket: "1-30"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T07:00:00Z"
+                    updated_at: "2024-01-25T09:00:00Z"
         '404':
           description: Not found
     delete:
@@ -138,6 +357,64 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation - AR payments
+                  value:
+                    items:
+                      - id: "a0040e8400-e29b-41d4-a716-446655440000"
+                        payment_number: "AR-PAY-2024-001"
+                        payment_date: "2024-01-20"
+                        customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                        payment_amount: 5500.00
+                        currency_code: "USD"
+                        exchange_rate: 1.0
+                        payment_method: "WIRE"
+                        status: "POSTED"
+                        company_id: "550e8400-e29b-41d4-a716-446655440000"
+                        created_at: "2024-01-20T10:00:00Z"
+                        updated_at: "2024-01-20T10:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                techStartExample:
+                  summary: TechStart Inc - AR payments
+                  value:
+                    items:
+                      - id: "b0040e8400-e29b-41d4-a716-446655440000"
+                        payment_number: "AR-PAY-2024-100"
+                        payment_date: "2024-01-25"
+                        customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                        payment_amount: 275.00
+                        currency_code: "USD"
+                        exchange_rate: 1.0
+                        payment_method: "CHECK"
+                        status: "POSTED"
+                        company_id: "660e8400-e29b-41d4-a716-446655440001"
+                        created_at: "2024-01-25T09:00:00Z"
+                        updated_at: "2024-01-25T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                globalManufacturingExample:
+                  summary: Global Manufacturing - Multi-currency AR payments
+                  value:
+                    items:
+                      - id: "c0040e8400-e29b-41d4-a716-446655440000"
+                        payment_number: "AR-PAY-2024-200"
+                        payment_date: "2024-01-30"
+                        customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                        payment_amount: 5500.00
+                        currency_code: "EUR"
+                        exchange_rate: 0.92
+                        payment_method: "WIRE"
+                        status: "POSTED"
+                        company_id: "770e8400-e29b-41d4-a716-446655440002"
+                        created_at: "2024-01-30T08:00:00Z"
+                        updated_at: "2024-01-30T08:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
     post:
       operationId: createPayment
       summary: Create payment
@@ -147,6 +424,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create AR payment for Acme Corporation
+                value:
+                  payment_number: "AR-PAY-2024-001"
+                  payment_date: "2024-01-20"
+                  customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                  payment_amount: 5500.00
+                  currency_code: "USD"
+                  exchange_rate: 1.0
+                  payment_method: "WIRE"
+                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+              techStartRequest:
+                summary: Create AR payment for TechStart Inc
+                value:
+                  payment_number: "AR-PAY-2024-100"
+                  payment_date: "2024-01-25"
+                  customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                  payment_amount: 275.00
+                  currency_code: "USD"
+                  exchange_rate: 1.0
+                  payment_method: "CHECK"
+                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+              globalManufacturingRequest:
+                summary: Create multi-currency AR payment
+                value:
+                  payment_number: "AR-PAY-2024-200"
+                  payment_date: "2024-01-30"
+                  customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                  payment_amount: 5500.00
+                  currency_code: "EUR"
+                  exchange_rate: 0.92
+                  payment_method: "WIRE"
+                  company_id: "770e8400-e29b-41d4-a716-446655440002"
       responses:
         '201':
           description: Payment created
@@ -154,6 +465,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation AR payment created
+                  value:
+                    id: "a0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-001"
+                    payment_date: "2024-01-20"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "WIRE"
+                    status: "DRAFT"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-20T10:00:00Z"
+                    updated_at: "2024-01-20T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart AR payment created
+                  value:
+                    id: "b0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-100"
+                    payment_date: "2024-01-25"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 275.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "CHECK"
+                    status: "DRAFT"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-25T09:00:00Z"
+                    updated_at: "2024-01-25T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing AR payment created
+                  value:
+                    id: "c0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-200"
+                    payment_date: "2024-01-30"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "EUR"
+                    exchange_rate: 0.92
+                    payment_method: "WIRE"
+                    status: "DRAFT"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-30T08:00:00Z"
+                    updated_at: "2024-01-30T08:00:00Z"
         '400':
           description: Invalid request
   /payments/{id}:
@@ -174,6 +531,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation AR payment
+                  value:
+                    id: "a0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-001"
+                    payment_date: "2024-01-20"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "WIRE"
+                    status: "POSTED"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-20T10:00:00Z"
+                    updated_at: "2024-01-20T10:00:00Z"
+                techStartExample:
+                  summary: TechStart AR payment
+                  value:
+                    id: "b0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-100"
+                    payment_date: "2024-01-25"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 275.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "CHECK"
+                    status: "POSTED"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-25T09:00:00Z"
+                    updated_at: "2024-01-25T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing AR payment
+                  value:
+                    id: "c0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-200"
+                    payment_date: "2024-01-30"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "EUR"
+                    exchange_rate: 0.92
+                    payment_method: "WIRE"
+                    status: "POSTED"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-30T08:00:00Z"
+                    updated_at: "2024-01-30T08:00:00Z"
         '404':
           description: Not found
     put:
@@ -192,6 +595,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePaymentRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation AR payment
+                value:
+                  status: "POSTED"
+                  payment_method: "WIRE"
+              techStartUpdate:
+                summary: Update TechStart AR payment
+                value:
+                  status: "POSTED"
+                  payment_method: "CHECK"
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing AR payment
+                value:
+                  status: "POSTED"
+                  payment_method: "WIRE"
       responses:
         '200':
           description: Payment updated
@@ -199,6 +618,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation AR payment updated
+                  value:
+                    id: "a0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-001"
+                    payment_date: "2024-01-20"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "WIRE"
+                    status: "POSTED"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-20T10:00:00Z"
+                    updated_at: "2024-01-20T11:00:00Z"
+                techStartResponse:
+                  summary: TechStart AR payment updated
+                  value:
+                    id: "b0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-100"
+                    payment_date: "2024-01-25"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 275.00
+                    currency_code: "USD"
+                    exchange_rate: 1.0
+                    payment_method: "CHECK"
+                    status: "POSTED"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-25T09:00:00Z"
+                    updated_at: "2024-01-25T10:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing AR payment updated
+                  value:
+                    id: "c0040e8400-e29b-41d4-a716-446655440000"
+                    payment_number: "AR-PAY-2024-200"
+                    payment_date: "2024-01-30"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    payment_amount: 5500.00
+                    currency_code: "EUR"
+                    exchange_rate: 0.92
+                    payment_method: "WIRE"
+                    status: "POSTED"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-30T08:00:00Z"
+                    updated_at: "2024-01-30T09:00:00Z"
         '404':
           description: Not found
     delete:
@@ -242,6 +707,64 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation - AR aging analysis
+                  value:
+                    items:
+                      - id: "a00a0e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                        aging_date: "2024-01-31"
+                        current: 5500.00
+                        days_31_60: 0.00
+                        days_61_90: 0.00
+                        days_91_120: 0.00
+                        over_120: 0.00
+                        total_outstanding: 5500.00
+                        currency_code: "USD"
+                        company_id: "550e8400-e29b-41d4-a716-446655440000"
+                        created_at: "2024-01-31T10:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                techStartExample:
+                  summary: TechStart Inc - AR aging analysis
+                  value:
+                    items:
+                      - id: "b00a0e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                        aging_date: "2024-01-31"
+                        current: 275.00
+                        days_31_60: 0.00
+                        days_61_90: 0.00
+                        days_91_120: 0.00
+                        over_120: 0.00
+                        total_outstanding: 275.00
+                        currency_code: "USD"
+                        company_id: "660e8400-e29b-41d4-a716-446655440001"
+                        created_at: "2024-01-31T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                globalManufacturingExample:
+                  summary: Global Manufacturing - Multi-currency AR aging
+                  value:
+                    items:
+                      - id: "c00a0e8400-e29b-41d4-a716-446655440000"
+                        customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                        aging_date: "2024-01-31"
+                        current: 5500.00
+                        days_31_60: 0.00
+                        days_61_90: 0.00
+                        days_91_120: 0.00
+                        over_120: 0.00
+                        total_outstanding: 5500.00
+                        currency_code: "EUR"
+                        company_id: "770e8400-e29b-41d4-a716-446655440002"
+                        created_at: "2024-01-31T08:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
     post:
       operationId: createArAging
       summary: Create ar-aging
@@ -251,6 +774,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateArAgingRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create AR aging for Acme Corporation
+                value:
+                  customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                  aging_date: "2024-01-31"
+                  currency_code: "USD"
+                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+              techStartRequest:
+                summary: Create AR aging for TechStart Inc
+                value:
+                  customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                  aging_date: "2024-01-31"
+                  currency_code: "USD"
+                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+              globalManufacturingRequest:
+                summary: Create multi-currency AR aging
+                value:
+                  customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                  aging_date: "2024-01-31"
+                  currency_code: "EUR"
+                  company_id: "770e8400-e29b-41d4-a716-446655440002"
       responses:
         '201':
           description: ArAging created
@@ -258,6 +803,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArAging'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation AR aging created
+                  value:
+                    id: "a00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 0.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 0.00
+                    currency_code: "USD"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart AR aging created
+                  value:
+                    id: "b00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 0.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 0.00
+                    currency_code: "USD"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing AR aging created
+                  value:
+                    id: "c00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 0.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 0.00
+                    currency_code: "EUR"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
         '400':
           description: Invalid request
   /ar-agings/{id}:
@@ -278,6 +869,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArAging'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation AR aging
+                  value:
+                    id: "a00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 5500.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 5500.00
+                    currency_code: "USD"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                techStartExample:
+                  summary: TechStart AR aging
+                  value:
+                    id: "b00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 275.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 275.00
+                    currency_code: "USD"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing AR aging
+                  value:
+                    id: "c00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 5500.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 5500.00
+                    currency_code: "EUR"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
         '404':
           description: Not found
     put:
@@ -296,6 +933,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateArAgingRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation AR aging
+                value:
+                  current: 6000.00
+                  total_outstanding: 6000.00
+              techStartUpdate:
+                summary: Update TechStart AR aging
+                value:
+                  current: 300.00
+                  total_outstanding: 300.00
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing AR aging
+                value:
+                  current: 6000.00
+                  total_outstanding: 6000.00
       responses:
         '200':
           description: ArAging updated
@@ -303,6 +956,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArAging'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation AR aging updated
+                  value:
+                    id: "a00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 6000.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 6000.00
+                    currency_code: "USD"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart AR aging updated
+                  value:
+                    id: "b00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 300.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 300.00
+                    currency_code: "USD"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing AR aging updated
+                  value:
+                    id: "c00a0e8400-e29b-41d4-a716-446655440000"
+                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
+                    aging_date: "2024-01-31"
+                    current: 6000.00
+                    days_31_60: 0.00
+                    days_61_90: 0.00
+                    days_91_120: 0.00
+                    over_120: 0.00
+                    total_outstanding: 6000.00
+                    currency_code: "EUR"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
         '404':
           description: Not found
     delete:
@@ -342,4 +1041,403 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    CustomerInvoice:
+      type: object
+      required:
+        - id
+        - invoice_id
+        - customer_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        outstanding_amount:
+          type: number
+          format: decimal
+        days_overdue:
+          type: integer
+        aging_bucket:
+          type: string
+          enum: [CURRENT, "1-30", "31-60", "61-90", "90+"]
+          nullable: true
+        credit_limit:
+          type: number
+          format: decimal
+          nullable: true
+        credit_used:
+          type: number
+          format: decimal
+          nullable: true
+        collection_status:
+          type: string
+          enum: [NORMAL, WARNING, COLLECTION, LEGAL]
+          nullable: true
+        last_payment_date:
+          type: string
+          format: date
+          nullable: true
+        last_payment_amount:
+          type: number
+          format: decimal
+          nullable: true
+        write_off_amount:
+          type: number
+          format: decimal
+          nullable: true
+        write_off_date:
+          type: string
+          format: date
+          nullable: true
+        write_off_reason:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Payment:
+      type: object
+      required:
+        - id
+        - customer_id
+        - payment_number
+        - payment_date
+        - payment_amount
+        - payment_method
+        - status
+        - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        payment_number:
+          type: string
+          maxLength: 100
+        payment_date:
+          type: string
+          format: date
+        payment_amount:
+          type: number
+          format: decimal
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        exchange_rate:
+          type: number
+          format: decimal
+        payment_method:
+          type: string
+          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+        payment_reference:
+          type: string
+          nullable: true
+        bank_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum: [DRAFT, POSTED, RECONCILED, CANCELLED]
+        reconciled_at:
+          type: string
+          format: date-time
+          nullable: true
+        reconciled_by:
+          type: string
+          format: uuid
+          nullable: true
+        applied_amount:
+          type: number
+          format: decimal
+        unapplied_amount:
+          type: number
+          format: decimal
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+    PaymentApplication:
+      type: object
+      required:
+        - id
+        - payment_id
+        - invoice_id
+        - applied_amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        applied_amount:
+          type: number
+          format: decimal
+        applied_at:
+          type: string
+          format: date-time
+        applied_by:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ArAging:
+      type: object
+      required:
+        - id
+        - customer_id
+        - aging_date
+        - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        aging_date:
+          type: string
+          format: date
+        current:
+          type: number
+          format: decimal
+        days_31_60:
+          type: number
+          format: decimal
+        days_61_90:
+          type: number
+          format: decimal
+        days_91_120:
+          type: number
+          format: decimal
+        over_120:
+          type: number
+          format: decimal
+        total_outstanding:
+          type: number
+          format: decimal
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateCustomerInvoiceRequest:
+      type: object
+      required:
+        - invoice_id
+        - customer_id
+      properties:
+        invoice_id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        credit_limit:
+          type: number
+          format: decimal
+        collection_status:
+          type: string
+          enum: [NORMAL, WARNING, COLLECTION, LEGAL]
+    UpdateCustomerInvoiceRequest:
+      type: object
+      properties:
+        outstanding_amount:
+          type: number
+          format: decimal
+        aging_bucket:
+          type: string
+          enum: [CURRENT, "1-30", "31-60", "61-90", "90+"]
+        collection_status:
+          type: string
+          enum: [NORMAL, WARNING, COLLECTION, LEGAL]
+        write_off_amount:
+          type: number
+          format: decimal
+        write_off_date:
+          type: string
+          format: date
+        write_off_reason:
+          type: string
+    CreatePaymentRequest:
+      type: object
+      required:
+        - customer_id
+        - payment_number
+        - payment_date
+        - payment_amount
+        - payment_method
+        - currency_code
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        payment_number:
+          type: string
+          maxLength: 100
+        payment_date:
+          type: string
+          format: date
+        payment_amount:
+          type: number
+          format: decimal
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        exchange_rate:
+          type: number
+          format: decimal
+        payment_method:
+          type: string
+          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+        payment_reference:
+          type: string
+        bank_account_id:
+          type: string
+          format: uuid
+        notes:
+          type: string
+        company_id:
+          type: string
+          format: uuid
+    UpdatePaymentRequest:
+      type: object
+      properties:
+        payment_date:
+          type: string
+          format: date
+        payment_amount:
+          type: number
+          format: decimal
+        payment_method:
+          type: string
+          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+        status:
+          type: string
+          enum: [DRAFT, POSTED, RECONCILED, CANCELLED]
+        notes:
+          type: string
+    CreatePaymentApplicationRequest:
+      type: object
+      required:
+        - payment_id
+        - invoice_id
+        - applied_amount
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        applied_amount:
+          type: number
+          format: decimal
+        notes:
+          type: string
+    UpdatePaymentApplicationRequest:
+      type: object
+      properties:
+        applied_amount:
+          type: number
+          format: decimal
+        notes:
+          type: string
+    CreateArAgingRequest:
+      type: object
+      required:
+        - customer_id
+        - aging_date
+        - currency_code
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        aging_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_id:
+          type: string
+          format: uuid
+    UpdateArAgingRequest:
+      type: object
+      properties:
+        current:
+          type: number
+          format: decimal
+        days_31_60:
+          type: number
+          format: decimal
+        days_61_90:
+          type: number
+          format: decimal
+        days_91_120:
+          type: number
+          format: decimal
+        over_120:
+          type: number
+          format: decimal
+        total_outstanding:
+          type: number
+          format: decimal
