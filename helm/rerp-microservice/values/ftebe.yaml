@@ -1,0 +1,23 @@
+# ⚠️ PORT CONFIGURATION REFERENCE:
+# Values file for FTE Service
+
+service:
+  name: ftebe
+  port: 8002
+  containerPort: 8002
+  nodePort: 30802
+
+image:
+  repository: localhost:5001
+  name: pricewhisperer-ftebe
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+
+app:
+  binaryName: ftebe_testing_service_api
+  serviceName: ftebe
+

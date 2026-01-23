@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }}
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.service.name }}
+    version: {{ .Values.deployment.namespace | default "dev" }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.name }}
+        version: {{ .Values.deployment.namespace | default "dev" }}
+      annotations:
+        # Force pod restart when config changes
+        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum | trunc 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.service.name }}
+          image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          env:
+            # PORT environment variable: Set from service.containerPort
+            # The application reads this to determine which port to listen on.
+            # See microservices/README.md for port mapping reference.
+            - name: PORT
+              value: {{ .Values.service.containerPort | quote }}
+            - name: RUST_LOG
+              value: {{ .Values.env.RUST_LOG | quote }}
+            - name: RUST_BACKTRACE
+              value: {{ .Values.env.RUST_BACKTRACE | quote }}
+            # Structured logging configuration for Loki/Promtail ingestion
+            - name: BRRTR_LOG_FORMAT
+              value: {{ .Values.env.BRRTR_LOG_FORMAT | quote }}
+            - name: BRRTR_LOG_SAMPLING_MODE
+              value: {{ .Values.env.BRRTR_LOG_SAMPLING_MODE | quote }}
+            - name: BRRTR_LOG_ASYNC
+              value: {{ .Values.env.BRRTR_LOG_ASYNC | quote }}
+            - name: BRRTR_LOG_INCLUDE_LOCATION
+              value: {{ .Values.env.BRRTR_LOG_INCLUDE_LOCATION | quote }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.app.config.observability.otlp_endpoint | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.app.serviceName | quote }}
+            # Increase stack size for serving large static assets (64KB instead of 16KB default)
+            - name: BRRTR_STACK_SIZE
+              value: {{ .Values.env.BRRTR_STACK_SIZE | quote }}
+          # Liveness probe - is the service alive?
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.liveness.failureThreshold }}
+          # Readiness probe - is the service ready to accept traffic?
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.readiness.failureThreshold }}
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+          volumeMounts:
+            # Configuration from ConfigMap (Kubernetes-native, matches production)
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            
+            # Application logs (writable)
+            - name: logs
+              mountPath: /app/logs
+            # Application data/cache (writable)
+            - name: data
+              mountPath: /app/data
+            # Temporary files (writable, in-memory for speed)
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        # Configuration from ConfigMap (Kubernetes-native approach)
+        # Edit the ConfigMap above to change config, then restart pod
+        - name: config
+          configMap:
+            name: {{ .Values.service.name }}-config
+        
+        # Logs volume (emptyDir for local dev, PVC for production)
+        - name: logs
+          emptyDir: {}
+        # Data volume (emptyDir for local dev, PVC for production)
+        - name: data
+          emptyDir: {}
+        # Temporary files (in-memory for performance)
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Mi
+

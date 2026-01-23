@@ -1,6 +1,6 @@
 # PriceWhisperer Website
 
-A modern SolidJS website for PriceWhisperer - Smart Stock Market Intelligence platform.
+A modern SolidJS website for RERP - An Enterprise ERP Platform.
 
 ## Development
 

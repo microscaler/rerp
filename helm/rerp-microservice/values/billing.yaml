@@ -1,0 +1,23 @@
+# ⚠️ PORT CONFIGURATION REFERENCE:
+# Values file for Billing Service
+
+service:
+  name: billing
+  port: 8006
+  containerPort: 8006
+  nodePort: 30806
+
+image:
+  repository: localhost:5001
+  name: pricewhisperer-billing
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+
+app:
+  binaryName: billing_service_api
+  serviceName: billing
+

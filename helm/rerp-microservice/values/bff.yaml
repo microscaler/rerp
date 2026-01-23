@@ -1,0 +1,30 @@
+# ⚠️ PORT CONFIGURATION REFERENCE:
+# =================================
+# For the complete canonical reference of ALL services, ports, NodePorts, and resource allocations,
+# see: docs/infrastructure/services-ports.md
+#
+# ALWAYS check docs/infrastructure/services-ports.md before adding new services or changing ports
+# to prevent port conflicts.
+
+# Values file for BFF Service
+
+service:
+  name: bff
+  port: 8001
+  containerPort: 8001
+  nodePort: 30801
+
+image:
+  repository: localhost:5001
+  name: pricewhisperer-bff
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+
+app:
+  binaryName: pricewhisperer_backend_for_frontend_api
+  serviceName: bff
+

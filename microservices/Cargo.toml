@@ -1,0 +1,56 @@
+[workspace]
+members = [
+    # Common utilities (to be created when needed)
+    # "accounting/common",
+    
+    # Generated library crates (will be added as services are bootstrapped)
+    "accounting/general-ledger",
+    # "accounting/invoice",
+    # "accounting/accounts-receivable",
+    # "accounting/accounts-payable",
+    # "accounting/bank-sync",
+    # "accounting/asset",
+    # "accounting/budget",
+    
+    # Implementation crates (will be added as services are bootstrapped)
+    # "accounting/general-ledger_impl",
+    # "accounting/invoice_impl",
+    # "accounting/accounts-receivable_impl",
+    # "accounting/accounts-payable_impl",
+    # "accounting/bank-sync_impl",
+    # "accounting/asset_impl",
+    # "accounting/budget_impl",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+# BRRTRouter
+brrtrouter = { path = "../../BRRTRouter" }
+brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
+
+# Lifeguard ORM
+lifeguard = { path = "../../lifeguard" }
+lifeguard-derive = { path = "../../lifeguard/lifeguard-derive" }
+rerp_entities = { path = "../entities" }
+
+# Standard dependencies
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+config = "0.14"
+http = "1.0"
+may = "0.3"
+may_minihttp = "0.1"
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+tikv-jemallocator = { version = "0.5", features = ["profiling"] }
+
+# Database
+may-postgres = "0.1"
+rust_decimal = "1.33"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }

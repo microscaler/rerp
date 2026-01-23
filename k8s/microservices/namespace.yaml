@@ -1,0 +1,14 @@
+---
+# RERP Microservices Namespace
+# IMPORTANT: This namespace should NOT be deleted during normal operations
+# If it gets stuck in "Terminating" state, force remove with:
+# kubectl patch namespace rerp -p '{"metadata":{"finalizers":[]}}' --type=merge
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rerp
+  labels:
+    app: rerp
+    managed-by: tilt
+  annotations:
+    description: "RERP accounting microservices namespace for General Ledger, Invoice, AR, AP, and other accounting services"

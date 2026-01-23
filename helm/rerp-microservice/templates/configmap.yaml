@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.service.name }}-config
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.service.name }}
+data:
+  config.yaml: |
+    # BRRTRouter {{ .Values.service.name | title }} Service Configuration
+    # This ConfigMap contains the full application configuration for Kubernetes deployment
+    
+    security:
+      # Static API keys bound to specific OpenAPI security scheme names
+      api_keys:
+        ApiKeyHeader:
+          key: {{ .Values.app.config.security.api_keys.ApiKeyHeader.key | quote }}
+          # header_name: "X-API-Key"  # optional override for header-based schemes
+      
+      # Remote API key verification by scheme name (commented out for local dev)
+      # remote_api_keys:
+      #   ApiKeyAuth:
+      #     verify_url: "https://auth.example/verify"
+      #     timeout_ms: 500
+      #     header_name: "X-API-Key"
+      #     cache_ttl_secs: 60
+      
+      # Simple bearer signature (dev only) and optional cookie name
+      # bearer:
+      #   signature: "sig"
+      #   cookie_name: "auth_token"
+      
+      # Simple oauth2 signature (dev only) and optional cookie name
+      # oauth2:
+      #   signature: "sig"
+      #   cookie_name: "oauth_token"
+      
+      # Per-scheme JWKS configuration (production)
+      # jwks:
+      #   BearerAuth:
+      #     jwks_url: "https://issuer.example/.well-known/jwks.json"
+      #     iss: "https://issuer.example/"
+      #     aud: "my-audience"
+      #     leeway_secs: 30
+      #     cache_ttl_secs: 300
+      
+      # PropelAuth integration (recommended as first provider)
+      # propelauth:
+      #   auth_url: "https://auth.yourdomain.com"
+      #   audience: "your-api-audience"
+      #   issuer: "https://auth.yourdomain.com/"
+      #   leeway_secs: 30
+      #   cache_ttl_secs: 300
+    
+    # Server port configuration
+    # Note: The PORT environment variable takes precedence over this setting
+    # This is included for documentation and fallback purposes
+    port: {{ .Values.service.containerPort }}
+    
+    http:
+      # Enable HTTP/1.1 keep-alive (default true in generated apps for testing)
+      keep_alive: {{ .Values.app.config.http.keep_alive }}
+      timeout_secs: {{ .Values.app.config.http.timeout_secs }}
+      max_requests: {{ .Values.app.config.http.max_requests }}
+    
+    # Database connection (PostgreSQL)
+    database:
+      host: {{ .Values.app.config.database.host | quote }}
+      port: {{ .Values.app.config.database.port }}
+      name: {{ .Values.app.config.database.name | quote }}
+      user: {{ .Values.app.config.database.user | quote }}
+      password: {{ .Values.app.config.database.password | quote }}
+      max_connections: {{ .Values.app.config.database.max_connections }}
+    
+    # Redis cache configuration
+    redis:
+      host: {{ .Values.app.config.redis.host | quote }}
+      port: {{ .Values.app.config.redis.port }}
+      db: {{ .Values.app.config.redis.db }}
+      max_connections: {{ .Values.app.config.redis.max_connections }}
+    
+    # Observability configuration
+    observability:
+      metrics_enabled: {{ .Values.app.config.observability.metrics_enabled }}
+      tracing_enabled: {{ .Values.app.config.observability.tracing_enabled }}
+      otlp_endpoint: {{ .Values.app.config.observability.otlp_endpoint | quote }}
+

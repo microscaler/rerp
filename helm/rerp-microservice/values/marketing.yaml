@@ -1,0 +1,23 @@
+# ⚠️ PORT CONFIGURATION REFERENCE:
+# Values file for Marketing Service
+
+service:
+  name: marketing
+  port: 8005
+  containerPort: 8005
+  nodePort: 30805
+
+image:
+  repository: localhost:5001
+  name: pricewhisperer-marketing
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+
+app:
+  binaryName: marketing_service_api
+  serviceName: marketing
+

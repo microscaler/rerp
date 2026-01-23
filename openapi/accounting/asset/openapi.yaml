@@ -34,6 +34,70 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation - Fixed assets
+                  value:
+                    items:
+                      - id: "a0100e8400-e29b-41d4-a716-446655440000"
+                        asset_number: "AST-2024-001"
+                        name: "Office Building - Main Campus"
+                        category_id: "a0110e8400-e29b-41d4-a716-446655440000"
+                        purchase_date: "2020-01-15"
+                        purchase_cost: 5000000.00
+                        current_value: 5500000.00
+                        depreciation_method: "STRAIGHT_LINE"
+                        useful_life_months: 360
+                        currency_code: "USD"
+                        status: "ACTIVE"
+                        company_id: "550e8400-e29b-41d4-a716-446655440000"
+                        created_at: "2024-01-15T10:00:00Z"
+                        updated_at: "2024-01-15T10:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                techStartExample:
+                  summary: TechStart Inc - Fixed assets
+                  value:
+                    items:
+                      - id: "b0100e8400-e29b-41d4-a716-446655440000"
+                        asset_number: "AST-2024-100"
+                        name: "Laptop Computer"
+                        category_id: "b0110e8400-e29b-41d4-a716-446655440000"
+                        purchase_date: "2024-01-10"
+                        purchase_cost: 1500.00
+                        current_value: 1200.00
+                        depreciation_method: "STRAIGHT_LINE"
+                        useful_life_months: 36
+                        currency_code: "USD"
+                        status: "ACTIVE"
+                        company_id: "660e8400-e29b-41d4-a716-446655440001"
+                        created_at: "2024-01-20T09:00:00Z"
+                        updated_at: "2024-01-20T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                globalManufacturingExample:
+                  summary: Global Manufacturing - Multi-currency assets
+                  value:
+                    items:
+                      - id: "c0100e8400-e29b-41d4-a716-446655440000"
+                        asset_number: "AST-2024-200"
+                        name: "Manufacturing Equipment"
+                        category_id: "c0110e8400-e29b-41d4-a716-446655440000"
+                        purchase_date: "2023-06-01"
+                        purchase_cost: 500000.00
+                        current_value: 450000.00
+                        depreciation_method: "DECLINING_BALANCE"
+                        useful_life_months: 120
+                        currency_code: "EUR"
+                        status: "ACTIVE"
+                        company_id: "770e8400-e29b-41d4-a716-446655440002"
+                        created_at: "2024-01-25T08:00:00Z"
+                        updated_at: "2024-01-25T08:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
     post:
       operationId: createAsset
       summary: Create asset
@@ -43,6 +107,43 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create asset for Acme Corporation
+                value:
+                  asset_number: "AST-2024-001"
+                  name: "Office Building - Main Campus"
+                  category_id: "a0110e8400-e29b-41d4-a716-446655440000"
+                  purchase_date: "2020-01-15"
+                  purchase_cost: 5000000.00
+                  depreciation_method: "STRAIGHT_LINE"
+                  useful_life_months: 360
+                  currency_code: "USD"
+                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+              techStartRequest:
+                summary: Create asset for TechStart Inc
+                value:
+                  asset_number: "AST-2024-100"
+                  name: "Laptop Computer"
+                  category_id: "b0110e8400-e29b-41d4-a716-446655440000"
+                  purchase_date: "2024-01-10"
+                  purchase_cost: 1500.00
+                  depreciation_method: "STRAIGHT_LINE"
+                  useful_life_months: 36
+                  currency_code: "USD"
+                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+              globalManufacturingRequest:
+                summary: Create multi-currency asset
+                value:
+                  asset_number: "AST-2024-200"
+                  name: "Manufacturing Equipment"
+                  category_id: "c0110e8400-e29b-41d4-a716-446655440000"
+                  purchase_date: "2023-06-01"
+                  purchase_cost: 500000.00
+                  depreciation_method: "DECLINING_BALANCE"
+                  useful_life_months: 120
+                  currency_code: "EUR"
+                  company_id: "770e8400-e29b-41d4-a716-446655440002"
       responses:
         '201':
           description: Asset created
@@ -50,6 +151,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation asset created
+                  value:
+                    id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-001"
+                    name: "Office Building - Main Campus"
+                    category_id: "a0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2020-01-15"
+                    purchase_cost: 5000000.00
+                    current_value: 5000000.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 360
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart asset created
+                  value:
+                    id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-100"
+                    name: "Laptop Computer"
+                    category_id: "b0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2024-01-10"
+                    purchase_cost: 1500.00
+                    current_value: 1500.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 36
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing asset created
+                  value:
+                    id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-200"
+                    name: "Manufacturing Equipment"
+                    category_id: "c0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2023-06-01"
+                    purchase_cost: 500000.00
+                    current_value: 500000.00
+                    depreciation_method: "DECLINING_BALANCE"
+                    useful_life_months: 120
+                    currency_code: "EUR"
+                    status: "ACTIVE"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T08:00:00Z"
         '400':
           description: Invalid request
   /assets/{id}:
@@ -70,6 +223,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation asset
+                  value:
+                    id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-001"
+                    name: "Office Building - Main Campus"
+                    category_id: "a0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2020-01-15"
+                    purchase_cost: 5000000.00
+                    current_value: 5500000.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 360
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T10:00:00Z"
+                techStartExample:
+                  summary: TechStart asset
+                  value:
+                    id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-100"
+                    name: "Laptop Computer"
+                    category_id: "b0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2024-01-10"
+                    purchase_cost: 1500.00
+                    current_value: 1200.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 36
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing asset
+                  value:
+                    id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-200"
+                    name: "Manufacturing Equipment"
+                    category_id: "c0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2023-06-01"
+                    purchase_cost: 500000.00
+                    current_value: 450000.00
+                    depreciation_method: "DECLINING_BALANCE"
+                    useful_life_months: 120
+                    currency_code: "EUR"
+                    status: "ACTIVE"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T08:00:00Z"
         '404':
           description: Not found
     put:
@@ -88,6 +293,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAssetRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation asset
+                value:
+                  name: "Office Building - Main Campus (Updated)"
+                  current_value: 5600000.00
+              techStartUpdate:
+                summary: Update TechStart asset
+                value:
+                  name: "Laptop Computer (Updated)"
+                  current_value: 1100.00
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing asset
+                value:
+                  name: "Manufacturing Equipment (Updated)"
+                  current_value: 440000.00
       responses:
         '200':
           description: Asset updated
@@ -95,6 +316,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation asset updated
+                  value:
+                    id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-001"
+                    name: "Office Building - Main Campus (Updated)"
+                    category_id: "a0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2020-01-15"
+                    purchase_cost: 5000000.00
+                    current_value: 5600000.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 360
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T11:00:00Z"
+                techStartResponse:
+                  summary: TechStart asset updated
+                  value:
+                    id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-100"
+                    name: "Laptop Computer (Updated)"
+                    category_id: "b0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2024-01-10"
+                    purchase_cost: 1500.00
+                    current_value: 1100.00
+                    depreciation_method: "STRAIGHT_LINE"
+                    useful_life_months: 36
+                    currency_code: "USD"
+                    status: "ACTIVE"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T10:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing asset updated
+                  value:
+                    id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    asset_number: "AST-2024-200"
+                    name: "Manufacturing Equipment (Updated)"
+                    category_id: "c0110e8400-e29b-41d4-a716-446655440000"
+                    purchase_date: "2023-06-01"
+                    purchase_cost: 500000.00
+                    current_value: 440000.00
+                    depreciation_method: "DECLINING_BALANCE"
+                    useful_life_months: 120
+                    currency_code: "EUR"
+                    status: "ACTIVE"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T09:00:00Z"
         '404':
           description: Not found
     delete:
@@ -147,6 +420,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDepreciationRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create depreciation for Acme Corporation asset
+                value:
+                  asset_id: "a0100e8400-e29b-41d4-a716-446655440000"
+                  period_start: "2024-01-01"
+                  period_end: "2024-01-31"
+                  depreciation_amount: 13888.89
+                  currency_code: "USD"
+                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+              techStartRequest:
+                summary: Create depreciation for TechStart asset
+                value:
+                  asset_id: "b0100e8400-e29b-41d4-a716-446655440000"
+                  period_start: "2024-01-01"
+                  period_end: "2024-01-31"
+                  depreciation_amount: 41.67
+                  currency_code: "USD"
+                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+              globalManufacturingRequest:
+                summary: Create multi-currency depreciation
+                value:
+                  asset_id: "c0100e8400-e29b-41d4-a716-446655440000"
+                  period_start: "2024-01-01"
+                  period_end: "2024-01-31"
+                  depreciation_amount: 4166.67
+                  currency_code: "EUR"
+                  company_id: "770e8400-e29b-41d4-a716-446655440002"
       responses:
         '201':
           description: Depreciation created
@@ -154,6 +455,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Depreciation'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation depreciation created
+                  value:
+                    id: "a0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 13888.89
+                    accumulated_depreciation: 0.00
+                    book_value: 0.00
+                    currency_code: "USD"
+                    status: "SCHEDULED"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                    updated_at: "2024-01-31T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart depreciation created
+                  value:
+                    id: "b0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 41.67
+                    accumulated_depreciation: 0.00
+                    book_value: 0.00
+                    currency_code: "USD"
+                    status: "SCHEDULED"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                    updated_at: "2024-01-31T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing depreciation created
+                  value:
+                    id: "c0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 4166.67
+                    accumulated_depreciation: 0.00
+                    book_value: 0.00
+                    currency_code: "EUR"
+                    status: "SCHEDULED"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
+                    updated_at: "2024-01-31T08:00:00Z"
         '400':
           description: Invalid request
   /depreciations/{id}:
@@ -174,6 +521,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Depreciation'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation depreciation
+                  value:
+                    id: "a0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 13888.89
+                    accumulated_depreciation: 555555.56
+                    book_value: 4444444.44
+                    currency_code: "USD"
+                    status: "POSTED"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                    updated_at: "2024-01-31T10:00:00Z"
+                techStartExample:
+                  summary: TechStart depreciation
+                  value:
+                    id: "b0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 41.67
+                    accumulated_depreciation: 41.67
+                    book_value: 1458.33
+                    currency_code: "USD"
+                    status: "POSTED"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                    updated_at: "2024-01-31T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing depreciation
+                  value:
+                    id: "c0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 4166.67
+                    accumulated_depreciation: 29166.67
+                    book_value: 470833.33
+                    currency_code: "EUR"
+                    status: "POSTED"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
+                    updated_at: "2024-01-31T08:00:00Z"
         '404':
           description: Not found
     put:
@@ -192,6 +585,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateDepreciationRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation depreciation
+                value:
+                  status: "POSTED"
+                  depreciation_amount: 14000.00
+              techStartUpdate:
+                summary: Update TechStart depreciation
+                value:
+                  status: "POSTED"
+                  depreciation_amount: 42.00
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing depreciation
+                value:
+                  status: "POSTED"
+                  depreciation_amount: 4200.00
       responses:
         '200':
           description: Depreciation updated
@@ -199,6 +608,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Depreciation'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation depreciation updated
+                  value:
+                    id: "a0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "a0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 14000.00
+                    accumulated_depreciation: 555555.56
+                    book_value: 4444444.44
+                    currency_code: "USD"
+                    status: "POSTED"
+                    company_id: "550e8400-e29b-41d4-a716-446655440000"
+                    created_at: "2024-01-31T10:00:00Z"
+                    updated_at: "2024-01-31T11:00:00Z"
+                techStartResponse:
+                  summary: TechStart depreciation updated
+                  value:
+                    id: "b0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "b0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 42.00
+                    accumulated_depreciation: 41.67
+                    book_value: 1458.33
+                    currency_code: "USD"
+                    status: "POSTED"
+                    company_id: "660e8400-e29b-41d4-a716-446655440001"
+                    created_at: "2024-01-31T09:00:00Z"
+                    updated_at: "2024-01-31T10:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing depreciation updated
+                  value:
+                    id: "c0120e8400-e29b-41d4-a716-446655440000"
+                    asset_id: "c0100e8400-e29b-41d4-a716-446655440000"
+                    period_start: "2024-01-01"
+                    period_end: "2024-01-31"
+                    depreciation_amount: 4200.00
+                    accumulated_depreciation: 29166.67
+                    book_value: 470833.33
+                    currency_code: "EUR"
+                    status: "POSTED"
+                    company_id: "770e8400-e29b-41d4-a716-446655440002"
+                    created_at: "2024-01-31T08:00:00Z"
+                    updated_at: "2024-01-31T09:00:00Z"
         '404':
           description: Not found
     delete:
@@ -242,6 +697,46 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation - Asset registers
+                  value:
+                    items:
+                      - id: "a0130e8400-e29b-41d4-a716-446655440000"
+                        code: "REAL_ESTATE"
+                        name: "Real Estate Register"
+                        is_active: true
+                        created_at: "2024-01-15T10:00:00Z"
+                        updated_at: "2024-01-15T10:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                techStartExample:
+                  summary: TechStart Inc - Asset registers
+                  value:
+                    items:
+                      - id: "b0130e8400-e29b-41d4-a716-446655440000"
+                        code: "EQUIPMENT"
+                        name: "Equipment Register"
+                        is_active: true
+                        created_at: "2024-01-20T09:00:00Z"
+                        updated_at: "2024-01-20T09:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
+                globalManufacturingExample:
+                  summary: Global Manufacturing - Asset registers
+                  value:
+                    items:
+                      - id: "c0130e8400-e29b-41d4-a716-446655440000"
+                        code: "MACHINERY"
+                        name: "Machinery Register"
+                        is_active: true
+                        created_at: "2024-01-25T08:00:00Z"
+                        updated_at: "2024-01-25T08:00:00Z"
+                    total: 1
+                    page: 1
+                    limit: 20
     post:
       operationId: createAssetRegister
       summary: Create asset-register
@@ -251,6 +746,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetRegisterRequest'
+            examples:
+              acmeCorporationRequest:
+                summary: Create asset register for Acme Corporation
+                value:
+                  code: "REAL_ESTATE"
+                  name: "Real Estate Register"
+                  is_active: true
+              techStartRequest:
+                summary: Create asset register for TechStart Inc
+                value:
+                  code: "EQUIPMENT"
+                  name: "Equipment Register"
+                  is_active: true
+              globalManufacturingRequest:
+                summary: Create asset register for Global Manufacturing
+                value:
+                  code: "MACHINERY"
+                  name: "Machinery Register"
+                  is_active: true
       responses:
         '201':
           description: AssetRegister created
@@ -258,6 +772,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetRegister'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation asset register created
+                  value:
+                    id: "a0130e8400-e29b-41d4-a716-446655440000"
+                    code: "REAL_ESTATE"
+                    name: "Real Estate Register"
+                    is_active: true
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T10:00:00Z"
+                techStartResponse:
+                  summary: TechStart asset register created
+                  value:
+                    id: "b0130e8400-e29b-41d4-a716-446655440000"
+                    code: "EQUIPMENT"
+                    name: "Equipment Register"
+                    is_active: true
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing asset register created
+                  value:
+                    id: "c0130e8400-e29b-41d4-a716-446655440000"
+                    code: "MACHINERY"
+                    name: "Machinery Register"
+                    is_active: true
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T08:00:00Z"
         '400':
           description: Invalid request
   /asset-registers/{id}:
@@ -278,6 +820,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetRegister'
+              examples:
+                acmeCorporationExample:
+                  summary: Acme Corporation asset register
+                  value:
+                    id: "a0130e8400-e29b-41d4-a716-446655440000"
+                    code: "REAL_ESTATE"
+                    name: "Real Estate Register"
+                    is_active: true
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T10:00:00Z"
+                techStartExample:
+                  summary: TechStart asset register
+                  value:
+                    id: "b0130e8400-e29b-41d4-a716-446655440000"
+                    code: "EQUIPMENT"
+                    name: "Equipment Register"
+                    is_active: true
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T09:00:00Z"
+                globalManufacturingExample:
+                  summary: Global Manufacturing asset register
+                  value:
+                    id: "c0130e8400-e29b-41d4-a716-446655440000"
+                    code: "MACHINERY"
+                    name: "Machinery Register"
+                    is_active: true
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T08:00:00Z"
         '404':
           description: Not found
     put:
@@ -296,6 +866,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAssetRegisterRequest'
+            examples:
+              acmeCorporationUpdate:
+                summary: Update Acme Corporation asset register
+                value:
+                  name: "Real Estate Register (Updated)"
+                  is_active: true
+              techStartUpdate:
+                summary: Update TechStart asset register
+                value:
+                  name: "Equipment Register (Updated)"
+                  is_active: true
+              globalManufacturingUpdate:
+                summary: Update Global Manufacturing asset register
+                value:
+                  name: "Machinery Register (Updated)"
+                  is_active: true
       responses:
         '200':
           description: AssetRegister updated
@@ -303,6 +889,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetRegister'
+              examples:
+                acmeCorporationResponse:
+                  summary: Acme Corporation asset register updated
+                  value:
+                    id: "a0130e8400-e29b-41d4-a716-446655440000"
+                    code: "REAL_ESTATE"
+                    name: "Real Estate Register (Updated)"
+                    is_active: true
+                    created_at: "2024-01-15T10:00:00Z"
+                    updated_at: "2024-01-15T11:00:00Z"
+                techStartResponse:
+                  summary: TechStart asset register updated
+                  value:
+                    id: "b0130e8400-e29b-41d4-a716-446655440000"
+                    code: "EQUIPMENT"
+                    name: "Equipment Register (Updated)"
+                    is_active: true
+                    created_at: "2024-01-20T09:00:00Z"
+                    updated_at: "2024-01-20T10:00:00Z"
+                globalManufacturingResponse:
+                  summary: Global Manufacturing asset register updated
+                  value:
+                    id: "c0130e8400-e29b-41d4-a716-446655440000"
+                    code: "MACHINERY"
+                    name: "Machinery Register (Updated)"
+                    is_active: true
+                    created_at: "2024-01-25T08:00:00Z"
+                    updated_at: "2024-01-25T09:00:00Z"
         '404':
           description: Not found
     delete:
@@ -342,4 +956,434 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    Asset:
+      type: object
+      required:
+        - id
+        - asset_number
+        - name
+        - category_id
+        - purchase_date
+        - status
+        - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_number:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        category_id:
+          type: string
+          format: uuid
+        purchase_cost:
+          type: number
+          format: decimal
+        current_value:
+          type: number
+          format: decimal
+        accumulated_depreciation:
+          type: number
+          format: decimal
+        salvage_value:
+          type: number
+          format: decimal
+        purchase_date:
+          type: string
+          format: date
+        in_service_date:
+          type: string
+          format: date
+          nullable: true
+        disposal_date:
+          type: string
+          format: date
+          nullable: true
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, UNITS_OF_PRODUCTION, SUM_OF_YEARS]
+          nullable: true
+        useful_life_months:
+          type: integer
+        depreciation_rate:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [ACTIVE, DEPRECIATING, FULLY_DEPRECIATED, DISPOSED, IMPAIRED]
+        location:
+          type: string
+          maxLength: 255
+          nullable: true
+        asset_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        depreciation_expense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        accumulated_depreciation_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+    Depreciation:
+      type: object
+      required:
+        - id
+        - asset_id
+        - period_start
+        - period_end
+        - depreciation_amount
+        - status
+        - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        depreciation_amount:
+          type: number
+          format: decimal
+        accumulated_depreciation:
+          type: number
+          format: decimal
+        book_value:
+          type: number
+          format: decimal
+        journal_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum: [SCHEDULED, POSTED, SKIPPED]
+        posted_at:
+          type: string
+          format: date-time
+          nullable: true
+        posted_by:
+          type: string
+          format: uuid
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    AssetRegister:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 255
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        default_depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, UNITS_OF_PRODUCTION, SUM_OF_YEARS]
+          nullable: true
+        default_useful_life_months:
+          type: integer
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    AssetTransaction:
+      type: object
+      required:
+        - id
+        - asset_id
+        - transaction_date
+        - transaction_type
+        - transaction_amount
+        - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+        transaction_date:
+          type: string
+          format: date
+        transaction_type:
+          type: string
+          enum: [PURCHASE, SALE, DISPOSAL, TRANSFER, IMPAIRMENT, ADJUSTMENT]
+        transaction_amount:
+          type: number
+          format: decimal
+        sale_proceeds:
+          type: number
+          format: decimal
+          nullable: true
+        gain_loss:
+          type: number
+          format: decimal
+          nullable: true
+        transfer_to_location:
+          type: string
+          nullable: true
+        transfer_to_company_id:
+          type: string
+          format: uuid
+          nullable: true
+        impairment_amount:
+          type: number
+          format: decimal
+          nullable: true
+        impairment_reason:
+          type: string
+          nullable: true
+        journal_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+    CreateAssetRequest:
+      type: object
+      required:
+        - asset_number
+        - name
+        - category_id
+        - purchase_date
+        - currency_code
+      properties:
+        asset_number:
+          type: string
+          maxLength: 100
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+        purchase_cost:
+          type: number
+          format: decimal
+        salvage_value:
+          type: number
+          format: decimal
+        purchase_date:
+          type: string
+          format: date
+        in_service_date:
+          type: string
+          format: date
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, UNITS_OF_PRODUCTION, SUM_OF_YEARS]
+        useful_life_months:
+          type: integer
+        location:
+          type: string
+          maxLength: 255
+        asset_account_id:
+          type: string
+          format: uuid
+        depreciation_expense_account_id:
+          type: string
+          format: uuid
+        accumulated_depreciation_account_id:
+          type: string
+          format: uuid
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_id:
+          type: string
+          format: uuid
+    UpdateAssetRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, DEPRECIATING, FULLY_DEPRECIATED, DISPOSED, IMPAIRED]
+        location:
+          type: string
+          maxLength: 255
+        disposal_date:
+          type: string
+          format: date
+    CreateDepreciationRequest:
+      type: object
+      required:
+        - asset_id
+        - period_start
+        - period_end
+        - depreciation_amount
+        - currency_code
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        depreciation_amount:
+          type: number
+          format: decimal
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    UpdateDepreciationRequest:
+      type: object
+      properties:
+        depreciation_amount:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [SCHEDULED, POSTED, SKIPPED]
+        journal_entry_id:
+          type: string
+          format: uuid
+    CreateAssetRegisterRequest:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+          maxLength: 50
+        name:
+          type: string
+          maxLength: 255
+        parent_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        default_depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, UNITS_OF_PRODUCTION, SUM_OF_YEARS]
+        default_useful_life_months:
+          type: integer
+        is_active:
+          type: boolean
+    UpdateAssetRegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        default_depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, UNITS_OF_PRODUCTION, SUM_OF_YEARS]
+        default_useful_life_months:
+          type: integer
+        is_active:
+          type: boolean

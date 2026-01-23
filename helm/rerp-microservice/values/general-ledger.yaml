@@ -1,0 +1,16 @@
+service:
+  name: general-ledger
+  port: 8001
+  containerPort: 8001
+  nodePort: 31001
+image:
+  repository: localhost:5001
+  name: rerp-general-ledger
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: general_ledger_service_api
+  serviceName: general-ledger
