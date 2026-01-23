@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "automation"
+name = "rerp_crm_automation_impl"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_crm_automation = { path = "../automation" }

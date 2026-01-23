@@ -2,7 +2,7 @@
 
 > **Cloud-native, microservices-based ERP system built with Rust and OpenAPI-first architecture**
 
-[![CI](https://github.com/microscaler/rerp/actions/workflows/generate-bff-specs.yml/badge.svg)](https://github.com/microscaler/rerp/actions)
+[![CI](https://github.com/microscaler/rerp/actions/workflows/ci.yml/badge.svg)](https://github.com/microscaler/rerp/actions)
 [![License](https://img.shields.io/badge/license-PolyForm--Shield--1.0.0-blue.svg)](LICENSE)
 
 ---
@@ -487,7 +487,15 @@ cargo test
 
 ### Auto-Generated BFF Specs
 
-System-level Backend for Frontend (BFF) specs are automatically generated:
+System-level Backend for Frontend (BFF) specs are automatically generated.
+
+**Accounting BFF** (`openapi/accounting/openapi_bff.yaml`): Tilt and local runs use the standalone [bff-generator](https://github.com/microscaler/bff-generator). Install with `pip install bff-generator`, then:
+
+```bash
+bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
+```
+
+**All systems** (`openapi/{system}/openapi.yaml`):
 
 ```bash
 # Regenerate all system BFF specs from sub-services
@@ -586,7 +594,7 @@ rerp/
 │   └── generate_complete_openapi.py
 └── .github/
     └── workflows/
-        └── generate-bff-specs.yml  # CI automation
+        └── ci.yml  # CI: validate OpenAPI, validate ports, build, test, multi-arch
 ```
 
 ---

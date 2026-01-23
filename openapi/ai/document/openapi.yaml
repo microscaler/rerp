@@ -10,7 +10,7 @@ tags: []
 paths:
   /documents:
     get:
-      operationId: listDocuments
+      operationId: list_documents
       summary: List documents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDocument
+      operationId: create_document
       summary: Create document
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /documents/{id}:
     get:
-      operationId: getDocument
+      operationId: get_document
       summary: Get document by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDocument
+      operationId: update_document
       summary: Update document
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDocument
+      operationId: delete_document
       summary: Delete document
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /extractions:
     get:
-      operationId: listExtractions
+      operationId: list_extractions
       summary: List extractions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createExtraction
+      operationId: create_extraction
       summary: Create extraction
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /extractions/{id}:
     get:
-      operationId: getExtraction
+      operationId: get_extraction
       summary: Get extraction by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateExtraction
+      operationId: update_extraction
       summary: Update extraction
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteExtraction
+      operationId: delete_extraction
       summary: Delete extraction
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /classifications:
     get:
-      operationId: listClassifications
+      operationId: list_classifications
       summary: List classifications
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createClassification
+      operationId: create_classification
       summary: Create classification
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /classifications/{id}:
     get:
-      operationId: getClassification
+      operationId: get_classification
       summary: Get classification by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateClassification
+      operationId: update_classification
       summary: Update classification
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteClassification
+      operationId: delete_classification
       summary: Delete classification
       parameters:
       - name: id

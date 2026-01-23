@@ -1,0 +1,83 @@
+# BRRTRouter application configuration (YAML)
+# This file is generated alongside the example application.
+# Adjust values per environment and reload/restart the app.
+
+security:
+  # PropelAuth integration (recommended as first provider)
+  # See PropelAuth docs: https://docs.propelauth.com/
+  propelauth:
+    # auth_url: "https://auth.yourdomain.com"   # REQUIRED - your PropelAuth Auth URL
+    # audience: "your-api-audience"             # OPTIONAL - set if configured in PropelAuth
+    # issuer: "https://auth.yourdomain.com/"    # OPTIONAL - defaults to auth_url
+    # jwks_url: "https://auth.yourdomain.com/.well-known/jwks.json"  # OPTIONAL - derived from auth_url by default
+    # leeway_secs: 30
+    # cache_ttl_secs: 300
+
+  # Static API keys bound to specific OpenAPI security scheme names
+  # Example: 'ApiKeyAuth' corresponds to components.securitySchemes.ApiKeyAuth
+  api_keys:
+    # Development default for Pet Store example: OpenAPI scheme name is 'ApiKeyHeader'
+    ApiKeyHeader:
+      key: "test123"
+      # header_name: "X-API-Key"  # optional override for header-based schemes
+
+  # Remote API key verification by scheme name
+  remote_api_keys:
+    # ApiKeyAuth:
+    #   verify_url: "https://auth.example/verify"
+    #   timeout_ms: 500
+    #   header_name: "X-API-Key"
+    #   cache_ttl_secs: 60
+
+  # Simple bearer signature (dev only) and optional cookie name
+  bearer:
+    # signature: "sig"
+    # cookie_name: "auth_token"
+
+  # Simple oauth2 signature (dev only) and optional cookie name
+  oauth2:
+    # signature: "sig"
+    # cookie_name: "oauth_token"
+
+  # Per-scheme JWKS configuration (production)
+  jwks:
+    # BearerAuth:
+    #   jwks_url: "https://issuer.example/.well-known/jwks.json"
+    #   iss: "https://issuer.example/"
+    #   aud: "my-audience"
+    #   leeway_secs: 30
+    #   cache_ttl_secs: 300
+
+http:
+  # Enable HTTP/1.1 keep-alive (default true in generated apps for testing)
+  keep_alive: true
+  timeout_secs: 5
+  max_requests: 5000
+
+cors:
+  # CORS configuration - origins are environment-specific and should be in config.yaml
+  # Route-specific CORS settings (methods, headers, credentials) can be defined in OpenAPI x-cors extension
+  # 
+  # IMPORTANT: If any route has allowCredentials: true in OpenAPI x-cors extension,
+  # you MUST configure at least one origin here (wildcard "*" is not allowed with credentials).
+  # For development, you can use localhost origins. For production, use your actual domain.
+  origins:
+    - "http://localhost:3000"  # Development frontend (uncomment and adjust as needed)
+    # - "https://example.com"   # Production origin (uncomment and set for production)
+    # - "https://api.example.com"
+    # Use "*" to allow all origins (insecure, not recommended for production)
+    # NOTE: "*" cannot be used with allowCredentials: true (CORS spec requirement)
+    # - "*"
+  # Global CORS settings (can be overridden per-route via OpenAPI x-cors)
+  allowed_headers:
+    - "Content-Type"
+    - "Authorization"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+  allow_credentials: false
+  expose_headers: []
+  max_age: null  # Preflight cache duration in seconds (null = no caching)

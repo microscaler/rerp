@@ -1,0 +1,16 @@
+service:
+  name: asset
+  port: 8006
+  containerPort: 8006
+  nodePort: 31006
+image:
+  repository: localhost:5001
+  name: rerp-asset
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: asset
+  serviceName: asset

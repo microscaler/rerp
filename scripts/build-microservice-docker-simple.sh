@@ -49,16 +49,17 @@ if ! docker build -t "${image_name}:tilt" --rm --force-rm -f "$dockerfile" .; th
   exit 1
 fi
 
-# Push Docker image (to local registry if available, or just tag for Kind)
-echo "📤 Tagging Docker image: $image_name:tilt"
-# For Kind, we can use localhost:5001 or just load directly
-# Try to push to local registry, but don't fail if it doesn't exist
+# Push to local registry, or load into Kind if registry is not running (e.g. dev-up without kind-registry)
+echo "📤 Pushing or loading image: $image_name:tilt"
 if docker push "${image_name}:tilt" 2>/dev/null; then
   echo "✅ Docker image pushed to registry: $image_name:tilt"
 else
-  echo "⚠️  Warning: Could not push to registry (registry may not be running)"
-  echo "   Image tagged as: $image_name:tilt"
-  echo "   Kind will load the image directly"
+  echo "⚠️  Registry not available at localhost:5001; loading into Kind cluster..."
+  if kind load docker-image "${image_name}:tilt" --name rerp 2>/dev/null; then
+    echo "✅ Image loaded into Kind: $image_name:tilt"
+  else
+    echo "⚠️  Could not push or kind load; image tagged as: $image_name:tilt"
+  fi
 fi
 
-echo "✅ Docker image built: $image_name:tilt"
+echo "✅ Docker image ready: $image_name:tilt"

@@ -1,0 +1,16 @@
+service:
+  name: accounts-payable
+  port: 8004
+  containerPort: 8004
+  nodePort: 31004
+image:
+  repository: localhost:5001
+  name: rerp-accounts-payable
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: accounts_payable
+  serviceName: accounts-payable

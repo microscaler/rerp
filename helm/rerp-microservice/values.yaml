@@ -21,6 +21,9 @@
 #   - bank-sync:          8005 (NodePort: 30805) - Bank Synchronization
 #   - asset:              8006 (NodePort: 30806) - Asset Management
 #   - budget:             8007 (NodePort: 30807) - Budget Management
+#   - edi:                8008 (NodePort: 30808) - EDI & Compliance
+#   - financial-reports:  8009 (NodePort: 30809) - Financial Reports
+#   - bff:                8010 (NodePort: 30810) - Accounting BFF
 #
 # See docs/RERP_PREPARATION_PLAN.md for the complete services and ports table.
 #

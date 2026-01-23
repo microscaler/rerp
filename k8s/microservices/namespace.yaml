@@ -9,6 +9,6 @@ metadata:
   name: rerp
   labels:
     app: rerp
-    managed-by: tilt
+    managed-by: cluster-bootstrap
   annotations:
     description: "RERP accounting microservices namespace for General Ledger, Invoice, AR, AP, and other accounting services"

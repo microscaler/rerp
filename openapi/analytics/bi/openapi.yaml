@@ -10,7 +10,7 @@ tags: []
 paths:
   /datasets:
     get:
-      operationId: listDatasets
+      operationId: list_datasets
       summary: List datasets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDataset
+      operationId: create_dataset
       summary: Create dataset
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /datasets/{id}:
     get:
-      operationId: getDataset
+      operationId: get_dataset
       summary: Get dataset by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDataset
+      operationId: update_dataset
       summary: Update dataset
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDataset
+      operationId: delete_dataset
       summary: Delete dataset
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /querys:
     get:
-      operationId: listQuerys
+      operationId: list_querys
       summary: List querys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createQuery
+      operationId: create_query
       summary: Create query
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /querys/{id}:
     get:
-      operationId: getQuery
+      operationId: get_query
       summary: Get query by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateQuery
+      operationId: update_query
       summary: Update query
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteQuery
+      operationId: delete_query
       summary: Delete query
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /visualizations:
     get:
-      operationId: listVisualizations
+      operationId: list_visualizations
       summary: List visualizations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createVisualization
+      operationId: create_visualization
       summary: Create visualization
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /visualizations/{id}:
     get:
-      operationId: getVisualization
+      operationId: get_visualization
       summary: Get visualization by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateVisualization
+      operationId: update_visualization
       summary: Update visualization
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteVisualization
+      operationId: delete_visualization
       summary: Delete visualization
       parameters:
       - name: id

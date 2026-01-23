@@ -29,7 +29,7 @@ tags: []
 paths:
   /audit-logs:
     get:
-      operationId: listAuditLogs
+      operationId: list_audit_logs
       summary: List audit-logs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
-      operationId: createAuditLog
+      operationId: create_audit_log
       summary: Create audit-log
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /audit-logs/{id}:
     get:
-      operationId: getAuditLog
+      operationId: get_audit_log
       summary: Get audit-log by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     put:
-      operationId: updateAuditLog
+      operationId: update_audit_log
       summary: Update audit-log
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     delete:
-      operationId: deleteAuditLog
+      operationId: delete_audit_log
       summary: Delete audit-log
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /compliance-rules:
     get:
-      operationId: listComplianceRules
+      operationId: list_compliance_rules
       summary: List compliance-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
-      operationId: createComplianceRule
+      operationId: create_compliance_rule
       summary: Create compliance-rule
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /compliance-rules/{id}:
     get:
-      operationId: getComplianceRule
+      operationId: get_compliance_rule
       summary: Get compliance-rule by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     put:
-      operationId: updateComplianceRule
+      operationId: update_compliance_rule
       summary: Update compliance-rule
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     delete:
-      operationId: deleteComplianceRule
+      operationId: delete_compliance_rule
       summary: Delete compliance-rule
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /currencys:
     get:
-      operationId: listCurrencys
+      operationId: list_currencys
       summary: List currencys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
-      operationId: createCurrency
+      operationId: create_currency
       summary: Create currency
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/localization/core
   /currencys/{id}:
     get:
-      operationId: getCurrency
+      operationId: get_currency
       summary: Get currency by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     put:
-      operationId: updateCurrency
+      operationId: update_currency
       summary: Update currency
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     delete:
-      operationId: deleteCurrency
+      operationId: delete_currency
       summary: Delete currency
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/localization/core
   /locales:
     get:
-      operationId: listLocales
+      operationId: list_locales
       summary: List locales
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
-      operationId: createLocale
+      operationId: create_locale
       summary: Create locale
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/localization/core
   /locales/{id}:
     get:
-      operationId: getLocale
+      operationId: get_locale
       summary: Get locale by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     put:
-      operationId: updateLocale
+      operationId: update_locale
       summary: Update locale
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     delete:
-      operationId: deleteLocale
+      operationId: delete_locale
       summary: Delete locale
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/localization/core
   /policys:
     get:
-      operationId: listPolicys
+      operationId: list_policys
       summary: List policys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
-      operationId: createPolicy
+      operationId: create_policy
       summary: Create policy
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /policys/{id}:
     get:
-      operationId: getPolicy
+      operationId: get_policy
       summary: Get policy by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     put:
-      operationId: updatePolicy
+      operationId: update_policy
       summary: Update policy
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     delete:
-      operationId: deletePolicy
+      operationId: delete_policy
       summary: Delete policy
       parameters:
       - name: id
@@ -599,7 +599,7 @@ paths:
       x-service-base-path: /api/v1/localization/compliance
   /translations:
     get:
-      operationId: listTranslations
+      operationId: list_translations
       summary: List translations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -626,7 +626,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
-      operationId: createTranslation
+      operationId: create_translation
       summary: Create translation
       requestBody:
         required: true
@@ -647,7 +647,7 @@ paths:
       x-service-base-path: /api/v1/localization/core
   /translations/{id}:
     get:
-      operationId: getTranslation
+      operationId: get_translation
       summary: Get translation by id
       parameters:
       - name: id
@@ -668,7 +668,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     put:
-      operationId: updateTranslation
+      operationId: update_translation
       summary: Update translation
       parameters:
       - name: id
@@ -695,7 +695,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/localization/core
     delete:
-      operationId: deleteTranslation
+      operationId: delete_translation
       summary: Delete translation
       parameters:
       - name: id

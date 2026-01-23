@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "compliance"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_localization_compliance = { path = "../compliance" }

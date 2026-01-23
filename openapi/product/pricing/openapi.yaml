@@ -11,7 +11,7 @@ tags: []
 paths:
   /price-lists:
     get:
-      operationId: listPriceLists
+      operationId: list_price_lists
       summary: List price-lists
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPriceList
+      operationId: create_price_list
       summary: Create price-list
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /price-lists/{id}:
     get:
-      operationId: getPriceList
+      operationId: get_price_list
       summary: Get price-list by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePriceList
+      operationId: update_price_list
       summary: Update price-list
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePriceList
+      operationId: delete_price_list
       summary: Delete price-list
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /price-rules:
     get:
-      operationId: listPriceRules
+      operationId: list_price_rules
       summary: List price-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPriceRule
+      operationId: create_price_rule
       summary: Create price-rule
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /price-rules/{id}:
     get:
-      operationId: getPriceRule
+      operationId: get_price_rule
       summary: Get price-rule by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePriceRule
+      operationId: update_price_rule
       summary: Update price-rule
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePriceRule
+      operationId: delete_price_rule
       summary: Delete price-rule
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /discounts:
     get:
-      operationId: listDiscounts
+      operationId: list_discounts
       summary: List discounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -244,7 +244,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDiscount
+      operationId: create_discount
       summary: Create discount
       requestBody:
         required: true
@@ -263,7 +263,7 @@ paths:
           description: Invalid request
   /discounts/{id}:
     get:
-      operationId: getDiscount
+      operationId: get_discount
       summary: Get discount by id
       parameters:
       - name: id
@@ -282,7 +282,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDiscount
+      operationId: update_discount
       summary: Update discount
       parameters:
       - name: id
@@ -307,7 +307,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDiscount
+      operationId: delete_discount
       summary: Delete discount
       parameters:
       - name: id
@@ -323,7 +323,7 @@ paths:
           description: Not found
   /calculate:
     post:
-      operationId: calculatePrice
+      operationId: calculate_price
       summary: Calculate price for product
       responses:
         '200':
@@ -343,7 +343,7 @@ paths:
               properties: {}
   /price-lists/{priceListId}/rules:
     get:
-      operationId: getPriceRules
+      operationId: get_price_rules
       summary: Get price rules for price list
       responses:
         '200':

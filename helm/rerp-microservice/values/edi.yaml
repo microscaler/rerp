@@ -1,0 +1,16 @@
+service:
+  name: edi
+  port: 8008
+  containerPort: 8008
+  nodePort: 31008
+image:
+  repository: localhost:5001
+  name: rerp-edi
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: edi
+  serviceName: edi

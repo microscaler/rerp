@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "repair"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_manufacturing_repair = { path = "../repair" }

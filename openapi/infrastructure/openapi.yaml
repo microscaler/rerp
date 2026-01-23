@@ -29,7 +29,7 @@ tags: []
 paths:
   /api-keys:
     get:
-      operationId: listApiKeys
+      operationId: list_api_keys
       summary: List api-keys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
-      operationId: createApiKey
+      operationId: create_api_key
       summary: Create api-key
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /api-keys/{id}:
     get:
-      operationId: getApiKey
+      operationId: get_api_key
       summary: Get api-key by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     put:
-      operationId: updateApiKey
+      operationId: update_api_key
       summary: Update api-key
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     delete:
-      operationId: deleteApiKey
+      operationId: delete_api_key
       summary: Delete api-key
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /health:
     get:
-      operationId: healthCheck
+      operationId: health_check
       summary: Gateway health check
       responses:
         '200':
@@ -158,7 +158,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /integrations:
     get:
-      operationId: listIntegrations
+      operationId: list_integrations
       summary: List integrations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -185,7 +185,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
-      operationId: createIntegration
+      operationId: create_integration
       summary: Create integration
       requestBody:
         required: true
@@ -206,7 +206,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /integrations/{id}:
     get:
-      operationId: getIntegration
+      operationId: get_integration
       summary: Get integration by id
       parameters:
       - name: id
@@ -227,7 +227,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     put:
-      operationId: updateIntegration
+      operationId: update_integration
       summary: Update integration
       parameters:
       - name: id
@@ -254,7 +254,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     delete:
-      operationId: deleteIntegration
+      operationId: delete_integration
       summary: Delete integration
       parameters:
       - name: id
@@ -272,7 +272,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /integrations/{integrationId}/test:
     post:
-      operationId: testIntegration
+      operationId: test_integration
       summary: Test integration connection
       responses:
         '200':
@@ -301,7 +301,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /metrics:
     get:
-      operationId: getMetrics
+      operationId: get_metrics
       summary: Get gateway metrics
       responses:
         '200':
@@ -316,7 +316,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /policys:
     get:
-      operationId: listPolicys
+      operationId: list_policys
       summary: List policys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -343,7 +343,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     post:
-      operationId: createPolicy
+      operationId: create_policy
       summary: Create policy
       requestBody:
         required: true
@@ -364,7 +364,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /policys/{id}:
     get:
-      operationId: getPolicy
+      operationId: get_policy
       summary: Get policy by id
       parameters:
       - name: id
@@ -385,7 +385,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     put:
-      operationId: updatePolicy
+      operationId: update_policy
       summary: Update policy
       parameters:
       - name: id
@@ -412,7 +412,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     delete:
-      operationId: deletePolicy
+      operationId: delete_policy
       summary: Delete policy
       parameters:
       - name: id
@@ -430,7 +430,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /routes:
     get:
-      operationId: listRoutes
+      operationId: list_routes
       summary: List routes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -457,7 +457,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     post:
-      operationId: createRoute
+      operationId: create_route
       summary: Create route
       requestBody:
         required: true
@@ -478,7 +478,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /routes/{id}:
     get:
-      operationId: getRoute
+      operationId: get_route
       summary: Get route by id
       parameters:
       - name: id
@@ -499,7 +499,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     put:
-      operationId: updateRoute
+      operationId: update_route
       summary: Update route
       parameters:
       - name: id
@@ -526,7 +526,7 @@ paths:
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     delete:
-      operationId: deleteRoute
+      operationId: delete_route
       summary: Delete route
       parameters:
       - name: id
@@ -544,7 +544,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /routes/{routeId}/test:
     post:
-      operationId: testRoute
+      operationId: test_route
       summary: Test route configuration
       responses:
         '200':
@@ -573,7 +573,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/gateway
   /webhooks:
     get:
-      operationId: listWebhooks
+      operationId: list_webhooks
       summary: List webhooks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -600,7 +600,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
-      operationId: createWebhook
+      operationId: create_webhook
       summary: Create webhook
       requestBody:
         required: true
@@ -621,7 +621,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /webhooks/{id}:
     get:
-      operationId: getWebhook
+      operationId: get_webhook
       summary: Get webhook by id
       parameters:
       - name: id
@@ -642,7 +642,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     put:
-      operationId: updateWebhook
+      operationId: update_webhook
       summary: Update webhook
       parameters:
       - name: id
@@ -669,7 +669,7 @@ paths:
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     delete:
-      operationId: deleteWebhook
+      operationId: delete_webhook
       summary: Delete webhook
       parameters:
       - name: id
@@ -687,7 +687,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /webhooks/{webhookId}/events:
     get:
-      operationId: getWebhookEvents
+      operationId: get_webhook_events
       summary: Get webhook event history
       responses:
         '200':
@@ -709,7 +709,7 @@ paths:
       x-service-base-path: /api/v1/infrastructure/integration-platform
   /webhooks/{webhookId}/trigger:
     post:
-      operationId: triggerWebhook
+      operationId: trigger_webhook
       summary: Manually trigger webhook
       responses:
         '200':

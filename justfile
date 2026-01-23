@@ -21,10 +21,18 @@ dev-up:
     # Create Kind cluster
     echo "📦 Creating Kind cluster..."
     kind create cluster --config kind-config.yaml || true
+
+    # Start local registry and connect to kind network (so docker push localhost:5001/... works)
+    echo "📦 Setting up local registry (localhost:5001)..."
+    ./scripts/setup-kind-registry.sh
     
     # Wait for cluster to be ready
     echo "⏳ Waiting for cluster to be ready..."
     kubectl wait --for=condition=Ready nodes --all --timeout=300s
+    
+    # Create rerp namespace (at cluster creation; Tilt does not manage it)
+    echo "📁 Creating rerp namespace..."
+    kubectl apply -f k8s/microservices/namespace.yaml
     
     # Create PersistentVolumes (outside of Tilt management)
     echo "💾 Creating PersistentVolumes..."
@@ -36,7 +44,7 @@ dev-up:
     echo "🎯 Starting Tilt..."
     tilt up --host=0.0.0.0 --port=10351
 
-# Stop development environment
+# Stop development environment (Kind cluster and Tilt; local registry is left running)
 dev-down:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -48,9 +56,17 @@ dev-down:
     
     # Delete Kind cluster
     echo "🗑️ Deleting Kind cluster..."
-    kind delete cluster --name rerp
+    kind delete cluster --name rerp 2>/dev/null || true
     
     echo "✅ Development environment stopped"
+    echo "   (Local registry kind-registry is left running. To remove: just dev-down-full)"
+
+# Stop development environment and remove the local registry
+dev-down-full: dev-down
+    @echo "🗑️ Removing local registry..."
+    @docker stop kind-registry 2>/dev/null || true
+    @docker rm kind-registry 2>/dev/null || true
+    @echo "✅ Registry removed"
 
 # Setup development environment (Tilt-based)
 setup:
@@ -67,8 +83,9 @@ up:
     @echo "Starting all services with Tilt (local Docker mode)..."
     @tilt up
 
-# Start with Kind cluster
+# Start with Kind cluster (cluster and rerp namespace must exist; see dev-up)
 up-k8s:
+    @kubectl apply -f k8s/microservices/namespace.yaml 2>/dev/null || true
     @echo "Starting all services with Tilt (Kubernetes mode)..."
     @tilt up -- --use-kind
 
@@ -129,6 +146,16 @@ test-integration:
 # Validate all (tests + workflows)
 validate:
     @echo "All validations passed!"
+
+# Scan port registry, helm, kind, Tiltfile, bff-suite-config; report conflicts
+# Run before dev-up to avoid "address already in use"
+validate-ports:
+    @./scripts/assign-port.py validate
+
+# Resolve duplicate service.port in helm; accounting keeps, others get next free
+# Use after reconcile when validate reports duplicates
+fix-duplicate-ports:
+    @./scripts/assign-port.py fix-duplicates
 
 # ============================================================================
 # Utilities

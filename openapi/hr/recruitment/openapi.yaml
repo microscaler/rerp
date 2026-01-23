@@ -10,7 +10,7 @@ tags: []
 paths:
   /job-postings:
     get:
-      operationId: listJobPostings
+      operationId: list_job_postings
       summary: List job-postings
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createJobPosting
+      operationId: create_job_posting
       summary: Create job-posting
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /job-postings/{id}:
     get:
-      operationId: getJobPosting
+      operationId: get_job_posting
       summary: Get job-posting by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateJobPosting
+      operationId: update_job_posting
       summary: Update job-posting
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteJobPosting
+      operationId: delete_job_posting
       summary: Delete job-posting
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /applicants:
     get:
-      operationId: listApplicants
+      operationId: list_applicants
       summary: List applicants
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createApplicant
+      operationId: create_applicant
       summary: Create applicant
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /applicants/{id}:
     get:
-      operationId: getApplicant
+      operationId: get_applicant
       summary: Get applicant by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateApplicant
+      operationId: update_applicant
       summary: Update applicant
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteApplicant
+      operationId: delete_applicant
       summary: Delete applicant
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /interviews:
     get:
-      operationId: listInterviews
+      operationId: list_interviews
       summary: List interviews
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createInterview
+      operationId: create_interview
       summary: Create interview
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /interviews/{id}:
     get:
-      operationId: getInterview
+      operationId: get_interview
       summary: Get interview by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateInterview
+      operationId: update_interview
       summary: Update interview
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteInterview
+      operationId: delete_interview
       summary: Delete interview
       parameters:
       - name: id

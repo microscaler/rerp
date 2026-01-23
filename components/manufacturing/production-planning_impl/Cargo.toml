@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "production_planning"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_manufacturing_production_planning = { path = "../production-planning" }

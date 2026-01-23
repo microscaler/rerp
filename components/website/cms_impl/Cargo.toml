@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "cms"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_website_cms = { path = "../cms" }

@@ -11,7 +11,7 @@ tags: []
 paths:
   /tax-rules:
     get:
-      operationId: listTaxRules
+      operationId: list_tax_rules
       summary: List tax-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTaxRule
+      operationId: create_tax_rule
       summary: Create tax-rule
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /tax-rules/{id}:
     get:
-      operationId: getTaxRule
+      operationId: get_tax_rule
       summary: Get tax-rule by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTaxRule
+      operationId: update_tax_rule
       summary: Update tax-rule
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTaxRule
+      operationId: delete_tax_rule
       summary: Delete tax-rule
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /tax-rates:
     get:
-      operationId: listTaxRates
+      operationId: list_tax_rates
       summary: List tax-rates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTaxRate
+      operationId: create_tax_rate
       summary: Create tax-rate
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /tax-rates/{id}:
     get:
-      operationId: getTaxRate
+      operationId: get_tax_rate
       summary: Get tax-rate by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTaxRate
+      operationId: update_tax_rate
       summary: Update tax-rate
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTaxRate
+      operationId: delete_tax_rate
       summary: Delete tax-rate
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /calculate:
     post:
-      operationId: calculateTax
+      operationId: calculate_tax
       summary: Calculate tax for transaction
       responses:
         '200':
@@ -239,7 +239,7 @@ paths:
               properties: {}
   /rules/by-location:
     get:
-      operationId: getTaxRulesByLocation
+      operationId: get_tax_rules_by_location
       summary: Get tax rules by location
       responses:
         '200':

@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "logistics"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_inventory_logistics = { path = "../logistics" }

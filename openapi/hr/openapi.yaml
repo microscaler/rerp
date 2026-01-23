@@ -39,7 +39,7 @@ tags: []
 paths:
   /applicants:
     get:
-      operationId: listApplicants
+      operationId: list_applicants
       summary: List applicants
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -66,7 +66,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
-      operationId: createApplicant
+      operationId: create_applicant
       summary: Create applicant
       requestBody:
         required: true
@@ -87,7 +87,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /applicants/{id}:
     get:
-      operationId: getApplicant
+      operationId: get_applicant
       summary: Get applicant by id
       parameters:
       - name: id
@@ -108,7 +108,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     put:
-      operationId: updateApplicant
+      operationId: update_applicant
       summary: Update applicant
       parameters:
       - name: id
@@ -135,7 +135,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     delete:
-      operationId: deleteApplicant
+      operationId: delete_applicant
       summary: Delete applicant
       parameters:
       - name: id
@@ -153,7 +153,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /appraisals:
     get:
-      operationId: listAppraisals
+      operationId: list_appraisals
       summary: List appraisals
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -180,7 +180,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
-      operationId: createAppraisal
+      operationId: create_appraisal
       summary: Create appraisal
       requestBody:
         required: true
@@ -201,7 +201,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /appraisals/{id}:
     get:
-      operationId: getAppraisal
+      operationId: get_appraisal
       summary: Get appraisal by id
       parameters:
       - name: id
@@ -222,7 +222,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     put:
-      operationId: updateAppraisal
+      operationId: update_appraisal
       summary: Update appraisal
       parameters:
       - name: id
@@ -249,7 +249,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     delete:
-      operationId: deleteAppraisal
+      operationId: delete_appraisal
       summary: Delete appraisal
       parameters:
       - name: id
@@ -267,7 +267,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /attendances:
     get:
-      operationId: listAttendances
+      operationId: list_attendances
       summary: List attendances
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -294,7 +294,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     post:
-      operationId: createAttendance
+      operationId: create_attendance
       summary: Create attendance
       requestBody:
         required: true
@@ -315,7 +315,7 @@ paths:
       x-service-base-path: /api/v1/hr/attendance
   /attendances/{id}:
     get:
-      operationId: getAttendance
+      operationId: get_attendance
       summary: Get attendance by id
       parameters:
       - name: id
@@ -336,7 +336,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     put:
-      operationId: updateAttendance
+      operationId: update_attendance
       summary: Update attendance
       parameters:
       - name: id
@@ -363,7 +363,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     delete:
-      operationId: deleteAttendance
+      operationId: delete_attendance
       summary: Delete attendance
       parameters:
       - name: id
@@ -381,7 +381,7 @@ paths:
       x-service-base-path: /api/v1/hr/attendance
   /deductions:
     get:
-      operationId: listDeductions
+      operationId: list_deductions
       summary: List deductions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -408,7 +408,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
-      operationId: createDeduction
+      operationId: create_deduction
       summary: Create deduction
       requestBody:
         required: true
@@ -429,7 +429,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /deductions/{id}:
     get:
-      operationId: getDeduction
+      operationId: get_deduction
       summary: Get deduction by id
       parameters:
       - name: id
@@ -450,7 +450,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     put:
-      operationId: updateDeduction
+      operationId: update_deduction
       summary: Update deduction
       parameters:
       - name: id
@@ -477,7 +477,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     delete:
-      operationId: deleteDeduction
+      operationId: delete_deduction
       summary: Delete deduction
       parameters:
       - name: id
@@ -495,7 +495,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /departments:
     get:
-      operationId: listDepartments
+      operationId: list_departments
       summary: List departments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -522,7 +522,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
-      operationId: createDepartment
+      operationId: create_department
       summary: Create department
       requestBody:
         required: true
@@ -543,7 +543,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /departments/{id}:
     get:
-      operationId: getDepartment
+      operationId: get_department
       summary: Get department by id
       parameters:
       - name: id
@@ -564,7 +564,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     put:
-      operationId: updateDepartment
+      operationId: update_department
       summary: Update department
       parameters:
       - name: id
@@ -591,7 +591,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     delete:
-      operationId: deleteDepartment
+      operationId: delete_department
       summary: Delete department
       parameters:
       - name: id
@@ -609,7 +609,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /employees:
     get:
-      operationId: listEmployees
+      operationId: list_employees
       summary: List employees
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -636,7 +636,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
-      operationId: createEmployee
+      operationId: create_employee
       summary: Create employee
       requestBody:
         required: true
@@ -657,7 +657,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /employees/{id}:
     get:
-      operationId: getEmployee
+      operationId: get_employee
       summary: Get employee by id
       parameters:
       - name: id
@@ -678,7 +678,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     put:
-      operationId: updateEmployee
+      operationId: update_employee
       summary: Update employee
       parameters:
       - name: id
@@ -705,7 +705,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     delete:
-      operationId: deleteEmployee
+      operationId: delete_employee
       summary: Delete employee
       parameters:
       - name: id
@@ -723,7 +723,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /goals:
     get:
-      operationId: listGoals
+      operationId: list_goals
       summary: List goals
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -750,7 +750,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
-      operationId: createGoal
+      operationId: create_goal
       summary: Create goal
       requestBody:
         required: true
@@ -771,7 +771,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /goals/{id}:
     get:
-      operationId: getGoal
+      operationId: get_goal
       summary: Get goal by id
       parameters:
       - name: id
@@ -792,7 +792,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     put:
-      operationId: updateGoal
+      operationId: update_goal
       summary: Update goal
       parameters:
       - name: id
@@ -819,7 +819,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     delete:
-      operationId: deleteGoal
+      operationId: delete_goal
       summary: Delete goal
       parameters:
       - name: id
@@ -837,7 +837,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /holiday-calendars:
     get:
-      operationId: listHolidayCalendars
+      operationId: list_holiday_calendars
       summary: List holiday-calendars
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -864,7 +864,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
-      operationId: createHolidayCalendar
+      operationId: create_holiday_calendar
       summary: Create holiday-calendar
       requestBody:
         required: true
@@ -885,7 +885,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /holiday-calendars/{id}:
     get:
-      operationId: getHolidayCalendar
+      operationId: get_holiday_calendar
       summary: Get holiday-calendar by id
       parameters:
       - name: id
@@ -906,7 +906,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     put:
-      operationId: updateHolidayCalendar
+      operationId: update_holiday_calendar
       summary: Update holiday-calendar
       parameters:
       - name: id
@@ -933,7 +933,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     delete:
-      operationId: deleteHolidayCalendar
+      operationId: delete_holiday_calendar
       summary: Delete holiday-calendar
       parameters:
       - name: id
@@ -951,7 +951,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /interviews:
     get:
-      operationId: listInterviews
+      operationId: list_interviews
       summary: List interviews
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -978,7 +978,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
-      operationId: createInterview
+      operationId: create_interview
       summary: Create interview
       requestBody:
         required: true
@@ -999,7 +999,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /interviews/{id}:
     get:
-      operationId: getInterview
+      operationId: get_interview
       summary: Get interview by id
       parameters:
       - name: id
@@ -1020,7 +1020,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     put:
-      operationId: updateInterview
+      operationId: update_interview
       summary: Update interview
       parameters:
       - name: id
@@ -1047,7 +1047,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     delete:
-      operationId: deleteInterview
+      operationId: delete_interview
       summary: Delete interview
       parameters:
       - name: id
@@ -1065,7 +1065,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /job-postings:
     get:
-      operationId: listJobPostings
+      operationId: list_job_postings
       summary: List job-postings
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1092,7 +1092,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
-      operationId: createJobPosting
+      operationId: create_job_posting
       summary: Create job-posting
       requestBody:
         required: true
@@ -1113,7 +1113,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /job-postings/{id}:
     get:
-      operationId: getJobPosting
+      operationId: get_job_posting
       summary: Get job-posting by id
       parameters:
       - name: id
@@ -1134,7 +1134,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     put:
-      operationId: updateJobPosting
+      operationId: update_job_posting
       summary: Update job-posting
       parameters:
       - name: id
@@ -1161,7 +1161,7 @@ paths:
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     delete:
-      operationId: deleteJobPosting
+      operationId: delete_job_posting
       summary: Delete job-posting
       parameters:
       - name: id
@@ -1179,7 +1179,7 @@ paths:
       x-service-base-path: /api/v1/hr/recruitment
   /leave-balances:
     get:
-      operationId: listLeaveBalances
+      operationId: list_leave_balances
       summary: List leave-balances
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1206,7 +1206,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
-      operationId: createLeaveBalance
+      operationId: create_leave_balance
       summary: Create leave-balance
       requestBody:
         required: true
@@ -1227,7 +1227,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /leave-balances/{id}:
     get:
-      operationId: getLeaveBalance
+      operationId: get_leave_balance
       summary: Get leave-balance by id
       parameters:
       - name: id
@@ -1248,7 +1248,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     put:
-      operationId: updateLeaveBalance
+      operationId: update_leave_balance
       summary: Update leave-balance
       parameters:
       - name: id
@@ -1275,7 +1275,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     delete:
-      operationId: deleteLeaveBalance
+      operationId: delete_leave_balance
       summary: Delete leave-balance
       parameters:
       - name: id
@@ -1293,7 +1293,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /leave-requests:
     get:
-      operationId: listLeaveRequests
+      operationId: list_leave_requests
       summary: List leave-requests
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1320,7 +1320,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
-      operationId: createLeaveRequest
+      operationId: create_leave_request
       summary: Create leave-request
       requestBody:
         required: true
@@ -1341,7 +1341,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /leave-requests/{id}:
     get:
-      operationId: getLeaveRequest
+      operationId: get_leave_request
       summary: Get leave-request by id
       parameters:
       - name: id
@@ -1362,7 +1362,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     put:
-      operationId: updateLeaveRequest
+      operationId: update_leave_request
       summary: Update leave-request
       parameters:
       - name: id
@@ -1389,7 +1389,7 @@ paths:
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     delete:
-      operationId: deleteLeaveRequest
+      operationId: delete_leave_request
       summary: Delete leave-request
       parameters:
       - name: id
@@ -1407,7 +1407,7 @@ paths:
       x-service-base-path: /api/v1/hr/leave
   /payslips:
     get:
-      operationId: listPayslips
+      operationId: list_payslips
       summary: List payslips
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1434,7 +1434,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
-      operationId: createPayslip
+      operationId: create_payslip
       summary: Create payslip
       requestBody:
         required: true
@@ -1455,7 +1455,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /payslips/{id}:
     get:
-      operationId: getPayslip
+      operationId: get_payslip
       summary: Get payslip by id
       parameters:
       - name: id
@@ -1476,7 +1476,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     put:
-      operationId: updatePayslip
+      operationId: update_payslip
       summary: Update payslip
       parameters:
       - name: id
@@ -1503,7 +1503,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     delete:
-      operationId: deletePayslip
+      operationId: delete_payslip
       summary: Delete payslip
       parameters:
       - name: id
@@ -1521,7 +1521,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /positions:
     get:
-      operationId: listPositions
+      operationId: list_positions
       summary: List positions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1548,7 +1548,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
-      operationId: createPosition
+      operationId: create_position
       summary: Create position
       requestBody:
         required: true
@@ -1569,7 +1569,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /positions/{id}:
     get:
-      operationId: getPosition
+      operationId: get_position
       summary: Get position by id
       parameters:
       - name: id
@@ -1590,7 +1590,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     put:
-      operationId: updatePosition
+      operationId: update_position
       summary: Update position
       parameters:
       - name: id
@@ -1617,7 +1617,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/hr/core
     delete:
-      operationId: deletePosition
+      operationId: delete_position
       summary: Delete position
       parameters:
       - name: id
@@ -1635,7 +1635,7 @@ paths:
       x-service-base-path: /api/v1/hr/core
   /reviews:
     get:
-      operationId: listReviews
+      operationId: list_reviews
       summary: List reviews
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1662,7 +1662,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
-      operationId: createReview
+      operationId: create_review
       summary: Create review
       requestBody:
         required: true
@@ -1683,7 +1683,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /reviews/{id}:
     get:
-      operationId: getReview
+      operationId: get_review
       summary: Get review by id
       parameters:
       - name: id
@@ -1704,7 +1704,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     put:
-      operationId: updateReview
+      operationId: update_review
       summary: Update review
       parameters:
       - name: id
@@ -1731,7 +1731,7 @@ paths:
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     delete:
-      operationId: deleteReview
+      operationId: delete_review
       summary: Delete review
       parameters:
       - name: id
@@ -1749,7 +1749,7 @@ paths:
       x-service-base-path: /api/v1/hr/appraisal
   /salary-rules:
     get:
-      operationId: listSalaryRules
+      operationId: list_salary_rules
       summary: List salary-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1776,7 +1776,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
-      operationId: createSalaryRule
+      operationId: create_salary_rule
       summary: Create salary-rule
       requestBody:
         required: true
@@ -1797,7 +1797,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /salary-rules/{id}:
     get:
-      operationId: getSalaryRule
+      operationId: get_salary_rule
       summary: Get salary-rule by id
       parameters:
       - name: id
@@ -1818,7 +1818,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     put:
-      operationId: updateSalaryRule
+      operationId: update_salary_rule
       summary: Update salary-rule
       parameters:
       - name: id
@@ -1845,7 +1845,7 @@ paths:
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     delete:
-      operationId: deleteSalaryRule
+      operationId: delete_salary_rule
       summary: Delete salary-rule
       parameters:
       - name: id
@@ -1863,7 +1863,7 @@ paths:
       x-service-base-path: /api/v1/hr/payroll
   /skill-assessments:
     get:
-      operationId: listSkillAssessments
+      operationId: list_skill_assessments
       summary: List skill-assessments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1890,7 +1890,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
-      operationId: createSkillAssessment
+      operationId: create_skill_assessment
       summary: Create skill-assessment
       requestBody:
         required: true
@@ -1911,7 +1911,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /skill-assessments/{id}:
     get:
-      operationId: getSkillAssessment
+      operationId: get_skill_assessment
       summary: Get skill-assessment by id
       parameters:
       - name: id
@@ -1932,7 +1932,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     put:
-      operationId: updateSkillAssessment
+      operationId: update_skill_assessment
       summary: Update skill-assessment
       parameters:
       - name: id
@@ -1959,7 +1959,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     delete:
-      operationId: deleteSkillAssessment
+      operationId: delete_skill_assessment
       summary: Delete skill-assessment
       parameters:
       - name: id
@@ -1977,7 +1977,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /skill-requirements:
     get:
-      operationId: listSkillRequirements
+      operationId: list_skill_requirements
       summary: List skill-requirements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -2004,7 +2004,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
-      operationId: createSkillRequirement
+      operationId: create_skill_requirement
       summary: Create skill-requirement
       requestBody:
         required: true
@@ -2025,7 +2025,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /skill-requirements/{id}:
     get:
-      operationId: getSkillRequirement
+      operationId: get_skill_requirement
       summary: Get skill-requirement by id
       parameters:
       - name: id
@@ -2046,7 +2046,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     put:
-      operationId: updateSkillRequirement
+      operationId: update_skill_requirement
       summary: Update skill-requirement
       parameters:
       - name: id
@@ -2073,7 +2073,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     delete:
-      operationId: deleteSkillRequirement
+      operationId: delete_skill_requirement
       summary: Delete skill-requirement
       parameters:
       - name: id
@@ -2091,7 +2091,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /skills:
     get:
-      operationId: listSkills
+      operationId: list_skills
       summary: List skills
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -2118,7 +2118,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
-      operationId: createSkill
+      operationId: create_skill
       summary: Create skill
       requestBody:
         required: true
@@ -2139,7 +2139,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /skills/{id}:
     get:
-      operationId: getSkill
+      operationId: get_skill
       summary: Get skill by id
       parameters:
       - name: id
@@ -2160,7 +2160,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     put:
-      operationId: updateSkill
+      operationId: update_skill
       summary: Update skill
       parameters:
       - name: id
@@ -2187,7 +2187,7 @@ paths:
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     delete:
-      operationId: deleteSkill
+      operationId: delete_skill
       summary: Delete skill
       parameters:
       - name: id
@@ -2205,7 +2205,7 @@ paths:
       x-service-base-path: /api/v1/hr/skills
   /timesheets:
     get:
-      operationId: listTimesheets
+      operationId: list_timesheets
       summary: List timesheets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -2232,7 +2232,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     post:
-      operationId: createTimesheet
+      operationId: create_timesheet
       summary: Create timesheet
       requestBody:
         required: true
@@ -2253,7 +2253,7 @@ paths:
       x-service-base-path: /api/v1/hr/attendance
   /timesheets/{id}:
     get:
-      operationId: getTimesheet
+      operationId: get_timesheet
       summary: Get timesheet by id
       parameters:
       - name: id
@@ -2274,7 +2274,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     put:
-      operationId: updateTimesheet
+      operationId: update_timesheet
       summary: Update timesheet
       parameters:
       - name: id
@@ -2301,7 +2301,7 @@ paths:
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     delete:
-      operationId: deleteTimesheet
+      operationId: delete_timesheet
       summary: Delete timesheet
       parameters:
       - name: id

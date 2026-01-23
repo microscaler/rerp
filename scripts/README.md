@@ -4,6 +4,11 @@ This directory contains build scripts for RERP microservices.
 
 ## Scripts
 
+### `setup-kind-registry.sh`
+Starts a local Docker registry on `localhost:5001` and connects it to the Kind network so that `docker push localhost:5001/<image>:<tag>` works and the cluster can pull those images. Run automatically by `just dev-up` after the Kind cluster is created. See [Kind: Local Registry](https://kind.sigs.k8s.io/docs/user/local-registry/).
+
+**Standalone usage:** Run after `kind create cluster`; requires the `kind` Docker network to exist.
+
 ### `host-aware-build.py`
 Host-aware build script that detects the current architecture and builds accordingly. Supports cross-compilation for multiple architectures.
 

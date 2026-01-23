@@ -5,32 +5,32 @@
 
 pub mod types;
 
-pub mod listAccounts;
+pub mod list_accounts;
 
-pub mod createAccount;
+pub mod create_account;
 
-pub mod getAccount;
+pub mod get_account;
 
-pub mod updateAccount;
+pub mod update_account;
 
-pub mod deleteAccount;
+pub mod delete_account;
 
-pub mod listChartOfAccounts;
+pub mod list_chart_of_accounts;
 
-pub mod createChartOfAccount;
+pub mod create_chart_of_account;
 
-pub mod getChartOfAccount;
+pub mod get_chart_of_account;
 
-pub mod updateChartOfAccount;
+pub mod update_chart_of_account;
 
-pub mod deleteChartOfAccount;
+pub mod delete_chart_of_account;
 
-pub mod listJournalEntrys;
+pub mod list_journal_entrys;
 
-pub mod createJournalEntry;
+pub mod create_journal_entry;
 
-pub mod getJournalEntry;
+pub mod get_journal_entry;
 
-pub mod updateJournalEntry;
+pub mod update_journal_entry;
 
-pub mod deleteJournalEntry;
+pub mod delete_journal_entry;

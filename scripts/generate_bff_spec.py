@@ -2,6 +2,10 @@
 """
 Generate Backend for Frontend (BFF) OpenAPI specification from all microservice specs.
 
+**NOTE**: For openapi/accounting/openapi_bff.yaml, the Tiltfile and CI use the
+standalone bff-generator instead. See openapi/accounting/bff-suite-config.yaml and
+`bff-generator generate-spec`. This script is kept for reference or fallback.
+
 This script aggregates all paths, schemas, and components from microservice OpenAPI specs
 into a single BFF spec that proxies requests to the appropriate microservices.
 

@@ -33,7 +33,7 @@ tags: []
 paths:
   /carriers:
     get:
-      operationId: listCarriers
+      operationId: list_carriers
       summary: List carriers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -60,7 +60,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
-      operationId: createCarrier
+      operationId: create_carrier
       summary: Create carrier
       requestBody:
         required: true
@@ -81,7 +81,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /carriers/{id}:
     get:
-      operationId: getCarrier
+      operationId: get_carrier
       summary: Get carrier by id
       parameters:
       - name: id
@@ -102,7 +102,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     put:
-      operationId: updateCarrier
+      operationId: update_carrier
       summary: Update carrier
       parameters:
       - name: id
@@ -129,7 +129,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     delete:
-      operationId: deleteCarrier
+      operationId: delete_carrier
       summary: Delete carrier
       parameters:
       - name: id
@@ -147,7 +147,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /dropship-orders:
     get:
-      operationId: listDropshipOrders
+      operationId: list_dropship_orders
       summary: List dropship-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -174,7 +174,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     post:
-      operationId: createDropshipOrder
+      operationId: create_dropship_order
       summary: Create dropship-order
       requestBody:
         required: true
@@ -195,7 +195,7 @@ paths:
       x-service-base-path: /api/v1/inventory/dropshipping
   /dropship-orders/{id}:
     get:
-      operationId: getDropshipOrder
+      operationId: get_dropship_order
       summary: Get dropship-order by id
       parameters:
       - name: id
@@ -216,7 +216,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     put:
-      operationId: updateDropshipOrder
+      operationId: update_dropship_order
       summary: Update dropship-order
       parameters:
       - name: id
@@ -243,7 +243,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     delete:
-      operationId: deleteDropshipOrder
+      operationId: delete_dropship_order
       summary: Delete dropship-order
       parameters:
       - name: id
@@ -261,7 +261,7 @@ paths:
       x-service-base-path: /api/v1/inventory/dropshipping
   /locations:
     get:
-      operationId: listLocations
+      operationId: list_locations
       summary: List locations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -288,7 +288,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
-      operationId: createLocation
+      operationId: create_location
       summary: Create location
       requestBody:
         required: true
@@ -309,7 +309,7 @@ paths:
       x-service-base-path: /api/v1/inventory/warehouse
   /locations/{id}:
     get:
-      operationId: getLocation
+      operationId: get_location
       summary: Get location by id
       parameters:
       - name: id
@@ -330,7 +330,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     put:
-      operationId: updateLocation
+      operationId: update_location
       summary: Update location
       parameters:
       - name: id
@@ -357,7 +357,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     delete:
-      operationId: deleteLocation
+      operationId: delete_location
       summary: Delete location
       parameters:
       - name: id
@@ -375,7 +375,7 @@ paths:
       x-service-base-path: /api/v1/inventory/warehouse
   /shipments:
     get:
-      operationId: listShipments
+      operationId: list_shipments
       summary: List shipments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -402,7 +402,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
-      operationId: createShipment
+      operationId: create_shipment
       summary: Create shipment
       requestBody:
         required: true
@@ -423,7 +423,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /shipments/{id}:
     get:
-      operationId: getShipment
+      operationId: get_shipment
       summary: Get shipment by id
       parameters:
       - name: id
@@ -444,7 +444,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     put:
-      operationId: updateShipment
+      operationId: update_shipment
       summary: Update shipment
       parameters:
       - name: id
@@ -471,7 +471,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     delete:
-      operationId: deleteShipment
+      operationId: delete_shipment
       summary: Delete shipment
       parameters:
       - name: id
@@ -489,7 +489,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /shipping-rates:
     get:
-      operationId: listShippingRates
+      operationId: list_shipping_rates
       summary: List shipping-rates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -516,7 +516,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
-      operationId: createShippingRate
+      operationId: create_shipping_rate
       summary: Create shipping-rate
       requestBody:
         required: true
@@ -537,7 +537,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /shipping-rates/{id}:
     get:
-      operationId: getShippingRate
+      operationId: get_shipping_rate
       summary: Get shipping-rate by id
       parameters:
       - name: id
@@ -558,7 +558,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     put:
-      operationId: updateShippingRate
+      operationId: update_shipping_rate
       summary: Update shipping-rate
       parameters:
       - name: id
@@ -585,7 +585,7 @@ paths:
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     delete:
-      operationId: deleteShippingRate
+      operationId: delete_shipping_rate
       summary: Delete shipping-rate
       parameters:
       - name: id
@@ -603,7 +603,7 @@ paths:
       x-service-base-path: /api/v1/inventory/logistics
   /stock-movements:
     get:
-      operationId: listStockMovements
+      operationId: list_stock_movements
       summary: List stock-movements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -630,7 +630,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
-      operationId: createStockMovement
+      operationId: create_stock_movement
       summary: Create stock-movement
       requestBody:
         required: true
@@ -651,7 +651,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /stock-movements/{id}:
     get:
-      operationId: getStockMovement
+      operationId: get_stock_movement
       summary: Get stock-movement by id
       parameters:
       - name: id
@@ -672,7 +672,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     put:
-      operationId: updateStockMovement
+      operationId: update_stock_movement
       summary: Update stock-movement
       parameters:
       - name: id
@@ -699,7 +699,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     delete:
-      operationId: deleteStockMovement
+      operationId: delete_stock_movement
       summary: Delete stock-movement
       parameters:
       - name: id
@@ -717,7 +717,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /stock-valuations:
     get:
-      operationId: listStockValuations
+      operationId: list_stock_valuations
       summary: List stock-valuations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -744,7 +744,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
-      operationId: createStockValuation
+      operationId: create_stock_valuation
       summary: Create stock-valuation
       requestBody:
         required: true
@@ -765,7 +765,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /stock-valuations/{id}:
     get:
-      operationId: getStockValuation
+      operationId: get_stock_valuation
       summary: Get stock-valuation by id
       parameters:
       - name: id
@@ -786,7 +786,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     put:
-      operationId: updateStockValuation
+      operationId: update_stock_valuation
       summary: Update stock-valuation
       parameters:
       - name: id
@@ -813,7 +813,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     delete:
-      operationId: deleteStockValuation
+      operationId: delete_stock_valuation
       summary: Delete stock-valuation
       parameters:
       - name: id
@@ -831,7 +831,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /stocks:
     get:
-      operationId: listStocks
+      operationId: list_stocks
       summary: List stocks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -858,7 +858,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
-      operationId: createStock
+      operationId: create_stock
       summary: Create stock
       requestBody:
         required: true
@@ -879,7 +879,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /stocks/{id}:
     get:
-      operationId: getStock
+      operationId: get_stock
       summary: Get stock by id
       parameters:
       - name: id
@@ -900,7 +900,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     put:
-      operationId: updateStock
+      operationId: update_stock
       summary: Update stock
       parameters:
       - name: id
@@ -927,7 +927,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     delete:
-      operationId: deleteStock
+      operationId: delete_stock
       summary: Delete stock
       parameters:
       - name: id
@@ -945,7 +945,7 @@ paths:
       x-service-base-path: /api/v1/inventory/core
   /transfers:
     get:
-      operationId: listTransfers
+      operationId: list_transfers
       summary: List transfers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -972,7 +972,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
-      operationId: createTransfer
+      operationId: create_transfer
       summary: Create transfer
       requestBody:
         required: true
@@ -993,7 +993,7 @@ paths:
       x-service-base-path: /api/v1/inventory/warehouse
   /transfers/{id}:
     get:
-      operationId: getTransfer
+      operationId: get_transfer
       summary: Get transfer by id
       parameters:
       - name: id
@@ -1014,7 +1014,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     put:
-      operationId: updateTransfer
+      operationId: update_transfer
       summary: Update transfer
       parameters:
       - name: id
@@ -1041,7 +1041,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     delete:
-      operationId: deleteTransfer
+      operationId: delete_transfer
       summary: Delete transfer
       parameters:
       - name: id
@@ -1059,7 +1059,7 @@ paths:
       x-service-base-path: /api/v1/inventory/warehouse
   /vendor-orders:
     get:
-      operationId: listVendorOrders
+      operationId: list_vendor_orders
       summary: List vendor-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1086,7 +1086,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     post:
-      operationId: createVendorOrder
+      operationId: create_vendor_order
       summary: Create vendor-order
       requestBody:
         required: true
@@ -1107,7 +1107,7 @@ paths:
       x-service-base-path: /api/v1/inventory/dropshipping
   /vendor-orders/{id}:
     get:
-      operationId: getVendorOrder
+      operationId: get_vendor_order
       summary: Get vendor-order by id
       parameters:
       - name: id
@@ -1128,7 +1128,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     put:
-      operationId: updateVendorOrder
+      operationId: update_vendor_order
       summary: Update vendor-order
       parameters:
       - name: id
@@ -1155,7 +1155,7 @@ paths:
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     delete:
-      operationId: deleteVendorOrder
+      operationId: delete_vendor_order
       summary: Delete vendor-order
       parameters:
       - name: id
@@ -1173,7 +1173,7 @@ paths:
       x-service-base-path: /api/v1/inventory/dropshipping
   /warehouses:
     get:
-      operationId: listWarehouses
+      operationId: list_warehouses
       summary: List warehouses
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1200,7 +1200,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
-      operationId: createWarehouse
+      operationId: create_warehouse
       summary: Create warehouse
       requestBody:
         required: true
@@ -1221,7 +1221,7 @@ paths:
       x-service-base-path: /api/v1/inventory/warehouse
   /warehouses/{id}:
     get:
-      operationId: getWarehouse
+      operationId: get_warehouse
       summary: Get warehouse by id
       parameters:
       - name: id
@@ -1242,7 +1242,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     put:
-      operationId: updateWarehouse
+      operationId: update_warehouse
       summary: Update warehouse
       parameters:
       - name: id
@@ -1269,7 +1269,7 @@ paths:
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     delete:
-      operationId: deleteWarehouse
+      operationId: delete_warehouse
       summary: Delete warehouse
       parameters:
       - name: id

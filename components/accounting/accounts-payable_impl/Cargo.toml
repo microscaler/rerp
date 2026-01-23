@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "accounts_payable"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_accounting_accounts_payable = { path = "../accounts-payable" }

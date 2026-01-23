@@ -10,7 +10,7 @@ tags: []
 paths:
   /production-schedules:
     get:
-      operationId: listProductionSchedules
+      operationId: list_production_schedules
       summary: List production-schedules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createProductionSchedule
+      operationId: create_production_schedule
       summary: Create production-schedule
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /production-schedules/{id}:
     get:
-      operationId: getProductionSchedule
+      operationId: get_production_schedule
       summary: Get production-schedule by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateProductionSchedule
+      operationId: update_production_schedule
       summary: Update production-schedule
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteProductionSchedule
+      operationId: delete_production_schedule
       summary: Delete production-schedule
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /mrp-runs:
     get:
-      operationId: listMrpRuns
+      operationId: list_mrp_runs
       summary: List mrp-runs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createMrpRun
+      operationId: create_mrp_run
       summary: Create mrp-run
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /mrp-runs/{id}:
     get:
-      operationId: getMrpRun
+      operationId: get_mrp_run
       summary: Get mrp-run by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateMrpRun
+      operationId: update_mrp_run
       summary: Update mrp-run
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteMrpRun
+      operationId: delete_mrp_run
       summary: Delete mrp-run
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /capacity-plans:
     get:
-      operationId: listCapacityPlans
+      operationId: list_capacity_plans
       summary: List capacity-plans
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCapacityPlan
+      operationId: create_capacity_plan
       summary: Create capacity-plan
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /capacity-plans/{id}:
     get:
-      operationId: getCapacityPlan
+      operationId: get_capacity_plan
       summary: Get capacity-plan by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCapacityPlan
+      operationId: update_capacity_plan
       summary: Update capacity-plan
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCapacityPlan
+      operationId: delete_capacity_plan
       summary: Delete capacity-plan
       parameters:
       - name: id

@@ -10,7 +10,7 @@ tags: []
 paths:
   /quotations:
     get:
-      operationId: listQuotations
+      operationId: list_quotations
       summary: List quotations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createQuotation
+      operationId: create_quotation
       summary: Create quotation
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /quotations/{id}:
     get:
-      operationId: getQuotation
+      operationId: get_quotation
       summary: Get quotation by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateQuotation
+      operationId: update_quotation
       summary: Update quotation
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteQuotation
+      operationId: delete_quotation
       summary: Delete quotation
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /quote-lines:
     get:
-      operationId: listQuoteLines
+      operationId: list_quote_lines
       summary: List quote-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createQuoteLine
+      operationId: create_quote_line
       summary: Create quote-line
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /quote-lines/{id}:
     get:
-      operationId: getQuoteLine
+      operationId: get_quote_line
       summary: Get quote-line by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateQuoteLine
+      operationId: update_quote_line
       summary: Update quote-line
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteQuoteLine
+      operationId: delete_quote_line
       summary: Delete quote-line
       parameters:
       - name: id

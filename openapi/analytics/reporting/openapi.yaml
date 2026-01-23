@@ -10,7 +10,7 @@ tags: []
 paths:
   /reports:
     get:
-      operationId: listReports
+      operationId: list_reports
       summary: List reports
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createReport
+      operationId: create_report
       summary: Create report
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /reports/{id}:
     get:
-      operationId: getReport
+      operationId: get_report
       summary: Get report by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateReport
+      operationId: update_report
       summary: Update report
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteReport
+      operationId: delete_report
       summary: Delete report
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /report-templates:
     get:
-      operationId: listReportTemplates
+      operationId: list_report_templates
       summary: List report-templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createReportTemplate
+      operationId: create_report_template
       summary: Create report-template
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /report-templates/{id}:
     get:
-      operationId: getReportTemplate
+      operationId: get_report_template
       summary: Get report-template by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateReportTemplate
+      operationId: update_report_template
       summary: Update report-template
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteReportTemplate
+      operationId: delete_report_template
       summary: Delete report-template
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /schedules:
     get:
-      operationId: listSchedules
+      operationId: list_schedules
       summary: List schedules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSchedule
+      operationId: create_schedule
       summary: Create schedule
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /schedules/{id}:
     get:
-      operationId: getSchedule
+      operationId: get_schedule
       summary: Get schedule by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSchedule
+      operationId: update_schedule
       summary: Update schedule
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSchedule
+      operationId: delete_schedule
       summary: Delete schedule
       parameters:
       - name: id

@@ -1,0 +1,16 @@
+service:
+  name: financial-reports
+  port: 8009
+  containerPort: 8009
+  nodePort: 31009
+image:
+  repository: localhost:5001
+  name: rerp-financial-reports
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: financial_reports
+  serviceName: financial-reports

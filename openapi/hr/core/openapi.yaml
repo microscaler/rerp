@@ -10,7 +10,7 @@ tags: []
 paths:
   /employees:
     get:
-      operationId: listEmployees
+      operationId: list_employees
       summary: List employees
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createEmployee
+      operationId: create_employee
       summary: Create employee
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /employees/{id}:
     get:
-      operationId: getEmployee
+      operationId: get_employee
       summary: Get employee by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateEmployee
+      operationId: update_employee
       summary: Update employee
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteEmployee
+      operationId: delete_employee
       summary: Delete employee
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /departments:
     get:
-      operationId: listDepartments
+      operationId: list_departments
       summary: List departments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDepartment
+      operationId: create_department
       summary: Create department
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /departments/{id}:
     get:
-      operationId: getDepartment
+      operationId: get_department
       summary: Get department by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDepartment
+      operationId: update_department
       summary: Update department
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDepartment
+      operationId: delete_department
       summary: Delete department
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /positions:
     get:
-      operationId: listPositions
+      operationId: list_positions
       summary: List positions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPosition
+      operationId: create_position
       summary: Create position
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /positions/{id}:
     get:
-      operationId: getPosition
+      operationId: get_position
       summary: Get position by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePosition
+      operationId: update_position
       summary: Update position
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePosition
+      operationId: delete_position
       summary: Delete position
       parameters:
       - name: id

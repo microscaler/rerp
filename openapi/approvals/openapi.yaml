@@ -27,7 +27,7 @@ tags: []
 paths:
   /approval-requests:
     get:
-      operationId: listApprovalRequests
+      operationId: list_approval_requests
       summary: List approval-requests
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -54,7 +54,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     post:
-      operationId: createApprovalRequest
+      operationId: create_approval_request
       summary: Create approval-request
       requestBody:
         required: true
@@ -75,7 +75,7 @@ paths:
       x-service-base-path: /api/v1/approvals/core
   /approval-requests/{id}:
     get:
-      operationId: getApprovalRequest
+      operationId: get_approval_request
       summary: Get approval-request by id
       parameters:
       - name: id
@@ -96,7 +96,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     put:
-      operationId: updateApprovalRequest
+      operationId: update_approval_request
       summary: Update approval-request
       parameters:
       - name: id
@@ -123,7 +123,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     delete:
-      operationId: deleteApprovalRequest
+      operationId: delete_approval_request
       summary: Delete approval-request
       parameters:
       - name: id
@@ -141,7 +141,7 @@ paths:
       x-service-base-path: /api/v1/approvals/core
   /approval-workflows:
     get:
-      operationId: listApprovalWorkflows
+      operationId: list_approval_workflows
       summary: List approval-workflows
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -168,7 +168,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     post:
-      operationId: createApprovalWorkflow
+      operationId: create_approval_workflow
       summary: Create approval-workflow
       requestBody:
         required: true
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/approvals/core
   /approval-workflows/{id}:
     get:
-      operationId: getApprovalWorkflow
+      operationId: get_approval_workflow
       summary: Get approval-workflow by id
       parameters:
       - name: id
@@ -210,7 +210,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     put:
-      operationId: updateApprovalWorkflow
+      operationId: update_approval_workflow
       summary: Update approval-workflow
       parameters:
       - name: id
@@ -237,7 +237,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     delete:
-      operationId: deleteApprovalWorkflow
+      operationId: delete_approval_workflow
       summary: Delete approval-workflow
       parameters:
       - name: id
@@ -255,7 +255,7 @@ paths:
       x-service-base-path: /api/v1/approvals/core
   /delegations:
     get:
-      operationId: listDelegations
+      operationId: list_delegations
       summary: List delegations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -282,7 +282,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     post:
-      operationId: createDelegation
+      operationId: create_delegation
       summary: Create delegation
       requestBody:
         required: true
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/approvals/core
   /delegations/{id}:
     get:
-      operationId: getDelegation
+      operationId: get_delegation
       summary: Get delegation by id
       parameters:
       - name: id
@@ -324,7 +324,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     put:
-      operationId: updateDelegation
+      operationId: update_delegation
       summary: Update delegation
       parameters:
       - name: id
@@ -351,7 +351,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/approvals/core
     delete:
-      operationId: deleteDelegation
+      operationId: delete_delegation
       summary: Delete delegation
       parameters:
       - name: id

@@ -10,7 +10,7 @@ tags: []
 paths:
   /timesheets:
     get:
-      operationId: listTimesheets
+      operationId: list_timesheets
       summary: List timesheets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTimesheet
+      operationId: create_timesheet
       summary: Create timesheet
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /timesheets/{id}:
     get:
-      operationId: getTimesheet
+      operationId: get_timesheet
       summary: Get timesheet by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTimesheet
+      operationId: update_timesheet
       summary: Update timesheet
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTimesheet
+      operationId: delete_timesheet
       summary: Delete timesheet
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /timesheet-lines:
     get:
-      operationId: listTimesheetLines
+      operationId: list_timesheet_lines
       summary: List timesheet-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTimesheetLine
+      operationId: create_timesheet_line
       summary: Create timesheet-line
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /timesheet-lines/{id}:
     get:
-      operationId: getTimesheetLine
+      operationId: get_timesheet_line
       summary: Get timesheet-line by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTimesheetLine
+      operationId: update_timesheet_line
       summary: Update timesheet-line
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTimesheetLine
+      operationId: delete_timesheet_line
       summary: Delete timesheet-line
       parameters:
       - name: id

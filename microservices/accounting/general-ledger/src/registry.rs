@@ -12,78 +12,78 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "listAccounts",
-        crate::controllers::listAccounts::ListAccountsController,
+        "list_accounts",
+        crate::controllers::list_accounts::ListAccountsController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "createAccount",
-        crate::controllers::createAccount::CreateAccountController,
+        "create_account",
+        crate::controllers::create_account::CreateAccountController,
         16384,
     );
     dispatcher.register_typed_with_stack_size(
-        "getAccount",
-        crate::controllers::getAccount::GetAccountController,
+        "get_account",
+        crate::controllers::get_account::GetAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "updateAccount",
-        crate::controllers::updateAccount::UpdateAccountController,
+        "update_account",
+        crate::controllers::update_account::UpdateAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "deleteAccount",
-        crate::controllers::deleteAccount::DeleteAccountController,
+        "delete_account",
+        crate::controllers::delete_account::DeleteAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "listChartOfAccounts",
-        crate::controllers::listChartOfAccounts::ListChartOfAccountsController,
+        "list_chart_of_accounts",
+        crate::controllers::list_chart_of_accounts::ListChartOfAccountsController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "createChartOfAccount",
-        crate::controllers::createChartOfAccount::CreateChartOfAccountController,
+        "create_chart_of_account",
+        crate::controllers::create_chart_of_account::CreateChartOfAccountController,
         16384,
     );
     dispatcher.register_typed_with_stack_size(
-        "getChartOfAccount",
-        crate::controllers::getChartOfAccount::GetChartOfAccountController,
+        "get_chart_of_account",
+        crate::controllers::get_chart_of_account::GetChartOfAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "updateChartOfAccount",
-        crate::controllers::updateChartOfAccount::UpdateChartOfAccountController,
+        "update_chart_of_account",
+        crate::controllers::update_chart_of_account::UpdateChartOfAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "deleteChartOfAccount",
-        crate::controllers::deleteChartOfAccount::DeleteChartOfAccountController,
+        "delete_chart_of_account",
+        crate::controllers::delete_chart_of_account::DeleteChartOfAccountController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "listJournalEntrys",
-        crate::controllers::listJournalEntrys::ListJournalEntrysController,
+        "list_journal_entrys",
+        crate::controllers::list_journal_entrys::ListJournalEntrysController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "createJournalEntry",
-        crate::controllers::createJournalEntry::CreateJournalEntryController,
+        "create_journal_entry",
+        crate::controllers::create_journal_entry::CreateJournalEntryController,
         16384,
     );
     dispatcher.register_typed_with_stack_size(
-        "getJournalEntry",
-        crate::controllers::getJournalEntry::GetJournalEntryController,
+        "get_journal_entry",
+        crate::controllers::get_journal_entry::GetJournalEntryController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "updateJournalEntry",
-        crate::controllers::updateJournalEntry::UpdateJournalEntryController,
+        "update_journal_entry",
+        crate::controllers::update_journal_entry::UpdateJournalEntryController,
         20480,
     );
     dispatcher.register_typed_with_stack_size(
-        "deleteJournalEntry",
-        crate::controllers::deleteJournalEntry::DeleteJournalEntryController,
+        "delete_journal_entry",
+        crate::controllers::delete_journal_entry::DeleteJournalEntryController,
         20480,
     );
 }
@@ -105,121 +105,121 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
-            "listAccounts" => {
+            "list_accounts" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::listAccounts::ListAccountsController,
+                    crate::controllers::list_accounts::ListAccountsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "createAccount" => {
+            "create_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::createAccount::CreateAccountController,
+                    crate::controllers::create_account::CreateAccountController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "getAccount" => {
+            "get_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::getAccount::GetAccountController,
+                    crate::controllers::get_account::GetAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "updateAccount" => {
+            "update_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::updateAccount::UpdateAccountController,
+                    crate::controllers::update_account::UpdateAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "deleteAccount" => {
+            "delete_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::deleteAccount::DeleteAccountController,
+                    crate::controllers::delete_account::DeleteAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "listChartOfAccounts" => {
+            "list_chart_of_accounts" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::listChartOfAccounts::ListChartOfAccountsController,
+                    crate::controllers::list_chart_of_accounts::ListChartOfAccountsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "createChartOfAccount" => {
+            "create_chart_of_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::createChartOfAccount::CreateChartOfAccountController,
+                    crate::controllers::create_chart_of_account::CreateChartOfAccountController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "getChartOfAccount" => {
+            "get_chart_of_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::getChartOfAccount::GetChartOfAccountController,
+                    crate::controllers::get_chart_of_account::GetChartOfAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "updateChartOfAccount" => {
+            "update_chart_of_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::updateChartOfAccount::UpdateChartOfAccountController,
+                    crate::controllers::update_chart_of_account::UpdateChartOfAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "deleteChartOfAccount" => {
+            "delete_chart_of_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::deleteChartOfAccount::DeleteChartOfAccountController,
+                    crate::controllers::delete_chart_of_account::DeleteChartOfAccountController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "listJournalEntrys" => {
+            "list_journal_entrys" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::listJournalEntrys::ListJournalEntrysController,
+                    crate::controllers::list_journal_entrys::ListJournalEntrysController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "createJournalEntry" => {
+            "create_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::createJournalEntry::CreateJournalEntryController,
+                    crate::controllers::create_journal_entry::CreateJournalEntryController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "getJournalEntry" => {
+            "get_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::getJournalEntry::GetJournalEntryController,
+                    crate::controllers::get_journal_entry::GetJournalEntryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "updateJournalEntry" => {
+            "update_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::updateJournalEntry::UpdateJournalEntryController,
+                    crate::controllers::update_journal_entry::UpdateJournalEntryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "deleteJournalEntry" => {
+            "delete_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::deleteJournalEntry::DeleteJournalEntryController,
+                    crate::controllers::delete_journal_entry::DeleteJournalEntryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
