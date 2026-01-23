@@ -3,7 +3,7 @@
 > **Cloud-native, microservices-based ERP system built with Rust and OpenAPI-first architecture**
 
 [![CI](https://github.com/microscaler/rerp/actions/workflows/generate-bff-specs.yml/badge.svg)](https://github.com/microscaler/rerp/actions)
-[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-PolyForm--Shield--1.0.0-blue.svg)](LICENSE)
 
 ---
 
@@ -652,12 +652,48 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ## License
 
-Licensed under either of:
+RERP is licensed under the **PolyForm Shield License 1.0.0**. See [LICENSE](LICENSE) for the full license text.
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+### Licensing Overview
 
-at your option.
+**Base Modules (Open Source)**
+- All base RERP modules are **open source and publicly viewable**
+- Source code is available for inspection, modification, and distribution
+- You can use, modify, and contribute to the base modules
+
+**Commercial Restrictions**
+- ❌ **No SaaS services may be built or sold** other than by the repository owner (Microscaler)
+- ❌ **You may not "sell the software"** - RERP itself cannot be sold as a product
+- ✅ **You may sell services** around implementing RERP (consulting, integration, support, customization)
+- ✅ **You may use RERP internally** for your own business operations
+
+**Enterprise Components (Future)**
+- Enterprise components will be produced by Microscaler at a later stage
+- Enterprise components will be **source available to paid users**
+- Enterprise components will have separate licensing terms
+
+**System Integrator Modules**
+- System integrators may build their own modules that integrate with the RERP ecosystem
+- Integrators **own their modules** and can sell them
+- Custom modules **must be sold via the future RERP marketplace** (when available)
+- This enables an ecosystem of third-party extensions while maintaining quality and compatibility
+
+### What This Means
+
+**You CAN:**
+- ✅ View and study the source code
+- ✅ Use RERP for your own business operations
+- ✅ Modify RERP for your internal use
+- ✅ Sell services around implementing, customizing, or supporting RERP
+- ✅ Build and sell your own modules via the RERP marketplace
+- ✅ Contribute improvements back to the project
+
+**You CANNOT:**
+- ❌ Offer RERP as a SaaS service (only Microscaler can do this)
+- ❌ Sell RERP itself as a product
+- ❌ Build competing products using RERP
+
+For more details, see the [PolyForm Shield License 1.0.0](LICENSE) and the [PolyForm Project website](https://polyformproject.org/licenses/shield/1.0.0/).
 
 ---
 
