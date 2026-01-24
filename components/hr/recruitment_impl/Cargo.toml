@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "recruitment"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_hr_recruitment = { path = "../recruitment" }

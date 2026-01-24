@@ -1,0 +1,16 @@
+service:
+  name: bff
+  port: 8010
+  containerPort: 8010
+  nodePort: 31010
+image:
+  repository: localhost:5001
+  name: rerp-bff
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: bff_service_api
+  serviceName: bff

@@ -73,7 +73,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /auth/password/reset:
     post:
-      operationId: requestPasswordReset
+      operationId: request_password_reset
       summary: Request password reset
       responses:
         '200':
@@ -95,7 +95,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /auth/password/reset/confirm:
     post:
-      operationId: confirmPasswordReset
+      operationId: confirm_password_reset
       summary: Confirm password reset
       responses:
         '200':
@@ -117,7 +117,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /auth/refresh:
     post:
-      operationId: refreshToken
+      operationId: refresh_token
       summary: Refresh access token
       responses:
         '200':
@@ -161,7 +161,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /check:
     post:
-      operationId: checkPermission
+      operationId: check_permission
       summary: Check if user has permission
       responses:
         '200':
@@ -183,7 +183,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /mfa/enable:
     post:
-      operationId: enableMfa
+      operationId: enable_mfa
       summary: Enable MFA for user
       responses:
         '200':
@@ -205,7 +205,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /mfa/verify:
     post:
-      operationId: verifyMfa
+      operationId: verify_mfa
       summary: Verify MFA code
       responses:
         '200':
@@ -227,7 +227,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /permissions:
     get:
-      operationId: listPermissions
+      operationId: list_permissions
       summary: List permissions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -254,7 +254,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     post:
-      operationId: createPermission
+      operationId: create_permission
       summary: Create permission
       requestBody:
         required: true
@@ -275,7 +275,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /permissions/{id}:
     get:
-      operationId: getPermission
+      operationId: get_permission
       summary: Get permission by id
       parameters:
       - name: id
@@ -296,7 +296,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     put:
-      operationId: updatePermission
+      operationId: update_permission
       summary: Update permission
       parameters:
       - name: id
@@ -323,7 +323,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     delete:
-      operationId: deletePermission
+      operationId: delete_permission
       summary: Delete permission
       parameters:
       - name: id
@@ -341,7 +341,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /roles:
     get:
-      operationId: listRoles
+      operationId: list_roles
       summary: List roles
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -368,7 +368,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     post:
-      operationId: createRole
+      operationId: create_role
       summary: Create role
       requestBody:
         required: true
@@ -389,7 +389,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /roles/{id}:
     get:
-      operationId: getRole
+      operationId: get_role
       summary: Get role by id
       parameters:
       - name: id
@@ -410,7 +410,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     put:
-      operationId: updateRole
+      operationId: update_role
       summary: Update role
       parameters:
       - name: id
@@ -437,7 +437,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     delete:
-      operationId: deleteRole
+      operationId: delete_role
       summary: Delete role
       parameters:
       - name: id
@@ -455,7 +455,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /roles/{roleId}/permissions:
     get:
-      operationId: getRolePermissions
+      operationId: get_role_permissions
       summary: Get permissions for role
       responses:
         '200':
@@ -476,7 +476,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     post:
-      operationId: assignPermission
+      operationId: assign_permission
       summary: Assign permission to role
       responses:
         '200':
@@ -505,7 +505,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /roles/{roleId}/permissions/{permissionId}:
     delete:
-      operationId: revokePermission
+      operationId: revoke_permission
       summary: Revoke permission from role
       responses:
         '200':
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /sessions:
     get:
-      operationId: listSessions
+      operationId: list_sessions
       summary: List sessions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -560,7 +560,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     post:
-      operationId: createSession
+      operationId: create_session
       summary: Create session
       requestBody:
         required: true
@@ -581,7 +581,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /sessions/{id}:
     get:
-      operationId: getSession
+      operationId: get_session
       summary: Get session by id
       parameters:
       - name: id
@@ -602,7 +602,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     put:
-      operationId: updateSession
+      operationId: update_session
       summary: Update session
       parameters:
       - name: id
@@ -629,7 +629,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     delete:
-      operationId: deleteSession
+      operationId: delete_session
       summary: Delete session
       parameters:
       - name: id
@@ -647,7 +647,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /users:
     get:
-      operationId: listUsers
+      operationId: list_users
       summary: List users
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -674,7 +674,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     post:
-      operationId: createUser
+      operationId: create_user
       summary: Create user
       requestBody:
         required: true
@@ -695,7 +695,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /users/{id}:
     get:
-      operationId: getUser
+      operationId: get_user
       summary: Get user by id
       parameters:
       - name: id
@@ -716,7 +716,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     put:
-      operationId: updateUser
+      operationId: update_user
       summary: Update user
       parameters:
       - name: id
@@ -743,7 +743,7 @@ paths:
       x-service: idam
       x-service-base-path: /api/v1/auth/idam
     delete:
-      operationId: deleteUser
+      operationId: delete_user
       summary: Delete user
       parameters:
       - name: id
@@ -761,7 +761,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /users/{userId}/roles:
     get:
-      operationId: getUserRoles
+      operationId: get_user_roles
       summary: Get roles for user
       responses:
         '200':
@@ -782,7 +782,7 @@ paths:
       x-service: rbac
       x-service-base-path: /api/v1/auth/rbac
     post:
-      operationId: assignRole
+      operationId: assign_role
       summary: Assign role to user
       responses:
         '200':
@@ -811,7 +811,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /users/{userId}/roles/{roleId}:
     delete:
-      operationId: revokeRole
+      operationId: revoke_role
       summary: Revoke role from user
       responses:
         '200':
@@ -839,7 +839,7 @@ paths:
       x-service-base-path: /api/v1/auth/rbac
   /users/{userId}/verify/email:
     post:
-      operationId: verifyEmail
+      operationId: verify_email
       summary: Verify email address
       responses:
         '200':
@@ -868,7 +868,7 @@ paths:
       x-service-base-path: /api/v1/auth/idam
   /users/{userId}/verify/phone:
     post:
-      operationId: verifyPhone
+      operationId: verify_phone
       summary: Verify phone number
       responses:
         '200':

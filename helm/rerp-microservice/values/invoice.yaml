@@ -1,0 +1,16 @@
+service:
+  name: invoice
+  port: 8002
+  containerPort: 8002
+  nodePort: 31002
+image:
+  repository: localhost:5001
+  name: rerp-invoice
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: invoice_service_api
+  serviceName: invoice

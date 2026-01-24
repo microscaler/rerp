@@ -27,7 +27,7 @@ tags: []
 paths:
   /devices:
     get:
-      operationId: listDevices
+      operationId: list_devices
       summary: List devices
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -54,7 +54,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     post:
-      operationId: createDevice
+      operationId: create_device
       summary: Create device
       requestBody:
         required: true
@@ -75,7 +75,7 @@ paths:
       x-service-base-path: /api/v1/iot/core
   /devices/{id}:
     get:
-      operationId: getDevice
+      operationId: get_device
       summary: Get device by id
       parameters:
       - name: id
@@ -96,7 +96,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     put:
-      operationId: updateDevice
+      operationId: update_device
       summary: Update device
       parameters:
       - name: id
@@ -123,7 +123,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     delete:
-      operationId: deleteDevice
+      operationId: delete_device
       summary: Delete device
       parameters:
       - name: id
@@ -141,7 +141,7 @@ paths:
       x-service-base-path: /api/v1/iot/core
   /readings:
     get:
-      operationId: listReadings
+      operationId: list_readings
       summary: List readings
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -168,7 +168,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     post:
-      operationId: createReading
+      operationId: create_reading
       summary: Create reading
       requestBody:
         required: true
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/iot/core
   /readings/{id}:
     get:
-      operationId: getReading
+      operationId: get_reading
       summary: Get reading by id
       parameters:
       - name: id
@@ -210,7 +210,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     put:
-      operationId: updateReading
+      operationId: update_reading
       summary: Update reading
       parameters:
       - name: id
@@ -237,7 +237,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     delete:
-      operationId: deleteReading
+      operationId: delete_reading
       summary: Delete reading
       parameters:
       - name: id
@@ -255,7 +255,7 @@ paths:
       x-service-base-path: /api/v1/iot/core
   /sensors:
     get:
-      operationId: listSensors
+      operationId: list_sensors
       summary: List sensors
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -282,7 +282,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     post:
-      operationId: createSensor
+      operationId: create_sensor
       summary: Create sensor
       requestBody:
         required: true
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/iot/core
   /sensors/{id}:
     get:
-      operationId: getSensor
+      operationId: get_sensor
       summary: Get sensor by id
       parameters:
       - name: id
@@ -324,7 +324,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     put:
-      operationId: updateSensor
+      operationId: update_sensor
       summary: Update sensor
       parameters:
       - name: id
@@ -351,7 +351,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/iot/core
     delete:
-      operationId: deleteSensor
+      operationId: delete_sensor
       summary: Delete sensor
       parameters:
       - name: id

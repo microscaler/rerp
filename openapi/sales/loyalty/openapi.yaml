@@ -10,7 +10,7 @@ tags: []
 paths:
   /loyalty-programs:
     get:
-      operationId: listLoyaltyPrograms
+      operationId: list_loyalty_programs
       summary: List loyalty-programs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLoyaltyProgram
+      operationId: create_loyalty_program
       summary: Create loyalty-program
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /loyalty-programs/{id}:
     get:
-      operationId: getLoyaltyProgram
+      operationId: get_loyalty_program
       summary: Get loyalty-program by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLoyaltyProgram
+      operationId: update_loyalty_program
       summary: Update loyalty-program
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLoyaltyProgram
+      operationId: delete_loyalty_program
       summary: Delete loyalty-program
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /rewards:
     get:
-      operationId: listRewards
+      operationId: list_rewards
       summary: List rewards
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createReward
+      operationId: create_reward
       summary: Create reward
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /rewards/{id}:
     get:
-      operationId: getReward
+      operationId: get_reward
       summary: Get reward by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateReward
+      operationId: update_reward
       summary: Update reward
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteReward
+      operationId: delete_reward
       summary: Delete reward
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /points-transactions:
     get:
-      operationId: listPointsTransactions
+      operationId: list_points_transactions
       summary: List points-transactions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPointsTransaction
+      operationId: create_points_transaction
       summary: Create points-transaction
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /points-transactions/{id}:
     get:
-      operationId: getPointsTransaction
+      operationId: get_points_transaction
       summary: Get points-transaction by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePointsTransaction
+      operationId: update_points_transaction
       summary: Update points-transaction
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePointsTransaction
+      operationId: delete_points_transaction
       summary: Delete points-transaction
       parameters:
       - name: id

@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "core"
+name = "rerp_project_core_impl"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_project_core = { path = "../core" }

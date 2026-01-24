@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# namespace: rerp is created at cluster creation (e.g. just dev-up), not by Tilt.
+# Do not add namespace.yaml here — it is applied by the cluster bootstrap.
+namespace: rerp
+
+# No resources: namespace and service deploys are handled outside this kustomization.
+resources: []

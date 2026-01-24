@@ -10,7 +10,7 @@ tags: []
 paths:
   /data-records:
     get:
-      operationId: listDataRecords
+      operationId: list_data_records
       summary: List data-records
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDataRecord
+      operationId: create_data_record
       summary: Create data-record
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /data-records/{id}:
     get:
-      operationId: getDataRecord
+      operationId: get_data_record
       summary: Get data-record by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDataRecord
+      operationId: update_data_record
       summary: Update data-record
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDataRecord
+      operationId: delete_data_record
       summary: Delete data-record
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /duplicates:
     get:
-      operationId: listDuplicates
+      operationId: list_duplicates
       summary: List duplicates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDuplicate
+      operationId: create_duplicate
       summary: Create duplicate
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /duplicates/{id}:
     get:
-      operationId: getDuplicate
+      operationId: get_duplicate
       summary: Get duplicate by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDuplicate
+      operationId: update_duplicate
       summary: Update duplicate
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDuplicate
+      operationId: delete_duplicate
       summary: Delete duplicate
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /merges:
     get:
-      operationId: listMerges
+      operationId: list_merges
       summary: List merges
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createMerge
+      operationId: create_merge
       summary: Create merge
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /merges/{id}:
     get:
-      operationId: getMerge
+      operationId: get_merge
       summary: Get merge by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateMerge
+      operationId: update_merge
       summary: Update merge
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteMerge
+      operationId: delete_merge
       summary: Delete merge
       parameters:
       - name: id

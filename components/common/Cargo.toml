@@ -28,7 +28,7 @@ reqwest = { version = "0.12.25", default-features = false, features = ["json", "
 tokio = { version = "1.45.1", features = ["full"] }
 
 # Database clients (add as needed)
-# may_postgres = { git = "https://github.com/Xudong-Huang/may_postgres" }
+# may_postgres = { git = "https://github.com/microscaler/may_postgres.git", branch = "master" }
 
 # Redis client (if needed)
 # redis = { version = "0.24", features = ["tokio-comp", "connection-manager"] }

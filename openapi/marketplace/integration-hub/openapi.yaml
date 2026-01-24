@@ -10,7 +10,7 @@ tags: []
 paths:
   /connectors:
     get:
-      operationId: listConnectors
+      operationId: list_connectors
       summary: List connectors
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createConnector
+      operationId: create_connector
       summary: Create connector
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /connectors/{id}:
     get:
-      operationId: getConnector
+      operationId: get_connector
       summary: Get connector by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateConnector
+      operationId: update_connector
       summary: Update connector
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteConnector
+      operationId: delete_connector
       summary: Delete connector
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /integration-templates:
     get:
-      operationId: listIntegrationTemplates
+      operationId: list_integration_templates
       summary: List integration-templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createIntegrationTemplate
+      operationId: create_integration_template
       summary: Create integration-template
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /integration-templates/{id}:
     get:
-      operationId: getIntegrationTemplate
+      operationId: get_integration_template
       summary: Get integration-template by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateIntegrationTemplate
+      operationId: update_integration_template
       summary: Update integration-template
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteIntegrationTemplate
+      operationId: delete_integration_template
       summary: Delete integration-template
       parameters:
       - name: id

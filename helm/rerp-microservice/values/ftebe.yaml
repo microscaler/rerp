@@ -1,0 +1,16 @@
+service:
+  name: ftebe
+  port: 8011
+  containerPort: 8011
+  nodePort: 31011
+image:
+  repository: localhost:5001
+  name: pricewhisperer-ftebe
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+app:
+  binaryName: ftebe_testing_service_api
+  serviceName: ftebe

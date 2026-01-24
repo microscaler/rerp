@@ -10,7 +10,7 @@ tags: []
 paths:
   /boms:
     get:
-      operationId: listBoms
+      operationId: list_boms
       summary: List boms
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createBom
+      operationId: create_bom
       summary: Create bom
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /boms/{id}:
     get:
-      operationId: getBom
+      operationId: get_bom
       summary: Get bom by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateBom
+      operationId: update_bom
       summary: Update bom
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteBom
+      operationId: delete_bom
       summary: Delete bom
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /bom-lines:
     get:
-      operationId: listBomLines
+      operationId: list_bom_lines
       summary: List bom-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createBomLine
+      operationId: create_bom_line
       summary: Create bom-line
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /bom-lines/{id}:
     get:
-      operationId: getBomLine
+      operationId: get_bom_line
       summary: Get bom-line by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateBomLine
+      operationId: update_bom_line
       summary: Update bom-line
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteBomLine
+      operationId: delete_bom_line
       summary: Delete bom-line
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /bom-versions:
     get:
-      operationId: listBomVersions
+      operationId: list_bom_versions
       summary: List bom-versions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createBomVersion
+      operationId: create_bom_version
       summary: Create bom-version
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /bom-versions/{id}:
     get:
-      operationId: getBomVersion
+      operationId: get_bom_version
       summary: Get bom-version by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateBomVersion
+      operationId: update_bom_version
       summary: Update bom-version
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteBomVersion
+      operationId: delete_bom_version
       summary: Delete bom-version
       parameters:
       - name: id

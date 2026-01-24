@@ -1,0 +1,118 @@
+# Default values for rerp-microservice
+# This is a template - use service-specific values files instead
+
+# Service configuration
+# 
+# PORT MAPPING REFERENCE (for AI agents and developers):
+# ======================================================
+# Service ports are defined per-service in values/<service>.yaml files.
+# The PORT environment variable is automatically set from service.containerPort
+# and is read by the application at runtime.
+#
+# ⚠️ IMPORTANT: See docs/RERP_PREPARATION_PLAN.md for the canonical
+#    reference of ALL services, ports, and resource allocations.
+#    Always check that document before adding new services to prevent port conflicts.
+#
+# Current port assignments (30xxx NodePort range for microservices):
+#   - general-ledger:      8001 (NodePort: 30801) - General Ledger
+#   - invoice:             8002 (NodePort: 30802) - Invoice Management
+#   - accounts-receivable: 8003 (NodePort: 30803) - Accounts Receivable
+#   - accounts-payable:    8004 (NodePort: 30804) - Accounts Payable
+#   - bank-sync:          8005 (NodePort: 30805) - Bank Synchronization
+#   - asset:              8006 (NodePort: 30806) - Asset Management
+#   - budget:             8007 (NodePort: 30807) - Budget Management
+#   - edi:                8008 (NodePort: 30808) - EDI & Compliance
+#   - financial-reports:  8009 (NodePort: 30809) - Financial Reports
+#   - bff:                8010 (NodePort: 30810) - Accounting BFF
+#
+# See docs/RERP_PREPARATION_PLAN.md for the complete services and ports table.
+#
+service:
+  name: ""  # e.g., general-ledger, invoice, accounts-receivable, accounts-payable
+  port: 8080  # Default - override in service-specific values files
+  containerPort: 8080  # Default - override in service-specific values files. This sets the PORT env var.
+  nodePort: null  # Set to specific port for NodePort type, null for ClusterIP
+
+# Image configuration
+image:
+  repository: localhost:5001
+  name: ""  # e.g., rerp-general-ledger
+  tag: tilt
+  pullPolicy: IfNotPresent
+
+# Deployment configuration
+deployment:
+  replicas: 1
+  namespace: rerp
+
+# Application configuration
+app:
+  binaryName: ""  # e.g., general_ledger_service_api
+  serviceName: ""  # For OTEL service name, e.g., general-ledger
+  config:
+    security:
+      api_keys:
+        ApiKeyHeader:
+          key: "test123"
+    http:
+      keep_alive: true
+      timeout_secs: 5
+      max_requests: 50000
+    database:
+      host: "postgres"
+      port: 5432
+      name: "pricewhisperer"
+      user: "pricewhisperer"
+      password: "dev_password_change_in_prod"
+      max_connections: 10
+    redis:
+      host: "redis"
+      port: 6379
+      db: 0
+      max_connections: 10
+    observability:
+      metrics_enabled: true
+      tracing_enabled: true
+      otlp_endpoint: "http://otel-collector:4317"
+
+# Resources
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "2000m"
+
+# Health checks
+healthCheck:
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 2
+
+# Environment variables
+env:
+  RUST_LOG: "debug"
+  RUST_BACKTRACE: "1"
+  BRRTR_LOG_FORMAT: "json"
+  BRRTR_LOG_SAMPLING_MODE: "all"
+  BRRTR_LOG_ASYNC: "true"
+  BRRTR_LOG_INCLUDE_LOCATION: "false"
+  BRRTR_STACK_SIZE: "0x10000"
+
+# Service type
+serviceType: NodePort  # NodePort, ClusterIP, or LoadBalancer
+
+# Prometheus scraping
+prometheus:
+  enabled: true
+  port: 9090
+  path: "/metrics"
+

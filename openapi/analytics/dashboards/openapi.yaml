@@ -10,7 +10,7 @@ tags: []
 paths:
   /dashboards:
     get:
-      operationId: listDashboards
+      operationId: list_dashboards
       summary: List dashboards
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDashboard
+      operationId: create_dashboard
       summary: Create dashboard
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /dashboards/{id}:
     get:
-      operationId: getDashboard
+      operationId: get_dashboard
       summary: Get dashboard by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDashboard
+      operationId: update_dashboard
       summary: Update dashboard
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDashboard
+      operationId: delete_dashboard
       summary: Delete dashboard
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /widgets:
     get:
-      operationId: listWidgets
+      operationId: list_widgets
       summary: List widgets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWidget
+      operationId: create_widget
       summary: Create widget
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /widgets/{id}:
     get:
-      operationId: getWidget
+      operationId: get_widget
       summary: Get widget by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWidget
+      operationId: update_widget
       summary: Update widget
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWidget
+      operationId: delete_widget
       summary: Delete widget
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /kpis:
     get:
-      operationId: listKpis
+      operationId: list_kpis
       summary: List kpis
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createKpi
+      operationId: create_kpi
       summary: Create kpi
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /kpis/{id}:
     get:
-      operationId: getKpi
+      operationId: get_kpi
       summary: Get kpi by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateKpi
+      operationId: update_kpi
       summary: Update kpi
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteKpi
+      operationId: delete_kpi
       summary: Delete kpi
       parameters:
       - name: id

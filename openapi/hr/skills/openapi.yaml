@@ -10,7 +10,7 @@ tags: []
 paths:
   /skills:
     get:
-      operationId: listSkills
+      operationId: list_skills
       summary: List skills
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSkill
+      operationId: create_skill
       summary: Create skill
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /skills/{id}:
     get:
-      operationId: getSkill
+      operationId: get_skill
       summary: Get skill by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSkill
+      operationId: update_skill
       summary: Update skill
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSkill
+      operationId: delete_skill
       summary: Delete skill
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /skill-assessments:
     get:
-      operationId: listSkillAssessments
+      operationId: list_skill_assessments
       summary: List skill-assessments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSkillAssessment
+      operationId: create_skill_assessment
       summary: Create skill-assessment
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /skill-assessments/{id}:
     get:
-      operationId: getSkillAssessment
+      operationId: get_skill_assessment
       summary: Get skill-assessment by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSkillAssessment
+      operationId: update_skill_assessment
       summary: Update skill-assessment
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSkillAssessment
+      operationId: delete_skill_assessment
       summary: Delete skill-assessment
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /skill-requirements:
     get:
-      operationId: listSkillRequirements
+      operationId: list_skill_requirements
       summary: List skill-requirements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSkillRequirement
+      operationId: create_skill_requirement
       summary: Create skill-requirement
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /skill-requirements/{id}:
     get:
-      operationId: getSkillRequirement
+      operationId: get_skill_requirement
       summary: Get skill-requirement by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSkillRequirement
+      operationId: update_skill_requirement
       summary: Update skill-requirement
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSkillRequirement
+      operationId: delete_skill_requirement
       summary: Delete skill-requirement
       parameters:
       - name: id

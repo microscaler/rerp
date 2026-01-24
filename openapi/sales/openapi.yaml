@@ -35,7 +35,7 @@ tags: []
 paths:
   /fulfillments:
     get:
-      operationId: listFulfillments
+      operationId: list_fulfillments
       summary: List fulfillments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -62,7 +62,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
-      operationId: createFulfillment
+      operationId: create_fulfillment
       summary: Create fulfillment
       requestBody:
         required: true
@@ -83,7 +83,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /fulfillments/{id}:
     get:
-      operationId: getFulfillment
+      operationId: get_fulfillment
       summary: Get fulfillment by id
       parameters:
       - name: id
@@ -104,7 +104,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     put:
-      operationId: updateFulfillment
+      operationId: update_fulfillment
       summary: Update fulfillment
       parameters:
       - name: id
@@ -131,7 +131,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     delete:
-      operationId: deleteFulfillment
+      operationId: delete_fulfillment
       summary: Delete fulfillment
       parameters:
       - name: id
@@ -149,7 +149,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /loyalty-programs:
     get:
-      operationId: listLoyaltyPrograms
+      operationId: list_loyalty_programs
       summary: List loyalty-programs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -176,7 +176,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
-      operationId: createLoyaltyProgram
+      operationId: create_loyalty_program
       summary: Create loyalty-program
       requestBody:
         required: true
@@ -197,7 +197,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /loyalty-programs/{id}:
     get:
-      operationId: getLoyaltyProgram
+      operationId: get_loyalty_program
       summary: Get loyalty-program by id
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     put:
-      operationId: updateLoyaltyProgram
+      operationId: update_loyalty_program
       summary: Update loyalty-program
       parameters:
       - name: id
@@ -245,7 +245,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     delete:
-      operationId: deleteLoyaltyProgram
+      operationId: delete_loyalty_program
       summary: Delete loyalty-program
       parameters:
       - name: id
@@ -263,7 +263,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /order-lines:
     get:
-      operationId: listOrderLines
+      operationId: list_order_lines
       summary: List order-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -290,7 +290,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
-      operationId: createOrderLine
+      operationId: create_order_line
       summary: Create order-line
       requestBody:
         required: true
@@ -311,7 +311,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /order-lines/{id}:
     get:
-      operationId: getOrderLine
+      operationId: get_order_line
       summary: Get order-line by id
       parameters:
       - name: id
@@ -332,7 +332,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     put:
-      operationId: updateOrderLine
+      operationId: update_order_line
       summary: Update order-line
       parameters:
       - name: id
@@ -359,7 +359,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     delete:
-      operationId: deleteOrderLine
+      operationId: delete_order_line
       summary: Delete order-line
       parameters:
       - name: id
@@ -377,7 +377,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /orders:
     get:
-      operationId: listOrders
+      operationId: list_orders
       summary: List orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -404,7 +404,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
-      operationId: createOrder
+      operationId: create_order
       summary: Create order
       requestBody:
         required: true
@@ -425,7 +425,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /orders/{id}:
     get:
-      operationId: getOrder
+      operationId: get_order
       summary: Get order by id
       parameters:
       - name: id
@@ -446,7 +446,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     put:
-      operationId: updateOrder
+      operationId: update_order
       summary: Update order
       parameters:
       - name: id
@@ -473,7 +473,7 @@ paths:
       x-service: order
       x-service-base-path: /api/v1/sales/order
     delete:
-      operationId: deleteOrder
+      operationId: delete_order
       summary: Delete order
       parameters:
       - name: id
@@ -491,7 +491,7 @@ paths:
       x-service-base-path: /api/v1/sales/order
   /plans:
     get:
-      operationId: listPlans
+      operationId: list_plans
       summary: List plans
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -518,7 +518,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
-      operationId: createPlan
+      operationId: create_plan
       summary: Create plan
       requestBody:
         required: true
@@ -539,7 +539,7 @@ paths:
       x-service-base-path: /api/v1/sales/subscription
   /plans/{id}:
     get:
-      operationId: getPlan
+      operationId: get_plan
       summary: Get plan by id
       parameters:
       - name: id
@@ -560,7 +560,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     put:
-      operationId: updatePlan
+      operationId: update_plan
       summary: Update plan
       parameters:
       - name: id
@@ -587,7 +587,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     delete:
-      operationId: deletePlan
+      operationId: delete_plan
       summary: Delete plan
       parameters:
       - name: id
@@ -605,7 +605,7 @@ paths:
       x-service-base-path: /api/v1/sales/subscription
   /points-transactions:
     get:
-      operationId: listPointsTransactions
+      operationId: list_points_transactions
       summary: List points-transactions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -632,7 +632,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
-      operationId: createPointsTransaction
+      operationId: create_points_transaction
       summary: Create points-transaction
       requestBody:
         required: true
@@ -653,7 +653,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /points-transactions/{id}:
     get:
-      operationId: getPointsTransaction
+      operationId: get_points_transaction
       summary: Get points-transaction by id
       parameters:
       - name: id
@@ -674,7 +674,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     put:
-      operationId: updatePointsTransaction
+      operationId: update_points_transaction
       summary: Update points-transaction
       parameters:
       - name: id
@@ -701,7 +701,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     delete:
-      operationId: deletePointsTransaction
+      operationId: delete_points_transaction
       summary: Delete points-transaction
       parameters:
       - name: id
@@ -719,7 +719,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /quotations:
     get:
-      operationId: listQuotations
+      operationId: list_quotations
       summary: List quotations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -746,7 +746,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     post:
-      operationId: createQuotation
+      operationId: create_quotation
       summary: Create quotation
       requestBody:
         required: true
@@ -767,7 +767,7 @@ paths:
       x-service-base-path: /api/v1/sales/quotation
   /quotations/{id}:
     get:
-      operationId: getQuotation
+      operationId: get_quotation
       summary: Get quotation by id
       parameters:
       - name: id
@@ -788,7 +788,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     put:
-      operationId: updateQuotation
+      operationId: update_quotation
       summary: Update quotation
       parameters:
       - name: id
@@ -815,7 +815,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     delete:
-      operationId: deleteQuotation
+      operationId: delete_quotation
       summary: Delete quotation
       parameters:
       - name: id
@@ -833,7 +833,7 @@ paths:
       x-service-base-path: /api/v1/sales/quotation
   /quote-lines:
     get:
-      operationId: listQuoteLines
+      operationId: list_quote_lines
       summary: List quote-lines
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -860,7 +860,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     post:
-      operationId: createQuoteLine
+      operationId: create_quote_line
       summary: Create quote-line
       requestBody:
         required: true
@@ -881,7 +881,7 @@ paths:
       x-service-base-path: /api/v1/sales/quotation
   /quote-lines/{id}:
     get:
-      operationId: getQuoteLine
+      operationId: get_quote_line
       summary: Get quote-line by id
       parameters:
       - name: id
@@ -902,7 +902,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     put:
-      operationId: updateQuoteLine
+      operationId: update_quote_line
       summary: Update quote-line
       parameters:
       - name: id
@@ -929,7 +929,7 @@ paths:
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     delete:
-      operationId: deleteQuoteLine
+      operationId: delete_quote_line
       summary: Delete quote-line
       parameters:
       - name: id
@@ -947,7 +947,7 @@ paths:
       x-service-base-path: /api/v1/sales/quotation
   /quotes:
     get:
-      operationId: listQuotes
+      operationId: list_quotes
       summary: List quotes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -974,7 +974,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     post:
-      operationId: createQuote
+      operationId: create_quote
       summary: Create quote
       requestBody:
         required: true
@@ -995,7 +995,7 @@ paths:
       x-service-base-path: /api/v1/sales/core
   /quotes/{id}:
     get:
-      operationId: getQuote
+      operationId: get_quote
       summary: Get quote by id
       parameters:
       - name: id
@@ -1016,7 +1016,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     put:
-      operationId: updateQuote
+      operationId: update_quote
       summary: Update quote
       parameters:
       - name: id
@@ -1043,7 +1043,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     delete:
-      operationId: deleteQuote
+      operationId: delete_quote
       summary: Delete quote
       parameters:
       - name: id
@@ -1061,7 +1061,7 @@ paths:
       x-service-base-path: /api/v1/sales/core
   /renewals:
     get:
-      operationId: listRenewals
+      operationId: list_renewals
       summary: List renewals
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1088,7 +1088,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
-      operationId: createRenewal
+      operationId: create_renewal
       summary: Create renewal
       requestBody:
         required: true
@@ -1109,7 +1109,7 @@ paths:
       x-service-base-path: /api/v1/sales/subscription
   /renewals/{id}:
     get:
-      operationId: getRenewal
+      operationId: get_renewal
       summary: Get renewal by id
       parameters:
       - name: id
@@ -1130,7 +1130,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     put:
-      operationId: updateRenewal
+      operationId: update_renewal
       summary: Update renewal
       parameters:
       - name: id
@@ -1157,7 +1157,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     delete:
-      operationId: deleteRenewal
+      operationId: delete_renewal
       summary: Delete renewal
       parameters:
       - name: id
@@ -1175,7 +1175,7 @@ paths:
       x-service-base-path: /api/v1/sales/subscription
   /rewards:
     get:
-      operationId: listRewards
+      operationId: list_rewards
       summary: List rewards
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1202,7 +1202,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
-      operationId: createReward
+      operationId: create_reward
       summary: Create reward
       requestBody:
         required: true
@@ -1223,7 +1223,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /rewards/{id}:
     get:
-      operationId: getReward
+      operationId: get_reward
       summary: Get reward by id
       parameters:
       - name: id
@@ -1244,7 +1244,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     put:
-      operationId: updateReward
+      operationId: update_reward
       summary: Update reward
       parameters:
       - name: id
@@ -1271,7 +1271,7 @@ paths:
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     delete:
-      operationId: deleteReward
+      operationId: delete_reward
       summary: Delete reward
       parameters:
       - name: id
@@ -1289,7 +1289,7 @@ paths:
       x-service-base-path: /api/v1/sales/loyalty
   /sales:
     get:
-      operationId: listSales
+      operationId: list_sales
       summary: List sales
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1316,7 +1316,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     post:
-      operationId: createSale
+      operationId: create_sale
       summary: Create sale
       requestBody:
         required: true
@@ -1337,7 +1337,7 @@ paths:
       x-service-base-path: /api/v1/sales/core
   /sales/{id}:
     get:
-      operationId: getSale
+      operationId: get_sale
       summary: Get sale by id
       parameters:
       - name: id
@@ -1358,7 +1358,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     put:
-      operationId: updateSale
+      operationId: update_sale
       summary: Update sale
       parameters:
       - name: id
@@ -1385,7 +1385,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/sales/core
     delete:
-      operationId: deleteSale
+      operationId: delete_sale
       summary: Delete sale
       parameters:
       - name: id
@@ -1403,7 +1403,7 @@ paths:
       x-service-base-path: /api/v1/sales/core
   /subscriptions:
     get:
-      operationId: listSubscriptions
+      operationId: list_subscriptions
       summary: List subscriptions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -1430,7 +1430,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
-      operationId: createSubscription
+      operationId: create_subscription
       summary: Create subscription
       requestBody:
         required: true
@@ -1451,7 +1451,7 @@ paths:
       x-service-base-path: /api/v1/sales/subscription
   /subscriptions/{id}:
     get:
-      operationId: getSubscription
+      operationId: get_subscription
       summary: Get subscription by id
       parameters:
       - name: id
@@ -1472,7 +1472,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     put:
-      operationId: updateSubscription
+      operationId: update_subscription
       summary: Update subscription
       parameters:
       - name: id
@@ -1499,7 +1499,7 @@ paths:
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     delete:
-      operationId: deleteSubscription
+      operationId: delete_subscription
       summary: Delete subscription
       parameters:
       - name: id

@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "knowledge_base"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_helpdesk_knowledge_base = { path = "../knowledge-base" }

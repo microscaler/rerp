@@ -67,6 +67,12 @@ def should_use_zigbuild() -> bool:
     return os_name == "Darwin" or (os_name == "Linux" and arch != "x86_64")
 
 
+def should_use_cross() -> bool:
+    """Use cross-rs Docker-based cross-compilation (e.g. in CI) to avoid needing
+    aarch64-linux-musl-gcc, arm-linux-musleabihf-gcc, etc. on the host."""
+    return os.environ.get("RERP_USE_CROSS") == "1"
+
+
 def install_rust_target(rust_target: str) -> bool:
     """Install Rust target if not already installed."""
     try:
@@ -112,13 +118,23 @@ def get_cargo_env(rust_target: str) -> Dict[str, str]:
     return env
 
 
-def build_workspace(rust_target: str, arch_name: str, use_zigbuild: bool, extra_args: List[str]) -> bool:
+def build_workspace(rust_target: str, arch_name: str, use_zigbuild: bool, use_cross: bool, extra_args: List[str]) -> bool:
     """Build entire workspace for a specific architecture."""
     components_dir = Path("components")
     if not (components_dir / "Cargo.toml").exists():
         print(f"❌ Error: Cargo.toml not found in {components_dir}", file=sys.stderr)
         return False
-    
+
+    if use_cross:
+        # cross runs in Docker with the right C toolchain for *-linux-musl; must run from repo root
+        cmd = ["cross", "build", "--manifest-path", "components/Cargo.toml", "--target", rust_target, "--workspace", "--release"] + extra_args
+        try:
+            subprocess.run(cmd, check=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
+            return False
+
     os.chdir(components_dir)
     try:
         if use_zigbuild:
@@ -138,7 +154,7 @@ def build_workspace(rust_target: str, arch_name: str, use_zigbuild: bool, extra_
         os.chdir("..")
 
 
-def build_service(system: str, module: str, rust_target: str, arch_name: str, use_zigbuild: bool, extra_args: List[str]) -> bool:
+def build_service(system: str, module: str, rust_target: str, arch_name: str, use_zigbuild: bool, use_cross: bool, extra_args: List[str]) -> bool:
     """Build a specific service for a specific architecture."""
     # Convert module name to binary name
     binary_name = f"rerp_{system}_{module.replace('-', '_')}_impl"
@@ -147,7 +163,16 @@ def build_service(system: str, module: str, rust_target: str, arch_name: str, us
     if not crate_path.exists():
         print(f"❌ Error: Crate not found: {crate_path}", file=sys.stderr)
         return False
-    
+
+    if use_cross:
+        cmd = ["cross", "build", "--manifest-path", "components/Cargo.toml", "-p", binary_name, "--target", rust_target, "--release"] + extra_args
+        try:
+            subprocess.run(cmd, check=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
+            return False
+
     components_dir = Path("components")
     os.chdir(components_dir)
     try:
@@ -173,18 +198,19 @@ def build_for_architecture(
     rust_target: str,
     arch_name: str,
     use_zigbuild: bool,
+    use_cross: bool,
     extra_args: List[str],
 ) -> bool:
     """Build for a specific architecture."""
     print(f"🔨 Building for {arch_name} ({rust_target})...")
     
-    # Install Rust target if needed
-    if not install_rust_target(rust_target):
+    # Install Rust target if needed (cross provides its own in-container toolchain)
+    if not use_cross and not install_rust_target(rust_target):
         return False
     
     # Parse target
     if target == "workspace":
-        return build_workspace(rust_target, arch_name, use_zigbuild, extra_args)
+        return build_workspace(rust_target, arch_name, use_zigbuild, use_cross, extra_args)
     else:
         # Parse service name (system_module)
         parts = target.split("_", 1)
@@ -194,7 +220,7 @@ def build_for_architecture(
             return False
         
         system, module = parts
-        return build_service(system, module, rust_target, arch_name, use_zigbuild, extra_args)
+        return build_service(system, module, rust_target, arch_name, use_zigbuild, use_cross, extra_args)
 
 
 def determine_architectures(requested_arch: Optional[str]) -> List[str]:
@@ -236,14 +262,15 @@ def main():
     # Determine architectures to build
     build_archs = determine_architectures(requested_arch)
     
-    # Determine build tool
+    # Determine build tool (RERP_USE_CROSS=1 uses cross-rs Docker images with correct C toolchains for *-linux-musl)
     use_zigbuild = should_use_zigbuild()
+    use_cross = should_use_cross()
     
     # Build for each architecture
     success = True
     for arch_name in build_archs:
         rust_target = ARCH_TARGETS[arch_name]
-        if not build_for_architecture(target, rust_target, arch_name, use_zigbuild, extra_args):
+        if not build_for_architecture(target, rust_target, arch_name, use_zigbuild, use_cross, extra_args):
             success = False
     
     if success:

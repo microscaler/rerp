@@ -10,7 +10,7 @@ tags: []
 paths:
   /projects:
     get:
-      operationId: listProjects
+      operationId: list_projects
       summary: List projects
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createProject
+      operationId: create_project
       summary: Create project
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /projects/{id}:
     get:
-      operationId: getProject
+      operationId: get_project
       summary: Get project by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateProject
+      operationId: update_project
       summary: Update project
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteProject
+      operationId: delete_project
       summary: Delete project
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /tasks:
     get:
-      operationId: listTasks
+      operationId: list_tasks
       summary: List tasks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTask
+      operationId: create_task
       summary: Create task
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /tasks/{id}:
     get:
-      operationId: getTask
+      operationId: get_task
       summary: Get task by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTask
+      operationId: update_task
       summary: Update task
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTask
+      operationId: delete_task
       summary: Delete task
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /milestones:
     get:
-      operationId: listMilestones
+      operationId: list_milestones
       summary: List milestones
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createMilestone
+      operationId: create_milestone
       summary: Create milestone
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /milestones/{id}:
     get:
-      operationId: getMilestone
+      operationId: get_milestone
       summary: Get milestone by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateMilestone
+      operationId: update_milestone
       summary: Update milestone
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteMilestone
+      operationId: delete_milestone
       summary: Delete milestone
       parameters:
       - name: id

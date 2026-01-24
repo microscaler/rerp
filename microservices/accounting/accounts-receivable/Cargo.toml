@@ -1,0 +1,26 @@
+[package]
+name = "accounts_receivable"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["jemalloc"]
+# Use jemalloc as the global allocator for better memory performance.
+# Disable this feature if brrtrouter is already providing jemalloc via its own feature,
+# or if you want to use the system allocator.
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+config = { workspace = true }
+http = { workspace = true }
+may = { workspace = true }
+may_minihttp = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }

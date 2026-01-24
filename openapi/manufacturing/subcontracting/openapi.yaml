@@ -10,7 +10,7 @@ tags: []
 paths:
   /subcontract-orders:
     get:
-      operationId: listSubcontractOrders
+      operationId: list_subcontract_orders
       summary: List subcontract-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSubcontractOrder
+      operationId: create_subcontract_order
       summary: Create subcontract-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /subcontract-orders/{id}:
     get:
-      operationId: getSubcontractOrder
+      operationId: get_subcontract_order
       summary: Get subcontract-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSubcontractOrder
+      operationId: update_subcontract_order
       summary: Update subcontract-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSubcontractOrder
+      operationId: delete_subcontract_order
       summary: Delete subcontract-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /subcontractor-pos:
     get:
-      operationId: listSubcontractorPos
+      operationId: list_subcontractor_pos
       summary: List subcontractor-pos
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSubcontractorPo
+      operationId: create_subcontractor_po
       summary: Create subcontractor-po
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /subcontractor-pos/{id}:
     get:
-      operationId: getSubcontractorPo
+      operationId: get_subcontractor_po
       summary: Get subcontractor-po by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSubcontractorPo
+      operationId: update_subcontractor_po
       summary: Update subcontractor-po
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSubcontractorPo
+      operationId: delete_subcontractor_po
       summary: Delete subcontractor-po
       parameters:
       - name: id

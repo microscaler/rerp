@@ -29,7 +29,7 @@ tags: []
 paths:
   /apps:
     get:
-      operationId: listApps
+      operationId: list_apps
       summary: List apps
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     post:
-      operationId: createApp
+      operationId: create_app
       summary: Create app
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /apps/{id}:
     get:
-      operationId: getApp
+      operationId: get_app
       summary: Get app by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     put:
-      operationId: updateApp
+      operationId: update_app
       summary: Update app
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     delete:
-      operationId: deleteApp
+      operationId: delete_app
       summary: Delete app
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /connectors:
     get:
-      operationId: listConnectors
+      operationId: list_connectors
       summary: List connectors
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     post:
-      operationId: createConnector
+      operationId: create_connector
       summary: Create connector
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/integration-hub
   /connectors/{id}:
     get:
-      operationId: getConnector
+      operationId: get_connector
       summary: Get connector by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     put:
-      operationId: updateConnector
+      operationId: update_connector
       summary: Update connector
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     delete:
-      operationId: deleteConnector
+      operationId: delete_connector
       summary: Delete connector
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/integration-hub
   /extensions:
     get:
-      operationId: listExtensions
+      operationId: list_extensions
       summary: List extensions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     post:
-      operationId: createExtension
+      operationId: create_extension
       summary: Create extension
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /extensions/{id}:
     get:
-      operationId: getExtension
+      operationId: get_extension
       summary: Get extension by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     put:
-      operationId: updateExtension
+      operationId: update_extension
       summary: Update extension
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     delete:
-      operationId: deleteExtension
+      operationId: delete_extension
       summary: Delete extension
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /installations:
     get:
-      operationId: listInstallations
+      operationId: list_installations
       summary: List installations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     post:
-      operationId: createInstallation
+      operationId: create_installation
       summary: Create installation
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /installations/{id}:
     get:
-      operationId: getInstallation
+      operationId: get_installation
       summary: Get installation by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     put:
-      operationId: updateInstallation
+      operationId: update_installation
       summary: Update installation
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/marketplace/core
     delete:
-      operationId: deleteInstallation
+      operationId: delete_installation
       summary: Delete installation
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/core
   /integration-templates:
     get:
-      operationId: listIntegrationTemplates
+      operationId: list_integration_templates
       summary: List integration-templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     post:
-      operationId: createIntegrationTemplate
+      operationId: create_integration_template
       summary: Create integration-template
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/marketplace/integration-hub
   /integration-templates/{id}:
     get:
-      operationId: getIntegrationTemplate
+      operationId: get_integration_template
       summary: Get integration-template by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     put:
-      operationId: updateIntegrationTemplate
+      operationId: update_integration_template
       summary: Update integration-template
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: integration-hub
       x-service-base-path: /api/v1/marketplace/integration-hub
     delete:
-      operationId: deleteIntegrationTemplate
+      operationId: delete_integration_template
       summary: Delete integration-template
       parameters:
       - name: id

@@ -10,7 +10,7 @@ tags: []
 paths:
   /dropship-orders:
     get:
-      operationId: listDropshipOrders
+      operationId: list_dropship_orders
       summary: List dropship-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDropshipOrder
+      operationId: create_dropship_order
       summary: Create dropship-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /dropship-orders/{id}:
     get:
-      operationId: getDropshipOrder
+      operationId: get_dropship_order
       summary: Get dropship-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDropshipOrder
+      operationId: update_dropship_order
       summary: Update dropship-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDropshipOrder
+      operationId: delete_dropship_order
       summary: Delete dropship-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /vendor-orders:
     get:
-      operationId: listVendorOrders
+      operationId: list_vendor_orders
       summary: List vendor-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createVendorOrder
+      operationId: create_vendor_order
       summary: Create vendor-order
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /vendor-orders/{id}:
     get:
-      operationId: getVendorOrder
+      operationId: get_vendor_order
       summary: Get vendor-order by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateVendorOrder
+      operationId: update_vendor_order
       summary: Update vendor-order
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteVendorOrder
+      operationId: delete_vendor_order
       summary: Delete vendor-order
       parameters:
       - name: id

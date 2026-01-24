@@ -10,7 +10,7 @@ tags: []
 paths:
   /vendors:
     get:
-      operationId: listVendors
+      operationId: list_vendors
       summary: List vendors
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createVendor
+      operationId: create_vendor
       summary: Create vendor
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /vendors/{id}:
     get:
-      operationId: getVendor
+      operationId: get_vendor
       summary: Get vendor by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateVendor
+      operationId: update_vendor
       summary: Update vendor
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteVendor
+      operationId: delete_vendor
       summary: Delete vendor
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /suppliers:
     get:
-      operationId: listSuppliers
+      operationId: list_suppliers
       summary: List suppliers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSupplier
+      operationId: create_supplier
       summary: Create supplier
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /suppliers/{id}:
     get:
-      operationId: getSupplier
+      operationId: get_supplier
       summary: Get supplier by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSupplier
+      operationId: update_supplier
       summary: Update supplier
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSupplier
+      operationId: delete_supplier
       summary: Delete supplier
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /vendor-ratings:
     get:
-      operationId: listVendorRatings
+      operationId: list_vendor_ratings
       summary: List vendor-ratings
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createVendorRating
+      operationId: create_vendor_rating
       summary: Create vendor-rating
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /vendor-ratings/{id}:
     get:
-      operationId: getVendorRating
+      operationId: get_vendor_rating
       summary: Get vendor-rating by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateVendorRating
+      operationId: update_vendor_rating
       summary: Update vendor-rating
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteVendorRating
+      operationId: delete_vendor_rating
       summary: Delete vendor-rating
       parameters:
       - name: id

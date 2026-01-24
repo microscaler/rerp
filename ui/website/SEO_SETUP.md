@@ -1,10 +1,10 @@
 # SEO Setup & Maintenance Guide
 
-This guide explains the SEO implementation for PriceWhisperer and how to maintain it.
+This guide explains the SEO implementation for RERP and how to maintain it.
 
 ## Overview
 
-PriceWhisperer uses a **hybrid SEO approach**:
+RERP uses a **hybrid SEO approach**:
 - **Base SEO**: Site-wide meta tags in `index.html`
 - **Dynamic SEO**: Per-page meta tags updated via JavaScript for SPA routing
 
@@ -46,10 +46,10 @@ Updates:
 import { updateSEO } from './utils/seo';
 
 updateSEO({
-  title: 'Page Title - PriceWhisperer',
+  title: 'Page Title - RERP',
   description: 'Page description...',
   keywords: 'keyword1, keyword2',
-  canonical: 'https://pricewhisperer.microscaler.io/#page',
+  canonical: 'https://rerp.microscaler.io/#page',
   ogImage: '/og-image.jpg',
   structuredData: { /* JSON-LD schema */ }
 });
@@ -77,7 +77,7 @@ Controls search engine crawling:
 - References sitemap location
 - Can disallow specific paths if needed
 
-**Location:** `https://pricewhisperer.microscaler.io/robots.txt`
+**Location:** `https://rerp.microscaler.io/robots.txt`
 
 ### 4. Sitemap (`public/sitemap.xml`)
 
@@ -108,7 +108,7 @@ Edit `src/data/seo-data.ts`:
 
 ```typescript
 export const newPageSEO: SEOData = {
-  title: 'New Page Title - PriceWhisperer',
+  title: 'New Page Title - RERP',
   description: 'Page description for search engines...',
   keywords: 'relevant, keywords, here',
   canonical: `${BASE_URL}/#new-page`,
@@ -177,7 +177,7 @@ npm run generate-sitemap
 ## Testing SEO
 
 ### 1. Google Search Console
-1. Submit sitemap: `https://pricewhisperer.microscaler.io/sitemap.xml`
+1. Submit sitemap: `https://rerp.microscaler.io/sitemap.xml`
 2. Monitor indexing status
 3. Check for errors
 

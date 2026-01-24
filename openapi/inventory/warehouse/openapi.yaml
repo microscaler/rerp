@@ -10,7 +10,7 @@ tags: []
 paths:
   /warehouses:
     get:
-      operationId: listWarehouses
+      operationId: list_warehouses
       summary: List warehouses
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWarehouse
+      operationId: create_warehouse
       summary: Create warehouse
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /warehouses/{id}:
     get:
-      operationId: getWarehouse
+      operationId: get_warehouse
       summary: Get warehouse by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWarehouse
+      operationId: update_warehouse
       summary: Update warehouse
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWarehouse
+      operationId: delete_warehouse
       summary: Delete warehouse
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /locations:
     get:
-      operationId: listLocations
+      operationId: list_locations
       summary: List locations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLocation
+      operationId: create_location
       summary: Create location
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /locations/{id}:
     get:
-      operationId: getLocation
+      operationId: get_location
       summary: Get location by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLocation
+      operationId: update_location
       summary: Update location
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLocation
+      operationId: delete_location
       summary: Delete location
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /transfers:
     get:
-      operationId: listTransfers
+      operationId: list_transfers
       summary: List transfers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTransfer
+      operationId: create_transfer
       summary: Create transfer
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /transfers/{id}:
     get:
-      operationId: getTransfer
+      operationId: get_transfer
       summary: Get transfer by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTransfer
+      operationId: update_transfer
       summary: Update transfer
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTransfer
+      operationId: delete_transfer
       summary: Delete transfer
       parameters:
       - name: id

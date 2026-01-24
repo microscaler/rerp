@@ -1,0 +1,7 @@
+apiVersion: v2
+name: rerp-microservice
+description: A Helm chart for RERP accounting microservices
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+

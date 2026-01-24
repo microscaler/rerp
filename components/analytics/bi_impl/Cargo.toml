@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "bi"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_analytics_bi = { path = "../bi" }

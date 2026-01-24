@@ -29,7 +29,7 @@ tags: []
 paths:
   /payment-methods:
     get:
-      operationId: listPaymentMethods
+      operationId: list_payment_methods
       summary: List payment-methods
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     post:
-      operationId: createPaymentMethod
+      operationId: create_payment_method
       summary: Create payment-method
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/pos/payment-gateway
   /payment-methods/{id}:
     get:
-      operationId: getPaymentMethod
+      operationId: get_payment_method
       summary: Get payment-method by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     put:
-      operationId: updatePaymentMethod
+      operationId: update_payment_method
       summary: Update payment-method
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     delete:
-      operationId: deletePaymentMethod
+      operationId: delete_payment_method
       summary: Delete payment-method
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/pos/payment-gateway
   /payments:
     get:
-      operationId: listPayments
+      operationId: list_payments
       summary: List payments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     post:
-      operationId: createPayment
+      operationId: create_payment
       summary: Create payment
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/pos/payment-gateway
   /payments/{id}:
     get:
-      operationId: getPayment
+      operationId: get_payment
       summary: Get payment by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     put:
-      operationId: updatePayment
+      operationId: update_payment
       summary: Update payment
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     delete:
-      operationId: deletePayment
+      operationId: delete_payment
       summary: Delete payment
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/pos/payment-gateway
   /pos-orders:
     get:
-      operationId: listPosOrders
+      operationId: list_pos_orders
       summary: List pos-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     post:
-      operationId: createPosOrder
+      operationId: create_pos_order
       summary: Create pos-order
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /pos-orders/{id}:
     get:
-      operationId: getPosOrder
+      operationId: get_pos_order
       summary: Get pos-order by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     put:
-      operationId: updatePosOrder
+      operationId: update_pos_order
       summary: Update pos-order
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     delete:
-      operationId: deletePosOrder
+      operationId: delete_pos_order
       summary: Delete pos-order
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /pos-sessions:
     get:
-      operationId: listPosSessions
+      operationId: list_pos_sessions
       summary: List pos-sessions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     post:
-      operationId: createPosSession
+      operationId: create_pos_session
       summary: Create pos-session
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /pos-sessions/{id}:
     get:
-      operationId: getPosSession
+      operationId: get_pos_session
       summary: Get pos-session by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     put:
-      operationId: updatePosSession
+      operationId: update_pos_session
       summary: Update pos-session
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     delete:
-      operationId: deletePosSession
+      operationId: delete_pos_session
       summary: Delete pos-session
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /receipts:
     get:
-      operationId: listReceipts
+      operationId: list_receipts
       summary: List receipts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     post:
-      operationId: createReceipt
+      operationId: create_receipt
       summary: Create receipt
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /receipts/{id}:
     get:
-      operationId: getReceipt
+      operationId: get_receipt
       summary: Get receipt by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     put:
-      operationId: updateReceipt
+      operationId: update_receipt
       summary: Update receipt
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/pos/core
     delete:
-      operationId: deleteReceipt
+      operationId: delete_receipt
       summary: Delete receipt
       parameters:
       - name: id
@@ -599,7 +599,7 @@ paths:
       x-service-base-path: /api/v1/pos/core
   /transactions:
     get:
-      operationId: listTransactions
+      operationId: list_transactions
       summary: List transactions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -626,7 +626,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     post:
-      operationId: createTransaction
+      operationId: create_transaction
       summary: Create transaction
       requestBody:
         required: true
@@ -647,7 +647,7 @@ paths:
       x-service-base-path: /api/v1/pos/payment-gateway
   /transactions/{id}:
     get:
-      operationId: getTransaction
+      operationId: get_transaction
       summary: Get transaction by id
       parameters:
       - name: id
@@ -668,7 +668,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     put:
-      operationId: updateTransaction
+      operationId: update_transaction
       summary: Update transaction
       parameters:
       - name: id
@@ -695,7 +695,7 @@ paths:
       x-service: payment-gateway
       x-service-base-path: /api/v1/pos/payment-gateway
     delete:
-      operationId: deleteTransaction
+      operationId: delete_transaction
       summary: Delete transaction
       parameters:
       - name: id

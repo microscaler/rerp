@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "cleaning"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_data_cleaning = { path = "../cleaning" }

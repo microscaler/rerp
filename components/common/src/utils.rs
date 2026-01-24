@@ -7,5 +7,5 @@ pub fn current_timestamp() -> DateTime<Utc> {
 }
 
 pub fn format_currency(amount: f64, currency: &str) -> String {
-    format!("{} {:.2}", currency, amount)
+    format!("{currency} {amount:.2}")
 }

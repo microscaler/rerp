@@ -10,7 +10,7 @@ tags: []
 paths:
   /shipments:
     get:
-      operationId: listShipments
+      operationId: list_shipments
       summary: List shipments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createShipment
+      operationId: create_shipment
       summary: Create shipment
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /shipments/{id}:
     get:
-      operationId: getShipment
+      operationId: get_shipment
       summary: Get shipment by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateShipment
+      operationId: update_shipment
       summary: Update shipment
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteShipment
+      operationId: delete_shipment
       summary: Delete shipment
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /carriers:
     get:
-      operationId: listCarriers
+      operationId: list_carriers
       summary: List carriers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCarrier
+      operationId: create_carrier
       summary: Create carrier
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /carriers/{id}:
     get:
-      operationId: getCarrier
+      operationId: get_carrier
       summary: Get carrier by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCarrier
+      operationId: update_carrier
       summary: Update carrier
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCarrier
+      operationId: delete_carrier
       summary: Delete carrier
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /shipping-rates:
     get:
-      operationId: listShippingRates
+      operationId: list_shipping_rates
       summary: List shipping-rates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createShippingRate
+      operationId: create_shipping_rate
       summary: Create shipping-rate
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /shipping-rates/{id}:
     get:
-      operationId: getShippingRate
+      operationId: get_shipping_rate
       summary: Get shipping-rate by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateShippingRate
+      operationId: update_shipping_rate
       summary: Update shipping-rate
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteShippingRate
+      operationId: delete_shipping_rate
       summary: Delete shipping-rate
       parameters:
       - name: id

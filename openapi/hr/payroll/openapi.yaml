@@ -10,7 +10,7 @@ tags: []
 paths:
   /payslips:
     get:
-      operationId: listPayslips
+      operationId: list_payslips
       summary: List payslips
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPayslip
+      operationId: create_payslip
       summary: Create payslip
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /payslips/{id}:
     get:
-      operationId: getPayslip
+      operationId: get_payslip
       summary: Get payslip by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePayslip
+      operationId: update_payslip
       summary: Update payslip
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePayslip
+      operationId: delete_payslip
       summary: Delete payslip
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /salary-rules:
     get:
-      operationId: listSalaryRules
+      operationId: list_salary_rules
       summary: List salary-rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSalaryRule
+      operationId: create_salary_rule
       summary: Create salary-rule
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /salary-rules/{id}:
     get:
-      operationId: getSalaryRule
+      operationId: get_salary_rule
       summary: Get salary-rule by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSalaryRule
+      operationId: update_salary_rule
       summary: Update salary-rule
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSalaryRule
+      operationId: delete_salary_rule
       summary: Delete salary-rule
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /deductions:
     get:
-      operationId: listDeductions
+      operationId: list_deductions
       summary: List deductions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createDeduction
+      operationId: create_deduction
       summary: Create deduction
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /deductions/{id}:
     get:
-      operationId: getDeduction
+      operationId: get_deduction
       summary: Get deduction by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateDeduction
+      operationId: update_deduction
       summary: Update deduction
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteDeduction
+      operationId: delete_deduction
       summary: Delete deduction
       parameters:
       - name: id

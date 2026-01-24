@@ -1,0 +1,16 @@
+service:
+  name: amd
+  port: 8013
+  containerPort: 8013
+  nodePort: 31013
+image:
+  repository: localhost:5001
+  name: pricewhisperer-amd
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+app:
+  binaryName: account_management_domain_service_api
+  serviceName: amd

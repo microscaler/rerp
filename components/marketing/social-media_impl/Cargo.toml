@@ -6,6 +6,7 @@ edition = "2021"
 [[bin]]
 name = "social_media"
 path = "src/main.rs"
+doc = false
 
 [dependencies]
 rerp_marketing_social_media = { path = "../social-media" }
