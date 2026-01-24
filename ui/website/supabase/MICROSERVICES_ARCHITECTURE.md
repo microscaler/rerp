@@ -1,4 +1,4 @@
-# PriceWhisperer Microservices Architecture Analysis
+# RERP Microservices Architecture
 
 ## Executive Summary
 

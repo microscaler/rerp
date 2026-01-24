@@ -20,6 +20,63 @@ tilt_port = cfg.get('tilt_port', '10352')  # Default to 10352 to avoid conflicts
 os.putenv('TILT_PORT', tilt_port)
 
 # ====================
+# Tooling (rerp CLI)
+# ====================
+# Rebuild on tooling src/pyproject changes. Run `just init` before first `tilt up`.
+local_resource(
+    'build-tooling',
+    'just build-tooling',
+    deps=[
+        './tooling/src',
+        './tooling/pyproject.toml',
+    ],
+    ignore=[
+        '**/*.pyc',
+        '**/__pycache__',
+        '**/.pytest_cache',
+    ],
+    labels=['tooling'],
+    allow_parallel=True,
+)
+
+# Ruff check --fix + format (fix in place). Same deps as build-tooling plus tests.
+local_resource(
+    'lint-tooling',
+    'just lint-fix && just format',
+    deps=[
+        './tooling/src',
+        './tooling/tests',
+        './tooling/pyproject.toml',
+    ],
+    ignore=[
+        '**/*.pyc',
+        '**/__pycache__',
+        '**/.pytest_cache',
+    ],
+    labels=['tooling'],
+    allow_parallel=True,
+)
+
+# Pytest for tooling (rerp_tooling).
+local_resource(
+    'test-tooling',
+    'tooling/.venv/bin/pytest tooling/tests -v --tb=short',
+    deps=[
+        './tooling/src',
+        './tooling/tests',
+        './tooling/pyproject.toml',
+    ],
+    ignore=[
+        '**/*.pyc',
+        '**/__pycache__',
+        '**/.pytest_cache',
+        '**/.coverage',
+    ],
+    labels=['tooling'],
+    allow_parallel=True,
+)
+
+# ====================
 # Base Docker Image
 # ====================
 # Note: Base image is not currently used - each service builds its own image
@@ -33,118 +90,6 @@ os.putenv('TILT_PORT', tilt_port)
 #         './docker/base',
 #     ],
 # )
-
-# ====================
-# Microservices Build System
-# ====================
-
-# Helper function to create build resources for a microservice
-def create_microservice_build(system, module, port=8000):
-    """Create build resources for a RERP microservice."""
-    
-    # Convert module name to binary name
-    binary_name = 'rerp_%s_%s_impl' % (system, module.replace('-', '_'))
-    hash_path = './build_artifacts/%s.sha256' % binary_name
-    artifact_path = './build_artifacts/%s' % binary_name
-    dockerfile = './docker/microservices/Dockerfile.%s_%s' % (system, module)
-    image_name = 'localhost:5001/rerp-%s-%s' % (system, module)
-    
-    # Build workspace (all microservices at once) - only runs once
-    local_resource(
-        'workspace-build',
-        cmd='''
-            echo "🔨 Building all RERP microservices..."
-            python3 ./scripts/host-aware-build.py workspace amd64
-            echo "✅ Workspace build complete"
-        ''',
-        deps=[
-            './components/Cargo.toml',
-            './components/**/*.rs',
-            './scripts/host-aware-build.py',
-        ],
-        ignore=[
-            './components/target',
-            './build_artifacts',
-        ],
-        labels=['microservices-build'],
-        allow_parallel=False,
-    )
-    
-    # Copy binary to build_artifacts
-    local_resource(
-        '%s-%s-copy' % (system, module),
-        cmd='''
-            echo "📦 Copying %s-%s binary..."
-            ./scripts/copy-microservice-binary.sh %s %s
-            echo "✅ Binary copied"
-        ''' % (system, module, system, module),
-        deps=[
-            './components/target/x86_64-unknown-linux-musl/release/%s' % binary_name,
-            './scripts/copy-microservice-binary.sh',
-        ],
-        resource_deps=['workspace-build'],
-        labels=['microservices-build'],
-        allow_parallel=True,
-    )
-    
-    # Generate Dockerfile if it doesn't exist
-    local_resource(
-        '%s-%s-dockerfile' % (system, module),
-        cmd='''
-            echo "📝 Generating Dockerfile for %s-%s..."
-            python3 ./scripts/generate-dockerfile.py %s %s %s
-            echo "✅ Dockerfile generated"
-        ''' % (system, module, system, module, port),
-        deps=[
-            './docker/microservices/Dockerfile.template',
-            './scripts/generate-dockerfile.py',
-        ],
-        ignore=[dockerfile],  # Don't watch the generated file
-        labels=['microservices-docker'],
-        allow_parallel=True,
-    )
-    
-    # Build and push Docker image
-    local_resource(
-        '%s-%s-docker' % (system, module),
-        cmd='''
-            echo "🔨 Building Docker image for %s-%s..."
-            ./scripts/build-microservice-docker.sh %s %s %s %s
-            echo "✅ Docker image built and pushed"
-        ''' % (system, module, system, module, image_name, port),
-        deps=[
-            hash_path,
-            artifact_path,
-            dockerfile,
-            './scripts/build-microservice-docker.sh',
-        ],
-        resource_deps=[
-            '%s-%s-copy' % (system, module),
-            '%s-%s-dockerfile' % (system, module),
-        ],
-        labels=['microservices-docker'],
-        allow_parallel=True,
-    )
-    
-    # Build Docker image for Tilt
-    docker_build(
-        image_name,
-        '.',
-        dockerfile=dockerfile,
-        platform='linux/amd64',
-        only=[
-            artifact_path,
-            './components/%s/%s_impl/config' % (system, module),
-            './components/%s/%s/doc' % (system, module),
-            './components/%s/%s_impl/static_site' % (system, module),
-            dockerfile,
-        ],
-        resource_deps=[
-            '%s-%s-docker' % (system, module),
-        ],
-    )
-    
-    return image_name
 
 # ====================
 # Microservices Code Generation (BRRTRouter)
@@ -197,14 +142,14 @@ def create_microservice_gen(name, spec_file, output_dir):
             # Fix Cargo.toml paths to point to BRRTRouter repository
             echo "🔧 Fixing Cargo.toml dependency paths..."
             if [ -f ./microservices/accounting/%s/Cargo.toml ]; then
-                python3 ./scripts/fix_cargo_toml_paths.py ./microservices/accounting/%s/Cargo.toml
+                tooling/.venv/bin/rerp ci fix-cargo-paths ./microservices/accounting/%s/Cargo.toml
             fi
             
             echo "✅ %s service regeneration complete"
         ''' % (name, spec_file, output_dir, spec_file, output_dir, output_dir, output_dir, name),
         deps=[
             './openapi/%s' % spec_file,
-            './scripts/fix_cargo_toml_paths.py',
+            'tooling/pyproject.toml',
         ],
         ignore=[
             './microservices/accounting/%s/src' % output_dir,  # Don't watch generated files
@@ -265,17 +210,17 @@ def get_service_port(name):
 
 # Helper function to create build resource for a microservice
 def create_microservice_build_resource(name):
-    # Build the service binary. build-microservice.sh maps name -> Cargo [package] name and
+    # Build the service binary. rerp build microservice maps name -> Cargo [package] and
     # emits to microservices/target/x86_64-unknown-linux-musl/debug/<package_name>.
     # create_microservice_deployment's copy step uses PACKAGE_NAMES for that path and
     # BINARY_NAMES for build_artifacts/amd64/<binary_name> (Docker/Helm).
     local_resource(
         'build-%s' % name,
-        './scripts/build-microservice.sh %s' % name,
+        'tooling/.venv/bin/rerp build microservice %s' % name,
         deps=[
             './microservices/accounting/%s/Cargo.toml' % name,
             './microservices/accounting/%s/src' % name,
-            './scripts/build-microservice.sh',
+            'tooling/pyproject.toml',
         ],
         ignore=[
             './microservices/target',
@@ -301,8 +246,8 @@ def create_microservice_deployment(name):
     hash_path = 'build_artifacts/amd64/%s.sha256' % binary_name
     local_resource(
         'copy-%s' % name,
-        './scripts/copy-microservice-binary-simple.sh %s %s %s' % (target_path, artifact_path, binary_name),
-        deps=[target_path, './scripts/copy-microservice-binary-simple.sh'],
+        'tooling/.venv/bin/rerp docker copy-binary %s %s %s' % (target_path, artifact_path, binary_name),
+        deps=[target_path, 'tooling/pyproject.toml'],
         resource_deps=['build-%s' % name],
         labels=['acc_' + name],
         allow_parallel=True,
@@ -311,8 +256,8 @@ def create_microservice_deployment(name):
     # 2. Build and push Docker image
     local_resource(
         'docker-%s' % name,
-        './scripts/build-microservice-docker-simple.sh %s %s %s %s' % (image_name, dockerfile, hash_path, artifact_path),
-        deps=[hash_path, artifact_path, dockerfile, './scripts/build-microservice-docker-simple.sh'],
+        'tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s' % (image_name, dockerfile, hash_path, artifact_path),
+        deps=[hash_path, artifact_path, dockerfile, 'tooling/pyproject.toml'],
         resource_deps=['copy-%s' % name],
         labels=['acc_' + name],
         allow_parallel=False,
@@ -323,8 +268,8 @@ def create_microservice_deployment(name):
     # or, if registry is not running, use kind load (no registry needed)
     custom_build(
         image_name,
-        ('(docker image inspect %s:tilt >/dev/null 2>&1) || ./scripts/build-microservice-docker-simple.sh %s %s %s %s' % (image_name, image_name, dockerfile, hash_path, artifact_path)
-         + ' && (docker push $EXPECTED_REF 2>/dev/null || kind load docker-image $EXPECTED_REF --name rerp)'),
+        ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s' % (image_name, image_name, dockerfile, hash_path, artifact_path)
+         + ' && (docker push %s:tilt 2>/dev/null || kind load docker-image %s:tilt --name rerp)' % (image_name, image_name)),
         deps=[artifact_path, hash_path, 'microservices/accounting/%s/config' % name, 'microservices/accounting/%s/doc' % name, 'microservices/accounting/%s/static_site' % name],
         tag='tilt',
         live_update=[
@@ -452,3 +397,21 @@ local_resource(
 create_microservice_gen('bff', 'accounting/openapi_bff.yaml', 'bff')
 create_microservice_build_resource('bff')
 create_microservice_deployment('bff')
+
+# ====================
+# Website (UI)
+# ====================
+# SolidJS site in docker/website; build and push to localhost:5001 or kind-load
+custom_build(
+    'localhost:5001/rerp-website',
+    'docker build -f docker/website/Dockerfile -t localhost:5001/rerp-website:tilt . && (docker push localhost:5001/rerp-website:tilt 2>/dev/null || kind load docker-image localhost:5001/rerp-website:tilt --name rerp)',
+    deps=['./ui/website', './ui/shared', './docker/website'],
+    tag='tilt',
+)
+
+k8s_yaml('k8s/website.yaml')
+k8s_resource(
+    'website',
+    port_forwards=['3000:8080'],
+    labels=['ui'],
+)

@@ -34,21 +34,24 @@ docker build -t rerp/base:latest -f docker/base/Dockerfile .
 
 Service-specific Dockerfiles are generated from the template using:
 ```bash
-python3 scripts/generate-dockerfile.py <system> <module> [port]
+rerp docker generate-dockerfile <system> <module> [--port N]
 ```
 
 Example:
 ```bash
-python3 scripts/generate-dockerfile.py auth idam 8000
+rerp docker generate-dockerfile auth idam --port 8000
 ```
 
-This generates `docker/microservices/Dockerfile.auth_idam`.
+This generates `docker/microservices/Dockerfile.auth_idam`. Run from repo root after `just init`.
 
 ## Build Process
 
-1. **Build Rust binaries**: `python3 scripts/host-aware-build.py <system>_<module> [architecture]`
-2. **Copy binaries**: `scripts/copy-multiarch-binary.sh <system> <module>` (for multi-arch) or `scripts/copy-microservice-binary.sh <system> <module>` (amd64 only)
-3. **Build Docker image**: `scripts/build-multiarch-docker.sh <system> <module> <image_name> [tag] [push]` (for multi-arch) or `scripts/build-microservice-docker.sh <system> <module> <image_name> [port]` (amd64 only)
+**Tilt flow (single-arch, local/Kind):** Tilt runs `rerp docker copy-binary` and `rerp docker build-image-simple`; see `Tiltfile` and `tooling/README.md`.
+
+**Manual / multi-arch (components, e.g. auth_idam):**
+1. **Build Rust binaries**: `tooling/.venv/bin/rerp build <system>_<module> [arch]` (run `just init` first). Use `all` for amd64+arm64+arm7.
+2. **Copy binaries**: `tooling/.venv/bin/rerp docker copy-multiarch <system> <module> [arch]` (arch: amd64, arm64, arm7, or all).
+3. **Build Docker image**: `tooling/.venv/bin/rerp docker build-multiarch <system> <module> <image_name> [--tag N] [--push]`.
 
 The build process:
 - Cross-compiles Rust binaries to `x86_64-unknown-linux-musl`

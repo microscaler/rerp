@@ -1,7 +1,7 @@
 # Minimal runtime-only Dockerfile for {{service_name}} Service (Tilt development)
 # Binary is cross-compiled on host and copied in.
 # This file is a template. Generate service-specific Dockerfiles using:
-#   scripts/generate-dockerfile.py <system> <module>
+#   rerp docker generate-dockerfile <system> <module> [--port N]
 #
 # Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
 

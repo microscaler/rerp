@@ -2,11 +2,11 @@ openapi: 3.1.0
 info:
   title: Accounting API Gateway
   description: 'Comprehensive financial management including general ledger, accounts payable/receivable, financial reporting,
-    and compliance.. This aggregates and proxies requests to Accounting microservices. This is the single entry point for
-    the Accounting system.
+    and compliance.. This aggregates and proxies requests to Accounting microservices. Single entry point for the Accounting
+    system.
 
 
-    All requests are proxied to the appropriate sub-service:
+    All requests proxied to sub-services:
 
     - `/api/v1/accounting/accounts-payable/*` → AccountsPayable Service
 
@@ -27,15 +27,10 @@ info:
     - `/api/v1/accounting/invoice/*` → Invoice Service
 
 
-    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
-    on next generation.
+    **Note**: Auto-generated. Do not edit manually.
 
 
-    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
-    output.
-
-
-    **Service Discovery**: Sub-services are discovered from openapi/accounting/ directory.'
+    **Discovery**: openapi/accounting/'
   version: 1.0.0
 servers:
 - url: /api/v1/accounting
@@ -9820,7 +9815,7 @@ components:
         details:
           type: object
           nullable: true
-          description: Additional error details
+          description: Additional details
           additionalProperties: true
     FinancialReportsCreateFinancialStatementRequest:
       type: object
