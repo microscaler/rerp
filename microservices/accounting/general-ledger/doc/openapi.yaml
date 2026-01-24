@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Core accounting service managing general ledger and journal entries.
 servers:
+- url: http://localhost:8001/api/v1/accounting/general-ledger
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/general-ledger
   description: General Ledger API
 tags: []
@@ -39,30 +41,30 @@ paths:
                   summary: Acme Corporation - Large enterprise accounts
                   value:
                     items:
-                      - id: "a0070e8400-e29b-41d4-a716-446655440000"
-                        chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1010"
-                        name: "Cash - Operating Account"
-                        account_type: "ASSET"
-                        normal_balance: "DEBIT"
-                        currency_code: "USD"
-                        is_active: true
-                        is_system_account: false
-                        description: "Primary operating cash account"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
-                      - id: "a0071e8400-e29b-41d4-a716-446655440001"
-                        chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1200"
-                        name: "Accounts Receivable"
-                        account_type: "ASSET"
-                        normal_balance: "DEBIT"
-                        currency_code: "USD"
-                        is_active: true
-                        is_system_account: false
-                        description: "Trade receivables from customers"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
+                    - id: a0070e8400-e29b-41d4-a716-446655440000
+                      chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1010'
+                      name: Cash - Operating Account
+                      account_type: ASSET
+                      normal_balance: DEBIT
+                      currency_code: USD
+                      is_active: true
+                      is_system_account: false
+                      description: Primary operating cash account
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
+                    - id: a0071e8400-e29b-41d4-a716-446655440001
+                      chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1200'
+                      name: Accounts Receivable
+                      account_type: ASSET
+                      normal_balance: DEBIT
+                      currency_code: USD
+                      is_active: true
+                      is_system_account: false
+                      description: Trade receivables from customers
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
                     total: 2
                     page: 1
                     limit: 20
@@ -70,18 +72,18 @@ paths:
                   summary: TechStart Inc - Small business accounts
                   value:
                     items:
-                      - id: "b0070e8400-e29b-41d4-a716-446655440000"
-                        chart_of_account_id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1000"
-                        name: "Cash Account"
-                        account_type: "ASSET"
-                        normal_balance: "DEBIT"
-                        currency_code: "USD"
-                        is_active: true
-                        is_system_account: false
-                        description: "Main cash account"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0070e8400-e29b-41d4-a716-446655440000
+                      chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1000'
+                      name: Cash Account
+                      account_type: ASSET
+                      normal_balance: DEBIT
+                      currency_code: USD
+                      is_active: true
+                      is_system_account: false
+                      description: Main cash account
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -89,30 +91,30 @@ paths:
                   summary: Global Manufacturing - Multi-currency accounts
                   value:
                     items:
-                      - id: "c0070e8400-e29b-41d4-a716-446655440000"
-                        chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1010"
-                        name: "Cash - USD Account"
-                        account_type: "ASSET"
-                        normal_balance: "DEBIT"
-                        currency_code: "USD"
-                        is_active: true
-                        is_system_account: false
-                        description: "US Dollar cash account"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
-                      - id: "c0071e8400-e29b-41d4-a716-446655440001"
-                        chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1011"
-                        name: "Cash - EUR Account"
-                        account_type: "ASSET"
-                        normal_balance: "DEBIT"
-                        currency_code: "EUR"
-                        is_active: true
-                        is_system_account: false
-                        description: "Euro cash account"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c0070e8400-e29b-41d4-a716-446655440000
+                      chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1010'
+                      name: Cash - USD Account
+                      account_type: ASSET
+                      normal_balance: DEBIT
+                      currency_code: USD
+                      is_active: true
+                      is_system_account: false
+                      description: US Dollar cash account
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
+                    - id: c0071e8400-e29b-41d4-a716-446655440001
+                      chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1011'
+                      name: Cash - EUR Account
+                      account_type: ASSET
+                      normal_balance: DEBIT
+                      currency_code: EUR
+                      is_active: true
+                      is_system_account: false
+                      description: Euro cash account
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 2
                     page: 1
                     limit: 20
@@ -129,35 +131,35 @@ paths:
               acmeCorporationRequest:
                 summary: Create account for Acme Corporation
                 value:
-                  chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                  code: "1010"
-                  name: "Cash - Operating Account"
-                  account_type: "ASSET"
-                  normal_balance: "DEBIT"
-                  currency_code: "USD"
-                  description: "Primary operating cash account"
+                  chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                  code: '1010'
+                  name: Cash - Operating Account
+                  account_type: ASSET
+                  normal_balance: DEBIT
+                  currency_code: USD
+                  description: Primary operating cash account
                   is_active: true
               techStartRequest:
                 summary: Create account for TechStart Inc
                 value:
-                  chart_of_account_id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                  code: "1000"
-                  name: "Cash Account"
-                  account_type: "ASSET"
-                  normal_balance: "DEBIT"
-                  currency_code: "USD"
-                  description: "Main cash account"
+                  chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
+                  code: '1000'
+                  name: Cash Account
+                  account_type: ASSET
+                  normal_balance: DEBIT
+                  currency_code: USD
+                  description: Main cash account
                   is_active: true
               globalManufacturingRequest:
                 summary: Create multi-currency account
                 value:
-                  chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                  code: "1010"
-                  name: "Cash - USD Account"
-                  account_type: "ASSET"
-                  normal_balance: "DEBIT"
-                  currency_code: "USD"
-                  description: "US Dollar cash account"
+                  chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                  code: '1010'
+                  name: Cash - USD Account
+                  account_type: ASSET
+                  normal_balance: DEBIT
+                  currency_code: USD
+                  description: US Dollar cash account
                   is_active: true
       responses:
         '201':
@@ -170,48 +172,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation account created
                   value:
-                    id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - Operating Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: a0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - Operating Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Primary operating cash account"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    description: Primary operating cash account
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartResponse:
                   summary: TechStart account created
                   value:
-                    id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1000"
-                    name: "Cash Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: b0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1000'
+                    name: Cash Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Main cash account"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    description: Main cash account
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing account created
                   value:
-                    id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - USD Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: c0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - USD Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "US Dollar cash account"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    description: US Dollar cash account
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '400':
           description: Invalid request
   /accounts/{id}:
@@ -236,48 +238,48 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation account
                   value:
-                    id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - Operating Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: a0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - Operating Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Primary operating cash account"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    description: Primary operating cash account
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart account
                   value:
-                    id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1000"
-                    name: "Cash Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: b0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1000'
+                    name: Cash Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Main cash account"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    description: Main cash account
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing account
                   value:
-                    id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - USD Account"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: c0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - USD Account
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "US Dollar cash account"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    description: US Dollar cash account
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -300,20 +302,20 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation account
                 value:
-                  name: "Cash - Operating Account (Updated)"
-                  description: "Updated description"
+                  name: Cash - Operating Account (Updated)
+                  description: Updated description
                   is_active: true
               techStartUpdate:
                 summary: Update TechStart account
                 value:
-                  name: "Cash Account (Updated)"
-                  description: "Updated description"
+                  name: Cash Account (Updated)
+                  description: Updated description
                   is_active: true
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing account
                 value:
-                  name: "Cash - USD Account (Updated)"
-                  description: "Updated description"
+                  name: Cash - USD Account (Updated)
+                  description: Updated description
                   is_active: true
       responses:
         '200':
@@ -326,48 +328,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation account updated
                   value:
-                    id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - Operating Account (Updated)"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: a0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - Operating Account (Updated)
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Updated description"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart account updated
                   value:
-                    id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1000"
-                    name: "Cash Account (Updated)"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: b0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1000'
+                    name: Cash Account (Updated)
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Updated description"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing account updated
                   value:
-                    id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    chart_of_account_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1010"
-                    name: "Cash - USD Account (Updated)"
-                    account_type: "ASSET"
-                    normal_balance: "DEBIT"
-                    currency_code: "USD"
+                    id: c0070e8400-e29b-41d4-a716-446655440000
+                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1010'
+                    name: Cash - USD Account (Updated)
+                    account_type: ASSET
+                    normal_balance: DEBIT
+                    currency_code: USD
                     is_active: true
                     is_system_account: false
-                    description: "Updated description"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -416,35 +418,35 @@ paths:
                   summary: Acme Corporation - Large enterprise journal entries
                   value:
                     items:
-                      - id: "a0080e8400-e29b-41d4-a716-446655440000"
-                        entry_number: "JE-2024-001"
-                        entry_date: "2024-01-15"
-                        description: "Monthly accrual entry"
-                        status: "POSTED"
-                        total_debit: 5000.00
-                        total_credit: 5000.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        source_type: "MANUAL"
-                        posted_at: "2024-01-15T10:00:00Z"
-                        created_at: "2024-01-15T09:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
-                      - id: "a0081e8400-e29b-41d4-a716-446655440001"
-                        entry_number: "JE-2024-002"
-                        entry_date: "2024-01-16"
-                        description: "Invoice posting entry"
-                        status: "POSTED"
-                        total_debit: 1200.00
-                        total_credit: 1200.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        source_type: "INVOICE"
-                        source_id: "a0010e8400-e29b-41d4-a716-446655440000"
-                        posted_at: "2024-01-16T11:00:00Z"
-                        created_at: "2024-01-16T10:00:00Z"
-                        updated_at: "2024-01-16T11:00:00Z"
+                    - id: a0080e8400-e29b-41d4-a716-446655440000
+                      entry_number: JE-2024-001
+                      entry_date: '2024-01-15'
+                      description: Monthly accrual entry
+                      status: POSTED
+                      total_debit: 5000.0
+                      total_credit: 5000.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      source_type: MANUAL
+                      posted_at: '2024-01-15T10:00:00Z'
+                      created_at: '2024-01-15T09:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
+                    - id: a0081e8400-e29b-41d4-a716-446655440001
+                      entry_number: JE-2024-002
+                      entry_date: '2024-01-16'
+                      description: Invoice posting entry
+                      status: POSTED
+                      total_debit: 1200.0
+                      total_credit: 1200.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      source_type: INVOICE
+                      source_id: a0010e8400-e29b-41d4-a716-446655440000
+                      posted_at: '2024-01-16T11:00:00Z'
+                      created_at: '2024-01-16T10:00:00Z'
+                      updated_at: '2024-01-16T11:00:00Z'
                     total: 2
                     page: 1
                     limit: 20
@@ -452,19 +454,19 @@ paths:
                   summary: TechStart Inc - Small business journal entries
                   value:
                     items:
-                      - id: "b0080e8400-e29b-41d4-a716-446655440000"
-                        entry_number: "JE-2024-100"
-                        entry_date: "2024-01-20"
-                        description: "Monthly adjustment"
-                        status: "DRAFT"
-                        total_debit: 500.00
-                        total_credit: 500.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        source_type: "MANUAL"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0080e8400-e29b-41d4-a716-446655440000
+                      entry_number: JE-2024-100
+                      entry_date: '2024-01-20'
+                      description: Monthly adjustment
+                      status: DRAFT
+                      total_debit: 500.0
+                      total_credit: 500.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      source_type: MANUAL
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -472,20 +474,20 @@ paths:
                   summary: Global Manufacturing - Multi-currency journal entries
                   value:
                     items:
-                      - id: "c0080e8400-e29b-41d4-a716-446655440000"
-                        entry_number: "JE-2024-200"
-                        entry_date: "2024-01-25"
-                        description: "Multi-currency invoice entry"
-                        status: "POSTED"
-                        total_debit: 10000.00
-                        total_credit: 10000.00
-                        currency_code: "EUR"
-                        exchange_rate: 0.92
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        source_type: "INVOICE"
-                        posted_at: "2024-01-25T08:00:00Z"
-                        created_at: "2024-01-25T07:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c0080e8400-e29b-41d4-a716-446655440000
+                      entry_number: JE-2024-200
+                      entry_date: '2024-01-25'
+                      description: Multi-currency invoice entry
+                      status: POSTED
+                      total_debit: 10000.0
+                      total_credit: 10000.0
+                      currency_code: EUR
+                      exchange_rate: 0.92
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      source_type: INVOICE
+                      posted_at: '2024-01-25T08:00:00Z'
+                      created_at: '2024-01-25T07:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -502,33 +504,33 @@ paths:
               acmeCorporationRequest:
                 summary: Create journal entry for Acme Corporation
                 value:
-                  entry_number: "JE-2024-001"
-                  entry_date: "2024-01-15"
-                  description: "Monthly accrual entry"
-                  currency_code: "USD"
+                  entry_number: JE-2024-001
+                  entry_date: '2024-01-15'
+                  description: Monthly accrual entry
+                  currency_code: USD
                   exchange_rate: 1.0
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
-                  source_type: "MANUAL"
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
+                  source_type: MANUAL
               techStartRequest:
                 summary: Create journal entry for TechStart Inc
                 value:
-                  entry_number: "JE-2024-100"
-                  entry_date: "2024-01-20"
-                  description: "Monthly adjustment"
-                  currency_code: "USD"
+                  entry_number: JE-2024-100
+                  entry_date: '2024-01-20'
+                  description: Monthly adjustment
+                  currency_code: USD
                   exchange_rate: 1.0
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
-                  source_type: "MANUAL"
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
+                  source_type: MANUAL
               globalManufacturingRequest:
                 summary: Create multi-currency journal entry
                 value:
-                  entry_number: "JE-2024-200"
-                  entry_date: "2024-01-25"
-                  description: "Multi-currency invoice entry"
-                  currency_code: "EUR"
+                  entry_number: JE-2024-200
+                  entry_date: '2024-01-25'
+                  description: Multi-currency invoice entry
+                  currency_code: EUR
                   exchange_rate: 0.92
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
-                  source_type: "INVOICE"
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
+                  source_type: INVOICE
       responses:
         '201':
           description: JournalEntry created
@@ -540,51 +542,51 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation journal entry created
                   value:
-                    id: "a0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-001"
-                    entry_date: "2024-01-15"
-                    description: "Monthly accrual entry"
-                    status: "DRAFT"
-                    total_debit: 0.00
-                    total_credit: 0.00
-                    currency_code: "USD"
+                    id: a0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-001
+                    entry_date: '2024-01-15'
+                    description: Monthly accrual entry
+                    status: DRAFT
+                    total_debit: 0.0
+                    total_credit: 0.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    source_type: "MANUAL"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    source_type: MANUAL
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartResponse:
                   summary: TechStart journal entry created
                   value:
-                    id: "b0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-100"
-                    entry_date: "2024-01-20"
-                    description: "Monthly adjustment"
-                    status: "DRAFT"
-                    total_debit: 0.00
-                    total_credit: 0.00
-                    currency_code: "USD"
+                    id: b0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-100
+                    entry_date: '2024-01-20'
+                    description: Monthly adjustment
+                    status: DRAFT
+                    total_debit: 0.0
+                    total_credit: 0.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    source_type: "MANUAL"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    source_type: MANUAL
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing journal entry created
                   value:
-                    id: "c0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-200"
-                    entry_date: "2024-01-25"
-                    description: "Multi-currency invoice entry"
-                    status: "DRAFT"
-                    total_debit: 0.00
-                    total_credit: 0.00
-                    currency_code: "EUR"
+                    id: c0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-200
+                    entry_date: '2024-01-25'
+                    description: Multi-currency invoice entry
+                    status: DRAFT
+                    total_debit: 0.0
+                    total_credit: 0.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    source_type: "INVOICE"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    source_type: INVOICE
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '400':
           description: Invalid request
   /journal-entrys/{id}:
@@ -609,53 +611,53 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation journal entry
                   value:
-                    id: "a0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-001"
-                    entry_date: "2024-01-15"
-                    description: "Monthly accrual entry"
-                    status: "POSTED"
-                    total_debit: 5000.00
-                    total_credit: 5000.00
-                    currency_code: "USD"
+                    id: a0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-001
+                    entry_date: '2024-01-15'
+                    description: Monthly accrual entry
+                    status: POSTED
+                    total_debit: 5000.0
+                    total_credit: 5000.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    source_type: "MANUAL"
-                    posted_at: "2024-01-15T10:00:00Z"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    source_type: MANUAL
+                    posted_at: '2024-01-15T10:00:00Z'
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart journal entry
                   value:
-                    id: "b0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-100"
-                    entry_date: "2024-01-20"
-                    description: "Monthly adjustment"
-                    status: "DRAFT"
-                    total_debit: 500.00
-                    total_credit: 500.00
-                    currency_code: "USD"
+                    id: b0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-100
+                    entry_date: '2024-01-20'
+                    description: Monthly adjustment
+                    status: DRAFT
+                    total_debit: 500.0
+                    total_credit: 500.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    source_type: "MANUAL"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    source_type: MANUAL
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing journal entry
                   value:
-                    id: "c0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-200"
-                    entry_date: "2024-01-25"
-                    description: "Multi-currency invoice entry"
-                    status: "POSTED"
-                    total_debit: 10000.00
-                    total_credit: 10000.00
-                    currency_code: "EUR"
+                    id: c0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-200
+                    entry_date: '2024-01-25'
+                    description: Multi-currency invoice entry
+                    status: POSTED
+                    total_debit: 10000.0
+                    total_credit: 10000.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    source_type: "INVOICE"
-                    posted_at: "2024-01-25T08:00:00Z"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    source_type: INVOICE
+                    posted_at: '2024-01-25T08:00:00Z'
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -678,21 +680,21 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation journal entry
                 value:
-                  description: "Monthly accrual entry (Updated)"
-                  status: "POSTED"
-                  posted_at: "2024-01-15T10:00:00Z"
+                  description: Monthly accrual entry (Updated)
+                  status: POSTED
+                  posted_at: '2024-01-15T10:00:00Z'
               techStartUpdate:
                 summary: Update TechStart journal entry
                 value:
-                  description: "Monthly adjustment (Updated)"
-                  status: "POSTED"
-                  posted_at: "2024-01-20T10:00:00Z"
+                  description: Monthly adjustment (Updated)
+                  status: POSTED
+                  posted_at: '2024-01-20T10:00:00Z'
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing journal entry
                 value:
-                  description: "Multi-currency invoice entry (Updated)"
-                  status: "POSTED"
-                  posted_at: "2024-01-25T09:00:00Z"
+                  description: Multi-currency invoice entry (Updated)
+                  status: POSTED
+                  posted_at: '2024-01-25T09:00:00Z'
       responses:
         '200':
           description: JournalEntry updated
@@ -704,54 +706,54 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation journal entry updated
                   value:
-                    id: "a0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-001"
-                    entry_date: "2024-01-15"
-                    description: "Monthly accrual entry (Updated)"
-                    status: "POSTED"
-                    total_debit: 5000.00
-                    total_credit: 5000.00
-                    currency_code: "USD"
+                    id: a0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-001
+                    entry_date: '2024-01-15'
+                    description: Monthly accrual entry (Updated)
+                    status: POSTED
+                    total_debit: 5000.0
+                    total_credit: 5000.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    source_type: "MANUAL"
-                    posted_at: "2024-01-15T10:00:00Z"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    source_type: MANUAL
+                    posted_at: '2024-01-15T10:00:00Z'
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart journal entry updated
                   value:
-                    id: "b0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-100"
-                    entry_date: "2024-01-20"
-                    description: "Monthly adjustment (Updated)"
-                    status: "POSTED"
-                    total_debit: 500.00
-                    total_credit: 500.00
-                    currency_code: "USD"
+                    id: b0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-100
+                    entry_date: '2024-01-20'
+                    description: Monthly adjustment (Updated)
+                    status: POSTED
+                    total_debit: 500.0
+                    total_credit: 500.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    source_type: "MANUAL"
-                    posted_at: "2024-01-20T10:00:00Z"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T11:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    source_type: MANUAL
+                    posted_at: '2024-01-20T10:00:00Z'
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T11:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing journal entry updated
                   value:
-                    id: "c0080e8400-e29b-41d4-a716-446655440000"
-                    entry_number: "JE-2024-200"
-                    entry_date: "2024-01-25"
-                    description: "Multi-currency invoice entry (Updated)"
-                    status: "POSTED"
-                    total_debit: 10000.00
-                    total_credit: 10000.00
-                    currency_code: "EUR"
+                    id: c0080e8400-e29b-41d4-a716-446655440000
+                    entry_number: JE-2024-200
+                    entry_date: '2024-01-25'
+                    description: Multi-currency invoice entry (Updated)
+                    status: POSTED
+                    total_debit: 10000.0
+                    total_credit: 10000.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    source_type: "INVOICE"
-                    posted_at: "2024-01-25T09:00:00Z"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T10:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    source_type: INVOICE
+                    posted_at: '2024-01-25T09:00:00Z'
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T10:00:00Z'
         '404':
           description: Not found
     delete:
@@ -800,24 +802,24 @@ paths:
                   summary: Acme Corporation - Large enterprise chart of accounts
                   value:
                     items:
-                      - id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1"
-                        name: "Assets"
-                        account_type: "ASSET"
-                        level: 0
-                        is_active: true
-                        description: "Root asset account"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
-                      - id: "a00c1e8400-e29b-41d4-a716-446655440001"
-                        code: "2"
-                        name: "Liabilities"
-                        account_type: "LIABILITY"
-                        level: 0
-                        is_active: true
-                        description: "Root liability account"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
+                    - id: a00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1'
+                      name: Assets
+                      account_type: ASSET
+                      level: 0
+                      is_active: true
+                      description: Root asset account
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
+                    - id: a00c1e8400-e29b-41d4-a716-446655440001
+                      code: '2'
+                      name: Liabilities
+                      account_type: LIABILITY
+                      level: 0
+                      is_active: true
+                      description: Root liability account
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
                     total: 2
                     page: 1
                     limit: 20
@@ -825,15 +827,15 @@ paths:
                   summary: TechStart Inc - Small business chart of accounts
                   value:
                     items:
-                      - id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1"
-                        name: "Assets"
-                        account_type: "ASSET"
-                        level: 0
-                        is_active: true
-                        description: "Root asset account"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1'
+                      name: Assets
+                      account_type: ASSET
+                      level: 0
+                      is_active: true
+                      description: Root asset account
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -841,25 +843,25 @@ paths:
                   summary: Global Manufacturing - Multi-currency chart of accounts
                   value:
                     items:
-                      - id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                        code: "1"
-                        name: "Assets"
-                        account_type: "ASSET"
-                        level: 0
-                        is_active: true
-                        description: "Root asset account"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
-                      - id: "c00c3e8400-e29b-41d4-a716-446655440003"
-                        code: "1.1"
-                        name: "Multi-Currency Assets"
-                        account_type: "ASSET"
-                        level: 1
-                        parent_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                        is_active: true
-                        description: "Multi-currency asset sub-account"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c00c0e8400-e29b-41d4-a716-446655440000
+                      code: '1'
+                      name: Assets
+                      account_type: ASSET
+                      level: 0
+                      is_active: true
+                      description: Root asset account
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
+                    - id: c00c3e8400-e29b-41d4-a716-446655440003
+                      code: '1.1'
+                      name: Multi-Currency Assets
+                      account_type: ASSET
+                      level: 1
+                      parent_id: c00c0e8400-e29b-41d4-a716-446655440000
+                      is_active: true
+                      description: Multi-currency asset sub-account
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 2
                     page: 1
                     limit: 20
@@ -876,27 +878,27 @@ paths:
               acmeCorporationRequest:
                 summary: Create chart of account for Acme Corporation
                 value:
-                  code: "1"
-                  name: "Assets"
-                  account_type: "ASSET"
-                  description: "Root asset account"
+                  code: '1'
+                  name: Assets
+                  account_type: ASSET
+                  description: Root asset account
                   is_active: true
               techStartRequest:
                 summary: Create chart of account for TechStart Inc
                 value:
-                  code: "1"
-                  name: "Assets"
-                  account_type: "ASSET"
-                  description: "Root asset account"
+                  code: '1'
+                  name: Assets
+                  account_type: ASSET
+                  description: Root asset account
                   is_active: true
               globalManufacturingRequest:
                 summary: Create multi-currency chart of account
                 value:
-                  code: "1.1"
-                  name: "Multi-Currency Assets"
-                  account_type: "ASSET"
-                  parent_id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                  description: "Multi-currency asset sub-account"
+                  code: '1.1'
+                  name: Multi-Currency Assets
+                  account_type: ASSET
+                  parent_id: c00c0e8400-e29b-41d4-a716-446655440000
+                  description: Multi-currency asset sub-account
                   is_active: true
       responses:
         '201':
@@ -909,40 +911,40 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation chart of account created
                   value:
-                    id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets"
-                    account_type: "ASSET"
+                    id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Root asset account"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    description: Root asset account
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartResponse:
                   summary: TechStart chart of account created
                   value:
-                    id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets"
-                    account_type: "ASSET"
+                    id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Root asset account"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    description: Root asset account
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing chart of account created
                   value:
-                    id: "c00c3e8400-e29b-41d4-a716-446655440003"
-                    code: "1.1"
-                    name: "Multi-Currency Assets"
-                    account_type: "ASSET"
+                    id: c00c3e8400-e29b-41d4-a716-446655440003
+                    code: '1.1'
+                    name: Multi-Currency Assets
+                    account_type: ASSET
                     level: 1
-                    parent_id: "c00c0e8400-e29b-41d4-a716-446655440000"
+                    parent_id: c00c0e8400-e29b-41d4-a716-446655440000
                     is_active: true
-                    description: "Multi-currency asset sub-account"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    description: Multi-currency asset sub-account
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '400':
           description: Invalid request
   /chart-of-accounts/{id}:
@@ -967,39 +969,39 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation chart of account
                   value:
-                    id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets"
-                    account_type: "ASSET"
+                    id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Root asset account"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    description: Root asset account
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart chart of account
                   value:
-                    id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets"
-                    account_type: "ASSET"
+                    id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Root asset account"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    description: Root asset account
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing chart of account
                   value:
-                    id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets"
-                    account_type: "ASSET"
+                    id: c00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Root asset account"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    description: Root asset account
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -1022,20 +1024,20 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation chart of account
                 value:
-                  name: "Assets (Updated)"
-                  description: "Updated description"
+                  name: Assets (Updated)
+                  description: Updated description
                   is_active: true
               techStartUpdate:
                 summary: Update TechStart chart of account
                 value:
-                  name: "Assets (Updated)"
-                  description: "Updated description"
+                  name: Assets (Updated)
+                  description: Updated description
                   is_active: true
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing chart of account
                 value:
-                  name: "Assets (Updated)"
-                  description: "Updated description"
+                  name: Assets (Updated)
+                  description: Updated description
                   is_active: true
       responses:
         '200':
@@ -1048,39 +1050,39 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation chart of account updated
                   value:
-                    id: "a00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets (Updated)"
-                    account_type: "ASSET"
+                    id: a00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets (Updated)
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Updated description"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart chart of account updated
                   value:
-                    id: "b00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets (Updated)"
-                    account_type: "ASSET"
+                    id: b00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets (Updated)
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Updated description"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing chart of account updated
                   value:
-                    id: "c00c0e8400-e29b-41d4-a716-446655440000"
-                    code: "1"
-                    name: "Assets (Updated)"
-                    account_type: "ASSET"
+                    id: c00c0e8400-e29b-41d4-a716-446655440000
+                    code: '1'
+                    name: Assets (Updated)
+                    account_type: ASSET
                     level: 0
                     is_active: true
-                    description: "Updated description"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    description: Updated description
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -1124,15 +1126,15 @@ components:
     Account:
       type: object
       required:
-        - id
-        - chart_of_account_id
-        - code
-        - name
-        - account_type
-        - normal_balance
-        - currency_code
-        - is_active
-        - is_system_account
+      - id
+      - chart_of_account_id
+      - code
+      - name
+      - account_type
+      - normal_balance
+      - currency_code
+      - is_active
+      - is_system_account
       properties:
         id:
           type: string
@@ -1148,10 +1150,17 @@ components:
           maxLength: 255
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         normal_balance:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         currency_code:
           type: string
           minLength: 3
@@ -1175,14 +1184,14 @@ components:
     JournalEntry:
       type: object
       required:
-        - id
-        - entry_number
-        - entry_date
-        - description
-        - status
-        - total_debit
-        - total_credit
-        - currency_code
+      - id
+      - entry_number
+      - entry_date
+      - description
+      - status
+      - total_debit
+      - total_credit
+      - currency_code
       properties:
         id:
           type: string
@@ -1201,7 +1210,13 @@ components:
           nullable: true
         source_type:
           type: string
-          enum: [MANUAL, INVOICE, PAYMENT, ADJUSTMENT, RECURRING, REVERSAL]
+          enum:
+          - MANUAL
+          - INVOICE
+          - PAYMENT
+          - ADJUSTMENT
+          - RECURRING
+          - REVERSAL
           nullable: true
         source_id:
           type: string
@@ -1213,7 +1228,10 @@ components:
           nullable: true
         status:
           type: string
-          enum: [DRAFT, POSTED, REVERSED]
+          enum:
+          - DRAFT
+          - POSTED
+          - REVERSED
         posted_at:
           type: string
           format: date-time
@@ -1259,12 +1277,12 @@ components:
     ChartOfAccount:
       type: object
       required:
-        - id
-        - code
-        - name
-        - account_type
-        - level
-        - is_active
+      - id
+      - code
+      - name
+      - account_type
+      - level
+      - is_active
       properties:
         id:
           type: string
@@ -1277,7 +1295,12 @@ components:
           maxLength: 255
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         parent_id:
           type: string
           format: uuid
@@ -1298,12 +1321,12 @@ components:
     CreateAccountRequest:
       type: object
       required:
-        - chart_of_account_id
-        - code
-        - name
-        - account_type
-        - normal_balance
-        - currency_code
+      - chart_of_account_id
+      - code
+      - name
+      - account_type
+      - normal_balance
+      - currency_code
       properties:
         chart_of_account_id:
           type: string
@@ -1316,10 +1339,17 @@ components:
           maxLength: 255
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         normal_balance:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         currency_code:
           type: string
           minLength: 3
@@ -1340,14 +1370,19 @@ components:
           type: boolean
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
     CreateJournalEntryRequest:
       type: object
       required:
-        - entry_number
-        - entry_date
-        - description
-        - currency_code
+      - entry_number
+      - entry_date
+      - description
+      - currency_code
       properties:
         entry_number:
           type: string
@@ -1362,7 +1397,13 @@ components:
           maxLength: 100
         source_type:
           type: string
-          enum: [MANUAL, INVOICE, PAYMENT, ADJUSTMENT, RECURRING, REVERSAL]
+          enum:
+          - MANUAL
+          - INVOICE
+          - PAYMENT
+          - ADJUSTMENT
+          - RECURRING
+          - REVERSAL
         source_id:
           type: string
           format: uuid
@@ -1389,16 +1430,19 @@ components:
           maxLength: 100
         status:
           type: string
-          enum: [DRAFT, POSTED, REVERSED]
+          enum:
+          - DRAFT
+          - POSTED
+          - REVERSED
         posted_at:
           type: string
           format: date-time
     CreateChartOfAccountRequest:
       type: object
       required:
-        - code
-        - name
-        - account_type
+      - code
+      - name
+      - account_type
       properties:
         code:
           type: string
@@ -1408,7 +1452,12 @@ components:
           maxLength: 255
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         parent_id:
           type: string
           format: uuid
@@ -1428,4 +1477,9 @@ components:
           type: boolean
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE

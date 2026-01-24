@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: bank_sync
+  binaryName: bank_sync_service_api
   serviceName: bank-sync

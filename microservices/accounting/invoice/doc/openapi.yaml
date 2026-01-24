@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Invoice management service handling invoice creation and approval workflows.
 servers:
+- url: http://localhost:8002/api/v1/accounting/invoice
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/invoice
   description: Invoice Management API
 tags: []
@@ -39,26 +41,26 @@ paths:
                   summary: Acme Corporation - Large enterprise invoices
                   value:
                     items:
-                      - id: "a0010e8400-e29b-41d4-a716-446655440000"
-                        invoice_number: "INV-2024-001"
-                        invoice_date: "2024-01-15"
-                        due_date: "2024-02-15"
-                        invoice_type: "CUSTOMER_INVOICE"
-                        status: "POSTED"
-                        payment_state: "NOT_PAID"
-                        customer_id: "111e8400-e29b-41d4-a716-446655440001"
-                        subtotal: 10000.00
-                        tax_amount: 1000.00
-                        discount_amount: 0.00
-                        total_amount: 11000.00
-                        paid_amount: 0.00
-                        outstanding_amount: 11000.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        posted_at: "2024-01-15T10:00:00Z"
-                        created_at: "2024-01-15T09:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
+                    - id: a0010e8400-e29b-41d4-a716-446655440000
+                      invoice_number: INV-2024-001
+                      invoice_date: '2024-01-15'
+                      due_date: '2024-02-15'
+                      invoice_type: CUSTOMER_INVOICE
+                      status: POSTED
+                      payment_state: NOT_PAID
+                      customer_id: 111e8400-e29b-41d4-a716-446655440001
+                      subtotal: 10000.0
+                      tax_amount: 1000.0
+                      discount_amount: 0.0
+                      total_amount: 11000.0
+                      paid_amount: 0.0
+                      outstanding_amount: 11000.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      posted_at: '2024-01-15T10:00:00Z'
+                      created_at: '2024-01-15T09:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -66,25 +68,25 @@ paths:
                   summary: TechStart Inc - Small business invoices
                   value:
                     items:
-                      - id: "b0010e8400-e29b-41d4-a716-446655440000"
-                        invoice_number: "INV-2024-100"
-                        invoice_date: "2024-01-20"
-                        due_date: "2024-02-20"
-                        invoice_type: "CUSTOMER_INVOICE"
-                        status: "DRAFT"
-                        payment_state: "NOT_PAID"
-                        customer_id: "222e8400-e29b-41d4-a716-446655440001"
-                        subtotal: 500.00
-                        tax_amount: 50.00
-                        discount_amount: 0.00
-                        total_amount: 550.00
-                        paid_amount: 0.00
-                        outstanding_amount: 550.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0010e8400-e29b-41d4-a716-446655440000
+                      invoice_number: INV-2024-100
+                      invoice_date: '2024-01-20'
+                      due_date: '2024-02-20'
+                      invoice_type: CUSTOMER_INVOICE
+                      status: DRAFT
+                      payment_state: NOT_PAID
+                      customer_id: 222e8400-e29b-41d4-a716-446655440001
+                      subtotal: 500.0
+                      tax_amount: 50.0
+                      discount_amount: 0.0
+                      total_amount: 550.0
+                      paid_amount: 0.0
+                      outstanding_amount: 550.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -92,26 +94,26 @@ paths:
                   summary: Global Manufacturing - Multi-currency invoices
                   value:
                     items:
-                      - id: "c0010e8400-e29b-41d4-a716-446655440000"
-                        invoice_number: "INV-2024-200"
-                        invoice_date: "2024-01-25"
-                        due_date: "2024-02-25"
-                        invoice_type: "CUSTOMER_INVOICE"
-                        status: "POSTED"
-                        payment_state: "NOT_PAID"
-                        customer_id: "333e8400-e29b-41d4-a716-446655440001"
-                        subtotal: 10000.00
-                        tax_amount: 1000.00
-                        discount_amount: 0.00
-                        total_amount: 11000.00
-                        paid_amount: 0.00
-                        outstanding_amount: 11000.00
-                        currency_code: "EUR"
-                        exchange_rate: 0.92
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        posted_at: "2024-01-25T08:00:00Z"
-                        created_at: "2024-01-25T07:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c0010e8400-e29b-41d4-a716-446655440000
+                      invoice_number: INV-2024-200
+                      invoice_date: '2024-01-25'
+                      due_date: '2024-02-25'
+                      invoice_type: CUSTOMER_INVOICE
+                      status: POSTED
+                      payment_state: NOT_PAID
+                      customer_id: 333e8400-e29b-41d4-a716-446655440001
+                      subtotal: 10000.0
+                      tax_amount: 1000.0
+                      discount_amount: 0.0
+                      total_amount: 11000.0
+                      paid_amount: 0.0
+                      outstanding_amount: 11000.0
+                      currency_code: EUR
+                      exchange_rate: 0.92
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      posted_at: '2024-01-25T08:00:00Z'
+                      created_at: '2024-01-25T07:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -128,36 +130,36 @@ paths:
               acmeCorporationRequest:
                 summary: Create invoice for Acme Corporation customer
                 value:
-                  invoice_number: "INV-2024-001"
-                  invoice_date: "2024-01-15"
-                  due_date: "2024-02-15"
-                  invoice_type: "CUSTOMER_INVOICE"
-                  currency_code: "USD"
+                  invoice_number: INV-2024-001
+                  invoice_date: '2024-01-15'
+                  due_date: '2024-02-15'
+                  invoice_type: CUSTOMER_INVOICE
+                  currency_code: USD
                   exchange_rate: 1.0
-                  customer_id: "111e8400-e29b-41d4-a716-446655440001"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  customer_id: 111e8400-e29b-41d4-a716-446655440001
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create invoice for TechStart customer
                 value:
-                  invoice_number: "INV-2024-100"
-                  invoice_date: "2024-01-20"
-                  due_date: "2024-02-20"
-                  invoice_type: "CUSTOMER_INVOICE"
-                  currency_code: "USD"
+                  invoice_number: INV-2024-100
+                  invoice_date: '2024-01-20'
+                  due_date: '2024-02-20'
+                  invoice_type: CUSTOMER_INVOICE
+                  currency_code: USD
                   exchange_rate: 1.0
-                  customer_id: "222e8400-e29b-41d4-a716-446655440001"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  customer_id: 222e8400-e29b-41d4-a716-446655440001
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency invoice
                 value:
-                  invoice_number: "INV-2024-200"
-                  invoice_date: "2024-01-25"
-                  due_date: "2024-02-25"
-                  invoice_type: "CUSTOMER_INVOICE"
-                  currency_code: "EUR"
+                  invoice_number: INV-2024-200
+                  invoice_date: '2024-01-25'
+                  due_date: '2024-02-25'
+                  invoice_type: CUSTOMER_INVOICE
+                  currency_code: EUR
                   exchange_rate: 0.92
-                  customer_id: "333e8400-e29b-41d4-a716-446655440001"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  customer_id: 333e8400-e29b-41d4-a716-446655440001
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: Invoice created
@@ -169,69 +171,69 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation invoice created
                   value:
-                    id: "a0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-001"
-                    invoice_date: "2024-01-15"
-                    due_date: "2024-02-15"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "DRAFT"
-                    payment_state: "NOT_PAID"
-                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 0.00
-                    tax_amount: 0.00
-                    discount_amount: 0.00
-                    total_amount: 0.00
-                    paid_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "USD"
+                    id: a0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-001
+                    invoice_date: '2024-01-15'
+                    due_date: '2024-02-15'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: DRAFT
+                    payment_state: NOT_PAID
+                    customer_id: 111e8400-e29b-41d4-a716-446655440001
+                    subtotal: 0.0
+                    tax_amount: 0.0
+                    discount_amount: 0.0
+                    total_amount: 0.0
+                    paid_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartResponse:
                   summary: TechStart invoice created
                   value:
-                    id: "b0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-100"
-                    invoice_date: "2024-01-20"
-                    due_date: "2024-02-20"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "DRAFT"
-                    payment_state: "NOT_PAID"
-                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 0.00
-                    tax_amount: 0.00
-                    discount_amount: 0.00
-                    total_amount: 0.00
-                    paid_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "USD"
+                    id: b0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-100
+                    invoice_date: '2024-01-20'
+                    due_date: '2024-02-20'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: DRAFT
+                    payment_state: NOT_PAID
+                    customer_id: 222e8400-e29b-41d4-a716-446655440001
+                    subtotal: 0.0
+                    tax_amount: 0.0
+                    discount_amount: 0.0
+                    total_amount: 0.0
+                    paid_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing invoice created
                   value:
-                    id: "c0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-200"
-                    invoice_date: "2024-01-25"
-                    due_date: "2024-02-25"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "DRAFT"
-                    payment_state: "NOT_PAID"
-                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 0.00
-                    tax_amount: 0.00
-                    discount_amount: 0.00
-                    total_amount: 0.00
-                    paid_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "EUR"
+                    id: c0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-200
+                    invoice_date: '2024-01-25'
+                    due_date: '2024-02-25'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: DRAFT
+                    payment_state: NOT_PAID
+                    customer_id: 333e8400-e29b-41d4-a716-446655440001
+                    subtotal: 0.0
+                    tax_amount: 0.0
+                    discount_amount: 0.0
+                    total_amount: 0.0
+                    paid_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '400':
           description: Invalid request
   /invoices/{id}:
@@ -256,71 +258,71 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation invoice
                   value:
-                    id: "a0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-001"
-                    invoice_date: "2024-01-15"
-                    due_date: "2024-02-15"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "POSTED"
-                    payment_state: "NOT_PAID"
-                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 10000.00
-                    tax_amount: 1000.00
-                    discount_amount: 0.00
-                    total_amount: 11000.00
-                    paid_amount: 0.00
-                    outstanding_amount: 11000.00
-                    currency_code: "USD"
+                    id: a0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-001
+                    invoice_date: '2024-01-15'
+                    due_date: '2024-02-15'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: POSTED
+                    payment_state: NOT_PAID
+                    customer_id: 111e8400-e29b-41d4-a716-446655440001
+                    subtotal: 10000.0
+                    tax_amount: 1000.0
+                    discount_amount: 0.0
+                    total_amount: 11000.0
+                    paid_amount: 0.0
+                    outstanding_amount: 11000.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    posted_at: "2024-01-15T10:00:00Z"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    posted_at: '2024-01-15T10:00:00Z'
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart invoice
                   value:
-                    id: "b0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-100"
-                    invoice_date: "2024-01-20"
-                    due_date: "2024-02-20"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "DRAFT"
-                    payment_state: "NOT_PAID"
-                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 500.00
-                    tax_amount: 50.00
-                    discount_amount: 0.00
-                    total_amount: 550.00
-                    paid_amount: 0.00
-                    outstanding_amount: 550.00
-                    currency_code: "USD"
+                    id: b0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-100
+                    invoice_date: '2024-01-20'
+                    due_date: '2024-02-20'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: DRAFT
+                    payment_state: NOT_PAID
+                    customer_id: 222e8400-e29b-41d4-a716-446655440001
+                    subtotal: 500.0
+                    tax_amount: 50.0
+                    discount_amount: 0.0
+                    total_amount: 550.0
+                    paid_amount: 0.0
+                    outstanding_amount: 550.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing invoice
                   value:
-                    id: "c0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-200"
-                    invoice_date: "2024-01-25"
-                    due_date: "2024-02-25"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "POSTED"
-                    payment_state: "NOT_PAID"
-                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 10000.00
-                    tax_amount: 1000.00
-                    discount_amount: 0.00
-                    total_amount: 11000.00
-                    paid_amount: 0.00
-                    outstanding_amount: 11000.00
-                    currency_code: "EUR"
+                    id: c0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-200
+                    invoice_date: '2024-01-25'
+                    due_date: '2024-02-25'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: POSTED
+                    payment_state: NOT_PAID
+                    customer_id: 333e8400-e29b-41d4-a716-446655440001
+                    subtotal: 10000.0
+                    tax_amount: 1000.0
+                    discount_amount: 0.0
+                    total_amount: 11000.0
+                    paid_amount: 0.0
+                    outstanding_amount: 11000.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    posted_at: "2024-01-25T08:00:00Z"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    posted_at: '2024-01-25T08:00:00Z'
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -343,21 +345,21 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation invoice
                 value:
-                  status: "POSTED"
-                  payment_state: "NOT_PAID"
-                  notes: "Updated invoice notes"
+                  status: POSTED
+                  payment_state: NOT_PAID
+                  notes: Updated invoice notes
               techStartUpdate:
                 summary: Update TechStart invoice
                 value:
-                  status: "POSTED"
-                  payment_state: "NOT_PAID"
-                  notes: "Updated invoice notes"
+                  status: POSTED
+                  payment_state: NOT_PAID
+                  notes: Updated invoice notes
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing invoice
                 value:
-                  status: "POSTED"
-                  payment_state: "NOT_PAID"
-                  notes: "Updated invoice notes"
+                  status: POSTED
+                  payment_state: NOT_PAID
+                  notes: Updated invoice notes
       responses:
         '200':
           description: Invoice updated
@@ -369,75 +371,75 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation invoice updated
                   value:
-                    id: "a0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-001"
-                    invoice_date: "2024-01-15"
-                    due_date: "2024-02-15"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "POSTED"
-                    payment_state: "NOT_PAID"
-                    customer_id: "111e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 10000.00
-                    tax_amount: 1000.00
-                    discount_amount: 0.00
-                    total_amount: 11000.00
-                    paid_amount: 0.00
-                    outstanding_amount: 11000.00
-                    currency_code: "USD"
+                    id: a0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-001
+                    invoice_date: '2024-01-15'
+                    due_date: '2024-02-15'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: POSTED
+                    payment_state: NOT_PAID
+                    customer_id: 111e8400-e29b-41d4-a716-446655440001
+                    subtotal: 10000.0
+                    tax_amount: 1000.0
+                    discount_amount: 0.0
+                    total_amount: 11000.0
+                    paid_amount: 0.0
+                    outstanding_amount: 11000.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    notes: "Updated invoice notes"
-                    posted_at: "2024-01-15T11:00:00Z"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    notes: Updated invoice notes
+                    posted_at: '2024-01-15T11:00:00Z'
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart invoice updated
                   value:
-                    id: "b0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-100"
-                    invoice_date: "2024-01-20"
-                    due_date: "2024-02-20"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "POSTED"
-                    payment_state: "NOT_PAID"
-                    customer_id: "222e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 500.00
-                    tax_amount: 50.00
-                    discount_amount: 0.00
-                    total_amount: 550.00
-                    paid_amount: 0.00
-                    outstanding_amount: 550.00
-                    currency_code: "USD"
+                    id: b0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-100
+                    invoice_date: '2024-01-20'
+                    due_date: '2024-02-20'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: POSTED
+                    payment_state: NOT_PAID
+                    customer_id: 222e8400-e29b-41d4-a716-446655440001
+                    subtotal: 500.0
+                    tax_amount: 50.0
+                    discount_amount: 0.0
+                    total_amount: 550.0
+                    paid_amount: 0.0
+                    outstanding_amount: 550.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    notes: "Updated invoice notes"
-                    posted_at: "2024-01-20T10:00:00Z"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    notes: Updated invoice notes
+                    posted_at: '2024-01-20T10:00:00Z'
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing invoice updated
                   value:
-                    id: "c0010e8400-e29b-41d4-a716-446655440000"
-                    invoice_number: "INV-2024-200"
-                    invoice_date: "2024-01-25"
-                    due_date: "2024-02-25"
-                    invoice_type: "CUSTOMER_INVOICE"
-                    status: "POSTED"
-                    payment_state: "NOT_PAID"
-                    customer_id: "333e8400-e29b-41d4-a716-446655440001"
-                    subtotal: 10000.00
-                    tax_amount: 1000.00
-                    discount_amount: 0.00
-                    total_amount: 11000.00
-                    paid_amount: 0.00
-                    outstanding_amount: 11000.00
-                    currency_code: "EUR"
+                    id: c0010e8400-e29b-41d4-a716-446655440000
+                    invoice_number: INV-2024-200
+                    invoice_date: '2024-01-25'
+                    due_date: '2024-02-25'
+                    invoice_type: CUSTOMER_INVOICE
+                    status: POSTED
+                    payment_state: NOT_PAID
+                    customer_id: 333e8400-e29b-41d4-a716-446655440001
+                    subtotal: 10000.0
+                    tax_amount: 1000.0
+                    discount_amount: 0.0
+                    total_amount: 11000.0
+                    paid_amount: 0.0
+                    outstanding_amount: 11000.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    notes: "Updated invoice notes"
-                    posted_at: "2024-01-25T09:00:00Z"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    notes: Updated invoice notes
+                    posted_at: '2024-01-25T09:00:00Z'
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -486,20 +488,20 @@ paths:
                   summary: Acme Corporation - Invoice line items
                   value:
                     items:
-                      - id: "a0020e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
-                        line_number: 1
-                        product_name: "Professional Services"
-                        quantity: 40.00
-                        unit_price: 250.00
-                        discount_percent: 0.00
-                        discount_amount: 0.00
-                        line_subtotal: 10000.00
-                        tax_amount: 1000.00
-                        line_total: 11000.00
-                        currency_code: "USD"
-                        created_at: "2024-01-15T09:00:00Z"
-                        updated_at: "2024-01-15T09:00:00Z"
+                    - id: a0020e8400-e29b-41d4-a716-446655440000
+                      invoice_id: a0010e8400-e29b-41d4-a716-446655440000
+                      line_number: 1
+                      product_name: Professional Services
+                      quantity: 40.0
+                      unit_price: 250.0
+                      discount_percent: 0.0
+                      discount_amount: 0.0
+                      line_subtotal: 10000.0
+                      tax_amount: 1000.0
+                      line_total: 11000.0
+                      currency_code: USD
+                      created_at: '2024-01-15T09:00:00Z'
+                      updated_at: '2024-01-15T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -507,20 +509,20 @@ paths:
                   summary: TechStart Inc - Invoice line items
                   value:
                     items:
-                      - id: "b0020e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
-                        line_number: 1
-                        product_name: "Consulting Services"
-                        quantity: 10.00
-                        unit_price: 50.00
-                        discount_percent: 0.00
-                        discount_amount: 0.00
-                        line_subtotal: 500.00
-                        tax_amount: 50.00
-                        line_total: 550.00
-                        currency_code: "USD"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0020e8400-e29b-41d4-a716-446655440000
+                      invoice_id: b0010e8400-e29b-41d4-a716-446655440000
+                      line_number: 1
+                      product_name: Consulting Services
+                      quantity: 10.0
+                      unit_price: 50.0
+                      discount_percent: 0.0
+                      discount_amount: 0.0
+                      line_subtotal: 500.0
+                      tax_amount: 50.0
+                      line_total: 550.0
+                      currency_code: USD
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -528,20 +530,20 @@ paths:
                   summary: Global Manufacturing - Multi-currency invoice lines
                   value:
                     items:
-                      - id: "c0020e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
-                        line_number: 1
-                        product_name: "Manufacturing Equipment"
-                        quantity: 1.00
-                        unit_price: 10000.00
-                        discount_percent: 0.00
-                        discount_amount: 0.00
-                        line_subtotal: 10000.00
-                        tax_amount: 1000.00
-                        line_total: 11000.00
-                        currency_code: "EUR"
-                        created_at: "2024-01-25T07:00:00Z"
-                        updated_at: "2024-01-25T07:00:00Z"
+                    - id: c0020e8400-e29b-41d4-a716-446655440000
+                      invoice_id: c0010e8400-e29b-41d4-a716-446655440000
+                      line_number: 1
+                      product_name: Manufacturing Equipment
+                      quantity: 1.0
+                      unit_price: 10000.0
+                      discount_percent: 0.0
+                      discount_amount: 0.0
+                      line_subtotal: 10000.0
+                      tax_amount: 1000.0
+                      line_total: 11000.0
+                      currency_code: EUR
+                      created_at: '2024-01-25T07:00:00Z'
+                      updated_at: '2024-01-25T07:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -558,30 +560,30 @@ paths:
               acmeCorporationRequest:
                 summary: Create invoice line for Acme Corporation invoice
                 value:
-                  invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                  invoice_id: a0010e8400-e29b-41d4-a716-446655440000
                   line_number: 1
-                  product_name: "Professional Services"
-                  quantity: 40.00
-                  unit_price: 250.00
-                  discount_percent: 0.00
+                  product_name: Professional Services
+                  quantity: 40.0
+                  unit_price: 250.0
+                  discount_percent: 0.0
               techStartRequest:
                 summary: Create invoice line for TechStart invoice
                 value:
-                  invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                  invoice_id: b0010e8400-e29b-41d4-a716-446655440000
                   line_number: 1
-                  product_name: "Consulting Services"
-                  quantity: 10.00
-                  unit_price: 50.00
-                  discount_percent: 0.00
+                  product_name: Consulting Services
+                  quantity: 10.0
+                  unit_price: 50.0
+                  discount_percent: 0.0
               globalManufacturingRequest:
                 summary: Create multi-currency invoice line
                 value:
-                  invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                  invoice_id: c0010e8400-e29b-41d4-a716-446655440000
                   line_number: 1
-                  product_name: "Manufacturing Equipment"
-                  quantity: 1.00
-                  unit_price: 10000.00
-                  discount_percent: 0.00
+                  product_name: Manufacturing Equipment
+                  quantity: 1.0
+                  unit_price: 10000.0
+                  discount_percent: 0.0
       responses:
         '201':
           description: InvoiceLine created
@@ -593,54 +595,54 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation invoice line created
                   value:
-                    id: "a0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    id: a0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Professional Services"
-                    quantity: 40.00
-                    unit_price: 250.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 10000.00
-                    tax_amount: 0.00
-                    line_total: 10000.00
-                    currency_code: "USD"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    product_name: Professional Services
+                    quantity: 40.0
+                    unit_price: 250.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 10000.0
+                    tax_amount: 0.0
+                    line_total: 10000.0
+                    currency_code: USD
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartResponse:
                   summary: TechStart invoice line created
                   value:
-                    id: "b0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    id: b0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Consulting Services"
-                    quantity: 10.00
-                    unit_price: 50.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 500.00
-                    tax_amount: 0.00
-                    line_total: 500.00
-                    currency_code: "USD"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    product_name: Consulting Services
+                    quantity: 10.0
+                    unit_price: 50.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 500.0
+                    tax_amount: 0.0
+                    line_total: 500.0
+                    currency_code: USD
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing invoice line created
                   value:
-                    id: "c0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    id: c0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Manufacturing Equipment"
-                    quantity: 1.00
-                    unit_price: 10000.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 10000.00
-                    tax_amount: 0.00
-                    line_total: 10000.00
-                    currency_code: "EUR"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    product_name: Manufacturing Equipment
+                    quantity: 1.0
+                    unit_price: 10000.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 10000.0
+                    tax_amount: 0.0
+                    line_total: 10000.0
+                    currency_code: EUR
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '400':
           description: Invalid request
   /invoice-lines/{id}:
@@ -665,54 +667,54 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation invoice line
                   value:
-                    id: "a0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    id: a0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Professional Services"
-                    quantity: 40.00
-                    unit_price: 250.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 10000.00
-                    tax_amount: 1000.00
-                    line_total: 11000.00
-                    currency_code: "USD"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    product_name: Professional Services
+                    quantity: 40.0
+                    unit_price: 250.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 10000.0
+                    tax_amount: 1000.0
+                    line_total: 11000.0
+                    currency_code: USD
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartExample:
                   summary: TechStart invoice line
                   value:
-                    id: "b0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    id: b0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Consulting Services"
-                    quantity: 10.00
-                    unit_price: 50.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 500.00
-                    tax_amount: 50.00
-                    line_total: 550.00
-                    currency_code: "USD"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    product_name: Consulting Services
+                    quantity: 10.0
+                    unit_price: 50.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 500.0
+                    tax_amount: 50.0
+                    line_total: 550.0
+                    currency_code: USD
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing invoice line
                   value:
-                    id: "c0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    id: c0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Manufacturing Equipment"
-                    quantity: 1.00
-                    unit_price: 10000.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 10000.00
-                    tax_amount: 1000.00
-                    line_total: 11000.00
-                    currency_code: "EUR"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    product_name: Manufacturing Equipment
+                    quantity: 1.0
+                    unit_price: 10000.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 10000.0
+                    tax_amount: 1000.0
+                    line_total: 11000.0
+                    currency_code: EUR
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '404':
           description: Not found
     put:
@@ -735,21 +737,21 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation invoice line
                 value:
-                  quantity: 45.00
-                  unit_price: 250.00
-                  discount_percent: 5.00
+                  quantity: 45.0
+                  unit_price: 250.0
+                  discount_percent: 5.0
               techStartUpdate:
                 summary: Update TechStart invoice line
                 value:
-                  quantity: 12.00
-                  unit_price: 50.00
-                  discount_percent: 0.00
+                  quantity: 12.0
+                  unit_price: 50.0
+                  discount_percent: 0.0
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing invoice line
                 value:
-                  quantity: 1.00
-                  unit_price: 10500.00
-                  discount_percent: 0.00
+                  quantity: 1.0
+                  unit_price: 10500.0
+                  discount_percent: 0.0
       responses:
         '200':
           description: InvoiceLine updated
@@ -761,54 +763,54 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation invoice line updated
                   value:
-                    id: "a0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0010e8400-e29b-41d4-a716-446655440000"
+                    id: a0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Professional Services"
-                    quantity: 45.00
-                    unit_price: 250.00
-                    discount_percent: 5.00
-                    discount_amount: 562.50
-                    line_subtotal: 10687.50
+                    product_name: Professional Services
+                    quantity: 45.0
+                    unit_price: 250.0
+                    discount_percent: 5.0
+                    discount_amount: 562.5
+                    line_subtotal: 10687.5
                     tax_amount: 1068.75
                     line_total: 11756.25
-                    currency_code: "USD"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    currency_code: USD
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart invoice line updated
                   value:
-                    id: "b0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0010e8400-e29b-41d4-a716-446655440000"
+                    id: b0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Consulting Services"
-                    quantity: 12.00
-                    unit_price: 50.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 600.00
-                    tax_amount: 60.00
-                    line_total: 660.00
-                    currency_code: "USD"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    product_name: Consulting Services
+                    quantity: 12.0
+                    unit_price: 50.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 600.0
+                    tax_amount: 60.0
+                    line_total: 660.0
+                    currency_code: USD
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing invoice line updated
                   value:
-                    id: "c0020e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0010e8400-e29b-41d4-a716-446655440000"
+                    id: c0020e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
                     line_number: 1
-                    product_name: "Manufacturing Equipment"
-                    quantity: 1.00
-                    unit_price: 10500.00
-                    discount_percent: 0.00
-                    discount_amount: 0.00
-                    line_subtotal: 10500.00
-                    tax_amount: 1050.00
-                    line_total: 11550.00
-                    currency_code: "EUR"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    product_name: Manufacturing Equipment
+                    quantity: 1.0
+                    unit_price: 10500.0
+                    discount_percent: 0.0
+                    discount_amount: 0.0
+                    line_subtotal: 10500.0
+                    tax_amount: 1050.0
+                    line_total: 11550.0
+                    currency_code: EUR
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -852,13 +854,13 @@ components:
     Invoice:
       type: object
       required:
-        - id
-        - invoice_number
-        - invoice_date
-        - invoice_type
-        - status
-        - payment_state
-        - currency_code
+      - id
+      - invoice_number
+      - invoice_date
+      - invoice_type
+      - status
+      - payment_state
+      - currency_code
       properties:
         id:
           type: string
@@ -875,13 +877,27 @@ components:
           nullable: true
         invoice_type:
           type: string
-          enum: [CUSTOMER_INVOICE, VENDOR_BILL, CREDIT_NOTE, REFUND]
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_NOTE
+          - REFUND
         status:
           type: string
-          enum: [DRAFT, POSTED, PAID, CANCELLED, REVERSED]
+          enum:
+          - DRAFT
+          - POSTED
+          - PAID
+          - CANCELLED
+          - REVERSED
         payment_state:
           type: string
-          enum: [NOT_PAID, PARTIAL, PAID, OVERPAID, REVERSED]
+          enum:
+          - NOT_PAID
+          - PARTIAL
+          - PAID
+          - OVERPAID
+          - REVERSED
         customer_id:
           type: string
           format: uuid
@@ -959,12 +975,12 @@ components:
     InvoiceLine:
       type: object
       required:
-        - id
-        - invoice_id
-        - product_name
-        - quantity
-        - unit_price
-        - currency_code
+      - id
+      - invoice_id
+      - product_name
+      - quantity
+      - unit_price
+      - currency_code
       properties:
         id:
           type: string
@@ -1038,10 +1054,10 @@ components:
     CreateInvoiceRequest:
       type: object
       required:
-        - invoice_number
-        - invoice_date
-        - invoice_type
-        - currency_code
+      - invoice_number
+      - invoice_date
+      - invoice_type
+      - currency_code
       properties:
         invoice_number:
           type: string
@@ -1054,7 +1070,11 @@ components:
           format: date
         invoice_type:
           type: string
-          enum: [CUSTOMER_INVOICE, VENDOR_BILL, CREDIT_NOTE, REFUND]
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_NOTE
+          - REFUND
         customer_id:
           type: string
           format: uuid
@@ -1093,10 +1113,20 @@ components:
           format: date
         status:
           type: string
-          enum: [DRAFT, POSTED, PAID, CANCELLED, REVERSED]
+          enum:
+          - DRAFT
+          - POSTED
+          - PAID
+          - CANCELLED
+          - REVERSED
         payment_state:
           type: string
-          enum: [NOT_PAID, PARTIAL, PAID, OVERPAID, REVERSED]
+          enum:
+          - NOT_PAID
+          - PARTIAL
+          - PAID
+          - OVERPAID
+          - REVERSED
         notes:
           type: string
         internal_notes:
@@ -1106,10 +1136,10 @@ components:
     CreateInvoiceLineRequest:
       type: object
       required:
-        - invoice_id
-        - product_name
-        - quantity
-        - unit_price
+      - invoice_id
+      - product_name
+      - quantity
+      - unit_price
       properties:
         invoice_id:
           type: string

@@ -78,7 +78,11 @@ When you assign a port with `--update-configs`, the script automatically updates
 
 2. **Kind Config** (`kind-config.yaml`): Adds port mapping only for ports **outside** 8001–8099 (Tilt-managed range). See "Kind and Tilt: Avoid Port Conflicts" below.
 
-3. **Port Registry** (`scripts/port-registry.json`):
+3. **OpenAPI servers** (so Swagger "Try it" uses the correct localhost port):
+   - **BFF**: `openapi/{suite}/bff-suite-config.yaml` → `metadata.servers` localhost URL set to `http://localhost:<port>`. Regenerate `openapi/{suite}/openapi_bff.yaml` with `bff-generator generate-spec --config openapi/{suite}/bff-suite-config.yaml --output openapi/{suite}/openapi_bff.yaml` (e.g. `openapi/accounting/` for the accounting suite).
+   - **Suite microservices** (`openapi/{suite}/{name}/openapi.yaml`): A `http://localhost:<port>/api/v1/{suite}/{name}` server entry is added or updated. assign-port discovers suites by listing `openapi/*/bff-suite-config.yaml` and microservices by walking `openapi/{suite}/{name}/openapi.yaml`.
+
+4. **Port Registry** (`scripts/port-registry.json`):
    - Records the assignment
    - Updates `next_port` for next assignment
 
@@ -183,9 +187,9 @@ Create the service first, then assign the port.
 ./scripts/assign-port.py validate --json   # machine-readable
 ```
 
-**Scans:** `port-registry.json`, `helm/rerp-microservice/values/*.yaml`, `kind-config.yaml` (hostPort), `Tiltfile` (get_service_port), `openapi/accounting/bff-suite-config.yaml`, `scripts/generate_bff_spec.py`.
+**Scans:** `port-registry.json`, `helm/rerp-microservice/values/*.yaml`, `kind-config.yaml` (hostPort), `Tiltfile` (get_service_port), all `openapi/{suite}/bff-suite-config.yaml` (suites discovered by listing), `scripts/generate_bff_spec.py`, each `openapi/{suite}/openapi_bff.yaml` (localhost server), each `openapi/{suite}/{name}/openapi.yaml` (localhost server).
 
-**Reports:** Duplicate `service.port` in helm, duplicate `hostPort` in kind, kind `hostPort` in 8001–8099 (conflicts with Tilt port-forwards), registry/helm/Tiltfile mismatches.
+**Reports:** Duplicate `service.port` in helm, duplicate `hostPort` in kind, kind `hostPort` in 8001–8099 (conflicts with Tilt port-forwards), registry/helm/Tiltfile mismatches, and **OpenAPI localhost server port** mismatches (bff-suite-config, openapi_bff, and each suite microservice spec). Fix OpenAPI with `update-configs <service>`; for a BFF, regenerate `openapi/{suite}/openapi_bff.yaml` after `update-configs <bff_service_name>`.
 
 Run before `just dev-up` or in CI to catch conflicts.
 
@@ -207,8 +211,8 @@ When several services share the same `service.port` in helm (e.g. `invoice` and 
 ./scripts/assign-port.py fix-duplicates --dry-run   # show plan only
 ```
 
-- **Accounting** services (from `openapi/accounting/bff-suite-config.yaml` and `bff`) **keep** their port.
-- **Others** (idam, amd, marketing, billing, ftebe, etc.) are assigned the next free port and their **helm values are updated** (`service.port`, `service.containerPort`, `service.nodePort` only; `app.binaryName`, `image`, etc. are left as-is).
+- **Suite** services (from each `openapi/{suite}/bff-suite-config.yaml`: `services` and `bff_service_name`) **keep** their port.
+- **Others** (e.g. idam, amd, marketing, billing, ftebe) are assigned the next free port and their **helm values are updated** (`service.port`, `service.containerPort`, `service.nodePort` only; `app.binaryName`, `image`, etc. are left as-is).
 - Run `validate` after to confirm.
 
 ## Kind and Tilt: Avoid Port Conflicts

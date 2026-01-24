@@ -10,13 +10,26 @@ This document provides agentic AI systems with essential context and references 
 
 ---
 
+## Suites and BFF (Important)
+
+**RERP is composed of suites of systems.** Each **suite** has:
+
+- **Microservices**: `openapi/{suite}/{name}/openapi.yaml` and corresponding `microservices/` / `components/` crates
+- **One BFF per suite**: `openapi/{suite}/bff-suite-config.yaml` and generated `openapi/{suite}/openapi_bff.yaml` that aggregates that suite’s services
+
+Example: the **accounting** suite has microservices (general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports) and one **BFF** that fronts them. Other suites (e.g. HR, sales) will have their own BFF when implemented.
+
+Scripts infer suites **dynamically**: they list `openapi/` subdirs that contain `bff-suite-config.yaml`, read `bff_service_name` from each config, and walk `openapi/{suite}/{name}/openapi.yaml` for microservices. **No hardcoded suite names or BFF mappings** in `assign-port.py`. When adding a new suite with a BFF, add `openapi/{suite}/bff-suite-config.yaml` with `bff_service_name` and the script will pick it up.
+
+---
+
 ## Key Architecture Principles
 
 1. **OpenAPI-First**: All services are defined in OpenAPI 3.1.0 specifications
 2. **Code Generation**: Services are generated from OpenAPI specs using BRRTRouter
 3. **Two-Crate Model**: Each service has a generated crate and an implementation crate
 4. **Microservices**: Independent, deployable services with well-defined APIs
-5. **System-Level BFF**: Auto-generated Backend-for-Frontend specs aggregate sub-services
+5. **Suite-Level BFF**: Each suite has one BFF; `openapi/{suite}/bff-suite-config.yaml` and `openapi_bff.yaml` are per-suite
 
 ---
 
@@ -67,18 +80,15 @@ cd components/{system}/{module}
 brrtrouter-gen --spec ../../openapi/{system}/{module}/openapi.yaml
 ```
 
-### 4. System BFF Generation
+### 4. Suite BFF Generation
+
+Each suite has its own BFF. For the **accounting** suite:
 
 ```bash
-# Regenerate all system-level BFF specs
-python3 scripts/generate_system_bff.py
+bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
 ```
 
-This automatically:
-- Aggregates sub-service paths
-- Prefixes schemas to avoid conflicts
-- Updates references
-- Adds routing metadata
+For other suites, use `openapi/{suite}/bff-suite-config.yaml` and `openapi/{suite}/openapi_bff.yaml`. The `generate_system_bff.py` and CI workflows may generate one or more suite BFFs.
 
 ---
 
@@ -137,7 +147,7 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 
 - ✅ **71 Services Defined**: Complete OpenAPI specifications
 - ✅ **Crate Structure**: 142 crates organized in workspace
-- ✅ **BFF Generation**: Auto-generated system-level specs
+- ✅ **BFF Generation**: Auto-generated BFF per suite (accounting has `openapi_bff.yaml`)
 - ✅ **CI Automation**: GitHub Actions for BFF generation
 - ⏳ **Code Generation**: Services ready for BRRTRouter generation
 - ⏳ **Implementation**: Business logic implementation in progress
@@ -149,7 +159,7 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 1. **Always check AI docs first**: Review relevant documents in `docs/ai/` before making changes
 2. **Follow the two-crate model**: Don't modify generated crates directly
 3. **Update OpenAPI specs**: Changes to APIs should be in OpenAPI specs first
-4. **Regenerate BFF specs**: After updating service specs, regenerate system BFF specs
+4. **Regenerate BFF specs**: After updating service specs in a suite, regenerate that suite’s BFF (`openapi/{suite}/openapi_bff.yaml` from `bff-suite-config.yaml`)
 5. **Test changes**: Ensure all tests pass before committing
 6. **Update documentation**: Keep AI planning docs updated with status changes
 
@@ -186,8 +196,8 @@ RERP uses **Lifeguard** (`lifeguard_derive::LifeModel`) for ORM entities in `ent
 # View all services
 ls openapi/*/openapi.yaml
 
-# Generate BFF specs
-python3 scripts/generate_system_bff.py
+# Generate BFF for a suite (e.g. accounting)
+bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
 
 # Build workspace
 cd components && cargo build --workspace

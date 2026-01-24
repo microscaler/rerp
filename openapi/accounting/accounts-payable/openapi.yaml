@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Accounts payable service managing vendor invoices and payments.
 servers:
+- url: http://localhost:8004/api/v1/accounting/accounts-payable
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/accounts-payable
   description: Accounts Payable API
 tags: []
@@ -39,17 +41,17 @@ paths:
                   summary: Acme Corporation - Vendor invoices
                   value:
                     items:
-                      - id: "a0050e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "a0011e8400-e29b-41d4-a716-446655440001"
-                        vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                        original_amount: 15000.00
-                        outstanding_amount: 15000.00
-                        currency_code: "USD"
-                        status: "OUTSTANDING"
-                        aging_bucket: "CURRENT"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-15T09:00:00Z"
-                        updated_at: "2024-01-15T09:00:00Z"
+                    - id: a0050e8400-e29b-41d4-a716-446655440000
+                      invoice_id: a0011e8400-e29b-41d4-a716-446655440001
+                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                      original_amount: 15000.0
+                      outstanding_amount: 15000.0
+                      currency_code: USD
+                      status: OUTSTANDING
+                      aging_bucket: CURRENT
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-15T09:00:00Z'
+                      updated_at: '2024-01-15T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -57,17 +59,17 @@ paths:
                   summary: TechStart Inc - Vendor invoices
                   value:
                     items:
-                      - id: "b0050e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "b0011e8400-e29b-41d4-a716-446655440001"
-                        vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                        original_amount: 800.00
-                        outstanding_amount: 800.00
-                        currency_code: "USD"
-                        status: "OUTSTANDING"
-                        aging_bucket: "CURRENT"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0050e8400-e29b-41d4-a716-446655440000
+                      invoice_id: b0011e8400-e29b-41d4-a716-446655440001
+                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                      original_amount: 800.0
+                      outstanding_amount: 800.0
+                      currency_code: USD
+                      status: OUTSTANDING
+                      aging_bucket: CURRENT
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -75,17 +77,17 @@ paths:
                   summary: Global Manufacturing - Multi-currency vendor invoices
                   value:
                     items:
-                      - id: "c0050e8400-e29b-41d4-a716-446655440000"
-                        invoice_id: "c0011e8400-e29b-41d4-a716-446655440001"
-                        vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                        original_amount: 15000.00
-                        outstanding_amount: 15000.00
-                        currency_code: "EUR"
-                        status: "OUTSTANDING"
-                        aging_bucket: "CURRENT"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-25T07:00:00Z"
-                        updated_at: "2024-01-25T07:00:00Z"
+                    - id: c0050e8400-e29b-41d4-a716-446655440000
+                      invoice_id: c0011e8400-e29b-41d4-a716-446655440001
+                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                      original_amount: 15000.0
+                      outstanding_amount: 15000.0
+                      currency_code: EUR
+                      status: OUTSTANDING
+                      aging_bucket: CURRENT
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-25T07:00:00Z'
+                      updated_at: '2024-01-25T07:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -102,24 +104,24 @@ paths:
               acmeCorporationRequest:
                 summary: Create vendor invoice for Acme Corporation
                 value:
-                  invoice_id: "a0011e8400-e29b-41d4-a716-446655440001"
-                  vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                  currency_code: "USD"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  invoice_id: a0011e8400-e29b-41d4-a716-446655440001
+                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                  currency_code: USD
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create vendor invoice for TechStart Inc
                 value:
-                  invoice_id: "b0011e8400-e29b-41d4-a716-446655440001"
-                  vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                  currency_code: "USD"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  invoice_id: b0011e8400-e29b-41d4-a716-446655440001
+                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                  currency_code: USD
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency vendor invoice
                 value:
-                  invoice_id: "c0011e8400-e29b-41d4-a716-446655440001"
-                  vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                  currency_code: "EUR"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  invoice_id: c0011e8400-e29b-41d4-a716-446655440001
+                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                  currency_code: EUR
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: VendorInvoice created
@@ -131,42 +133,42 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation vendor invoice created
                   value:
-                    id: "a0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "USD"
-                    status: "OUTSTANDING"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    id: a0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    original_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: USD
+                    status: OUTSTANDING
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartResponse:
                   summary: TechStart vendor invoice created
                   value:
-                    id: "b0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "USD"
-                    status: "OUTSTANDING"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    id: b0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    original_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: USD
+                    status: OUTSTANDING
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing vendor invoice created
                   value:
-                    id: "c0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 0.00
-                    outstanding_amount: 0.00
-                    currency_code: "EUR"
-                    status: "OUTSTANDING"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    id: c0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    original_amount: 0.0
+                    outstanding_amount: 0.0
+                    currency_code: EUR
+                    status: OUTSTANDING
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '400':
           description: Invalid request
   /vendor-invoices/{id}:
@@ -191,45 +193,45 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation vendor invoice
                   value:
-                    id: "a0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 15000.00
-                    outstanding_amount: 15000.00
-                    currency_code: "USD"
-                    status: "OUTSTANDING"
-                    aging_bucket: "CURRENT"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T09:00:00Z"
+                    id: a0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    original_amount: 15000.0
+                    outstanding_amount: 15000.0
+                    currency_code: USD
+                    status: OUTSTANDING
+                    aging_bucket: CURRENT
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T09:00:00Z'
                 techStartExample:
                   summary: TechStart vendor invoice
                   value:
-                    id: "b0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 800.00
-                    outstanding_amount: 800.00
-                    currency_code: "USD"
-                    status: "OUTSTANDING"
-                    aging_bucket: "CURRENT"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    id: b0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    original_amount: 800.0
+                    outstanding_amount: 800.0
+                    currency_code: USD
+                    status: OUTSTANDING
+                    aging_bucket: CURRENT
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing vendor invoice
                   value:
-                    id: "c0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 15000.00
-                    outstanding_amount: 15000.00
-                    currency_code: "EUR"
-                    status: "OUTSTANDING"
-                    aging_bucket: "CURRENT"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T07:00:00Z"
+                    id: c0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    original_amount: 15000.0
+                    outstanding_amount: 15000.0
+                    currency_code: EUR
+                    status: OUTSTANDING
+                    aging_bucket: CURRENT
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T07:00:00Z'
         '404':
           description: Not found
     put:
@@ -252,18 +254,18 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation vendor invoice
                 value:
-                  status: "PARTIAL"
-                  aging_bucket: "1-30"
+                  status: PARTIAL
+                  aging_bucket: 1-30
               techStartUpdate:
                 summary: Update TechStart vendor invoice
                 value:
-                  status: "PARTIAL"
-                  aging_bucket: "1-30"
+                  status: PARTIAL
+                  aging_bucket: 1-30
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing vendor invoice
                 value:
-                  status: "PARTIAL"
-                  aging_bucket: "1-30"
+                  status: PARTIAL
+                  aging_bucket: 1-30
       responses:
         '200':
           description: VendorInvoice updated
@@ -275,45 +277,45 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation vendor invoice updated
                   value:
-                    id: "a0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "a0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 15000.00
-                    outstanding_amount: 7500.00
-                    currency_code: "USD"
-                    status: "PARTIAL"
-                    aging_bucket: "1-30"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T09:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    id: a0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    original_amount: 15000.0
+                    outstanding_amount: 7500.0
+                    currency_code: USD
+                    status: PARTIAL
+                    aging_bucket: 1-30
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T09:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart vendor invoice updated
                   value:
-                    id: "b0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "b0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 800.00
-                    outstanding_amount: 400.00
-                    currency_code: "USD"
-                    status: "PARTIAL"
-                    aging_bucket: "1-30"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    id: b0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    original_amount: 800.0
+                    outstanding_amount: 400.0
+                    currency_code: USD
+                    status: PARTIAL
+                    aging_bucket: 1-30
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing vendor invoice updated
                   value:
-                    id: "c0050e8400-e29b-41d4-a716-446655440000"
-                    invoice_id: "c0011e8400-e29b-41d4-a716-446655440001"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    original_amount: 15000.00
-                    outstanding_amount: 7500.00
-                    currency_code: "EUR"
-                    status: "PARTIAL"
-                    aging_bucket: "1-30"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T07:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    id: c0050e8400-e29b-41d4-a716-446655440000
+                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    original_amount: 15000.0
+                    outstanding_amount: 7500.0
+                    currency_code: EUR
+                    status: PARTIAL
+                    aging_bucket: 1-30
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T07:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -362,18 +364,18 @@ paths:
                   summary: Acme Corporation - AP payments
                   value:
                     items:
-                      - id: "a0060e8400-e29b-41d4-a716-446655440000"
-                        payment_number: "AP-PAY-2024-001"
-                        payment_date: "2024-01-20"
-                        vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                        payment_amount: 7500.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        payment_method: "WIRE"
-                        status: "POSTED"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-20T10:00:00Z"
-                        updated_at: "2024-01-20T10:00:00Z"
+                    - id: a0060e8400-e29b-41d4-a716-446655440000
+                      payment_number: AP-PAY-2024-001
+                      payment_date: '2024-01-20'
+                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                      payment_amount: 7500.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      payment_method: WIRE
+                      status: POSTED
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-20T10:00:00Z'
+                      updated_at: '2024-01-20T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -381,18 +383,18 @@ paths:
                   summary: TechStart Inc - AP payments
                   value:
                     items:
-                      - id: "b0060e8400-e29b-41d4-a716-446655440000"
-                        payment_number: "AP-PAY-2024-100"
-                        payment_date: "2024-01-25"
-                        vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                        payment_amount: 400.00
-                        currency_code: "USD"
-                        exchange_rate: 1.0
-                        payment_method: "CHECK"
-                        status: "POSTED"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-25T09:00:00Z"
-                        updated_at: "2024-01-25T09:00:00Z"
+                    - id: b0060e8400-e29b-41d4-a716-446655440000
+                      payment_number: AP-PAY-2024-100
+                      payment_date: '2024-01-25'
+                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                      payment_amount: 400.0
+                      currency_code: USD
+                      exchange_rate: 1.0
+                      payment_method: CHECK
+                      status: POSTED
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-25T09:00:00Z'
+                      updated_at: '2024-01-25T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -400,18 +402,18 @@ paths:
                   summary: Global Manufacturing - Multi-currency AP payments
                   value:
                     items:
-                      - id: "c0060e8400-e29b-41d4-a716-446655440000"
-                        payment_number: "AP-PAY-2024-200"
-                        payment_date: "2024-01-30"
-                        vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                        payment_amount: 7500.00
-                        currency_code: "EUR"
-                        exchange_rate: 0.92
-                        payment_method: "WIRE"
-                        status: "POSTED"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-30T08:00:00Z"
-                        updated_at: "2024-01-30T08:00:00Z"
+                    - id: c0060e8400-e29b-41d4-a716-446655440000
+                      payment_number: AP-PAY-2024-200
+                      payment_date: '2024-01-30'
+                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                      payment_amount: 7500.0
+                      currency_code: EUR
+                      exchange_rate: 0.92
+                      payment_method: WIRE
+                      status: POSTED
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-30T08:00:00Z'
+                      updated_at: '2024-01-30T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -428,36 +430,36 @@ paths:
               acmeCorporationRequest:
                 summary: Create AP payment for Acme Corporation
                 value:
-                  payment_number: "AP-PAY-2024-001"
-                  payment_date: "2024-01-20"
-                  vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                  payment_amount: 7500.00
-                  currency_code: "USD"
+                  payment_number: AP-PAY-2024-001
+                  payment_date: '2024-01-20'
+                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                  payment_amount: 7500.0
+                  currency_code: USD
                   exchange_rate: 1.0
-                  payment_method: "WIRE"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  payment_method: WIRE
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create AP payment for TechStart Inc
                 value:
-                  payment_number: "AP-PAY-2024-100"
-                  payment_date: "2024-01-25"
-                  vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                  payment_amount: 400.00
-                  currency_code: "USD"
+                  payment_number: AP-PAY-2024-100
+                  payment_date: '2024-01-25'
+                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                  payment_amount: 400.0
+                  currency_code: USD
                   exchange_rate: 1.0
-                  payment_method: "CHECK"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  payment_method: CHECK
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency AP payment
                 value:
-                  payment_number: "AP-PAY-2024-200"
-                  payment_date: "2024-01-30"
-                  vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                  payment_amount: 7500.00
-                  currency_code: "EUR"
+                  payment_number: AP-PAY-2024-200
+                  payment_date: '2024-01-30'
+                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                  payment_amount: 7500.0
+                  currency_code: EUR
                   exchange_rate: 0.92
-                  payment_method: "WIRE"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  payment_method: WIRE
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: Payment created
@@ -469,48 +471,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation AP payment created
                   value:
-                    id: "a0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-001"
-                    payment_date: "2024-01-20"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "USD"
+                    id: a0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-001
+                    payment_date: '2024-01-20'
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "WIRE"
-                    status: "DRAFT"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-20T10:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    payment_method: WIRE
+                    status: DRAFT
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-20T10:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 techStartResponse:
                   summary: TechStart AP payment created
                   value:
-                    id: "b0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-100"
-                    payment_date: "2024-01-25"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 400.00
-                    currency_code: "USD"
+                    id: b0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-100
+                    payment_date: '2024-01-25'
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 400.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "CHECK"
-                    status: "DRAFT"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-25T09:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    payment_method: CHECK
+                    status: DRAFT
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-25T09:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing AP payment created
                   value:
-                    id: "c0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-200"
-                    payment_date: "2024-01-30"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "EUR"
+                    id: c0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-200
+                    payment_date: '2024-01-30'
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    payment_method: "WIRE"
-                    status: "DRAFT"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-30T08:00:00Z"
-                    updated_at: "2024-01-30T08:00:00Z"
+                    payment_method: WIRE
+                    status: DRAFT
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-30T08:00:00Z'
+                    updated_at: '2024-01-30T08:00:00Z'
         '400':
           description: Invalid request
   /payments/{id}:
@@ -535,48 +537,48 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation AP payment
                   value:
-                    id: "a0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-001"
-                    payment_date: "2024-01-20"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "USD"
+                    id: a0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-001
+                    payment_date: '2024-01-20'
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "WIRE"
-                    status: "POSTED"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-20T10:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    payment_method: WIRE
+                    status: POSTED
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-20T10:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 techStartExample:
                   summary: TechStart AP payment
                   value:
-                    id: "b0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-100"
-                    payment_date: "2024-01-25"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 400.00
-                    currency_code: "USD"
+                    id: b0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-100
+                    payment_date: '2024-01-25'
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 400.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "CHECK"
-                    status: "POSTED"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-25T09:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    payment_method: CHECK
+                    status: POSTED
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-25T09:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing AP payment
                   value:
-                    id: "c0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-200"
-                    payment_date: "2024-01-30"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "EUR"
+                    id: c0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-200
+                    payment_date: '2024-01-30'
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    payment_method: "WIRE"
-                    status: "POSTED"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-30T08:00:00Z"
-                    updated_at: "2024-01-30T08:00:00Z"
+                    payment_method: WIRE
+                    status: POSTED
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-30T08:00:00Z'
+                    updated_at: '2024-01-30T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -599,18 +601,18 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation AP payment
                 value:
-                  status: "POSTED"
-                  payment_method: "WIRE"
+                  status: POSTED
+                  payment_method: WIRE
               techStartUpdate:
                 summary: Update TechStart AP payment
                 value:
-                  status: "POSTED"
-                  payment_method: "CHECK"
+                  status: POSTED
+                  payment_method: CHECK
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing AP payment
                 value:
-                  status: "POSTED"
-                  payment_method: "WIRE"
+                  status: POSTED
+                  payment_method: WIRE
       responses:
         '200':
           description: Payment updated
@@ -622,48 +624,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation AP payment updated
                   value:
-                    id: "a0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-001"
-                    payment_date: "2024-01-20"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "USD"
+                    id: a0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-001
+                    payment_date: '2024-01-20'
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "WIRE"
-                    status: "POSTED"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-20T10:00:00Z"
-                    updated_at: "2024-01-20T11:00:00Z"
+                    payment_method: WIRE
+                    status: POSTED
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-20T10:00:00Z'
+                    updated_at: '2024-01-20T11:00:00Z'
                 techStartResponse:
                   summary: TechStart AP payment updated
                   value:
-                    id: "b0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-100"
-                    payment_date: "2024-01-25"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 400.00
-                    currency_code: "USD"
+                    id: b0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-100
+                    payment_date: '2024-01-25'
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 400.0
+                    currency_code: USD
                     exchange_rate: 1.0
-                    payment_method: "CHECK"
-                    status: "POSTED"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-25T09:00:00Z"
-                    updated_at: "2024-01-25T10:00:00Z"
+                    payment_method: CHECK
+                    status: POSTED
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-25T09:00:00Z'
+                    updated_at: '2024-01-25T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing AP payment updated
                   value:
-                    id: "c0060e8400-e29b-41d4-a716-446655440000"
-                    payment_number: "AP-PAY-2024-200"
-                    payment_date: "2024-01-30"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    payment_amount: 7500.00
-                    currency_code: "EUR"
+                    id: c0060e8400-e29b-41d4-a716-446655440000
+                    payment_number: AP-PAY-2024-200
+                    payment_date: '2024-01-30'
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    payment_amount: 7500.0
+                    currency_code: EUR
                     exchange_rate: 0.92
-                    payment_method: "WIRE"
-                    status: "POSTED"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-30T08:00:00Z"
-                    updated_at: "2024-01-30T09:00:00Z"
+                    payment_method: WIRE
+                    status: POSTED
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-30T08:00:00Z'
+                    updated_at: '2024-01-30T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -712,18 +714,18 @@ paths:
                   summary: Acme Corporation - AP aging analysis
                   value:
                     items:
-                      - id: "a00b0e8400-e29b-41d4-a716-446655440000"
-                        vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                        aging_date: "2024-01-31"
-                        current: 7500.00
-                        days_31_60: 0.00
-                        days_61_90: 0.00
-                        days_91_120: 0.00
-                        over_120: 0.00
-                        total_outstanding: 7500.00
-                        currency_code: "USD"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-31T10:00:00Z"
+                    - id: a00b0e8400-e29b-41d4-a716-446655440000
+                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                      aging_date: '2024-01-31'
+                      current: 7500.0
+                      days_31_60: 0.0
+                      days_61_90: 0.0
+                      days_91_120: 0.0
+                      over_120: 0.0
+                      total_outstanding: 7500.0
+                      currency_code: USD
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-31T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -731,18 +733,18 @@ paths:
                   summary: TechStart Inc - AP aging analysis
                   value:
                     items:
-                      - id: "b00b0e8400-e29b-41d4-a716-446655440000"
-                        vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                        aging_date: "2024-01-31"
-                        current: 400.00
-                        days_31_60: 0.00
-                        days_61_90: 0.00
-                        days_91_120: 0.00
-                        over_120: 0.00
-                        total_outstanding: 400.00
-                        currency_code: "USD"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-31T09:00:00Z"
+                    - id: b00b0e8400-e29b-41d4-a716-446655440000
+                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                      aging_date: '2024-01-31'
+                      current: 400.0
+                      days_31_60: 0.0
+                      days_61_90: 0.0
+                      days_91_120: 0.0
+                      over_120: 0.0
+                      total_outstanding: 400.0
+                      currency_code: USD
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-31T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -750,18 +752,18 @@ paths:
                   summary: Global Manufacturing - Multi-currency AP aging
                   value:
                     items:
-                      - id: "c00b0e8400-e29b-41d4-a716-446655440000"
-                        vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                        aging_date: "2024-01-31"
-                        current: 7500.00
-                        days_31_60: 0.00
-                        days_61_90: 0.00
-                        days_91_120: 0.00
-                        over_120: 0.00
-                        total_outstanding: 7500.00
-                        currency_code: "EUR"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-31T08:00:00Z"
+                    - id: c00b0e8400-e29b-41d4-a716-446655440000
+                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                      aging_date: '2024-01-31'
+                      current: 7500.0
+                      days_31_60: 0.0
+                      days_61_90: 0.0
+                      days_91_120: 0.0
+                      over_120: 0.0
+                      total_outstanding: 7500.0
+                      currency_code: EUR
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-31T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -778,24 +780,24 @@ paths:
               acmeCorporationRequest:
                 summary: Create AP aging for Acme Corporation
                 value:
-                  vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                  aging_date: "2024-01-31"
-                  currency_code: "USD"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                  aging_date: '2024-01-31'
+                  currency_code: USD
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create AP aging for TechStart Inc
                 value:
-                  vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                  aging_date: "2024-01-31"
-                  currency_code: "USD"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                  aging_date: '2024-01-31'
+                  currency_code: USD
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency AP aging
                 value:
-                  vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                  aging_date: "2024-01-31"
-                  currency_code: "EUR"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                  aging_date: '2024-01-31'
+                  currency_code: EUR
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: ApAging created
@@ -807,48 +809,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation AP aging created
                   value:
-                    id: "a00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 0.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 0.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
+                    id: a00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 0.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 0.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
                 techStartResponse:
                   summary: TechStart AP aging created
                   value:
-                    id: "b00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 0.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 0.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
+                    id: b00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 0.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 0.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing AP aging created
                   value:
-                    id: "c00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 0.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 0.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
+                    id: c00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 0.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 0.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
         '400':
           description: Invalid request
   /ap-agings/{id}:
@@ -873,48 +875,48 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation AP aging
                   value:
-                    id: "a00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 7500.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 7500.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
+                    id: a00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 7500.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 7500.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
                 techStartExample:
                   summary: TechStart AP aging
                   value:
-                    id: "b00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 400.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 400.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
+                    id: b00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 400.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 400.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing AP aging
                   value:
-                    id: "c00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 7500.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 7500.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
+                    id: c00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 7500.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 7500.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -937,18 +939,18 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation AP aging
                 value:
-                  current: 8000.00
-                  total_outstanding: 8000.00
+                  current: 8000.0
+                  total_outstanding: 8000.0
               techStartUpdate:
                 summary: Update TechStart AP aging
                 value:
-                  current: 450.00
-                  total_outstanding: 450.00
+                  current: 450.0
+                  total_outstanding: 450.0
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing AP aging
                 value:
-                  current: 8000.00
-                  total_outstanding: 8000.00
+                  current: 8000.0
+                  total_outstanding: 8000.0
       responses:
         '200':
           description: ApAging updated
@@ -960,48 +962,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation AP aging updated
                   value:
-                    id: "a00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "411e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 8000.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 8000.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
+                    id: a00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 8000.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 8000.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
                 techStartResponse:
                   summary: TechStart AP aging updated
                   value:
-                    id: "b00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "422e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 450.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 450.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
+                    id: b00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 450.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 450.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing AP aging updated
                   value:
-                    id: "c00b0e8400-e29b-41d4-a716-446655440000"
-                    vendor_id: "433e8400-e29b-41d4-a716-446655440001"
-                    aging_date: "2024-01-31"
-                    current: 8000.00
-                    days_31_60: 0.00
-                    days_61_90: 0.00
-                    days_91_120: 0.00
-                    over_120: 0.00
-                    total_outstanding: 8000.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
+                    id: c00b0e8400-e29b-41d4-a716-446655440000
+                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
+                    aging_date: '2024-01-31'
+                    current: 8000.0
+                    days_31_60: 0.0
+                    days_61_90: 0.0
+                    days_91_120: 0.0
+                    over_120: 0.0
+                    total_outstanding: 8000.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
         '404':
           description: Not found
     delete:
@@ -1045,9 +1047,9 @@ components:
     VendorInvoice:
       type: object
       required:
-        - id
-        - invoice_id
-        - vendor_id
+      - id
+      - invoice_id
+      - vendor_id
       properties:
         id:
           type: string
@@ -1065,7 +1067,12 @@ components:
           type: integer
         aging_bucket:
           type: string
-          enum: [CURRENT, "1-30", "31-60", "61-90", "90+"]
+          enum:
+          - CURRENT
+          - 1-30
+          - 31-60
+          - 61-90
+          - 90+
           nullable: true
         purchase_order_id:
           type: string
@@ -1073,11 +1080,17 @@ components:
           nullable: true
         matching_status:
           type: string
-          enum: [NOT_MATCHED, PARTIAL, MATCHED]
+          enum:
+          - NOT_MATCHED
+          - PARTIAL
+          - MATCHED
           nullable: true
         approval_status:
           type: string
-          enum: [PENDING, APPROVED, REJECTED]
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
           nullable: true
         approved_at:
           type: string
@@ -1107,14 +1120,14 @@ components:
     ApPayment:
       type: object
       required:
-        - id
-        - vendor_id
-        - payment_number
-        - payment_date
-        - payment_amount
-        - payment_method
-        - status
-        - currency_code
+      - id
+      - vendor_id
+      - payment_number
+      - payment_date
+      - payment_amount
+      - payment_method
+      - status
+      - currency_code
       properties:
         id:
           type: string
@@ -1137,7 +1150,13 @@ components:
           maxLength: 3
         payment_method:
           type: string
-          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+          enum:
+          - CHECK
+          - WIRE
+          - ACH
+          - CASH
+          - CREDIT_CARD
+          - OTHER
         payment_reference:
           type: string
           nullable: true
@@ -1147,7 +1166,11 @@ components:
           nullable: true
         status:
           type: string
-          enum: [DRAFT, POSTED, RECONCILED, CANCELLED]
+          enum:
+          - DRAFT
+          - POSTED
+          - RECONCILED
+          - CANCELLED
         applied_amount:
           type: number
           format: decimal
@@ -1178,10 +1201,10 @@ components:
     ApPaymentApplication:
       type: object
       required:
-        - id
-        - payment_id
-        - invoice_id
-        - applied_amount
+      - id
+      - payment_id
+      - invoice_id
+      - applied_amount
       properties:
         id:
           type: string
@@ -1214,10 +1237,10 @@ components:
     ApAging:
       type: object
       required:
-        - id
-        - vendor_id
-        - aging_date
-        - currency_code
+      - id
+      - vendor_id
+      - aging_date
+      - currency_code
       properties:
         id:
           type: string
@@ -1263,8 +1286,8 @@ components:
     CreateVendorInvoiceRequest:
       type: object
       required:
-        - invoice_id
-        - vendor_id
+      - invoice_id
+      - vendor_id
       properties:
         invoice_id:
           type: string
@@ -1277,7 +1300,10 @@ components:
           format: uuid
         approval_status:
           type: string
-          enum: [PENDING, APPROVED, REJECTED]
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
         early_payment_discount_percent:
           type: number
           format: decimal
@@ -1292,22 +1318,33 @@ components:
           format: decimal
         aging_bucket:
           type: string
-          enum: [CURRENT, "1-30", "31-60", "61-90", "90+"]
+          enum:
+          - CURRENT
+          - 1-30
+          - 31-60
+          - 61-90
+          - 90+
         matching_status:
           type: string
-          enum: [NOT_MATCHED, PARTIAL, MATCHED]
+          enum:
+          - NOT_MATCHED
+          - PARTIAL
+          - MATCHED
         approval_status:
           type: string
-          enum: [PENDING, APPROVED, REJECTED]
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
     CreateApPaymentRequest:
       type: object
       required:
-        - vendor_id
-        - payment_number
-        - payment_date
-        - payment_amount
-        - payment_method
-        - currency_code
+      - vendor_id
+      - payment_number
+      - payment_date
+      - payment_amount
+      - payment_method
+      - currency_code
       properties:
         vendor_id:
           type: string
@@ -1327,7 +1364,13 @@ components:
           maxLength: 3
         payment_method:
           type: string
-          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+          enum:
+          - CHECK
+          - WIRE
+          - ACH
+          - CASH
+          - CREDIT_CARD
+          - OTHER
         payment_reference:
           type: string
         bank_account_id:
@@ -1349,18 +1392,28 @@ components:
           format: decimal
         payment_method:
           type: string
-          enum: [CHECK, WIRE, ACH, CASH, CREDIT_CARD, OTHER]
+          enum:
+          - CHECK
+          - WIRE
+          - ACH
+          - CASH
+          - CREDIT_CARD
+          - OTHER
         status:
           type: string
-          enum: [DRAFT, POSTED, RECONCILED, CANCELLED]
+          enum:
+          - DRAFT
+          - POSTED
+          - RECONCILED
+          - CANCELLED
         notes:
           type: string
     CreateApPaymentApplicationRequest:
       type: object
       required:
-        - payment_id
-        - invoice_id
-        - applied_amount
+      - payment_id
+      - invoice_id
+      - applied_amount
       properties:
         payment_id:
           type: string
@@ -1384,9 +1437,9 @@ components:
     CreateApAgingRequest:
       type: object
       required:
-        - vendor_id
-        - aging_date
-        - currency_code
+      - vendor_id
+      - aging_date
+      - currency_code
       properties:
         vendor_id:
           type: string

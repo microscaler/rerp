@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: invoice
+  binaryName: invoice_service_api
   serviceName: invoice

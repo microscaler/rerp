@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Financial reporting service generating P&L and balance sheets.
 servers:
+- url: http://localhost:8009/api/v1/accounting/financial-reports
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/financial-reports
   description: Financial Reports API
 tags: []
@@ -242,12 +244,12 @@ components:
     Report:
       type: object
       required:
-        - id
-        - report_code
-        - name
-        - report_type
-        - status
-        - currency_code
+      - id
+      - report_code
+      - name
+      - report_type
+      - status
+      - currency_code
       properties:
         id:
           type: string
@@ -263,7 +265,12 @@ components:
           nullable: true
         report_type:
           type: string
-          enum: [PROFIT_LOSS, BALANCE_SHEET, CASH_FLOW, TRIAL_BALANCE, CUSTOM]
+          enum:
+          - PROFIT_LOSS
+          - BALANCE_SHEET
+          - CASH_FLOW
+          - TRIAL_BALANCE
+          - CUSTOM
         template_id:
           type: string
           format: uuid
@@ -282,7 +289,11 @@ components:
           nullable: true
         status:
           type: string
-          enum: [DRAFT, GENERATED, APPROVED, PUBLISHED]
+          enum:
+          - DRAFT
+          - GENERATED
+          - APPROVED
+          - PUBLISHED
         generated_at:
           type: string
           format: date-time
@@ -333,14 +344,14 @@ components:
     ReportTemplate:
       type: object
       required:
-        - id
-        - template_code
-        - name
-        - report_type
-        - template_structure
-        - is_active
-        - is_system_template
-        - version
+      - id
+      - template_code
+      - name
+      - report_type
+      - template_structure
+      - is_active
+      - is_system_template
+      - version
       properties:
         id:
           type: string
@@ -356,7 +367,12 @@ components:
           nullable: true
         report_type:
           type: string
-          enum: [PROFIT_LOSS, BALANCE_SHEET, CASH_FLOW, TRIAL_BALANCE, CUSTOM]
+          enum:
+          - PROFIT_LOSS
+          - BALANCE_SHEET
+          - CASH_FLOW
+          - TRIAL_BALANCE
+          - CUSTOM
         template_structure:
           type: object
         formulas:
@@ -391,12 +407,12 @@ components:
     ReportSchedule:
       type: object
       required:
-        - id
-        - template_id
-        - name
-        - frequency
-        - status
-        - run_count
+      - id
+      - template_id
+      - name
+      - frequency
+      - status
+      - run_count
       properties:
         id:
           type: string
@@ -412,7 +428,13 @@ components:
           nullable: true
         frequency:
           type: string
-          enum: [DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY, CUSTOM]
+          enum:
+          - DAILY
+          - WEEKLY
+          - MONTHLY
+          - QUARTERLY
+          - YEARLY
+          - CUSTOM
         schedule_config:
           type: object
           nullable: true
@@ -428,7 +450,11 @@ components:
           type: integer
         status:
           type: string
-          enum: [ACTIVE, PAUSED, COMPLETED, ERROR]
+          enum:
+          - ACTIVE
+          - PAUSED
+          - COMPLETED
+          - ERROR
         recipients:
           type: object
           nullable: true
@@ -437,7 +463,12 @@ components:
           nullable: true
         output_format:
           type: string
-          enum: [PDF, EXCEL, CSV, JSON, HTML]
+          enum:
+          - PDF
+          - EXCEL
+          - CSV
+          - JSON
+          - HTML
           nullable: true
         company_id:
           type: string
@@ -463,12 +494,12 @@ components:
     FinancialStatement:
       type: object
       required:
-        - id
-        - report_id
-        - report_date
-        - data
-        - currency_code
-        - data_version
+      - id
+      - report_id
+      - report_date
+      - data
+      - currency_code
+      - data_version
       properties:
         id:
           type: string
@@ -513,10 +544,10 @@ components:
     CreateReportRequest:
       type: object
       required:
-        - report_code
-        - name
-        - report_type
-        - currency_code
+      - report_code
+      - name
+      - report_type
+      - currency_code
       properties:
         report_code:
           type: string
@@ -528,7 +559,12 @@ components:
           type: string
         report_type:
           type: string
-          enum: [PROFIT_LOSS, BALANCE_SHEET, CASH_FLOW, TRIAL_BALANCE, CUSTOM]
+          enum:
+          - PROFIT_LOSS
+          - BALANCE_SHEET
+          - CASH_FLOW
+          - TRIAL_BALANCE
+          - CUSTOM
         template_id:
           type: string
           format: uuid
@@ -560,7 +596,11 @@ components:
           type: string
         status:
           type: string
-          enum: [DRAFT, GENERATED, APPROVED, PUBLISHED]
+          enum:
+          - DRAFT
+          - GENERATED
+          - APPROVED
+          - PUBLISHED
         report_data:
           type: object
         parameters:
@@ -568,10 +608,10 @@ components:
     CreateFinancialStatementRequest:
       type: object
       required:
-        - report_id
-        - report_date
-        - data
-        - currency_code
+      - report_id
+      - report_date
+      - data
+      - currency_code
       properties:
         report_id:
           type: string

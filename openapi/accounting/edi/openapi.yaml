@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Electronic Data Interchange service supporting PEPPOL and UBL formats.
 servers:
+- url: http://localhost:8008/api/v1/accounting/edi
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/edi
   description: EDI & Compliance API
 tags: []
@@ -242,14 +244,14 @@ components:
     EdiDocument:
       type: object
       required:
-        - id
-        - document_number
-        - document_type
-        - format_id
-        - status
-        - received_at
-        - retry_count
-        - acknowledgment_sent
+      - id
+      - document_number
+      - document_type
+      - format_id
+      - status
+      - received_at
+      - retry_count
+      - acknowledgment_sent
       properties:
         id:
           type: string
@@ -259,13 +261,24 @@ components:
           maxLength: 100
         document_type:
           type: string
-          enum: [INVOICE, PURCHASE_ORDER, ACKNOWLEDGMENT, SHIPPING_NOTICE, PAYMENT_ORDER]
+          enum:
+          - INVOICE
+          - PURCHASE_ORDER
+          - ACKNOWLEDGMENT
+          - SHIPPING_NOTICE
+          - PAYMENT_ORDER
         format_id:
           type: string
           format: uuid
         status:
           type: string
-          enum: [RECEIVED, PARSING, PARSED, VALIDATED, PROCESSED, ERROR]
+          enum:
+          - RECEIVED
+          - PARSING
+          - PARSED
+          - VALIDATED
+          - PROCESSED
+          - ERROR
         received_at:
           type: string
           format: date-time
@@ -345,10 +358,10 @@ components:
     EdiFormat:
       type: object
       required:
-        - id
-        - code
-        - name
-        - is_active
+      - id
+      - code
+      - name
+      - is_active
       properties:
         id:
           type: string
@@ -384,12 +397,12 @@ components:
     EdiMapping:
       type: object
       required:
-        - id
-        - format_id
-        - document_type
-        - mapping_name
-        - field_mappings
-        - is_active
+      - id
+      - format_id
+      - document_type
+      - mapping_name
+      - field_mappings
+      - is_active
       properties:
         id:
           type: string
@@ -399,7 +412,12 @@ components:
           format: uuid
         document_type:
           type: string
-          enum: [INVOICE, PURCHASE_ORDER, ACKNOWLEDGMENT, SHIPPING_NOTICE, PAYMENT_ORDER]
+          enum:
+          - INVOICE
+          - PURCHASE_ORDER
+          - ACKNOWLEDGMENT
+          - SHIPPING_NOTICE
+          - PAYMENT_ORDER
         mapping_name:
           type: string
           maxLength: 100
@@ -436,10 +454,10 @@ components:
     EdiAcknowledgment:
       type: object
       required:
-        - id
-        - document_id
-        - acknowledgment_type
-        - status
+      - id
+      - document_id
+      - acknowledgment_type
+      - status
       properties:
         id:
           type: string
@@ -449,10 +467,16 @@ components:
           format: uuid
         acknowledgment_type:
           type: string
-          enum: [FUNCTIONAL, TECHNICAL, RECEIPT]
+          enum:
+          - FUNCTIONAL
+          - TECHNICAL
+          - RECEIPT
         status:
           type: string
-          enum: [ACCEPTED, REJECTED, PARTIAL]
+          enum:
+          - ACCEPTED
+          - REJECTED
+          - PARTIAL
         acknowledgment_content:
           type: string
           nullable: true
@@ -485,17 +509,22 @@ components:
     CreateEdiDocumentRequest:
       type: object
       required:
-        - document_number
-        - document_type
-        - format_id
-        - status
+      - document_number
+      - document_type
+      - format_id
+      - status
       properties:
         document_number:
           type: string
           maxLength: 100
         document_type:
           type: string
-          enum: [INVOICE, PURCHASE_ORDER, ACKNOWLEDGMENT, SHIPPING_NOTICE, PAYMENT_ORDER]
+          enum:
+          - INVOICE
+          - PURCHASE_ORDER
+          - ACKNOWLEDGMENT
+          - SHIPPING_NOTICE
+          - PAYMENT_ORDER
         format_id:
           type: string
           format: uuid
@@ -515,7 +544,13 @@ components:
       properties:
         status:
           type: string
-          enum: [RECEIVED, PARSING, PARSED, VALIDATED, PROCESSED, ERROR]
+          enum:
+          - RECEIVED
+          - PARSING
+          - PARSED
+          - VALIDATED
+          - PROCESSED
+          - ERROR
         parsed_data:
           type: object
         related_invoice_id:
@@ -531,17 +566,22 @@ components:
     CreateEdiMappingRequest:
       type: object
       required:
-        - format_id
-        - document_type
-        - mapping_name
-        - field_mappings
+      - format_id
+      - document_type
+      - mapping_name
+      - field_mappings
       properties:
         format_id:
           type: string
           format: uuid
         document_type:
           type: string
-          enum: [INVOICE, PURCHASE_ORDER, ACKNOWLEDGMENT, SHIPPING_NOTICE, PAYMENT_ORDER]
+          enum:
+          - INVOICE
+          - PURCHASE_ORDER
+          - ACKNOWLEDGMENT
+          - SHIPPING_NOTICE
+          - PAYMENT_ORDER
         mapping_name:
           type: string
           maxLength: 100

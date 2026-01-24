@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: accounts_payable
+  binaryName: accounts_payable_service_api
   serviceName: accounts-payable

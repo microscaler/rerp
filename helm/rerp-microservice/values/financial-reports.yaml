@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: financial_reports
+  binaryName: financial_reports_service_api
   serviceName: financial-reports

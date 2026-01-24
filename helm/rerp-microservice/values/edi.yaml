@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: edi
+  binaryName: edi_service_api
   serviceName: edi
