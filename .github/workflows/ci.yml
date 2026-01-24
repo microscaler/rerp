@@ -271,7 +271,7 @@ jobs:
         run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }}
 
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: rerp-binaries-${{ matrix.architecture }}
           path: components/target/*/release/rerp_*
@@ -279,7 +279,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload microservices binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: microservices-binaries-${{ matrix.architecture == 'arm7' && 'arm' || matrix.architecture }}
           path: build_artifacts/${{ matrix.architecture == 'arm7' && 'arm' || matrix.architecture }}
@@ -352,7 +352,7 @@ jobs:
           fi
 
       - name: Upload build_artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-artifacts
           path: build_artifacts
