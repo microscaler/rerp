@@ -3,7 +3,12 @@
 > **Cloud-native, microservices-based ERP system built with Rust and OpenAPI-first architecture**
 
 [![CI](https://github.com/microscaler/rerp/actions/workflows/ci.yml/badge.svg)](https://github.com/microscaler/rerp/actions)
+[![Deploy Website](https://github.com/microscaler/rerp/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/microscaler/rerp/actions/workflows/deploy-website.yml)
 [![License](https://img.shields.io/badge/license-PolyForm--Shield--1.0.0-blue.svg)](LICENSE)
+[![Rust](https://img.shields.io/badge/rust-stable-orange?logo=rust)](https://www.rust-lang.org/)
+[![OpenAPI 3.1](https://img.shields.io/badge/OpenAPI-3.1-green)](https://www.openapis.org/)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen)](.github/dependabot.yml)
+[![Website](https://img.shields.io/badge/website-GitHub%20Pages-2196F3?logo=github)](https://microscaler.github.io/rerp/)
 
 ---
 
