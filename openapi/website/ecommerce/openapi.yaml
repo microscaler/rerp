@@ -10,7 +10,7 @@ tags: []
 paths:
   /stores:
     get:
-      operationId: listStores
+      operationId: list_stores
       summary: List stores
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createStore
+      operationId: create_store
       summary: Create store
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /stores/{id}:
     get:
-      operationId: getStore
+      operationId: get_store
       summary: Get store by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateStore
+      operationId: update_store
       summary: Update store
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteStore
+      operationId: delete_store
       summary: Delete store
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /carts:
     get:
-      operationId: listCarts
+      operationId: list_carts
       summary: List carts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCart
+      operationId: create_cart
       summary: Create cart
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /carts/{id}:
     get:
-      operationId: getCart
+      operationId: get_cart
       summary: Get cart by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCart
+      operationId: update_cart
       summary: Update cart
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCart
+      operationId: delete_cart
       summary: Delete cart
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /checkouts:
     get:
-      operationId: listCheckouts
+      operationId: list_checkouts
       summary: List checkouts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCheckout
+      operationId: create_checkout
       summary: Create checkout
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /checkouts/{id}:
     get:
-      operationId: getCheckout
+      operationId: get_checkout
       summary: Get checkout by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCheckout
+      operationId: update_checkout
       summary: Update checkout
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCheckout
+      operationId: delete_checkout
       summary: Delete checkout
       parameters:
       - name: id

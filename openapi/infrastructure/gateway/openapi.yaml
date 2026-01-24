@@ -11,7 +11,7 @@ tags: []
 paths:
   /routes:
     get:
-      operationId: listRoutes
+      operationId: list_routes
       summary: List routes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRoute
+      operationId: create_route
       summary: Create route
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /routes/{id}:
     get:
-      operationId: getRoute
+      operationId: get_route
       summary: Get route by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRoute
+      operationId: update_route
       summary: Update route
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRoute
+      operationId: delete_route
       summary: Delete route
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /policys:
     get:
-      operationId: listPolicys
+      operationId: list_policys
       summary: List policys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPolicy
+      operationId: create_policy
       summary: Create policy
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /policys/{id}:
     get:
-      operationId: getPolicy
+      operationId: get_policy
       summary: Get policy by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePolicy
+      operationId: update_policy
       summary: Update policy
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePolicy
+      operationId: delete_policy
       summary: Delete policy
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /routes/{routeId}/test:
     post:
-      operationId: testRoute
+      operationId: test_route
       summary: Test route configuration
       responses:
         '200':
@@ -246,7 +246,7 @@ paths:
           format: uuid
   /health:
     get:
-      operationId: healthCheck
+      operationId: health_check
       summary: Gateway health check
       responses:
         '200':
@@ -259,7 +259,7 @@ paths:
           description: Internal server error
   /metrics:
     get:
-      operationId: getMetrics
+      operationId: get_metrics
       summary: Get gateway metrics
       responses:
         '200':

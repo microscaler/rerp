@@ -10,7 +10,7 @@ tags: []
 paths:
   /apps:
     get:
-      operationId: listApps
+      operationId: list_apps
       summary: List apps
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createApp
+      operationId: create_app
       summary: Create app
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /apps/{id}:
     get:
-      operationId: getApp
+      operationId: get_app
       summary: Get app by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateApp
+      operationId: update_app
       summary: Update app
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteApp
+      operationId: delete_app
       summary: Delete app
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /extensions:
     get:
-      operationId: listExtensions
+      operationId: list_extensions
       summary: List extensions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createExtension
+      operationId: create_extension
       summary: Create extension
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /extensions/{id}:
     get:
-      operationId: getExtension
+      operationId: get_extension
       summary: Get extension by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateExtension
+      operationId: update_extension
       summary: Update extension
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteExtension
+      operationId: delete_extension
       summary: Delete extension
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /installations:
     get:
-      operationId: listInstallations
+      operationId: list_installations
       summary: List installations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createInstallation
+      operationId: create_installation
       summary: Create installation
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /installations/{id}:
     get:
-      operationId: getInstallation
+      operationId: get_installation
       summary: Get installation by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateInstallation
+      operationId: update_installation
       summary: Update installation
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteInstallation
+      operationId: delete_installation
       summary: Delete installation
       parameters:
       - name: id

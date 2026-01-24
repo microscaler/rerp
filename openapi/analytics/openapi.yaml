@@ -31,7 +31,7 @@ tags: []
 paths:
   /dashboards:
     get:
-      operationId: listDashboards
+      operationId: list_dashboards
       summary: List dashboards
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -58,7 +58,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
-      operationId: createDashboard
+      operationId: create_dashboard
       summary: Create dashboard
       requestBody:
         required: true
@@ -79,7 +79,7 @@ paths:
       x-service-base-path: /api/v1/analytics/dashboards
   /dashboards/{id}:
     get:
-      operationId: getDashboard
+      operationId: get_dashboard
       summary: Get dashboard by id
       parameters:
       - name: id
@@ -100,7 +100,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     put:
-      operationId: updateDashboard
+      operationId: update_dashboard
       summary: Update dashboard
       parameters:
       - name: id
@@ -127,7 +127,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     delete:
-      operationId: deleteDashboard
+      operationId: delete_dashboard
       summary: Delete dashboard
       parameters:
       - name: id
@@ -145,7 +145,7 @@ paths:
       x-service-base-path: /api/v1/analytics/dashboards
   /datasets:
     get:
-      operationId: listDatasets
+      operationId: list_datasets
       summary: List datasets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -172,7 +172,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
-      operationId: createDataset
+      operationId: create_dataset
       summary: Create dataset
       requestBody:
         required: true
@@ -193,7 +193,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /datasets/{id}:
     get:
-      operationId: getDataset
+      operationId: get_dataset
       summary: Get dataset by id
       parameters:
       - name: id
@@ -214,7 +214,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     put:
-      operationId: updateDataset
+      operationId: update_dataset
       summary: Update dataset
       parameters:
       - name: id
@@ -241,7 +241,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     delete:
-      operationId: deleteDataset
+      operationId: delete_dataset
       summary: Delete dataset
       parameters:
       - name: id
@@ -259,7 +259,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /kpis:
     get:
-      operationId: listKpis
+      operationId: list_kpis
       summary: List kpis
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -286,7 +286,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
-      operationId: createKpi
+      operationId: create_kpi
       summary: Create kpi
       requestBody:
         required: true
@@ -307,7 +307,7 @@ paths:
       x-service-base-path: /api/v1/analytics/dashboards
   /kpis/{id}:
     get:
-      operationId: getKpi
+      operationId: get_kpi
       summary: Get kpi by id
       parameters:
       - name: id
@@ -328,7 +328,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     put:
-      operationId: updateKpi
+      operationId: update_kpi
       summary: Update kpi
       parameters:
       - name: id
@@ -355,7 +355,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     delete:
-      operationId: deleteKpi
+      operationId: delete_kpi
       summary: Delete kpi
       parameters:
       - name: id
@@ -373,7 +373,7 @@ paths:
       x-service-base-path: /api/v1/analytics/dashboards
   /querys:
     get:
-      operationId: listQuerys
+      operationId: list_querys
       summary: List querys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -400,7 +400,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
-      operationId: createQuery
+      operationId: create_query
       summary: Create query
       requestBody:
         required: true
@@ -421,7 +421,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /querys/{id}:
     get:
-      operationId: getQuery
+      operationId: get_query
       summary: Get query by id
       parameters:
       - name: id
@@ -442,7 +442,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     put:
-      operationId: updateQuery
+      operationId: update_query
       summary: Update query
       parameters:
       - name: id
@@ -469,7 +469,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     delete:
-      operationId: deleteQuery
+      operationId: delete_query
       summary: Delete query
       parameters:
       - name: id
@@ -487,7 +487,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /report-templates:
     get:
-      operationId: listReportTemplates
+      operationId: list_report_templates
       summary: List report-templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -514,7 +514,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
-      operationId: createReportTemplate
+      operationId: create_report_template
       summary: Create report-template
       requestBody:
         required: true
@@ -535,7 +535,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /report-templates/{id}:
     get:
-      operationId: getReportTemplate
+      operationId: get_report_template
       summary: Get report-template by id
       parameters:
       - name: id
@@ -556,7 +556,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     put:
-      operationId: updateReportTemplate
+      operationId: update_report_template
       summary: Update report-template
       parameters:
       - name: id
@@ -583,7 +583,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     delete:
-      operationId: deleteReportTemplate
+      operationId: delete_report_template
       summary: Delete report-template
       parameters:
       - name: id
@@ -601,7 +601,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /reports:
     get:
-      operationId: listReports
+      operationId: list_reports
       summary: List reports
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -628,7 +628,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
-      operationId: createReport
+      operationId: create_report
       summary: Create report
       requestBody:
         required: true
@@ -649,7 +649,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /reports/{id}:
     get:
-      operationId: getReport
+      operationId: get_report
       summary: Get report by id
       parameters:
       - name: id
@@ -670,7 +670,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     put:
-      operationId: updateReport
+      operationId: update_report
       summary: Update report
       parameters:
       - name: id
@@ -697,7 +697,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     delete:
-      operationId: deleteReport
+      operationId: delete_report
       summary: Delete report
       parameters:
       - name: id
@@ -715,7 +715,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /schedules:
     get:
-      operationId: listSchedules
+      operationId: list_schedules
       summary: List schedules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -742,7 +742,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
-      operationId: createSchedule
+      operationId: create_schedule
       summary: Create schedule
       requestBody:
         required: true
@@ -763,7 +763,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /schedules/{id}:
     get:
-      operationId: getSchedule
+      operationId: get_schedule
       summary: Get schedule by id
       parameters:
       - name: id
@@ -784,7 +784,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     put:
-      operationId: updateSchedule
+      operationId: update_schedule
       summary: Update schedule
       parameters:
       - name: id
@@ -811,7 +811,7 @@ paths:
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     delete:
-      operationId: deleteSchedule
+      operationId: delete_schedule
       summary: Delete schedule
       parameters:
       - name: id
@@ -829,7 +829,7 @@ paths:
       x-service-base-path: /api/v1/analytics/reporting
   /visualizations:
     get:
-      operationId: listVisualizations
+      operationId: list_visualizations
       summary: List visualizations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -856,7 +856,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
-      operationId: createVisualization
+      operationId: create_visualization
       summary: Create visualization
       requestBody:
         required: true
@@ -877,7 +877,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /visualizations/{id}:
     get:
-      operationId: getVisualization
+      operationId: get_visualization
       summary: Get visualization by id
       parameters:
       - name: id
@@ -898,7 +898,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     put:
-      operationId: updateVisualization
+      operationId: update_visualization
       summary: Update visualization
       parameters:
       - name: id
@@ -925,7 +925,7 @@ paths:
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     delete:
-      operationId: deleteVisualization
+      operationId: delete_visualization
       summary: Delete visualization
       parameters:
       - name: id
@@ -943,7 +943,7 @@ paths:
       x-service-base-path: /api/v1/analytics/bi
   /widgets:
     get:
-      operationId: listWidgets
+      operationId: list_widgets
       summary: List widgets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -970,7 +970,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
-      operationId: createWidget
+      operationId: create_widget
       summary: Create widget
       requestBody:
         required: true
@@ -991,7 +991,7 @@ paths:
       x-service-base-path: /api/v1/analytics/dashboards
   /widgets/{id}:
     get:
-      operationId: getWidget
+      operationId: get_widget
       summary: Get widget by id
       parameters:
       - name: id
@@ -1012,7 +1012,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     put:
-      operationId: updateWidget
+      operationId: update_widget
       summary: Update widget
       parameters:
       - name: id
@@ -1039,7 +1039,7 @@ paths:
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     delete:
-      operationId: deleteWidget
+      operationId: delete_widget
       summary: Delete widget
       parameters:
       - name: id

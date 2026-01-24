@@ -11,7 +11,7 @@ tags: []
 paths:
   /products:
     get:
-      operationId: listProducts
+      operationId: list_products
       summary: List products
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createProduct
+      operationId: create_product
       summary: Create product
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /products/{id}:
     get:
-      operationId: getProduct
+      operationId: get_product
       summary: Get product by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateProduct
+      operationId: update_product
       summary: Update product
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteProduct
+      operationId: delete_product
       summary: Delete product
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /categorys:
     get:
-      operationId: listCategorys
+      operationId: list_categorys
       summary: List categorys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCategory
+      operationId: create_category
       summary: Create category
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /categorys/{id}:
     get:
-      operationId: getCategory
+      operationId: get_category
       summary: Get category by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCategory
+      operationId: update_category
       summary: Update category
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCategory
+      operationId: delete_category
       summary: Delete category
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /attributes:
     get:
-      operationId: listAttributes
+      operationId: list_attributes
       summary: List attributes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -244,7 +244,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createAttribute
+      operationId: create_attribute
       summary: Create attribute
       requestBody:
         required: true
@@ -263,7 +263,7 @@ paths:
           description: Invalid request
   /attributes/{id}:
     get:
-      operationId: getAttribute
+      operationId: get_attribute
       summary: Get attribute by id
       parameters:
       - name: id
@@ -282,7 +282,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateAttribute
+      operationId: update_attribute
       summary: Update attribute
       parameters:
       - name: id
@@ -307,7 +307,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteAttribute
+      operationId: delete_attribute
       summary: Delete attribute
       parameters:
       - name: id
@@ -323,7 +323,7 @@ paths:
           description: Not found
   /variants:
     get:
-      operationId: listVariants
+      operationId: list_variants
       summary: List variants
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -348,7 +348,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createVariant
+      operationId: create_variant
       summary: Create variant
       requestBody:
         required: true
@@ -367,7 +367,7 @@ paths:
           description: Invalid request
   /variants/{id}:
     get:
-      operationId: getVariant
+      operationId: get_variant
       summary: Get variant by id
       parameters:
       - name: id
@@ -386,7 +386,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateVariant
+      operationId: update_variant
       summary: Update variant
       parameters:
       - name: id
@@ -411,7 +411,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteVariant
+      operationId: delete_variant
       summary: Delete variant
       parameters:
       - name: id
@@ -427,7 +427,7 @@ paths:
           description: Not found
   /products/{productId}/variants:
     get:
-      operationId: getProductVariants
+      operationId: get_product_variants
       summary: Get product variants
       responses:
         '200':
@@ -446,7 +446,7 @@ paths:
           type: string
           format: uuid
     post:
-      operationId: createVariant
+      operationId: create_variant
       summary: Create product variant
       responses:
         '200':
@@ -473,7 +473,7 @@ paths:
           format: uuid
   /categories/{categoryId}/products:
     get:
-      operationId: getCategoryProducts
+      operationId: get_category_products
       summary: Get products in category
       responses:
         '200':

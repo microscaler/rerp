@@ -1,0 +1,16 @@
+service:
+  name: accounts-receivable
+  port: 8003
+  containerPort: 8003
+  nodePort: 31003
+image:
+  repository: localhost:5001
+  name: rerp-accounts-receivable
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: accounts_receivable_service_api
+  serviceName: accounts-receivable

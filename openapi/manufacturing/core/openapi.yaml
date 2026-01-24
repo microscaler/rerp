@@ -10,7 +10,7 @@ tags: []
 paths:
   /production-orders:
     get:
-      operationId: listProductionOrders
+      operationId: list_production_orders
       summary: List production-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createProductionOrder
+      operationId: create_production_order
       summary: Create production-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /production-orders/{id}:
     get:
-      operationId: getProductionOrder
+      operationId: get_production_order
       summary: Get production-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateProductionOrder
+      operationId: update_production_order
       summary: Update production-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteProductionOrder
+      operationId: delete_production_order
       summary: Delete production-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /work-orders:
     get:
-      operationId: listWorkOrders
+      operationId: list_work_orders
       summary: List work-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWorkOrder
+      operationId: create_work_order
       summary: Create work-order
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /work-orders/{id}:
     get:
-      operationId: getWorkOrder
+      operationId: get_work_order
       summary: Get work-order by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWorkOrder
+      operationId: update_work_order
       summary: Update work-order
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWorkOrder
+      operationId: delete_work_order
       summary: Delete work-order
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /boms:
     get:
-      operationId: listBoms
+      operationId: list_boms
       summary: List boms
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createBom
+      operationId: create_bom
       summary: Create bom
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /boms/{id}:
     get:
-      operationId: getBom
+      operationId: get_bom
       summary: Get bom by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateBom
+      operationId: update_bom
       summary: Update bom
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteBom
+      operationId: delete_bom
       summary: Delete bom
       parameters:
       - name: id

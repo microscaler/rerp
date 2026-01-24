@@ -1,0 +1,16 @@
+service:
+  name: idam
+  port: 8012
+  containerPort: 8012
+  nodePort: 31012
+image:
+  repository: localhost:5001
+  name: pricewhisperer-idam
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: pricewhisperer
+app:
+  binaryName: identity_and_access_management_service_api
+  serviceName: idam

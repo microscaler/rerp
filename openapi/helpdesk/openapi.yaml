@@ -29,7 +29,7 @@ tags: []
 paths:
   /articles:
     get:
-      operationId: listArticles
+      operationId: list_articles
       summary: List articles
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     post:
-      operationId: createArticle
+      operationId: create_article
       summary: Create article
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /articles/{id}:
     get:
-      operationId: getArticle
+      operationId: get_article
       summary: Get article by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     put:
-      operationId: updateArticle
+      operationId: update_article
       summary: Update article
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     delete:
-      operationId: deleteArticle
+      operationId: delete_article
       summary: Delete article
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /categorys:
     get:
-      operationId: listCategorys
+      operationId: list_categorys
       summary: List categorys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     post:
-      operationId: createCategory
+      operationId: create_category
       summary: Create category
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /categorys/{id}:
     get:
-      operationId: getCategory
+      operationId: get_category
       summary: Get category by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     put:
-      operationId: updateCategory
+      operationId: update_category
       summary: Update category
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     delete:
-      operationId: deleteCategory
+      operationId: delete_category
       summary: Delete category
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /searchs:
     get:
-      operationId: listSearchs
+      operationId: list_searchs
       summary: List searchs
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     post:
-      operationId: createSearch
+      operationId: create_search
       summary: Create search
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /searchs/{id}:
     get:
-      operationId: getSearch
+      operationId: get_search
       summary: Get search by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     put:
-      operationId: updateSearch
+      operationId: update_search
       summary: Update search
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: knowledge-base
       x-service-base-path: /api/v1/helpdesk/knowledge-base
     delete:
-      operationId: deleteSearch
+      operationId: delete_search
       summary: Delete search
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/knowledge-base
   /slas:
     get:
-      operationId: listSlas
+      operationId: list_slas
       summary: List slas
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     post:
-      operationId: createSla
+      operationId: create_sla
       summary: Create sla
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/core
   /slas/{id}:
     get:
-      operationId: getSla
+      operationId: get_sla
       summary: Get sla by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     put:
-      operationId: updateSla
+      operationId: update_sla
       summary: Update sla
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     delete:
-      operationId: deleteSla
+      operationId: delete_sla
       summary: Delete sla
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/core
   /ticket-comments:
     get:
-      operationId: listTicketComments
+      operationId: list_ticket_comments
       summary: List ticket-comments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     post:
-      operationId: createTicketComment
+      operationId: create_ticket_comment
       summary: Create ticket-comment
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/core
   /ticket-comments/{id}:
     get:
-      operationId: getTicketComment
+      operationId: get_ticket_comment
       summary: Get ticket-comment by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     put:
-      operationId: updateTicketComment
+      operationId: update_ticket_comment
       summary: Update ticket-comment
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     delete:
-      operationId: deleteTicketComment
+      operationId: delete_ticket_comment
       summary: Delete ticket-comment
       parameters:
       - name: id
@@ -599,7 +599,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/core
   /tickets:
     get:
-      operationId: listTickets
+      operationId: list_tickets
       summary: List tickets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -626,7 +626,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     post:
-      operationId: createTicket
+      operationId: create_ticket
       summary: Create ticket
       requestBody:
         required: true
@@ -647,7 +647,7 @@ paths:
       x-service-base-path: /api/v1/helpdesk/core
   /tickets/{id}:
     get:
-      operationId: getTicket
+      operationId: get_ticket
       summary: Get ticket by id
       parameters:
       - name: id
@@ -668,7 +668,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     put:
-      operationId: updateTicket
+      operationId: update_ticket
       summary: Update ticket
       parameters:
       - name: id
@@ -695,7 +695,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/helpdesk/core
     delete:
-      operationId: deleteTicket
+      operationId: delete_ticket
       summary: Delete ticket
       parameters:
       - name: id

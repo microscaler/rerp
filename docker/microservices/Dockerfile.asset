@@ -1,0 +1,25 @@
+# Minimal runtime-only Dockerfile for Asset Service (Tilt development)
+# Binary is cross-compiled on host and copied in.
+# Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
+
+ARG TARGETPLATFORM=linux/amd64
+FROM --platform=${TARGETPLATFORM} alpine:3.19
+
+RUN apk add --no-cache ca-certificates libgcc
+WORKDIR /app
+
+# TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
+ARG TARGETARCH=amd64
+COPY ./build_artifacts/${TARGETARCH}/asset /app/asset
+RUN chmod +x /app/asset
+
+RUN mkdir -p /app/config /app/doc /app/static_site && chmod -R 777 /app
+COPY ./microservices/accounting/asset/config /app/config
+COPY ./microservices/accounting/asset/doc /app/doc
+COPY ./microservices/accounting/asset/static_site /app/static_site
+
+EXPOSE 8006
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=debug
+
+ENTRYPOINT ["/app/asset", "--spec", "/app/doc/openapi.yaml", "--doc-dir", "/app/doc", "--static-dir", "/app/static_site", "--config", "/app/config/config.yaml"]

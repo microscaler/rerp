@@ -3,6 +3,7 @@ name: RERP CI
 on:
   push:
     branches: [main, develop]
+    tags: ['v*']
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -13,138 +14,6 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            components/target
-          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-rerp-
-      
-      - name: Install musl target and tools
-        run: |
-          rustup target add x86_64-unknown-linux-musl
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-      
-      - name: Install cross-compilation tools
-        run: |
-          # Install ARM64 cross-compiler
-          sudo apt-get install -y gcc-aarch64-linux-gnu
-          # Install ARM7 cross-compiler
-          sudo apt-get install -y gcc-arm-linux-gnueabihf
-      
-      - name: Build workspace (amd64)
-        run: |
-          echo "🔨 Building RERP workspace for amd64..."
-          python3 scripts/host-aware-build.py workspace amd64
-      
-      - name: Build example service (amd64)
-        run: |
-          echo "🔨 Building example service (auth/idam) for amd64..."
-          python3 scripts/host-aware-build.py auth_idam amd64
-      
-      - name: Format check
-        run: |
-          cd components
-          cargo fmt --check || (echo "❌ Code formatting check failed. Run 'cargo fmt' to fix." && exit 1)
-      
-      - name: Lint with Clippy
-        run: |
-          cd components
-          cargo clippy --workspace -- -D warnings || true
-      
-      - name: Run tests
-        run: |
-          cd components
-          cargo test --workspace --lib || true
-      
-      - name: Check documentation
-        run: |
-          cd components
-          cargo doc --workspace --no-deps || true
-
-  build-multiarch:
-    name: Build Multi-Architecture
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    strategy:
-      matrix:
-        architecture: [amd64, arm64, arm7]
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
-      - name: Install Rust targets
-        run: |
-          rustup target add x86_64-unknown-linux-musl
-          rustup target add aarch64-unknown-linux-musl
-          rustup target add armv7-unknown-linux-musleabihf
-      
-      - name: Install cross-compilation tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-          sudo apt-get install -y gcc-aarch64-linux-gnu
-          sudo apt-get install -y gcc-arm-linux-gnueabihf
-      
-      - name: Build workspace for ${{ matrix.architecture }}
-        run: |
-          echo "🔨 Building RERP workspace for ${{ matrix.architecture }}..."
-          python3 scripts/host-aware-build.py workspace ${{ matrix.architecture }}
-      
-      - name: Upload binaries
-        if: matrix.architecture == 'amd64'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rerp-binaries-${{ matrix.architecture }}
-          path: components/target/*/release/rerp_*
-          retention-days: 7
-          if-no-files-found: warn
-
   validate-openapi:
     name: Validate OpenAPI Specs
     runs-on: ubuntu-latest
@@ -168,7 +37,6 @@ jobs:
       - name: Validate OpenAPI specs
         run: |
           echo "🔍 Validating OpenAPI specifications..."
-          # Check that all service specs exist and are valid YAML
           python3 -c "
           import yaml
           from pathlib import Path
@@ -197,3 +65,295 @@ jobs:
           echo "🔄 Testing BFF spec generation..."
           python3 scripts/generate_system_bff.py
           echo "✅ BFF spec generation successful"
+
+  validate-ports:
+    name: Validate Port Assignments
+    needs: [validate-openapi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+
+      - name: Validate port assignments
+        run: |
+          echo "🔍 Validating port registry, helm, kind-config, Tiltfile..."
+          ./scripts/assign-port.py validate
+
+  build-and-test:
+    name: Build and Test
+    needs: [validate-ports]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/patch-brrtrouter-for-ci.py
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            components/target
+          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-rerp-
+      
+      - name: Install musl target and tools
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      
+      - name: Build workspace (amd64)
+        run: |
+          echo "🔨 Building RERP workspace for amd64..."
+          python3 scripts/host-aware-build.py workspace amd64
+      
+      - name: Build example service (amd64)
+        run: |
+          echo "🔨 Building example service (auth/idam) for amd64..."
+          python3 scripts/host-aware-build.py auth_idam amd64
+      
+      - name: Build accounting microservices (amd64) - smoke test
+        run: |
+          echo "🔨 Building accounting microservices (workspace) for amd64..."
+          ./scripts/build-microservice.sh workspace --arch amd64 --release
+      
+      - name: Format check
+        run: |
+          cd components
+          cargo fmt --check || (echo "❌ Code formatting check failed. Run 'cargo fmt' to fix." && exit 1)
+      
+      - name: Lint with Clippy
+        run: |
+          cd components
+          cargo clippy --workspace -- -D warnings
+      
+      - name: Run tests
+        run: |
+          cd components
+          cargo test --workspace --lib
+      
+      - name: Check documentation
+        run: |
+          cd components
+          cargo doc --workspace --no-deps || true
+
+  build-multiarch:
+    name: Build Multi-Architecture
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RERP_USE_CROSS: '1'   # Use cross-rs Docker images (include aarch64-linux-musl-gcc, etc.) so aws-lc-sys builds
+    strategy:
+      matrix:
+        architecture: [amd64, arm64, arm7]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/patch-brrtrouter-for-ci.py
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+      
+      - name: Cache cargo registry and git
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      
+      - name: Cache cargo target (per-architecture)
+        uses: actions/cache@v4
+        with:
+          path: components/target
+          key: ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-
+      
+      - name: Install cross
+        run: cargo install cross
+      
+      - name: Build workspace for ${{ matrix.architecture }}
+        run: |
+          echo "🔨 Building RERP workspace for ${{ matrix.architecture }}..."
+          python3 scripts/host-aware-build.py workspace ${{ matrix.architecture }}
+      
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: rerp-binaries-${{ matrix.architecture }}
+          path: components/target/*/release/rerp_*
+          retention-days: 7
+          if-no-files-found: warn
+
+  build-push-containers:
+    name: Build and Push Containers
+    needs: [build-multiarch]
+    # Future: restrict to merge-on-main only (merge = push to main). Temporary: also run on boostrap-accounting-suit until container process is validated; remove that branch when done.
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/boostrap-accounting-suit') && needs.build-multiarch.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Patch Cargo.toml (BRRTRouter, lifeguard from git)
+        run: python3 scripts/patch-brrtrouter-for-ci.py
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+
+      - name: Install musl target and tools
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Install cross (for arm64/arm7)
+        run: cargo install cross
+
+      - name: Build microservices amd64 and copy to build_artifacts/amd64
+        run: |
+          echo "🔨 Building microservices (amd64, release)..."
+          ./scripts/build-microservice.sh workspace --arch amd64 --release
+          ./scripts/build-and-push-microservice-containers.sh --copy-only=amd64
+
+      - name: Build microservices arm64 and copy to build_artifacts/arm64
+        run: |
+          echo "🔨 Building microservices (arm64, release)..."
+          ./scripts/build-microservice.sh workspace --arch arm64 --release
+          ./scripts/build-and-push-microservice-containers.sh --copy-only=arm64
+
+      - name: Build microservices arm7 and copy to build_artifacts/arm
+        run: |
+          echo "🔨 Building microservices (arm7, release)..."
+          ./scripts/build-microservice.sh workspace --arch arm7 --release
+          ./scripts/build-and-push-microservice-containers.sh --copy-only=arm7
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: ${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set image tag
+        id: tag
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "extra_tag=" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            if [[ "${{ github.ref }}" == refs/heads/main ]]; then
+              echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
+            else
+              echo "extra_tag=" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Build and push microservice images
+        env:
+          GHCR_OWNER: ${{ github.repository_owner }}
+          DOCKERHUB_ORG: ${{ vars.DOCKERHUB_ORG }}
+        run: |
+          chmod +x scripts/build-and-push-microservice-containers.sh
+          args=("${{ steps.tag.outputs.tag }}")
+          [[ -n "${{ steps.tag.outputs.extra_tag }}" ]] && args+=("${{ steps.tag.outputs.extra_tag }}")
+          ./scripts/build-and-push-microservice-containers.sh "${args[@]}"
+
+      - name: Verify published images
+        run: |
+          set -e
+          TAG="${{ steps.tag.outputs.tag }}"
+          OWNER="${{ github.repository_owner }}"
+          for name in general-ledger invoice accounts-receivable accounts-payable bank-sync asset budget edi financial-reports bff; do
+            img="ghcr.io/${OWNER}/rerp-${name}:${TAG}"
+            echo "🔍 Inspecting $img ..."
+            out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ $name: imagetools inspect failed"; exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/amd64'   || { echo "❌ $name: missing linux/amd64";   exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/arm64'  || { echo "❌ $name: missing linux/arm64";  exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/arm/v7' || { echo "❌ $name: missing linux/arm/v7"; exit 1; }
+            echo "✅ $name: linux/amd64, linux/arm64, linux/arm/v7"
+          done
+          echo "🎉 All 10 images verified (amd64, arm64, arm/v7)."

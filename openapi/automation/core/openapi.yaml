@@ -10,7 +10,7 @@ tags: []
 paths:
   /workflows:
     get:
-      operationId: listWorkflows
+      operationId: list_workflows
       summary: List workflows
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWorkflow
+      operationId: create_workflow
       summary: Create workflow
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /workflows/{id}:
     get:
-      operationId: getWorkflow
+      operationId: get_workflow
       summary: Get workflow by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWorkflow
+      operationId: update_workflow
       summary: Update workflow
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWorkflow
+      operationId: delete_workflow
       summary: Delete workflow
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /rules:
     get:
-      operationId: listRules
+      operationId: list_rules
       summary: List rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRule
+      operationId: create_rule
       summary: Create rule
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /rules/{id}:
     get:
-      operationId: getRule
+      operationId: get_rule
       summary: Get rule by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRule
+      operationId: update_rule
       summary: Update rule
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRule
+      operationId: delete_rule
       summary: Delete rule
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /executions:
     get:
-      operationId: listExecutions
+      operationId: list_executions
       summary: List executions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createExecution
+      operationId: create_execution
       summary: Create execution
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /executions/{id}:
     get:
-      operationId: getExecution
+      operationId: get_execution
       summary: Get execution by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateExecution
+      operationId: update_execution
       summary: Update execution
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteExecution
+      operationId: delete_execution
       summary: Delete execution
       parameters:
       - name: id

@@ -1,15 +1,17 @@
 # Minimal runtime-only Dockerfile for {{service_name}} Service (Tilt development)
-# Binary is cross-compiled on host (Apple Silicon -> x86_64 Linux) and copied in
-#
+# Binary is cross-compiled on host and copied in.
 # This file is a template. Generate service-specific Dockerfiles using:
 #   scripts/generate-dockerfile.py <system> <module>
+#
+# Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
 
 ARG TARGETPLATFORM=linux/amd64
 ARG BUILDPLATFORM
 FROM --platform=${TARGETPLATFORM} rerp/base:latest
 
-# Copy pre-built binary from staging directory (x86_64 Linux musl target)
-COPY ./build_artifacts/{{binary_name}} /app/{{binary_name}}
+# TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
+ARG TARGETARCH=amd64
+COPY ./build_artifacts/${TARGETARCH}/{{binary_name}} /app/{{binary_name}}
 RUN chmod +x /app/{{binary_name}}
 
 # Copy configuration and assets to writable locations

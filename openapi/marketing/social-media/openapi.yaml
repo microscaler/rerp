@@ -10,7 +10,7 @@ tags: []
 paths:
   /social-posts:
     get:
-      operationId: listSocialPosts
+      operationId: list_social_posts
       summary: List social-posts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSocialPost
+      operationId: create_social_post
       summary: Create social-post
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /social-posts/{id}:
     get:
-      operationId: getSocialPost
+      operationId: get_social_post
       summary: Get social-post by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSocialPost
+      operationId: update_social_post
       summary: Update social-post
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSocialPost
+      operationId: delete_social_post
       summary: Delete social-post
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /social-accounts:
     get:
-      operationId: listSocialAccounts
+      operationId: list_social_accounts
       summary: List social-accounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSocialAccount
+      operationId: create_social_account
       summary: Create social-account
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /social-accounts/{id}:
     get:
-      operationId: getSocialAccount
+      operationId: get_social_account
       summary: Get social-account by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSocialAccount
+      operationId: update_social_account
       summary: Update social-account
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSocialAccount
+      operationId: delete_social_account
       summary: Delete social-account
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /engagements:
     get:
-      operationId: listEngagements
+      operationId: list_engagements
       summary: List engagements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createEngagement
+      operationId: create_engagement
       summary: Create engagement
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /engagements/{id}:
     get:
-      operationId: getEngagement
+      operationId: get_engagement
       summary: Get engagement by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateEngagement
+      operationId: update_engagement
       summary: Update engagement
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteEngagement
+      operationId: delete_engagement
       summary: Delete engagement
       parameters:
       - name: id

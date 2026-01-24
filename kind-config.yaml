@@ -1,0 +1,39 @@
+# Kind cluster configuration for RERP
+# Based on PriceWhisperer's working configuration
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: rerp
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  # Microservice ports 8001–8010 are forwarded by Tilt (port_forwards). Do NOT add
+  # hostPort for 8001–8010 here or it will conflict with Tilt binding "address already in use".
+  extraPortMappings:
+  # PostgreSQL (using 5433 to avoid conflict with local postgres on 5432)
+  - containerPort: 30432
+    hostPort: 5433
+    protocol: TCP
+  # Redis
+  - containerPort: 30379
+    hostPort: 6379
+    protocol: TCP
+  # Prometheus (NodePort 30091)
+  - containerPort: 30091
+    hostPort: 9091
+    protocol: TCP
+  # Grafana
+  - containerPort: 30002
+    hostPort: 3002
+    protocol: TCP
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+    endpoint = ["http://kind-registry:5000"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5001"]
+    endpoint = ["http://kind-registry:5000"]

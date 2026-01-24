@@ -11,7 +11,7 @@ tags: []
 paths:
   /users:
     get:
-      operationId: listUsers
+      operationId: list_users
       summary: List users
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createUser
+      operationId: create_user
       summary: Create user
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /users/{id}:
     get:
-      operationId: getUser
+      operationId: get_user
       summary: Get user by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateUser
+      operationId: update_user
       summary: Update user
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteUser
+      operationId: delete_user
       summary: Delete user
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /sessions:
     get:
-      operationId: listSessions
+      operationId: list_sessions
       summary: List sessions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSession
+      operationId: create_session
       summary: Create session
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /sessions/{id}:
     get:
-      operationId: getSession
+      operationId: get_session
       summary: Get session by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSession
+      operationId: update_session
       summary: Update session
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSession
+      operationId: delete_session
       summary: Delete session
       parameters:
       - name: id
@@ -259,7 +259,7 @@ paths:
               properties: {}
   /auth/refresh:
     post:
-      operationId: refreshToken
+      operationId: refresh_token
       summary: Refresh access token
       responses:
         '200':
@@ -299,7 +299,7 @@ paths:
               properties: {}
   /auth/password/reset:
     post:
-      operationId: requestPasswordReset
+      operationId: request_password_reset
       summary: Request password reset
       responses:
         '200':
@@ -319,7 +319,7 @@ paths:
               properties: {}
   /auth/password/reset/confirm:
     post:
-      operationId: confirmPasswordReset
+      operationId: confirm_password_reset
       summary: Confirm password reset
       responses:
         '200':
@@ -339,7 +339,7 @@ paths:
               properties: {}
   /users/{userId}/verify/email:
     post:
-      operationId: verifyEmail
+      operationId: verify_email
       summary: Verify email address
       responses:
         '200':
@@ -366,7 +366,7 @@ paths:
           format: uuid
   /users/{userId}/verify/phone:
     post:
-      operationId: verifyPhone
+      operationId: verify_phone
       summary: Verify phone number
       responses:
         '200':
@@ -393,7 +393,7 @@ paths:
           format: uuid
   /mfa/enable:
     post:
-      operationId: enableMfa
+      operationId: enable_mfa
       summary: Enable MFA for user
       responses:
         '200':
@@ -413,7 +413,7 @@ paths:
               properties: {}
   /mfa/verify:
     post:
-      operationId: verifyMfa
+      operationId: verify_mfa
       summary: Verify MFA code
       responses:
         '200':

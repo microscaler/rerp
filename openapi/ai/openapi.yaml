@@ -29,7 +29,7 @@ tags: []
 paths:
   /ai-models:
     get:
-      operationId: listAiModels
+      operationId: list_ai_models
       summary: List ai-models
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -56,7 +56,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     post:
-      operationId: createAiModel
+      operationId: create_ai_model
       summary: Create ai-model
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
       x-service-base-path: /api/v1/ai/core
   /ai-models/{id}:
     get:
-      operationId: getAiModel
+      operationId: get_ai_model
       summary: Get ai-model by id
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     put:
-      operationId: updateAiModel
+      operationId: update_ai_model
       summary: Update ai-model
       parameters:
       - name: id
@@ -125,7 +125,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     delete:
-      operationId: deleteAiModel
+      operationId: delete_ai_model
       summary: Delete ai-model
       parameters:
       - name: id
@@ -143,7 +143,7 @@ paths:
       x-service-base-path: /api/v1/ai/core
   /classifications:
     get:
-      operationId: listClassifications
+      operationId: list_classifications
       summary: List classifications
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -170,7 +170,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     post:
-      operationId: createClassification
+      operationId: create_classification
       summary: Create classification
       requestBody:
         required: true
@@ -191,7 +191,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /classifications/{id}:
     get:
-      operationId: getClassification
+      operationId: get_classification
       summary: Get classification by id
       parameters:
       - name: id
@@ -212,7 +212,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     put:
-      operationId: updateClassification
+      operationId: update_classification
       summary: Update classification
       parameters:
       - name: id
@@ -239,7 +239,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     delete:
-      operationId: deleteClassification
+      operationId: delete_classification
       summary: Delete classification
       parameters:
       - name: id
@@ -257,7 +257,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /documents:
     get:
-      operationId: listDocuments
+      operationId: list_documents
       summary: List documents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -284,7 +284,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     post:
-      operationId: createDocument
+      operationId: create_document
       summary: Create document
       requestBody:
         required: true
@@ -305,7 +305,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /documents/{id}:
     get:
-      operationId: getDocument
+      operationId: get_document
       summary: Get document by id
       parameters:
       - name: id
@@ -326,7 +326,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     put:
-      operationId: updateDocument
+      operationId: update_document
       summary: Update document
       parameters:
       - name: id
@@ -353,7 +353,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     delete:
-      operationId: deleteDocument
+      operationId: delete_document
       summary: Delete document
       parameters:
       - name: id
@@ -371,7 +371,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /extractions:
     get:
-      operationId: listExtractions
+      operationId: list_extractions
       summary: List extractions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -398,7 +398,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     post:
-      operationId: createExtraction
+      operationId: create_extraction
       summary: Create extraction
       requestBody:
         required: true
@@ -419,7 +419,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /extractions/{id}:
     get:
-      operationId: getExtraction
+      operationId: get_extraction
       summary: Get extraction by id
       parameters:
       - name: id
@@ -440,7 +440,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     put:
-      operationId: updateExtraction
+      operationId: update_extraction
       summary: Update extraction
       parameters:
       - name: id
@@ -467,7 +467,7 @@ paths:
       x-service: document
       x-service-base-path: /api/v1/ai/document
     delete:
-      operationId: deleteExtraction
+      operationId: delete_extraction
       summary: Delete extraction
       parameters:
       - name: id
@@ -485,7 +485,7 @@ paths:
       x-service-base-path: /api/v1/ai/document
   /insights:
     get:
-      operationId: listInsights
+      operationId: list_insights
       summary: List insights
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -512,7 +512,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     post:
-      operationId: createInsight
+      operationId: create_insight
       summary: Create insight
       requestBody:
         required: true
@@ -533,7 +533,7 @@ paths:
       x-service-base-path: /api/v1/ai/core
   /insights/{id}:
     get:
-      operationId: getInsight
+      operationId: get_insight
       summary: Get insight by id
       parameters:
       - name: id
@@ -554,7 +554,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     put:
-      operationId: updateInsight
+      operationId: update_insight
       summary: Update insight
       parameters:
       - name: id
@@ -581,7 +581,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     delete:
-      operationId: deleteInsight
+      operationId: delete_insight
       summary: Delete insight
       parameters:
       - name: id
@@ -599,7 +599,7 @@ paths:
       x-service-base-path: /api/v1/ai/core
   /predictions:
     get:
-      operationId: listPredictions
+      operationId: list_predictions
       summary: List predictions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -626,7 +626,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     post:
-      operationId: createPrediction
+      operationId: create_prediction
       summary: Create prediction
       requestBody:
         required: true
@@ -647,7 +647,7 @@ paths:
       x-service-base-path: /api/v1/ai/core
   /predictions/{id}:
     get:
-      operationId: getPrediction
+      operationId: get_prediction
       summary: Get prediction by id
       parameters:
       - name: id
@@ -668,7 +668,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     put:
-      operationId: updatePrediction
+      operationId: update_prediction
       summary: Update prediction
       parameters:
       - name: id
@@ -695,7 +695,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/ai/core
     delete:
-      operationId: deletePrediction
+      operationId: delete_prediction
       summary: Delete prediction
       parameters:
       - name: id

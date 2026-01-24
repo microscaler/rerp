@@ -10,7 +10,7 @@ tags: []
 paths:
   /pages:
     get:
-      operationId: listPages
+      operationId: list_pages
       summary: List pages
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPage
+      operationId: create_page
       summary: Create page
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /pages/{id}:
     get:
-      operationId: getPage
+      operationId: get_page
       summary: Get page by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePage
+      operationId: update_page
       summary: Update page
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePage
+      operationId: delete_page
       summary: Delete page
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /templates:
     get:
-      operationId: listTemplates
+      operationId: list_templates
       summary: List templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTemplate
+      operationId: create_template
       summary: Create template
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /templates/{id}:
     get:
-      operationId: getTemplate
+      operationId: get_template
       summary: Get template by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTemplate
+      operationId: update_template
       summary: Update template
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTemplate
+      operationId: delete_template
       summary: Delete template
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /widgets:
     get:
-      operationId: listWidgets
+      operationId: list_widgets
       summary: List widgets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWidget
+      operationId: create_widget
       summary: Create widget
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /widgets/{id}:
     get:
-      operationId: getWidget
+      operationId: get_widget
       summary: Get widget by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWidget
+      operationId: update_widget
       summary: Update widget
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWidget
+      operationId: delete_widget
       summary: Delete widget
       parameters:
       - name: id

@@ -10,7 +10,7 @@ tags: []
 paths:
   /locales:
     get:
-      operationId: listLocales
+      operationId: list_locales
       summary: List locales
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLocale
+      operationId: create_locale
       summary: Create locale
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /locales/{id}:
     get:
-      operationId: getLocale
+      operationId: get_locale
       summary: Get locale by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLocale
+      operationId: update_locale
       summary: Update locale
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLocale
+      operationId: delete_locale
       summary: Delete locale
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /translations:
     get:
-      operationId: listTranslations
+      operationId: list_translations
       summary: List translations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTranslation
+      operationId: create_translation
       summary: Create translation
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /translations/{id}:
     get:
-      operationId: getTranslation
+      operationId: get_translation
       summary: Get translation by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTranslation
+      operationId: update_translation
       summary: Update translation
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTranslation
+      operationId: delete_translation
       summary: Delete translation
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /currencys:
     get:
-      operationId: listCurrencys
+      operationId: list_currencys
       summary: List currencys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createCurrency
+      operationId: create_currency
       summary: Create currency
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /currencys/{id}:
     get:
-      operationId: getCurrency
+      operationId: get_currency
       summary: Get currency by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateCurrency
+      operationId: update_currency
       summary: Update currency
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteCurrency
+      operationId: delete_currency
       summary: Delete currency
       parameters:
       - name: id

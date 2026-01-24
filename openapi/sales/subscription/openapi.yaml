@@ -10,7 +10,7 @@ tags: []
 paths:
   /subscriptions:
     get:
-      operationId: listSubscriptions
+      operationId: list_subscriptions
       summary: List subscriptions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSubscription
+      operationId: create_subscription
       summary: Create subscription
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /subscriptions/{id}:
     get:
-      operationId: getSubscription
+      operationId: get_subscription
       summary: Get subscription by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSubscription
+      operationId: update_subscription
       summary: Update subscription
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSubscription
+      operationId: delete_subscription
       summary: Delete subscription
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /plans:
     get:
-      operationId: listPlans
+      operationId: list_plans
       summary: List plans
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPlan
+      operationId: create_plan
       summary: Create plan
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /plans/{id}:
     get:
-      operationId: getPlan
+      operationId: get_plan
       summary: Get plan by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePlan
+      operationId: update_plan
       summary: Update plan
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePlan
+      operationId: delete_plan
       summary: Delete plan
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /renewals:
     get:
-      operationId: listRenewals
+      operationId: list_renewals
       summary: List renewals
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createRenewal
+      operationId: create_renewal
       summary: Create renewal
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /renewals/{id}:
     get:
-      operationId: getRenewal
+      operationId: get_renewal
       summary: Get renewal by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateRenewal
+      operationId: update_renewal
       summary: Update renewal
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteRenewal
+      operationId: delete_renewal
       summary: Delete renewal
       parameters:
       - name: id

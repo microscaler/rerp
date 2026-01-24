@@ -11,7 +11,7 @@ tags: []
 paths:
   /integrations:
     get:
-      operationId: listIntegrations
+      operationId: list_integrations
       summary: List integrations
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -36,7 +36,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createIntegration
+      operationId: create_integration
       summary: Create integration
       requestBody:
         required: true
@@ -55,7 +55,7 @@ paths:
           description: Invalid request
   /integrations/{id}:
     get:
-      operationId: getIntegration
+      operationId: get_integration
       summary: Get integration by id
       parameters:
       - name: id
@@ -74,7 +74,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateIntegration
+      operationId: update_integration
       summary: Update integration
       parameters:
       - name: id
@@ -99,7 +99,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteIntegration
+      operationId: delete_integration
       summary: Delete integration
       parameters:
       - name: id
@@ -115,7 +115,7 @@ paths:
           description: Not found
   /webhooks:
     get:
-      operationId: listWebhooks
+      operationId: list_webhooks
       summary: List webhooks
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -140,7 +140,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createWebhook
+      operationId: create_webhook
       summary: Create webhook
       requestBody:
         required: true
@@ -159,7 +159,7 @@ paths:
           description: Invalid request
   /webhooks/{id}:
     get:
-      operationId: getWebhook
+      operationId: get_webhook
       summary: Get webhook by id
       parameters:
       - name: id
@@ -178,7 +178,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateWebhook
+      operationId: update_webhook
       summary: Update webhook
       parameters:
       - name: id
@@ -203,7 +203,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteWebhook
+      operationId: delete_webhook
       summary: Delete webhook
       parameters:
       - name: id
@@ -219,7 +219,7 @@ paths:
           description: Not found
   /api-keys:
     get:
-      operationId: listApiKeys
+      operationId: list_api_keys
       summary: List api-keys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -244,7 +244,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createApiKey
+      operationId: create_api_key
       summary: Create api-key
       requestBody:
         required: true
@@ -263,7 +263,7 @@ paths:
           description: Invalid request
   /api-keys/{id}:
     get:
-      operationId: getApiKey
+      operationId: get_api_key
       summary: Get api-key by id
       parameters:
       - name: id
@@ -282,7 +282,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateApiKey
+      operationId: update_api_key
       summary: Update api-key
       parameters:
       - name: id
@@ -307,7 +307,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteApiKey
+      operationId: delete_api_key
       summary: Delete api-key
       parameters:
       - name: id
@@ -323,7 +323,7 @@ paths:
           description: Not found
   /integrations/{integrationId}/test:
     post:
-      operationId: testIntegration
+      operationId: test_integration
       summary: Test integration connection
       responses:
         '200':
@@ -350,7 +350,7 @@ paths:
           format: uuid
   /webhooks/{webhookId}/trigger:
     post:
-      operationId: triggerWebhook
+      operationId: trigger_webhook
       summary: Manually trigger webhook
       responses:
         '200':
@@ -377,7 +377,7 @@ paths:
           format: uuid
   /webhooks/{webhookId}/events:
     get:
-      operationId: getWebhookEvents
+      operationId: get_webhook_events
       summary: Get webhook event history
       responses:
         '200':

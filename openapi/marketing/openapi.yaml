@@ -31,7 +31,7 @@ tags: []
 paths:
   /actions:
     get:
-      operationId: listActions
+      operationId: list_actions
       summary: List actions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -58,7 +58,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
-      operationId: createAction
+      operationId: create_action
       summary: Create action
       requestBody:
         required: true
@@ -79,7 +79,7 @@ paths:
       x-service-base-path: /api/v1/marketing/automation
   /actions/{id}:
     get:
-      operationId: getAction
+      operationId: get_action
       summary: Get action by id
       parameters:
       - name: id
@@ -100,7 +100,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     put:
-      operationId: updateAction
+      operationId: update_action
       summary: Update action
       parameters:
       - name: id
@@ -127,7 +127,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     delete:
-      operationId: deleteAction
+      operationId: delete_action
       summary: Delete action
       parameters:
       - name: id
@@ -145,7 +145,7 @@ paths:
       x-service-base-path: /api/v1/marketing/automation
   /automation-workflows:
     get:
-      operationId: listAutomationWorkflows
+      operationId: list_automation_workflows
       summary: List automation-workflows
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -172,7 +172,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
-      operationId: createAutomationWorkflow
+      operationId: create_automation_workflow
       summary: Create automation-workflow
       requestBody:
         required: true
@@ -193,7 +193,7 @@ paths:
       x-service-base-path: /api/v1/marketing/automation
   /automation-workflows/{id}:
     get:
-      operationId: getAutomationWorkflow
+      operationId: get_automation_workflow
       summary: Get automation-workflow by id
       parameters:
       - name: id
@@ -214,7 +214,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     put:
-      operationId: updateAutomationWorkflow
+      operationId: update_automation_workflow
       summary: Update automation-workflow
       parameters:
       - name: id
@@ -241,7 +241,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     delete:
-      operationId: deleteAutomationWorkflow
+      operationId: delete_automation_workflow
       summary: Delete automation-workflow
       parameters:
       - name: id
@@ -259,7 +259,7 @@ paths:
       x-service-base-path: /api/v1/marketing/automation
   /campaigns:
     get:
-      operationId: listCampaigns
+      operationId: list_campaigns
       summary: List campaigns
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -286,7 +286,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
-      operationId: createCampaign
+      operationId: create_campaign
       summary: Create campaign
       requestBody:
         required: true
@@ -307,7 +307,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /campaigns/{id}:
     get:
-      operationId: getCampaign
+      operationId: get_campaign
       summary: Get campaign by id
       parameters:
       - name: id
@@ -328,7 +328,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     put:
-      operationId: updateCampaign
+      operationId: update_campaign
       summary: Update campaign
       parameters:
       - name: id
@@ -355,7 +355,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     delete:
-      operationId: deleteCampaign
+      operationId: delete_campaign
       summary: Delete campaign
       parameters:
       - name: id
@@ -373,7 +373,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /email-templates:
     get:
-      operationId: listEmailTemplates
+      operationId: list_email_templates
       summary: List email-templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -400,7 +400,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
-      operationId: createEmailTemplate
+      operationId: create_email_template
       summary: Create email-template
       requestBody:
         required: true
@@ -421,7 +421,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /email-templates/{id}:
     get:
-      operationId: getEmailTemplate
+      operationId: get_email_template
       summary: Get email-template by id
       parameters:
       - name: id
@@ -442,7 +442,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     put:
-      operationId: updateEmailTemplate
+      operationId: update_email_template
       summary: Update email-template
       parameters:
       - name: id
@@ -469,7 +469,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     delete:
-      operationId: deleteEmailTemplate
+      operationId: delete_email_template
       summary: Delete email-template
       parameters:
       - name: id
@@ -487,7 +487,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /engagements:
     get:
-      operationId: listEngagements
+      operationId: list_engagements
       summary: List engagements
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -514,7 +514,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
-      operationId: createEngagement
+      operationId: create_engagement
       summary: Create engagement
       requestBody:
         required: true
@@ -535,7 +535,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /engagements/{id}:
     get:
-      operationId: getEngagement
+      operationId: get_engagement
       summary: Get engagement by id
       parameters:
       - name: id
@@ -556,7 +556,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     put:
-      operationId: updateEngagement
+      operationId: update_engagement
       summary: Update engagement
       parameters:
       - name: id
@@ -583,7 +583,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     delete:
-      operationId: deleteEngagement
+      operationId: delete_engagement
       summary: Delete engagement
       parameters:
       - name: id
@@ -601,7 +601,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /mailing-lists:
     get:
-      operationId: listMailingLists
+      operationId: list_mailing_lists
       summary: List mailing-lists
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -628,7 +628,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
-      operationId: createMailingList
+      operationId: create_mailing_list
       summary: Create mailing-list
       requestBody:
         required: true
@@ -649,7 +649,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /mailing-lists/{id}:
     get:
-      operationId: getMailingList
+      operationId: get_mailing_list
       summary: Get mailing-list by id
       parameters:
       - name: id
@@ -670,7 +670,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     put:
-      operationId: updateMailingList
+      operationId: update_mailing_list
       summary: Update mailing-list
       parameters:
       - name: id
@@ -697,7 +697,7 @@ paths:
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     delete:
-      operationId: deleteMailingList
+      operationId: delete_mailing_list
       summary: Delete mailing-list
       parameters:
       - name: id
@@ -715,7 +715,7 @@ paths:
       x-service-base-path: /api/v1/marketing/email
   /social-accounts:
     get:
-      operationId: listSocialAccounts
+      operationId: list_social_accounts
       summary: List social-accounts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -742,7 +742,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
-      operationId: createSocialAccount
+      operationId: create_social_account
       summary: Create social-account
       requestBody:
         required: true
@@ -763,7 +763,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /social-accounts/{id}:
     get:
-      operationId: getSocialAccount
+      operationId: get_social_account
       summary: Get social-account by id
       parameters:
       - name: id
@@ -784,7 +784,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     put:
-      operationId: updateSocialAccount
+      operationId: update_social_account
       summary: Update social-account
       parameters:
       - name: id
@@ -811,7 +811,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     delete:
-      operationId: deleteSocialAccount
+      operationId: delete_social_account
       summary: Delete social-account
       parameters:
       - name: id
@@ -829,7 +829,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /social-posts:
     get:
-      operationId: listSocialPosts
+      operationId: list_social_posts
       summary: List social-posts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -856,7 +856,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
-      operationId: createSocialPost
+      operationId: create_social_post
       summary: Create social-post
       requestBody:
         required: true
@@ -877,7 +877,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /social-posts/{id}:
     get:
-      operationId: getSocialPost
+      operationId: get_social_post
       summary: Get social-post by id
       parameters:
       - name: id
@@ -898,7 +898,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     put:
-      operationId: updateSocialPost
+      operationId: update_social_post
       summary: Update social-post
       parameters:
       - name: id
@@ -925,7 +925,7 @@ paths:
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     delete:
-      operationId: deleteSocialPost
+      operationId: delete_social_post
       summary: Delete social-post
       parameters:
       - name: id
@@ -943,7 +943,7 @@ paths:
       x-service-base-path: /api/v1/marketing/social-media
   /triggers:
     get:
-      operationId: listTriggers
+      operationId: list_triggers
       summary: List triggers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -970,7 +970,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
-      operationId: createTrigger
+      operationId: create_trigger
       summary: Create trigger
       requestBody:
         required: true
@@ -991,7 +991,7 @@ paths:
       x-service-base-path: /api/v1/marketing/automation
   /triggers/{id}:
     get:
-      operationId: getTrigger
+      operationId: get_trigger
       summary: Get trigger by id
       parameters:
       - name: id
@@ -1012,7 +1012,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     put:
-      operationId: updateTrigger
+      operationId: update_trigger
       summary: Update trigger
       parameters:
       - name: id
@@ -1039,7 +1039,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     delete:
-      operationId: deleteTrigger
+      operationId: delete_trigger
       summary: Delete trigger
       parameters:
       - name: id

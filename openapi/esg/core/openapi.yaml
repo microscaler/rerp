@@ -10,7 +10,7 @@ tags: []
 paths:
   /esg-metrics:
     get:
-      operationId: listEsgMetrics
+      operationId: list_esg_metrics
       summary: List esg-metrics
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createEsgMetric
+      operationId: create_esg_metric
       summary: Create esg-metric
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /esg-metrics/{id}:
     get:
-      operationId: getEsgMetric
+      operationId: get_esg_metric
       summary: Get esg-metric by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateEsgMetric
+      operationId: update_esg_metric
       summary: Update esg-metric
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteEsgMetric
+      operationId: delete_esg_metric
       summary: Delete esg-metric
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /sustainability-reports:
     get:
-      operationId: listSustainabilityReports
+      operationId: list_sustainability_reports
       summary: List sustainability-reports
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createSustainabilityReport
+      operationId: create_sustainability_report
       summary: Create sustainability-report
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /sustainability-reports/{id}:
     get:
-      operationId: getSustainabilityReport
+      operationId: get_sustainability_report
       summary: Get sustainability-report by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateSustainabilityReport
+      operationId: update_sustainability_report
       summary: Update sustainability-report
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteSustainabilityReport
+      operationId: delete_sustainability_report
       summary: Delete sustainability-report
       parameters:
       - name: id

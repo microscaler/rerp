@@ -27,7 +27,7 @@ tags: []
 paths:
   /routes:
     get:
-      operationId: listRoutes
+      operationId: list_routes
       summary: List routes
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -54,7 +54,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     post:
-      operationId: createRoute
+      operationId: create_route
       summary: Create route
       requestBody:
         required: true
@@ -75,7 +75,7 @@ paths:
       x-service-base-path: /api/v1/field-service/core
   /routes/{id}:
     get:
-      operationId: getRoute
+      operationId: get_route
       summary: Get route by id
       parameters:
       - name: id
@@ -96,7 +96,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     put:
-      operationId: updateRoute
+      operationId: update_route
       summary: Update route
       parameters:
       - name: id
@@ -123,7 +123,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     delete:
-      operationId: deleteRoute
+      operationId: delete_route
       summary: Delete route
       parameters:
       - name: id
@@ -141,7 +141,7 @@ paths:
       x-service-base-path: /api/v1/field-service/core
   /technicians:
     get:
-      operationId: listTechnicians
+      operationId: list_technicians
       summary: List technicians
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -168,7 +168,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     post:
-      operationId: createTechnician
+      operationId: create_technician
       summary: Create technician
       requestBody:
         required: true
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/field-service/core
   /technicians/{id}:
     get:
-      operationId: getTechnician
+      operationId: get_technician
       summary: Get technician by id
       parameters:
       - name: id
@@ -210,7 +210,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     put:
-      operationId: updateTechnician
+      operationId: update_technician
       summary: Update technician
       parameters:
       - name: id
@@ -237,7 +237,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     delete:
-      operationId: deleteTechnician
+      operationId: delete_technician
       summary: Delete technician
       parameters:
       - name: id
@@ -255,7 +255,7 @@ paths:
       x-service-base-path: /api/v1/field-service/core
   /work-orders:
     get:
-      operationId: listWorkOrders
+      operationId: list_work_orders
       summary: List work-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -282,7 +282,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     post:
-      operationId: createWorkOrder
+      operationId: create_work_order
       summary: Create work-order
       requestBody:
         required: true
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/field-service/core
   /work-orders/{id}:
     get:
-      operationId: getWorkOrder
+      operationId: get_work_order
       summary: Get work-order by id
       parameters:
       - name: id
@@ -324,7 +324,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     put:
-      operationId: updateWorkOrder
+      operationId: update_work_order
       summary: Update work-order
       parameters:
       - name: id
@@ -351,7 +351,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/field-service/core
     delete:
-      operationId: deleteWorkOrder
+      operationId: delete_work_order
       summary: Delete work-order
       parameters:
       - name: id

@@ -10,7 +10,7 @@ tags: []
 paths:
   /leads:
     get:
-      operationId: listLeads
+      operationId: list_leads
       summary: List leads
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createLead
+      operationId: create_lead
       summary: Create lead
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /leads/{id}:
     get:
-      operationId: getLead
+      operationId: get_lead
       summary: Get lead by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateLead
+      operationId: update_lead
       summary: Update lead
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteLead
+      operationId: delete_lead
       summary: Delete lead
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /opportunitys:
     get:
-      operationId: listOpportunitys
+      operationId: list_opportunitys
       summary: List opportunitys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createOpportunity
+      operationId: create_opportunity
       summary: Create opportunity
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /opportunitys/{id}:
     get:
-      operationId: getOpportunity
+      operationId: get_opportunity
       summary: Get opportunity by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateOpportunity
+      operationId: update_opportunity
       summary: Update opportunity
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteOpportunity
+      operationId: delete_opportunity
       summary: Delete opportunity
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /contacts:
     get:
-      operationId: listContacts
+      operationId: list_contacts
       summary: List contacts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createContact
+      operationId: create_contact
       summary: Create contact
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /contacts/{id}:
     get:
-      operationId: getContact
+      operationId: get_contact
       summary: Get contact by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateContact
+      operationId: update_contact
       summary: Update contact
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteContact
+      operationId: delete_contact
       summary: Delete contact
       parameters:
       - name: id

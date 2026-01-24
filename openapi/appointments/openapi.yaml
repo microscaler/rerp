@@ -27,7 +27,7 @@ tags: []
 paths:
   /appointments:
     get:
-      operationId: listAppointments
+      operationId: list_appointments
       summary: List appointments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -54,7 +54,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     post:
-      operationId: createAppointment
+      operationId: create_appointment
       summary: Create appointment
       requestBody:
         required: true
@@ -75,7 +75,7 @@ paths:
       x-service-base-path: /api/v1/appointments/core
   /appointments/{id}:
     get:
-      operationId: getAppointment
+      operationId: get_appointment
       summary: Get appointment by id
       parameters:
       - name: id
@@ -96,7 +96,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     put:
-      operationId: updateAppointment
+      operationId: update_appointment
       summary: Update appointment
       parameters:
       - name: id
@@ -123,7 +123,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     delete:
-      operationId: deleteAppointment
+      operationId: delete_appointment
       summary: Delete appointment
       parameters:
       - name: id
@@ -141,7 +141,7 @@ paths:
       x-service-base-path: /api/v1/appointments/core
   /availabilitys:
     get:
-      operationId: listAvailabilitys
+      operationId: list_availabilitys
       summary: List availabilitys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -168,7 +168,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     post:
-      operationId: createAvailability
+      operationId: create_availability
       summary: Create availability
       requestBody:
         required: true
@@ -189,7 +189,7 @@ paths:
       x-service-base-path: /api/v1/appointments/core
   /availabilitys/{id}:
     get:
-      operationId: getAvailability
+      operationId: get_availability
       summary: Get availability by id
       parameters:
       - name: id
@@ -210,7 +210,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     put:
-      operationId: updateAvailability
+      operationId: update_availability
       summary: Update availability
       parameters:
       - name: id
@@ -237,7 +237,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     delete:
-      operationId: deleteAvailability
+      operationId: delete_availability
       summary: Delete availability
       parameters:
       - name: id
@@ -255,7 +255,7 @@ paths:
       x-service-base-path: /api/v1/appointments/core
   /calendars:
     get:
-      operationId: listCalendars
+      operationId: list_calendars
       summary: List calendars
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -282,7 +282,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     post:
-      operationId: createCalendar
+      operationId: create_calendar
       summary: Create calendar
       requestBody:
         required: true
@@ -303,7 +303,7 @@ paths:
       x-service-base-path: /api/v1/appointments/core
   /calendars/{id}:
     get:
-      operationId: getCalendar
+      operationId: get_calendar
       summary: Get calendar by id
       parameters:
       - name: id
@@ -324,7 +324,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     put:
-      operationId: updateCalendar
+      operationId: update_calendar
       summary: Update calendar
       parameters:
       - name: id
@@ -351,7 +351,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/appointments/core
     delete:
-      operationId: deleteCalendar
+      operationId: delete_calendar
       summary: Delete calendar
       parameters:
       - name: id

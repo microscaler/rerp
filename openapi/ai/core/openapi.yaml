@@ -10,7 +10,7 @@ tags: []
 paths:
   /ai-models:
     get:
-      operationId: listAiModels
+      operationId: list_ai_models
       summary: List ai-models
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createAiModel
+      operationId: create_ai_model
       summary: Create ai-model
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /ai-models/{id}:
     get:
-      operationId: getAiModel
+      operationId: get_ai_model
       summary: Get ai-model by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateAiModel
+      operationId: update_ai_model
       summary: Update ai-model
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteAiModel
+      operationId: delete_ai_model
       summary: Delete ai-model
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /predictions:
     get:
-      operationId: listPredictions
+      operationId: list_predictions
       summary: List predictions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPrediction
+      operationId: create_prediction
       summary: Create prediction
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /predictions/{id}:
     get:
-      operationId: getPrediction
+      operationId: get_prediction
       summary: Get prediction by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePrediction
+      operationId: update_prediction
       summary: Update prediction
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePrediction
+      operationId: delete_prediction
       summary: Delete prediction
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /insights:
     get:
-      operationId: listInsights
+      operationId: list_insights
       summary: List insights
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createInsight
+      operationId: create_insight
       summary: Create insight
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /insights/{id}:
     get:
-      operationId: getInsight
+      operationId: get_insight
       summary: Get insight by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateInsight
+      operationId: update_insight
       summary: Update insight
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteInsight
+      operationId: delete_insight
       summary: Delete insight
       parameters:
       - name: id

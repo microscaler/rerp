@@ -31,7 +31,7 @@ tags: []
 paths:
   /agents:
     get:
-      operationId: listAgents
+      operationId: list_agents
       summary: List agents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -58,7 +58,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
-      operationId: createAgent
+      operationId: create_agent
       summary: Create agent
       requestBody:
         required: true
@@ -79,7 +79,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /agents/{id}:
     get:
-      operationId: getAgent
+      operationId: get_agent
       summary: Get agent by id
       parameters:
       - name: id
@@ -100,7 +100,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     put:
-      operationId: updateAgent
+      operationId: update_agent
       summary: Update agent
       parameters:
       - name: id
@@ -127,7 +127,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     delete:
-      operationId: deleteAgent
+      operationId: delete_agent
       summary: Delete agent
       parameters:
       - name: id
@@ -145,7 +145,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /chats:
     get:
-      operationId: listChats
+      operationId: list_chats
       summary: List chats
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -172,7 +172,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
-      operationId: createChat
+      operationId: create_chat
       summary: Create chat
       requestBody:
         required: true
@@ -193,7 +193,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /chats/{id}:
     get:
-      operationId: getChat
+      operationId: get_chat
       summary: Get chat by id
       parameters:
       - name: id
@@ -214,7 +214,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     put:
-      operationId: updateChat
+      operationId: update_chat
       summary: Update chat
       parameters:
       - name: id
@@ -241,7 +241,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     delete:
-      operationId: deleteChat
+      operationId: delete_chat
       summary: Delete chat
       parameters:
       - name: id
@@ -259,7 +259,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /contacts:
     get:
-      operationId: listContacts
+      operationId: list_contacts
       summary: List contacts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -286,7 +286,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
-      operationId: createContact
+      operationId: create_contact
       summary: Create contact
       requestBody:
         required: true
@@ -307,7 +307,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /contacts/{id}:
     get:
-      operationId: getContact
+      operationId: get_contact
       summary: Get contact by id
       parameters:
       - name: id
@@ -328,7 +328,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     put:
-      operationId: updateContact
+      operationId: update_contact
       summary: Update contact
       parameters:
       - name: id
@@ -355,7 +355,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     delete:
-      operationId: deleteContact
+      operationId: delete_contact
       summary: Delete contact
       parameters:
       - name: id
@@ -373,7 +373,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /leads:
     get:
-      operationId: listLeads
+      operationId: list_leads
       summary: List leads
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -400,7 +400,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
-      operationId: createLead
+      operationId: create_lead
       summary: Create lead
       requestBody:
         required: true
@@ -421,7 +421,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /leads/{id}:
     get:
-      operationId: getLead
+      operationId: get_lead
       summary: Get lead by id
       parameters:
       - name: id
@@ -442,7 +442,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     put:
-      operationId: updateLead
+      operationId: update_lead
       summary: Update lead
       parameters:
       - name: id
@@ -469,7 +469,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     delete:
-      operationId: deleteLead
+      operationId: delete_lead
       summary: Delete lead
       parameters:
       - name: id
@@ -487,7 +487,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /messages:
     get:
-      operationId: listMessages
+      operationId: list_messages
       summary: List messages
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -514,7 +514,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
-      operationId: createMessage
+      operationId: create_message
       summary: Create message
       requestBody:
         required: true
@@ -535,7 +535,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /messages/{id}:
     get:
-      operationId: getMessage
+      operationId: get_message
       summary: Get message by id
       parameters:
       - name: id
@@ -556,7 +556,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     put:
-      operationId: updateMessage
+      operationId: update_message
       summary: Update message
       parameters:
       - name: id
@@ -583,7 +583,7 @@ paths:
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     delete:
-      operationId: deleteMessage
+      operationId: delete_message
       summary: Delete message
       parameters:
       - name: id
@@ -601,7 +601,7 @@ paths:
       x-service-base-path: /api/v1/crm/livechat
   /opportunitys:
     get:
-      operationId: listOpportunitys
+      operationId: list_opportunitys
       summary: List opportunitys
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -628,7 +628,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
-      operationId: createOpportunity
+      operationId: create_opportunity
       summary: Create opportunity
       requestBody:
         required: true
@@ -649,7 +649,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /opportunitys/{id}:
     get:
-      operationId: getOpportunity
+      operationId: get_opportunity
       summary: Get opportunity by id
       parameters:
       - name: id
@@ -670,7 +670,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     put:
-      operationId: updateOpportunity
+      operationId: update_opportunity
       summary: Update opportunity
       parameters:
       - name: id
@@ -697,7 +697,7 @@ paths:
       x-service: core
       x-service-base-path: /api/v1/crm/core
     delete:
-      operationId: deleteOpportunity
+      operationId: delete_opportunity
       summary: Delete opportunity
       parameters:
       - name: id
@@ -715,7 +715,7 @@ paths:
       x-service-base-path: /api/v1/crm/core
   /rules:
     get:
-      operationId: listRules
+      operationId: list_rules
       summary: List rules
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -742,7 +742,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
-      operationId: createRule
+      operationId: create_rule
       summary: Create rule
       requestBody:
         required: true
@@ -763,7 +763,7 @@ paths:
       x-service-base-path: /api/v1/crm/automation
   /rules/{id}:
     get:
-      operationId: getRule
+      operationId: get_rule
       summary: Get rule by id
       parameters:
       - name: id
@@ -784,7 +784,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     put:
-      operationId: updateRule
+      operationId: update_rule
       summary: Update rule
       parameters:
       - name: id
@@ -811,7 +811,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     delete:
-      operationId: deleteRule
+      operationId: delete_rule
       summary: Delete rule
       parameters:
       - name: id
@@ -829,7 +829,7 @@ paths:
       x-service-base-path: /api/v1/crm/automation
   /triggers:
     get:
-      operationId: listTriggers
+      operationId: list_triggers
       summary: List triggers
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -856,7 +856,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
-      operationId: createTrigger
+      operationId: create_trigger
       summary: Create trigger
       requestBody:
         required: true
@@ -877,7 +877,7 @@ paths:
       x-service-base-path: /api/v1/crm/automation
   /triggers/{id}:
     get:
-      operationId: getTrigger
+      operationId: get_trigger
       summary: Get trigger by id
       parameters:
       - name: id
@@ -898,7 +898,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     put:
-      operationId: updateTrigger
+      operationId: update_trigger
       summary: Update trigger
       parameters:
       - name: id
@@ -925,7 +925,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     delete:
-      operationId: deleteTrigger
+      operationId: delete_trigger
       summary: Delete trigger
       parameters:
       - name: id
@@ -943,7 +943,7 @@ paths:
       x-service-base-path: /api/v1/crm/automation
   /workflows:
     get:
-      operationId: listWorkflows
+      operationId: list_workflows
       summary: List workflows
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -970,7 +970,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
-      operationId: createWorkflow
+      operationId: create_workflow
       summary: Create workflow
       requestBody:
         required: true
@@ -991,7 +991,7 @@ paths:
       x-service-base-path: /api/v1/crm/automation
   /workflows/{id}:
     get:
-      operationId: getWorkflow
+      operationId: get_workflow
       summary: Get workflow by id
       parameters:
       - name: id
@@ -1012,7 +1012,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     put:
-      operationId: updateWorkflow
+      operationId: update_workflow
       summary: Update workflow
       parameters:
       - name: id
@@ -1039,7 +1039,7 @@ paths:
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     delete:
-      operationId: deleteWorkflow
+      operationId: delete_workflow
       summary: Delete workflow
       parameters:
       - name: id

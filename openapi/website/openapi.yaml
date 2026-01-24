@@ -31,7 +31,7 @@ tags: []
 paths:
   /carts:
     get:
-      operationId: listCarts
+      operationId: list_carts
       summary: List carts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -58,7 +58,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
-      operationId: createCart
+      operationId: create_cart
       summary: Create cart
       requestBody:
         required: true
@@ -79,7 +79,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /carts/{id}:
     get:
-      operationId: getCart
+      operationId: get_cart
       summary: Get cart by id
       parameters:
       - name: id
@@ -100,7 +100,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     put:
-      operationId: updateCart
+      operationId: update_cart
       summary: Update cart
       parameters:
       - name: id
@@ -127,7 +127,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     delete:
-      operationId: deleteCart
+      operationId: delete_cart
       summary: Delete cart
       parameters:
       - name: id
@@ -145,7 +145,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /checkouts:
     get:
-      operationId: listCheckouts
+      operationId: list_checkouts
       summary: List checkouts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -172,7 +172,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
-      operationId: createCheckout
+      operationId: create_checkout
       summary: Create checkout
       requestBody:
         required: true
@@ -193,7 +193,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /checkouts/{id}:
     get:
-      operationId: getCheckout
+      operationId: get_checkout
       summary: Get checkout by id
       parameters:
       - name: id
@@ -214,7 +214,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     put:
-      operationId: updateCheckout
+      operationId: update_checkout
       summary: Update checkout
       parameters:
       - name: id
@@ -241,7 +241,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     delete:
-      operationId: deleteCheckout
+      operationId: delete_checkout
       summary: Delete checkout
       parameters:
       - name: id
@@ -259,7 +259,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /contents:
     get:
-      operationId: listContents
+      operationId: list_contents
       summary: List contents
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -286,7 +286,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
-      operationId: createContent
+      operationId: create_content
       summary: Create content
       requestBody:
         required: true
@@ -307,7 +307,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /contents/{id}:
     get:
-      operationId: getContent
+      operationId: get_content
       summary: Get content by id
       parameters:
       - name: id
@@ -328,7 +328,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     put:
-      operationId: updateContent
+      operationId: update_content
       summary: Update content
       parameters:
       - name: id
@@ -355,7 +355,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     delete:
-      operationId: deleteContent
+      operationId: delete_content
       summary: Delete content
       parameters:
       - name: id
@@ -373,7 +373,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /medias:
     get:
-      operationId: listMedias
+      operationId: list_medias
       summary: List medias
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -400,7 +400,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
-      operationId: createMedia
+      operationId: create_media
       summary: Create media
       requestBody:
         required: true
@@ -421,7 +421,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /medias/{id}:
     get:
-      operationId: getMedia
+      operationId: get_media
       summary: Get media by id
       parameters:
       - name: id
@@ -442,7 +442,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     put:
-      operationId: updateMedia
+      operationId: update_media
       summary: Update media
       parameters:
       - name: id
@@ -469,7 +469,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     delete:
-      operationId: deleteMedia
+      operationId: delete_media
       summary: Delete media
       parameters:
       - name: id
@@ -487,7 +487,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /pages:
     get:
-      operationId: listPages
+      operationId: list_pages
       summary: List pages
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -514,7 +514,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
-      operationId: createPage
+      operationId: create_page
       summary: Create page
       requestBody:
         required: true
@@ -535,7 +535,7 @@ paths:
       x-service-base-path: /api/v1/website/builder
   /pages/{id}:
     get:
-      operationId: getPage
+      operationId: get_page
       summary: Get page by id
       parameters:
       - name: id
@@ -556,7 +556,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     put:
-      operationId: updatePage
+      operationId: update_page
       summary: Update page
       parameters:
       - name: id
@@ -583,7 +583,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     delete:
-      operationId: deletePage
+      operationId: delete_page
       summary: Delete page
       parameters:
       - name: id
@@ -601,7 +601,7 @@ paths:
       x-service-base-path: /api/v1/website/builder
   /seos:
     get:
-      operationId: listSeos
+      operationId: list_seos
       summary: List seos
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -628,7 +628,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
-      operationId: createSeo
+      operationId: create_seo
       summary: Create seo
       requestBody:
         required: true
@@ -649,7 +649,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /seos/{id}:
     get:
-      operationId: getSeo
+      operationId: get_seo
       summary: Get seo by id
       parameters:
       - name: id
@@ -670,7 +670,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     put:
-      operationId: updateSeo
+      operationId: update_seo
       summary: Update seo
       parameters:
       - name: id
@@ -697,7 +697,7 @@ paths:
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     delete:
-      operationId: deleteSeo
+      operationId: delete_seo
       summary: Delete seo
       parameters:
       - name: id
@@ -715,7 +715,7 @@ paths:
       x-service-base-path: /api/v1/website/cms
   /stores:
     get:
-      operationId: listStores
+      operationId: list_stores
       summary: List stores
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -742,7 +742,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
-      operationId: createStore
+      operationId: create_store
       summary: Create store
       requestBody:
         required: true
@@ -763,7 +763,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /stores/{id}:
     get:
-      operationId: getStore
+      operationId: get_store
       summary: Get store by id
       parameters:
       - name: id
@@ -784,7 +784,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     put:
-      operationId: updateStore
+      operationId: update_store
       summary: Update store
       parameters:
       - name: id
@@ -811,7 +811,7 @@ paths:
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     delete:
-      operationId: deleteStore
+      operationId: delete_store
       summary: Delete store
       parameters:
       - name: id
@@ -829,7 +829,7 @@ paths:
       x-service-base-path: /api/v1/website/ecommerce
   /templates:
     get:
-      operationId: listTemplates
+      operationId: list_templates
       summary: List templates
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -856,7 +856,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
-      operationId: createTemplate
+      operationId: create_template
       summary: Create template
       requestBody:
         required: true
@@ -877,7 +877,7 @@ paths:
       x-service-base-path: /api/v1/website/builder
   /templates/{id}:
     get:
-      operationId: getTemplate
+      operationId: get_template
       summary: Get template by id
       parameters:
       - name: id
@@ -898,7 +898,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     put:
-      operationId: updateTemplate
+      operationId: update_template
       summary: Update template
       parameters:
       - name: id
@@ -925,7 +925,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     delete:
-      operationId: deleteTemplate
+      operationId: delete_template
       summary: Delete template
       parameters:
       - name: id
@@ -943,7 +943,7 @@ paths:
       x-service-base-path: /api/v1/website/builder
   /widgets:
     get:
-      operationId: listWidgets
+      operationId: list_widgets
       summary: List widgets
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -970,7 +970,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
-      operationId: createWidget
+      operationId: create_widget
       summary: Create widget
       requestBody:
         required: true
@@ -991,7 +991,7 @@ paths:
       x-service-base-path: /api/v1/website/builder
   /widgets/{id}:
     get:
-      operationId: getWidget
+      operationId: get_widget
       summary: Get widget by id
       parameters:
       - name: id
@@ -1012,7 +1012,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     put:
-      operationId: updateWidget
+      operationId: update_widget
       summary: Update widget
       parameters:
       - name: id
@@ -1039,7 +1039,7 @@ paths:
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     delete:
-      operationId: deleteWidget
+      operationId: delete_widget
       summary: Delete widget
       parameters:
       - name: id

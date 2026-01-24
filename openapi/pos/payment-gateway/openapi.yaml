@@ -10,7 +10,7 @@ tags: []
 paths:
   /payments:
     get:
-      operationId: listPayments
+      operationId: list_payments
       summary: List payments
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPayment
+      operationId: create_payment
       summary: Create payment
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /payments/{id}:
     get:
-      operationId: getPayment
+      operationId: get_payment
       summary: Get payment by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePayment
+      operationId: update_payment
       summary: Update payment
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePayment
+      operationId: delete_payment
       summary: Delete payment
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /payment-methods:
     get:
-      operationId: listPaymentMethods
+      operationId: list_payment_methods
       summary: List payment-methods
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPaymentMethod
+      operationId: create_payment_method
       summary: Create payment-method
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /payment-methods/{id}:
     get:
-      operationId: getPaymentMethod
+      operationId: get_payment_method
       summary: Get payment-method by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePaymentMethod
+      operationId: update_payment_method
       summary: Update payment-method
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePaymentMethod
+      operationId: delete_payment_method
       summary: Delete payment-method
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /transactions:
     get:
-      operationId: listTransactions
+      operationId: list_transactions
       summary: List transactions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createTransaction
+      operationId: create_transaction
       summary: Create transaction
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /transactions/{id}:
     get:
-      operationId: getTransaction
+      operationId: get_transaction
       summary: Get transaction by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateTransaction
+      operationId: update_transaction
       summary: Update transaction
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteTransaction
+      operationId: delete_transaction
       summary: Delete transaction
       parameters:
       - name: id

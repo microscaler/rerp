@@ -10,7 +10,7 @@ tags: []
 paths:
   /pos-orders:
     get:
-      operationId: listPosOrders
+      operationId: list_pos_orders
       summary: List pos-orders
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -35,7 +35,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPosOrder
+      operationId: create_pos_order
       summary: Create pos-order
       requestBody:
         required: true
@@ -54,7 +54,7 @@ paths:
           description: Invalid request
   /pos-orders/{id}:
     get:
-      operationId: getPosOrder
+      operationId: get_pos_order
       summary: Get pos-order by id
       parameters:
       - name: id
@@ -73,7 +73,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePosOrder
+      operationId: update_pos_order
       summary: Update pos-order
       parameters:
       - name: id
@@ -98,7 +98,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePosOrder
+      operationId: delete_pos_order
       summary: Delete pos-order
       parameters:
       - name: id
@@ -114,7 +114,7 @@ paths:
           description: Not found
   /pos-sessions:
     get:
-      operationId: listPosSessions
+      operationId: list_pos_sessions
       summary: List pos-sessions
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -139,7 +139,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createPosSession
+      operationId: create_pos_session
       summary: Create pos-session
       requestBody:
         required: true
@@ -158,7 +158,7 @@ paths:
           description: Invalid request
   /pos-sessions/{id}:
     get:
-      operationId: getPosSession
+      operationId: get_pos_session
       summary: Get pos-session by id
       parameters:
       - name: id
@@ -177,7 +177,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updatePosSession
+      operationId: update_pos_session
       summary: Update pos-session
       parameters:
       - name: id
@@ -202,7 +202,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deletePosSession
+      operationId: delete_pos_session
       summary: Delete pos-session
       parameters:
       - name: id
@@ -218,7 +218,7 @@ paths:
           description: Not found
   /receipts:
     get:
-      operationId: listReceipts
+      operationId: list_receipts
       summary: List receipts
       parameters:
       - $ref: '#/components/parameters/Page'
@@ -243,7 +243,7 @@ paths:
                   limit:
                     type: integer
     post:
-      operationId: createReceipt
+      operationId: create_receipt
       summary: Create receipt
       requestBody:
         required: true
@@ -262,7 +262,7 @@ paths:
           description: Invalid request
   /receipts/{id}:
     get:
-      operationId: getReceipt
+      operationId: get_receipt
       summary: Get receipt by id
       parameters:
       - name: id
@@ -281,7 +281,7 @@ paths:
         '404':
           description: Not found
     put:
-      operationId: updateReceipt
+      operationId: update_receipt
       summary: Update receipt
       parameters:
       - name: id
@@ -306,7 +306,7 @@ paths:
         '404':
           description: Not found
     delete:
-      operationId: deleteReceipt
+      operationId: delete_receipt
       summary: Delete receipt
       parameters:
       - name: id
