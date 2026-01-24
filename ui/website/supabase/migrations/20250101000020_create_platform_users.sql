@@ -1,4 +1,4 @@
--- Create platform_users table for PriceWhisperer platform admin users
+-- Create platform_users table for RERP platform admin users
 -- This table is COMPLETELY SEPARATE from customer users (human_names)
 -- Platform users are internal staff and must never be mixed with customer data
 -- They have their own email, phone, and name fields to ensure complete isolation

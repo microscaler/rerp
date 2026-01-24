@@ -19,7 +19,7 @@ This document provides agentic AI systems with essential context and references 
 
 Example: the **accounting** suite has microservices (general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports) and one **BFF** that fronts them. Other suites (e.g. HR, sales) will have their own BFF when implemented.
 
-Scripts infer suites **dynamically**: they list `openapi/` subdirs that contain `bff-suite-config.yaml`, read `bff_service_name` from each config, and walk `openapi/{suite}/{name}/openapi.yaml` for microservices. **No hardcoded suite names or BFF mappings** in `assign-port.py`. When adding a new suite with a BFF, add `openapi/{suite}/bff-suite-config.yaml` with `bff_service_name` and the script will pick it up.
+Suites are inferred **dynamically**: `rerp` and related tooling list `openapi/` subdirs that contain `bff-suite-config.yaml`, read `bff_service_name` from each config, and walk `openapi/{suite}/{name}/openapi.yaml` for microservices. **No hardcoded suite names or BFF mappings** in `rerp ports`. When adding a new suite with a BFF, add `openapi/{suite}/bff-suite-config.yaml` with `bff_service_name` and tooling will pick it up.
 
 ---
 
@@ -88,7 +88,7 @@ Each suite has its own BFF. For the **accounting** suite:
 bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
 ```
 
-For other suites, use `openapi/{suite}/bff-suite-config.yaml` and `openapi/{suite}/openapi_bff.yaml`. The `generate_system_bff.py` and CI workflows may generate one or more suite BFFs.
+For other suites, use `openapi/{suite}/bff-suite-config.yaml` and `openapi/{suite}/openapi_bff.yaml`. The `rerp bff generate-system` command and CI workflows may generate one or more suite BFFs.
 
 ---
 
@@ -99,7 +99,7 @@ For other suites, use `openapi/{suite}/bff-suite-config.yaml` and `openapi/{suit
 - `components/Cargo.toml` - Workspace root configuration
 - `components/common/` - Shared utilities crate
 - `openapi/` - All OpenAPI specifications
-- `scripts/` - Generation and automation scripts
+- `port-registry.json` - Port registry at **project root**; `rerp ports` uses it. All automation is in `rerp` (tooling/).
 
 ### Documentation
 
@@ -130,16 +130,17 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 
 ---
 
-## Key Scripts
+## Automation and Scripting
 
-### OpenAPI Generation
+**All scripting and automation must be implemented in `tooling/`** (the `rerp` CLI). Do not create scripts in other directories. See `tooling/README.md` for the `rerp` surface.
 
-- `scripts/generate_complete_openapi.py` - Generates individual service OpenAPI specs
-- `scripts/generate_system_bff.py` - Generates system-level BFF specs
+### OpenAPI / BFF
 
-### Requirements
+- `rerp bff generate-system` — Generates system-level BFF specs (run via `tooling/.venv/bin/rerp` after `just init`). For suite BFF: `bff-generator generate-spec --config openapi/{suite}/bff-suite-config.yaml --output openapi/{suite}/openapi_bff.yaml`. Use existing `openapi/*` specs and `brrtrouter-gen` for new stubs.
 
-- `scripts/requirements.txt` - Python dependencies for generation scripts
+### Setup
+
+- Use `rerp` and its deps via `just init` (tooling/.venv).
 
 ---
 
@@ -162,6 +163,8 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 4. **Regenerate BFF specs**: After updating service specs in a suite, regenerate that suite’s BFF (`openapi/{suite}/openapi_bff.yaml` from `bff-suite-config.yaml`)
 5. **Test changes**: Ensure all tests pass before committing
 6. **Update documentation**: Keep AI planning docs updated with status changes
+7. **Scripting in tooling only**: **Any scripting or automation requirements must be implemented in `tooling/`** (the `rerp` CLI). Do not add ad-hoc scripts, shell scripts, or one-off Python files elsewhere in the repo. For new automation, add a `rerp` subcommand or module in `tooling/` and **update all usages in the same commit**: CI, justfile, Tiltfile, docs. See `tooling/README.md`.
+8. **Staging: only track what belongs in git** — Before `git add` or `farm git commit`, **check every staged file**: must **not** be in [`.gitignore`](.gitignore) or be generated/temporary (e.g. `tooling/.coverage`, `tooling/.venv/`, `**/target/`, `*.pyc`, `__pycache__/`, `node_modules/`, `.env` with secrets). If a file should be ignored, add it to `.gitignore` and `git rm --cached <path>` to stop tracking; do not stage it. This avoids committing build artifacts, coverage, and local config.
 
 ---
 

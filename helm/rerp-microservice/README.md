@@ -1,85 +1,45 @@
-# PriceWhisperer Microservice Helm Chart
+# RERP Microservice Helm Chart
 
-A reusable Helm chart for deploying PriceWhisperer microservices (Marketing, IDAM, AMD, Billing, FTE, BFF).
+Reusable Helm chart for RERP microservices (accounting, auth, etc.).
 
 ## Usage
 
 ### Deploy a specific microservice
 
 ```bash
-# Deploy Marketing service
-helm install marketing ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/marketing.yaml
-
-# Deploy IDAM service
-helm install idam ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/idam.yaml
-
-# Deploy AMD service
-helm install amd ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/amd.yaml
-
-# Deploy Billing service
-helm install billing ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/billing.yaml
-
-# Deploy FTE service
-helm install fte ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/fte.yaml
-
-# Deploy BFF service
-helm install bff ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/bff.yaml
+# Accounting (examples; see Tiltfile for full set)
+helm install general-ledger ./helm/rerp-microservice -f ./helm/rerp-microservice/values/general-ledger.yaml
+helm install invoice ./helm/rerp-microservice -f ./helm/rerp-microservice/values/invoice.yaml
+helm install bff ./helm/rerp-microservice -f ./helm/rerp-microservice/values/bff.yaml
 ```
 
-### Upgrade a service
+### Upgrade
 
 ```bash
-helm upgrade marketing ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/marketing.yaml
+helm upgrade general-ledger ./helm/rerp-microservice -f ./helm/rerp-microservice/values/general-ledger.yaml
 ```
 
-### Uninstall a service
+### Uninstall
 
 ```bash
-helm uninstall marketing
+helm uninstall general-ledger
 ```
 
 ## Values Files
 
-Each microservice has its own values file in `values/`:
-- `marketing.yaml` - Marketing Service (port 8004)
-- `idam.yaml` - Identity & Access Management Service (port 8002)
-- `amd.yaml` - Account Management Domain Service (port 8003)
-- `billing.yaml` - Billing Service (port 8005)
-- `fte.yaml` - FTE Testing Service (port 8001)
-- `bff.yaml` - Backend for Frontend Service (port 8000)
+Service-specific values in `values/`:
+
+- **Accounting**: `general-ledger`, `invoice`, `accounts-receivable`, `accounts-payable`, `bank-sync`, `asset`, `budget`, `edi`, `financial-reports`, `bff`
+- **Other**: `idam`, `marketing`, `amd`, `billing`, `ftebe`
 
 ## Customization
 
-Override any value from the base `values.yaml` by:
-1. Editing the service-specific values file
-2. Using `--set` flags: `helm install marketing ./helm/pricewhisperer-microservice -f ./helm/pricewhisperer-microservice/values/marketing.yaml --set deployment.replicas=3`
+Override via `--set`, e.g.:
+
+```bash
+helm install general-ledger ./helm/rerp-microservice -f ./helm/rerp-microservice/values/general-ledger.yaml --set deployment.replicas=3
+```
 
 ## Configuration
 
-The chart creates:
-- **ConfigMap**: Application configuration (security, database, redis, observability)
-- **Deployment**: Service deployment with health checks and resource limits
-- **Service**: Kubernetes service (NodePort by default for local dev)
-
-## Ports
-
-- Marketing: 8004 (NodePort: 30804)
-- IDAM: 8002 (NodePort: 30802)
-- AMD: 8003 (NodePort: 30803)
-- Billing: 8005 (NodePort: 30805)
-- FTE: 8001 (NodePort: 30801)
-- BFF: 8000 (NodePort: 30800)
-
-## Health Checks
-
-All services expose `/health` endpoint for:
-- Liveness probe (checks if service is alive)
-- Readiness probe (checks if service is ready to accept traffic)
-
-## Observability
-
-All services are configured with:
-- Prometheus metrics scraping (enabled by default)
-- OpenTelemetry tracing (OTLP endpoint: `http://otel-collector:4317`)
-- Structured JSON logging for Loki ingestion
-
+The chart creates ConfigMap, Deployment, and Service (NodePort for local dev). See `values.yaml` for defaults (database, redis, observability).

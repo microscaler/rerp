@@ -5,7 +5,7 @@
  * Works with SolidJS SPA architecture and hash-based routing
  */
 
-import { BASE_URL } from '../config/constants';
+import { BASE_URL, SITE_NAME, SITE_DESCRIPTION } from '../config/constants';
 
 export interface SEOData {
   title: string;
@@ -173,12 +173,11 @@ export const updateSEO = (data: SEOData): void => {
  */
 export const resetSEO = (): void => {
   updateSEO({
-    title: 'PriceWhisperer - AI-Powered Stock Trading Alerts & Options Analytics',
-    description: 'Find profitable trades faster with AI-powered alerts, pattern detection, and automated risk management. Track 50K+ tickers across 25+ exchanges. Start free 14-day trial.',
-    keywords: 'stock trading alerts, options trading, pattern detection, trading software, stock market intelligence, options analytics, trading alerts, automated trading',
+    title: `${SITE_NAME} - ${SITE_DESCRIPTION}`,
+    description: SITE_DESCRIPTION,
+    keywords: 'ERP, enterprise resource planning, open source, modular, cloud-native',
     canonical: BASE_URL,
     ogType: 'website',
-    ogImage: '/og-image.jpg'
   });
 };
 

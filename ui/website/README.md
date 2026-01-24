@@ -1,43 +1,23 @@
-# PriceWhisperer Website
+# RERP Website
 
-A modern SolidJS website for RERP - An Enterprise ERP Platform.
+SolidJS marketing site for RERP (Rust ERP). Minimal setup: Home, About, Contact.
 
 ## Development
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+cd ui/website
+yarn install
+yarn dev
 ```
 
-## Tech Stack
+## Build
 
-- **SolidJS** - Reactive UI framework
-- **Vite** - Build tool
-- **Tailwind CSS** - Utility-first CSS framework
-- **TypeScript** - Type safety
-- **Font Awesome** - Icons
-
-## Project Structure
-
+```bash
+yarn build
 ```
-website/
-├── src/
-│   ├── components/     # SolidJS components
-│   ├── App.tsx        # Main app component
-│   ├── index.tsx      # Entry point
-│   └── index.css      # Global styles
-├── index.html         # HTML template
-├── package.json       # Dependencies
-├── tsconfig.json      # TypeScript config
-├── vite.config.ts     # Vite config
-└── tailwind.config.js # Tailwind config
-```
+
+## Structure
+
+- `src/App.tsx` – app shell, hash routing
+- `src/components/` – Hero, About, Contact
+- `@shared` – header, footer, analytics (from `ui/shared`)

@@ -6,8 +6,6 @@
  */
 
 import { BASE_URL } from './build-config';
-
-// Re-export BASE_URL from build-config for backwards compatibility
 export { BASE_URL };
 
 /**
