@@ -10644,5 +10644,5 @@ components:
 servers:
 - url: https://api.rerp.ai
   description: Production server
-- url: http://localhost:8000
+- url: http://localhost:8010
   description: Local development server (BFF)

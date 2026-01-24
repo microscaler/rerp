@@ -4,6 +4,8 @@ info:
   version: 1.0.0
   description: Budgeting service for budget creation and budget vs actual analysis.
 servers:
+- url: http://localhost:8007/api/v1/accounting/budget
+  description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/budget
   description: Budgeting API
 tags: []
@@ -39,16 +41,16 @@ paths:
                   summary: Acme Corporation - Budgets
                   value:
                     items:
-                      - id: "a0140e8400-e29b-41d4-a716-446655440000"
-                        budget_name: "2024 Annual Budget"
-                        fiscal_year: 2024
-                        budget_type: "ANNUAL"
-                        currency_code: "USD"
-                        total_budget_amount: 10000000.00
-                        status: "APPROVED"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
+                    - id: a0140e8400-e29b-41d4-a716-446655440000
+                      budget_name: 2024 Annual Budget
+                      fiscal_year: 2024
+                      budget_type: ANNUAL
+                      currency_code: USD
+                      total_budget_amount: 10000000.0
+                      status: APPROVED
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -56,16 +58,16 @@ paths:
                   summary: TechStart Inc - Budgets
                   value:
                     items:
-                      - id: "b0140e8400-e29b-41d4-a716-446655440000"
-                        budget_name: "2024 Q1 Budget"
-                        fiscal_year: 2024
-                        budget_type: "QUARTERLY"
-                        currency_code: "USD"
-                        total_budget_amount: 50000.00
-                        status: "DRAFT"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0140e8400-e29b-41d4-a716-446655440000
+                      budget_name: 2024 Q1 Budget
+                      fiscal_year: 2024
+                      budget_type: QUARTERLY
+                      currency_code: USD
+                      total_budget_amount: 50000.0
+                      status: DRAFT
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -73,16 +75,16 @@ paths:
                   summary: Global Manufacturing - Multi-currency budgets
                   value:
                     items:
-                      - id: "c0140e8400-e29b-41d4-a716-446655440000"
-                        budget_name: "2024 Annual Budget"
-                        fiscal_year: 2024
-                        budget_type: "ANNUAL"
-                        currency_code: "EUR"
-                        total_budget_amount: 10000000.00
-                        status: "APPROVED"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c0140e8400-e29b-41d4-a716-446655440000
+                      budget_name: 2024 Annual Budget
+                      fiscal_year: 2024
+                      budget_type: ANNUAL
+                      currency_code: EUR
+                      total_budget_amount: 10000000.0
+                      status: APPROVED
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -99,27 +101,27 @@ paths:
               acmeCorporationRequest:
                 summary: Create budget for Acme Corporation
                 value:
-                  budget_name: "2024 Annual Budget"
+                  budget_name: 2024 Annual Budget
                   fiscal_year: 2024
-                  budget_type: "ANNUAL"
-                  currency_code: "USD"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  budget_type: ANNUAL
+                  currency_code: USD
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create budget for TechStart Inc
                 value:
-                  budget_name: "2024 Q1 Budget"
+                  budget_name: 2024 Q1 Budget
                   fiscal_year: 2024
-                  budget_type: "QUARTERLY"
-                  currency_code: "USD"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  budget_type: QUARTERLY
+                  currency_code: USD
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency budget
                 value:
-                  budget_name: "2024 Annual Budget"
+                  budget_name: 2024 Annual Budget
                   fiscal_year: 2024
-                  budget_type: "ANNUAL"
-                  currency_code: "EUR"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  budget_type: ANNUAL
+                  currency_code: EUR
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: Budget created
@@ -131,42 +133,42 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget created
                   value:
-                    id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget"
+                    id: a0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "USD"
-                    total_budget_amount: 0.00
-                    status: "DRAFT"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: USD
+                    total_budget_amount: 0.0
+                    status: DRAFT
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartResponse:
                   summary: TechStart budget created
                   value:
-                    id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Q1 Budget"
+                    id: b0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Q1 Budget
                     fiscal_year: 2024
-                    budget_type: "QUARTERLY"
-                    currency_code: "USD"
-                    total_budget_amount: 0.00
-                    status: "DRAFT"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    budget_type: QUARTERLY
+                    currency_code: USD
+                    total_budget_amount: 0.0
+                    status: DRAFT
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget created
                   value:
-                    id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget"
+                    id: c0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "EUR"
-                    total_budget_amount: 0.00
-                    status: "DRAFT"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: EUR
+                    total_budget_amount: 0.0
+                    status: DRAFT
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '400':
           description: Invalid request
   /budgets/{id}:
@@ -191,42 +193,42 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation budget
                   value:
-                    id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget"
+                    id: a0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "USD"
-                    total_budget_amount: 10000000.00
-                    status: "APPROVED"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: USD
+                    total_budget_amount: 10000000.0
+                    status: APPROVED
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart budget
                   value:
-                    id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Q1 Budget"
+                    id: b0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Q1 Budget
                     fiscal_year: 2024
-                    budget_type: "QUARTERLY"
-                    currency_code: "USD"
-                    total_budget_amount: 50000.00
-                    status: "DRAFT"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    budget_type: QUARTERLY
+                    currency_code: USD
+                    total_budget_amount: 50000.0
+                    status: DRAFT
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing budget
                   value:
-                    id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget"
+                    id: c0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "EUR"
-                    total_budget_amount: 10000000.00
-                    status: "APPROVED"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: EUR
+                    total_budget_amount: 10000000.0
+                    status: APPROVED
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -249,18 +251,18 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation budget
                 value:
-                  budget_name: "2024 Annual Budget (Updated)"
-                  status: "APPROVED"
+                  budget_name: 2024 Annual Budget (Updated)
+                  status: APPROVED
               techStartUpdate:
                 summary: Update TechStart budget
                 value:
-                  budget_name: "2024 Q1 Budget (Updated)"
-                  status: "APPROVED"
+                  budget_name: 2024 Q1 Budget (Updated)
+                  status: APPROVED
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing budget
                 value:
-                  budget_name: "2024 Annual Budget (Updated)"
-                  status: "APPROVED"
+                  budget_name: 2024 Annual Budget (Updated)
+                  status: APPROVED
       responses:
         '200':
           description: Budget updated
@@ -272,42 +274,42 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget updated
                   value:
-                    id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget (Updated)"
+                    id: a0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget (Updated)
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "USD"
-                    total_budget_amount: 10000000.00
-                    status: "APPROVED"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: USD
+                    total_budget_amount: 10000000.0
+                    status: APPROVED
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart budget updated
                   value:
-                    id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Q1 Budget (Updated)"
+                    id: b0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Q1 Budget (Updated)
                     fiscal_year: 2024
-                    budget_type: "QUARTERLY"
-                    currency_code: "USD"
-                    total_budget_amount: 50000.00
-                    status: "APPROVED"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    budget_type: QUARTERLY
+                    currency_code: USD
+                    total_budget_amount: 50000.0
+                    status: APPROVED
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget updated
                   value:
-                    id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    budget_name: "2024 Annual Budget (Updated)"
+                    id: c0140e8400-e29b-41d4-a716-446655440000
+                    budget_name: 2024 Annual Budget (Updated)
                     fiscal_year: 2024
-                    budget_type: "ANNUAL"
-                    currency_code: "EUR"
-                    total_budget_amount: 10000000.00
-                    status: "APPROVED"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    budget_type: ANNUAL
+                    currency_code: EUR
+                    total_budget_amount: 10000000.0
+                    status: APPROVED
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -356,15 +358,15 @@ paths:
                   summary: Acme Corporation - Budget line items
                   value:
                     items:
-                      - id: "a0150e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 100000.00
-                        currency_code: "USD"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-15T10:00:00Z"
-                        updated_at: "2024-01-15T10:00:00Z"
+                    - id: a0150e8400-e29b-41d4-a716-446655440000
+                      budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                      account_id: a0070e8400-e29b-41d4-a716-446655440000
+                      period_id: a0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 100000.0
+                      currency_code: USD
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-15T10:00:00Z'
+                      updated_at: '2024-01-15T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -372,15 +374,15 @@ paths:
                   summary: TechStart Inc - Budget line items
                   value:
                     items:
-                      - id: "b0150e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 5000.00
-                        currency_code: "USD"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-20T09:00:00Z"
-                        updated_at: "2024-01-20T09:00:00Z"
+                    - id: b0150e8400-e29b-41d4-a716-446655440000
+                      budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                      account_id: b0070e8400-e29b-41d4-a716-446655440000
+                      period_id: b0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 5000.0
+                      currency_code: USD
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-20T09:00:00Z'
+                      updated_at: '2024-01-20T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -388,15 +390,15 @@ paths:
                   summary: Global Manufacturing - Multi-currency budget lines
                   value:
                     items:
-                      - id: "c0150e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 100000.00
-                        currency_code: "EUR"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-25T08:00:00Z"
-                        updated_at: "2024-01-25T08:00:00Z"
+                    - id: c0150e8400-e29b-41d4-a716-446655440000
+                      budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                      account_id: c0070e8400-e29b-41d4-a716-446655440000
+                      period_id: c0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 100000.0
+                      currency_code: EUR
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-25T08:00:00Z'
+                      updated_at: '2024-01-25T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -413,30 +415,30 @@ paths:
               acmeCorporationRequest:
                 summary: Create budget line for Acme Corporation
                 value:
-                  budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 100000.00
-                  currency_code: "USD"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                  account_id: a0070e8400-e29b-41d4-a716-446655440000
+                  period_id: a0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 100000.0
+                  currency_code: USD
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create budget line for TechStart Inc
                 value:
-                  budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 5000.00
-                  currency_code: "USD"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                  account_id: b0070e8400-e29b-41d4-a716-446655440000
+                  period_id: b0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 5000.0
+                  currency_code: USD
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency budget line
                 value:
-                  budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 100000.00
-                  currency_code: "EUR"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                  account_id: c0070e8400-e29b-41d4-a716-446655440000
+                  period_id: c0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 100000.0
+                  currency_code: EUR
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: BudgetLine created
@@ -448,39 +450,39 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget line created
                   value:
-                    id: "a0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    id: a0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartResponse:
                   summary: TechStart budget line created
                   value:
-                    id: "b0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5000.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    id: b0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5000.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget line created
                   value:
-                    id: "c0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    id: c0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '400':
           description: Invalid request
   /budget-lines/{id}:
@@ -505,39 +507,39 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation budget line
                   value:
-                    id: "a0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T10:00:00Z"
+                    id: a0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T10:00:00Z'
                 techStartExample:
                   summary: TechStart budget line
                   value:
-                    id: "b0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5000.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T09:00:00Z"
+                    id: b0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5000.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing budget line
                   value:
-                    id: "c0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T08:00:00Z"
+                    id: c0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -560,15 +562,15 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation budget line
                 value:
-                  budget_amount: 110000.00
+                  budget_amount: 110000.0
               techStartUpdate:
                 summary: Update TechStart budget line
                 value:
-                  budget_amount: 5500.00
+                  budget_amount: 5500.0
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing budget line
                 value:
-                  budget_amount: 110000.00
+                  budget_amount: 110000.0
       responses:
         '200':
           description: BudgetLine updated
@@ -580,39 +582,39 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget line updated
                   value:
-                    id: "a0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 110000.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-15T10:00:00Z"
-                    updated_at: "2024-01-15T11:00:00Z"
+                    id: a0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 110000.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-15T10:00:00Z'
+                    updated_at: '2024-01-15T11:00:00Z'
                 techStartResponse:
                   summary: TechStart budget line updated
                   value:
-                    id: "b0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5500.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-20T09:00:00Z"
-                    updated_at: "2024-01-20T10:00:00Z"
+                    id: b0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5500.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-20T09:00:00Z'
+                    updated_at: '2024-01-20T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget line updated
                   value:
-                    id: "c0150e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 110000.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-25T08:00:00Z"
-                    updated_at: "2024-01-25T09:00:00Z"
+                    id: c0150e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 110000.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-25T08:00:00Z'
+                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -661,18 +663,18 @@ paths:
                   summary: Acme Corporation - Budget variances
                   value:
                     items:
-                      - id: "a0170e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 100000.00
-                        actual_amount: 95000.00
-                        variance_amount: -5000.00
-                        variance_percent: -5.00
-                        currency_code: "USD"
-                        company_id: "550e8400-e29b-41d4-a716-446655440000"
-                        created_at: "2024-01-31T10:00:00Z"
-                        updated_at: "2024-01-31T10:00:00Z"
+                    - id: a0170e8400-e29b-41d4-a716-446655440000
+                      budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                      account_id: a0070e8400-e29b-41d4-a716-446655440000
+                      period_id: a0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 100000.0
+                      actual_amount: 95000.0
+                      variance_amount: -5000.0
+                      variance_percent: -5.0
+                      currency_code: USD
+                      company_id: 550e8400-e29b-41d4-a716-446655440000
+                      created_at: '2024-01-31T10:00:00Z'
+                      updated_at: '2024-01-31T10:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -680,18 +682,18 @@ paths:
                   summary: TechStart Inc - Budget variances
                   value:
                     items:
-                      - id: "b0170e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 5000.00
-                        actual_amount: 4800.00
-                        variance_amount: -200.00
-                        variance_percent: -4.00
-                        currency_code: "USD"
-                        company_id: "660e8400-e29b-41d4-a716-446655440001"
-                        created_at: "2024-01-31T09:00:00Z"
-                        updated_at: "2024-01-31T09:00:00Z"
+                    - id: b0170e8400-e29b-41d4-a716-446655440000
+                      budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                      account_id: b0070e8400-e29b-41d4-a716-446655440000
+                      period_id: b0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 5000.0
+                      actual_amount: 4800.0
+                      variance_amount: -200.0
+                      variance_percent: -4.0
+                      currency_code: USD
+                      company_id: 660e8400-e29b-41d4-a716-446655440001
+                      created_at: '2024-01-31T09:00:00Z'
+                      updated_at: '2024-01-31T09:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -699,18 +701,18 @@ paths:
                   summary: Global Manufacturing - Multi-currency budget variances
                   value:
                     items:
-                      - id: "c0170e8400-e29b-41d4-a716-446655440000"
-                        budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                        account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                        period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                        budget_amount: 100000.00
-                        actual_amount: 95000.00
-                        variance_amount: -5000.00
-                        variance_percent: -5.00
-                        currency_code: "EUR"
-                        company_id: "770e8400-e29b-41d4-a716-446655440002"
-                        created_at: "2024-01-31T08:00:00Z"
-                        updated_at: "2024-01-31T08:00:00Z"
+                    - id: c0170e8400-e29b-41d4-a716-446655440000
+                      budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                      account_id: c0070e8400-e29b-41d4-a716-446655440000
+                      period_id: c0160e8400-e29b-41d4-a716-446655440000
+                      budget_amount: 100000.0
+                      actual_amount: 95000.0
+                      variance_amount: -5000.0
+                      variance_percent: -5.0
+                      currency_code: EUR
+                      company_id: 770e8400-e29b-41d4-a716-446655440002
+                      created_at: '2024-01-31T08:00:00Z'
+                      updated_at: '2024-01-31T08:00:00Z'
                     total: 1
                     page: 1
                     limit: 20
@@ -727,33 +729,33 @@ paths:
               acmeCorporationRequest:
                 summary: Create budget variance for Acme Corporation
                 value:
-                  budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 100000.00
-                  actual_amount: 95000.00
-                  currency_code: "USD"
-                  company_id: "550e8400-e29b-41d4-a716-446655440000"
+                  budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                  account_id: a0070e8400-e29b-41d4-a716-446655440000
+                  period_id: a0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 100000.0
+                  actual_amount: 95000.0
+                  currency_code: USD
+                  company_id: 550e8400-e29b-41d4-a716-446655440000
               techStartRequest:
                 summary: Create budget variance for TechStart Inc
                 value:
-                  budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 5000.00
-                  actual_amount: 4800.00
-                  currency_code: "USD"
-                  company_id: "660e8400-e29b-41d4-a716-446655440001"
+                  budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                  account_id: b0070e8400-e29b-41d4-a716-446655440000
+                  period_id: b0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 5000.0
+                  actual_amount: 4800.0
+                  currency_code: USD
+                  company_id: 660e8400-e29b-41d4-a716-446655440001
               globalManufacturingRequest:
                 summary: Create multi-currency budget variance
                 value:
-                  budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                  account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                  period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                  budget_amount: 100000.00
-                  actual_amount: 95000.00
-                  currency_code: "EUR"
-                  company_id: "770e8400-e29b-41d4-a716-446655440002"
+                  budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                  account_id: c0070e8400-e29b-41d4-a716-446655440000
+                  period_id: c0160e8400-e29b-41d4-a716-446655440000
+                  budget_amount: 100000.0
+                  actual_amount: 95000.0
+                  currency_code: EUR
+                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: BudgetVariance created
@@ -765,48 +767,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget variance created
                   value:
-                    id: "a0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 95000.00
-                    variance_amount: -5000.00
-                    variance_percent: -5.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
-                    updated_at: "2024-01-31T10:00:00Z"
+                    id: a0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 95000.0
+                    variance_amount: -5000.0
+                    variance_percent: -5.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
+                    updated_at: '2024-01-31T10:00:00Z'
                 techStartResponse:
                   summary: TechStart budget variance created
                   value:
-                    id: "b0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5000.00
-                    actual_amount: 4800.00
-                    variance_amount: -200.00
-                    variance_percent: -4.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
-                    updated_at: "2024-01-31T09:00:00Z"
+                    id: b0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5000.0
+                    actual_amount: 4800.0
+                    variance_amount: -200.0
+                    variance_percent: -4.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
+                    updated_at: '2024-01-31T09:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget variance created
                   value:
-                    id: "c0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 95000.00
-                    variance_amount: -5000.00
-                    variance_percent: -5.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
-                    updated_at: "2024-01-31T08:00:00Z"
+                    id: c0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 95000.0
+                    variance_amount: -5000.0
+                    variance_percent: -5.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
+                    updated_at: '2024-01-31T08:00:00Z'
         '400':
           description: Invalid request
   /budget-variances/{id}:
@@ -831,48 +833,48 @@ paths:
                 acmeCorporationExample:
                   summary: Acme Corporation budget variance
                   value:
-                    id: "a0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 95000.00
-                    variance_amount: -5000.00
-                    variance_percent: -5.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
-                    updated_at: "2024-01-31T10:00:00Z"
+                    id: a0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 95000.0
+                    variance_amount: -5000.0
+                    variance_percent: -5.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
+                    updated_at: '2024-01-31T10:00:00Z'
                 techStartExample:
                   summary: TechStart budget variance
                   value:
-                    id: "b0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5000.00
-                    actual_amount: 4800.00
-                    variance_amount: -200.00
-                    variance_percent: -4.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
-                    updated_at: "2024-01-31T09:00:00Z"
+                    id: b0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5000.0
+                    actual_amount: 4800.0
+                    variance_amount: -200.0
+                    variance_percent: -4.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
+                    updated_at: '2024-01-31T09:00:00Z'
                 globalManufacturingExample:
                   summary: Global Manufacturing budget variance
                   value:
-                    id: "c0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 95000.00
-                    variance_amount: -5000.00
-                    variance_percent: -5.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
-                    updated_at: "2024-01-31T08:00:00Z"
+                    id: c0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 95000.0
+                    variance_amount: -5000.0
+                    variance_percent: -5.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
+                    updated_at: '2024-01-31T08:00:00Z'
         '404':
           description: Not found
     put:
@@ -895,15 +897,15 @@ paths:
               acmeCorporationUpdate:
                 summary: Update Acme Corporation budget variance
                 value:
-                  actual_amount: 98000.00
+                  actual_amount: 98000.0
               techStartUpdate:
                 summary: Update TechStart budget variance
                 value:
-                  actual_amount: 4900.00
+                  actual_amount: 4900.0
               globalManufacturingUpdate:
                 summary: Update Global Manufacturing budget variance
                 value:
-                  actual_amount: 98000.00
+                  actual_amount: 98000.0
       responses:
         '200':
           description: BudgetVariance updated
@@ -915,48 +917,48 @@ paths:
                 acmeCorporationResponse:
                   summary: Acme Corporation budget variance updated
                   value:
-                    id: "a0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "a0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "a0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "a0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 98000.00
-                    variance_amount: -2000.00
-                    variance_percent: -2.00
-                    currency_code: "USD"
-                    company_id: "550e8400-e29b-41d4-a716-446655440000"
-                    created_at: "2024-01-31T10:00:00Z"
-                    updated_at: "2024-01-31T11:00:00Z"
+                    id: a0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
+                    account_id: a0070e8400-e29b-41d4-a716-446655440000
+                    period_id: a0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 98000.0
+                    variance_amount: -2000.0
+                    variance_percent: -2.0
+                    currency_code: USD
+                    company_id: 550e8400-e29b-41d4-a716-446655440000
+                    created_at: '2024-01-31T10:00:00Z'
+                    updated_at: '2024-01-31T11:00:00Z'
                 techStartResponse:
                   summary: TechStart budget variance updated
                   value:
-                    id: "b0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "b0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "b0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "b0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 5000.00
-                    actual_amount: 4900.00
-                    variance_amount: -100.00
-                    variance_percent: -2.00
-                    currency_code: "USD"
-                    company_id: "660e8400-e29b-41d4-a716-446655440001"
-                    created_at: "2024-01-31T09:00:00Z"
-                    updated_at: "2024-01-31T10:00:00Z"
+                    id: b0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
+                    account_id: b0070e8400-e29b-41d4-a716-446655440000
+                    period_id: b0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 5000.0
+                    actual_amount: 4900.0
+                    variance_amount: -100.0
+                    variance_percent: -2.0
+                    currency_code: USD
+                    company_id: 660e8400-e29b-41d4-a716-446655440001
+                    created_at: '2024-01-31T09:00:00Z'
+                    updated_at: '2024-01-31T10:00:00Z'
                 globalManufacturingResponse:
                   summary: Global Manufacturing budget variance updated
                   value:
-                    id: "c0170e8400-e29b-41d4-a716-446655440000"
-                    budget_id: "c0140e8400-e29b-41d4-a716-446655440000"
-                    account_id: "c0070e8400-e29b-41d4-a716-446655440000"
-                    period_id: "c0160e8400-e29b-41d4-a716-446655440000"
-                    budget_amount: 100000.00
-                    actual_amount: 98000.00
-                    variance_amount: -2000.00
-                    variance_percent: -2.00
-                    currency_code: "EUR"
-                    company_id: "770e8400-e29b-41d4-a716-446655440002"
-                    created_at: "2024-01-31T08:00:00Z"
-                    updated_at: "2024-01-31T09:00:00Z"
+                    id: c0170e8400-e29b-41d4-a716-446655440000
+                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
+                    account_id: c0070e8400-e29b-41d4-a716-446655440000
+                    period_id: c0160e8400-e29b-41d4-a716-446655440000
+                    budget_amount: 100000.0
+                    actual_amount: 98000.0
+                    variance_amount: -2000.0
+                    variance_percent: -2.0
+                    currency_code: EUR
+                    company_id: 770e8400-e29b-41d4-a716-446655440002
+                    created_at: '2024-01-31T08:00:00Z'
+                    updated_at: '2024-01-31T09:00:00Z'
         '404':
           description: Not found
     delete:
@@ -1000,14 +1002,14 @@ components:
     Budget:
       type: object
       required:
-        - id
-        - budget_number
-        - name
-        - fiscal_year
-        - period_start
-        - period_end
-        - status
-        - currency_code
+      - id
+      - budget_number
+      - name
+      - fiscal_year
+      - period_start
+      - period_end
+      - status
+      - currency_code
       properties:
         id:
           type: string
@@ -1035,10 +1037,17 @@ components:
           nullable: true
         status:
           type: string
-          enum: [DRAFT, ACTIVE, CLOSED, CANCELLED]
+          enum:
+          - DRAFT
+          - ACTIVE
+          - CLOSED
+          - CANCELLED
         approval_status:
           type: string
-          enum: [PENDING, APPROVED, REJECTED]
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
           nullable: true
         approved_at:
           type: string
@@ -1085,12 +1094,12 @@ components:
     BudgetLine:
       type: object
       required:
-        - id
-        - budget_id
-        - version_id
-        - account_id
-        - period_id
-        - currency_code
+      - id
+      - budget_id
+      - version_id
+      - account_id
+      - period_id
+      - currency_code
       properties:
         id:
           type: string
@@ -1135,11 +1144,11 @@ components:
     BudgetVariance:
       type: object
       required:
-        - id
-        - budget_id
-        - account_id
-        - period_id
-        - currency_code
+      - id
+      - budget_id
+      - account_id
+      - period_id
+      - currency_code
       properties:
         id:
           type: string
@@ -1185,12 +1194,12 @@ components:
     CreateBudgetRequest:
       type: object
       required:
-        - budget_number
-        - name
-        - fiscal_year
-        - period_start
-        - period_end
-        - currency_code
+      - budget_number
+      - name
+      - fiscal_year
+      - period_start
+      - period_end
+      - currency_code
       properties:
         budget_number:
           type: string
@@ -1225,18 +1234,25 @@ components:
           type: string
         status:
           type: string
-          enum: [DRAFT, ACTIVE, CLOSED, CANCELLED]
+          enum:
+          - DRAFT
+          - ACTIVE
+          - CLOSED
+          - CANCELLED
         approval_status:
           type: string
-          enum: [PENDING, APPROVED, REJECTED]
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
     CreateBudgetLineRequest:
       type: object
       required:
-        - budget_id
-        - version_id
-        - account_id
-        - period_id
-        - currency_code
+      - budget_id
+      - version_id
+      - account_id
+      - period_id
+      - currency_code
       properties:
         budget_id:
           type: string
@@ -1273,10 +1289,10 @@ components:
     CreateBudgetVarianceRequest:
       type: object
       required:
-        - budget_id
-        - account_id
-        - period_id
-        - currency_code
+      - budget_id
+      - account_id
+      - period_id
+      - currency_code
       properties:
         budget_id:
           type: string

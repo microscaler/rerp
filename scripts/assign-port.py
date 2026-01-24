@@ -13,7 +13,7 @@ Usage:
     assign-port.py update-configs <service-name> # Update config files with assigned port
     assign-port.py validate [--json]             # Scan all sources; report conflicts
     assign-port.py reconcile [--update-configs]  # Add helm-only services to registry
-    assign-port.py fix-duplicates [--dry-run]    # Resolve duplicate helm ports; prefer accounting
+    assign-port.py fix-duplicates [--dry-run]    # Resolve duplicate helm ports; prefer suite (BFF + bff-suite-config)
 """
 
 import json
@@ -22,7 +22,7 @@ import re
 import sys
 import argparse
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 from datetime import datetime
 from collections import defaultdict
 
@@ -35,11 +35,67 @@ REGISTRY_FILE = SCRIPT_DIR / "port-registry.json"
 HELM_VALUES_DIR = PROJECT_ROOT / "helm" / "rerp-microservice" / "values"
 KIND_CONFIG = PROJECT_ROOT / "kind-config.yaml"
 TILTFILE = PROJECT_ROOT / "Tiltfile"
-BFF_SUITE_CONFIG = PROJECT_ROOT / "openapi" / "accounting" / "bff-suite-config.yaml"
+OPENAPI_DIR = PROJECT_ROOT / "openapi"
 START_PORT = 8001
 RESERVED_PORTS = [8080]  # Ports that should never be assigned
 # Tilt port-forwards bind these on the host; kind-config must NOT use hostPort in this range
 TILT_MANAGED_RANGE = (8001, 8099)
+
+
+def _suites_with_bff() -> List[str]:
+    """Suites that have a BFF: openapi/{suite}/bff-suite-config.yaml exists."""
+    if not OPENAPI_DIR.exists():
+        return []
+    return [d.name for d in OPENAPI_DIR.iterdir() if d.is_dir() and (d / "bff-suite-config.yaml").exists()]
+
+
+def _bff_suite_config_path(suite: str) -> Path:
+    return OPENAPI_DIR / suite / "bff-suite-config.yaml"
+
+
+def _openapi_bff_path(suite: str) -> Path:
+    return OPENAPI_DIR / suite / "openapi_bff.yaml"
+
+
+def _service_to_suite(service_name: str) -> Optional[str]:
+    """Return the suite that contains openapi/{suite}/{service_name}/openapi.yaml, or None."""
+    if not OPENAPI_DIR.exists():
+        return None
+    for d in OPENAPI_DIR.iterdir():
+        if d.is_dir() and (d / service_name / "openapi.yaml").exists():
+            return d.name
+    return None
+
+
+def _get_bff_service_name_from_config(data: dict) -> Optional[str]:
+    """Read bff_service_name from bff-suite-config (top-level or metadata). Returns None if absent."""
+    return data.get("bff_service_name") or (data.get("metadata") or {}).get("bff_service_name")
+
+
+def _iter_bffs() -> Iterator[Tuple[str, str]]:
+    """
+    Yield (bff_service_name, suite) for each suite that has bff-suite-config.yaml with
+    bff_service_name set. Suites are discovered by listing openapi/ subdirs that contain
+    bff-suite-config.yaml.
+    """
+    for suite in _suites_with_bff():
+        path = _bff_suite_config_path(suite)
+        try:
+            with open(path) as f:
+                data = yaml.safe_load(f) or {}
+            name = _get_bff_service_name_from_config(data)
+            if name:
+                yield (name, suite)
+        except Exception:
+            pass
+
+
+def _bff_service_to_suite(service_name: str) -> Optional[str]:
+    """Return the suite whose BFF has the given registry service name, or None."""
+    for bff_svc, suite in _iter_bffs():
+        if bff_svc == service_name:
+            return suite
+    return None
 
 
 class PortRegistry:
@@ -170,6 +226,9 @@ class PortRegistry:
             yaml.dump(values, f, default_flow_style=False, sort_keys=False)
         print(f"✅ Updated {values_file}")
 
+        # OpenAPI: update servers so Swagger "Try it" uses the correct localhost port
+        _update_openapi_servers(service_name, port)
+
         if port_only:
             return
         # Update kind-config.yaml: skip for ports in TILT_MANAGED_RANGE (Tilt port-forwards
@@ -205,6 +264,68 @@ class PortRegistry:
                     print(f"✅ Updated {KIND_CONFIG}")
             else:
                 print(f"ℹ️  Port mapping already exists in {KIND_CONFIG}")
+
+
+# ---------------------------------------------------------------------------
+# OpenAPI: update servers for correct localhost port (Swagger "Try it")
+# ---------------------------------------------------------------------------
+
+def _update_openapi_servers(service_name: str, port: int) -> None:
+    """
+    Update OpenAPI server URLs so Swagger UI "Try it" points at the correct
+    localhost port. Per-suite: updates openapi/{suite}/bff-suite-config.yaml for a
+    BFF, or openapi/{suite}/{name}/openapi.yaml for a suite microservice.
+    """
+    suite = _bff_service_to_suite(service_name)
+    if suite is not None:
+        path = _bff_suite_config_path(suite)
+        if not path.exists():
+            return
+        with open(path, "r") as f:
+            data = yaml.safe_load(f) or {}
+        meta = data.setdefault("metadata", {})
+        servers = meta.get("servers") or []
+        localhost_url = f"http://localhost:{port}"
+        found = False
+        for s in servers:
+            if isinstance(s, dict) and "localhost" in str(s.get("url", "")):
+                s["url"] = localhost_url
+                found = True
+                break
+        if not found:
+            servers.append({"url": localhost_url, "description": "Local development server (BFF)"})
+        meta["servers"] = servers
+        with open(path, "w") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+        print(f"✅ Updated {path} (BFF localhost server -> {localhost_url})")
+        return
+
+    suite = _service_to_suite(service_name)
+    if not suite:
+        return
+    spec_path = OPENAPI_DIR / suite / service_name / "openapi.yaml"
+    if not spec_path.exists():
+        return
+    with open(spec_path, "r") as f:
+        data = yaml.safe_load(f) or {}
+    servers = data.get("servers") or []
+    localhost_url = f"http://localhost:{port}/api/v1/{suite}/{service_name}"
+    desc = "Local development (direct to service, port from port-registry)"
+    new_list = []
+    replaced = False
+    for s in servers:
+        if isinstance(s, dict) and "localhost" in str(s.get("url", "")):
+            if not replaced:
+                new_list.append({"url": localhost_url, "description": desc})
+                replaced = True
+        else:
+            new_list.append(s)
+    if not replaced:
+        new_list.insert(0, {"url": localhost_url, "description": desc})
+    data["servers"] = new_list
+    with open(spec_path, "w") as f:
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+    print(f"✅ Updated {spec_path} (localhost server -> {localhost_url})")
 
 
 # ---------------------------------------------------------------------------
@@ -269,18 +390,18 @@ def _discover_tiltfile() -> Dict[str, int]:
 
 
 def _discover_bff_suite_config() -> Dict[str, int]:
-    """Discover services.*.port from openapi/accounting/bff-suite-config.yaml."""
+    """Discover services.*.port from all openapi/{suite}/bff-suite-config.yaml."""
     out: Dict[str, int] = {}
-    if not BFF_SUITE_CONFIG.exists():
-        return out
-    try:
-        with open(BFF_SUITE_CONFIG) as f:
-            data = yaml.safe_load(f) or {}
-        for name, cfg in (data.get("services") or {}).items():
-            if isinstance(cfg, dict) and "port" in cfg:
-                out[name] = int(cfg["port"])
-    except Exception:
-        pass
+    for suite in _suites_with_bff():
+        path = _bff_suite_config_path(suite)
+        try:
+            with open(path) as f:
+                data = yaml.safe_load(f) or {}
+            for name, cfg in (data.get("services") or {}).items():
+                if isinstance(cfg, dict) and "port" in cfg:
+                    out[name] = int(cfg["port"])
+        except Exception:
+            pass
     return out
 
 
@@ -297,6 +418,62 @@ def _discover_generate_bff_spec() -> Dict[str, int]:
             out[m.group(1)] = int(m.group(2))
     except Exception:
         pass
+    return out
+
+
+def _discover_openapi_bff_localhost() -> Dict[str, Tuple[int, str]]:
+    """
+    Extract localhost port from openapi/{suite}/openapi_bff.yaml for each BFF discovered via
+    _iter_bffs (from bff-suite-config). Returns {bff_service_name: (port, suite)}.
+    """
+    out: Dict[str, Tuple[int, str]] = {}
+    for bff_svc, suite in _iter_bffs():
+        path = _openapi_bff_path(suite)
+        if not path.exists():
+            continue
+        try:
+            with open(path) as f:
+                data = yaml.safe_load(f) or {}
+            for s in data.get("servers") or []:
+                if isinstance(s, dict):
+                    u = str(s.get("url", ""))
+                    if "localhost" in u:
+                        m = re.search(r":(\d+)(?:/|$)", u)
+                        if m:
+                            out[bff_svc] = (int(m.group(1)), suite)
+                        break
+        except Exception:
+            pass
+    return out
+
+
+def _discover_openapi_suite_microservice_localhost() -> Dict[str, Tuple[str, int]]:
+    """Extract localhost ports from openapi/{suite}/{name}/openapi.yaml. Returns {service_name: (suite, port)}."""
+    out: Dict[str, Tuple[str, int]] = {}
+    if not OPENAPI_DIR.exists():
+        return out
+    for suite_dir in OPENAPI_DIR.iterdir():
+        if not suite_dir.is_dir():
+            continue
+        for sdir in suite_dir.iterdir():
+            if not sdir.is_dir():
+                continue
+            spec = sdir / "openapi.yaml"
+            if not spec.exists():
+                continue
+            try:
+                with open(spec) as f:
+                    data = yaml.safe_load(f) or {}
+                for s in data.get("servers") or []:
+                    if isinstance(s, dict):
+                        u = str(s.get("url", ""))
+                        if "localhost" in u:
+                            m = re.search(r":(\d+)(?:/|$)", u)
+                            if m:
+                                out[sdir.name] = (suite_dir.name, int(m.group(1)))
+                            break
+            except Exception:
+                pass
     return out
 
 
@@ -352,7 +529,7 @@ def validate(registry: "PortRegistry", json_out: bool = False) -> int:
         if r is not None and r != port:
             errors.append(f"Port mismatch: registry has {svc}={r}, Tiltfile has {port}")
 
-    # 6) Helm vs Tiltfile (for accounting services that use both)
+    # 6) Helm vs Tiltfile (for services that use both)
     for svc, port in helm.items():
         t = tilt.get(svc)
         if t is not None and t != port:
@@ -371,6 +548,59 @@ def validate(registry: "PortRegistry", json_out: bool = False) -> int:
             warnings.append(f"generate_bff_spec {svc}= {port} differs from helm {helm[svc]}")
         if tilt.get(svc) is not None and tilt[svc] != port:
             warnings.append(f"generate_bff_spec {svc}= {port} differs from Tiltfile {tilt[svc]}")
+
+    # 8b) bff-suite-config missing bff_service_name (needed for BFF discovery)
+    for suite in _suites_with_bff():
+        try:
+            with open(_bff_suite_config_path(suite)) as f:
+                data = yaml.safe_load(f) or {}
+            if not _get_bff_service_name_from_config(data):
+                warnings.append(
+                    f"openapi/{suite}/bff-suite-config.yaml has no bff_service_name (top-level or metadata). "
+                    "Add it so assign-port can discover this suite's BFF."
+                )
+        except Exception:
+            pass
+
+    # 9) bff-suite-config metadata.servers localhost vs registry (per suite)
+    for bff_svc, suite in _iter_bffs():
+        path = _bff_suite_config_path(suite)
+        if not path.exists() or bff_svc not in reg:
+            continue
+        try:
+            with open(path) as f:
+                bsc = yaml.safe_load(f) or {}
+            for s in (bsc.get("metadata") or {}).get("servers") or []:
+                if isinstance(s, dict) and "localhost" in str(s.get("url", "")):
+                    m = re.search(r":(\d+)(?:/|$)", str(s.get("url", "")))
+                    if m and int(m.group(1)) != reg[bff_svc]:
+                        errors.append(
+                            f"openapi/{suite}/bff-suite-config.yaml metadata.servers localhost port {m.group(1)} differs from registry {bff_svc}={reg[bff_svc]}. "
+                            f"Run: assign-port.py update-configs {bff_svc}"
+                        )
+                    break
+        except Exception:
+            pass
+
+    # 10) openapi/{suite}/openapi_bff.yaml localhost vs registry (per BFF; regenerate from bff-suite-config if (9) fixed)
+    obff = _discover_openapi_bff_localhost()
+    for bff_svc, (port, suite) in obff.items():
+        if bff_svc not in reg or reg[bff_svc] == port:
+            continue
+        errors.append(
+            f"openapi/{suite}/openapi_bff.yaml localhost server port {port} differs from registry {bff_svc}={reg[bff_svc]}. "
+            f"Regenerate: bff-generator generate-spec --config openapi/{suite}/bff-suite-config.yaml --output openapi/{suite}/openapi_bff.yaml"
+        )
+
+    # 11) openapi/{suite}/{name}/openapi.yaml localhost vs registry
+    oacc = _discover_openapi_suite_microservice_localhost()
+    for svc, (suite, port) in oacc.items():
+        r = reg.get(svc)
+        if r is not None and r != port:
+            errors.append(
+                f"openapi/{suite}/{svc}/openapi.yaml localhost server port {port} differs from registry {svc}={r}. "
+                f"Run: assign-port.py update-configs {svc}"
+            )
 
     if json_out:
         obj = {"ok": len(errors) == 0, "errors": errors, "warnings": warnings}
@@ -419,31 +649,34 @@ def reconcile(registry: "PortRegistry", update_configs: bool = False) -> int:
     return 0
 
 
-def _load_accounting_services() -> set:
-    """Services that keep their port in duplicate resolution (from bff-suite-config + bff)."""
-    acc = set()
-    if BFF_SUITE_CONFIG.exists():
+def _load_suite_services() -> set:
+    """Services that keep their port in fix-duplicates: all suite microservices (from any bff-suite-config) and all BFF service names (from bff_service_name)."""
+    keep: set = set()
+    for bff_svc, _ in _iter_bffs():
+        keep.add(bff_svc)
+    for suite in _suites_with_bff():
+        path = _bff_suite_config_path(suite)
         try:
-            with open(BFF_SUITE_CONFIG) as f:
+            with open(path) as f:
                 data = yaml.safe_load(f) or {}
-            acc = set((data.get("services") or {}).keys())
+            keep |= set((data.get("services") or {}).keys())
         except Exception:
             pass
-    acc.add("bff")
-    return acc
+    return keep
 
 
 def fix_duplicates(registry: "PortRegistry", dry_run: bool = False) -> int:
     """
-    Resolve duplicate service.port in helm: for each duplicate group, the accounting
-    service keeps the port; others get the next available. Updates registry and helm
-    (port-only for losers to preserve app.binaryName etc.). Returns 0.
+    Resolve duplicate service.port in helm: for each duplicate group, the suite
+    service (from any bff-suite-config or BFF) keeps the port; others get the next
+    available. Updates registry and helm (port-only for losers to preserve
+    app.binaryName etc.). Returns 0.
     """
     helm = _discover_helm()
     by_port: Dict[int, List[str]] = defaultdict(list)
     for svc, port in helm.items():
         by_port[port].append(svc)
-    accounting = _load_accounting_services()
+    suite_keepers = _load_suite_services()
     reg = registry.list_assignments()
     dupes = [(p, svcs) for p, svcs in sorted(by_port.items()) if len(svcs) > 1]
     if not dupes:
@@ -451,9 +684,9 @@ def fix_duplicates(registry: "PortRegistry", dry_run: bool = False) -> int:
         return 0
     print(f"Resolving {len(dupes)} duplicate port(s)...")
     for port, svcs in dupes:
-        # Prefer accounting; else first alphabetically
-        in_acc = [s for s in svcs if s in accounting]
-        keeper = sorted(in_acc)[0] if in_acc else sorted(svcs)[0]
+        # Prefer suite service (BFF or bff-suite-config member); else first alphabetically
+        in_keep = [s for s in svcs if s in suite_keepers]
+        keeper = sorted(in_keep)[0] if in_keep else sorted(svcs)[0]
         losers = [s for s in svcs if s != keeper]
         need_p_for_k = (reg.get(keeper) != port)
         if need_p_for_k:
@@ -525,8 +758,8 @@ def main():
     reconcile_parser = subparsers.add_parser('reconcile', help='Add services from helm values to registry (using helm port); report mismatches')
     reconcile_parser.add_argument('--update-configs', action='store_true', help='Run update-configs for each added service')
 
-    # Fix-duplicates: resolve duplicate helm ports; accounting keeps, others get next
-    fix_parser = subparsers.add_parser('fix-duplicates', help='Resolve duplicate service.port in helm; prefer accounting suite')
+    # Fix-duplicates: prefer suite services (BFF + bff-suite-config), others get next
+    fix_parser = subparsers.add_parser('fix-duplicates', help='Resolve duplicate service.port in helm; prefer suite (BFF + bff-suite-config members)')
     fix_parser.add_argument('--dry-run', action='store_true', help='Only print planned changes')
     
     args = parser.parse_args()

@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: accounts_receivable
+  binaryName: accounts_receivable_service_api
   serviceName: accounts-receivable
