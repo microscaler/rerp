@@ -189,6 +189,29 @@ def test_docker_generate_dockerfile(tmp_path, monkeypatch, capsys):
     assert "rerp_auth_idam_impl" in gen.read_text()
 
 
+def test_docker_validate_build_artifacts_missing_exits_1(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    code = _run_main(["docker", "validate-build-artifacts"])
+    out, err = capsys.readouterr()
+    assert code == 1
+    assert "Missing" in (out + err) or "build_artifacts" in (out + err)
+
+
+def test_docker_validate_build_artifacts_success_exits_0(tmp_path, monkeypatch, capsys):
+    from rerp_tooling.docker.copy_artifacts import BINARY_NAMES
+
+    for arch in ("amd64", "arm64", "arm"):
+        d = tmp_path / "build_artifacts" / arch
+        d.mkdir(parents=True)
+        for name in BINARY_NAMES.values():
+            (d / name).write_bytes(b"\x7fELF")
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    code = _run_main(["docker", "validate-build-artifacts"])
+    out, _ = capsys.readouterr()
+    assert code == 0
+    assert "amd64" in out and "arm64" in out and "arm" in out
+
+
 def test_docker_copy_artifacts_unknown_arch_exits_1(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
     code = _run_main(["docker", "copy-artifacts", "x64"])

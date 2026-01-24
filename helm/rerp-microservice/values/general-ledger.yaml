@@ -5,7 +5,7 @@ service:
   nodePort: 31001
 image:
   repository: localhost:5001
-  name: rerp-general-ledger
+  name: rerp-accounting-general-ledger
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

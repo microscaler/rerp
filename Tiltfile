@@ -240,7 +240,7 @@ def create_microservice_deployment(name):
     target_path = 'microservices/target/x86_64-unknown-linux-musl/debug/%s' % package_name
     artifact_path = 'build_artifacts/amd64/%s' % binary_name
     dockerfile = 'docker/microservices/Dockerfile.%s' % name
-    image_name = 'localhost:5001/rerp-%s' % name
+    image_name = 'localhost:5001/rerp-accounting-%s' % name
 
     # 1. Copy binary from workspace build to artifacts and create SHA256 hash
     hash_path = 'build_artifacts/amd64/%s.sha256' % binary_name

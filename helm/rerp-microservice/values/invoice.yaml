@@ -5,7 +5,7 @@ service:
   nodePort: 31002
 image:
   repository: localhost:5001
-  name: rerp-invoice
+  name: rerp-accounting-invoice
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

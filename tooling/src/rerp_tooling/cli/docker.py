@@ -7,9 +7,11 @@ from rerp_tooling.docker.build_base import run as run_build_base
 from rerp_tooling.docker.build_image_simple import run as run_build_image_simple
 from rerp_tooling.docker.build_multiarch import run as run_build_multiarch
 from rerp_tooling.docker.copy_artifacts import run as run_copy_artifacts
+from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
 from rerp_tooling.docker.copy_binary import run as run_copy_binary
 from rerp_tooling.docker.copy_multiarch import run as run_copy_multiarch
 from rerp_tooling.docker.generate_dockerfile import run as run_generate_dockerfile
+from rerp_tooling.docker.unpack_build_bins import run as run_unpack_build_bins
 
 
 def run_docker(args, project_root: Path) -> None:
@@ -21,6 +23,14 @@ def run_docker(args, project_root: Path) -> None:
             project_root=project_root,
         )
         sys.exit(0)
+    if args.docker_cmd == "unpack-build-bins":
+        inp = Path(args.input_dir)
+        inp = (project_root / inp) if not inp.is_absolute() else inp
+        rc = run_unpack_build_bins(inp, project_root)
+        sys.exit(rc)
+    if args.docker_cmd == "validate-build-artifacts":
+        rc = validate_build_artifacts(project_root)
+        sys.exit(rc)
     if args.docker_cmd == "copy-artifacts":
         rc = run_copy_artifacts(args.arch, project_root)
         sys.exit(rc)
