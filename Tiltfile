@@ -155,6 +155,7 @@ def create_microservice_lint(name, spec_file):
     local_resource(
         '%s-lint' % name,
         cmd='''
+            set -e
             echo "🔍 Linting %s OpenAPI spec..."
             # Use the built debug binary directly for speed
             ../BRRTRouter/target/debug/brrtrouter-gen lint \
@@ -180,6 +181,7 @@ def create_microservice_gen(name, spec_file, output_dir):
     local_resource(
         '%s-service-gen' % name,
         cmd='''
+            set -e
             echo "🔄 Regenerating %s service from OpenAPI spec..."
             # Use the built debug binary directly for speed (instant vs minutes for cargo run)
             ../BRRTRouter/target/debug/brrtrouter-gen generate \
@@ -263,13 +265,10 @@ def get_service_port(name):
 
 # Helper function to create build resource for a microservice
 def create_microservice_build_resource(name):
-    binary_name = BINARY_NAMES.get(name, '%s_service_api' % name.replace('-', '_'))
-    # Target path is in workspace target directory (in microservices directory)
-    # Using debug builds for active development (faster compilation, better debugging)
-    target_path = 'microservices/target/x86_64-unknown-linux-musl/debug/%s' % binary_name
-    artifact_path = 'build_artifacts/%s' % binary_name
-    
-    # Build the service binary
+    # Build the service binary. build-microservice.sh maps name -> Cargo [package] name and
+    # emits to microservices/target/x86_64-unknown-linux-musl/debug/<package_name>.
+    # create_microservice_deployment's copy step uses PACKAGE_NAMES for that path and
+    # BINARY_NAMES for build_artifacts/amd64/<binary_name> (Docker/Helm).
     local_resource(
         'build-%s' % name,
         './scripts/build-microservice.sh %s' % name,
@@ -286,8 +285,6 @@ def create_microservice_build_resource(name):
         labels=['acc_' + name],
         allow_parallel=True,
     )
-    
-    return binary_name, artifact_path
 
 # Helper function to create deployment resource for a microservice
 def create_microservice_deployment(name):
@@ -404,6 +401,7 @@ for name in ACCOUNTING_SERVICES:
 local_resource(
     'bff-spec-gen',
     cmd='''
+        set -e
         echo "🔄 Regenerating Accounting BFF OpenAPI spec (bff-generator)..."
         bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
         echo "✅ Accounting BFF spec regeneration complete"
@@ -435,6 +433,7 @@ local_resource(
 local_resource(
     'bff-lint',
     cmd='''
+        set -e
         echo "🔍 Linting BFF OpenAPI spec..."
         ../BRRTRouter/target/debug/brrtrouter-gen lint \
             --spec ./openapi/accounting/openapi_bff.yaml \
