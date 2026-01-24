@@ -1,13 +1,7 @@
 /**
- * Shared Constants
- * 
- * Constants shared across website and FTE applications
+ * Shared constants for RERP UI applications
  */
 
-/**
- * External URLs
- */
 export const EXTERNAL_URLS = {
-  tradingEducation: 'https://pricewhisperer.ai/fte/'
+  github: 'https://github.com/microscaler/rerp',
 };
-

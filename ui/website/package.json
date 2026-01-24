@@ -1,12 +1,12 @@
 {
-  "name": "pricewhisperer-website",
+  "name": "rerp-website",
   "version": "1.0.0",
   "type": "module",
   "license": "BUSINESS-SOURCE-1.1",
   "config": {
-    "baseUrl": "https://pricewhisperer.ai",
-    "siteName": "PriceWhisperer",
-    "siteDescription": "AI-Powered Stock Trading Alerts & Options Analytics"
+    "baseUrl": "https://github.com/microscaler/rerp",
+    "siteName": "RERP",
+    "siteDescription": "Enterprise Resource Planning, Reimagined"
   },
   "scripts": {
     "dev": "vite",
@@ -15,19 +15,20 @@
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.80.0",
-    "flatpickr": "^4.6.13",
-    "solid-js": "^1.8.7",
-    "wordcloud": "^1.2.3"
+    "@fortawesome/fontawesome-free": "^6.4.0",
+    "solid-js": "^1.9.11"
   },
   "devDependencies": {
-    "@types/flatpickr": "^3.1.4",
-    "@types/node": "^20.10.6",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.3.3",
-    "vite": "^5.0.10",
+    "vite": "^5.4.21",
     "vite-plugin-solid": "^2.8.2"
+  },
+  "resolutions": {
+    "esbuild": ">=0.25.0",
+    "seroval": ">=1.4.1",
+    "glob": ">=10.5.0"
   }
 }

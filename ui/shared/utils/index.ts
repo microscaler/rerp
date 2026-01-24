@@ -1,5 +1,4 @@
-// Shared utilities for PriceWhisperer applications
+// Shared utilities for RERP UI
 
-// Analytics utilities
 export * from './analytics';
 

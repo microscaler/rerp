@@ -1,2 +1,0 @@
-# Python dependencies for OpenAPI generation scripts
-PyYAML>=6.0

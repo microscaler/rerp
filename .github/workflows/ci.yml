@@ -8,62 +8,74 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   RUST_BACKTRACE: "1"
   RUST_LOG: "info"
   PYTHON_VERSION: '3.12'
 
 jobs:
-  validate-openapi:
-    name: Validate OpenAPI Specs
+  tooling:
+    name: Build, Test and Coverage (Tooling)
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-      
-      - name: Install dependencies
+
+      - name: Set up tooling .venv
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling[dev]
+
+      - name: Run tooling tests with coverage
+        run: cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-missing --cov-fail-under=65
+
+  validate-openapi:
+    name: Validate OpenAPI Specs
+    needs: [tooling]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
       - name: Validate OpenAPI specs
         run: |
           echo "🔍 Validating OpenAPI specifications..."
-          python3 -c "
-          import yaml
-          from pathlib import Path
-          
-          openapi_dir = Path('openapi')
-          errors = []
-          
-          for spec_file in openapi_dir.rglob('openapi.yaml'):
-              try:
-                  with open(spec_file, 'r') as f:
-                      yaml.safe_load(f)
-                  print(f'✅ {spec_file}')
-              except Exception as e:
-                  errors.append(f'{spec_file}: {e}')
-                  print(f'❌ {spec_file}: {e}')
-          
-          if errors:
-              print(f'\n❌ Found {len(errors)} invalid OpenAPI specs')
-              exit(1)
-          else:
-              print(f'\n✅ All OpenAPI specs are valid')
-          "
-      
+          tooling/.venv/bin/rerp openapi validate
+
       - name: Generate BFF specs (dry run)
         run: |
           echo "🔄 Testing BFF spec generation..."
-          python3 scripts/generate_system_bff.py
+          tooling/.venv/bin/rerp bff generate-system
           echo "✅ BFF spec generation successful"
 
   validate-ports:
@@ -71,6 +83,8 @@ jobs:
     needs: [validate-openapi]
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -82,22 +96,25 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Set up tooling .venv
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
 
       - name: Validate port assignments
         run: |
           echo "🔍 Validating port registry, helm, kind-config, Tiltfile..."
-          ./scripts/assign-port.py validate
+          tooling/.venv/bin/rerp ports validate
 
   build-and-test:
     name: Build and Test
     needs: [validate-ports]
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -112,16 +129,17 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-      
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
       - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
         working-directory: ${{ github.workspace }}
-        run: python3 scripts/patch-brrtrouter-for-ci.py
-      
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -142,17 +160,17 @@ jobs:
       - name: Build workspace (amd64)
         run: |
           echo "🔨 Building RERP workspace for amd64..."
-          python3 scripts/host-aware-build.py workspace amd64
+          tooling/.venv/bin/rerp build workspace amd64
       
       - name: Build example service (amd64)
         run: |
           echo "🔨 Building example service (auth/idam) for amd64..."
-          python3 scripts/host-aware-build.py auth_idam amd64
+          tooling/.venv/bin/rerp build auth_idam amd64
       
       - name: Build accounting microservices (amd64) - smoke test
         run: |
           echo "🔨 Building accounting microservices (workspace) for amd64..."
-          ./scripts/build-microservice.sh workspace --arch amd64 --release
+          tooling/.venv/bin/rerp build microservices amd64 --release
       
       - name: Format check
         run: |
@@ -179,12 +197,14 @@ jobs:
     needs: [build-and-test]
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
     env:
       RERP_USE_CROSS: '1'   # Use cross-rs Docker images (include aarch64-linux-musl-gcc, etc.) so aws-lc-sys builds
     strategy:
       matrix:
         architecture: [amd64, arm64, arm7]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -197,16 +217,17 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
-      
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
       - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
         working-directory: ${{ github.workspace }}
-        run: python3 scripts/patch-brrtrouter-for-ci.py
-      
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
-      
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
+
       - name: Cache cargo registry and git
         uses: actions/cache@v4
         with:
@@ -231,7 +252,7 @@ jobs:
       - name: Build workspace for ${{ matrix.architecture }}
         run: |
           echo "🔨 Building RERP workspace for ${{ matrix.architecture }}..."
-          python3 scripts/host-aware-build.py workspace ${{ matrix.architecture }}
+          tooling/.venv/bin/rerp build workspace ${{ matrix.architecture }}
       
       - name: Upload binaries
         uses: actions/upload-artifact@v4
@@ -244,13 +265,14 @@ jobs:
   build-push-containers:
     name: Build and Push Containers
     needs: [build-multiarch]
-    # Future: restrict to merge-on-main only (merge = push to main). Temporary: also run on boostrap-accounting-suit until container process is validated; remove that branch when done.
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/boostrap-accounting-suit') && needs.build-multiarch.result == 'success'
+    # Future: restrict to merge-on-main only (merge = push to main).
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')) && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
       contents: read
       packages: write
+      id-token: write  # For attest-build-provenance
 
     steps:
       - name: Checkout code
@@ -268,13 +290,14 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Patch Cargo.toml (BRRTRouter, lifeguard from git)
-        run: python3 scripts/patch-brrtrouter-for-ci.py
-
-      - name: Install Python dependencies
+      - name: Set up tooling .venv
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements.txt
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
+      - name: Patch Cargo.toml (BRRTRouter, lifeguard from git)
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
 
       - name: Install musl target and tools
         run: |
@@ -288,20 +311,22 @@ jobs:
       - name: Build microservices amd64 and copy to build_artifacts/amd64
         run: |
           echo "🔨 Building microservices (amd64, release)..."
-          ./scripts/build-microservice.sh workspace --arch amd64 --release
-          ./scripts/build-and-push-microservice-containers.sh --copy-only=amd64
+          tooling/.venv/bin/rerp build microservices amd64 --release
+          tooling/.venv/bin/rerp docker copy-artifacts amd64
 
       - name: Build microservices arm64 and copy to build_artifacts/arm64
+        env: { RERP_USE_CROSS: "1" }
         run: |
           echo "🔨 Building microservices (arm64, release)..."
-          ./scripts/build-microservice.sh workspace --arch arm64 --release
-          ./scripts/build-and-push-microservice-containers.sh --copy-only=arm64
+          tooling/.venv/bin/rerp build microservices arm64 --release
+          tooling/.venv/bin/rerp docker copy-artifacts arm64
 
       - name: Build microservices arm7 and copy to build_artifacts/arm
+        env: { RERP_USE_CROSS: "1" }
         run: |
           echo "🔨 Building microservices (arm7, release)..."
-          ./scripts/build-microservice.sh workspace --arch arm7 --release
-          ./scripts/build-and-push-microservice-containers.sh --copy-only=arm7
+          tooling/.venv/bin/rerp build microservices arm7 --release
+          tooling/.venv/bin/rerp docker copy-artifacts arm7
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -332,15 +357,302 @@ jobs:
             fi
           fi
 
-      - name: Build and push microservice images
-        env:
-          GHCR_OWNER: ${{ github.repository_owner }}
-          DOCKERHUB_ORG: ${{ vars.DOCKERHUB_ORG }}
-        run: |
-          chmod +x scripts/build-and-push-microservice-containers.sh
-          args=("${{ steps.tag.outputs.tag }}")
-          [[ -n "${{ steps.tag.outputs.extra_tag }}" ]] && args+=("${{ steps.tag.outputs.extra_tag }}")
-          ./scripts/build-and-push-microservice-containers.sh "${args[@]}"
+      - name: Extract metadata for general-ledger
+        id: meta-general-ledger
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-general-ledger
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push general-ledger
+        id: build-general-ledger
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.general-ledger
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-general-ledger:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-general-ledger:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-general-ledger:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-general-ledger:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-general-ledger.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest general-ledger
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-general-ledger
+          subject-digest: ${{ steps.build-general-ledger.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for invoice
+        id: meta-invoice
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-invoice
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push invoice
+        id: build-invoice
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.invoice
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-invoice:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-invoice:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-invoice:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-invoice:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-invoice.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest invoice
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-invoice
+          subject-digest: ${{ steps.build-invoice.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for accounts-receivable
+        id: meta-accounts-receivable
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-accounts-receivable
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push accounts-receivable
+        id: build-accounts-receivable
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.accounts-receivable
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-accounts-receivable:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounts-receivable:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounts-receivable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounts-receivable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-accounts-receivable.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest accounts-receivable
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounts-receivable
+          subject-digest: ${{ steps.build-accounts-receivable.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for accounts-payable
+        id: meta-accounts-payable
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-accounts-payable
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push accounts-payable
+        id: build-accounts-payable
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.accounts-payable
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-accounts-payable:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounts-payable:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounts-payable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounts-payable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-accounts-payable.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest accounts-payable
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounts-payable
+          subject-digest: ${{ steps.build-accounts-payable.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for bank-sync
+        id: meta-bank-sync
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-bank-sync
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push bank-sync
+        id: build-bank-sync
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.bank-sync
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-bank-sync:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-bank-sync:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-bank-sync:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-bank-sync:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-bank-sync.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest bank-sync
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-bank-sync
+          subject-digest: ${{ steps.build-bank-sync.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for asset
+        id: meta-asset
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-asset
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push asset
+        id: build-asset
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.asset
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-asset:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-asset:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-asset:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-asset:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-asset.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest asset
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-asset
+          subject-digest: ${{ steps.build-asset.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for budget
+        id: meta-budget
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-budget
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push budget
+        id: build-budget
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.budget
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-budget:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-budget:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-budget:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-budget:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-budget.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest budget
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-budget
+          subject-digest: ${{ steps.build-budget.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for edi
+        id: meta-edi
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-edi
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push edi
+        id: build-edi
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.edi
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-edi:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-edi:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-edi:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-edi:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-edi.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest edi
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-edi
+          subject-digest: ${{ steps.build-edi.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for financial-reports
+        id: meta-financial-reports
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-financial-reports
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push financial-reports
+        id: build-financial-reports
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.financial-reports
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-financial-reports:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-financial-reports:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-financial-reports:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-financial-reports:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-financial-reports.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest financial-reports
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-financial-reports
+          subject-digest: ${{ steps.build-financial-reports.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for bff
+        id: meta-bff
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-bff
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push bff
+        id: build-bff
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.bff
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-bff:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-bff:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-bff:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-bff:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-bff.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest bff
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-bff
+          subject-digest: ${{ steps.build-bff.outputs.digest }}
+          push-to-registry: true
+
+      - name: Extract metadata for website
+        id: meta-website
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-website
+          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+
+      - name: Build and push website
+        id: build-website
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/website/Dockerfile
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-website:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-website:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-website:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-website:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta-website.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Attest website
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-website
+          subject-digest: ${{ steps.build-website.outputs.digest }}
+          push-to-registry: true
 
       - name: Verify published images
         run: |
@@ -356,4 +668,9 @@ jobs:
             echo "$out" | grep -qE 'Platform:.*linux/arm/v7' || { echo "❌ $name: missing linux/arm/v7"; exit 1; }
             echo "✅ $name: linux/amd64, linux/arm64, linux/arm/v7"
           done
-          echo "🎉 All 10 images verified (amd64, arm64, arm/v7)."
+          img="ghcr.io/${OWNER}/rerp-website:${TAG}"
+          echo "🔍 Inspecting $img ..."
+          out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ website: imagetools inspect failed"; exit 1; }
+          echo "$out" | grep -qE 'Platform:.*linux/amd64' || { echo "❌ website: missing linux/amd64"; exit 1; }
+          echo "✅ website: linux/amd64"
+          echo "🎉 All 11 images verified (10 microservices: amd64, arm64, arm/v7; website: amd64)."

@@ -17,7 +17,7 @@ import { sendEmail } from '../utils/send-email';
 await sendEmail({
   to: 'user@example.com',
   subject: 'Welcome!',
-  html: '<p>Welcome to PriceWhisperer!</p>',
+  html: '<p>Welcome to RERP!</p>',
 });
 ```
 
@@ -49,7 +49,7 @@ supabase link --project-ref your-project-ref
 Set these secrets in **Supabase Dashboard > Edge Functions > Secrets**:
 
 - `RESEND_API_KEY` - Your Resend API key (get from [Resend Dashboard](https://resend.com/api-keys))
-- `FROM_EMAIL` - Your verified sender email (e.g., `PriceWhisperer <noreply@pricewhisperer.ai>`)
+- `FROM_EMAIL` - Your verified sender email (e.g., `RERP <noreply@rerp.dev>`)
 
 **Why not in build-config.ts?**
 - Edge Functions run on Supabase servers (Deno runtime), not in the client build
@@ -59,7 +59,7 @@ Set these secrets in **Supabase Dashboard > Edge Functions > Secrets**:
 **To set secrets via CLI:**
 ```bash
 supabase secrets set RESEND_API_KEY=re_xxxxxxxxx
-supabase secrets set FROM_EMAIL="PriceWhisperer <noreply@pricewhisperer.ai>"
+supabase secrets set FROM_EMAIL="RERP <noreply@rerp.dev>"
 ```
 
 **To set secrets via Supabase Dashboard:**
@@ -92,7 +92,7 @@ supabase functions serve send-email --no-verify-jwt --env-file .env.local
 2. **Get API Key**: Go to [API Keys](https://resend.com/api-keys) and create a new key
 3. **Verify Domain** (for production):
    - Go to [Domains](https://resend.com/domains)
-   - Add your domain (e.g., `pricewhisperer.ai`)
+   - Add your domain (e.g., `rerp.dev`)
    - Add the DNS records provided
    - Wait for verification
 
@@ -102,7 +102,7 @@ supabase functions serve send-email --no-verify-jwt --env-file .env.local
 - `RESEND_API_KEY` - Resend API key
 
 ### Optional
-- `FROM_EMAIL` - Default sender email (defaults to `PriceWhisperer <onboarding@resend.dev>`)
+- `FROM_EMAIL` - Default sender email (defaults to `RERP <onboarding@resend.dev>`)
 
 ## Function Endpoint
 

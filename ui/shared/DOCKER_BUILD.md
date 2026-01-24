@@ -32,22 +32,7 @@ This ensures that when Vite resolves `@shared` from `/build/`, it correctly find
 
 ## Tiltfile Configuration
 
-The Tiltfile watches both `ui/website/` and `ui/shared/` for changes:
-
-```python
-docker_build(
-    'pricewhisperer/website',
-    '.',
-    dockerfile='./docker/website/Dockerfile',
-    platform='linux/amd64',
-    only=[
-        './ui/website',
-        './ui/shared',  # Watch shared components
-        './docker/website',
-    ],
-    ...
-)
-```
+The Tiltfile includes the website: a `custom_build` builds the image, pushes to `localhost:5001` (or `kind load` if the registry is unavailable), and `k8s/website.yaml` deploys it. Port-forward **3000:8080** so the site is at http://localhost:3000. It watches `./ui/website`, `./ui/shared`, and `./docker/website`.
 
 ## Troubleshooting
 
@@ -58,7 +43,7 @@ Could not load /shared/header/Header (imported by src/App.tsx): ENOENT: no such 
 
 Check:
 1. ✅ Dockerfile copies `ui/shared/` to `../shared/`
-2. ✅ Tiltfile includes `./ui/shared` in the `only` list
+2. ✅ Tiltfile includes `./ui/shared` in the website build deps
 3. ✅ `vite.config.ts` has the `@shared` alias configured
 4. ✅ `tsconfig.json` has the `@shared` path mapping
 

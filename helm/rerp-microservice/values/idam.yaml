@@ -5,12 +5,12 @@ service:
   nodePort: 31012
 image:
   repository: localhost:5001
-  name: pricewhisperer-idam
+  name: rerp-idam
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:
   replicas: 1
-  namespace: pricewhisperer
+  namespace: rerp
 app:
   binaryName: identity_and_access_management_service_api
   serviceName: idam

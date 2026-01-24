@@ -1,5 +1,5 @@
 suite: accounting
-# Registry/Helm service name for this suite's BFF (used by assign-port, port-registry, Tiltfile).
+# Registry/Helm service name for this suite's BFF (used by rerp ports, port-registry, Tiltfile).
 bff_service_name: bff
 architecture: multi-suite
 openapi_base_dir: openapi/accounting

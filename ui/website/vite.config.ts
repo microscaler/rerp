@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [solid()],
-  base: '/',
+  base: process.env.VITE_BASE_PATH || '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
