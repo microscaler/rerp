@@ -83,6 +83,18 @@ The site will be at `https://<owner>.github.io/<repo>/` (e.g. `https://microscal
 
 ---
 
+## Dependabot
+
+Dependency updates are managed by [Dependabot](https://docs.github.com/en/code-security/dependabot) via `.github/dependabot.yml`.
+
+**Ecosystems**: npm (ui/website), pip (tooling), cargo (workspace + entities), docker (docker/base, docker/website), github-actions.
+
+**Schedule**: Weekly on Monday 09:00 UTC. Minor and patch updates are grouped per ecosystem to reduce PR volume; major updates stay as separate PRs.
+
+**Not scanned**: `docker/microservices/Dockerfile.<service>` (Dependabot only recognizes a file named `Dockerfile`). Path and git deps outside the repo (e.g. `brrtrouter`, `lifeguard*`) are ignored.
+
+---
+
 ## Future Workflows
 
 Additional workflows will be added for:
