@@ -1,6 +1,6 @@
 # Shared Components
 
-Shared components, styles, and configuration used across PriceWhisperer applications.
+Shared components, styles, and configuration for RERP UI applications.
 
 ## Structure
 
@@ -35,37 +35,17 @@ import Footer from '@shared/footer/Footer';
 import { EXTERNAL_URLS } from '@shared/config/constants';
 ```
 
-### In FTE Site (`ui/fte`)
-
-Import using the `@shared` alias:
-
-```typescript
-import Header from '@shared/header/Header';
-import Footer from '@shared/footer/Footer';
-import { EXTERNAL_URLS } from '@shared/config/constants';
-```
-
 ## Configuration
 
-Both `website` and `fte` have path aliases configured:
+The website uses the `@shared` path alias:
 
 - **TypeScript**: `tsconfig.json` includes `@shared/*` path mapping
 - **Vite**: `vite.config.ts` includes `@shared` alias resolution
-
-## Migration Notes
-
-- ✅ Header component migrated from `ui/website/src/components/Header.tsx`
-- ✅ Footer component migrated from `ui/website/src/components/Footer.tsx`
-- ✅ Footer subcomponents migrated from `ui/website/src/components/footer/components/`
-- ✅ Shared constants extracted from `ui/website/src/config/constants.ts` (EXTERNAL_URLS)
-- ✅ Website updated to import from shared (build verified ✅)
-- ✅ FTE site configured to import from shared
-- ✅ Old duplicate files removed from website directory (migration complete)
 
 ## Adding New Shared Components
 
 1. Create component in appropriate directory under `shared/`
 2. Export from `shared/index.ts` if needed
 3. Update consuming applications to import using `@shared` alias
-4. Test build in both website and FTE site
+4. Test build in the website
 

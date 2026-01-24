@@ -46,37 +46,26 @@ const Hero: Component = () => {
 
           <div class="flex flex-wrap gap-4 pt-4">
             <a
-              href="#modules"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.hash = '#modules';
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }}
+              href="#about"
               class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition-colors inline-flex items-center"
             >
-              Explore Modules
+              About
               <i class="fa-solid fa-arrow-right ml-2"></i>
+            </a>
+            <a
+              href="#contact"
+              class="bg-white text-primary border-2 border-primary px-6 py-3 rounded-lg hover:bg-blue-50 font-semibold transition-colors inline-flex items-center"
+            >
+              Contact
             </a>
             <a
               href="https://github.com/microscaler/rerp"
               target="_blank"
               rel="noopener noreferrer"
-              class="bg-white text-primary border-2 border-primary px-6 py-3 rounded-lg hover:bg-blue-50 font-semibold transition-colors inline-flex items-center"
+              class="text-primary hover:text-blue-700 font-semibold inline-flex items-center"
             >
               <i class="fa-brands fa-github mr-2"></i>
               View on GitHub
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.hash = '#how-it-works';
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }}
-              class="text-primary hover:text-blue-700 font-semibold inline-flex items-center"
-            >
-              Learn More
-              <i class="fa-solid fa-arrow-right ml-2"></i>
             </a>
           </div>
         </div>

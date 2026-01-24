@@ -1,4 +1,4 @@
-# PriceWhisperer Database Schema
+# RERP Website Database Schema
 
 This document provides a complete overview of the database structure, including all tables, relationships, enums, functions, and security policies.
 

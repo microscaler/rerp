@@ -61,8 +61,8 @@ app:
     database:
       host: "postgres"
       port: 5432
-      name: "pricewhisperer"
-      user: "pricewhisperer"
+      name: "rerp"
+      user: "rerp"
       password: "dev_password_change_in_prod"
       max_connections: 10
     redis:

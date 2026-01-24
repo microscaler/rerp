@@ -1,7 +1,7 @@
 /**
  * Analytics utility functions for Google Analytics 4
  * 
- * Shared utility for all PriceWhisperer applications (Website, FTE, Trader Portal, Platform Portal)
+ * Shared utility for RERP UI applications
  * 
  * Usage:
  * import { trackEvent, trackPageView, initializeGA } from '@shared/utils/analytics';

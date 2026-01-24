@@ -5,12 +5,12 @@ service:
   nodePort: 31011
 image:
   repository: localhost:5001
-  name: pricewhisperer-ftebe
+  name: rerp-ftebe
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:
   replicas: 1
-  namespace: pricewhisperer
+  namespace: rerp
 app:
   binaryName: ftebe_testing_service_api
   serviceName: ftebe

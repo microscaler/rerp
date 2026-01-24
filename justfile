@@ -24,7 +24,7 @@ dev-up:
 
     # Start local registry and connect to kind network (so docker push localhost:5001/... works)
     echo "📦 Setting up local registry (localhost:5001)..."
-    ./scripts/setup-kind-registry.sh
+    tooling/.venv/bin/rerp tilt setup-kind-registry
     
     # Wait for cluster to be ready
     echo "⏳ Waiting for cluster to be ready..."
@@ -36,7 +36,7 @@ dev-up:
     
     # Create PersistentVolumes (outside of Tilt management)
     echo "💾 Creating PersistentVolumes..."
-    ./scripts/setup-persistent-volumes.sh || {
+    tooling/.venv/bin/rerp tilt setup-persistent-volumes || {
         echo "⚠️  Warning: Some PVs may already exist (this is OK)"
     }
     
@@ -70,13 +70,11 @@ dev-down-full: dev-down
 
 # Setup development environment (Tilt-based)
 setup:
-    @chmod +x scripts/setup-tilt.sh
-    @./scripts/setup-tilt.sh
+    @tooling/.venv/bin/rerp tilt setup
 
-# Teardown development environment
+# Teardown development environment (add --remove-images, --remove-volumes, --system-prune as needed)
 teardown:
-    @chmod +x scripts/teardown-tilt.sh
-    @./scripts/teardown-tilt.sh
+    @tooling/.venv/bin/rerp tilt teardown
 
 # Start services with Tilt (local Docker mode)
 up:
@@ -92,6 +90,50 @@ up-k8s:
 # Stop services
 down:
     @tilt down
+
+# ============================================================================
+# Tooling (.venv and rerp CLI)
+# ============================================================================
+# Setup is in the justfile (not in tooling) to avoid circular deps: tooling
+# requires .venv to exist; creating .venv must not depend on tooling.
+
+# Create tooling/.venv and install rerp tooling [dev]. Run once before first
+# use of rerp or `tilt up` (build-tooling in Tilt expects .venv). Idempotent.
+init:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "🐍 Setting up tooling .venv..."
+    if [ ! -d tooling/.venv ]; then
+        python3 -m venv tooling/.venv
+    fi
+    tooling/.venv/bin/pip install --upgrade pip
+    tooling/.venv/bin/pip install -e ./tooling[dev]
+    echo "✅ Tooling .venv ready. Use: tooling/.venv/bin/rerp or add tooling/.venv/bin to PATH"
+
+# Rebuild tooling (pip install -e) after source changes. Used by Tilt on
+# tooling/src and pyproject.toml changes (ignores .pyc, __pycache__). Run
+# `just init` first if tooling/.venv does not exist.
+build-tooling:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    echo "🔨 Rebuilding tooling..."
+    tooling/.venv/bin/pip install -e ./tooling[dev]
+    echo "✅ Tooling rebuilt"
+
+# Start an interactive shell with tooling/.venv sourced and activated (exit to leave).
+venv:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    echo "Shell with tooling/.venv activated (exit to leave)..."
+    exec bash -c "source tooling/.venv/bin/activate && exec bash -i"
 
 # ============================================================================
 # Building
@@ -150,12 +192,76 @@ validate:
 # Scan port registry, helm, kind, Tiltfile, bff-suite-config; report conflicts
 # Run before dev-up to avoid "address already in use"
 validate-ports:
-    @./scripts/assign-port.py validate
+    @tooling/.venv/bin/rerp ports validate
 
 # Resolve duplicate service.port in helm; accounting keeps, others get next free
 # Use after reconcile when validate reports duplicates
 fix-duplicate-ports:
-    @./scripts/assign-port.py fix-duplicates
+    @tooling/.venv/bin/rerp ports fix-duplicates
+
+# ============================================================================
+# Lint & Format
+# ============================================================================
+
+# Run ruff check on tooling (E,F,W,B,C4,UP,SIM,I,PTH,RUF,S110,A,BLE,ERA,T10,EM,RET,LOG,PIE,PT,RSE,PGH,N,PERF,C90,TRY). Run `just init` first.
+lint:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    tooling/.venv/bin/ruff check tooling/
+
+# Format tooling with ruff. Run `just init` first.
+format:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    tooling/.venv/bin/ruff format tooling/
+
+# Check tooling is formatted (CI). Run `just init` first.
+format-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    tooling/.venv/bin/ruff format tooling/ --check
+
+# Full QA: lint + format-check + tooling tests. Run before commit or demo.
+qa:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just lint
+    just format-check
+    tooling/.venv/bin/pytest tooling/tests -v --tb=short
+
+# Auto-fix fixable ruff rules (including unsafe). Run `just init` first.
+lint-fix:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    tooling/.venv/bin/ruff check tooling/ --fix --unsafe-fixes
+
+# Find and remove unused imports in tooling (F401). Uses ruff. Run `just init` first.
+# --fix: edit files in place; run again to confirm clean.
+lint-unused-imports:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    echo "🔍 Checking for unused imports (F401) in tooling..."
+    tooling/.venv/bin/ruff check tooling/ --select F401 --fix
 
 # ============================================================================
 # Utilities
@@ -175,7 +281,7 @@ clean:
 # Usage: just logs <component-name>
 # Example: just logs general-ledger
 logs component:
-    @./scripts/tail-tilt-logs.sh {{component}} || echo "Logs script not found. Use: tilt logs {{component}}"
+    @tooling/.venv/bin/rerp tilt logs {{component}} || echo "Use: tilt logs {{component}}"
 
 # Show logs from all services
 logs-all:

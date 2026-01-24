@@ -499,7 +499,7 @@ bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --
 
 ```bash
 # Regenerate all system BFF specs from sub-services
-python3 scripts/generate_system_bff.py
+rerp bff generate-system
 ```
 
 This aggregates all sub-service paths and schemas into unified system APIs, automatically kept in sync via GitHub Actions.
@@ -554,7 +554,7 @@ ls openapi/*/openapi.yaml
 ls components/*/
 
 # Generate system BFF specs
-python3 scripts/generate_system_bff.py
+rerp bff generate-system
 ```
 
 ### Generate a Service
@@ -589,9 +589,8 @@ rerp/
 │   │   └── {module}/       # Service directories
 │   │       ├── openapi.yaml # Service OpenAPI spec
 │   │       └── README.md     # Service documentation
-├── scripts/                 # Generation and automation scripts
-│   ├── generate_system_bff.py
-│   └── generate_complete_openapi.py
+├── port-registry.json       # Port registry (rerp ports)
+├── tooling/                 # rerp CLI: ports, openapi, ci, bff, build, docker, bootstrap, tilt
 └── .github/
     └── workflows/
         └── ci.yml  # CI: validate OpenAPI, validate ports, build, test, multi-arch

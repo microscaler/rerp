@@ -3,7 +3,7 @@
 // Called from the website to send welcome emails, verification emails, etc.
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'PriceWhisperer <onboarding@resend.dev>';
+const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'RERP <onboarding@resend.dev>';
 
 interface EmailRequest {
   to: string | string[];

@@ -1,0 +1,120 @@
+# Build and publish rerp-base to GHCR (and optionally Docker Hub).
+# Uses registry cache and change detection to reduce build time.
+# Local build: `rerp docker build-base` (or --push with GHCR_OWNER set).
+
+name: Build Base Images
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'docker/base/Dockerfile'
+      - 'docker/base/Dockerfile.multiarch'
+      - '.github/workflows/base-images.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'docker/base/Dockerfile'
+      - 'docker/base/Dockerfile.multiarch'
+      - '.github/workflows/base-images.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (default: latest)'
+        required: false
+        type: string
+        default: 'latest'
+      force:
+        description: 'Force build even if no changes detected'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_GHCR: ghcr.io/${{ github.repository_owner }}/rerp-base
+
+jobs:
+  build-rerp-base:
+    name: Build rerp-base
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # For change detection (HEAD~1)
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: ${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Check for changes
+        id: check-changes
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.force != 'true'
+        run: |
+          if git diff --quiet HEAD~1 HEAD -- docker/base/Dockerfile docker/base/Dockerfile.multiarch 2>/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "⏭️  No changes in docker/base Dockerfiles"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected in docker/base"
+          fi
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="latest"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📌 Version: ${VERSION}"
+
+      - name: Build and push rerp-base
+        id: build
+        if: steps.check-changes.outputs.changed == 'true' || github.event.inputs.force == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/base/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_GHCR }}:${{ steps.version.outputs.version }},${{ env.IMAGE_GHCR }}:latest${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-base:{1},docker.io/{0}/rerp-base:latest', vars.DOCKERHUB_ORG, steps.version.outputs.version) || '' }}
+          cache-from: type=registry,ref=${{ env.IMAGE_GHCR }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE_GHCR }}:buildcache,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build summary
+        if: always()
+        run: |
+          echo "## Base Image Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | Status | Version |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.build.outcome }}" == "success" ]; then
+            echo "| rerp-base | ✅ Success | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.build.outcome }}" == "skipped" ]; then
+            echo "| rerp-base | ⏭️  Skipped (no changes) | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| rerp-base | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi

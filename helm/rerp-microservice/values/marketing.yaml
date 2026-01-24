@@ -5,12 +5,12 @@ service:
   nodePort: 31014
 image:
   repository: localhost:5001
-  name: pricewhisperer-marketing
+  name: rerp-marketing
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:
   replicas: 1
-  namespace: pricewhisperer
+  namespace: rerp
 app:
   binaryName: marketing_service_api
   serviceName: marketing

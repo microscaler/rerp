@@ -5,12 +5,12 @@ service:
   nodePort: 31015
 image:
   repository: localhost:5001
-  name: pricewhisperer-billing
+  name: rerp-billing
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:
   replicas: 1
-  namespace: pricewhisperer
+  namespace: rerp
 app:
   binaryName: billing_service_api
   serviceName: billing

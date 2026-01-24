@@ -32,10 +32,7 @@ This guide will help you get started with contributing to the project.
    ls components/*/
    ```
 
-3. **Generate system BFF specs** (optional, for testing):
-   ```bash
-   python3 scripts/generate_system_bff.py
-   ```
+3. **Generate system BFF specs** (optional, for testing): run `just init` then `rerp bff generate-system`.
 
 ---
 
@@ -163,7 +160,7 @@ rerp/
 │   ├── {system}/       # System directories
 │   │   ├── openapi.yaml  # System BFF spec
 │   │   └── {module}/   # Service directories
-├── scripts/            # Generation scripts
+├── tooling/            # rerp CLI (ports, openapi, ci, bff, build, docker, bootstrap, tilt)
 ├── docs/               # Documentation
 └── .github/            # GitHub workflows
 ```

@@ -20,7 +20,7 @@ Add these secrets to your GitHub repository:
 - `SUPABASE_WEBSITE_ANON_API_KEY` - Your Supabase anon key (for client-side access)
 - `SUPABASE_WEBSITE_PASSWORD` - Database password (for migrations)
 
-**Note:** The naming convention uses `WEBSITE` prefix because the PriceWhisperer Supabase org has multiple databases (website, FTE, etc.)
+**Note:** The naming convention uses `WEBSITE` prefix for the RERP website database.
 
 ### 3. Run Initial Migration
 
