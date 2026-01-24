@@ -24,7 +24,7 @@ Resolved: esbuild 0.27.2, seroval 1.5.0, glob 13.0.0. `yarn audit` 0 vulnerabili
 
 **Issue:** The CI workflow (and any workflow used for CodeQL) did not set an explicit `permissions` block. The default grants all permissions to `GITHUB_TOKEN`. Restricting to the minimum needed (e.g. `contents: read`) follows least-privilege and satisfies CodeQL’s recommendation.
 
-**Fix:** Add workflow-level `permissions: { contents: read }` to `.github/workflows/ci.yml`. Jobs that need more (e.g. `build-push-containers`: `packages: write`, `id-token: write`) keep their job-level `permissions`, which override the workflow default.
+**Fix:** Add workflow-level `permissions: { contents: read }` to `.github/workflows/ci.yml`. Jobs that need more (e.g. `build-push-service`: `packages: write`, `id-token: write`, `attestations: write` for push and attest-build-provenance) keep their job-level `permissions`, which override the workflow default.
 
 **Note:** If a dedicated CodeQL workflow (e.g. `codeql.yml`) exists, it should also include `permissions: { contents: read }` (or the minimum required for the CodeQL action).
 
@@ -58,7 +58,7 @@ Resolved: esbuild 0.27.2, seroval 1.5.0, glob 13.0.0. `yarn audit` 0 vulnerabili
 
 **File:** `.github/workflows/ci.yml`
 
-**Issue:** The `docker/metadata-action` step extracted metadata only for `rerp-general-ledger` (`images: ghcr.io/.../rerp-general-ledger`), but `${{ steps.meta.outputs.labels }}` was applied to all 11 build-push steps (general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff, website). Every image received OCI labels (e.g. `org.opencontainers.image.title`) identifying it as `rerp-general-ledger`. Tools that inspect container metadata reported incorrect image identities.
+**Issue:** The `docker/metadata-action` step extracted metadata only for `rerp-accounting-general-ledger` (`images: ghcr.io/.../rerp-accounting-general-ledger`), but `${{ steps.meta.outputs.labels }}` was applied to all 11 build-push steps (general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff, website). Every image received OCI labels (e.g. `org.opencontainers.image.title`) identifying it as `rerp-accounting-general-ledger`. Tools that inspect container metadata reported incorrect image identities.
 
 **Fix:** Run `docker/metadata-action` once per image, immediately before each `docker/build-push-action`, with the correct `images` value and a unique step `id` (e.g. `meta-invoice`, `meta-accounts-receivable`). Each build step uses `${{ steps.meta-<name>.outputs.labels }}` so OCI labels match the image being built.
 

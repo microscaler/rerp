@@ -1,6 +1,34 @@
-"""Tests for rerp_tooling.docker.copy_artifacts (rerp docker copy-artifacts)."""
+"""Tests for rerp_tooling.docker.copy_artifacts (rerp docker copy-artifacts, validate-build-artifacts)."""
 
 from pathlib import Path
+
+from rerp_tooling.docker.copy_artifacts import BINARY_NAMES
+
+
+class TestValidateBuildArtifacts:
+    def test_missing_dir_returns_1(self, tmp_path: Path):
+        from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
+
+        assert validate_build_artifacts(tmp_path) == 1
+
+    def test_missing_binary_in_dir_returns_1(self, tmp_path: Path):
+        from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
+
+        for arch in ("amd64", "arm64", "arm"):
+            (tmp_path / "build_artifacts" / arch).mkdir(parents=True)
+        # amd64 missing general_ledger
+        (tmp_path / "build_artifacts" / "amd64" / "invoice").write_bytes(b"")
+        assert validate_build_artifacts(tmp_path) == 1
+
+    def test_all_present_returns_0(self, tmp_path: Path):
+        from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
+
+        for arch in ("amd64", "arm64", "arm"):
+            d = tmp_path / "build_artifacts" / arch
+            d.mkdir(parents=True)
+            for name in BINARY_NAMES.values():
+                (d / name).write_bytes(b"\x7fELF")
+        assert validate_build_artifacts(tmp_path) == 0
 
 
 class TestCopyArtifacts:

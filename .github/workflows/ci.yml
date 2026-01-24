@@ -245,46 +245,65 @@ jobs:
           key: ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-
-      
+
+      - name: Cache microservices target (per-architecture)
+        uses: actions/cache@v4
+        with:
+          path: microservices/target
+          key: ${{ runner.os }}-cargo-microservices-${{ matrix.architecture }}-${{ hashFiles('microservices/**/Cargo.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-microservices-${{ matrix.architecture }}-
+
       - name: Install cross
         run: cargo install cross
-      
+
       - name: Build workspace for ${{ matrix.architecture }}
         run: |
           echo "🔨 Building RERP workspace for ${{ matrix.architecture }}..."
           tooling/.venv/bin/rerp build workspace ${{ matrix.architecture }}
-      
+
+      - name: Build microservices for ${{ matrix.architecture }}
+        run: |
+          echo "🔨 Building microservices for ${{ matrix.architecture }}..."
+          tooling/.venv/bin/rerp build microservices ${{ matrix.architecture }} --release
+
+      - name: Copy microservices to build_artifacts
+        run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }}
+
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
           name: rerp-binaries-${{ matrix.architecture }}
           path: components/target/*/release/rerp_*
-          retention-days: 7
+          retention-days: 1
           if-no-files-found: warn
 
-  build-push-containers:
-    name: Build and Push Containers
+      - name: Upload microservices binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: microservices-binaries-${{ matrix.architecture == 'arm7' && 'arm' || matrix.architecture }}
+          path: build_artifacts/${{ matrix.architecture == 'arm7' && 'arm' || matrix.architecture }}
+          retention-days: 1
+          if-no-files-found: error
+
+  download-copy-package-push-containers:
+    name: Download Copy Package and Push Containers
     needs: [build-multiarch]
     # Future: restrict to merge-on-main only (merge = push to main).
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')) && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
     permissions:
       contents: read
-      packages: write
-      id-token: write  # For attest-build-provenance
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      extra_tag: ${{ steps.tag.outputs.extra_tag }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Set up Python
+      - name: Set up Python and tooling (for validate)
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -296,51 +315,26 @@ jobs:
           tooling/.venv/bin/pip install --upgrade pip
           tooling/.venv/bin/pip install -e ./tooling
 
-      - name: Patch Cargo.toml (BRRTRouter, lifeguard from git)
-        run: tooling/.venv/bin/rerp ci patch-brrtrouter
-
-      - name: Install musl target and tools
-        run: |
-          rustup target add x86_64-unknown-linux-musl
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-
-      - name: Install cross (for arm64/arm7)
-        run: cargo install cross
-
-      - name: Build microservices amd64 and copy to build_artifacts/amd64
-        run: |
-          echo "🔨 Building microservices (amd64, release)..."
-          tooling/.venv/bin/rerp build microservices amd64 --release
-          tooling/.venv/bin/rerp docker copy-artifacts amd64
-
-      - name: Build microservices arm64 and copy to build_artifacts/arm64
-        env: { RERP_USE_CROSS: "1" }
-        run: |
-          echo "🔨 Building microservices (arm64, release)..."
-          tooling/.venv/bin/rerp build microservices arm64 --release
-          tooling/.venv/bin/rerp docker copy-artifacts arm64
-
-      - name: Build microservices arm7 and copy to build_artifacts/arm
-        env: { RERP_USE_CROSS: "1" }
-        run: |
-          echo "🔨 Building microservices (arm7, release)..."
-          tooling/.venv/bin/rerp build microservices arm7 --release
-          tooling/.venv/bin/rerp docker copy-artifacts arm7
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      - name: Copy microservices binaries (amd64) from build-multiarch artifacts
+        uses: actions/download-artifact@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          name: microservices-binaries-amd64
+          path: build_artifacts/amd64
 
-      - name: Log in to Docker Hub
-        if: ${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' }}
-        uses: docker/login-action@v3
+      - name: Copy microservices binaries (arm64) from build-multiarch artifacts
+        uses: actions/download-artifact@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          name: microservices-binaries-arm64
+          path: build_artifacts/arm64
+
+      - name: Copy microservices binaries (arm) from build-multiarch artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: microservices-binaries-arm
+          path: build_artifacts/arm
+
+      - name: Validate build_artifacts
+        run: tooling/.venv/bin/rerp docker validate-build-artifacts
 
       - name: Set image tag
         id: tag
@@ -357,320 +351,125 @@ jobs:
             fi
           fi
 
-      - name: Extract metadata for general-ledger
-        id: meta-general-ledger
+      - name: Upload build_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build_artifacts
+          retention-days: 1
+
+  build-push-service:
+    name: Build and push ${{ matrix.service }}
+    needs: [download-copy-package-push-containers]
+    if: needs.download-copy-package-push-containers.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write  # required for actions/attest-build-provenance (create attestation API)
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy microservices binaries from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build_artifacts
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: ${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata for ${{ matrix.service }}
+        id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-general-ledger
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+          images: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
+          tags: type=raw,value=${{ needs.download-copy-package-push-containers.outputs.tag }}
 
-      - name: Build and push general-ledger
-        id: build-general-ledger
+      - name: Build and push ${{ matrix.service }}
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/microservices/Dockerfile.general-ledger
+          file: docker/microservices/Dockerfile.${{ matrix.service }}
           push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-general-ledger:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-general-ledger:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-general-ledger:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-general-ledger:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-general-ledger.outputs.labels }}
+          tags: ${{ format('ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.tag) }}${{ needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64,linux/arm/v7
 
-      - name: Attest general-ledger
+      - name: Attest ${{ matrix.service }}
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-general-ledger
-          subject-digest: ${{ steps.build-general-ledger.outputs.digest }}
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
+          subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
 
-      - name: Extract metadata for invoice
-        id: meta-invoice
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-invoice
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
+      - name: Set GHCR package visibility to public
+        run: |
+          echo '{"visibility":"public"}' | gh api --method PUT \
+            /orgs/${{ github.repository_owner }}/packages/container/rerp-accounting-${{ matrix.service }}/visibility \
+            --input -
 
-      - name: Build and push invoice
-        id: build-invoice
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.invoice
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-invoice:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-invoice:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-invoice:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-invoice:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-invoice.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+  verify-published-images:
+    name: Verify published images
+    needs: [download-copy-package-push-containers, build-push-service]
+    if: needs.download-copy-package-push-containers.result == 'success' && needs.build-push-service.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read  # for docker buildx imagetools inspect of ghcr.io images
 
-      - name: Attest invoice
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-invoice
-          subject-digest: ${{ steps.build-invoice.outputs.digest }}
-          push-to-registry: true
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Extract metadata for accounts-receivable
-        id: meta-accounts-receivable
-        uses: docker/metadata-action@v5
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-accounts-receivable
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push accounts-receivable
-        id: build-accounts-receivable
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.accounts-receivable
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-accounts-receivable:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounts-receivable:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounts-receivable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounts-receivable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-accounts-receivable.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest accounts-receivable
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounts-receivable
-          subject-digest: ${{ steps.build-accounts-receivable.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for accounts-payable
-        id: meta-accounts-payable
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-accounts-payable
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push accounts-payable
-        id: build-accounts-payable
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.accounts-payable
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-accounts-payable:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounts-payable:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounts-payable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounts-payable:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-accounts-payable.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest accounts-payable
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounts-payable
-          subject-digest: ${{ steps.build-accounts-payable.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for bank-sync
-        id: meta-bank-sync
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-bank-sync
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push bank-sync
-        id: build-bank-sync
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.bank-sync
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-bank-sync:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-bank-sync:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-bank-sync:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-bank-sync:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-bank-sync.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest bank-sync
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-bank-sync
-          subject-digest: ${{ steps.build-bank-sync.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for asset
-        id: meta-asset
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-asset
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push asset
-        id: build-asset
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.asset
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-asset:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-asset:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-asset:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-asset:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-asset.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest asset
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-asset
-          subject-digest: ${{ steps.build-asset.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for budget
-        id: meta-budget
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-budget
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push budget
-        id: build-budget
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.budget
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-budget:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-budget:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-budget:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-budget:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-budget.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest budget
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-budget
-          subject-digest: ${{ steps.build-budget.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for edi
-        id: meta-edi
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-edi
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push edi
-        id: build-edi
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.edi
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-edi:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-edi:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-edi:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-edi:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-edi.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest edi
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-edi
-          subject-digest: ${{ steps.build-edi.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for financial-reports
-        id: meta-financial-reports
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-financial-reports
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push financial-reports
-        id: build-financial-reports
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.financial-reports
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-financial-reports:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-financial-reports:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-financial-reports:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-financial-reports:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-financial-reports.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest financial-reports
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-financial-reports
-          subject-digest: ${{ steps.build-financial-reports.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for bff
-        id: meta-bff
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-bff
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push bff
-        id: build-bff
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/microservices/Dockerfile.bff
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-bff:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-bff:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-bff:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-bff:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-bff.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-      - name: Attest bff
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-bff
-          subject-digest: ${{ steps.build-bff.outputs.digest }}
-          push-to-registry: true
-
-      - name: Extract metadata for website
-        id: meta-website
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/rerp-website
-          tags: type=raw,value=${{ steps.tag.outputs.tag }}
-
-      - name: Build and push website
-        id: build-website
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/website/Dockerfile
-          push: true
-          tags: ${{ format('ghcr.io/{0}/rerp-website:{1}', github.repository_owner, steps.tag.outputs.tag) }}${{ steps.tag.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-website:{1}', github.repository_owner, steps.tag.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-website:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && steps.tag.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-website:{1}', vars.DOCKERHUB_ORG, steps.tag.outputs.extra_tag) || '' }}
-          labels: ${{ steps.meta-website.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
-
-      - name: Attest website
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-website
-          subject-digest: ${{ steps.build-website.outputs.digest }}
-          push-to-registry: true
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify published images
         run: |
           set -e
-          TAG="${{ steps.tag.outputs.tag }}"
+          TAG="${{ needs.download-copy-package-push-containers.outputs.tag }}"
           OWNER="${{ github.repository_owner }}"
+          echo "⏳ Waiting 10s for registry propagation after parallel pushes..."
+          sleep 10
           for name in general-ledger invoice accounts-receivable accounts-payable bank-sync asset budget edi financial-reports bff; do
-            img="ghcr.io/${OWNER}/rerp-${name}:${TAG}"
+            img="ghcr.io/${OWNER}/rerp-accounting-${name}:${TAG}"
             echo "🔍 Inspecting $img ..."
-            out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ $name: imagetools inspect failed"; exit 1; }
+            out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ $name: imagetools inspect failed:"; echo "$out"; exit 1; }
             echo "$out" | grep -qE 'Platform:.*linux/amd64'   || { echo "❌ $name: missing linux/amd64";   exit 1; }
             echo "$out" | grep -qE 'Platform:.*linux/arm64'  || { echo "❌ $name: missing linux/arm64";  exit 1; }
             echo "$out" | grep -qE 'Platform:.*linux/arm/v7' || { echo "❌ $name: missing linux/arm/v7"; exit 1; }
             echo "✅ $name: linux/amd64, linux/arm64, linux/arm/v7"
           done
-          img="ghcr.io/${OWNER}/rerp-website:${TAG}"
-          echo "🔍 Inspecting $img ..."
-          out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ website: imagetools inspect failed"; exit 1; }
-          echo "$out" | grep -qE 'Platform:.*linux/amd64' || { echo "❌ website: missing linux/amd64"; exit 1; }
-          echo "✅ website: linux/amd64"
-          echo "🎉 All 11 images verified (10 microservices: amd64, arm64, arm/v7; website: amd64)."
+          echo "🎉 All 10 microservice images verified (linux/amd64, linux/arm64, linux/arm/v7)."
+

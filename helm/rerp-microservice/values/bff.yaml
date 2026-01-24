@@ -5,7 +5,7 @@ service:
   nodePort: 31010
 image:
   repository: localhost:5001
-  name: rerp-bff
+  name: rerp-accounting-bff
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

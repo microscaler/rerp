@@ -105,6 +105,13 @@ jobs:
           cache-to: type=registry,ref=${{ env.IMAGE_GHCR }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64
 
+      - name: Set GHCR package visibility to public
+        if: steps.build.outcome == 'success'
+        run: |
+          echo '{"visibility":"public"}' | gh api --method PUT \
+            /orgs/${{ github.repository_owner }}/packages/container/rerp-base/visibility \
+            --input -
+
       - name: Build summary
         if: always()
         run: |

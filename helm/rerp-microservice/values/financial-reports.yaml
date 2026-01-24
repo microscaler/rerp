@@ -5,7 +5,7 @@ service:
   nodePort: 31009
 image:
   repository: localhost:5001
-  name: rerp-financial-reports
+  name: rerp-accounting-financial-reports
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

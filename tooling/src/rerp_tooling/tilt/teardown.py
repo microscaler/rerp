@@ -25,8 +25,10 @@ def run(
         subprocess.run(["docker", "rm", f"rerp-{s}-dev"], capture_output=True)
     if remove_images:
         for s in tilt_service_names(project_root):
-            subprocess.run(["docker", "rmi", f"rerp-{s}:latest"], capture_output=True)
-            subprocess.run(["docker", "rmi", f"localhost:5001/rerp-{s}:tilt"], capture_output=True)
+            subprocess.run(["docker", "rmi", f"rerp-accounting-{s}:latest"], capture_output=True)
+            subprocess.run(
+                ["docker", "rmi", f"localhost:5001/rerp-accounting-{s}:tilt"], capture_output=True
+            )
     if remove_volumes:
         for v in ["postgres_data", "redis_data", "prometheus_data", "grafana_data"]:
             subprocess.run(["docker", "volume", "rm", v], capture_output=True)

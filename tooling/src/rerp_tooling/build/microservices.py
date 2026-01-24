@@ -75,17 +75,21 @@ def build_microservices_workspace(project_root: Path, arch: str, release: bool) 
     use_cross = should_use_cross()
     use_zigbuild = should_use_zigbuild()
     rel = ["--release"] if release else []
+    # Disable jemalloc on armv7: tikv-jemalloc-sys needs __ffsdi2 (compiler-rt), which
+    # is not available when cross-linking for armv7-unknown-linux-musleabihf with musl.
+    no_jemalloc = rust_target == "armv7-unknown-linux-musleabihf"
+    base = ["--no-default-features"] if no_jemalloc else []
 
     if use_cross:
-        cmd = ["cross", "build", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + rel
+        cmd = ["cross", "build", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + base + rel
         subprocess.run(cmd, check=True, cwd=str(project_root))
         return 0
 
     if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + rel
+        cmd = ["cargo", "zigbuild", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + base + rel
         subprocess.run(cmd, check=True, cwd=str(project_root))
     else:
-        cmd = ["cargo", "build", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + rel
+        cmd = ["cargo", "build", "--manifest-path", str(manifest), "--target", rust_target, "--workspace"] + base + rel
         env = {**os.environ, **_get_cargo_env(rust_target)}
         subprocess.run(cmd, check=True, cwd=str(project_root), env=env)
     return 0
