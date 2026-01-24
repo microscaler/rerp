@@ -155,6 +155,31 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 
 ---
 
+## Lifeguard Entities and Indices (entities/)
+
+RERP uses **Lifeguard** (`lifeguard_derive::LifeModel`) for ORM entities in `entities/`. Migration SQL is generated from these structs. Follow these rules to avoid broken migrations:
+
+### Index and column rules
+
+- **`#[index = "idx_name(column)"]` and `#[indexed]` must reference only columns that exist on that struct.**  
+  The derive and migration generator do not validate that index columns exist. Indices on non-existent columns produce `CREATE INDEX` on a missing column and **migration application fails** (e.g. PostgreSQL: "column does not exist").
+
+- **Child/specialized entities that link to a base entity via a foreign key do not inherit the base entity’s columns.**  
+  Example: `CustomerInvoice` and `VendorInvoice` link to the base `invoices` table via `invoice_id`. They do **not** have `invoice_number`, `due_date`, `status`, or `payment_state`; those exist only on `invoices`.  
+  - ✅ Index on `customer_id` on `CustomerInvoice` (column exists on the struct).  
+  - ❌ Index on `invoice_number` on `CustomerInvoice` (column exists only on `invoices`).
+
+- **To query by base-entity fields on a child table, use a JOIN.**  
+  Index the child’s own columns (e.g. `customer_id`, `vendor_id`, `invoice_id` if you need faster lookups from child to parent). Put indices for `invoice_number`, `due_date`, `status`, etc. on the base `Invoice` entity only.
+
+### Checklist when adding or changing entities
+
+1. List the struct’s fields. Every `#[index = "idx_name(x)"]` and `#[indexed]` must use one of those names.
+2. If the struct is a child of another (e.g. `invoice_id` → `invoices`), do not copy indices from the parent; only index columns that exist on the child.
+3. After changing indices, run migration generation (e.g. from the `entities/` directory: `cargo run --bin generate-migrations`) and apply migrations in a test DB to confirm they apply cleanly.
+
+---
+
 ## Quick Reference
 
 ```bash

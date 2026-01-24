@@ -10,10 +10,6 @@ use serde_json::Value;
 #[skip_from_row]
 #[table_comment = "Customer invoices for accounts receivable tracking"]
 #[index = "idx_customer_invoices_customer_id(customer_id)"]
-#[index = "idx_customer_invoices_invoice_number(invoice_number)"]
-#[index = "idx_customer_invoices_due_date(due_date)"]
-#[index = "idx_customer_invoices_status(status)"]
-#[index = "idx_customer_invoices_payment_state(payment_state)"]
 pub struct CustomerInvoice {
     #[primary_key]
     pub id: uuid::Uuid,
