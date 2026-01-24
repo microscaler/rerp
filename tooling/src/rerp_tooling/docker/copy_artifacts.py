@@ -60,3 +60,23 @@ def run(arch: str, project_root: Path) -> int:
         print(f"📦 Copying {name}: {src.name} -> {dst.relative_to(project_root)}")
     print(f"✅ Copied to build_artifacts/{artifact_dir}/")
     return 0
+
+
+def validate_build_artifacts(project_root: Path) -> int:
+    """Check build_artifacts/{amd64,arm64,arm} contain expected microservice binaries. Returns 0 or 1."""
+    required = set(BINARY_NAMES.values())
+    for arch_dir in ("amd64", "arm64", "arm"):
+        d = project_root / "build_artifacts" / arch_dir
+        if not d.is_dir():
+            print(f"❌ Missing: {d.relative_to(project_root)}", file=sys.stderr)
+            return 1
+        found = {f.name for f in d.iterdir() if f.is_file() and f.name in required}
+        missing = required - found
+        if missing:
+            print(
+                f"❌ {d.relative_to(project_root)}: missing {sorted(missing)}",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"✅ {arch_dir}: {len(found)}/{len(required)} binaries")
+    return 0

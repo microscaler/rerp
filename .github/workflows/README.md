@@ -8,12 +8,14 @@
 
 **Triggers**: Push and pull requests to `main` and `develop`; tags `v*`.
 
-**Jobs** (order: validate-openapi → validate-ports → build-and-test → build-multiarch → build-push-containers on push):
+**Jobs** (order: validate-openapi → validate-ports → build-and-test → build-multiarch → on push: download-copy-package-push-containers → build-push-service (matrix) → verify-published-images):
 - **Validate OpenAPI Specs**: Validates all `openapi.yaml` files and runs `rerp bff generate-system` as a dry run to ensure BFF generation works.
 - **Validate Port Assignments**: Runs `rerp ports validate` to check for duplicate ports in helm/kind/Tiltfile and mismatches with the port registry.
 - **Build and Test**: Patches deps for CI, builds workspace (amd64), example service (auth_idam), and accounting microservices (smoke test), format/lint/test/doc.
-- **Build Multi-Architecture**: Builds for amd64, arm64, arm7 via `cross` (runs after build-and-test).
-- **Build and Push Containers**: After `build-multiarch` succeeds, on **push** to `main`, `develop`, tags `v*`, or (temporarily) `boostrap-accounting-suit`. Plan: once direct pushes to `main` are off, only merges to `main` (a push to `main`) will trigger this; remove `boostrap-accounting-suit` from the `if` when the container process is validated. Builds multi-arch (linux/amd64, linux/arm64, linux/arm/v7) images for all accounting microservices, pushes to GHCR and optionally Docker Hub, then verifies each image manifest. This job does **not** use the artifacts uploaded by `build-multiarch`; it rebuilds microservices from scratch. See `docs/CONTAINER_RELEASE_DESIGN_PROPOSAL.md` §2.9 and §2.10.
+- **Build Multi-Architecture**: Builds workspace and microservices for amd64, arm64, arm7 via `cross`; uploads `rerp-binaries-*` (components) and `microservices-binaries-*` (amd64, arm64, arm) artifacts.
+- **Download Copy Package and Push Containers** (on **push** to `main`, `develop`, or tags `v*`): Copies microservices binaries from `build-multiarch` artifacts into `build_artifacts/`, validates layout, sets image tag, and uploads `build-artifacts` for the matrix job.
+- **Build and push \<service\>** (matrix over 10 microservices: general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff): For each service, downloads `build-artifacts`, runs Extract metadata → Build and push → Attest. Uses `docker/microservices/Dockerfile.\<service\>`, multi-arch linux/amd64, linux/arm64, linux/arm/v7. (The website is deployed via GitHub Pages in `deploy-website.yml`, not as a container here.)
+- **Verify published images**: After all matrix jobs succeed, runs `docker buildx imagetools inspect` on all 10 microservice images to confirm manifests and platforms.
 
 **BFF generation**: `rerp bff generate-system` is exercised in the validate-openapi job. To regenerate and commit BFF specs, run `rerp bff generate-system` locally (e.g. `tooling/.venv/bin/rerp bff generate-system` after `just init`) and commit.
 
@@ -21,28 +23,28 @@
 
 ## Containers published to GHCR and Docker Hub
 
-When **Build and Push Containers** runs (push to `main`/`develop` or tags `v*`), the following images are published.
+When the container pipeline runs (push to `main`/`develop` or tags `v*`: **Download Copy Package and Push Containers** → **Build and push \<service\>** matrix → **Verify published images**), the following 10 microservice images are published. The website is deployed separately via **deploy-website.yml** to GitHub Pages.
 
 ### GHCR (always)
 
 | Image | Description |
 |-------|-------------|
-| `ghcr.io/<owner>/rerp-general-ledger` | General Ledger |
-| `ghcr.io/<owner>/rerp-invoice` | Invoice Management |
-| `ghcr.io/<owner>/rerp-accounts-receivable` | Accounts Receivable |
-| `ghcr.io/<owner>/rerp-accounts-payable` | Accounts Payable |
-| `ghcr.io/<owner>/rerp-bank-sync` | Bank Synchronization |
-| `ghcr.io/<owner>/rerp-asset` | Asset Management |
-| `ghcr.io/<owner>/rerp-budget` | Budgeting |
-| `ghcr.io/<owner>/rerp-edi` | EDI & Compliance |
-| `ghcr.io/<owner>/rerp-financial-reports` | Financial Reports |
-| `ghcr.io/<owner>/rerp-bff` | Accounting BFF API |
+| `ghcr.io/<owner>/rerp-accounting-general-ledger` | General Ledger |
+| `ghcr.io/<owner>/rerp-accounting-invoice` | Invoice Management |
+| `ghcr.io/<owner>/rerp-accounting-accounts-receivable` | Accounts Receivable |
+| `ghcr.io/<owner>/rerp-accounting-accounts-payable` | Accounts Payable |
+| `ghcr.io/<owner>/rerp-accounting-bank-sync` | Bank Synchronization |
+| `ghcr.io/<owner>/rerp-accounting-asset` | Asset Management |
+| `ghcr.io/<owner>/rerp-accounting-budget` | Budgeting |
+| `ghcr.io/<owner>/rerp-accounting-edi` | EDI & Compliance |
+| `ghcr.io/<owner>/rerp-accounting-financial-reports` | Financial Reports |
+| `ghcr.io/<owner>/rerp-accounting-bff` | Accounting BFF API |
 
 `<owner>` is `github.repository_owner` (e.g. `microscaler`). Each image is multi-arch: `linux/amd64`, `linux/arm64`, `linux/arm/v7`. Tags: on tags `v*` → the version (e.g. `v1.2.3` → `1.2.3`); on `main` → `sha-<short-sha>` and `latest`; on `develop` → `sha-<short-sha>` only.
 
 ### Docker Hub (optional)
 
-If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also pushed to `docker.io/<DOCKERHUB_ORG>/rerp-<name>:<tag>`.
+If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also pushed to `docker.io/<DOCKERHUB_ORG>/rerp-accounting-<name>:<tag>`.
 
 **Required repository configuration** (when using Docker Hub):
 

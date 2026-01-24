@@ -51,7 +51,9 @@ cd tooling && uv venv && uv pip install -e ".[dev]"
 - **`rerp bff generate-system [--system NAME] [--output PATH] [--openapi-dir DIR]`** — Merge `openapi/{system}/{service}/openapi.yaml` into system BFF at `openapi/{system}/openapi.yaml`. No `--system` ⇒ all systems with sub-services. Replaces `scripts/generate_system_bff.py`.
 
 **Docker**
+- **`rerp docker unpack-build-bins [--input-dir DIR]`** — Extract `rerp-binaries-{amd64,arm64,arm7}.zip` from `tmp/buildBins` (or `--input-dir`) into `components/target/`. Use after downloading Multi-Arch job artifacts. Then run `rerp docker copy-multiarch <system> <module> all` and build images.
 - **`rerp docker generate-dockerfile <system> <module> [--port N]`** — Generate `docker/microservices/Dockerfile.{system}_{module}` from template. Replaces `scripts/generate-dockerfile.py`.
+- **`rerp docker validate-build-artifacts`** — Check `build_artifacts/{amd64,arm64,arm}` contain the expected microservice binaries. Use after copying from build-multiarch artifacts (GHA) or after `rerp docker copy-artifacts` for each arch.
 - **`rerp docker copy-artifacts <arch>`** — Copy microservice binaries from `microservices/target/{triple}/release/` to `build_artifacts/{amd64|arm64|arm}`. Use after `rerp build microservices <arch> --release`. Replaces `--copy-only` of `build-and-push-microservice-containers.sh`. **Push is in GHA only** (`docker/build-push-action` per service).
 - **`rerp docker copy-binary <source> <dest> <binary_name>`** — Copy a binary to dest, chmod +x, write `{dest}.sha256`. Used by Tilt’s accounting flow. Replaces `copy-microservice-binary-simple.sh`.
 - **`rerp docker build-image-simple <image_name> <dockerfile> <hash_path> <artifact_path>`** — Ensure hash/artifact/dockerfile exist; `docker build -t {image_name}:tilt`; push to registry or `kind load`. Used by Tilt. Replaces `build-microservice-docker-simple.sh`.
@@ -104,7 +106,7 @@ cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-mi
   - `ci/` — `patch_brrtrouter` for `rerp ci patch-brrtrouter`; `fix_cargo_paths` for `rerp ci fix-cargo-paths`
   - `bff/` — `discover_sub_services`, `generate_system_bff_spec`, `list_systems_with_sub_services` for `rerp bff generate-system`
   - `cli/` — `rerp` entry and `ports`, `openapi`, `ci`, `bff`, `docker`, `build` subcommands
-  - `docker/` — `generate_dockerfile`, `copy_artifacts`, `copy_binary`, `copy_multiarch`, `build_image_simple`, `build_multiarch`, `build_base` for `rerp docker generate-dockerfile`, `copy-artifacts`, `copy-binary`, `copy-multiarch`, `build-image-simple`, `build-multiarch`, `build-base`
+  - `docker/` — `unpack_build_bins`, `generate_dockerfile`, `copy_artifacts`, `validate_build_artifacts`, `copy_binary`, `copy_multiarch`, `build_image_simple`, `build_multiarch`, `build_base` for `rerp docker unpack-build-bins`, `generate-dockerfile`, `copy-artifacts`, `validate-build-artifacts`, `copy-binary`, `copy-multiarch`, `build-image-simple`, `build-multiarch`, `build-base`
   - `tilt/` — `setup_kind_registry`, `setup_persistent_volumes`, `setup`, `teardown`, `logs` for `rerp tilt setup-kind-registry`, `setup-persistent-volumes`, `setup`, `teardown`, `logs`
   - `build/` — `host_aware` for `rerp build` (workspace or \<system\>_\<module\> [arch])
   - `bootstrap/` — `microservice` for `rerp bootstrap microservice`

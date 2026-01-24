@@ -5,7 +5,7 @@ service:
   nodePort: 31007
 image:
   repository: localhost:5001
-  name: rerp-budget
+  name: rerp-accounting-budget
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

@@ -5,7 +5,7 @@ service:
   nodePort: 31005
 image:
   repository: localhost:5001
-  name: rerp-bank-sync
+  name: rerp-accounting-bank-sync
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

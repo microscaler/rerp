@@ -5,7 +5,7 @@ service:
   nodePort: 31008
 image:
   repository: localhost:5001
-  name: rerp-edi
+  name: rerp-accounting-edi
   tag: tilt
   pullPolicy: IfNotPresent
 deployment:

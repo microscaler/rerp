@@ -158,9 +158,9 @@ class TestTeardown:
         assert ["docker", "stop", "rerp-financial-reports-dev"] in [
             c[:3] for c in calls if c[:2] == ["docker", "stop"] and len(c) > 2
         ]
-        # Image rmi: rerp-{name}:latest and localhost:5001/rerp-{name}:tilt
+        # Image rmi: rerp-accounting-{name}:latest and localhost:5001/rerp-accounting-{name}:tilt
         rmi_calls = [c for c in calls if c[:2] == ["docker", "rmi"] and len(c) > 2]
         rmi_args = [c[2] for c in rmi_calls]
-        assert "rerp-bff:latest" in rmi_args
-        assert "rerp-edi:latest" in rmi_args
-        assert "localhost:5001/rerp-financial-reports:tilt" in rmi_args
+        assert "rerp-accounting-bff:latest" in rmi_args
+        assert "rerp-accounting-edi:latest" in rmi_args
+        assert "localhost:5001/rerp-accounting-financial-reports:tilt" in rmi_args

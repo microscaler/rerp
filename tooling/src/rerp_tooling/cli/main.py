@@ -253,9 +253,19 @@ def __build_parser():
     # --- docker ---
     pd = sub.add_parser(
         "docker",
-        help="Docker: generate-dockerfile, copy-artifacts, copy-binary, build-image-simple, copy-multiarch, build-multiarch, build-base",
+        help="Docker: generate-dockerfile, copy-artifacts, copy-binary, build-image-simple, copy-multiarch, build-multiarch, build-base, unpack-build-bins, validate-build-artifacts",
     )
     pd_sub = pd.add_subparsers(dest="docker_cmd")
+    pdub = pd_sub.add_parser(
+        "unpack-build-bins",
+        help="Extract rerp-binaries-*.zip into components/target (from Multi-Arch artifacts in tmp/buildBins)",
+    )
+    pdub.add_argument(
+        "--input-dir",
+        default="tmp/buildBins",
+        metavar="DIR",
+        help="Directory with rerp-binaries-amd64.zip, rerp-binaries-arm64.zip, rerp-binaries-arm7.zip (default: tmp/buildBins)",
+    )
     pdg = pd_sub.add_parser(
         "generate-dockerfile",
         help="Generate docker/microservices/Dockerfile.{system}_{module} from template",
@@ -268,6 +278,10 @@ def __build_parser():
         default=8000,
         metavar="N",
         help="Service port (default: 8000)",
+    )
+    pd_sub.add_parser(
+        "validate-build-artifacts",
+        help="Check build_artifacts/{amd64,arm64,arm} contain expected microservice binaries (after download from Multi-Arch)",
     )
     pdc = pd_sub.add_parser(
         "copy-artifacts",
@@ -298,7 +312,9 @@ def __build_parser():
         "build-image-simple",
         help="Build image:tilt and push or kind load (replaces build-microservice-docker-simple.sh)",
     )
-    pdbi.add_argument("image_name", help="Image name (e.g. localhost:5001/rerp-general-ledger)")
+    pdbi.add_argument(
+        "image_name", help="Image name (e.g. localhost:5001/rerp-accounting-general-ledger)"
+    )
     pdbi.add_argument("dockerfile", help="Path to Dockerfile")
     pdbi.add_argument("hash_path", help="Path to .sha256 file")
     pdbi.add_argument("artifact_path", help="Path to binary artifact")

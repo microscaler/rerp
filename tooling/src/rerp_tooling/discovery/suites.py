@@ -95,5 +95,5 @@ def suite_sub_service_names(project_root: Path, suite: str) -> list[str]:
 
 
 def tilt_service_names(project_root: Path) -> list[str]:
-    """Service names that Tilt runs (containers rerp-{name}-dev, images rerp-{name}:*). Sorted. From bff-suite-config + BFFs."""
+    """Service names that Tilt runs (containers rerp-{name}-dev, images rerp-accounting-{name}:*). Sorted. From bff-suite-config + BFFs."""
     return sorted(load_suite_services(project_root))
