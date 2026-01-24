@@ -4,7 +4,7 @@
 
 ARG TARGETPLATFORM=linux/amd64
 ARG BUILDPLATFORM
-FROM --platform=${TARGETPLATFORM} alpine:3.19
+FROM --platform=${TARGETPLATFORM} alpine:3.23
 
 # Install runtime dependencies
 RUN apk add --no-cache \
