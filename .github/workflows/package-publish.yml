@@ -1,3 +1,19 @@
+# Package and Publish Workflow
+#
+# This workflow is triggered after the CI workflow completes successfully.
+# It downloads build artifacts and publishes container images.
+#
+# Security Note: This workflow uses workflow_run trigger which checks out code
+# based on github.event.workflow_run.head_sha. To mitigate security risks:
+# - Only runs on successful CI completion
+# - Only runs for push events (not pull_request)
+# - Validates the source repository (rejects forks)
+# - Validates branch/tag names (only main, develop, or version tags)
+# - Downloads artifacts only from the same workflow run
+#
+# This pattern is necessary to access artifacts from the CI workflow across
+# workflow boundaries, which is required for the release process.
+
 name: Package and Publish
 
 on:
@@ -29,6 +45,32 @@ jobs:
       extra_tag: ${{ steps.tag.outputs.extra_tag }}
 
     steps:
+      - name: Validate workflow trigger
+        run: |
+          # Security: Validate that this workflow was triggered by a trusted source
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          REPO="${{ github.event.workflow_run.head_repository.full_name }}"
+          EXPECTED_REPO="${{ github.repository }}"
+          
+          echo "Workflow triggered by repository: $REPO"
+          echo "Expected repository: $EXPECTED_REPO"
+          echo "Branch: $BRANCH"
+          
+          # Only allow workflows from the same repository (no forks)
+          if [[ "$REPO" != "$EXPECTED_REPO" ]]; then
+            echo "❌ Security: Workflow run from different repository. Rejecting."
+            exit 1
+          fi
+          
+          # Only allow known branches or tags
+          if [[ "$BRANCH" != "main" && "$BRANCH" != "develop" && ! "$BRANCH" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "⚠️  Unknown branch or tag: $BRANCH"
+            echo "Only main, develop, or version tags (vX.Y.Z) are allowed"
+            exit 1
+          fi
+          
+          echo "✅ Security validation passed"
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -130,6 +172,20 @@ jobs:
         service: [general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff]
 
     steps:
+      - name: Validate workflow trigger
+        run: |
+          # Security: Validate that this workflow was triggered by a trusted source
+          REPO="${{ github.event.workflow_run.head_repository.full_name }}"
+          EXPECTED_REPO="${{ github.repository }}"
+          
+          # Only allow workflows from the same repository (no forks)
+          if [[ "$REPO" != "$EXPECTED_REPO" ]]; then
+            echo "❌ Security: Workflow run from different repository. Rejecting."
+            exit 1
+          fi
+          
+          echo "✅ Security validation passed"
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
