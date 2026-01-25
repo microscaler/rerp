@@ -1,6 +1,6 @@
 [package]
 name = "rerp_product_catalog_impl"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [[bin]]
