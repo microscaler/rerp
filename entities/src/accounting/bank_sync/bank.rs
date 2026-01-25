@@ -15,71 +15,71 @@ use serde_json::Value;
 pub struct Bank {
     #[primary_key]
     pub id: uuid::Uuid,
-    
+
     // Bank identification
     #[indexed]
     #[column_type = "VARCHAR(255)"]
     pub name: String,
-    
+
     #[unique]
     #[indexed]
     #[column_type = "VARCHAR(11)"]
     pub bic: Option<String>, // Bank Identifier Code (BIC) - same as SWIFT
-    
+
     #[unique]
     #[indexed]
     #[column_type = "VARCHAR(11)"]
     pub swift_code: Option<String>, // SWIFT code (alias for BIC, for clarity)
-    
+
     #[column_type = "VARCHAR(50)"]
     pub routing_number: Option<String>, // US routing number, etc.
-    
+
     // Address information
     #[column_type = "VARCHAR(255)"]
     pub street: Option<String>,
-    
+
     #[column_type = "VARCHAR(255)"]
     pub street2: Option<String>,
-    
+
     #[column_type = "VARCHAR(100)"]
     pub city: Option<String>,
-    
+
     #[column_type = "VARCHAR(100)"]
     pub state: Option<String>,
-    
+
     #[column_type = "VARCHAR(20)"]
     pub zip: Option<String>,
-    
+
     #[indexed]
     #[column_type = "VARCHAR(3)"]
     pub country_code: Option<String>, // ISO country code
-    
+
     // Contact information
     #[column_type = "VARCHAR(255)"]
     pub email: Option<String>,
-    
+
     #[column_type = "VARCHAR(50)"]
     pub phone: Option<String>,
-    
+
     #[column_type = "VARCHAR(255)"]
     pub website: Option<String>,
-    
+
     // Status
     #[default_value = "true"]
     #[indexed]
     pub is_active: bool,
-    
+
     // Metadata
     #[column_type = "JSONB"]
     pub metadata: Option<Value>,
-    
+
     // Audit
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub created_at: chrono::NaiveDateTime,
-    
+
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub updated_at: chrono::NaiveDateTime,
-    
+
     pub created_by: Option<uuid::Uuid>,
     pub updated_by: Option<uuid::Uuid>,
 }

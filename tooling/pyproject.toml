@@ -18,6 +18,7 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.4.0",
+    "pre-commit>=3.0",
 ]
 
 [project.scripts]
@@ -88,6 +89,10 @@ ignore = [
 
 [tool.ruff.lint.mccabe]
 max-complexity = 20
+
+[tool.ruff.lint.per-file-ignores]
+# main: arg-parsing dispatcher; complexity expected
+"src/rerp_tooling/cli/main.py" = ["C901"]
 
 [tool.ruff.format]
 quote-style = "double"

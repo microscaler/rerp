@@ -22,6 +22,26 @@ os.putenv('TILT_PORT', tilt_port)
 # ====================
 # Tooling (rerp CLI)
 # ====================
+# Ignore patterns for tooling deps to avoid build storms from bytecode, caches,
+# test/lint/coverage output, and packaging artifacts.
+TOOLING_IGNORE = [
+    '**/*.pyc',
+    '**/*.pyo',
+    '**/__pycache__',
+    '**/.pytest_cache',
+    '**/.coverage',
+    '**/.coverage.*',
+    '**/htmlcov',
+    '**/coverage.xml',
+    '**/.ruff_cache',
+    '**/.mypy_cache',
+    '**/*.egg',
+    '**/*.egg-info',
+    '**/.eggs',
+    '**/dist',
+    '**/.hypothesis',
+]
+
 # Rebuild on tooling src/pyproject changes. Run `just init` before first `tilt up`.
 local_resource(
     'build-tooling',
@@ -30,11 +50,7 @@ local_resource(
         './tooling/src',
         './tooling/pyproject.toml',
     ],
-    ignore=[
-        '**/*.pyc',
-        '**/__pycache__',
-        '**/.pytest_cache',
-    ],
+    ignore=TOOLING_IGNORE,
     labels=['tooling'],
     allow_parallel=True,
 )
@@ -48,11 +64,7 @@ local_resource(
         './tooling/tests',
         './tooling/pyproject.toml',
     ],
-    ignore=[
-        '**/*.pyc',
-        '**/__pycache__',
-        '**/.pytest_cache',
-    ],
+    ignore=TOOLING_IGNORE,
     labels=['tooling'],
     allow_parallel=True,
 )
@@ -66,12 +78,7 @@ local_resource(
         './tooling/tests',
         './tooling/pyproject.toml',
     ],
-    ignore=[
-        '**/*.pyc',
-        '**/__pycache__',
-        '**/.pytest_cache',
-        '**/.coverage',
-    ],
+    ignore=TOOLING_IGNORE,
     labels=['tooling'],
     allow_parallel=True,
 )

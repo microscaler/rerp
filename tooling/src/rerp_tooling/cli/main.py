@@ -11,6 +11,7 @@ from . import ci as ci_cli
 from . import docker as docker_cli
 from . import openapi as openapi_cli
 from . import ports as ports_cli
+from . import pre_commit as pre_commit_cli
 from . import release as release_cli
 from . import tilt as tilt_cli
 
@@ -114,6 +115,15 @@ def main() -> None:
             print("  Use: rerp release --help")
             sys.exit(1)
         release_cli.run_release(args, project_root)
+        return
+
+    if args.command == "pre-commit":
+        if not getattr(args, "pre_commit_cmd", None):
+            print("rerp pre-commit: missing subcommand")
+            print("  microservices-fmt")
+            print("  Use: rerp pre-commit --help")
+            sys.exit(1)
+        pre_commit_cli.run_pre_commit(args, project_root)
         return
 
     # Placeholder for future: brrtrouter
@@ -452,5 +462,16 @@ def __build_parser():
     ptt.add_argument("--system-prune", action="store_true", help="Run docker system prune -f")
     ptl = pt_sub.add_parser("logs", help="Tail tilt logs for a component")
     ptl.add_argument("component", help="Component name (e.g. general-ledger)")
+
+    # --- pre-commit ---
+    ppc = sub.add_parser(
+        "pre-commit",
+        help="Pre-commit hooks: microservices-fmt (cargo fmt when microservices/ changes)",
+    )
+    ppc_sub = ppc.add_subparsers(dest="pre_commit_cmd")
+    ppc_sub.add_parser(
+        "microservices-fmt",
+        help="If microservices/ changed vs HEAD, run cargo fmt in components and entities",
+    )
 
     return p

@@ -34,6 +34,10 @@ This guide will help you get started with contributing to the project.
 
 3. **Generate system BFF specs** (optional, for testing): run `just init` then `rerp bff generate-system`.
 
+4. **Pre-commit hooks** (recommended): run `just init` then `just install-hooks`. Before each commit this runs:
+   - **Tooling QA**: `just qa` (lint, format-check, tooling tests)
+   - **microservices-fmt**: if `microservices/` changed vs HEAD, runs `just fmt-rust` (cargo fmt in `components/`, rustfmt in `entities/`); fast if Tilt has recently built.
+
 ---
 
 ## Development Workflow
