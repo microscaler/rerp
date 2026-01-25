@@ -71,7 +71,7 @@ cargo clippy --workspace
 
 Commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This is enforced in CI via commitlint; PRs with invalid commit messages will fail.
 
-Format: `<type>[optional scope]: <description>`
+Format: `<type>[optional scope]: <description>` (subject line max 1500 characters; extra space for agentic tracking)
 
 Examples:
 - `feat: add new service endpoint`
@@ -82,6 +82,8 @@ Examples:
 - `chore(deps): bump crate-x to 1.2`
 
 Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`, `revert`.
+
+To validate before pushing: `npx commitlint --from HEAD~1` (requires Node; or rely on CI).
 
 ### 5. Submit a Pull Request
 
