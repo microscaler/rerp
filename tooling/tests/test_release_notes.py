@@ -9,11 +9,30 @@ import pytest
 from rerp_tooling.release.notes import (
     DEFAULT_TEMPLATE,
     _call_anthropic,
+    _call_openai,
     _get_commits_since,
     _get_previous_tag,
     _load_template,
     run,
 )
+
+# Basic JSON responses for mocked HTTP: validate provider→API path and parsing.
+OPENAI_BASIC = {"choices": [{"message": {"content": "OpenAI basic response for 1.0.0"}}]}
+ANTHROPIC_BASIC = {"content": [{"type": "text", "text": "Anthropic basic response for 1.0.0"}]}
+
+
+def _fake_http_resp(payload: dict):
+    class _Resp:
+        def read(self) -> bytes:
+            return json.dumps(payload).encode()
+
+        def __enter__(self) -> "_Resp":
+            return self
+
+        def __exit__(self, *a: object) -> None:
+            pass
+
+    return _Resp()
 
 
 class TestGetPreviousTag:
@@ -29,6 +48,13 @@ class TestGetPreviousTag:
         import subprocess
 
         with patch("subprocess.run", side_effect=subprocess.CalledProcessError(1, "git")):
+            assert _get_previous_tag(tmp_path) is None
+
+    def test_returns_none_when_stdout_empty_or_whitespace(self, tmp_path: Path) -> None:
+        from types import SimpleNamespace
+
+        with patch("subprocess.run") as m:
+            m.return_value = SimpleNamespace(stdout="\n  \n")
             assert _get_previous_tag(tmp_path) is None
 
 
@@ -73,6 +99,10 @@ class TestLoadTemplate:
         p = tmp_path / "t.md"
         p.write_text("# Custom\n")
         assert _load_template(p) == "# Custom\n"
+
+    def test_returns_default_when_path_is_directory(self, tmp_path: Path) -> None:
+        (tmp_path / "adir").mkdir()
+        assert _load_template(tmp_path / "adir") == DEFAULT_TEMPLATE
 
 
 class TestRun:
@@ -168,6 +198,177 @@ class TestRun:
                 provider="openai",
             )
         assert rc == 1
+
+    def test_run_fails_on_invalid_provider(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]):
+            rc = run(tmp_path, "1.0.0", since_tag="v0.9.0", output_path=None, provider="claude")
+        assert rc == 1
+        err = capsys.readouterr().err
+        assert "Invalid provider 'claude'" in err
+        assert "openai" in err and "anthropic" in err
+
+    def test_run_fails_on_invalid_provider_via_env(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch.dict("os.environ", {"RELEASE_NOTES_PROVIDER": "claude"}, clear=False),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=None,
+                provider=None,
+            )
+        assert rc == 1
+        assert "Invalid provider 'claude'" in capsys.readouterr().err
+
+    def test_run_returns_1_when_body_whitespace_only(self, tmp_path: Path) -> None:
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch("rerp_tooling.release.notes._call_openai", return_value="   \n  \t  "),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=tmp_path / "out.md",
+                provider="openai",
+            )
+        assert rc == 1
+
+    def test_run_openai_fails_without_openai_api_key(self, tmp_path: Path) -> None:
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch.dict("os.environ", {"OPENAI_API_KEY": ""}, clear=False),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            run(tmp_path, "1.0.0", since_tag="v0.9.0", provider="openai")
+        assert exc_info.value.code == 1
+
+    def test_run_output_path_creates_parent_dirs(self, tmp_path: Path) -> None:
+        out = tmp_path / "a" / "b" / "out.md"
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["x"]),
+            patch(
+                "rerp_tooling.release.notes._call_openai",
+                return_value="# Release v1.0.0\n\nDone.",
+            ),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=out,
+                provider="openai",
+            )
+        assert rc == 0
+        assert out.is_file()
+        assert "Release v1.0.0" in out.read_text()
+
+    def test_run_openai_path_mocked_http(self, tmp_path: Path) -> None:
+        """Provider openai: full path through _call_openai and JSON parsing."""
+        out = tmp_path / "out.md"
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]),
+            patch("urllib.request.urlopen", return_value=_fake_http_resp(OPENAI_BASIC)),
+            patch.dict("os.environ", {"OPENAI_API_KEY": "sk-fake"}, clear=False),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=out,
+                provider="openai",
+            )
+        assert rc == 0
+        assert "OpenAI basic response for 1.0.0" in out.read_text()
+
+    def test_run_anthropic_path_mocked_http(self, tmp_path: Path) -> None:
+        """Provider anthropic: full path through _call_anthropic and JSON parsing."""
+        out = tmp_path / "out.md"
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]),
+            patch("urllib.request.urlopen", return_value=_fake_http_resp(ANTHROPIC_BASIC)),
+            patch.dict("os.environ", {"ANTHROPIC_API_KEY": "skant-fake"}, clear=False),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=out,
+                provider="anthropic",
+            )
+        assert rc == 0
+        assert "Anthropic basic response for 1.0.0" in out.read_text()
+
+
+class TestCallOpenai:
+    def test_returns_text_from_choices_message_content(self) -> None:
+        payload = {
+            "choices": [{"message": {"content": "# Release v1.0.0\n\nOpenAI."}}],
+        }
+
+        class FakeResp:
+            def read(self) -> bytes:
+                return json.dumps(payload).encode()
+
+            def __enter__(self) -> "FakeResp":
+                return self
+
+            def __exit__(self, *a: object) -> None:
+                pass
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"}, clear=False),
+            patch("urllib.request.urlopen", return_value=FakeResp()),
+        ):
+            got = _call_openai(
+                ["feat: x"],
+                "Format here",
+                "1.0.0",
+                "gpt-4o-mini",
+            )
+        assert got == "# Release v1.0.0\n\nOpenAI."
+
+    def test_strips_markdown_code_fence(self) -> None:
+        payload = {
+            "choices": [
+                {
+                    "message": {
+                        "content": "```markdown\n# Release v2.0.0\n\nDone.\n```",
+                    }
+                }
+            ],
+        }
+
+        class FakeResp:
+            def read(self) -> bytes:
+                return json.dumps(payload).encode()
+
+            def __enter__(self) -> "FakeResp":
+                return self
+
+            def __exit__(self, *a: object) -> None:
+                pass
+
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": "k"}, clear=False),
+            patch("urllib.request.urlopen", return_value=FakeResp()),
+        ):
+            got = _call_openai([], "F", "2.0.0", "gpt-4o-mini")
+        assert got == "# Release v2.0.0\n\nDone."
+
+    def test_raises_without_openai_api_key(self) -> None:
+        with (
+            patch.dict("os.environ", {"OPENAI_API_KEY": ""}, clear=False),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            _call_openai([], "F", "1.0.0", "gpt-4o-mini")
+        assert exc_info.value.code == 1
 
 
 class TestCallAnthropic:

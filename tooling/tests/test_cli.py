@@ -456,3 +456,123 @@ def test_run_ci_patch_brrtrouter(tmp_path, monkeypatch):
     with pytest.raises(SystemExit) as exc:
         run_ci(A(), tmp_path)
     assert exc.value.code == 0
+
+
+# --- release (bump, generate-notes) ---
+
+
+def test_release_generate_notes_requires_version(tmp_path, monkeypatch, capsys):
+    from rerp_tooling.cli.release import run_release
+
+    class A:
+        release_cmd = "generate-notes"
+        version = None
+        since_tag = None
+        template = None
+        output = None
+        model = None
+        provider = None
+
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    with pytest.raises(SystemExit) as exc:
+        run_release(A(), tmp_path)
+    assert exc.value.code == 1
+    assert "version" in capsys.readouterr().err.lower()
+
+
+def _fake_http_resp(payload: dict):
+    import json
+
+    class _Resp:
+        def read(self) -> bytes:
+            return json.dumps(payload).encode()
+
+        def __enter__(self) -> "_Resp":
+            return self
+
+        def __exit__(self, *a: object) -> None:
+            pass
+
+    return _Resp()
+
+
+OPENAI_BASIC = {"choices": [{"message": {"content": "OpenAI basic response for 1.0.0"}}]}
+ANTHROPIC_BASIC = {"content": [{"type": "text", "text": "Anthropic basic response for 1.0.0"}]}
+
+
+def test_release_generate_notes_provider_openai(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-fake")
+    out = tmp_path / "notes.md"
+    with (
+        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("urllib.request.urlopen", return_value=_fake_http_resp(OPENAI_BASIC)),
+    ):
+        code = _run_main(
+            [
+                "release",
+                "generate-notes",
+                "-v",
+                "1.0.0",
+                "--since-tag",
+                "v0.9.0",
+                "-o",
+                str(out),
+                "--provider",
+                "openai",
+            ]
+        )
+    assert code == 0
+    assert "OpenAI basic response for 1.0.0" in out.read_text()
+
+
+def test_release_generate_notes_provider_anthropic(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "skant-fake")
+    out = tmp_path / "notes.md"
+    with (
+        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("urllib.request.urlopen", return_value=_fake_http_resp(ANTHROPIC_BASIC)),
+    ):
+        code = _run_main(
+            [
+                "release",
+                "generate-notes",
+                "-v",
+                "1.0.0",
+                "--since-tag",
+                "v0.9.0",
+                "-o",
+                str(out),
+                "--provider",
+                "anthropic",
+            ]
+        )
+    assert code == 0
+    assert "Anthropic basic response for 1.0.0" in out.read_text()
+
+
+def test_release_generate_notes_provider_via_env_anthropic(tmp_path, monkeypatch, capsys):
+    """RELEASE_NOTES_PROVIDER=anthropic without --provider uses Anthropic path."""
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "skant-fake")
+    monkeypatch.setenv("RELEASE_NOTES_PROVIDER", "anthropic")
+    out = tmp_path / "notes.md"
+    with (
+        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("urllib.request.urlopen", return_value=_fake_http_resp(ANTHROPIC_BASIC)),
+    ):
+        code = _run_main(
+            [
+                "release",
+                "generate-notes",
+                "-v",
+                "1.0.0",
+                "--since-tag",
+                "v0.9.0",
+                "-o",
+                str(out),
+            ]
+        )
+    assert code == 0
+    assert "Anthropic basic response for 1.0.0" in out.read_text()

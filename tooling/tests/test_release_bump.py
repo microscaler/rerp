@@ -1,6 +1,7 @@
 """Tests for rerp_tooling.release.bump."""
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -35,6 +36,22 @@ class TestReadCurrent:
         with pytest.raises(SystemExit):
             _read_current(tmp_path / "components" / "Cargo.toml")
 
+    def test_raises_when_only_package_section(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[package]\nname = "x"\nversion = "1.0.0"\n'
+        )
+        with pytest.raises(SystemExit):
+            _read_current(tmp_path / "components" / "Cargo.toml")
+
+    def test_raises_when_workspace_package_version_malformed(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace.package]\nversion = "1.2"\nedition = "2021"\n'
+        )
+        with pytest.raises(SystemExit):
+            _read_current(tmp_path / "components" / "Cargo.toml")
+
 
 class TestNextVersion:
     def test_patch(self) -> None:
@@ -52,6 +69,15 @@ class TestNextVersion:
     def test_strips_v_prefix(self) -> None:
         assert _next_version("v0.1.0", "patch") == "0.1.1"
         assert _next_version("v1.2.3", "minor") == "1.3.0"
+
+    def test_invalid_version_raises(self) -> None:
+        for bad in ("1.2", "1.2.3.4", "x.y.z", "1.2.3-beta"):
+            with pytest.raises(SystemExit):
+                _next_version(bad, "patch")
+
+    def test_invalid_bump_raises(self) -> None:
+        with pytest.raises(SystemExit):
+            _next_version("1.2.3", "foo")
 
 
 class TestReplaceInFile:
@@ -160,6 +186,16 @@ class TestCargoTomlPaths:
         assert "microservices/Cargo.toml" in rels
         assert len(got) == 4
 
+    def test_excludes_build(self, tmp_path: Path) -> None:
+        (tmp_path / "lib").mkdir()
+        (tmp_path / "lib" / "Cargo.toml").write_text('[package]\nversion = "0.1.0"\n')
+        (tmp_path / "build").mkdir()
+        (tmp_path / "build" / "Cargo.toml").write_text("")
+        got = _cargo_toml_paths(tmp_path)
+        rels = [str(p.relative_to(tmp_path)) for p in got]
+        assert rels == ["lib/Cargo.toml"]
+        assert not any("build" in r for r in rels)
+
 
 class TestRun:
     def test_success_updates_all_matching(self, tmp_path: Path) -> None:
@@ -209,6 +245,32 @@ class TestRun:
         assert rc == 0
         assert 'version = "0.2.1"' in (tmp_path / "Cargo.toml").read_text()
         assert 'version = "0.2.1"' in (tmp_path / "components" / "Cargo.toml").read_text()
+
+    def test_invalid_bump_raises_system_exit(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
+        with pytest.raises(SystemExit):
+            run(tmp_path, "invalid")
+
+    def test_appends_to_github_output_when_set(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
+        gh_out = tmp_path / "github_output.txt"
+        with patch.dict("os.environ", {"GITHUB_OUTPUT": str(gh_out)}, clear=False):
+            rc = run(tmp_path, "patch")
+        assert rc == 0
+        assert gh_out.is_file()
+        assert "version=0.1.1\n" in gh_out.read_text()
 
 
 class TestSetWorkspacePackageVersion:

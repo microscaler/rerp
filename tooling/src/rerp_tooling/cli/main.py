@@ -424,10 +424,12 @@ def __build_parser():
     prlgn.add_argument("--output", "-o", help="Write notes to file (default: stdout)")
     prlgn.add_argument("--template", "-t", help="Custom template path (default: built-in)")
     prlgn.add_argument("--since-tag", help="Git ref for 'since' (default: previous tag)")
+    _p = (os.environ.get("RELEASE_NOTES_PROVIDER") or "anthropic").strip().lower()
+    _prov_default = _p if _p in ("openai", "anthropic") else "anthropic"
     prlgn.add_argument(
         "--provider",
         choices=["openai", "anthropic"],
-        default=os.environ.get("RELEASE_NOTES_PROVIDER", "anthropic"),
+        default=_prov_default,
         help="AI provider: openai or anthropic (default: RELEASE_NOTES_PROVIDER or anthropic)",
     )
     prlgn.add_argument(

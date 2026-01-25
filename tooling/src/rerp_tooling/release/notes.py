@@ -233,6 +233,9 @@ def run(
     format_instructions = template.replace("{{VERSION}}", version)
 
     provider = (provider or os.environ.get("RELEASE_NOTES_PROVIDER") or "anthropic").strip().lower()
+    if provider not in ("openai", "anthropic"):
+        print(f"Invalid provider {provider!r}; must be 'openai' or 'anthropic'.", file=sys.stderr)
+        return 1
     if provider == "anthropic":
         model = (model or os.environ.get("ANTHROPIC_MODEL") or "claude-sonnet-4-5-20250929").strip()
         body = _call_anthropic(commits, format_instructions, version, model)
