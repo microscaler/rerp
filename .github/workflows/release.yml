@@ -1,6 +1,10 @@
-# Release workflow: bump version in Cargo.toml, commit, tag vX.Y.Z, push.
+# Release workflow: bump Cargo.toml, generate notes (OpenAI or Anthropic), commit, tag, push, create GitHub Release.
 # Triggers existing CI on refs/tags/v* to build and publish containers.
 # PRD: docs/RELEASE_MANAGEMENT_PRD.md
+#
+# Required secrets for release notes (use one per --provider):
+#   OPENAI_API_KEY (https://platform.openai.com/api-keys) when provider=openai
+#   ANTHROPIC_API_KEY (https://console.anthropic.com/) when provider=anthropic
 
 name: Release
 
@@ -21,6 +25,14 @@ on:
         required: false
         default: main
         type: string
+      provider:
+        description: 'AI provider for release notes (openai or anthropic)'
+        required: false
+        default: anthropic
+        type: choice
+        options:
+          - openai
+          - anthropic
 
 permissions:
   contents: write
@@ -32,6 +44,7 @@ jobs:
     env:
       BUMP: ${{ github.event.inputs.bump || 'patch' }}
       BRANCH: ${{ github.event.inputs.branch || 'main' }}
+      NOTES_PROVIDER: ${{ github.event.inputs.provider || 'anthropic' }}
 
     steps:
       - name: Checkout
@@ -41,65 +54,45 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
       - name: Bump version and update Cargo.toml
         id: bump
-        env:
-          BUMP: ${{ env.BUMP }}
+        run: tooling/.venv/bin/rerp release bump ${{ env.BUMP }}
+
+      - name: Check for changes
         run: |
-          set -e
-          python3 << 'PY'
-          import re
-          import os
+          git diff --quiet && { echo "No version change (already at this version?)"; exit 1; }
 
-          comp = open('components/Cargo.toml').read()
-          m = re.search(r'version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', comp)
-          if not m:
-              raise SystemExit('Could not find version in components/Cargo.toml')
-          x, y, z = int(m.group(1)), int(m.group(2)), int(m.group(3))
-          old = f'{x}.{y}.{z}'
-          bump = os.environ.get('BUMP', 'patch').lower()
-          if bump == 'patch':
-              z += 1
-          elif bump == 'minor':
-              y += 1
-              z = 0
-          elif bump == 'major':
-              x += 1
-              y = z = 0
-          else:
-              raise SystemExit(f'Unknown bump: {bump}')
-          new_ver = f'{x}.{y}.{z}'
-
-          for path in ['components/Cargo.toml', 'microservices/Cargo.toml', 'entities/Cargo.toml']:
-              s = open(path).read()
-              if f'version = "{old}"' not in s:
-                  raise SystemExit(f'Expected version = "{old}" not found in {path}')
-              s = s.replace(f'version = "{old}"', f'version = "{new_ver}"', 1)
-              open(path, 'w').write(s)
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-              f.write(f'version={new_ver}\n')
-          print(f'Bumped {old} -> {new_ver} ({bump})')
-          PY
-
-      - name: Commit and tag
+      - name: Generate release notes (OpenAI or Anthropic per provider)
+        # Script exits 1 on missing API key, API error, or empty body → GHA fails the job.
         env:
-          VERSION: ${{ steps.bump.outputs.version }}
-          BRANCH: ${{ env.BRANCH }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add components/Cargo.toml microservices/Cargo.toml entities/Cargo.toml
-          git diff --staged --quiet && { echo "No version change (already at this version?)"; exit 1; }
-          git commit -m "chore(release): v${VERSION}"
-          git tag "v${VERSION}"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: tooling/.venv/bin/rerp release generate-notes --version ${{ steps.bump.outputs.version }} --output release-body.md --template .github/release-notes-template.md --provider ${{ env.NOTES_PROVIDER }}
 
-      - name: Push branch and tag
-        env:
-          VERSION: ${{ steps.bump.outputs.version }}
-          BRANCH: ${{ env.BRANCH }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}"
-          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "v${VERSION}"
+      - name: Commit, tag and push
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "-u"
+          message: "chore(release): v${{ steps.bump.outputs.version }}"
+          tag: "v${{ steps.bump.outputs.version }}"
+          author_name: "github-actions[bot]"
+          author_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.bump.outputs.version }}"
+          body_path: release-body.md
+          generate_release_notes: false

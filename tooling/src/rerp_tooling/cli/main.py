@@ -11,6 +11,7 @@ from . import ci as ci_cli
 from . import docker as docker_cli
 from . import openapi as openapi_cli
 from . import ports as ports_cli
+from . import release as release_cli
 from . import tilt as tilt_cli
 
 
@@ -106,9 +107,18 @@ def main() -> None:
         tilt_cli.run_tilt(args, project_root)
         return
 
+    if args.command == "release":
+        if not getattr(args, "release_cmd", None):
+            print("rerp release: missing subcommand")
+            print("  bump, generate-notes")
+            print("  Use: rerp release --help")
+            sys.exit(1)
+        release_cli.run_release(args, project_root)
+        return
+
     # Placeholder for future: brrtrouter
     print(
-        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', or 'rerp tilt'."
+        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp release', or 'rerp tilt'."
     )
     sys.exit(1)
 
@@ -378,6 +388,39 @@ def __build_parser():
         type=int,
         default=None,
         help="Port (default: from port registry)",
+    )
+
+    # --- release ---
+    prl = sub.add_parser("release", help="Release: bump, generate-notes (Cargo.toml, GitHub Release)")
+    prl_sub = prl.add_subparsers(dest="release_cmd")
+    prlb = prl_sub.add_parser(
+        "bump",
+        help="Bump version from components/Cargo.toml; update all [package]/[workspace.package].version in repo",
+    )
+    prlb.add_argument(
+        "bump",
+        nargs="?",
+        default="patch",
+        choices=["patch", "minor", "major"],
+        help="Bump type (default: patch)",
+    )
+    prlgn = prl_sub.add_parser(
+        "generate-notes",
+        help="Generate release notes from commits since last tag via OpenAI or Anthropic; write to --output for gh-release body",
+    )
+    prlgn.add_argument("--version", "-v", required=True, help="Release version (e.g. 1.2.3)")
+    prlgn.add_argument("--output", "-o", help="Write notes to file (default: stdout)")
+    prlgn.add_argument("--template", "-t", help="Custom template path (default: built-in)")
+    prlgn.add_argument("--since-tag", help="Git ref for 'since' (default: previous tag)")
+    prlgn.add_argument(
+        "--provider",
+        choices=["openai", "anthropic"],
+        default=os.environ.get("RELEASE_NOTES_PROVIDER", "anthropic"),
+        help="AI provider: openai or anthropic (default: RELEASE_NOTES_PROVIDER or anthropic)",
+    )
+    prlgn.add_argument(
+        "--model",
+        help="Model: OpenAI (default: gpt-4o-mini or OPENAI_MODEL) or Anthropic (default: claude-sonnet-4-5-20250929 or ANTHROPIC_MODEL)",
     )
 
     # --- tilt ---
