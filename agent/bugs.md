@@ -127,3 +127,35 @@ new_content = content[: m.start()] + m.group(1) + "\n" + new_members + "]" + con
 ```python
 m = re.search(r"(ports\s*=\s*\{)(.*?)(\s*\})", content, re.DOTALL)
 ```
+
+---
+
+## Fixed: `_get_commits_since` crashed on invalid `--since-tag` (2025-01-24)
+
+**File:** `tooling/src/rerp_tooling/release/notes.py`
+
+**Issue:** `_get_commits_since` used `subprocess.run(..., check=True)` without catching `CalledProcessError`. When the user passes an invalid git ref via `--since-tag`, `run()` passes it to `_get_commits_since`, which runs `git log ref..HEAD`. Git exits non‑zero for an unknown ref, and the uncaught `CalledProcessError` produced a traceback instead of a clear error. This differed from `_get_previous_tag`, which catches `CalledProcessError` and returns `None`.
+
+**Fix:** Wrap the `subprocess.run` in `_get_commits_since` with `try/except subprocess.CalledProcessError`. On error: print a short message including the ref and any git stderr, then `raise SystemExit(1) from e`. Example: `Invalid git ref for --since-tag: 'v99'. Check the tag or commit exists. fatal: bad revision 'v99..HEAD'`
+
+---
+
+## Fixed: `_replace_in_file` only updated first version per file (2025-01-24)
+
+**File:** `tooling/src/rerp_tooling/release/bump.py`
+
+**Issue:** `_replace_in_file` used `if in_sec and not replaced:` so that after the first replacement, `replaced` stayed `True` and no further version lines were updated. A Cargo.toml with both `[package]` and `[workspace.package]` sections with explicit `version = "X.Y.Z"` (valid for a workspace root that is also a publishable crate) had only the first section’s version updated, leaving the file with inconsistent versions.
+
+**Fix:** Remove `and not replaced` from the condition so every `version = "old"` in a `[package]` or `[workspace.package]` section is replaced. Keep `replaced = True` when a replacement is made so the function still returns whether any change was made and the file is only written when there is a change.
+
+**Test:** `TestReplaceInFile::test_replaces_both_package_and_workspace_package_version` — file with `[package].version` and `[workspace.package].version` both `"0.1.0"`; after replace both are `"0.1.1"`.
+
+---
+
+## Fixed: `_cargo_toml_paths` used absolute `p.parts`, so `/tmp` triggered `tmp` skip (2025-01-24)
+
+**File:** `tooling/src/rerp_tooling/release/bump.py`
+
+**Issue:** `_cargo_toml_paths` used `if any(part in p.parts for part in SKIP_PARTS)`. `p.parts` is from the full path (e.g. `/tmp/pytest-of-runner/.../components/Cargo.toml`), so the segment `tmp` from `/tmp` is in `p.parts`. With `tmp` in `SKIP_PARTS`, every Cargo.toml was excluded when the project lived under `/tmp` (e.g. Linux CI). Tests that create `tmp_path` under `/tmp` saw `_cargo_toml_paths` return `[]`, breaking `test_excludes_target`, `test_includes_root_components_entities_microservices`, `TestRun::test_success_updates_all_matching`, etc.
+
+**Fix:** Use the path relative to `project_root` when checking SKIP_PARTS: `rel = p.relative_to(project_root)` and `if any(part in rel.parts for part in SKIP_PARTS)`. We only skip when the skip name appears as a segment under the project (e.g. `target/`, `node_modules/`), not in the absolute path (e.g. `/tmp`).

@@ -11,9 +11,9 @@ use std::path::Path;
 fn main() {
     // Discover entities in source directory
     let source_dir = Path::new("src");
-    
+
     println!("cargo:rerun-if-changed=src");
-    
+
     let entities = match build_script::discover_entities(source_dir) {
         Ok(entities) => {
             if entities.is_empty() {
@@ -28,15 +28,17 @@ fn main() {
             return;
         }
     };
-    
+
     // Generate registry module in OUT_DIR
-    let out_dir = env::var("OUT_DIR")
-        .expect("OUT_DIR environment variable not set");
+    let out_dir = env::var("OUT_DIR").expect("OUT_DIR environment variable not set");
     let registry_path = Path::new(&out_dir).join("entity_registry.rs");
-    
+
     match build_script::generate_registry_module(&entities, &registry_path) {
         Ok(()) => {
-            println!("cargo:warning=Generated entity registry at {:?}", registry_path);
+            println!(
+                "cargo:warning=Generated entity registry at {:?}",
+                registry_path
+            );
         }
         Err(e) => {
             println!("cargo:warning=Failed to generate registry: {}", e);

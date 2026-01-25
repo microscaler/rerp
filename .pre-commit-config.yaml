@@ -1,0 +1,19 @@
+# Pre-commit: https://pre-commit.com
+# Install: just init && just install-hooks
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: qa
+        name: Tooling QA (lint, format-check, tests)
+        entry: just qa
+        language: system
+        pass_filenames: false
+
+      - id: microservices-fmt
+        name: Cargo fmt (components+entities) if microservices/ changed
+        entry: tooling/.venv/bin/rerp
+        args: [pre-commit, microservices-fmt]
+        language: system
+        pass_filenames: false
