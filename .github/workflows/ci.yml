@@ -33,7 +33,8 @@ jobs:
   tooling:
     name: Build, Test and Coverage (Tooling)
     needs: [conventional-commits]
-    if: needs.conventional-commits.result == 'success' || needs.conventional-commits.result == 'skipped'
+    # On tag push: conventional-commits is skipped; run so container pipeline (download/build-push/verify) can run.
+    if: startsWith(github.ref, 'refs/tags/') || needs.conventional-commits.result == 'success' || needs.conventional-commits.result == 'skipped'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -301,10 +302,11 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  # Runs only on tag push (release). Extracts tag from github.ref (e.g. v0.1.1 → 0.1.1) and passes
+  # it via outputs.tag; extra_tag=latest so images are pushed with both :0.1.1 and :latest.
   download-copy-package-push-containers:
     name: Download Copy Package and Push Containers
     needs: [build-multiarch]
-    # Containers only on tag push (release). main/develop get full CI but no image build/push.
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -317,6 +319,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Set up Python and tooling (for validate)
         uses: actions/setup-python@v5
@@ -356,7 +360,7 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "tag=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
-            echo "extra_tag=" >> "$GITHUB_OUTPUT"
+            echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
           else
             echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
             if [[ "${{ github.ref }}" == refs/heads/main ]]; then
@@ -373,6 +377,8 @@ jobs:
           path: build_artifacts
           retention-days: 1
 
+  # Image tag comes from download-copy-package-push-containers.outputs.tag (release version from
+  # github.ref on tag push, e.g. 0.1.1), so images are associated with the GitHub Release.
   build-push-service:
     name: Build and push ${{ matrix.service }}
     needs: [download-copy-package-push-containers]
@@ -392,6 +398,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Copy microservices binaries from artifacts
         uses: actions/download-artifact@v4
@@ -443,6 +451,7 @@ jobs:
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
 
+  # Uses the same release tag (download-copy-package-push-containers.outputs.tag) to verify images.
   verify-published-images:
     name: Verify published images
     needs: [download-copy-package-push-containers, build-push-service]
