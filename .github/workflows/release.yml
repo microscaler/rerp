@@ -1,0 +1,105 @@
+# Release workflow: bump version in Cargo.toml, commit, tag vX.Y.Z, push.
+# Triggers existing CI on refs/tags/v* to build and publish containers.
+# PRD: docs/RELEASE_MANAGEMENT_PRD.md
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Bump type (default: patch = bump Z)'
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      branch:
+        description: 'Branch to release from'
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Bump, tag and push
+    runs-on: ubuntu-latest
+    env:
+      BUMP: ${{ github.event.inputs.bump || 'patch' }}
+      BRANCH: ${{ github.event.inputs.branch || 'main' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Bump version and update Cargo.toml
+        id: bump
+        env:
+          BUMP: ${{ env.BUMP }}
+        run: |
+          set -e
+          python3 << 'PY'
+          import re
+          import os
+
+          comp = open('components/Cargo.toml').read()
+          m = re.search(r'version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', comp)
+          if not m:
+              raise SystemExit('Could not find version in components/Cargo.toml')
+          x, y, z = int(m.group(1)), int(m.group(2)), int(m.group(3))
+          old = f'{x}.{y}.{z}'
+          bump = os.environ.get('BUMP', 'patch').lower()
+          if bump == 'patch':
+              z += 1
+          elif bump == 'minor':
+              y += 1
+              z = 0
+          elif bump == 'major':
+              x += 1
+              y = z = 0
+          else:
+              raise SystemExit(f'Unknown bump: {bump}')
+          new_ver = f'{x}.{y}.{z}'
+
+          for path in ['components/Cargo.toml', 'microservices/Cargo.toml', 'entities/Cargo.toml']:
+              s = open(path).read()
+              if f'version = "{old}"' not in s:
+                  raise SystemExit(f'Expected version = "{old}" not found in {path}')
+              s = s.replace(f'version = "{old}"', f'version = "{new_ver}"', 1)
+              open(path, 'w').write(s)
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'version={new_ver}\n')
+          print(f'Bumped {old} -> {new_ver} ({bump})')
+          PY
+
+      - name: Commit and tag
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+          BRANCH: ${{ env.BRANCH }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add components/Cargo.toml microservices/Cargo.toml entities/Cargo.toml
+          git diff --staged --quiet && { echo "No version change (already at this version?)"; exit 1; }
+          git commit -m "chore(release): v${VERSION}"
+          git tag "v${VERSION}"
+
+      - name: Push branch and tag
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+          BRANCH: ${{ env.BRANCH }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "HEAD:${BRANCH}"
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "v${VERSION}"

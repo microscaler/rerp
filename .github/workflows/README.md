@@ -66,6 +66,23 @@ If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also
 
 ---
 
+### `release.yml`
+
+**Purpose**: Bump the version in `components`, `microservices`, and `entities` Cargo.toml, commit, create tag `vX.Y.Z`, and push. The tag push triggers **ci.yml** (build and publish containers with the version as the image tag). See **docs/RELEASE_MANAGEMENT_PRD.md**.
+
+**Triggers**: **`workflow_dispatch` only** (manual run).
+
+**Inputs**:
+- **bump**: `patch` (default, bump Z) | `minor` (bump Y, Z→0) | `major` (bump X, Y Z→0)
+- **branch**: Branch to release from (default `main`)
+
+**Jobs**:
+- **Bump, tag and push**: Checkout branch → read version from `components/Cargo.toml` → compute next (patch/minor/major) → write to `components`, `microservices`, `entities` → commit `chore(release): vX.Y.Z` → tag `vX.Y.Z` → push branch and tag.
+
+**Version source**: `components/Cargo.toml` `[workspace.package].version`. The same value is written to `microservices/Cargo.toml` and `entities/Cargo.toml`.
+
+---
+
 ### `deploy-website.yml`
 
 **Purpose**: Build `ui/website` (SolidJS) and deploy to **GitHub Pages**.
