@@ -1,0 +1,102 @@
+# Release workflow: bump Cargo.toml, generate notes (OpenAI or Anthropic), commit, tag, push, create GitHub Release.
+# Tag push uses REPO_PAT so it triggers ci.yml; ci.yml builds and pushes containers only on refs/tags/v*.
+# PRD: docs/RELEASE_MANAGEMENT_PRD.md
+#
+# Required secrets:
+#   REPO_PAT: repo PAT (or GitHub App token) with repo scope—used for checkout/push so the tag push triggers ci.yml.
+#     (GITHUB_TOKEN pushes do not trigger workflows.) Create at: Settings → Developer settings → Personal access tokens.
+#   OPENAI_API_KEY (when provider=openai), ANTHROPIC_API_KEY (when provider=anthropic)
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Bump type (default: patch = bump Z)'
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      branch:
+        description: 'Branch to release from'
+        required: false
+        default: main
+        type: string
+      provider:
+        description: 'AI provider for release notes (openai or anthropic)'
+        required: false
+        default: anthropic
+        type: choice
+        options:
+          - openai
+          - anthropic
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Bump, tag and push
+    runs-on: ubuntu-latest
+    env:
+      BUMP: ${{ github.event.inputs.bump || 'patch' }}
+      BRANCH: ${{ github.event.inputs.branch || 'main' }}
+      NOTES_PROVIDER: ${{ github.event.inputs.provider || 'anthropic' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+          token: ${{ secrets.REPO_PAT }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
+      - name: Bump version and update Cargo.toml
+        id: bump
+        run: tooling/.venv/bin/rerp release bump ${{ env.BUMP }}
+
+      - name: Check for changes
+        run: |
+          if git diff --quiet; then
+            echo "No version change (already at this version?)"
+            exit 1
+          fi
+
+      - name: Generate release notes (OpenAI or Anthropic per provider)
+        # Script exits 1 on missing API key, API error, or empty body → GHA fails the job.
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: tooling/.venv/bin/rerp release generate-notes --version ${{ steps.bump.outputs.version }} --output release-body.md --template .github/release-notes-template.md --provider ${{ env.NOTES_PROVIDER }}
+
+      - name: Commit, tag and push
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "-u"
+          message: "chore(release): v${{ steps.bump.outputs.version }}"
+          tag: "v${{ steps.bump.outputs.version }}"
+          author_name: "github-actions[bot]"
+          author_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.bump.outputs.version }}"
+          body_path: release-body.md
+          generate_release_notes: false

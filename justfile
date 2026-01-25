@@ -223,6 +223,13 @@ format:
     fi
     tooling/.venv/bin/ruff format tooling/
 
+# Run cargo fmt in components/ and entities/. Use when microservices/ structure or
+# deps change; fast if Tilt has recently built. components: cargo fmt; entities:
+# rustfmt (cargo fmt from entities/ hits "multiple workspace roots" with root+components).
+fmt-rust:
+    @cd components && cargo fmt --all
+    @find entities -name '*.rs' -exec rustfmt {} +
+
 # Check tooling is formatted (CI). Run `just init` first.
 format-check:
     #!/usr/bin/env bash
@@ -250,6 +257,17 @@ lint-fix:
         exit 1
     fi
     tooling/.venv/bin/ruff check tooling/ --fix --unsafe-fixes
+
+# Install pre-commit hooks (qa, microservices-fmt). Run `just init` first.
+install-hooks:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -d tooling/.venv ]; then
+        echo "❌ tooling/.venv not found. Run: just init"
+        exit 1
+    fi
+    tooling/.venv/bin/pre-commit install
+    echo "✅ Pre-commit hooks installed"
 
 # Find and remove unused imports in tooling (F401). Uses ruff. Run `just init` first.
 # --fix: edit files in place; run again to confirm clean.

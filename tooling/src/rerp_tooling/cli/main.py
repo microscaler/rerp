@@ -11,6 +11,8 @@ from . import ci as ci_cli
 from . import docker as docker_cli
 from . import openapi as openapi_cli
 from . import ports as ports_cli
+from . import pre_commit as pre_commit_cli
+from . import release as release_cli
 from . import tilt as tilt_cli
 
 
@@ -106,9 +108,27 @@ def main() -> None:
         tilt_cli.run_tilt(args, project_root)
         return
 
+    if args.command == "release":
+        if not getattr(args, "release_cmd", None):
+            print("rerp release: missing subcommand")
+            print("  bump, generate-notes")
+            print("  Use: rerp release --help")
+            sys.exit(1)
+        release_cli.run_release(args, project_root)
+        return
+
+    if args.command == "pre-commit":
+        if not getattr(args, "pre_commit_cmd", None):
+            print("rerp pre-commit: missing subcommand")
+            print("  microservices-fmt")
+            print("  Use: rerp pre-commit --help")
+            sys.exit(1)
+        pre_commit_cli.run_pre_commit(args, project_root)
+        return
+
     # Placeholder for future: brrtrouter
     print(
-        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', or 'rerp tilt'."
+        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp release', or 'rerp tilt'."
     )
     sys.exit(1)
 
@@ -380,6 +400,43 @@ def __build_parser():
         help="Port (default: from port registry)",
     )
 
+    # --- release ---
+    prl = sub.add_parser(
+        "release", help="Release: bump, generate-notes (Cargo.toml, GitHub Release)"
+    )
+    prl_sub = prl.add_subparsers(dest="release_cmd")
+    prlb = prl_sub.add_parser(
+        "bump",
+        help="Bump version from components/Cargo.toml; update all [package]/[workspace.package].version in repo",
+    )
+    prlb.add_argument(
+        "bump",
+        nargs="?",
+        default="patch",
+        choices=["patch", "minor", "major"],
+        help="Bump type (default: patch)",
+    )
+    prlgn = prl_sub.add_parser(
+        "generate-notes",
+        help="Generate release notes from commits since last tag via OpenAI or Anthropic; write to --output for gh-release body",
+    )
+    prlgn.add_argument("--version", "-v", required=True, help="Release version (e.g. 1.2.3)")
+    prlgn.add_argument("--output", "-o", help="Write notes to file (default: stdout)")
+    prlgn.add_argument("--template", "-t", help="Custom template path (default: built-in)")
+    prlgn.add_argument("--since-tag", help="Git ref for 'since' (default: previous tag)")
+    _p = (os.environ.get("RELEASE_NOTES_PROVIDER") or "anthropic").strip().lower()
+    _prov_default = _p if _p in ("openai", "anthropic") else "anthropic"
+    prlgn.add_argument(
+        "--provider",
+        choices=["openai", "anthropic"],
+        default=_prov_default,
+        help="AI provider: openai or anthropic (default: RELEASE_NOTES_PROVIDER or anthropic)",
+    )
+    prlgn.add_argument(
+        "--model",
+        help="Model: OpenAI (default: gpt-4o-mini or OPENAI_MODEL) or Anthropic (default: claude-sonnet-4-5-20250929 or ANTHROPIC_MODEL)",
+    )
+
     # --- tilt ---
     pt = sub.add_parser(
         "tilt",
@@ -407,5 +464,16 @@ def __build_parser():
     ptt.add_argument("--system-prune", action="store_true", help="Run docker system prune -f")
     ptl = pt_sub.add_parser("logs", help="Tail tilt logs for a component")
     ptl.add_argument("component", help="Component name (e.g. general-ledger)")
+
+    # --- pre-commit ---
+    ppc = sub.add_parser(
+        "pre-commit",
+        help="Pre-commit hooks: microservices-fmt (cargo fmt when microservices/ changes)",
+    )
+    ppc_sub = ppc.add_subparsers(dest="pre_commit_cmd")
+    ppc_sub.add_parser(
+        "microservices-fmt",
+        help="If microservices/ changed vs HEAD, run cargo fmt in components and entities",
+    )
 
     return p

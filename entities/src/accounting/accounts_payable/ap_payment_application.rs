@@ -14,29 +14,29 @@ use lifeguard_derive::LifeModel;
 pub struct ApPaymentApplication {
     #[primary_key]
     pub id: uuid::Uuid,
-    
+
     #[foreign_key = "ap_payments(id) ON DELETE CASCADE"]
     #[indexed]
     pub payment_id: uuid::Uuid,
-    
+
     #[foreign_key = "vendor_invoices(id) ON DELETE CASCADE"]
     #[indexed]
     pub invoice_id: uuid::Uuid,
-    
+
     #[default_value = "0"]
     #[column_type = "NUMERIC(19, 4)"]
     pub applied_amount: rust_decimal::Decimal,
-    
+
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub applied_at: chrono::NaiveDateTime,
-    
+
     pub applied_by: Option<uuid::Uuid>,
-    
+
     pub notes: Option<String>,
-    
+
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub created_at: chrono::NaiveDateTime,
-    
+
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub updated_at: chrono::NaiveDateTime,
 }

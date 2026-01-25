@@ -9,12 +9,12 @@
 
 pub mod bank;
 pub mod bank_account;
-pub mod bank_transaction;
-pub mod bank_statement;
 pub mod bank_reconciliation;
+pub mod bank_statement;
+pub mod bank_transaction;
 
 pub use bank::Bank;
 pub use bank_account::BankAccount;
-pub use bank_transaction::BankTransaction;
-pub use bank_statement::BankStatement;
 pub use bank_reconciliation::BankReconciliation;
+pub use bank_statement::BankStatement;
+pub use bank_transaction::BankTransaction;
