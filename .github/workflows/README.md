@@ -86,7 +86,7 @@ If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also
 
 **Release notes template**: `.github/release-notes-template.md` defines the structure (Summary, Features, Fixes, Other). Use `{{VERSION}}` for the version; `[brackets]` are hints for the model. Override via `--template` in the workflow or run `rerp release generate-notes` locally.
 
-**Version source**: `components/Cargo.toml` `[workspace.package].version`. The same value is written to all `[package]` / `[workspace.package].version` in Cargo.toml across the repo.
+**Version source**: `components/Cargo.toml` `[workspace.package].version`. The same value is written to all `[package]` / `[workspace.package].version` in Cargo.toml across the repo, including the **root `Cargo.toml`** `[workspace.package].version` (which is explicitly kept in sync even if it has drifted).
 
 ---
 

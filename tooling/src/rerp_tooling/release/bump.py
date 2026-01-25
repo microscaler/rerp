@@ -1,7 +1,10 @@
 """Bump version in all Cargo.toml [package] and [workspace.package] sections.
 
 Source of truth: components/Cargo.toml [workspace.package].version.
-Walks the entire repo (rglob) for Cargo.toml; excludes target, .git, .venv, node_modules, build, dist.
+Walks the repo from the root (project_root) for every Cargo.toml: root, components/, entities/,
+microservices/, and any other Cargo.toml under the tree. Excludes paths containing: target, .git,
+.venv, venv, env, __pycache__, node_modules, node_packages, build, dist, tmp. The root Cargo.toml [workspace.package].version is
+explicitly ensured to match the new version (covers drift from components).
 Accepts version = \"v0.1.0\" or \"0.1.0\" when reading; always writes \"X.Y.Z\" (no \"v\") to Cargo.toml.
 Tags remain \"vX.Y.Z\" (workflow adds \"v\" when creating the git tag).
 """
@@ -16,8 +19,22 @@ from pathlib import Path
 # Sections that define a package/workspace version we own (not [dependencies]).
 VERSION_SECTIONS = ("package", "workspace.package")
 
-# Paths to skip when walking for Cargo.toml (e.g. target, deps, vendored).
-SKIP_PARTS = ("target", ".git", ".venv", "node_modules", "build", "dist")
+# Directory names to skip when walking for Cargo.toml (any path segment).
+# Covers: Rust (target, build, dist), VCS (.git), Python (.venv, venv, env, __pycache__),
+# Node (node_modules, node_packages), and other artifact/tool dirs (tmp).
+SKIP_PARTS = (
+    "target",
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    "node_modules",
+    "node_packages",
+    "build",
+    "dist",
+    "tmp",
+)
 
 
 def _read_current(components_toml: Path) -> str:
@@ -87,8 +104,37 @@ def _replace_in_file(path: Path, old: str, new: str) -> bool:
     return replaced
 
 
+def _set_workspace_package_version(path: Path, new: str) -> bool:
+    """Set [workspace.package].version to new in path. Returns True only if the value changed."""
+    text = path.read_text()
+    lines = text.splitlines(keepends=True)
+    out: list[str] = []
+    in_sec = False
+    changed = False
+    for line in lines:
+        s = line.strip()
+        if s.startswith("["):
+            in_sec = s.strip("[]").strip() == "workspace.package"
+            out.append(line)
+            continue
+        if in_sec:
+            m = re.match(r'^(\s*version\s*=\s*")v?(\d+\.\d+\.\d+)(")', line)
+            if m:
+                if m.group(2) != new:
+                    # Preserve trailing content (e.g. newline, comment) after the closing quote
+                    out.append(m.group(1) + new + '"' + line[m.end() :])
+                    changed = True
+                else:
+                    out.append(line)
+                continue
+        out.append(line)
+    if changed:
+        path.write_text("".join(out))
+    return changed
+
+
 def _cargo_toml_paths(project_root: Path) -> list[Path]:
-    """All Cargo.toml under project_root (root, components/, entities/, microservices/, etc.), excluding SKIP_PARTS."""
+    """All Cargo.toml under project_root (repo root): root, components/, entities/, microservices/, and everything else; excluding SKIP_PARTS."""
     out: list[Path] = []
     for p in project_root.rglob("Cargo.toml"):
         if any(part in p.parts for part in SKIP_PARTS):
@@ -119,6 +165,18 @@ def run(project_root: Path, bump: str) -> int:
                 updated.append(p.relative_to(project_root))
         except Exception as e:
             print(f"Error updating {p}: {e}", file=sys.stderr)
+            return 1
+
+    # Ensure root Cargo.toml [workspace.package].version stays in sync (handles drift from components)
+    root_cargo = project_root / "Cargo.toml"
+    if root_cargo.is_file():
+        try:
+            if _set_workspace_package_version(root_cargo, new):
+                rel = root_cargo.relative_to(project_root)
+                if rel not in updated:
+                    updated.append(rel)
+        except Exception as e:
+            print(f"Error updating root {root_cargo}: {e}", file=sys.stderr)
             return 1
 
     if not updated:
