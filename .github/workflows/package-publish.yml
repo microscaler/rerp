@@ -1,0 +1,212 @@
+name: Package and Publish
+
+on:
+  workflow_run:
+    workflows: ["RERP CI"]
+    types:
+      - completed
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  download-copy-package-push-containers:
+    name: Download Copy Package and Push Containers
+    # Only run on successful CI workflow completion for push events (not PRs)
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      (github.event.workflow_run.head_branch == 'main' || 
+       github.event.workflow_run.head_branch == 'develop' || 
+       startsWith(github.event.workflow_run.head_branch, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read  # Required to download artifacts from another workflow
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      extra_tag: ${{ steps.tag.outputs.extra_tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Python and tooling (for validate)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+
+      - name: Download artifacts from CI workflow
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: microservices-binaries-*
+          merge-multiple: false
+
+      - name: Copy microservices binaries (amd64) from build-multiarch artifacts
+        run: |
+          mkdir -p build_artifacts/amd64
+          cp -r microservices-binaries-amd64/* build_artifacts/amd64/ || echo "No amd64 artifacts"
+
+      - name: Copy microservices binaries (arm64) from build-multiarch artifacts
+        run: |
+          mkdir -p build_artifacts/arm64
+          cp -r microservices-binaries-arm64/* build_artifacts/arm64/ || echo "No arm64 artifacts"
+
+      - name: Copy microservices binaries (arm) from build-multiarch artifacts
+        run: |
+          mkdir -p build_artifacts/arm
+          cp -r microservices-binaries-arm/* build_artifacts/arm/ || echo "No arm artifacts"
+
+      - name: Validate build_artifacts
+        run: tooling/.venv/bin/rerp docker validate-build-artifacts
+
+      - name: Set image tag
+        id: tag
+        run: |
+          REF="${{ github.event.workflow_run.head_branch }}"
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          if [[ "$REF" == refs/tags/v* ]]; then
+            echo "tag=${REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+            echo "extra_tag=" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${SHA:0:7}" >> "$GITHUB_OUTPUT"
+            if [[ "$REF" == "main" ]]; then
+              echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
+            else
+              echo "extra_tag=" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Upload build_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build_artifacts
+          retention-days: 1
+
+  build-push-service:
+    name: Build and push ${{ matrix.service }}
+    needs: [download-copy-package-push-containers]
+    if: needs.download-copy-package-push-containers.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write  # required for actions/attest-build-provenance (create attestation API)
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Copy microservices binaries from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build_artifacts
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: ${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata for ${{ matrix.service }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
+          tags: type=raw,value=${{ needs.download-copy-package-push-containers.outputs.tag }}
+
+      - name: Build and push ${{ matrix.service }}
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/microservices/Dockerfile.${{ matrix.service }}
+          push: true
+          tags: ${{ format('ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.tag) }}${{ needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+      - name: Attest ${{ matrix.service }}
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+  verify-published-images:
+    name: Verify published images
+    needs: [download-copy-package-push-containers, build-push-service]
+    if: needs.download-copy-package-push-containers.result == 'success' && needs.build-push-service.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read  # for docker buildx imagetools inspect of ghcr.io images
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify published images
+        run: |
+          set -e
+          TAG="${{ needs.download-copy-package-push-containers.outputs.tag }}"
+          OWNER="${{ github.repository_owner }}"
+          echo "⏳ Waiting 10s for registry propagation after parallel pushes..."
+          sleep 10
+          for name in general-ledger invoice accounts-receivable accounts-payable bank-sync asset budget edi financial-reports bff; do
+            img="ghcr.io/${OWNER}/rerp-accounting-${name}:${TAG}"
+            echo "🔍 Inspecting $img ..."
+            out=$(docker buildx imagetools inspect "$img" 2>&1) || { echo "❌ $name: imagetools inspect failed:"; echo "$out"; exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/amd64'   || { echo "❌ $name: missing linux/amd64";   exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/arm64'  || { echo "❌ $name: missing linux/arm64";  exit 1; }
+            echo "$out" | grep -qE 'Platform:.*linux/arm/v7' || { echo "❌ $name: missing linux/arm/v7"; exit 1; }
+            echo "✅ $name: linux/amd64, linux/arm64, linux/arm/v7"
+          done
+          echo "🎉 All 10 microservice images verified (linux/amd64, linux/arm64, linux/arm/v7)."
