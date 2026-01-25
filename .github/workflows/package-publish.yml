@@ -5,7 +5,6 @@ on:
     workflows: ["RERP CI"]
     types:
       - completed
-    branches: [main, develop]
 
 permissions:
   contents: read
@@ -19,10 +18,7 @@ jobs:
     # Only run on successful CI workflow completion for push events (not PRs)
     if: |
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      (github.event.workflow_run.head_branch == 'main' || 
-       github.event.workflow_run.head_branch == 'develop' || 
-       startsWith(github.event.workflow_run.head_branch, 'refs/tags/v'))
+      github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -79,18 +75,34 @@ jobs:
       - name: Set image tag
         id: tag
         run: |
-          REF="${{ github.event.workflow_run.head_branch }}"
+          # Determine the ref from the workflow run
+          # For tags: head_branch will be empty, so we fetch tags matching the SHA
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
           SHA="${{ github.event.workflow_run.head_sha }}"
-          if [[ "$REF" == refs/tags/v* ]]; then
-            echo "tag=${REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          
+          # Check if this is a tag by looking for a tag at this commit
+          git fetch --tags
+          TAG_REF=$(git describe --exact-match "$SHA" 2>/dev/null || echo "")
+          
+          if [[ -n "$TAG_REF" && "$TAG_REF" == v* ]]; then
+            # This is a version tag
+            echo "tag=${TAG_REF#v}" >> "$GITHUB_OUTPUT"
             echo "extra_tag=" >> "$GITHUB_OUTPUT"
-          else
+            echo "Detected version tag: $TAG_REF"
+          elif [[ "$BRANCH" == "main" ]]; then
+            # Main branch - use sha tag and latest
             echo "tag=sha-${SHA:0:7}" >> "$GITHUB_OUTPUT"
-            if [[ "$REF" == "main" ]]; then
-              echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
-            else
-              echo "extra_tag=" >> "$GITHUB_OUTPUT"
-            fi
+            echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
+            echo "Building from main branch"
+          elif [[ "$BRANCH" == "develop" ]]; then
+            # Develop branch - use sha tag only
+            echo "tag=sha-${SHA:0:7}" >> "$GITHUB_OUTPUT"
+            echo "extra_tag=" >> "$GITHUB_OUTPUT"
+            echo "Building from develop branch"
+          else
+            # Other branches/scenarios - skip publishing
+            echo "Skipping: not main, develop, or a version tag"
+            exit 1
           fi
 
       - name: Upload build_artifacts
