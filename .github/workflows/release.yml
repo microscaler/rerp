@@ -1,10 +1,11 @@
 # Release workflow: bump Cargo.toml, generate notes (OpenAI or Anthropic), commit, tag, push, create GitHub Release.
-# Triggers existing CI on refs/tags/v* to build and publish containers.
+# Tag push uses REPO_PAT so it triggers ci.yml; ci.yml builds and pushes containers only on refs/tags/v*.
 # PRD: docs/RELEASE_MANAGEMENT_PRD.md
 #
-# Required secrets for release notes (use one per --provider):
-#   OPENAI_API_KEY (https://platform.openai.com/api-keys) when provider=openai
-#   ANTHROPIC_API_KEY (https://console.anthropic.com/) when provider=anthropic
+# Required secrets:
+#   REPO_PAT: repo PAT (or GitHub App token) with repo scope—used for checkout/push so the tag push triggers ci.yml.
+#     (GITHUB_TOKEN pushes do not trigger workflows.) Create at: Settings → Developer settings → Personal access tokens.
+#   OPENAI_API_KEY (when provider=openai), ANTHROPIC_API_KEY (when provider=anthropic)
 
 name: Release
 
@@ -51,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ env.BRANCH }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPO_PAT }}
           fetch-depth: 0
 
       - name: Set up Python

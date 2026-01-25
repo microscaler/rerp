@@ -304,8 +304,8 @@ jobs:
   download-copy-package-push-containers:
     name: Download Copy Package and Push Containers
     needs: [build-multiarch]
-    # Future: restrict to merge-on-main only (merge = push to main).
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')) && needs.build-multiarch.result == 'success'
+    # Containers only on tag push (release). main/develop get full CI but no image build/push.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
