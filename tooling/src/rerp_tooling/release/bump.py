@@ -90,7 +90,7 @@ def _replace_in_file(path: Path, old: str, new: str) -> bool:
             in_sec = s.strip("[]").strip() in VERSION_SECTIONS
             out.append(line)
             continue
-        if in_sec and not replaced:
+        if in_sec:
             # Match version = "0.1.0" or version = "v0.1.0"; replace with version = "X.Y.Z" (always no "v")
             pat = r'(\s*version\s*=\s*")v?' + re.escape(old) + r'"'
             if re.search(pat, line):
@@ -137,7 +137,11 @@ def _cargo_toml_paths(project_root: Path) -> list[Path]:
     """All Cargo.toml under project_root (repo root): root, components/, entities/, microservices/, and everything else; excluding SKIP_PARTS."""
     out: list[Path] = []
     for p in project_root.rglob("Cargo.toml"):
-        if any(part in p.parts for part in SKIP_PARTS):
+        try:
+            rel = p.relative_to(project_root)
+        except ValueError:
+            continue
+        if any(part in rel.parts for part in SKIP_PARTS):
             continue
         try:
             if not p.is_file():
@@ -163,7 +167,7 @@ def run(project_root: Path, bump: str) -> int:
         try:
             if _replace_in_file(p, old, new):
                 updated.append(p.relative_to(project_root))
-        except Exception as e:
+        except (OSError, ValueError) as e:
             print(f"Error updating {p}: {e}", file=sys.stderr)
             return 1
 
@@ -175,7 +179,7 @@ def run(project_root: Path, bump: str) -> int:
                 rel = root_cargo.relative_to(project_root)
                 if rel not in updated:
                     updated.append(rel)
-        except Exception as e:
+        except (OSError, ValueError) as e:
             print(f"Error updating root {root_cargo}: {e}", file=sys.stderr)
             return 1
 
@@ -190,7 +194,7 @@ def run(project_root: Path, bump: str) -> int:
     # GitHub Actions: append to GITHUB_OUTPUT for step outputs
     go = os.environ.get("GITHUB_OUTPUT")
     if go:
-        with open(go, "a") as f:
+        with Path(go).open("a") as f:
             f.write(f"version={new}\n")
 
     return 0

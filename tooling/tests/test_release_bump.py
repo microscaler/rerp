@@ -94,6 +94,17 @@ class TestReplaceInFile:
         assert 'version = "0.1.1"' in p.read_text()
         assert "v0.1.1" not in p.read_text()
 
+    def test_replaces_both_package_and_workspace_package_version(self, tmp_path: Path) -> None:
+        p = tmp_path / "Cargo.toml"
+        p.write_text(
+            '[package]\nname = "x"\nversion = "0.1.0"\n\n'
+            '[workspace.package]\nversion = "0.1.0"\nedition = "2021"\n'
+        )
+        assert _replace_in_file(p, "0.1.0", "0.1.1") is True
+        text = p.read_text()
+        assert text.count('version = "0.1.1"') == 2
+        assert 'version = "0.1.0"' not in text
+
 
 class TestCargoTomlPaths:
     def test_excludes_target(self, tmp_path: Path) -> None:
@@ -117,7 +128,7 @@ class TestCargoTomlPaths:
 
     def test_excludes_venv_node_modules_tmp_and_artifacts(self, tmp_path: Path) -> None:
         (tmp_path / "lib").mkdir()
-        (tmp_path / "lib" / "Cargo.toml").write_text("[package]\nversion = \"0.1.0\"\n")
+        (tmp_path / "lib" / "Cargo.toml").write_text('[package]\nversion = "0.1.0"\n')
         for skip in ("venv", "node_modules", "node_packages", "tmp", "__pycache__"):
             (tmp_path / skip).mkdir(parents=True)
             (tmp_path / skip / "Cargo.toml").write_text("")
@@ -128,13 +139,19 @@ class TestCargoTomlPaths:
             assert not any(skip in r for r in rels)
 
     def test_includes_root_components_entities_microservices(self, tmp_path: Path) -> None:
-        (tmp_path / "Cargo.toml").write_text("[workspace]\n[workspace.package]\nversion = \"0.1.0\"\n")
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
         (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text("[workspace]\n[workspace.package]\nversion = \"0.1.0\"\n")
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
         (tmp_path / "entities").mkdir()
-        (tmp_path / "entities" / "Cargo.toml").write_text("[package]\nversion = \"0.1.0\"\n")
+        (tmp_path / "entities" / "Cargo.toml").write_text('[package]\nversion = "0.1.0"\n')
         (tmp_path / "microservices").mkdir()
-        (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\n[workspace.package]\nversion = \"0.1.0\"\n")
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
         got = _cargo_toml_paths(tmp_path)
         rels = [str(p.relative_to(tmp_path)) for p in got]
         assert "Cargo.toml" in rels
@@ -146,7 +163,9 @@ class TestCargoTomlPaths:
 
 class TestRun:
     def test_success_updates_all_matching(self, tmp_path: Path) -> None:
-        (tmp_path / "Cargo.toml").write_text('[workspace]\n[workspace.package]\nversion = "0.1.0"\n')
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
+        )
         (tmp_path / "components").mkdir()
         (tmp_path / "components" / "Cargo.toml").write_text(
             '[workspace]\n\n[workspace.package]\nversion = "0.1.0"\n'
@@ -156,7 +175,9 @@ class TestRun:
             '[workspace]\n\n[workspace.package]\nversion = "0.1.0"\n'
         )
         (tmp_path / "entities").mkdir()
-        (tmp_path / "entities" / "Cargo.toml").write_text('[package]\nname = "e"\nversion = "0.1.0"\n')
+        (tmp_path / "entities" / "Cargo.toml").write_text(
+            '[package]\nname = "e"\nversion = "0.1.0"\n'
+        )
 
         rc = run(tmp_path, "patch")
 
@@ -179,7 +200,9 @@ class TestRun:
             '[workspace]\n\n[workspace.package]\nversion = "0.2.0"\n'
         )
         (tmp_path / "entities").mkdir()
-        (tmp_path / "entities" / "Cargo.toml").write_text('[package]\nname = "e"\nversion = "0.2.0"\n')
+        (tmp_path / "entities" / "Cargo.toml").write_text(
+            '[package]\nname = "e"\nversion = "0.2.0"\n'
+        )
 
         rc = run(tmp_path, "patch")
 

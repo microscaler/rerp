@@ -391,7 +391,9 @@ def __build_parser():
     )
 
     # --- release ---
-    prl = sub.add_parser("release", help="Release: bump, generate-notes (Cargo.toml, GitHub Release)")
+    prl = sub.add_parser(
+        "release", help="Release: bump, generate-notes (Cargo.toml, GitHub Release)"
+    )
     prl_sub = prl.add_subparsers(dest="release_cmd")
     prlb = prl_sub.add_parser(
         "bump",

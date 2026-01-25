@@ -49,6 +49,18 @@ class TestGetCommitsSince:
             got = _get_commits_since(tmp_path, "v1.0.0")
         assert got == []
 
+    def test_raises_system_exit_on_invalid_ref(self, tmp_path: Path) -> None:
+        import subprocess
+
+        err = subprocess.CalledProcessError(
+            128,
+            ["git", "log", "v99..HEAD", "--pretty=format:%s"],
+            stderr="fatal: bad revision 'v99..HEAD'\n",
+        )
+        with patch("subprocess.run", side_effect=err), pytest.raises(SystemExit) as exc_info:
+            _get_commits_since(tmp_path, "v99")
+        assert exc_info.value.code == 1
+
 
 class TestLoadTemplate:
     def test_returns_default_when_none(self) -> None:
@@ -71,72 +83,90 @@ class TestRun:
 
     def test_succeeds_with_since_tag_and_mocked_openai(self, tmp_path: Path) -> None:
         out = tmp_path / "out.md"
-        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]):
-            with patch("rerp_tooling.release.notes._call_openai", return_value="# Release v1.0.0\n\nDone."):
-                with patch.dict("os.environ", {}, clear=False):
-                    rc = run(tmp_path, "1.0.0", since_tag="v0.9.0", output_path=out, provider="openai")
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]),
+            patch(
+                "rerp_tooling.release.notes._call_openai", return_value="# Release v1.0.0\n\nDone."
+            ),
+            patch.dict("os.environ", {}, clear=False),
+        ):
+            rc = run(tmp_path, "1.0.0", since_tag="v0.9.0", output_path=out, provider="openai")
         assert rc == 0
         assert "Release v1.0.0" in out.read_text()
 
     def test_succeeds_stdout_when_no_output_path(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        with patch("rerp_tooling.release.notes._get_previous_tag", return_value="v0.9.0"):
-            with patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]):
-                with patch("rerp_tooling.release.notes._call_openai", return_value="Notes here"):
-                    rc = run(tmp_path, "1.0.0", output_path=None, provider="openai")
+        with (
+            patch("rerp_tooling.release.notes._get_previous_tag", return_value="v0.9.0"),
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch("rerp_tooling.release.notes._call_openai", return_value="Notes here"),
+        ):
+            rc = run(tmp_path, "1.0.0", output_path=None, provider="openai")
         assert rc == 0
         assert "Notes here" in capsys.readouterr().out
 
     def test_run_provider_anthropic_uses_call_anthropic(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]):
-            with patch(
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: x"]),
+            patch(
                 "rerp_tooling.release.notes._call_anthropic",
                 return_value="# Release v1.0.0\n\nClaude notes.",
-            ):
-                rc = run(
-                    tmp_path,
-                    "1.0.0",
-                    since_tag="v0.9.0",
-                    output_path=None,
-                    provider="anthropic",
-                )
+            ),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=None,
+                provider="anthropic",
+            )
         assert rc == 0
         assert "Claude notes" in capsys.readouterr().out
 
     def test_run_respects_release_notes_provider_env(self, tmp_path: Path) -> None:
         out = tmp_path / "out.md"
-        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]):
-            with patch(
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch(
                 "rerp_tooling.release.notes._call_anthropic",
                 return_value="From Anthropic via env",
-            ):
-                with patch.dict("os.environ", {"RELEASE_NOTES_PROVIDER": "anthropic"}, clear=False):
-                    rc = run(
-                        tmp_path,
-                        "1.0.0",
-                        since_tag="v0.9.0",
-                        output_path=out,
-                        provider=None,
-                    )
+            ),
+            patch.dict("os.environ", {"RELEASE_NOTES_PROVIDER": "anthropic"}, clear=False),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=out,
+                provider=None,
+            )
         assert rc == 0
         assert "From Anthropic via env" in out.read_text()
 
-    def test_run_provider_anthropic_fails_without_anthropic_api_key(
-        self, tmp_path: Path
-    ) -> None:
-        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]):
-            with patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}, clear=False):
-                with pytest.raises(SystemExit) as exc_info:
-                    run(tmp_path, "1.0.0", since_tag="v0.9.0", provider="anthropic")
+    def test_run_provider_anthropic_fails_without_anthropic_api_key(self, tmp_path: Path) -> None:
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}, clear=False),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            run(tmp_path, "1.0.0", since_tag="v0.9.0", provider="anthropic")
         assert exc_info.value.code == 1
 
     def test_run_returns_1_when_empty_body(self, tmp_path: Path) -> None:
-        with patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]):
-            with patch("rerp_tooling.release.notes._call_openai", return_value=""):
-                rc = run(tmp_path, "1.0.0", since_tag="v0.9.0", output_path=tmp_path / "out.md", provider="openai")
+        with (
+            patch("rerp_tooling.release.notes._get_commits_since", return_value=["a"]),
+            patch("rerp_tooling.release.notes._call_openai", return_value=""),
+        ):
+            rc = run(
+                tmp_path,
+                "1.0.0",
+                since_tag="v0.9.0",
+                output_path=tmp_path / "out.md",
+                provider="openai",
+            )
         assert rc == 1
 
 
@@ -156,14 +186,16 @@ class TestCallAnthropic:
             def __exit__(self, *a: object) -> None:
                 pass
 
-        with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}, clear=False):
-            with patch("urllib.request.urlopen", return_value=FakeResp()):
-                got = _call_anthropic(
-                    ["feat: x"],
-                    "Format here",
-                    "1.0.0",
-                    "claude-sonnet-4-5-20250929",
-                )
+        with (
+            patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}, clear=False),
+            patch("urllib.request.urlopen", return_value=FakeResp()),
+        ):
+            got = _call_anthropic(
+                ["feat: x"],
+                "Format here",
+                "1.0.0",
+                "claude-sonnet-4-5-20250929",
+            )
         assert got == "# Release v1.0.0\n\nAnthropic."
 
     def test_strips_markdown_code_fence(self) -> None:
@@ -186,7 +218,9 @@ class TestCallAnthropic:
             def __exit__(self, *a: object) -> None:
                 pass
 
-        with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "k"}, clear=False):
-            with patch("urllib.request.urlopen", return_value=FakeResp()):
-                got = _call_anthropic([], "F", "2.0.0", "claude-sonnet-4-5-20250929")
+        with (
+            patch.dict("os.environ", {"ANTHROPIC_API_KEY": "k"}, clear=False),
+            patch("urllib.request.urlopen", return_value=FakeResp()),
+        ):
+            got = _call_anthropic([], "F", "2.0.0", "claude-sonnet-4-5-20250929")
         assert got == "# Release v2.0.0\n\nDone."

@@ -69,11 +69,19 @@ cargo clippy --workspace
 
 ### 4. Commit Your Changes
 
-Follow conventional commit messages:
+Commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This is enforced in CI via commitlint; PRs with invalid commit messages will fail.
+
+Format: `<type>[optional scope]: <description>`
+
+Examples:
 - `feat: add new service endpoint`
+- `feat(auth): add login endpoint`
 - `fix: correct validation logic`
 - `docs: update API documentation`
 - `test: add tests for inventory service`
+- `chore(deps): bump crate-x to 1.2`
+
+Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`, `revert`.
 
 ### 5. Submit a Pull Request
 
@@ -140,7 +148,7 @@ We welcome contributions in the following areas:
 
 ### Git Workflow
 
-- Use meaningful commit messages
+- Use [Conventional Commits](https://www.conventionalcommits.org/) (enforced in CI)
 - Keep commits focused and atomic
 - Rebase on main before submitting PRs
 - Write clear PR descriptions

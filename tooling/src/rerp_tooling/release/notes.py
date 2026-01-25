@@ -53,13 +53,21 @@ def _get_previous_tag(project_root: Path) -> str | None:
 def _get_commits_since(project_root: Path, ref: str) -> list[str]:
     """Return list of commit subject lines from ref..HEAD (excluding ref, including HEAD)."""
 
-    out = subprocess.run(
-        ["git", "log", f"{ref}..HEAD", "--pretty=format:%s"],
-        cwd=project_root,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    try:
+        out = subprocess.run(
+            ["git", "log", f"{ref}..HEAD", "--pretty=format:%s"],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        hint = f" {e.stderr.strip()}" if (e.stderr and e.stderr.strip()) else ""
+        print(
+            f"Invalid git ref for --since-tag: {ref!r}. Check the tag or commit exists.{hint}",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from e
     if not out.stdout.strip():
         return []
     return [s for s in out.stdout.strip().split("\n") if s]
@@ -75,14 +83,16 @@ def _call_openai(commits: list[str], format_instructions: str, version: str, mod
     """Call OpenAI chat completions. Returns the generated markdown."""
     key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not key:
-        print("OPENAI_API_KEY is not set. Add it as a repository secret for release notes.", file=sys.stderr)
+        print(
+            "OPENAI_API_KEY is not set. Add it as a repository secret for release notes.",
+            file=sys.stderr,
+        )
         raise SystemExit(1)
 
     user_content = (
         f"Follow this format for the release note:\n\n{format_instructions}\n\n"
         f"Version to use in the title: {version}\n\n"
-        "Commit messages (one per line):\n"
-        + "\n".join(commits)
+        "Commit messages (one per line):\n" + "\n".join(commits)
     )
 
     payload = {
@@ -145,8 +155,7 @@ def _call_anthropic(commits: list[str], format_instructions: str, version: str, 
     user_content = (
         f"Follow this format for the release note:\n\n{format_instructions}\n\n"
         f"Version to use in the title: {version}\n\n"
-        "Commit messages (one per line):\n"
-        + "\n".join(commits)
+        "Commit messages (one per line):\n" + "\n".join(commits)
     )
     system = (
         "You generate release notes in Markdown from a list of commit messages. "
@@ -186,7 +195,7 @@ def _call_anthropic(commits: list[str], format_instructions: str, version: str, 
         raise SystemExit(1) from e
 
     content = ""
-    for block in (data.get("content") or []):
+    for block in data.get("content") or []:
         if block.get("type") == "text":
             content = block.get("text") or ""
             break
