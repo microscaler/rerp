@@ -1,6 +1,6 @@
 # Multi-stage build for RERP website
 # Stage 1: Build the SolidJS application
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM --platform=linux/amd64 node:25-alpine AS builder
 
 # Enable corepack for yarn support
 # Use Yarn v1 to match the lockfile format
