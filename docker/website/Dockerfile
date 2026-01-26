@@ -14,10 +14,6 @@ COPY ui/website/package.json ui/website/yarn.lock* ./
 # Install dependencies using yarn
 RUN yarn install --frozen-lockfile
 
-# Copy shared components to parent directory (matches path resolution)
-# This allows @shared alias to resolve correctly
-COPY ui/shared/ ../shared/
-
 # Copy source files
 COPY ui/website/ ./
 
