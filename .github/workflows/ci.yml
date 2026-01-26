@@ -57,14 +57,20 @@ jobs:
             echo "Warning: Could not read version from components/Cargo.toml, skipping validation"
             exit 0
           fi
-          # Get latest tag from GitHub API
-          LATEST=$(rerp ci get-latest-tag || echo "")
-          if [ -n "$LATEST" ]; then
-            echo "Validating version: current=$CURRENT, latest=$LATEST"
-            rerp ci validate-version --current "$CURRENT" --latest "$LATEST" || exit 1
-            echo "Version validation passed"
+          # Get latest tag from GitHub API (with retry logic and Fibonacci backoff)
+          # If command fails after retries, fail the job to prevent silent version downgrade
+          if LATEST=$(rerp ci get-latest-tag); then
+            if [ -n "$LATEST" ]; then
+              echo "Validating version: current=$CURRENT, latest=$LATEST"
+              rerp ci validate-version --current "$CURRENT" --latest "$LATEST" || exit 1
+              echo "Version validation passed"
+            else
+              echo "No previous releases found, allowing first release"
+            fi
           else
-            echo "No previous releases found, allowing first release"
+            echo "Error: Failed to get latest tag from GitHub API after retries. Cannot validate version safely."
+            echo "This prevents accidental version downgrades. Please retry the workflow."
+            exit 1
           fi
 
   conventional-commits:

@@ -173,3 +173,33 @@ m = re.search(r"(ports\s*=\s*\{)(.*?)(\s*\})", content, re.DOTALL)
 - `print("Error: GITHUB_TOKEN environment variable is required", file=sys.stderr)`
 
 **Linting:** Added pygrep-hook rule `PGH003` to detect empty print statements to stderr/stdout (see `tooling/pyproject.toml`).
+
+---
+
+## Fixed: Version validation treats API failures as "no releases" (2025-01-26)
+
+**File:** `.github/workflows/ci.yml` lines 60-68, `tooling/src/rerp_tooling/ci/get_latest_tag.py`
+
+**Issue:** The version validation logic in CI treated GitHub API failures the same as "no previous releases." When `rerp ci get-latest-tag` failed due to network issues, rate limiting, or other errors, the workflow used `|| echo ""` which set `LATEST` to empty. The `if [ -n "$LATEST" ]` check then skipped validation, assuming no releases existed. This could allow a version downgrade to be released if the GitHub API was unavailable during a release build, undermining the protection against accidental downgrades.
+
+**Root Cause:** The `get_latest_tag()` function had no retry logic, so transient failures (network errors, rate limits, temporary server errors) immediately failed. The workflow then masked these failures by treating them as "no releases."
+
+**Fix:**
+1. **Added retry logic with Fibonacci backoff** to `get_latest_tag()`:
+   - Retries on HTTPError (except 404) and URLError
+   - Uses Fibonacci sequence: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233 seconds
+   - Maximum total wait time: 300 seconds
+   - Logs each retry attempt with attempt number and wait time
+   - Raises `SystemExit` only after all retries are exhausted
+
+2. **Updated workflow** to fail the job if `get-latest-tag` fails after retries:
+   - Removed `|| echo ""` which masked failures
+   - Added explicit check: if command fails (non-zero exit), fail the job with error message
+   - Only allows releases when: (1) API succeeds and returns empty (no releases), or (2) API succeeds and version validation passes
+
+**Tests:** Added comprehensive tests for retry logic:
+- `test_retries_on_http_error_then_succeeds`: Verifies retry on 503 errors
+- `test_retries_on_urlerror_then_succeeds`: Verifies retry on network errors
+- `test_exhausts_retries_and_raises`: Verifies SystemExit after all retries
+- `test_fibonacci_backoff_sequence`: Verifies backoff sequence generation
+- `test_run_fails_after_retries_exhausted`: Verifies run() returns 1 on failure
