@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #1e40af;
+  --color-secondary: #059669;
+  --color-accent: #dc2626;
+  --font-sans: Inter, sans-serif;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
