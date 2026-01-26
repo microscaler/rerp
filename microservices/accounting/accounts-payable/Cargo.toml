@@ -1,6 +1,6 @@
 [package]
 name = "accounts_payable"
-version = "0.1.2"
+version = "0.1.0"
 edition = "2021"
 
 [features]
