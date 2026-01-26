@@ -38,7 +38,10 @@ SKIP_PARTS = (
 
 
 def _read_current(components_toml: Path) -> str:
-    """Read version from components/Cargo.toml [workspace.package].version. Raises on parse error."""
+    """Read version from components/Cargo.toml [workspace.package].version. Raises on parse error.
+
+    Supports X.Y.Z and X.Y.Z-rc.N (or other prerelease). Returns value without leading 'v'.
+    """
     text = components_toml.read_text()
     in_sec = False
     for line in text.splitlines():
@@ -47,22 +50,49 @@ def _read_current(components_toml: Path) -> str:
             in_sec = s.strip("[]").strip() == "workspace.package"
             continue
         if in_sec:
-            m = re.match(r'^\s*version\s*=\s*"v?(\d+\.\d+\.\d+)"', line)
+            # X.Y.Z or X.Y.Z-<prerelease>; v-prefix is stripped
+            m = re.match(r'^\s*version\s*=\s*"v?(\d+\.\d+\.\d+(?:-[\w.-]+)?)"', line)
             if m:
-                return m.group(1)  # Always return canonical X.Y.Z (no "v") for Cargo.toml
+                return m.group(1)
     msg = "Could not find [workspace.package].version in components/Cargo.toml"
     raise SystemExit(msg)
 
 
 def _next_version(old: str, bump: str) -> str:
-    """Compute next semver from old (X.Y.Z or vX.Y.Z) and bump (patch|minor|major). Always returns X.Y.Z."""
+    """Compute next version from old (X.Y.Z or X.Y.Z-rc.N or v-prefixed) and bump.
+
+    Bump types:
+      patch, minor, major: strip prerelease if present, then bump. (0.39.0-rc.2 + patch -> 0.39.1)
+      rc: create or increment -rc.N. (0.39.0 -> 0.39.0-rc.1; 0.39.0-rc.2 -> 0.39.0-rc.3)
+      release (or promote): drop prerelease. (0.39.0-rc.2 -> 0.39.0). Errors if already full.
+
+    Returns X.Y.Z or X.Y.Z-rc.N (no leading 'v').
+    """
     old = old.lstrip("v")
-    parts = old.split(".")
-    if len(parts) != 3 or not all(p.isdigit() for p in parts):
+    m = re.match(r"^(\d+)\.(\d+)\.(\d+)(?:-([\w.-]+))?$", old)
+    if not m:
         msg = f"Invalid version in components/Cargo.toml: {old}"
         raise SystemExit(msg)
-    x, y, z = int(parts[0]), int(parts[1]), int(parts[2])
+    x, y, z = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    prerel = m.group(4)  # None or e.g. "rc.2"
+
     b = (bump or "patch").lower()
+
+    if b == "rc":
+        if not prerel:
+            return f"{x}.{y}.{z}-rc.1"
+        m2 = re.match(r"^rc\.(\d+)$", prerel)
+        if not m2:
+            msg = f"rc bump only supports -rc.N prerelease; found -{prerel}"
+            raise SystemExit(msg)
+        return f"{x}.{y}.{z}-rc.{int(m2.group(1)) + 1}"
+
+    if b in ("release", "promote"):
+        if not prerel:
+            msg = f"Already a full release ({old}). Use patch, minor, or major to create a new version."
+            raise SystemExit(msg)
+        return f"{x}.{y}.{z}"
+
     if b == "patch":
         z += 1
     elif b == "minor":
@@ -72,7 +102,7 @@ def _next_version(old: str, bump: str) -> str:
         x += 1
         y = z = 0
     else:
-        msg = f"Unknown bump: {bump}. Use patch, minor, or major."
+        msg = f"Unknown bump: {bump}. Use patch, minor, major, rc, or release."
         raise SystemExit(msg)
     return f"{x}.{y}.{z}"
 
@@ -118,11 +148,11 @@ def _set_workspace_package_version(path: Path, new: str) -> bool:
             out.append(line)
             continue
         if in_sec:
-            m = re.match(r'^(\s*version\s*=\s*")v?(\d+\.\d+\.\d+)(")', line)
+            # Match any version value (X.Y.Z or X.Y.Z-rc.N)
+            m = re.match(r'^(\s*version\s*=\s*")([^"]*)(")', line)
             if m:
                 if m.group(2) != new:
-                    # Preserve trailing content (e.g. newline, comment) after the closing quote
-                    out.append(m.group(1) + new + '"' + line[m.end() :])
+                    out.append(m.group(1) + new + m.group(3) + line[m.end() :])
                     changed = True
                 else:
                     out.append(line)

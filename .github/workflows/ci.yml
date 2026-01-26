@@ -7,6 +7,19 @@ on:
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
+    inputs:
+      run_release_jobs:
+        description: "Run container build and push jobs (release build). Set when dispatching to (re-)run release, or when invoked by release.yaml."
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  # Each ref gets its own group (tags, branches, PRs are isolated)
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # CRITICAL: Only cancel PRs, NEVER cancel pushes (branches) or tags (releases)
+  # Tags are never PRs, so they're automatically protected
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -18,6 +31,21 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
+  vars:
+    name: Set CI vars
+    runs-on: ubuntu-latest
+    outputs:
+      run_release_jobs: ${{ steps.set_vars.outputs.is_release_tag == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_release_jobs == 'true') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ./tooling
+      - id: set_vars
+        run: echo "is_release_tag=$(rerp ci is-tag)" >> $GITHUB_OUTPUT
+
   conventional-commits:
     name: Conventional Commits
     runs-on: ubuntu-latest
@@ -306,8 +334,8 @@ jobs:
   # it via outputs.tag; extra_tag=latest so images are pushed with both :0.1.1 and :latest.
   download-copy-package-push-containers:
     name: Download Copy Package and Push Containers
-    needs: [build-multiarch]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.build-multiarch.result == 'success'
+    needs: [build-multiarch, vars]
+    if: needs.vars.outputs.run_release_jobs == 'true' && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -381,8 +409,8 @@ jobs:
   # github.ref on tag push, e.g. 0.1.1), so images are associated with the GitHub Release.
   build-push-service:
     name: Build and push ${{ matrix.service }}
-    needs: [download-copy-package-push-containers]
-    if: needs.download-copy-package-push-containers.result == 'success'
+    needs: [download-copy-package-push-containers, vars]
+    if: needs.vars.outputs.run_release_jobs == 'true' && needs.download-copy-package-push-containers.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -454,8 +482,8 @@ jobs:
   # Uses the same release tag (download-copy-package-push-containers.outputs.tag) to verify images.
   verify-published-images:
     name: Verify published images
-    needs: [download-copy-package-push-containers, build-push-service]
-    if: needs.download-copy-package-push-containers.result == 'success' && needs.build-push-service.result == 'success'
+    needs: [download-copy-package-push-containers, build-push-service, vars]
+    if: needs.vars.outputs.run_release_jobs == 'true' && needs.download-copy-package-push-containers.result == 'success' && needs.build-push-service.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

@@ -63,7 +63,7 @@ def main() -> None:
     if args.command == "ci":
         if not getattr(args, "ci_cmd", None):
             print("rerp ci: missing subcommand")
-            print("  patch-brrtrouter, fix-cargo-paths")
+            print("  patch-brrtrouter, fix-cargo-paths, is-tag")
             print("  Use: rerp ci --help")
             sys.exit(1)
         ci_cli.run_ci(args, project_root)
@@ -225,7 +225,7 @@ def __build_parser():
     # --- ci ---
     pci = sub.add_parser(
         "ci",
-        help="CI/build: patch-brrtrouter (git deps for CI), fix-cargo-paths (local path deps)",
+        help="CI/build: patch-brrtrouter (git deps for CI), fix-cargo-paths (local path deps), is-tag (check if ref is tag)",
     )
     pci_sub = pci.add_subparsers(dest="ci_cmd")
     pci_p = pci_sub.add_parser(
@@ -243,6 +243,10 @@ def __build_parser():
         help="Fix brrtrouter/brrtrouter_macros path deps in a Cargo.toml to ../BRRTRouter (local dev)",
     )
     pci_f.add_argument("cargo_toml", type=Path, metavar="PATH", help="Path to Cargo.toml")
+    pci_sub.add_parser(
+        "is-tag",
+        help="Check if GITHUB_REF is a release tag (refs/tags/v*). Prints 'true' or 'false' to stdout.",
+    )
 
     # --- bff ---
     pb = sub.add_parser("bff", help="BFF OpenAPI: generate-system from sub-service specs")
@@ -413,8 +417,8 @@ def __build_parser():
         "bump",
         nargs="?",
         default="patch",
-        choices=["patch", "minor", "major"],
-        help="Bump type (default: patch)",
+        choices=["patch", "minor", "major", "rc", "release"],
+        help="Bump: patch|minor|major; rc=bump -rc.N; release=promote 0.39.0-rc.2 -> 0.39.0 (default: patch)",
     )
     prlgn = prl_sub.add_parser(
         "generate-notes",
