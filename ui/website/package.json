@@ -15,7 +15,7 @@
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.4.0",
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "solid-js": "^1.9.11"
   },
   "devDependencies": {
