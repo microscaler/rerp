@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@source "../shared/**/*.{tsx,ts,jsx,js}";
+@source "../../shared/**/*.{tsx,ts,jsx,js}";
 
 @theme {
   --color-primary: #1e40af;
