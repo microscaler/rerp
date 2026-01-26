@@ -55,11 +55,24 @@ jobs:
         working-directory: ./ui/website
         run: yarn install --frozen-lockfile
 
+      - name: Determine base path
+        id: base-path
+        run: |
+          if [ -f "ui/website/public/CNAME" ]; then
+            # Custom domain detected - use root path
+            echo "base_path=/" >> $GITHUB_OUTPUT
+            echo "base_url=https://$(cat ui/website/public/CNAME)" >> $GITHUB_OUTPUT
+          else
+            # No custom domain - use repository subpath
+            echo "base_path=/${{ github.event.repository.name }}/" >> $GITHUB_OUTPUT
+            echo "base_url=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build website
         working-directory: ./ui/website
         env:
-          VITE_BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_BASE_URL: ${{ steps.base-path.outputs.base_url }}
+          VITE_BASE_PATH: ${{ steps.base-path.outputs.base_path }}
         run: yarn build
 
       - name: Upload artifact
