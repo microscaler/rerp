@@ -102,8 +102,56 @@ def validate_version(current: str, latest: str | None, allow_same: bool = False)
     raise SystemExit(1)
 
 
+def run_validate_version_cli(
+    current: str | None,
+    latest: str | None = None,
+    allow_same: bool = False,
+) -> int:
+    """CLI helper for validate-version command.
+
+    Args:
+        current: Current version to validate (required)
+        latest: Latest version from GitHub (optional, will fetch from API if not provided)
+        allow_same: Allow same version (for patch releases)
+
+    Returns:
+        0 on success, 1 on error
+    """
+    import os
+
+    from rerp_tooling.ci.get_latest_tag import get_latest_tag
+
+    if not current:
+        print("Error: --current required", file=sys.stderr)
+        return 1
+
+    if not latest:
+        # Try to get from GitHub API
+        repo = os.environ.get("GITHUB_REPOSITORY", "")
+        token = os.environ.get("GITHUB_TOKEN", "")
+
+        if repo and token:
+            latest = get_latest_tag(repo, token)
+        else:
+            print(
+                "Error: --latest required or set GITHUB_REPOSITORY and GITHUB_TOKEN",
+                file=sys.stderr,
+            )
+            return 1
+
+    try:
+        validate_version(current, latest, allow_same=allow_same)
+        return 0
+    except SystemExit as e:
+        # SystemExit.code is the exit code (if set), otherwise args[0] if int, else 1
+        code = getattr(e, "code", None)
+        if code is None and e.args and isinstance(e.args[0], int):
+            code = e.args[0]
+        return code if code is not None else 1
+
+
 def run() -> int:
-    """CLI entry point for validate-version command."""
+    """CLI entry point for validate-version command (standalone usage)."""
     import argparse
 
     parser = argparse.ArgumentParser(description="Validate version to prevent downgrades")
@@ -113,28 +161,8 @@ def run() -> int:
 
     args = parser.parse_args()
 
-    latest = args.latest
-    if not latest:
-        # Try to get from environment or GitHub API
-        import os
-
-        from rerp_tooling.ci.get_latest_tag import get_latest_tag
-
-        repo = os.environ.get("GITHUB_REPOSITORY", "")
-        token = os.environ.get("GITHUB_TOKEN", "")
-
-        if repo and token:
-            latest = get_latest_tag(repo, token)
-        else:
-            msg = "--latest required or set GITHUB_REPOSITORY and GITHUB_TOKEN"
-            raise SystemExit(msg)
-
-    try:
-        validate_version(args.current, latest, allow_same=args.allow_same)
-        return 0
-    except SystemExit as e:
-        # SystemExit.code is the exit code (if set), otherwise args[0] if int, else 1
-        code = getattr(e, "code", None)
-        if code is None and e.args and isinstance(e.args[0], int):
-            code = e.args[0]
-        return code if code is not None else 1
+    return run_validate_version_cli(
+        current=args.current,
+        latest=args.latest,
+        allow_same=args.allow_same,
+    )

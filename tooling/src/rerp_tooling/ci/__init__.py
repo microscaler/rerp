@@ -10,8 +10,14 @@ from .patch_brrtrouter import (
     run,
     run_cargo_update,
 )
-from .validate_version import compare_versions, validate_version
-from .validate_version import run as run_validate_version
+from .validate_version import (
+    compare_versions,
+    run_validate_version_cli,
+    validate_version,
+)
+from .validate_version import (
+    run as run_validate_version,
+)
 
 __all__ = [
     "compare_versions",
@@ -24,5 +30,6 @@ __all__ = [
     "run_get_latest_tag",
     "run_is_tag",
     "run_validate_version",
+    "run_validate_version_cli",
     "validate_version",
 ]

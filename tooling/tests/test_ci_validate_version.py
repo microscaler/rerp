@@ -5,7 +5,12 @@ from unittest.mock import patch
 
 import pytest
 
-from rerp_tooling.ci.validate_version import compare_versions, run, validate_version
+from rerp_tooling.ci.validate_version import (
+    compare_versions,
+    run,
+    run_validate_version_cli,
+    validate_version,
+)
 
 
 class TestCompareVersions:
@@ -95,3 +100,44 @@ class TestRun:
         ):
             result = run()
             assert result == 0
+
+
+class TestRunValidateVersionCli:
+    """Test run_validate_version_cli function (used by CLI integration)."""
+
+    def test_validates_successfully(self) -> None:
+        result = run_validate_version_cli(current="0.40.0", latest="0.39.0", allow_same=False)
+        assert result == 0
+
+    def test_fails_on_downgrade(self) -> None:
+        with patch("sys.stderr", new=StringIO()):
+            result = run_validate_version_cli(current="0.39.0", latest="0.40.0", allow_same=False)
+            assert result == 1
+
+    def test_allows_same_with_flag(self) -> None:
+        result = run_validate_version_cli(current="0.39.0", latest="0.39.0", allow_same=True)
+        assert result == 0
+
+    def test_requires_current(self) -> None:
+        with patch("sys.stderr", new=StringIO()):
+            result = run_validate_version_cli(current=None, latest="0.39.0", allow_same=False)
+            assert result == 1
+
+    def test_fetches_latest_from_github(self) -> None:
+        with (
+            patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo", "GITHUB_TOKEN": "token"}),
+            patch(
+                "rerp_tooling.ci.get_latest_tag.get_latest_tag",
+                return_value="0.39.0",
+            ),
+        ):
+            result = run_validate_version_cli(current="0.40.0", latest=None, allow_same=False)
+            assert result == 0
+
+    def test_fails_when_no_latest_and_no_github_env(self) -> None:
+        with (
+            patch.dict("os.environ", {}, clear=True),
+            patch("sys.stderr", new=StringIO()),
+        ):
+            result = run_validate_version_cli(current="0.40.0", latest=None, allow_same=False)
+            assert result == 1
