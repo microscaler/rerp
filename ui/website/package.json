@@ -3,32 +3,20 @@
   "version": "1.0.0",
   "type": "module",
   "license": "BUSINESS-SOURCE-1.1",
-  "config": {
-    "baseUrl": "https://github.com/microscaler/rerp",
-    "siteName": "RERP",
-    "siteDescription": "Enterprise Resource Planning, Reimagined"
-  },
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-sitemap.js && vite build",
-    "preview": "vite preview",
-    "generate-sitemap": "node scripts/generate-sitemap.js"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0",
     "solid-js": "^1.9.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "postcss": "^8.4.32",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.3.3",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-solid": "^2.8.2"
-  },
-  "resolutions": {
-    "esbuild": ">=0.25.0",
-    "seroval": ">=1.4.1",
-    "glob": ">=10.5.0"
+    "vite-plugin-solid": "^2.11.10"
   }
 }
