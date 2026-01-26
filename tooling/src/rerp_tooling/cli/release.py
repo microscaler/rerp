@@ -31,7 +31,7 @@ def run_release(args, project_root: Path) -> None:
         )
         sys.exit(rc)
     print("rerp release: use subcommand 'bump' or 'generate-notes'")
-    print("  rerp release bump [patch|minor|major]")
+    print("  rerp release bump [patch|minor|major|rc|release]")
     print(
         "  rerp release generate-notes --version X.Y.Z [--output PATH] [--template PATH] [--since-tag TAG] [--provider openai|anthropic]"
     )

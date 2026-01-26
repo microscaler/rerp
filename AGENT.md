@@ -35,24 +35,48 @@ Suites are inferred **dynamically**: `rerp` and related tooling list `openapi/` 
 
 ## Agentic AI Planning & Analysis Documents
 
-All planning, analysis, and implementation status documents are located in [`docs/ai/`](docs/ai/):
+**⚠️ CRITICAL RULE: ALL planning, analysis, design proposals, and implementation status documents MUST be created in `./docs/` or its subdirectories. Creating planning documents in the project root or other locations is NOT ALLOWED.**
 
-### Implementation Status
+### Document Organization
+
+Planning documents are organized in `docs/` as follows:
+
+- **`docs/ai/`** - AI-generated planning, analysis, and implementation status documents
+- **`docs/adrs/`** - Architecture Decision Records (ADRs)
+- **`docs/`** (root) - Design proposals, PRDs, and other planning documents
+
+### Implementation Status (docs/ai/)
 
 - **[docs/ai/OPENAPI_GENERATION_COMPLETE.md](docs/ai/OPENAPI_GENERATION_COMPLETE.md)** - OpenAPI specification generation status for all 71 services
 - **[docs/ai/BFF_GENERATION_COMPLETE.md](docs/ai/BFF_GENERATION_COMPLETE.md)** - System-level BFF generation completion status
 - **[docs/ai/FIRST_CI_AUTOMATION.md](docs/ai/FIRST_CI_AUTOMATION.md)** - First CI automation implementation and status
 
-### Architecture & Planning
+### Architecture & Planning (docs/ai/)
 
 - **[docs/ai/SYSTEM_BFF_GENERATION.md](docs/ai/SYSTEM_BFF_GENERATION.md)** - System-level BFF generation architecture and process
 - **[docs/ai/TOP_LEVEL_SPECS_PLAN.md](docs/ai/TOP_LEVEL_SPECS_PLAN.md)** - Planning document for top-level OpenAPI specifications
 - **[docs/ai/CI_AUTOMATION_SETUP.md](docs/ai/CI_AUTOMATION_SETUP.md)** - CI/CD automation setup and configuration
 
-### Analysis & Research
+### Analysis & Research (docs/ai/)
 
 - **[docs/ai/ODOO_MODULES_ANALYSIS.md](docs/ai/ODOO_MODULES_ANALYSIS.md)** - Comprehensive analysis of Odoo modules and architecture patterns
 - **[docs/ai/MICROSERVICE_MATRIX_AUDIT.md](docs/ai/MICROSERVICE_MATRIX_AUDIT.md)** - Microservice matrix audit and service organization analysis
+
+### Design Proposals & PRDs (docs/)
+
+Design proposals, Product Requirements Documents (PRDs), and similar planning documents should be placed in `docs/` (root of docs directory) or appropriate subdirectories:
+
+- Design proposals: `docs/DESIGN_PROPOSAL_*.md`
+- PRDs: `docs/*_PRD.md`
+- Analysis documents: `docs/*_ANALYSIS.md`
+- Status documents: `docs/*_STATUS.md` or `docs/*_COMPLETE.md`
+
+**Examples:**
+- ✅ `docs/DESIGN_PROPOSAL_RELEASE_CI_INTEGRATION.md`
+- ✅ `docs/VERSIONING_STRATEGY_ANALYSIS.md`
+- ✅ `docs/ACCOUNTING_SUITE_ENRICHMENT_PRD.md`
+- ❌ `DESIGN_PROPOSAL_*.md` (project root - NOT ALLOWED)
+- ❌ `VERSIONING_STRATEGY_*.md` (project root - NOT ALLOWED)
 
 ---
 
@@ -157,14 +181,15 @@ Plus **12 additional services** for AI, automation, data, documents, ESG, IoT, a
 
 ## Best Practices for Agents
 
-1. **Always check AI docs first**: Review relevant documents in `docs/ai/` before making changes
-2. **Follow the two-crate model**: Don't modify generated crates directly
-3. **Update OpenAPI specs**: Changes to APIs should be in OpenAPI specs first
-4. **Regenerate BFF specs**: After updating service specs in a suite, regenerate that suite’s BFF (`openapi/{suite}/openapi_bff.yaml` from `bff-suite-config.yaml`)
-5. **Test changes**: Ensure all tests pass before committing
-6. **Update documentation**: Keep AI planning docs updated with status changes
-7. **Scripting in tooling only**: **Any scripting or automation requirements must be implemented in `tooling/`** (the `rerp` CLI). Do not add ad-hoc scripts, shell scripts, or one-off Python files elsewhere in the repo. For new automation, add a `rerp` subcommand or module in `tooling/` and **update all usages in the same commit**: CI, justfile, Tiltfile, docs. See `tooling/README.md`.
-8. **Staging: only track what belongs in git** — Before `git add` or `farm git commit`, **check every staged file**: must **not** be in [`.gitignore`](.gitignore) or be generated/temporary (e.g. `tooling/.coverage`, `tooling/.venv/`, `**/target/`, `*.pyc`, `__pycache__/`, `node_modules/`, `.env` with secrets). If a file should be ignored, add it to `.gitignore` and `git rm --cached <path>` to stop tracking; do not stage it. This avoids committing build artifacts, coverage, and local config.
+1. **Always check AI docs first**: Review relevant documents in `docs/ai/` and `docs/` before making changes
+2. **Planning documents in docs/ only**: **ALL planning, analysis, design proposals, and status documents MUST be created in `./docs/` or subdirectories. NEVER create planning documents in the project root or other locations.**
+3. **Follow the two-crate model**: Don't modify generated crates directly
+4. **Update OpenAPI specs**: Changes to APIs should be in OpenAPI specs first
+5. **Regenerate BFF specs**: After updating service specs in a suite, regenerate that suite’s BFF (`openapi/{suite}/openapi_bff.yaml` from `bff-suite-config.yaml`)
+6. **Test changes**: Ensure all tests pass before committing
+7. **Update documentation**: Keep AI planning docs updated with status changes
+8. **Scripting in tooling only**: **Any scripting or automation requirements must be implemented in `tooling/`** (the `rerp` CLI). Do not add ad-hoc scripts, shell scripts, or one-off Python files elsewhere in the repo. For new automation, add a `rerp` subcommand or module in `tooling/` and **update all usages in the same commit**: CI, justfile, Tiltfile, docs. See `tooling/README.md`.
+9. **Staging: only track what belongs in git** — Before `git add` or `farm git commit`, **check every staged file**: must **not** be in [`.gitignore`](.gitignore) or be generated/temporary (e.g. `tooling/.coverage`, `tooling/.venv/`, `**/target/`, `*.pyc`, `__pycache__/`, `node_modules/`, `.env` with secrets). If a file should be ignored, add it to `.gitignore` and `git rm --cached <path>` to stop tracking; do not stage it. This avoids committing build artifacts, coverage, and local config.
 
 ---
 

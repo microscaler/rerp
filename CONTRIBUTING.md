@@ -125,6 +125,7 @@ We welcome contributions in the following areas:
 - **User guides**: Create guides for using RERP services
 - **API documentation**: Improve OpenAPI specifications
 - **Code examples**: Add practical usage examples
+- **Planning documents**: Design proposals, PRDs, and analysis documents (see "Planning Documents" section below)
 
 ### CI/CD
 
@@ -133,6 +134,46 @@ We welcome contributions in the following areas:
 - **Deployment**: Improve deployment processes
 
 ---
+
+## Planning Documents
+
+**⚠️ CRITICAL: All planning, analysis, design proposals, and implementation status documents MUST be created in `./docs/` or its subdirectories.**
+
+### Document Organization
+
+- **`docs/ai/`** - AI-generated planning, analysis, and implementation status documents
+- **`docs/adrs/`** - Architecture Decision Records (ADRs)
+- **`docs/`** (root) - Design proposals, PRDs, and other planning documents
+
+### Naming Conventions
+
+- Design proposals: `docs/DESIGN_PROPOSAL_*.md`
+- PRDs: `docs/*_PRD.md`
+- Analysis documents: `docs/*_ANALYSIS.md`
+- Status documents: `docs/*_STATUS.md` or `docs/*_COMPLETE.md`
+- Implementation status: `docs/ai/*_COMPLETE.md` or `docs/ai/*_STATUS.md`
+
+### Examples
+
+✅ **Correct locations:**
+- `docs/DESIGN_PROPOSAL_RELEASE_CI_INTEGRATION.md`
+- `docs/VERSIONING_STRATEGY_ANALYSIS.md`
+- `docs/ACCOUNTING_SUITE_ENRICHMENT_PRD.md`
+- `docs/ai/OPENAPI_GENERATION_COMPLETE.md`
+
+❌ **Incorrect locations (NOT ALLOWED):**
+- `DESIGN_PROPOSAL_*.md` (project root)
+- `VERSIONING_STRATEGY_*.md` (project root)
+- `ANALYSIS_*.md` (project root)
+
+### Why This Matters
+
+- Keeps project root clean and organized
+- Makes documentation easy to find
+- Follows standard documentation structure
+- Prevents accidental commits of planning documents in wrong locations
+
+**If you find planning documents in the project root, move them to `./docs/` immediately.**
 
 ## Code Standards
 
@@ -175,9 +216,14 @@ rerp/
 │   │   ├── openapi.yaml  # System BFF spec
 │   │   └── {module}/   # Service directories
 ├── tooling/            # rerp CLI (ports, openapi, ci, bff, build, docker, bootstrap, tilt)
-├── docs/               # Documentation
+├── docs/               # Documentation (ALL planning documents go here)
+│   ├── ai/             # AI-generated planning and analysis
+│   ├── adrs/           # Architecture Decision Records
+│   └── *.md            # Design proposals, PRDs, analysis documents
 └── .github/            # GitHub workflows
 ```
+
+**⚠️ Important**: The project root should NOT contain planning documents. All planning, analysis, design proposals, and status documents must be in `./docs/` or subdirectories.
 
 See [components/README.md](components/README.md) for detailed crate structure information.
 
