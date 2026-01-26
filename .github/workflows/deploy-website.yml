@@ -61,7 +61,7 @@ jobs:
           if [ -f "ui/website/public/CNAME" ]; then
             # Custom domain detected - use root path
             echo "base_path=/" >> $GITHUB_OUTPUT
-            echo "base_url=https://$(cat ui/website/public/CNAME)" >> $GITHUB_OUTPUT
+            echo "base_url=https://$(cat ui/website/public/CNAME)/" >> $GITHUB_OUTPUT
           else
             # No custom domain - use repository subpath
             echo "base_path=/${{ github.event.repository.name }}/" >> $GITHUB_OUTPUT
