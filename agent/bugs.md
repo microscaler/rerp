@@ -159,3 +159,17 @@ m = re.search(r"(ports\s*=\s*\{)(.*?)(\s*\})", content, re.DOTALL)
 **Issue:** `_cargo_toml_paths` used `if any(part in p.parts for part in SKIP_PARTS)`. `p.parts` is from the full path (e.g. `/tmp/pytest-of-runner/.../components/Cargo.toml`), so the segment `tmp` from `/tmp` is in `p.parts`. With `tmp` in `SKIP_PARTS`, every Cargo.toml was excluded when the project lived under `/tmp` (e.g. Linux CI). Tests that create `tmp_path` under `/tmp` saw `_cargo_toml_paths` return `[]`, breaking `test_excludes_target`, `test_includes_root_components_entities_microservices`, `TestRun::test_success_updates_all_matching`, etc.
 
 **Fix:** Use the path relative to `project_root` when checking SKIP_PARTS: `rel = p.relative_to(project_root)` and `if any(part in rel.parts for part in SKIP_PARTS)`. We only skip when the skip name appears as a segment under the project (e.g. `target/`, `node_modules/`), not in the absolute path (e.g. `/tmp`).
+
+---
+
+## Fixed: Empty error messages in `get_latest_tag.run()` (2025-01-26)
+
+**File:** `tooling/src/rerp_tooling/ci/get_latest_tag.py` lines 50-56
+
+**Issue:** The `run()` function printed empty strings to stderr when `GITHUB_REPOSITORY` or `GITHUB_TOKEN` were missing. This provided no feedback about why the command failed, making debugging difficult. Other error handling in the same file (line 64) and in `validate_version.py` (line 129) properly includes descriptive error messages like "Error: --latest required or set GITHUB_REPOSITORY and GITHUB_TOKEN". The empty `print("")` calls appeared to be forgotten error messages.
+
+**Fix:** Replace empty print statements with descriptive error messages:
+- `print("Error: GITHUB_REPOSITORY environment variable is required", file=sys.stderr)`
+- `print("Error: GITHUB_TOKEN environment variable is required", file=sys.stderr)`
+
+**Linting:** Added pygrep-hook rule `PGH003` to detect empty print statements to stderr/stdout (see `tooling/pyproject.toml`).

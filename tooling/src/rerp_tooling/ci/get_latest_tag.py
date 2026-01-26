@@ -48,11 +48,11 @@ def run() -> int:
     token = os.environ.get("GITHUB_TOKEN", "")
 
     if not repo:
-        print("", file=sys.stderr)
+        print("Error: GITHUB_REPOSITORY environment variable is required", file=sys.stderr)
         return 1
 
     if not token:
-        print("", file=sys.stderr)
+        print("Error: GITHUB_TOKEN environment variable is required", file=sys.stderr)
         return 1
 
     try:
