@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'Bump type (default: patch = bump Z)'
+        description: 'Bump: patch|minor|major; rc=bump -rc.N; release=promote RC to full (e.g. 0.39.0-rc.2 -> 0.39.0)'
         required: false
         default: patch
         type: choice
@@ -21,6 +21,8 @@ on:
           - patch
           - minor
           - major
+          - rc
+          - release
       branch:
         description: 'Branch to release from'
         required: false

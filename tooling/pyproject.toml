@@ -94,5 +94,11 @@ max-complexity = 20
 # main: arg-parsing dispatcher; complexity expected
 "src/rerp_tooling/cli/main.py" = ["C901"]
 
+# NOTE: Empty print statements to stderr/stdout are forbidden.
+# Pattern to avoid: print("", file=sys.stderr) or print("", file=sys.stdout)
+# Always provide descriptive error messages. Example:
+#   print("Error: GITHUB_REPOSITORY environment variable is required", file=sys.stderr)
+# This pattern is checked via code review and should be caught by grep/IDE searches.
+
 [tool.ruff.format]
 quote-style = "double"

@@ -30,6 +30,13 @@ class TestReadCurrent:
         )
         assert _read_current(tmp_path / "components" / "Cargo.toml") == "0.1.0"
 
+    def test_reads_prerelease_rc(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace.package]\nversion = "0.39.0-rc.2"\n'
+        )
+        assert _read_current(tmp_path / "components" / "Cargo.toml") == "0.39.0-rc.2"
+
     def test_missing_raises(self, tmp_path: Path) -> None:
         (tmp_path / "components").mkdir()
         (tmp_path / "components" / "Cargo.toml").write_text("[workspace]\nmembers = []\n")
@@ -71,13 +78,46 @@ class TestNextVersion:
         assert _next_version("v1.2.3", "minor") == "1.3.0"
 
     def test_invalid_version_raises(self) -> None:
-        for bad in ("1.2", "1.2.3.4", "x.y.z", "1.2.3-beta"):
+        for bad in ("1.2", "1.2.3.4", "x.y.z"):
             with pytest.raises(SystemExit):
                 _next_version(bad, "patch")
 
     def test_invalid_bump_raises(self) -> None:
         with pytest.raises(SystemExit):
             _next_version("1.2.3", "foo")
+
+    # --- rc and release (prerelease) ---
+
+    def test_rc_from_full_version(self) -> None:
+        assert _next_version("0.39.0", "rc") == "0.39.0-rc.1"
+        assert _next_version("v1.0.0", "rc") == "1.0.0-rc.1"
+
+    def test_rc_bumps_rc_number(self) -> None:
+        assert _next_version("0.39.0-rc.2", "rc") == "0.39.0-rc.3"
+        assert _next_version("0.39.0-rc.1", "rc") == "0.39.0-rc.2"
+
+    def test_rc_only_supports_rc_n_prerelease(self) -> None:
+        with pytest.raises(SystemExit, match=r"rc bump only supports -rc\.N"):
+            _next_version("1.2.3-alpha.1", "rc")
+
+    def test_release_promotes_rc_to_full(self) -> None:
+        assert _next_version("0.39.0-rc.2", "release") == "0.39.0"
+        assert _next_version("v0.39.0-rc.2", "release") == "0.39.0"
+
+    def test_promote_alias_for_release(self) -> None:
+        assert _next_version("0.39.0-rc.2", "promote") == "0.39.0"
+
+    def test_release_on_full_version_raises(self) -> None:
+        with pytest.raises(SystemExit, match="Already a full release"):
+            _next_version("0.39.0", "release")
+
+    def test_patch_minor_major_strip_prerelease_then_bump(self) -> None:
+        assert _next_version("0.39.0-rc.2", "patch") == "0.39.1"
+        assert _next_version("0.39.0-rc.2", "minor") == "0.40.0"
+        assert _next_version("0.39.0-rc.2", "major") == "1.0.0"
+
+    def test_other_prerelease_stripped_then_bump(self) -> None:
+        assert _next_version("1.2.3-beta", "patch") == "1.2.4"
 
 
 class TestReplaceInFile:
@@ -130,6 +170,12 @@ class TestReplaceInFile:
         text = p.read_text()
         assert text.count('version = "0.1.1"') == 2
         assert 'version = "0.1.0"' not in text
+
+    def test_replaces_prerelease_version(self, tmp_path: Path) -> None:
+        p = tmp_path / "Cargo.toml"
+        p.write_text('[package]\nname = "x"\nversion = "0.39.0-rc.2"\n')
+        assert _replace_in_file(p, "0.39.0-rc.2", "0.39.0-rc.3") is True
+        assert 'version = "0.39.0-rc.3"' in p.read_text()
 
 
 class TestCargoTomlPaths:
@@ -272,6 +318,40 @@ class TestRun:
         assert gh_out.is_file()
         assert "version=0.1.1\n" in gh_out.read_text()
 
+    def test_run_bump_rc(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
+        )
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
+        )
+        (tmp_path / "entities").mkdir()
+        (tmp_path / "entities" / "Cargo.toml").write_text(
+            '[package]\nname = "e"\nversion = "0.39.0-rc.2"\n'
+        )
+        rc = run(tmp_path, "rc")
+        assert rc == 0
+        assert 'version = "0.39.0-rc.3"' in (tmp_path / "components" / "Cargo.toml").read_text()
+        assert 'version = "0.39.0-rc.3"' in (tmp_path / "entities" / "Cargo.toml").read_text()
+
+    def test_run_release_promotes_rc_to_full(self, tmp_path: Path) -> None:
+        (tmp_path / "components").mkdir()
+        (tmp_path / "components" / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
+        )
+        (tmp_path / "Cargo.toml").write_text(
+            '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
+        )
+        (tmp_path / "entities").mkdir()
+        (tmp_path / "entities" / "Cargo.toml").write_text(
+            '[package]\nname = "e"\nversion = "0.39.0-rc.2"\n'
+        )
+        rc = run(tmp_path, "release")
+        assert rc == 0
+        assert 'version = "0.39.0"' in (tmp_path / "components" / "Cargo.toml").read_text()
+        assert 'version = "0.39.0"' in (tmp_path / "entities" / "Cargo.toml").read_text()
+
 
 class TestSetWorkspacePackageVersion:
     def test_changes_when_different(self, tmp_path: Path) -> None:
@@ -285,3 +365,9 @@ class TestSetWorkspacePackageVersion:
         p.write_text('[workspace.package]\nversion = "0.2.0"\n')
         assert _set_workspace_package_version(p, "0.2.0") is False
         assert 'version = "0.2.0"' in p.read_text()
+
+    def test_changes_prerelease_to_full(self, tmp_path: Path) -> None:
+        p = tmp_path / "Cargo.toml"
+        p.write_text('[workspace.package]\nversion = "0.39.0-rc.2"\n')
+        assert _set_workspace_package_version(p, "0.39.0") is True
+        assert 'version = "0.39.0"' in p.read_text()

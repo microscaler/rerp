@@ -17,3 +17,13 @@ repos:
         args: [pre-commit, microservices-fmt]
         language: system
         pass_filenames: false
+
+      - id: check-empty-print-statements
+        name: Check for empty print statements to stderr/stdout
+        entry: bash
+        args: [
+          -c,
+          'if grep -rn ''print("", file=sys\.\(stderr\|stdout\)'' tooling/src/ tooling/tests/ 2>/dev/null; then echo "Error: Empty print statements to stderr/stdout are forbidden. Provide descriptive error messages."; exit 1; fi'
+        ]
+        language: system
+        pass_filenames: false
