@@ -2,9 +2,9 @@
 # Stage 1: Build the SolidJS application
 FROM --platform=linux/amd64 node:25-alpine AS builder
 
-# Enable corepack for yarn support
-# Use Yarn v1 to match the lockfile format
-RUN corepack enable && corepack prepare yarn@1.22.22 --activate
+# Install Yarn via Alpine package manager
+# Yarn v1.22.22 is available in Alpine repositories
+RUN apk add --no-cache yarn
 
 WORKDIR /build
 
