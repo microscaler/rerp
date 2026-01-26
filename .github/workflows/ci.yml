@@ -45,6 +45,27 @@ jobs:
       - run: pip install -e ./tooling
       - id: set_vars
         run: echo "is_release_tag=$(rerp ci is-tag)" >> $GITHUB_OUTPUT
+      - name: Validate version (prevent downgrade)
+        if: steps.set_vars.outputs.is_release_tag == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_release_jobs == 'true')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # Read current version from components/Cargo.toml
+          CURRENT=$(grep -A 5 '\[workspace.package\]' components/Cargo.toml | grep -E '^\s*version\s*=' | head -1 | sed -E 's/.*version\s*=\s*"v?([^"]+)".*/\1/' || echo "")
+          if [ -z "$CURRENT" ]; then
+            echo "Warning: Could not read version from components/Cargo.toml, skipping validation"
+            exit 0
+          fi
+          # Get latest tag from GitHub API
+          LATEST=$(rerp ci get-latest-tag || echo "")
+          if [ -n "$LATEST" ]; then
+            echo "Validating version: current=$CURRENT, latest=$LATEST"
+            rerp ci validate-version --current "$CURRENT" --latest "$LATEST" || exit 1
+            echo "Version validation passed"
+          else
+            echo "No previous releases found, allowing first release"
+          fi
 
   conventional-commits:
     name: Conventional Commits
@@ -390,12 +411,10 @@ jobs:
             echo "tag=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
             echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
           else
+            # CRITICAL: Never set latest tag for non-tag builds (even workflow_dispatch from main)
+            # Only official release tags (created by release.yml) should set latest tag
             echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-            if [[ "${{ github.ref }}" == refs/heads/main ]]; then
-              echo "extra_tag=latest" >> "$GITHUB_OUTPUT"
-            else
-              echo "extra_tag=" >> "$GITHUB_OUTPUT"
-            fi
+            echo "extra_tag=" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload build_artifacts

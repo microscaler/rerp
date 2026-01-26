@@ -63,7 +63,7 @@ def main() -> None:
     if args.command == "ci":
         if not getattr(args, "ci_cmd", None):
             print("rerp ci: missing subcommand")
-            print("  patch-brrtrouter, fix-cargo-paths, is-tag")
+            print("  patch-brrtrouter, fix-cargo-paths, is-tag, get-latest-tag, validate-version")
             print("  Use: rerp ci --help")
             sys.exit(1)
         ci_cli.run_ci(args, project_root)
@@ -225,7 +225,7 @@ def __build_parser():
     # --- ci ---
     pci = sub.add_parser(
         "ci",
-        help="CI/build: patch-brrtrouter (git deps for CI), fix-cargo-paths (local path deps), is-tag (check if ref is tag)",
+        help="CI/build: patch-brrtrouter (git deps for CI), fix-cargo-paths (local path deps), is-tag (check if ref is tag), get-latest-tag (GitHub API), validate-version (prevent downgrades)",
     )
     pci_sub = pci.add_subparsers(dest="ci_cmd")
     pci_p = pci_sub.add_parser(
@@ -246,6 +246,19 @@ def __build_parser():
     pci_sub.add_parser(
         "is-tag",
         help="Check if GITHUB_REF is a release tag (refs/tags/v*). Prints 'true' or 'false' to stdout.",
+    )
+    pci_sub.add_parser(
+        "get-latest-tag",
+        help="Get latest release tag from GitHub API. Prints version (without 'v' prefix) to stdout, or empty if no releases.",
+    )
+    pci_v = pci_sub.add_parser(
+        "validate-version",
+        help="Validate version to prevent downgrades. Requires --current and --latest, or GITHUB_REPOSITORY/GITHUB_TOKEN.",
+    )
+    pci_v.add_argument("--current", required=True, help="Current version to validate")
+    pci_v.add_argument("--latest", help="Latest version from GitHub (or use GITHUB_API)")
+    pci_v.add_argument(
+        "--allow-same", action="store_true", help="Allow same version (for patch releases)"
     )
 
     # --- bff ---
