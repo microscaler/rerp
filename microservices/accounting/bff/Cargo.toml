@@ -1,6 +1,6 @@
 [package]
 name = "rerp_accounting_backend_for_frontend_api"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 
 [features]
