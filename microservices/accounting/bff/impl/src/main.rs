@@ -1,0 +1,626 @@
+// This file uses generated code from the rerp_accounting_bff_gen crate
+// Business logic controllers are in impl/src/controllers/
+// This file is based on gen/src/main.rs but uses impl controllers
+
+// ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
+// ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
+// ⚠️ To implement business logic, edit the corresponding controller file
+#![allow(clippy::uninlined_format_args)]
+use brrtrouter::dispatcher::Dispatcher;
+use brrtrouter::middleware::MetricsMiddleware;
+use brrtrouter::router::Router;
+use brrtrouter::runtime_config::RuntimeConfig;
+use brrtrouter::security::{JwksBearerProvider, RemoteApiKeyProvider};
+use brrtrouter::server::AppService;
+use brrtrouter::server::HttpServer;
+use brrtrouter::spec::SecurityScheme;
+use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
+use clap::Parser;
+// Use generated code from gen crate
+use rerp_accounting_bff_gen::handlers::*;
+use rerp_accounting_bff_gen::registry::*;
+use rerp_accounting_bff_gen::*;
+
+// Import implementation controllers (business logic)
+mod controllers;
+use controllers::*;
+
+use std::fs;
+use std::io;
+use std::path::PathBuf;
+
+// Use jemalloc as the global allocator for better memory performance.
+// This is gated behind the "jemalloc" feature (enabled by default).
+// Disable this feature if brrtrouter is providing jemalloc via its own "jemalloc" feature,
+// or if you want to use the system allocator: `cargo build --no-default-features`
+#[cfg(feature = "jemalloc")]
+use tikv_jemallocator::Jemalloc;
+
+#[cfg(feature = "jemalloc")]
+#[global_allocator]
+static GLOBAL: Jemalloc = Jemalloc;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct AppConfig {
+    port: Option<u16>, // Server port (preferred over PORT env var)
+    security: Option<SecurityConfig>,
+    http: Option<HttpConfig>,
+    cors: Option<CorsConfig>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct SecurityConfig {
+    api_keys: Option<std::collections::HashMap<String, ApiKeyConfig>>, // by scheme name
+    remote_api_keys: Option<std::collections::HashMap<String, RemoteApiKeyConfig>>, // by scheme name
+    bearer: Option<BearerConfig>,
+    oauth2: Option<OAuth2Config>,
+    jwks: Option<std::collections::HashMap<String, JwksConfig>>, // by scheme name
+    propelauth: Option<PropelAuthConfig>,                        // global PropelAuth config
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct ApiKeyConfig {
+    key: Option<String>,         // static key for simple validations
+    header_name: Option<String>, // override header for header-based keys
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct RemoteApiKeyConfig {
+    verify_url: String,
+    timeout_ms: Option<u64>,
+    header_name: Option<String>,
+    cache_ttl_secs: Option<u64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct BearerConfig {
+    signature: Option<String>,
+    cookie_name: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct OAuth2Config {
+    signature: Option<String>,
+    cookie_name: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct JwksConfig {
+    jwks_url: String,
+    iss: Option<String>,
+    aud: Option<String>,
+    leeway_secs: Option<u64>,
+    cache_ttl_secs: Option<u64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct PropelAuthConfig {
+    // Base auth URL from PropelAuth project settings, e.g. https://auth.yourdomain.com
+    auth_url: String,
+    // Optional overrides
+    audience: Option<String>,
+    issuer: Option<String>,
+    jwks_url: Option<String>,
+    leeway_secs: Option<u64>,
+    cache_ttl_secs: Option<u64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct HttpConfig {
+    keep_alive: Option<bool>,
+    timeout_secs: Option<u64>,
+    max_requests: Option<u64>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+struct CorsConfig {
+    // Allowed origins (environment-specific, should be in config.yaml)
+    origins: Option<Vec<String>>,
+    // Global CORS settings (can be overridden per-route via OpenAPI x-cors)
+    allowed_headers: Option<Vec<String>>,
+    allowed_methods: Option<Vec<String>>,
+    allow_credentials: Option<bool>,
+    expose_headers: Option<Vec<String>>,
+    max_age: Option<u32>, // Preflight cache duration in seconds
+}
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, default_value = "../gen/doc/openapi.yaml")]
+    spec: PathBuf,
+    #[arg(long)]
+    static_dir: Option<PathBuf>,
+    #[arg(long, default_value = "../gen/doc")]
+    doc_dir: PathBuf,
+    // Accept compatibility flags used by repo scripts; currently informational
+    #[arg(long, default_value_t = false)]
+    hot_reload: bool,
+    #[arg(long)]
+    test_api_key: Option<String>,
+    #[arg(long, default_value = "./impl/config/config.yaml")]
+    config: PathBuf,
+}
+
+fn main() -> io::Result<()> {
+    // Initialize structured logging early so all subsequent logs (including request logs)
+    // are emitted and scraped by Promtail/Loki. Honors RUST_LOG via EnvFilter.
+    if let Err(e) =
+        brrtrouter::otel::init_logging_with_config(&brrtrouter::otel::LogConfig::from_env())
+    {
+        eprintln!("[logging][error] failed to init tracing subscriber: {e}");
+    }
+
+    let args = Args::parse();
+    // configure coroutine stack size
+    let config = RuntimeConfig::from_env();
+    may::config().set_stack_size(config.stack_size);
+    // Load OpenAPI spec and create router
+    // Resolve relative specs against the crate directory so launches from other CWDs work
+    let spec_path = if args.spec.is_relative() {
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        base.join(args.spec)
+    } else {
+        args.spec.clone()
+    };
+    if args.hot_reload {
+        println!("[info] hot-reload requested (handled internally by service watcher if enabled)");
+    }
+    if let Some(k) = &args.test_api_key {
+        let key_len = k.len();
+        println!("[info] test-api-key provided ({key_len} chars)");
+    }
+    // Load application config (YAML) FIRST - required for CORS initialization
+    // If the file exists but is invalid, fail fast with a clear error.
+    // Only a missing file results in defaulting.
+    let app_config: AppConfig = match fs::read_to_string(&args.config) {
+        Ok(s) => match serde_yaml::from_str::<AppConfig>(&s) {
+            Ok(cfg) => cfg,
+            Err(e) => {
+                eprintln!(
+                    "[config][error] Failed to parse {}: {}",
+                    args.config.display(),
+                    e
+                );
+                return Err(io::Error::other(format!(
+                    "Invalid configuration file {}: {}",
+                    args.config.display(),
+                    e
+                )));
+            }
+        },
+        Err(e) if e.kind() == io::ErrorKind::NotFound => {
+            println!(
+                "[config] {} not found; continuing with defaults",
+                args.config.display()
+            );
+            AppConfig::default()
+        }
+        Err(e) => {
+            return Err(io::Error::other(format!(
+                "Failed to read configuration file {}: {}",
+                args.config.display(),
+                e
+            )));
+        }
+    };
+
+    let (routes, schemes, _slug) = brrtrouter::spec::load_spec_full(spec_path.to_str().unwrap())
+        .expect("failed to load OpenAPI spec");
+    let _router = Router::new(routes.clone());
+    // Create router and dispatcher
+    let mut dispatcher = Dispatcher::new();
+
+    // Create dispatcher and middleware
+    let metrics = std::sync::Arc::new(MetricsMiddleware::new());
+    dispatcher.add_middleware(metrics.clone());
+
+    // Create memory tracking middleware
+    let memory = std::sync::Arc::new(brrtrouter::middleware::MemoryMiddleware::new());
+
+    // Start background memory monitoring thread
+    brrtrouter::middleware::memory::start_memory_monitor(memory.clone());
+
+    // Initialize CORS middleware from config.yaml at STARTUP (JSF requirement)
+    // All CORS configuration is processed once at initialization time, no runtime parsing
+    // Origins come from config.yaml (environment-specific), route-specific settings from OpenAPI x-cors
+    let cors_middleware = {
+        use brrtrouter::middleware::{build_route_cors_map, CorsMiddlewareBuilder};
+        use http::Method;
+
+        // Extract origins from config.yaml (processed once at startup)
+        let cors_cfg = app_config.cors.as_ref();
+        let origins = cors_cfg
+            .and_then(|c| c.origins.as_ref())
+            .map(|o| o.iter().map(|s| s.as_str()).collect::<Vec<_>>())
+            .unwrap_or_default();
+
+        // Build global CORS middleware from config.yaml (startup-time only)
+        let mut builder = CorsMiddlewareBuilder::new();
+        if !origins.is_empty() {
+            builder = builder.allowed_origins(&origins);
+        }
+
+        // Apply global CORS settings from config.yaml (startup-time only)
+        if let Some(cfg) = cors_cfg {
+            if let Some(headers) = cfg.allowed_headers.as_ref() {
+                let header_strs: Vec<&str> = headers.iter().map(|s| s.as_str()).collect();
+                builder = builder.allowed_headers(&header_strs);
+            }
+            if let Some(methods) = cfg.allowed_methods.as_ref() {
+                let method_vec: Vec<Method> = methods
+                    .iter()
+                    .filter_map(|m| m.parse::<Method>().ok())
+                    .collect();
+                if !method_vec.is_empty() {
+                    builder = builder.allowed_methods(&method_vec);
+                }
+            }
+            if let Some(creds) = cfg.allow_credentials {
+                builder = builder.allow_credentials(creds);
+            }
+            if let Some(expose) = cfg.expose_headers.as_ref() {
+                let expose_strs: Vec<&str> = expose.iter().map(|s| s.as_str()).collect();
+                builder = builder.expose_headers(&expose_strs);
+            }
+            if let Some(age) = cfg.max_age {
+                builder = builder.max_age(age);
+            }
+        }
+
+        // Build global CORS middleware and merge with route-specific policies from OpenAPI
+        // All processing happens at startup - no runtime allocations in hot path
+        match builder.build() {
+            Ok(global_cors) => {
+                // Extract route-specific CORS policies from OpenAPI (startup-time only)
+                let route_policies = build_route_cors_map(&routes);
+                // Merge origins from config.yaml into route-specific configs (startup-time only)
+                let mut merged_policies = std::collections::HashMap::new();
+                for (handler_name, policy) in route_policies {
+                    // Only merge origins for Custom policies (Inherit and Disabled don't need origins)
+                    let merged_policy = match policy {
+                        brrtrouter::middleware::RouteCorsPolicy::Custom(route_config) => {
+                            // Set origin validation from config.yaml (not from OpenAPI)
+                            // BUG FIX: Always call with_origins() to ensure validation runs
+                            // This will panic if route has allowCredentials: true and:
+                            // - Global origins contain "*" (invalid CORS combination per spec)
+                            // - Global origins is empty (empty origins with credentials is invalid)
+                            // The with_origins() method now validates both cases
+                            let merged_config = route_config.with_origins(&origins);
+                            brrtrouter::middleware::RouteCorsPolicy::Custom(merged_config)
+                        }
+                        other => other, // Inherit or Disabled - no changes needed
+                    };
+                    merged_policies.insert(handler_name, merged_policy);
+                }
+                // Create CORS middleware with all policies pre-processed at startup
+                Some(std::sync::Arc::new(
+                    brrtrouter::middleware::CorsMiddleware::with_route_policies(
+                        global_cors,
+                        merged_policies,
+                    ),
+                ))
+            }
+            Err(e) => {
+                eprintln!("[cors][error] Failed to build CORS middleware: {:?}", e);
+                None
+            }
+        }
+    };
+
+    // Register CORS middleware (all config processed at startup, no runtime work)
+    if let Some(ref cors) = cors_middleware {
+        dispatcher.add_middleware(cors.clone());
+    }
+    // NOTE: This registers controllers from gen crate. We need to register impl controllers instead.
+    // TODO: Update to register impl controllers
+    unsafe {
+        registry::register_from_spec(&mut dispatcher, &routes);
+    }
+
+    // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
+    // set for local testing.
+    // This returns a coroutine JoinHandle; we join on it to keep the server running
+    let router = std::sync::Arc::new(std::sync::RwLock::new(Router::new(routes.clone())));
+    // Dump initial route table
+    router.read().unwrap().dump_routes();
+    let dispatcher = std::sync::Arc::new(std::sync::RwLock::new(dispatcher));
+    let mut service = AppService::new(
+        router,
+        dispatcher,
+        schemes,
+        spec_path.clone(),
+        args.static_dir.clone(),
+        Some(args.doc_dir.clone()),
+    );
+
+    // Pre-compile all JSON schemas at startup for optimal performance
+    let compiled_count = service.precompile_schemas(&routes);
+    println!(
+        "[startup] precompiled {} JSON schema validators",
+        compiled_count
+    );
+
+    service.set_metrics_middleware(metrics);
+    service.set_memory_middleware(memory);
+
+    // Note: app_config was loaded earlier (before CORS initialization) to comply with JSF requirements
+    // All configuration processing happens at startup time, not in the hot path
+    // Log startup context to console
+    let spec_display = spec_path.display();
+    let doc_display = args.doc_dir.display();
+    let stack_size = config.stack_size;
+    let routes_count = routes.len();
+    let hot_reload = args.hot_reload;
+    println!("[startup] spec_path={spec_display}");
+    if let Some(sd) = &args.static_dir {
+        let sd_display = sd.display();
+        println!("[startup] static_dir={sd_display}");
+    }
+    println!("[startup] doc_dir={doc_display}");
+    println!(
+        "[startup] stack_size={stack_size} routes_count={routes_count} hot_reload={hot_reload}"
+    );
+
+    match serde_yaml::to_string(&app_config) {
+        Ok(y) => println!("[config]\n{y}"),
+        Err(_) => println!("[config] <failed to serialize config>"),
+    }
+
+    // Keep-Alive from config (default ON for testing in generated app)
+    let (enable, timeout, max) = match app_config.http.as_ref() {
+        Some(http) => (
+            http.keep_alive.unwrap_or(true),
+            http.timeout_secs.unwrap_or(5),
+            http.max_requests.unwrap_or(1000),
+        ),
+        None => (true, 5, 1000),
+    };
+    service.set_keep_alive(enable, timeout, max);
+
+    // Register security providers from config first; if not found, fall back to env/CLI defaults
+    {
+        // Simple static ApiKey provider for header/query/cookie
+        struct StaticApiKeyProvider {
+            key: String,
+            header_override: Option<String>,
+        }
+        impl SecurityProvider for StaticApiKeyProvider {
+            fn validate(
+                &self,
+                scheme: &SecurityScheme,
+                _scopes: &[String],
+                req: &SecurityRequest,
+            ) -> bool {
+                match scheme {
+                    SecurityScheme::ApiKey { name, location, .. } => match location.as_str() {
+                        "header" => {
+                            let target = self.header_override.as_deref().unwrap_or(name);
+                            req.get_header(&target.to_ascii_lowercase())
+                                .map(|v| v == self.key)
+                                .unwrap_or(false)
+                        }
+                        "query" => req.get_query(name).map(|v| v == self.key).unwrap_or(false),
+                        "cookie" => req.get_cookie(name).map(|v| v == self.key).unwrap_or(false),
+                        _ => false,
+                    },
+                    _ => false,
+                }
+            }
+        }
+
+        let sec_cfg = app_config.security.as_ref();
+        for (scheme_name, scheme) in service.security_schemes.clone() {
+            match scheme {
+                SecurityScheme::ApiKey { .. } => {
+                    let mut registered = false;
+                    if let Some(cfgs) = sec_cfg.and_then(|s| s.remote_api_keys.as_ref()) {
+                        if let Some(cfg) = cfgs.get(&scheme_name) {
+                            let mut provider = RemoteApiKeyProvider::new(&cfg.verify_url);
+                            if let Some(ms) = cfg.timeout_ms {
+                                provider = provider.timeout_ms(ms);
+                            }
+                            if let Some(h) = cfg.header_name.as_ref() {
+                                provider = provider.header_name(h);
+                            }
+                            if let Some(ttl) = cfg.cache_ttl_secs {
+                                provider = provider.cache_ttl(std::time::Duration::from_secs(ttl));
+                            }
+                            println!("[auth] register RemoteApiKeyProvider scheme={} url={} header={} timeout_ms={:?} ttl_s={:?}", scheme_name, cfg.verify_url, cfg.header_name.clone().unwrap_or_else(|| "(default X-API-Key)".into()), cfg.timeout_ms, cfg.cache_ttl_secs);
+                            service.register_security_provider(
+                                &scheme_name,
+                                std::sync::Arc::new(provider),
+                            );
+                            registered = true;
+                        }
+                    }
+                    if !registered {
+                        if let Some(cfgs) = sec_cfg.and_then(|s| s.api_keys.as_ref()) {
+                            if let Some(cfg) = cfgs.get(&scheme_name) {
+                                if let Some(key) = cfg.key.clone() {
+                                    println!("[auth] register StaticApiKeyProvider scheme={} header_override={:?} key_len={}", scheme_name, cfg.header_name, key.len());
+                                    service.register_security_provider(
+                                        &scheme_name,
+                                        std::sync::Arc::new(StaticApiKeyProvider {
+                                            key,
+                                            header_override: cfg.header_name.clone(),
+                                        }),
+                                    );
+                                    registered = true;
+                                }
+                            }
+                        }
+                    }
+                    if !registered {
+                        // Fallback to env/CLI
+                        let fallback = std::env::var("BRRTR_API_KEY")
+                            .ok()
+                            .or_else(|| args.test_api_key.clone())
+                            .unwrap_or_else(|| "test123".to_string());
+                        println!("[auth] register StaticApiKeyProvider scheme={} from=fallback key_len={}", scheme_name, fallback.len());
+                        service.register_security_provider(
+                            &scheme_name,
+                            std::sync::Arc::new(StaticApiKeyProvider {
+                                key: fallback,
+                                header_override: None,
+                            }),
+                        );
+                    }
+                }
+                SecurityScheme::Http { ref scheme, .. }
+                    if scheme.eq_ignore_ascii_case("bearer") =>
+                {
+                    // Prefer PropelAuth (if configured) → JWKS per-scheme → signature-based mock
+                    if let Some(pa) = sec_cfg.and_then(|s| s.propelauth.as_ref()) {
+                        let jwks_url = pa.jwks_url.clone().unwrap_or_else(|| {
+                            let base = pa.auth_url.trim_end_matches('/');
+                            format!("{}/.well-known/jwks.json", base)
+                        });
+                        let mut p = JwksBearerProvider::new(&jwks_url);
+                        let issuer_opt: Option<&str> =
+                            pa.issuer.as_deref().or(Some(pa.auth_url.as_str()));
+                        if let Some(iss) = issuer_opt {
+                            p = p.issuer(iss);
+                        }
+                        if let Some(aud) = pa.audience.as_ref() {
+                            p = p.audience(aud.clone());
+                        }
+                        if let Some(leeway) = pa.leeway_secs {
+                            p = p.leeway(leeway);
+                        }
+                        if let Some(ttl) = pa.cache_ttl_secs {
+                            p = p.cache_ttl(std::time::Duration::from_secs(ttl));
+                        }
+                        println!("[auth] register JwksBearerProvider scheme={} source=propelauth jwks_url={} iss={:?} aud={:?}", scheme_name, jwks_url, pa.issuer, pa.audience);
+                        service.register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                        continue;
+                    }
+                    // Next, check per-scheme JWKS mapping
+                    if let Some(jwks_map) = sec_cfg.and_then(|s| s.jwks.as_ref()) {
+                        if let Some(jwks) = jwks_map.get(&scheme_name) {
+                            let mut p = JwksBearerProvider::new(&jwks.jwks_url);
+                            if let Some(iss) = jwks.iss.as_deref() {
+                                p = p.issuer(iss);
+                            }
+                            if let Some(aud) = jwks.aud.as_deref() {
+                                p = p.audience(aud);
+                            }
+                            if let Some(leeway) = jwks.leeway_secs {
+                                p = p.leeway(leeway);
+                            }
+                            if let Some(ttl) = jwks.cache_ttl_secs {
+                                p = p.cache_ttl(std::time::Duration::from_secs(ttl));
+                            }
+                            println!("[auth] register JwksBearerProvider scheme={} source=per-scheme jwks_url={} iss={:?} aud={:?}", scheme_name, jwks.jwks_url, jwks.iss, jwks.aud);
+                            service
+                                .register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                            continue;
+                        }
+                    }
+                    let sig = sec_cfg
+                        .and_then(|s| s.bearer.as_ref())
+                        .and_then(|b| b.signature.clone())
+                        .or_else(|| std::env::var("BRRTR_BEARER_SIGNATURE").ok())
+                        .unwrap_or_else(|| "sig".into());
+                    let sig_len = sig.len();
+                    let mut p = BearerJwtProvider::new(sig);
+                    let cookie_opt = sec_cfg
+                        .and_then(|s| s.bearer.as_ref())
+                        .and_then(|b| b.cookie_name.clone());
+                    if let Some(cookie) = cookie_opt.clone() {
+                        p = p.cookie_name(cookie);
+                    }
+                    println!("[auth] register BearerJwtProvider scheme={} source=mock signature_len={} cookie={:?}", scheme_name, sig_len, cookie_opt);
+                    service.register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                }
+                SecurityScheme::OAuth2 { .. } => {
+                    // Prefer PropelAuth (if configured) → JWKS under same scheme → signature-based mock
+                    if let Some(pa) = sec_cfg.and_then(|s| s.propelauth.as_ref()) {
+                        let jwks_url = pa.jwks_url.clone().unwrap_or_else(|| {
+                            let base = pa.auth_url.trim_end_matches('/');
+                            format!("{}/.well-known/jwks.json", base)
+                        });
+                        let mut p = JwksBearerProvider::new(&jwks_url);
+                        let issuer_opt: Option<&str> =
+                            pa.issuer.as_deref().or(Some(pa.auth_url.as_str()));
+                        if let Some(iss) = issuer_opt {
+                            p = p.issuer(iss);
+                        }
+                        if let Some(aud) = pa.audience.as_ref() {
+                            p = p.audience(aud.clone());
+                        }
+                        if let Some(leeway) = pa.leeway_secs {
+                            p = p.leeway(leeway);
+                        }
+                        if let Some(ttl) = pa.cache_ttl_secs {
+                            p = p.cache_ttl(std::time::Duration::from_secs(ttl));
+                        }
+                        println!("[auth] register JwksBearerProvider scheme={} source=propelauth jwks_url={} iss={:?} aud={:?}", scheme_name, jwks_url, pa.issuer, pa.audience);
+                        service.register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                        continue;
+                    }
+                    // Next, check per-scheme JWKS mapping
+                    if let Some(jwks_map) = sec_cfg.and_then(|s| s.jwks.as_ref()) {
+                        if let Some(jwks) = jwks_map.get(&scheme_name) {
+                            let mut p = JwksBearerProvider::new(&jwks.jwks_url);
+                            if let Some(iss) = jwks.iss.as_deref() {
+                                p = p.issuer(iss);
+                            }
+                            if let Some(aud) = jwks.aud.as_deref() {
+                                p = p.audience(aud);
+                            }
+                            if let Some(leeway) = jwks.leeway_secs {
+                                p = p.leeway(leeway);
+                            }
+                            if let Some(ttl) = jwks.cache_ttl_secs {
+                                p = p.cache_ttl(std::time::Duration::from_secs(ttl));
+                            }
+                            println!("[auth] register JwksBearerProvider scheme={} source=per-scheme jwks_url={} iss={:?} aud={:?}", scheme_name, jwks.jwks_url, jwks.iss, jwks.aud);
+                            service
+                                .register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                            continue;
+                        }
+                    }
+                    let sig = sec_cfg
+                        .and_then(|s| s.oauth2.as_ref())
+                        .and_then(|b| b.signature.clone())
+                        .or_else(|| std::env::var("BRRTR_OAUTH2_SIGNATURE").ok())
+                        .unwrap_or_else(|| "sig".into());
+                    let sig_len = sig.len();
+                    let mut p = OAuth2Provider::new(sig);
+                    let cookie_opt = sec_cfg
+                        .and_then(|s| s.oauth2.as_ref())
+                        .and_then(|b| b.cookie_name.clone());
+                    if let Some(cookie) = cookie_opt.clone() {
+                        p = p.cookie_name(cookie);
+                    }
+                    println!("[auth] register OAuth2Provider scheme={scheme_name} source=mock signature_len={sig_len} cookie={cookie_opt:?}");
+                    service.register_security_provider(&scheme_name, std::sync::Arc::new(p));
+                }
+                _ => {}
+            }
+        }
+    }
+    // Port selection priority: config.yaml > PORT environment variable > default 8080
+    // This allows Kubernetes ConfigMaps to set the port, with env var as fallback
+    let port = app_config
+        .port
+        .or_else(|| {
+            std::env::var("PORT")
+                .ok()
+                .and_then(|p| p.parse::<u16>().ok())
+        })
+        .unwrap_or(8080);
+    let addr = if std::env::var("BRRTR_LOCAL").is_ok() {
+        format!("127.0.0.1:{port}")
+    } else {
+        format!("0.0.0.0:{port}")
+    };
+    println!("🚀 rerp_accounting_backend_for_frontend_api example server listening on {addr}");
+    let server = HttpServer(service).start(&addr).map_err(io::Error::other)?;
+    println!("Server started successfully on {addr}");
+
+    server
+        .join()
+        .map_err(|e| io::Error::other(format!("Server encountered an error: {e:?}")))?;
+    Ok(())
+}

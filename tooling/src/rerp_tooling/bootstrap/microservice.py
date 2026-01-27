@@ -91,9 +91,9 @@ RUN mkdir -p /app/config /app/doc /app/static_site && \\
     chmod -R 777 /app
 
 # Copy configuration and assets to writable locations
-COPY ./microservices/accounting/{service_name}/config /app/config
-COPY ./microservices/accounting/{service_name}/doc /app/doc
-COPY ./microservices/accounting/{service_name}/static_site /app/static_site
+COPY ./microservices/accounting/{service_name}/impl/config /app/config
+COPY ./microservices/accounting/{service_name}/gen/doc /app/doc
+COPY ./microservices/accounting/{service_name}/gen/static_site /app/static_site
 
 # Expose HTTP port
 EXPOSE {port}
@@ -135,20 +135,25 @@ def update_workspace_cargo_toml(service_name: str, cargo_toml_path: Path) -> Non
     if not cargo_toml_path.exists():
         return
     content = cargo_toml_path.read_text()
-    if f'"accounting/{service_name}"' in content:
+    gen_member = f'"accounting/{service_name}/gen"'
+    impl_member = f'"accounting/{service_name}/impl"'
+    if gen_member in content and impl_member in content:
         return
     m = re.search(r"(members\s*=\s*\[)(.*?)(\])", content, re.DOTALL)
     if not m:
         return
     existing = [x.strip().strip('"') for x in m.group(2).split(",") if x.strip()]
-    if f"accounting/{service_name}" in existing:
+    if gen_member.strip('"') in existing and impl_member.strip('"') in existing:
         return
-    existing.append(f"accounting/{service_name}")
+    if gen_member.strip('"') not in existing:
+        existing.append(gen_member.strip('"'))
+    if impl_member.strip('"') not in existing:
+        existing.append(impl_member.strip('"'))
     existing.sort()
     new_members = '    "' + '",\n    "'.join(existing) + '",\n'
     new_content = content[: m.start()] + m.group(1) + "\n" + new_members + "]" + content[m.end() :]
     cargo_toml_path.write_text(new_content)
-    print(f"✅ Added {service_name} to workspace Cargo.toml")
+    print(f"✅ Added {service_name}/gen and {service_name}/impl to workspace Cargo.toml")
 
 
 def update_tiltfile(
@@ -213,9 +218,14 @@ def update_tiltfile(
         )
 
     m = re.search(r"(deps=\[)(.*?)(\]\s*resource_deps=)", content, re.DOTALL)
-    if m and f"'./microservices/accounting/{service_name}/Cargo.toml'" not in m.group(2):
+    gen_cargo = f"'./microservices/accounting/{service_name}/gen/Cargo.toml'"
+    impl_cargo = f"'./microservices/accounting/{service_name}/impl/Cargo.toml'"
+    if m:
         deps = [d.strip().strip("'\"") for d in m.group(2).split(",") if d.strip()]
-        deps.append(f"./microservices/accounting/{service_name}/Cargo.toml")
+        if gen_cargo.strip("'\"") not in deps:
+            deps.append(gen_cargo.strip("'\""))
+        if impl_cargo.strip("'\"") not in deps:
+            deps.append(impl_cargo.strip("'\""))
         deps.sort()
         content = (
             content[: m.start()]
@@ -256,6 +266,167 @@ def update_tiltfile(
     if content != orig:
         tiltfile_path.write_text(content)
         print("✅ Updated Tiltfile")
+
+
+def _update_gen_cargo_toml(cargo_path: Path, service_name: str) -> None:
+    """Update gen/Cargo.toml to be a library crate."""
+    content = cargo_path.read_text()
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+
+    # Update package name
+    content = re.sub(r'name = "[^"]+"', f'name = "{gen_crate_name}"', content, count=1)
+    # Update version to match workspace
+    content = re.sub(r'version = "[^"]+"', 'version = "0.1.3"', content, count=1)
+
+    # Add [lib] section if not present
+    if "[lib]" not in content:
+        # Insert after [package] section
+        content = re.sub(
+            r"(\[package\][^\[]+)",
+            r'\1\n[lib]\nname = "' + gen_crate_name + '"\npath = "src/lib.rs"\n',
+            content,
+            count=1,
+        )
+
+    cargo_path.write_text(content)
+
+
+def _create_impl_cargo_toml(cargo_path: Path, service_name: str) -> None:
+    """Create impl/Cargo.toml as a binary crate."""
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+    impl_crate_name = f"rerp_accounting_{service_snake}"
+
+    cargo_content = f"""[package]
+name = "{impl_crate_name}"
+version = "0.1.3"
+edition = "2021"
+
+[[bin]]
+name = "{impl_crate_name}"
+path = "src/main.rs"
+
+[features]
+default = ["jemalloc"]
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+# Generated crate
+{gen_crate_name} = {{ path = "../gen" }}
+
+# BRRTRouter (re-exported from gen crate, but may need direct access)
+brrtrouter = {{ workspace = true }}
+brrtrouter_macros = {{ workspace = true }}
+
+# Standard dependencies
+serde = {{ workspace = true }}
+serde_json = {{ workspace = true }}
+serde_yaml = {{ workspace = true }}
+config = {{ workspace = true }}
+http = {{ workspace = true }}
+may = {{ workspace = true }}
+may_minihttp = {{ workspace = true }}
+anyhow = {{ workspace = true }}
+clap = {{ workspace = true }}
+tikv-jemallocator = {{ workspace = true, optional = true }}
+"""
+
+    cargo_path.parent.mkdir(parents=True, exist_ok=True)
+    cargo_path.write_text(cargo_content)
+
+
+def _create_impl_main(gen_main_path: Path, impl_main_path: Path, service_name: str) -> None:
+    """Create impl/src/main.rs from gen/src/main.rs with necessary modifications.
+
+    Modifications:
+    1. Change imports to use gen crate
+    2. Import impl controllers instead of gen controllers
+    3. Update paths for config and doc directories
+    """
+    import re
+
+    if not gen_main_path.exists():
+        print(f"❌ Gen main.rs not found: {gen_main_path}")
+        return
+
+    content = gen_main_path.read_text()
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+
+    # 1. Remove the warning comments at the top (they're for gen, not impl)
+    content = re.sub(
+        r"^// ⚠️ WARNING: This file is auto-generated by BRRTRouter.*?\n",
+        "",
+        content,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+
+    # 2. Add comment at top explaining this uses gen crate
+    header = f"""// This file uses generated code from the {gen_crate_name} crate
+// Business logic controllers are in impl/src/controllers/
+// This file is based on gen/src/main.rs but uses impl controllers
+
+"""
+    content = header + content
+
+    # 3. Remove local mod declarations (handlers, registry, controllers are in gen crate)
+    # Remove mod handlers, mod registry, and mod controllers (with optional whitespace)
+    content = re.sub(r"^mod (handlers|registry|controllers);\s*\n", "", content, flags=re.MULTILINE)
+
+    # 4. Add imports for gen crate and impl controllers
+    imports_section = f"""// Use generated code from gen crate
+use {gen_crate_name}::*;
+use {gen_crate_name}::handlers::*;
+use {gen_crate_name}::registry::*;
+
+// Import implementation controllers (business logic)
+mod controllers;
+use controllers::*;
+
+"""
+
+    # Find where to insert: after the header comments, before the first use statement
+    lines = content.split("\n")
+    insert_idx = 0
+    for i, line in enumerate(lines):
+        if line.startswith("use ") and not line.startswith("use crate::"):
+            insert_idx = i
+            break
+
+    # Insert the imports section
+    lines.insert(insert_idx, imports_section.rstrip())
+    content = "\n".join(lines)
+
+    # 5. Update registry registration - add note about impl controllers
+    content = re.sub(
+        r"(unsafe \{\s*registry::register_from_spec)",
+        r"// NOTE: This registers controllers from gen crate. We need to register impl controllers instead.\n    // TODO: Update to register impl controllers\n    \1",
+        content,
+        flags=re.MULTILINE,
+    )
+
+    # 6. Update config path (it's now in impl/config/)
+    content = re.sub(
+        r'default_value = "\./config/config\.yaml"',
+        r'default_value = "./config/config.yaml"',
+        content,
+    )
+
+    # 7. Update doc path (it's now in gen/doc/)
+    content = re.sub(r'default_value = "\./doc"', r'default_value = "../gen/doc"', content)
+
+    # 8. Update spec path (it's now in gen/doc/)
+    content = re.sub(
+        r'default_value = "\./doc/openapi\.yaml"',
+        r'default_value = "../gen/doc/openapi.yaml"',
+        content,
+    )
+
+    # Write the file
+    impl_main_path.parent.mkdir(parents=True, exist_ok=True)
+    impl_main_path.write_text(content)
+    print(f"✅ Created {impl_main_path}")
 
 
 def generate_code_with_brrtrouter(spec_path: Path, output_dir: Path, project_root: Path) -> None:
@@ -307,8 +478,10 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
     spec_file = f"{service_name}/openapi.yaml"
     spec_path = project_root / "openapi" / "accounting" / service_name / "openapi.yaml"
     crate_dir = project_root / "microservices" / "accounting" / service_name
+    gen_dir = crate_dir / "gen"
+    impl_dir = crate_dir / "impl"
     dockerfile_path = project_root / "docker" / "microservices" / f"Dockerfile.{service_name}"
-    config_path = crate_dir / "config" / "config.yaml"
+    config_path = impl_dir / "config" / "config.yaml"
     cargo_toml_path = project_root / "microservices" / "Cargo.toml"
     tiltfile_path = project_root / "Tiltfile"
 
@@ -320,16 +493,36 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
     binary_name = derive_binary_name(openapi_spec, service_name)
     print(f"🚀 Bootstrapping {service_name} (port {port}, binary {binary_name})")
 
-    generate_code_with_brrtrouter(spec_path, crate_dir, project_root)
+    # Generate code to gen/ directory
+    generate_code_with_brrtrouter(spec_path, gen_dir, project_root)
 
-    crate_cargo = crate_dir / "Cargo.toml"
-    if crate_cargo.exists():
+    gen_cargo = gen_dir / "Cargo.toml"
+    if gen_cargo.exists():
         from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 
-        run_fix_cargo_paths(crate_cargo, project_root)
+        run_fix_cargo_paths(gen_cargo, project_root)
+        # Update gen/Cargo.toml to be a library crate
+        _update_gen_cargo_toml(gen_cargo, service_name)
+
+    # Create impl directory structure
+    impl_dir.mkdir(parents=True, exist_ok=True)
+    (impl_dir / "config").mkdir(parents=True, exist_ok=True)
+    (impl_dir / "src" / "controllers").mkdir(parents=True, exist_ok=True)
 
     if not config_path.exists():
         create_config_yaml(config_path)
+
+    # Create impl/Cargo.toml if it doesn't exist
+    impl_cargo = impl_dir / "Cargo.toml"
+    if not impl_cargo.exists():
+        _create_impl_cargo_toml(impl_cargo, service_name)
+
+    # Create impl/src/main.rs if gen/src/main.rs exists
+    impl_main = impl_dir / "src" / "main.rs"
+    gen_main = gen_dir / "src" / "main.rs"
+    if not impl_main.exists() and gen_main.exists():
+        _create_impl_main(gen_main, impl_main, service_name)
+
     create_dockerfile(service_name, binary_name, port, dockerfile_path)
     update_workspace_cargo_toml(service_name, cargo_toml_path)
     update_tiltfile(service_name, spec_file, binary_name, port, tiltfile_path)

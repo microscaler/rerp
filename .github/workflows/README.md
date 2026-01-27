@@ -12,7 +12,7 @@
 - **Validate OpenAPI Specs**: Validates all `openapi.yaml` files and runs `rerp bff generate-system` as a dry run to ensure BFF generation works.
 - **Validate Port Assignments**: Runs `rerp ports validate` to check for duplicate ports in helm/kind/Tiltfile and mismatches with the port registry.
 - **Build and Test**: Patches deps for CI, builds workspace (amd64), example service (auth_idam), and accounting microservices (smoke test), format/lint/test/doc.
-- **Build Multi-Architecture**: Builds workspace and microservices for amd64, arm64, arm7 via `cross`; uploads `rerp-binaries-*` (components) and `microservices-binaries-*` (amd64, arm64, arm) artifacts.
+- **Build Multi-Architecture**: Builds workspace and microservices for amd64, arm64, arm7 via `cross`; uploads `rerp-binaries-*` (microservices) and `microservices-binaries-*` (amd64, arm64, arm) artifacts.
 - **Download Copy Package and Push Containers** (on **push** to `main`, `develop`, or tags `v*`): Copies microservices binaries from `build-multiarch` artifacts into `build_artifacts/`, validates layout, sets image tag, and uploads `build-artifacts` for the matrix job.
 - **Build and push \<service\>** (matrix over 10 microservices: general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports, bff): For each service, downloads `build-artifacts`, runs Extract metadata → Build and push → Attest. Uses `docker/microservices/Dockerfile.\<service\>`, multi-arch linux/amd64, linux/arm64, linux/arm/v7. (The website is deployed via GitHub Pages in `deploy-website.yml`, not as a container here.)
 - **Verify published images**: After all matrix jobs succeed, runs `docker buildx imagetools inspect` on all 10 microservice images to confirm manifests and platforms.
@@ -78,7 +78,7 @@ If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also
 - **provider**: `anthropic` (default) | `openai` — AI provider for release notes generation
 
 **Jobs**:
-- **Bump, tag and push**: Checkout → bump (read `components/Cargo.toml`, compute next, write to all Cargo.toml) → **generate release notes** (commits since last tag → OpenAI or Anthropic per `provider` → `release-body.md`) → check for changes → commit `chore(release): vX.Y.Z` → tag `vX.Y.Z` → push (EndBug/add-and-commit) → **create GitHub Release** (softprops/action-gh-release) with `body_path: release-body.md`.
+- **Bump, tag and push**: Checkout → bump (read `microservices/Cargo.toml`, compute next, write to all Cargo.toml) → **generate release notes** (commits since last tag → OpenAI or Anthropic per `provider` → `release-body.md`) → check for changes → commit `chore(release): vX.Y.Z` → tag `vX.Y.Z` → push (EndBug/add-and-commit) → **create GitHub Release** (softprops/action-gh-release) with `body_path: release-body.md`.
 
 **Required secrets** (use the one for the chosen `provider`; default is anthropic):
 - **`ANTHROPIC_API_KEY`** — when `provider=anthropic` (default; https://console.anthropic.com/). If missing and provider is anthropic, the generate-notes step fails.
@@ -86,7 +86,7 @@ If `vars.DOCKERHUB_ORG` is set (e.g. `microscaler`), the same 10 images are also
 
 **Release notes template**: `.github/release-notes-template.md` defines the structure (Summary, Features, Fixes, Other). Use `{{VERSION}}` for the version; `[brackets]` are hints for the model. Override via `--template` in the workflow or run `rerp release generate-notes` locally.
 
-**Version source**: `components/Cargo.toml` `[workspace.package].version`. The same value is written to all `[package]` / `[workspace.package].version` in Cargo.toml across the repo, including the **root `Cargo.toml`** `[workspace.package].version` (which is explicitly kept in sync even if it has drifted).
+**Version source**: `microservices/Cargo.toml` `[workspace.package].version`. The same value is written to all `[package]` / `[workspace.package].version` in Cargo.toml across the repo, including the **root `Cargo.toml`** `[workspace.package].version` (which is explicitly kept in sync even if it has drifted).
 
 ---
 

@@ -48,21 +48,21 @@ cd tooling && uv venv && uv pip install -e ".[dev]"
 - **`rerp ci fix-cargo-paths PATH`** — Fix brrtrouter/brrtrouter_macros path deps in a Cargo.toml to ../BRRTRouter (local dev after brrtrouter-gen). Replaces `scripts/fix_cargo_toml_paths.py`.
 
 **BFF**
-- **`rerp bff generate-system [--system NAME] [--output PATH] [--openapi-dir DIR]`** — Merge `openapi/{system}/{service}/openapi.yaml` into system BFF at `openapi/{system}/openapi.yaml`. No `--system` ⇒ all systems with sub-services. Replaces `scripts/generate_system_bff.py`.
+- **`rerp bff generate-system [--system NAME] [--output PATH] [--openapi-dir DIR]`** — Merge `openapi/{suite}/{service}/openapi.yaml` into suite BFF at `openapi/{suite}/openapi_bff.yaml`. No `--system` ⇒ all suites with sub-services. Replaces `scripts/generate_system_bff.py`.
 
 **Docker**
-- **`rerp docker unpack-build-bins [--input-dir DIR]`** — Extract `rerp-binaries-{amd64,arm64,arm7}.zip` from `tmp/buildBins` (or `--input-dir`) into `components/target/`. Use after downloading Multi-Arch job artifacts. Then run `rerp docker copy-multiarch <system> <module> all` and build images.
-- **`rerp docker generate-dockerfile <system> <module> [--port N]`** — Generate `docker/microservices/Dockerfile.{system}_{module}` from template. Replaces `scripts/generate-dockerfile.py`.
+- **`rerp docker unpack-build-bins [--input-dir DIR]`** — Extract `rerp-binaries-{amd64,arm64,arm7}.zip` from `tmp/buildBins` (or `--input-dir`) into `microservices/target/`. Use after downloading Multi-Arch job artifacts. Then run `rerp docker copy-multiarch <suite> <service> all` and build images.
+- **`rerp docker generate-dockerfile <suite> <service> [--port N]`** — Generate `docker/microservices/Dockerfile.{suite}_{service}` from template. Replaces `scripts/generate-dockerfile.py`.
 - **`rerp docker validate-build-artifacts`** — Check `build_artifacts/{amd64,arm64,arm}` contain the expected microservice binaries. Use after copying from build-multiarch artifacts (GHA) or after `rerp docker copy-artifacts` for each arch.
 - **`rerp docker copy-artifacts <arch>`** — Copy microservice binaries from `microservices/target/{triple}/release/` to `build_artifacts/{amd64|arm64|arm}`. Use after `rerp build microservices <arch> --release`. Replaces `--copy-only` of `build-and-push-microservice-containers.sh`. **Push is in GHA only** (`docker/build-push-action` per service).
 - **`rerp docker copy-binary <source> <dest> <binary_name>`** — Copy a binary to dest, chmod +x, write `{dest}.sha256`. Used by Tilt’s accounting flow. Replaces `copy-microservice-binary-simple.sh`.
 - **`rerp docker build-image-simple <image_name> <dockerfile> <hash_path> <artifact_path>`** — Ensure hash/artifact/dockerfile exist; `docker build -t {image_name}:tilt`; push to registry or `kind load`. Used by Tilt. Replaces `build-microservice-docker-simple.sh`.
-- **`rerp docker copy-multiarch <system> <module> [arch]`** — Copy component binaries from `components/target/{triple}/release/` to `build_artifacts/{system}_{module}/{arch}/`. `arch`: amd64, arm64, arm7, or all. Replaces `copy-multiarch-binary.sh`.
-- **`rerp docker build-multiarch <system> <module> <image_name> [--tag N] [--push]`** — Build for all archs, copy, generate Dockerfile if missing, buildx base+images, manifest; optional push. Replaces `build-multiarch-docker.sh`.
+- **`rerp docker copy-multiarch <suite> <service> [arch]`** — Copy microservice binaries from `microservices/target/{triple}/release/` to `build_artifacts/{suite}_{service}/{arch}/`. `arch`: amd64, arm64, arm7, or all. Replaces `copy-multiarch-binary.sh`.
+- **`rerp docker build-multiarch <suite> <service> <image_name> [--tag N] [--push]`** — Build for all archs, copy, generate Dockerfile if missing, buildx base+images, manifest; optional push. Replaces `build-multiarch-docker.sh`.
 - **`rerp docker build-base [--push] [--dry-run]`** — Build `docker/base/Dockerfile` as `rerp-base:latest`. `--push` pushes to `ghcr.io/$GHCR_OWNER/rerp-base:latest` (requires login). **Publishing** uses `.github/workflows/base-images.yml` (change detection, registry cache).
 
 **Build**
-- **`rerp build <target> [arch]`** — Host-aware build: `workspace` or `<system>_<module>` (e.g. `auth_idam`). Optional `arch`: `amd64`, `arm64`, `arm7`, or `all` (default: host). Replaces `scripts/host-aware-build.py`.
+- **`rerp build <target> [arch]`** — Host-aware build: `workspace` or `<suite>_<service>` (e.g. `accounting_general_ledger`). Optional `arch`: `amd64`, `arm64`, `arm7`, or `all` (default: host). Replaces `scripts/host-aware-build.py`.
 - **`rerp build microservices [arch] [--release]`** — Build `microservices/` workspace (accounting). `arch`: amd64, arm64, arm7 (default amd64). Replaces `scripts/build-microservice.sh workspace`.
 - **`rerp build microservice <name> [--release]`** — Build one accounting microservice (e.g. general-ledger). Replaces `scripts/build-microservice.sh <name>`.
 
@@ -108,6 +108,6 @@ cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-mi
   - `cli/` — `rerp` entry and `ports`, `openapi`, `ci`, `bff`, `docker`, `build` subcommands
   - `docker/` — `unpack_build_bins`, `generate_dockerfile`, `copy_artifacts`, `validate_build_artifacts`, `copy_binary`, `copy_multiarch`, `build_image_simple`, `build_multiarch`, `build_base` for `rerp docker unpack-build-bins`, `generate-dockerfile`, `copy-artifacts`, `validate-build-artifacts`, `copy-binary`, `copy-multiarch`, `build-image-simple`, `build-multiarch`, `build-base`
   - `tilt/` — `setup_kind_registry`, `setup_persistent_volumes`, `setup`, `teardown`, `logs` for `rerp tilt setup-kind-registry`, `setup-persistent-volumes`, `setup`, `teardown`, `logs`
-  - `build/` — `host_aware` for `rerp build` (workspace or \<system\>_\<module\> [arch])
+  - `build/` — `host_aware` for `rerp build` (workspace or \<suite\>_\<service\> [arch])
   - `bootstrap/` — `microservice` for `rerp bootstrap microservice`
 - `tests/` — unit tests (TDD). No lift‑and‑shift; scripts are broken into modules and tested.

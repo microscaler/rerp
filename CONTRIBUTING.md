@@ -29,14 +29,14 @@ This guide will help you get started with contributing to the project.
    ls openapi/*/openapi.yaml
    
    # Check crate structure
-   ls components/*/
+   ls microservices/*/
    ```
 
 3. **Generate system BFF specs** (optional, for testing): run `just init` then `rerp bff generate-system`.
 
 4. **Pre-commit hooks** (recommended): run `just init` then `just install-hooks`. Before each commit this runs:
    - **Tooling QA**: `just qa` (lint, format-check, tooling tests)
-   - **microservices-fmt**: if `microservices/` changed vs HEAD, runs `just fmt-rust` (cargo fmt in `components/`, rustfmt in `entities/`); fast if Tilt has recently built.
+   - **microservices-fmt**: if `microservices/` changed vs HEAD, runs `just fmt-rust` (cargo fmt in `microservices/`, rustfmt in `entities/`); fast if Tilt has recently built.
 
 ---
 
@@ -206,15 +206,17 @@ We welcome contributions in the following areas:
 
 ```
 rerp/
-├── components/          # Rust workspace with service crates
-│   ├── {system}/       # System directories
-│   │   ├── {module}/   # Generated crate
-│   │   └── {module}_impl/  # Implementation crate
-│   └── common/         # Shared utilities
+├── microservices/      # Rust workspace with service crates
+│   ├── {suite}/        # Suite directories (e.g., accounting, hr, sales)
+│   │   ├── {service}/  # Service directories
+│   │   │   ├── gen/    # Generated crate (from OpenAPI)
+│   │   │   └── impl/   # Implementation crate (business logic)
 ├── openapi/            # OpenAPI specifications
-│   ├── {system}/       # System directories
-│   │   ├── openapi.yaml  # System BFF spec
-│   │   └── {module}/   # Service directories
+│   ├── {suite}/        # Suite directories
+│   │   ├── bff-suite-config.yaml  # Suite BFF config
+│   │   ├── openapi_bff.yaml       # Generated suite BFF spec
+│   │   └── {service}/  # Service directories
+│   │       └── openapi.yaml
 ├── tooling/            # rerp CLI (ports, openapi, ci, bff, build, docker, bootstrap, tilt)
 ├── docs/               # Documentation (ALL planning documents go here)
 │   ├── ai/             # AI-generated planning and analysis
@@ -225,7 +227,7 @@ rerp/
 
 **⚠️ Important**: The project root should NOT contain planning documents. All planning, analysis, design proposals, and status documents must be in `./docs/` or subdirectories.
 
-See [components/README.md](components/README.md) for detailed crate structure information.
+See microservices structure: `microservices/{suite}/{service}/gen/` (generated) and `microservices/{suite}/{service}/impl/` (business logic).
 
 ---
 

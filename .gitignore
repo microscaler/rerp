@@ -6,6 +6,7 @@ target/
 build/
 debug/
 build_artifacts/
+./components/
 
 # Remove Cargo.lock from gitignore if creating an executable; leave for libraries
 # https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html

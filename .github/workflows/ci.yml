@@ -51,26 +51,44 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          # Read current version from components/Cargo.toml
-          CURRENT=$(grep -A 5 '\[workspace.package\]' components/Cargo.toml | grep -E '^\s*version\s*=' | head -1 | sed -E 's/.*version\s*=\s*"v?([^"]+)".*/\1/' || echo "")
-          if [ -z "$CURRENT" ]; then
-            echo "Warning: Could not read version from components/Cargo.toml, skipping validation"
-            exit 0
-          fi
-          # Get latest tag from GitHub API (with retry logic and Fibonacci backoff)
-          # If command fails after retries, fail the job to prevent silent version downgrade
-          if LATEST=$(rerp ci get-latest-tag); then
-            if [ -n "$LATEST" ]; then
-              echo "Validating version: current=$CURRENT, latest=$LATEST"
-              rerp ci validate-version --current "$CURRENT" --latest "$LATEST" || exit 1
-              echo "Version validation passed"
-            else
-              echo "No previous releases found, allowing first release"
-            fi
+          # When running on a tag, extract version from the tag ref
+          # Otherwise, read from microservices/Cargo.toml
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            # Extract version from tag (e.g., refs/tags/v0.1.3 -> 0.1.3)
+            CURRENT=$(echo "${{ github.ref }}" | sed -E 's|refs/tags/v?||')
+            echo "Running on tag: ${{ github.ref }}, version: $CURRENT"
           else
-            echo "Error: Failed to get latest tag from GitHub API after retries. Cannot validate version safely."
-            echo "This prevents accidental version downgrades. Please retry the workflow."
-            exit 1
+            # Read current version from microservices/Cargo.toml
+            CURRENT=$(grep -A 5 '\[workspace.package\]' microservices/Cargo.toml | grep -E '^\s*version\s*=' | head -1 | sed -E 's/.*version\s*=\s*"v?([^"]+)".*/\1/' || echo "")
+            if [ -z "$CURRENT" ]; then
+              echo "Warning: Could not read version from microservices/Cargo.toml, skipping validation"
+              exit 0
+            fi
+          fi
+          
+          # Get all tags and find the previous one (excluding current tag if we're on a tag)
+          # Use git to get tags sorted by version, excluding the current tag
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            CURRENT_TAG=$(echo "${{ github.ref }}" | sed -E 's|refs/tags/||')
+            # Get all tags, sort by version, exclude current tag, get the latest
+            LATEST=$(git tag -l 'v*' | grep -v "^${CURRENT_TAG}$" | sort -V | tail -1 | sed 's/^v//' || echo "")
+          else
+            # Not on a tag, get latest from GitHub API
+            if LATEST=$(rerp ci get-latest-tag); then
+              LATEST="$LATEST"
+            else
+              echo "Error: Failed to get latest tag from GitHub API after retries. Cannot validate version safely."
+              echo "This prevents accidental version downgrades. Please retry the workflow."
+              exit 1
+            fi
+          fi
+          
+          if [ -n "$LATEST" ]; then
+            echo "Validating version: current=$CURRENT, latest=$LATEST"
+            rerp ci validate-version --current "$CURRENT" --latest "$LATEST" || exit 1
+            echo "Version validation passed"
+          else
+            echo "No previous releases found, allowing first release"
           fi
 
   conventional-commits:
@@ -217,8 +235,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            components/target
-          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+            microservices/target
+          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-rerp-
       
@@ -245,22 +263,22 @@ jobs:
       
       - name: Format check
         run: |
-          cd components
+          cd microservices
           cargo fmt --check || (echo "❌ Code formatting check failed. Run 'cargo fmt' to fix." && exit 1)
       
       - name: Lint with Clippy
         run: |
-          cd components
+          cd microservices
           cargo clippy --workspace -- -D warnings
       
       - name: Run tests
         run: |
-          cd components
+          cd microservices
           cargo test --workspace --lib
       
       - name: Check documentation
         run: |
-          cd components
+          cd microservices
           cargo doc --workspace --no-deps || true
 
   build-multiarch:
@@ -305,15 +323,15 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
       
       - name: Cache cargo target (per-architecture)
         uses: actions/cache@v5
         with:
-          path: components/target
-          key: ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-${{ hashFiles('components/**/Cargo.toml', 'components/Cargo.lock') }}
+          path: microservices/target
+          key: ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-
 
@@ -345,7 +363,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: rerp-binaries-${{ matrix.architecture }}
-          path: components/target/*/release/rerp_*
+          path: microservices/target/*/release/rerp_*
           retention-days: 1
           if-no-files-found: warn
 

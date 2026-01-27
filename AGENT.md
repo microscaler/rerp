@@ -14,7 +14,7 @@ This document provides agentic AI systems with essential context and references 
 
 **RERP is composed of suites of systems.** Each **suite** has:
 
-- **Microservices**: `openapi/{suite}/{name}/openapi.yaml` and corresponding `microservices/` / `components/` crates
+- **Microservices**: `openapi/{suite}/{name}/openapi.yaml` and corresponding `microservices/` crates
 - **One BFF per suite**: `openapi/{suite}/bff-suite-config.yaml` and generated `openapi/{suite}/openapi_bff.yaml` that aggregates that suite’s services
 
 Example: the **accounting** suite has microservices (general-ledger, invoice, accounts-receivable, accounts-payable, bank-sync, asset, budget, edi, financial-reports) and one **BFF** that fronts them. Other suites (e.g. HR, sales) will have their own BFF when implemented.
@@ -86,22 +86,22 @@ Design proposals, Product Requirements Documents (PRDs), and similar planning do
 
 1. Read [README.md](README.md) for project overview
 2. Review [RERP_MUSINGS.md](RERP_MUSINGS.md) for module breakdown and market analysis
-3. Check [components/README.md](components/README.md) for crate structure
+3. Check microservices structure: `microservices/{suite}/{service}/gen/` (generated) and `microservices/{suite}/{service}/impl/` (business logic)
 4. Review relevant AI planning documents in `docs/ai/`
 
 ### 2. Working with Services
 
 Each service follows this structure:
-- **Generated crate**: `components/{system}/{module}/` - Auto-generated from OpenAPI
-- **Implementation crate**: `components/{system}/{module}_impl/` - Business logic
-- **OpenAPI spec**: `openapi/{system}/{module}/openapi.yaml`
+- **Generated crate**: `microservices/{suite}/{service}/gen/` - Auto-generated from OpenAPI
+- **Implementation crate**: `microservices/{suite}/{service}/impl/` - Business logic
+- **OpenAPI spec**: `openapi/{suite}/{service}/openapi.yaml`
 
 ### 3. Code Generation
 
 ```bash
 # Generate code from OpenAPI spec
-cd components/{system}/{module}
-brrtrouter-gen --spec ../../openapi/{system}/{module}/openapi.yaml
+cd microservices/{suite}/{service}/impl
+brrtrouter-gen --spec ../../../openapi/{suite}/{service}/openapi.yaml --output ../gen
 ```
 
 ### 4. Suite BFF Generation
@@ -120,8 +120,8 @@ For other suites, use `openapi/{suite}/bff-suite-config.yaml` and `openapi/{suit
 
 ### Core Project Files
 
-- `components/Cargo.toml` - Workspace root configuration
-- `components/common/` - Shared utilities crate
+- `microservices/Cargo.toml` - Workspace root configuration
+- Shared utilities are in `entities/` crate
 - `openapi/` - All OpenAPI specifications
 - `port-registry.json` - Port registry at **project root**; `rerp ports` uses it. All automation is in `rerp` (tooling/).
 
@@ -240,7 +240,7 @@ cd components && cargo test --workspace
 
 - Review AI planning documents in `docs/ai/`
 - Check [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines
-- Review [components/README.md](components/README.md) for crate structure
+- Review microservices structure: `microservices/{suite}/{service}/gen/` (generated) and `microservices/{suite}/{service}/impl/` (business logic)
 
 ---
 

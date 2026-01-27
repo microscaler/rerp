@@ -86,7 +86,8 @@ class TestUpdateWorkspaceCargoToml:
         )
         update_workspace_cargo_toml("bar", cargo)
         text = cargo.read_text()
-        assert '"accounting/bar"' in text
+        assert '"accounting/bar/gen"' in text
+        assert '"accounting/bar/impl"' in text
         assert 'resolver = "2"' in text
         assert "[workspace.package]" in text
         assert "[workspace.dependencies]" in text
@@ -98,9 +99,12 @@ class TestUpdateWorkspaceCargoToml:
 
     def test_no_op_if_already_member(self, tmp_path: Path):
         cargo = tmp_path / "Cargo.toml"
-        cargo.write_text('[workspace]\nmembers = ["accounting/baz"]\nresolver = "2"\n')
+        cargo.write_text(
+            '[workspace]\nmembers = ["accounting/baz/gen", "accounting/baz/impl"]\nresolver = "2"\n'
+        )
         update_workspace_cargo_toml("baz", cargo)
-        assert cargo.read_text().count('"accounting/baz"') == 1
+        assert cargo.read_text().count('"accounting/baz/gen"') == 1
+        assert cargo.read_text().count('"accounting/baz/impl"') == 1
 
 
 class TestUpdateTiltfile:
@@ -143,14 +147,15 @@ class TestUpdateTiltfile:
         tilt = tmp_path / "Tiltfile"
         tilt.write_text(
             "local_resource('build-x', 'echo',\n"
-            "    deps=['./microservices/accounting/a/Cargo.toml']\n"
+            "    deps=['./microservices/accounting/a/gen/Cargo.toml', './microservices/accounting/a/impl/Cargo.toml']\n"
             "    resource_deps=['accounting-all-gens'],\n"
             ")\n"
         )
         update_tiltfile("b", "b/openapi.yaml", "b_api", 8002, tilt)
         text = tilt.read_text()
         assert "resource_deps=" in text
-        assert "'./microservices/accounting/b/Cargo.toml'" in text
+        assert "'./microservices/accounting/b/gen/Cargo.toml'" in text
+        assert "'./microservices/accounting/b/impl/Cargo.toml'" in text
 
     def test_binary_names_new_entry_sorts_alphabetically_and_has_consistent_indent(
         self, tmp_path: Path

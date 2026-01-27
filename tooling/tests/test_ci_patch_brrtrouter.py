@@ -153,9 +153,9 @@ class TestRun:
 
         from rerp_tooling.ci import patch_brrtrouter
 
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
-            '[package]\nname = "c"\n[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }\n'
+        (tmp_path / "microservices").mkdir()
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
+            '[package]\nname = "m"\n[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }\n'
         )
         called = []
 

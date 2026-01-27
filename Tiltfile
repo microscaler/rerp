@@ -138,18 +138,18 @@ def create_microservice_gen(name, spec_file, output_dir):
             # Use the built debug binary directly for speed (instant vs minutes for cargo run)
             ../BRRTRouter/target/debug/brrtrouter-gen generate \
                 --spec ./openapi/%s \
-                --output ./microservices/accounting/%s \
+                --output ./microservices/accounting/%s/gen \
                 --force || \
             cargo run --manifest-path ../BRRTRouter/Cargo.toml --bin brrtrouter-gen -- \
                 generate \
                 --spec ./openapi/%s \
-                --output ./microservices/accounting/%s \
+                --output ./microservices/accounting/%s/gen \
                 --force
             
             # Fix Cargo.toml paths to point to BRRTRouter repository
             echo "🔧 Fixing Cargo.toml dependency paths..."
-            if [ -f ./microservices/accounting/%s/Cargo.toml ]; then
-                tooling/.venv/bin/rerp ci fix-cargo-paths ./microservices/accounting/%s/Cargo.toml
+            if [ -f ./microservices/accounting/%s/gen/Cargo.toml ]; then
+                tooling/.venv/bin/rerp ci fix-cargo-paths ./microservices/accounting/%s/gen/Cargo.toml
             fi
             
             echo "✅ %s service regeneration complete"
@@ -159,10 +159,10 @@ def create_microservice_gen(name, spec_file, output_dir):
             'tooling/pyproject.toml',
         ],
         ignore=[
-            './microservices/accounting/%s/src' % output_dir,  # Don't watch generated files
-            './microservices/accounting/%s/doc' % output_dir,
-            './microservices/accounting/%s/config' % output_dir,
-            './microservices/accounting/%s/static_site' % output_dir,
+            './microservices/accounting/%s/gen/src' % output_dir,  # Don't watch generated files
+            './microservices/accounting/%s/gen/doc' % output_dir,
+            './microservices/accounting/%s/impl/config' % output_dir,  # Config moved to impl
+            './microservices/accounting/%s/gen/static_site' % output_dir,
         ],
         resource_deps=['%s-lint' % name],  # Wait for linting to pass before generating code
         labels=['acc_' + name],
@@ -225,8 +225,10 @@ def create_microservice_build_resource(name):
         'build-%s' % name,
         'tooling/.venv/bin/rerp build microservice %s' % name,
         deps=[
-            './microservices/accounting/%s/Cargo.toml' % name,
-            './microservices/accounting/%s/src' % name,
+            './microservices/accounting/%s/gen/Cargo.toml' % name,  # Generated crate
+            './microservices/accounting/%s/impl/Cargo.toml' % name,  # Implementation crate
+            './microservices/accounting/%s/gen/src' % name,  # Generated source
+            './microservices/accounting/%s/impl/src' % name,  # Implementation source
             'tooling/pyproject.toml',
         ],
         ignore=[
@@ -277,13 +279,13 @@ def create_microservice_deployment(name):
         image_name,
         ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s' % (image_name, image_name, dockerfile, hash_path, artifact_path)
          + ' && (docker push %s:tilt 2>/dev/null || kind load docker-image %s:tilt --name rerp)' % (image_name, image_name)),
-        deps=[artifact_path, hash_path, 'microservices/accounting/%s/config' % name, 'microservices/accounting/%s/doc' % name, 'microservices/accounting/%s/static_site' % name],
+        deps=[artifact_path, hash_path, 'microservices/accounting/%s/impl/config' % name, 'microservices/accounting/%s/gen/doc' % name, 'microservices/accounting/%s/gen/static_site' % name],
         tag='tilt',
         live_update=[
             sync(artifact_path, '/app/%s' % binary_name),
-            sync('microservices/accounting/%s/config/' % name, '/app/config/'),
-            sync('microservices/accounting/%s/doc/' % name, '/app/doc/'),
-            sync('microservices/accounting/%s/static_site/' % name, '/app/static_site/'),
+            sync('microservices/accounting/%s/impl/config/' % name, '/app/config/'),  # Config in impl
+            sync('microservices/accounting/%s/gen/doc/' % name, '/app/doc/'),  # Doc in gen
+            sync('microservices/accounting/%s/gen/static_site/' % name, '/app/static_site/'),  # Static in gen
             run('kill -HUP 1', trigger=[artifact_path]),
         ],
     )
@@ -310,7 +312,7 @@ def create_microservice_deployment(name):
 # ====================
 # Accounting Microservices
 # ====================
-# All accounting components: each has lint, gen, build, deploy. One label per resource with
+# All accounting microservices: each has lint, gen, build, deploy. One label per resource with
 # acc_ prefix (e.g. acc_general-ledger, acc_accounts-receivable, acc_bff, acc_all_gens).
 
 ACCOUNTING_SERVICES = [
@@ -329,7 +331,8 @@ for name in ACCOUNTING_SERVICES:
     create_microservice_lint(name, 'accounting/%s/openapi.yaml' % name)
     create_microservice_gen(name, 'accounting/%s/openapi.yaml' % name, name)
 
-# All accounting gens must complete before any build (so microservices/Cargo.toml members exist)
+# All accounting gens must complete before any build (so microservices/Cargo.toml workspace members exist)
+# After reorganization, workspace members are: accounting/{service}/gen and accounting/{service}/impl
 # Includes bff-service-gen (BFF spec is generated by bff-spec-gen, then bff-lint, then bff-service-gen)
 local_resource(
     'accounting-all-gens',
