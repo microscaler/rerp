@@ -9,9 +9,54 @@ use accounting_entities::accounting::{
     general_ledger, invoice,
 };
 
-use lifeguard_migrate::sql_generator;
+use lifeguard_migrate::{sql_generator, dependency_ordering};
 use std::fs;
 use std::path::PathBuf;
+use std::collections::HashMap;
+
+/// Extract foreign key dependencies from SQL by parsing REFERENCES clauses
+fn extract_dependencies_from_sql(sql: &str) -> Vec<String> {
+    let mut dependencies = Vec::new();
+    
+    // Look for REFERENCES clauses in the SQL
+    // Pattern: REFERENCES table_name(column) or REFERENCES schema.table_name(column)
+    // We'll use simple string parsing since we control the SQL format
+    let mut search_pos = 0;
+    while let Some(ref_pos) = sql[search_pos..].find("REFERENCES") {
+        let start = search_pos + ref_pos + "REFERENCES".len();
+        let remaining = &sql[start..];
+        
+        // Skip whitespace
+        let remaining = remaining.trim_start();
+        
+        // Extract table name (may be schema.table or just table)
+        let table_end = remaining
+            .find('(')
+            .or_else(|| remaining.find(' '))
+            .or_else(|| remaining.find('\n'))
+            .unwrap_or(remaining.len());
+        
+        let table_ref = &remaining[..table_end].trim();
+        
+        // Handle schema.table format
+        let table_name = if let Some(dot_pos) = table_ref.rfind('.') {
+            &table_ref[dot_pos + 1..]
+        } else {
+            table_ref
+        };
+        
+        if !table_name.is_empty() && !dependencies.contains(&table_name.to_string()) {
+            dependencies.push(table_name.to_string());
+        }
+        
+        search_pos = start + table_end;
+        if search_pos >= sql.len() {
+            break;
+        }
+    }
+    
+    dependencies
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = PathBuf::from("../../migrations/generated");
@@ -292,6 +337,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Bank Sync entities
+    // Note: Order matters - banks must come before bank_accounts, which must come before
+    // bank_transactions, bank_statements, and bank_reconciliations
+    {
+        type Entity = bank_sync::bank::Entity;
+        let entity = Entity::default();
+        let table_name = entity.table_name();
+        let table_def = Entity::table_definition();
+        match sql_generator::generate_create_table_sql::<Entity>(table_def) {
+            Ok(sql) => {
+                sql_by_service
+                    .entry("bank_sync".to_string())
+                    .or_insert_with(Vec::new)
+                    .push((table_name.to_string(), sql));
+                println!("   ✓ Generated SQL for {}", table_name);
+            }
+            Err(e) => eprintln!("   ✗ Failed to generate SQL for {}: {}", table_name, e),
+        }
+    }
+
     {
         type Entity = bank_sync::bank_account::Entity;
         let entity = Entity::default();
@@ -664,6 +728,41 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let output_file = service_dir.join(format!("{}_generated_from_entities.sql", timestamp));
 
+        // Build TableInfo structures for dependency analysis
+        let mut table_infos: Vec<dependency_ordering::TableInfo> = Vec::new();
+        let mut table_sql_map: HashMap<String, String> = HashMap::new();
+        
+        for (table_name, sql) in &tables {
+            table_sql_map.insert(table_name.clone(), sql.clone());
+            
+            // Extract foreign key dependencies from the SQL
+            // We parse the SQL to find REFERENCES clauses
+            let dependencies = extract_dependencies_from_sql(sql);
+            
+            table_infos.push(dependency_ordering::TableInfo {
+                name: table_name.clone(),
+                sql: sql.clone(),
+                dependencies,
+            });
+        }
+        
+        // Validate foreign key references
+        if let Err(e) = dependency_ordering::validate_foreign_key_references(&table_infos) {
+            eprintln!("⚠️  Warning for {} service: {}", service, e);
+            eprintln!("   This migration may fail when applied due to missing foreign key references.");
+        }
+        
+        // Topologically sort tables by dependencies
+        let sorted_table_names = match dependency_ordering::topological_sort(&table_infos) {
+            Ok(sorted) => sorted,
+            Err(e) => {
+                eprintln!("⚠️  Warning for {} service: {}", service, e);
+                eprintln!("   Tables will be written in original order.");
+                // Fall back to original order
+                tables.iter().map(|(name, _)| name.clone()).collect()
+            }
+        };
+
         let mut sql_content = String::new();
         sql_content.push_str("-- Migration: Generated from Lifeguard entities\n");
         sql_content.push_str(&format!("-- Service: {}\n", service));
@@ -676,10 +775,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .push_str("-- This migration was automatically generated from entity definitions.\n");
         sql_content.push_str("-- DO NOT EDIT MANUALLY - regenerate from entities instead.\n\n");
 
-        for (table_name, sql) in tables {
-            sql_content.push_str(&format!("-- Table: {}\n", table_name));
-            sql_content.push_str(&sql);
-            sql_content.push_str("\n\n");
+        // Write tables in dependency order
+        for table_name in sorted_table_names {
+            if let Some(sql) = table_sql_map.get(&table_name) {
+                sql_content.push_str(&format!("-- Table: {}\n", table_name));
+                sql_content.push_str(sql);
+                sql_content.push_str("\n\n");
+            }
         }
 
         fs::write(&output_file, sql_content)?;

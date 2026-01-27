@@ -9,6 +9,9 @@ use serde_json::Value;
 #[table_name = "customer_invoices"]
 #[skip_from_row]
 #[table_comment = "Customer invoices for accounts receivable tracking"]
+// NOTE: Only index columns that exist on THIS table, not on the parent 'invoices' table.
+// Columns like invoice_number, due_date, status, payment_state exist only on 'invoices',
+// not on 'customer_invoices'. Index those on the Invoice entity only.
 #[index = "idx_customer_invoices_customer_id(customer_id)"]
 pub struct CustomerInvoice {
     #[primary_key]
