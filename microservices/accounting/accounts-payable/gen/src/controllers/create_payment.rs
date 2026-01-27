@@ -22,7 +22,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // }
 
     Response {
-        applied_amount: Some(3.14),
+        applied_amount: Some(rust_decimal::Decimal::new(12345, 2)),
         bank_account_id: Some("example".to_string()),
         company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
         created_at: Some("2024-01-20T10:00:00Z".to_string()),

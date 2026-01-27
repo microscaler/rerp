@@ -28,3 +28,4 @@ may_minihttp = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 tikv-jemallocator = { workspace = true, optional = true }
+rust_decimal = { workspace = true }

@@ -15,7 +15,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "payment_amount")]
-    pub payment_amount: Option<f64>,
+    pub payment_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "payment_date")]
@@ -38,7 +38,7 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "applied_amount")]
-    pub applied_amount: Option<f64>,
+    pub applied_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "bank_account_id")]
@@ -71,7 +71,7 @@ pub struct Response {
     pub notes: Option<String>,
 
     #[serde(rename = "payment_amount")]
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     #[serde(rename = "payment_date")]
     pub payment_date: String,

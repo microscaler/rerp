@@ -289,6 +289,61 @@ def _update_gen_cargo_toml(cargo_path: Path, service_name: str) -> None:
             count=1,
         )
 
+    # Check if generated code uses Money or Decimal types and add dependencies
+    gen_src_dir = cargo_path.parent / "src"
+    uses_money = False
+    uses_decimal = False
+
+    if gen_src_dir.exists():
+        # Check types.rs and handler files for Money/Decimal usage
+        for rust_file in gen_src_dir.rglob("*.rs"):
+            try:
+                file_content = rust_file.read_text()
+                if "rusty_money::Money" in file_content or "Money<" in file_content:
+                    uses_money = True
+                if "rust_decimal::Decimal" in file_content or "Decimal" in file_content:
+                    uses_decimal = True
+                if uses_money and uses_decimal:
+                    break
+            except (OSError, UnicodeDecodeError):
+                continue
+
+    # Add rusty-money dependency if Money types are used
+    if uses_money and "rusty-money" not in content:
+        # Add after tikv-jemallocator line
+        if "tikv-jemallocator" in content:
+            content = re.sub(
+                r"(tikv-jemallocator = \{[^\}]+\}\n)",
+                r"\1rusty-money = { workspace = true }\n",
+                content,
+                count=1,
+            )
+        else:
+            # Add at end of dependencies section
+            content = re.sub(
+                r"(\[dependencies\][^\[]+)",
+                r"\1rusty-money = { workspace = true }\n",
+                content,
+                count=1,
+            )
+
+    # Add rust_decimal dependency if Decimal types are used (if not already present)
+    if uses_decimal and "rust_decimal" not in content:
+        if "rusty-money" in content:
+            content = re.sub(
+                r"(rusty-money = \{[^\}]+\}\n)",
+                r"\1rust_decimal = { workspace = true }\n",
+                content,
+                count=1,
+            )
+        elif "tikv-jemallocator" in content:
+            content = re.sub(
+                r"(tikv-jemallocator = \{[^\}]+\}\n)",
+                r"\1rust_decimal = { workspace = true }\n",
+                content,
+                count=1,
+            )
+
     cargo_path.write_text(content)
 
 

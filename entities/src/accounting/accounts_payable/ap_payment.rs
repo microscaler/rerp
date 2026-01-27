@@ -7,7 +7,7 @@ use serde_json::Value;
 
 #[derive(LifeModel)]
 #[table_name = "ap_payments"]
-#[skip_from_row]
+// #[skip_from_row] // Removed to test Decimal support - Decimal implements FromSql
 #[table_comment = "Vendor payments for accounts payable"]
 #[index = "idx_ap_payments_vendor_id(vendor_id)"]
 #[index = "idx_ap_payments_payment_date(payment_date)"]
