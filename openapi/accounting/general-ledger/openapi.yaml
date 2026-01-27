@@ -1242,10 +1242,10 @@ components:
           nullable: true
         total_debit:
           type: number
-          format: decimal
+          format: money
         total_credit:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3

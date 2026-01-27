@@ -1062,7 +1062,7 @@ components:
           format: uuid
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         days_overdue:
           type: integer
         aging_bucket:
@@ -1076,11 +1076,11 @@ components:
           nullable: true
         credit_limit:
           type: number
-          format: decimal
+          format: money
           nullable: true
         credit_used:
           type: number
-          format: decimal
+          format: money
           nullable: true
         collection_status:
           type: string
@@ -1096,11 +1096,11 @@ components:
           nullable: true
         last_payment_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         write_off_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         write_off_date:
           type: string
@@ -1144,7 +1144,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1185,10 +1185,10 @@ components:
           nullable: true
         applied_amount:
           type: number
-          format: decimal
+          format: money
         unapplied_amount:
           type: number
-          format: decimal
+          format: money
         company_id:
           type: string
           format: uuid
@@ -1232,7 +1232,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         applied_at:
           type: string
           format: date-time
@@ -1268,22 +1268,22 @@ components:
           format: date
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1312,7 +1312,7 @@ components:
           format: uuid
         credit_limit:
           type: number
-          format: decimal
+          format: money
         collection_status:
           type: string
           enum:
@@ -1325,7 +1325,7 @@ components:
       properties:
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         aging_bucket:
           type: string
           enum:
@@ -1343,7 +1343,7 @@ components:
           - LEGAL
         write_off_amount:
           type: number
-          format: decimal
+          format: money
         write_off_date:
           type: string
           format: date
@@ -1370,7 +1370,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1405,7 +1405,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         payment_method:
           type: string
           enum:
@@ -1439,7 +1439,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     UpdatePaymentApplicationRequest:
@@ -1447,7 +1447,7 @@ components:
       properties:
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     CreateArAgingRequest:
@@ -1475,19 +1475,19 @@ components:
       properties:
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money

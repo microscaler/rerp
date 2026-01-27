@@ -1062,7 +1062,7 @@ components:
           format: uuid
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         days_until_due:
           type: integer
         aging_bucket:
@@ -1143,7 +1143,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1173,7 +1173,7 @@ components:
           - CANCELLED
         applied_amount:
           type: number
-          format: decimal
+          format: money
         company_id:
           type: string
           format: uuid
@@ -1217,7 +1217,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         applied_at:
           type: string
           format: date-time
@@ -1253,22 +1253,22 @@ components:
           format: date
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1315,7 +1315,7 @@ components:
       properties:
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         aging_bucket:
           type: string
           enum:
@@ -1357,7 +1357,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1389,7 +1389,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         payment_method:
           type: string
           enum:
@@ -1423,7 +1423,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     UpdateApPaymentApplicationRequest:
@@ -1431,7 +1431,7 @@ components:
       properties:
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     CreateApAgingRequest:
@@ -1459,19 +1459,19 @@ components:
       properties:
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
