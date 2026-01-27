@@ -1,8 +1,12 @@
 [package]
-name = "financial_reports"
-version = "0.1.0"
+name = "rerp_accounting_financial_reports_gen"
+version = "0.1.3"
 edition = "2021"
 
+
+[lib]
+name = "rerp_accounting_financial_reports_gen"
+path = "src/lib.rs"
 [features]
 default = ["jemalloc"]
 # Use jemalloc as the global allocator for better memory performance.

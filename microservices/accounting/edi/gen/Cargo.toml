@@ -1,8 +1,12 @@
 [package]
-name = "edi___compliance"
-version = "0.1.0"
+name = "rerp_accounting_edi_gen"
+version = "0.1.3"
 edition = "2021"
 
+
+[lib]
+name = "rerp_accounting_edi_gen"
+path = "src/lib.rs"
 [features]
 default = ["jemalloc"]
 # Use jemalloc as the global allocator for better memory performance.
