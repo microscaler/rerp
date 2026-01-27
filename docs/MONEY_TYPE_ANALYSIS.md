@@ -85,15 +85,15 @@ pub fn dummy_value(ty: &str) -> askama::Result<String> {
     let value = match ty {
         "String" => "\"example\".to_string()",
         "i32" => "42",
-        "f64" => "1.23",  // Changed from 3.14 to avoid PI conflict
+        "f64" => "3.14",  // Valid mathematical number - clippy warning is acceptable for f64
         "rust_decimal::Decimal" => {
             // General decimal: 123.45
             "rust_decimal::Decimal::new(12345, 2)".to_string()
         }
         "rusty_money::Money" => {
-            // Money: $100.00 USD
-            // Note: Requires currency - use ISO::USD as default
-            "rusty_money::Money::from_major(100, rusty_money::iso::USD)".to_string()
+            // Money: $3.14 USD - clearly a dollar amount, not PI
+            // from_minor(314, USD) = 314 cents = $3.14
+            "rusty_money::Money::from_minor(314, rusty_money::iso::USD)".to_string()
         }
         "bool" => "true",
         "Vec<Value>" | "Vec<String>" | "Vec<i32>" | "Vec<f64>" | "Vec<bool>" => "vec![]",
@@ -102,6 +102,12 @@ pub fn dummy_value(ty: &str) -> askama::Result<String> {
     Ok(value.to_string())
 }
 ```
+
+**Key Points:**
+- `f64` uses `3.14` - Clippy warning is acceptable for mathematical numbers (they can legitimately be close to PI)
+- `rusty_money::Money` uses `from_minor(314, USD)` which equals **$3.14** - Clearly a dollar amount, not a mathematical constant
+- Clippy won't warn on Money because: (1) it's a different type (`Money` not `f64`), (2) the literal value is `314` (cents), not `3.14`
+- This solves the issue: financial systems can use `$3.14` without clippy warnings, while mathematical code can use `3.14` (warning is acceptable)
 
 **3. Update OpenAPI Specs to Use format: money**
 
@@ -267,13 +273,16 @@ pub coordinate: f64,  // ✅ Standard floating-point for math
 
 ## Benefits
 
-1. **No more clippy warnings** - Money and Decimal use different dummy values (not 3.14)
+1. **Solves clippy issue** - `f64` can use `3.14` (valid math number), `Money` uses `$3.14` (clearly financial)
+   - Clippy warning on `f64` is acceptable (mathematical numbers can legitimately be close to PI)
+   - `Money::from_minor(314, USD)` = $3.14 - clearly a dollar amount, not PI
+   - Clippy won't warn on Money because it's a different type and uses `314` (cents) not `3.14`
 2. **Financial accuracy** - No floating-point rounding errors
 3. **Currency-aware** - `rusty_money::Money` includes currency support (ISO-4217)
 4. **Type safety** - Clear distinction between:
-   - Mathematical numbers (`f64`)
-   - General decimals (`rust_decimal::Decimal`)
-   - Financial amounts (`rusty_money::Money`)
+   - Mathematical numbers (`f64`) - can use `3.14`
+   - General decimals (`rust_decimal::Decimal`) - uses `123.45`
+   - Financial amounts (`rusty_money::Money`) - uses `$3.14`
 5. **Industry standard** - `rusty-money` follows Fowler's Money pattern, designed for financial systems
 6. **Exchange rate support** - Built-in currency conversion capabilities
 7. **Internationalization** - Locale-aware formatting for different currencies
