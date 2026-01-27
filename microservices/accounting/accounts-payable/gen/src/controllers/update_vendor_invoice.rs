@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         invoice_id: "a0011e8400-e29b-41d4-a716-446655440001".to_string(),
         matching_status: Some("example".to_string()),
         metadata: Some(Default::default()),
-        outstanding_amount: Some(7500.0),
+        outstanding_amount: Some(rust_decimal::Decimal::new(75000, 1)),
         purchase_order_id: Some("example".to_string()),
         updated_at: Some("2024-01-15T11:00:00Z".to_string()),
         vendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(),

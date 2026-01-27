@@ -31,7 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         id: "a0060e8400-e29b-41d4-a716-446655440000".to_string(),
         metadata: Some(Default::default()),
         notes: Some("example".to_string()),
-        payment_amount: 7500.0,
+        payment_amount: rust_decimal::Decimal::new(75000, 1),
         payment_date: "2024-01-20".to_string(),
         payment_method: "WIRE".to_string(),
         payment_number: "AP-PAY-2024-001".to_string(),
