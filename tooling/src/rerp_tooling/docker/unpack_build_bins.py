@@ -1,4 +1,4 @@
-"""Extract rerp-binaries-*.zip from the Multi-Arch job into components/target. Replaces manual unzip for local container builds."""
+"""Extract rerp-binaries-*.zip from the Multi-Arch job into microservices/target. Replaces manual unzip for local container builds."""
 
 from __future__ import annotations
 
@@ -8,16 +8,16 @@ from pathlib import Path
 
 # Zips from Build Multi-Arch: rerp-binaries-{amd64,arm64,arm7}.zip
 # Each contains {triple}/release/rerp_*_impl (triple = x86_64-unknown-linux-musl, aarch64-unknown-linux-musl, armv7-unknown-linux-musleabihf)
-# We extract into components/target/ so copy-multiarch and build-multiarch find them.
+# We extract into microservices/target/ so copy-multiarch and build-multiarch find them.
 
 
 def run(input_dir: Path, project_root: Path) -> int:
-    """Extract rerp-binaries-*.zip from input_dir into project_root/components/target. Returns 0 or 1."""
+    """Extract rerp-binaries-*.zip from input_dir into project_root/microservices/target. Returns 0 or 1."""
     if not input_dir.is_dir():
         print(f"❌ Input directory not found: {input_dir}", file=sys.stderr)
         return 1
 
-    dest = project_root / "components" / "target"
+    dest = project_root / "microservices" / "target"
     dest.mkdir(parents=True, exist_ok=True)
 
     # Artifact names from ci.yml: rerp-binaries-amd64, rerp-binaries-arm64, rerp-binaries-arm7

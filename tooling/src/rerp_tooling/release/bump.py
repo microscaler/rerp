@@ -1,10 +1,10 @@
 """Bump version in all Cargo.toml [package] and [workspace.package] sections.
 
-Source of truth: components/Cargo.toml [workspace.package].version.
-Walks the repo from the root (project_root) for every Cargo.toml: root, components/, entities/,
-microservices/, and any other Cargo.toml under the tree. Excludes paths containing: target, .git,
+Source of truth: microservices/Cargo.toml [workspace.package].version.
+Walks the repo from the root (project_root) for every Cargo.toml: root, microservices/, entities/,
+and any other Cargo.toml under the tree. Excludes paths containing: target, .git,
 .venv, venv, env, __pycache__, node_modules, node_packages, build, dist, tmp. The root Cargo.toml [workspace.package].version is
-explicitly ensured to match the new version (covers drift from components).
+explicitly ensured to match the new version (covers drift from microservices).
 Accepts version = \"v0.1.0\" or \"0.1.0\" when reading; always writes \"X.Y.Z\" (no \"v\") to Cargo.toml.
 Tags remain \"vX.Y.Z\" (workflow adds \"v\" when creating the git tag).
 """
@@ -37,12 +37,12 @@ SKIP_PARTS = (
 )
 
 
-def _read_current(components_toml: Path) -> str:
-    """Read version from components/Cargo.toml [workspace.package].version. Raises on parse error.
+def _read_current(microservices_toml: Path) -> str:
+    """Read version from microservices/Cargo.toml [workspace.package].version. Raises on parse error.
 
     Supports X.Y.Z and X.Y.Z-rc.N (or other prerelease). Returns value without leading 'v'.
     """
-    text = components_toml.read_text()
+    text = microservices_toml.read_text()
     in_sec = False
     for line in text.splitlines():
         s = line.strip()
@@ -54,7 +54,7 @@ def _read_current(components_toml: Path) -> str:
             m = re.match(r'^\s*version\s*=\s*"v?(\d+\.\d+\.\d+(?:-[\w.-]+)?)"', line)
             if m:
                 return m.group(1)
-    msg = "Could not find [workspace.package].version in components/Cargo.toml"
+        msg = "Could not find [workspace.package].version in microservices/Cargo.toml"
     raise SystemExit(msg)
 
 
@@ -71,7 +71,7 @@ def _next_version(old: str, bump: str) -> str:
     old = old.lstrip("v")
     m = re.match(r"^(\d+)\.(\d+)\.(\d+)(?:-([\w.-]+))?$", old)
     if not m:
-        msg = f"Invalid version in components/Cargo.toml: {old}"
+        msg = f"Invalid version in microservices/Cargo.toml: {old}"
         raise SystemExit(msg)
     x, y, z = int(m.group(1)), int(m.group(2)), int(m.group(3))
     prerel = m.group(4)  # None or e.g. "rc.2"
@@ -164,7 +164,7 @@ def _set_workspace_package_version(path: Path, new: str) -> bool:
 
 
 def _cargo_toml_paths(project_root: Path) -> list[Path]:
-    """All Cargo.toml under project_root (repo root): root, components/, entities/, microservices/, and everything else; excluding SKIP_PARTS."""
+    """All Cargo.toml under project_root (repo root): root, microservices/, entities/, and everything else; excluding SKIP_PARTS."""
     out: list[Path] = []
     for p in project_root.rglob("Cargo.toml"):
         try:
@@ -183,13 +183,13 @@ def _cargo_toml_paths(project_root: Path) -> list[Path]:
 
 
 def run(project_root: Path, bump: str) -> int:
-    """Bump version: read from components/Cargo.toml, walk all Cargo.toml, replace in [package]/[workspace.package]. Returns 0 or 1."""
-    components_toml = project_root / "components" / "Cargo.toml"
-    if not components_toml.is_file():
-        print("components/Cargo.toml not found", file=sys.stderr)
+    """Bump version: read from microservices/Cargo.toml, walk all Cargo.toml, replace in [package]/[workspace.package]. Returns 0 or 1."""
+    microservices_toml = project_root / "microservices" / "Cargo.toml"
+    if not microservices_toml.is_file():
+        print("microservices/Cargo.toml not found", file=sys.stderr)
         return 1
 
-    old = _read_current(components_toml)
+    old = _read_current(microservices_toml)
     new = _next_version(old, bump)
 
     updated: list[Path] = []
@@ -201,7 +201,7 @@ def run(project_root: Path, bump: str) -> int:
             print(f"Error updating {p}: {e}", file=sys.stderr)
             return 1
 
-    # Ensure root Cargo.toml [workspace.package].version stays in sync (handles drift from components)
+    # Ensure root Cargo.toml [workspace.package].version stays in sync (handles drift from microservices)
     root_cargo = project_root / "Cargo.toml"
     if root_cargo.is_file():
         try:

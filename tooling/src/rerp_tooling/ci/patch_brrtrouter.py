@@ -127,7 +127,6 @@ def run(root: Path, *, dry_run: bool = False, audit: bool = False) -> None:
     run cargo update in touched workspace roots. Idempotent.
     """
     cargo_tomls = find_cargo_tomls(root)
-    patched_components = False
     patched_microservices_or_entities = False
     any_changed = False
 
@@ -140,8 +139,6 @@ def run(root: Path, *, dry_run: bool = False, audit: bool = False) -> None:
             rel = p.relative_to(root)
         except ValueError:
             rel = p
-        if "components" in rel.parts:
-            patched_components = True
         if "microservices" in rel.parts or "entities" in rel.parts:
             patched_microservices_or_entities = True
         for old, new in matches:
@@ -165,11 +162,6 @@ def run(root: Path, *, dry_run: bool = False, audit: bool = False) -> None:
         print("No Cargo.toml with BRRTRouter or lifeguard path deps found; nothing to patch.")
         return
 
-    if patched_components:
-        d = root / "components"
-        if (d / "Cargo.toml").exists():
-            run_cargo_update(d)
-            print("Ran cargo update in components/")
     if patched_microservices_or_entities:
         d = root / "microservices"
         if (d / "Cargo.toml").exists():

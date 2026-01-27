@@ -223,11 +223,11 @@ format:
     fi
     tooling/.venv/bin/ruff format tooling/
 
-# Run cargo fmt in components/ and entities/. Use when microservices/ structure or
-# deps change; fast if Tilt has recently built. components: cargo fmt; entities:
-# rustfmt (cargo fmt from entities/ hits "multiple workspace roots" with root+components).
+# Run cargo fmt in microservices/ and entities/. Use when microservices/ structure or
+# deps change; fast if Tilt has recently built. microservices: cargo fmt; entities:
+# rustfmt (cargo fmt from entities/ hits "multiple workspace roots" with root+microservices).
 fmt-rust:
-    @cd components && cargo fmt --all
+    @cd microservices && cargo fmt --all
     @find entities -name '*.rs' -exec rustfmt {} +
 
 # Check tooling is formatted (CI). Run `just init` first.

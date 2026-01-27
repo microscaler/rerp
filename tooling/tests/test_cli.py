@@ -288,12 +288,12 @@ def test_docker_copy_multiarch_unknown_arch_exits_1(tmp_path, monkeypatch, capsy
 
 
 def test_docker_copy_multiarch_success_exits_0(tmp_path, monkeypatch, capsys):
-    (tmp_path / "components" / "target" / "x86_64-unknown-linux-musl" / "release").mkdir(
+    (tmp_path / "microservices" / "target" / "x86_64-unknown-linux-musl" / "release").mkdir(
         parents=True
     )
     (
         tmp_path
-        / "components"
+        / "microservices"
         / "target"
         / "x86_64-unknown-linux-musl"
         / "release"

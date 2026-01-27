@@ -1,15 +1,17 @@
 # RERP OpenAPI Specifications
 
-This directory contains OpenAPI specifications for all RERP microservices, organized by system and module.
+This directory contains OpenAPI specifications for all RERP microservices, organized by suite and service.
 
 ## Directory Structure
 
 ```
 openapi/
-├── {system}/
-│   └── {module}/
-│       ├── README.md          # Consumer-facing service description
-│       └── openapi.yaml       # OpenAPI 3.0 specification
+├── {suite}/                    # Suite directory (e.g., accounting, hr, sales)
+│   ├── bff-suite-config.yaml   # Suite BFF configuration
+│   ├── openapi_bff.yaml        # Generated suite BFF spec
+│   └── {service}/              # Service directory
+│       ├── README.md            # Consumer-facing service description
+│       └── openapi.yaml         # OpenAPI 3.0 specification
 ```
 
 ## Service Organization
@@ -141,9 +143,9 @@ openapi/
 
 ## Service Naming Convention
 
-- Services are organized by `{system}/{module}` where:
-  - `{system}` is the business domain (e.g., `accounting`, `hr`, `sales`)
-  - `{module}` is the specific service within that domain (e.g., `general-ledger`, `payroll`, `quotation`)
+- Services are organized by `{suite}/{service}` where:
+  - `{suite}` is the business domain (e.g., `accounting`, `hr`, `sales`)
+  - `{service}` is the specific service within that suite (e.g., `general-ledger`, `payroll`, `quotation`)
 - The `-service` suffix is omitted from directory names as all items are services
 - Examples:
   - `auth-service` → `auth/idam/`

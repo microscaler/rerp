@@ -295,7 +295,7 @@ def __build_parser():
     pd_sub = pd.add_subparsers(dest="docker_cmd")
     pdub = pd_sub.add_parser(
         "unpack-build-bins",
-        help="Extract rerp-binaries-*.zip into components/target (from Multi-Arch artifacts in tmp/buildBins)",
+        help="Extract rerp-binaries-*.zip into microservices/target (from Multi-Arch artifacts in tmp/buildBins)",
     )
     pdub.add_argument(
         "--input-dir",
@@ -384,7 +384,7 @@ def __build_parser():
     )
     pbd.add_argument(
         "target",
-        help="workspace, <system>_<module> (components), microservices, or microservice",
+        help="workspace, <system>_<module> (microservices), microservices, or microservice",
     )
     pbd.add_argument(
         "arch",
@@ -395,7 +395,7 @@ def __build_parser():
     pbd.add_argument(
         "--release",
         action="store_true",
-        help="Release build (microservices/microservice; components always release)",
+        help="Release build (microservices/microservice; microservices always release)",
     )
 
     # --- bootstrap ---
@@ -424,7 +424,7 @@ def __build_parser():
     prl_sub = prl.add_subparsers(dest="release_cmd")
     prlb = prl_sub.add_parser(
         "bump",
-        help="Bump version from components/Cargo.toml; update all [package]/[workspace.package].version in repo",
+        help="Bump version from microservices/Cargo.toml; update all [package]/[workspace.package].version in repo",
     )
     prlb.add_argument(
         "bump",
@@ -490,7 +490,7 @@ def __build_parser():
     ppc_sub = ppc.add_subparsers(dest="pre_commit_cmd")
     ppc_sub.add_parser(
         "microservices-fmt",
-        help="If microservices/ changed vs HEAD, run cargo fmt in components and entities",
+        help="If microservices/ changed vs HEAD, run cargo fmt in microservices and entities",
     )
 
     return p

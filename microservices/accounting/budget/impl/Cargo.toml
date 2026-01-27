@@ -1,0 +1,32 @@
+[package]
+name = "rerp_accounting_budget"
+version = "0.1.3"
+edition = "2021"
+
+[[bin]]
+name = "rerp_accounting_budget"
+path = "src/main.rs"
+
+[features]
+default = ["jemalloc"]
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+# Generated crate
+rerp_accounting_budget_gen = { path = "../gen" }
+
+# BRRTRouter (re-exported from gen crate, but may need direct access)
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+
+# Standard dependencies
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+config = { workspace = true }
+http = { workspace = true }
+may = { workspace = true }
+may_minihttp = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }

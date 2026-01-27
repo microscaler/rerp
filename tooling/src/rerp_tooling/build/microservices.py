@@ -17,20 +17,20 @@ from .host_aware import (
     should_use_zigbuild,
 )
 
-# Service (directory) name -> Cargo [package] name (brrtrouter-gen output).
+# Service (directory) name -> Cargo [package] name (impl crate binary).
 # List of services for codegen comes from suite_sub_service_names; this mapping is
 # maintained by bootstrap when adding a service. Teardown uses tilt_service_names (discovery).
 PACKAGE_NAMES: Dict[str, str] = {
-    "general-ledger": "general_ledger",
-    "invoice": "invoice_management",
-    "accounts-receivable": "accounts_receivable",
-    "accounts-payable": "accounts_payable",
-    "bank-sync": "bank_synchronization",
-    "asset": "asset_management",
-    "budget": "budgeting",
-    "edi": "edi___compliance",
-    "financial-reports": "financial_reports",
-    "bff": "rerp_accounting_backend_for_frontend_api",
+    "general-ledger": "rerp_accounting_general_ledger",
+    "invoice": "rerp_accounting_invoice",
+    "accounts-receivable": "rerp_accounting_accounts_receivable",
+    "accounts-payable": "rerp_accounting_accounts_payable",
+    "bank-sync": "rerp_accounting_bank_sync",
+    "asset": "rerp_accounting_asset",
+    "budget": "rerp_accounting_budget",
+    "edi": "rerp_accounting_edi",
+    "financial-reports": "rerp_accounting_financial_reports",
+    "bff": "rerp_accounting_bff",
 }
 
 

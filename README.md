@@ -460,20 +460,21 @@ RERP uses an **OpenAPI-first** development approach:
 Each RERP service follows a consistent structure:
 
 ```
-components/
-├── {system}/
-│   ├── {module}/              # Generated crate (from OpenAPI)
-│   │   ├── Cargo.toml
-│   │   ├── doc/
-│   │   │   └── openapi.yaml    # Service OpenAPI spec
-│   │   └── src/                # Auto-generated code
-│   └── {module}_impl/          # Implementation crate
-│       ├── Cargo.toml
-│       ├── config/
-│       │   └── config.yaml
-│       └── src/
-│           ├── main.rs         # Service entry point
-│           └── controllers/   # Business logic
+microservices/
+├── {suite}/                    # Suite directory (e.g., accounting, hr, sales)
+│   ├── {service}/              # Service directory (e.g., general-ledger, invoice)
+│   │   ├── gen/                # Generated crate (from OpenAPI)
+│   │   │   ├── Cargo.toml
+│   │   │   ├── doc/
+│   │   │   │   └── openapi.yaml    # Service OpenAPI spec
+│   │   │   └── src/                # Auto-generated code
+│   │   └── impl/               # Implementation crate (business logic)
+│   │       ├── Cargo.toml
+│   │       ├── config/
+│   │       │   └── config.yaml
+│   │       └── src/
+│   │           ├── main.rs         # Service entry point
+│   │           └── controllers/     # Business logic
 ```
 
 ### Development Workflow
@@ -483,14 +484,14 @@ components/
 vim openapi/accounting/general-ledger/openapi.yaml
 
 # 2. Generate service code
-cd components/accounting/general-ledger
-brrtrouter-gen --spec ../../openapi/accounting/general-ledger/openapi.yaml
+cd microservices/accounting/general-ledger/gen
+brrtrouter-gen --spec ../../../openapi/accounting/general-ledger/openapi.yaml --output .
 
 # 3. Implement business logic
-vim ../general-ledger_impl/src/controllers/accounts.rs
+vim ../impl/src/controllers/accounts.rs
 
 # 4. Build and test
-cargo build -p rerp_accounting_general_ledger_impl
+cargo build -p rerp_accounting_general_ledger
 cargo test
 ```
 
@@ -504,7 +505,7 @@ System-level Backend for Frontend (BFF) specs are automatically generated.
 bff-generator generate-spec --config openapi/accounting/bff-suite-config.yaml --output openapi/accounting/openapi_bff.yaml
 ```
 
-**All systems** (`openapi/{system}/openapi.yaml`):
+**All suites** (`openapi/{suite}/openapi_bff.yaml`):
 
 ```bash
 # Regenerate all system BFF specs from sub-services
@@ -560,7 +561,7 @@ cd rerp
 ls openapi/*/openapi.yaml
 
 # Check crate structure
-ls components/*/
+ls microservices/*/
 
 # Generate system BFF specs
 rerp bff generate-system
@@ -570,10 +571,10 @@ rerp bff generate-system
 
 ```bash
 # Navigate to a service
-cd components/accounting/general-ledger
+cd microservices/accounting/general-ledger/impl
 
-# Generate code from OpenAPI spec
-brrtrouter-gen --spec ../../openapi/accounting/general-ledger/openapi.yaml
+# Generate code from OpenAPI spec (outputs to gen/)
+brrtrouter-gen --spec ../../../openapi/accounting/general-ledger/openapi.yaml --output ../gen
 
 # Build the service
 cargo build
@@ -585,17 +586,18 @@ cargo build
 
 ```
 rerp/
-├── components/              # Rust workspace with all service crates
+├── microservices/          # Rust workspace with all service crates
 │   ├── Cargo.toml          # Workspace configuration
-│   ├── {system}/           # System directories
-│   │   ├── {module}/       # Generated crate
-│   │   └── {module}_impl/  # Implementation crate
-│   └── common/             # Shared utilities
+│   ├── {suite}/            # Suite directories (e.g., accounting, hr, sales)
+│   │   ├── {service}/      # Service directories
+│   │   │   ├── gen/        # Generated crate
+│   │   │   └── impl/       # Implementation crate
 ├── openapi/                # OpenAPI specifications
-│   ├── {system}/           # System directories
-│   │   ├── openapi.yaml    # Auto-generated BFF spec
-│   │   ├── README.md       # System documentation
-│   │   └── {module}/       # Service directories
+│   ├── {suite}/            # Suite directories
+│   │   ├── bff-suite-config.yaml  # Suite BFF config
+│   │   ├── openapi_bff.yaml       # Generated suite BFF spec
+│   │   ├── README.md       # Suite documentation
+│   │   └── {service}/      # Service directories
 │   │       ├── openapi.yaml # Service OpenAPI spec
 │   │       └── README.md     # Service documentation
 ├── port-registry.json       # Port registry (rerp ports)
@@ -612,7 +614,7 @@ rerp/
 ### Core Documentation
 
 - **[RERP_MUSINGS.md](RERP_MUSINGS.md)** - Detailed module breakdown, market analysis, and design rationale
-- **[components/README.md](components/README.md)** - Crate structure and development guide
+- **Microservices structure**: `microservices/{suite}/{service}/gen/` (generated) and `microservices/{suite}/{service}/impl/` (business logic)
 - **[openapi/README.md](openapi/README.md)** - OpenAPI specifications overview
 
 ### User-Facing Documentation

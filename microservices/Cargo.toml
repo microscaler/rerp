@@ -3,17 +3,27 @@ members = [
     # Common utilities (to be created when needed)
     # "accounting/common",
     
-    # Generated library crates (brrtrouter-gen creates these; add here when bootstrapped)
-    "accounting/general-ledger",
-    "accounting/invoice",
-    "accounting/accounts-receivable",
-    "accounting/accounts-payable",
-    "accounting/bank-sync",
-    "accounting/asset",
-    "accounting/budget",
-    "accounting/edi",
-    "accounting/financial-reports",
-    "accounting/bff",
+    # Generated library crates (gen/) and implementation binary crates (impl/)
+    "accounting/general-ledger/gen",
+    "accounting/general-ledger/impl",
+    "accounting/invoice/gen",
+    "accounting/invoice/impl",
+    "accounting/accounts-receivable/gen",
+    "accounting/accounts-receivable/impl",
+    "accounting/accounts-payable/gen",
+    "accounting/accounts-payable/impl",
+    "accounting/bank-sync/gen",
+    "accounting/bank-sync/impl",
+    "accounting/asset/gen",
+    "accounting/asset/impl",
+    "accounting/budget/gen",
+    "accounting/budget/impl",
+    "accounting/edi/gen",
+    "accounting/edi/impl",
+    "accounting/financial-reports/gen",
+    "accounting/financial-reports/impl",
+    "accounting/bff/gen",
+    "accounting/bff/impl",
 ]
 resolver = "2"
 

@@ -14,7 +14,7 @@ def _binary_name(system: str, module: str) -> str:
 
 
 def run(system: str, module: str, arch: str, project_root: Path) -> int:
-    """Copy from components/target/{triple}/release/ to build_artifacts/{system}_{module}/{arch}. Returns 0 or 1."""
+    """Copy from microservices/target/{triple}/release/ to build_artifacts/{system}_{module}/{arch}. Returns 0 or 1."""
     if arch == "all":
         archs = ["amd64", "arm64", "arm7"]
     elif arch in ARCH_TARGETS:
@@ -28,13 +28,13 @@ def run(system: str, module: str, arch: str, project_root: Path) -> int:
 
     root = project_root
     binary_name = _binary_name(system, module)
-    components = root / "components" / "target"
+    microservices_target = root / "microservices" / "target"
     base_dest = root / "build_artifacts" / f"{system}_{module}"
     any_ok = False
 
     for a in archs:
         triple = ARCH_TARGETS[a]
-        src = components / triple / "release" / binary_name
+        src = microservices_target / triple / "release" / binary_name
         dest_dir = base_dest / a
         dest_bin = dest_dir / binary_name
         hash_path = dest_dir / f"{binary_name}.sha256"

@@ -125,11 +125,11 @@ class TestDetermineArchitectures:
 
 
 class TestRun:
-    def test_run_returns_one_when_components_missing(self, tmp_path: Path, monkeypatch):
+    def test_run_returns_one_when_microservices_missing(self, tmp_path: Path, monkeypatch):
         from rerp_tooling.build.host_aware import run
 
         monkeypatch.setenv("RERP_USE_CROSS", "1")  # skip rustup in _build_for_arch
-        # No components/Cargo.toml
+        # No microservices/Cargo.toml
         rc = run("workspace", arch="amd64", project_root=tmp_path)
         assert rc == 1
 
@@ -137,9 +137,9 @@ class TestRun:
         from rerp_tooling.build.host_aware import run
 
         monkeypatch.setenv("RERP_USE_CROSS", "1")
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text("[workspace]\n")
-        # auth_idam → components/auth/idam_impl must exist for _build_service
+        (tmp_path / "microservices").mkdir()
+        (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\n")
+        # auth_idam → microservices/auth/idam/impl must exist for _build_service
         rc = run("auth_idam", arch="amd64", project_root=tmp_path)
         assert rc == 1
 

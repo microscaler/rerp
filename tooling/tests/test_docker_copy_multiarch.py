@@ -12,7 +12,7 @@ class TestCopyMultiarch:
     def test_missing_binary_continues_no_copies(self, tmp_path: Path):
         from rerp_tooling.docker.copy_multiarch import run
 
-        # No components/target/.../release/rerp_auth_idam_impl
+        # No microservices/target/.../release/rerp_auth_idam_impl
         assert run("auth", "idam", "amd64", tmp_path) == 1
         assert not (tmp_path / "build_artifacts").exists()
 
@@ -20,7 +20,7 @@ class TestCopyMultiarch:
         from rerp_tooling.docker.copy_multiarch import run
 
         triple = "x86_64-unknown-linux-musl"
-        src = tmp_path / "components" / "target" / triple / "release"
+        src = tmp_path / "microservices" / "target" / triple / "release"
         src.mkdir(parents=True)
         (src / "rerp_auth_idam_impl").write_bytes(b"binary")
         assert run("auth", "idam", "amd64", tmp_path) == 0
@@ -37,7 +37,7 @@ class TestCopyMultiarch:
         from rerp_tooling.docker.copy_multiarch import run
 
         for triple in ["x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl"]:
-            src = tmp_path / "components" / "target" / triple / "release"
+            src = tmp_path / "microservices" / "target" / triple / "release"
             src.mkdir(parents=True)
             (src / "rerp_auth_idam_impl").write_bytes(b"x")
         # arm7 missing

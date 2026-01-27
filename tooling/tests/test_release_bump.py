@@ -17,47 +17,47 @@ from rerp_tooling.release.bump import (
 
 class TestReadCurrent:
     def test_reads_workspace_package_version(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\nmembers = []\n\n[workspace.package]\nversion = "1.2.3"\nedition = "2021"\n'
         )
-        assert _read_current(tmp_path / "components" / "Cargo.toml") == "1.2.3"
+        assert _read_current(tmp_path / "microservices" / "Cargo.toml") == "1.2.3"
 
     def test_reads_v_prefix_strips_to_canonical(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "v0.1.0"\n'
         )
-        assert _read_current(tmp_path / "components" / "Cargo.toml") == "0.1.0"
+        assert _read_current(tmp_path / "microservices" / "Cargo.toml") == "0.1.0"
 
     def test_reads_prerelease_rc(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace.package]\nversion = "0.39.0-rc.2"\n'
         )
-        assert _read_current(tmp_path / "components" / "Cargo.toml") == "0.39.0-rc.2"
+        assert _read_current(tmp_path / "microservices" / "Cargo.toml") == "0.39.0-rc.2"
 
     def test_missing_raises(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text("[workspace]\nmembers = []\n")
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\nmembers = []\n")
         with pytest.raises(SystemExit):
-            _read_current(tmp_path / "components" / "Cargo.toml")
+            _read_current(tmp_path / "microservices" / "Cargo.toml")
 
     def test_raises_when_only_package_section(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[package]\nname = "x"\nversion = "1.0.0"\n'
         )
         with pytest.raises(SystemExit):
-            _read_current(tmp_path / "components" / "Cargo.toml")
+            _read_current(tmp_path / "microservices" / "Cargo.toml")
 
     def test_raises_when_workspace_package_version_malformed(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace.package]\nversion = "1.2"\nedition = "2021"\n'
         )
         with pytest.raises(SystemExit):
-            _read_current(tmp_path / "components" / "Cargo.toml")
+            _read_current(tmp_path / "microservices" / "Cargo.toml")
 
 
 class TestNextVersion:
@@ -180,8 +180,8 @@ class TestReplaceInFile:
 
 class TestCargoTomlPaths:
     def test_excludes_target(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text("")
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text("")
         (tmp_path / "target").mkdir()
         (tmp_path / "target" / "Cargo.toml").write_text("")
         got = _cargo_toml_paths(tmp_path)
@@ -210,27 +210,23 @@ class TestCargoTomlPaths:
         for skip in ("venv", "node_modules", "node_packages", "tmp", "__pycache__"):
             assert not any(skip in r for r in rels)
 
-    def test_includes_root_components_entities_microservices(self, tmp_path: Path) -> None:
+    def test_includes_root_microservices_entities(self, tmp_path: Path) -> None:
         (tmp_path / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
         )
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
-            '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
-        )
-        (tmp_path / "entities").mkdir()
-        (tmp_path / "entities" / "Cargo.toml").write_text('[package]\nversion = "0.1.0"\n')
-        (tmp_path / "microservices").mkdir()
+        (tmp_path / "microservices").mkdir(exist_ok=True)
         (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
         )
+        (tmp_path / "entities").mkdir(exist_ok=True)
+        (tmp_path / "entities" / "Cargo.toml").write_text('[package]\nversion = "0.1.0"\n')
         got = _cargo_toml_paths(tmp_path)
         rels = [str(p.relative_to(tmp_path)) for p in got]
         assert "Cargo.toml" in rels
-        assert "components/Cargo.toml" in rels
+        # components/ removed, only microservices/ now
         assert "entities/Cargo.toml" in rels
         assert "microservices/Cargo.toml" in rels
-        assert len(got) == 4
+        assert len(got) == 3
 
     def test_excludes_build(self, tmp_path: Path) -> None:
         (tmp_path / "lib").mkdir()
@@ -248,11 +244,7 @@ class TestRun:
         (tmp_path / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
         )
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
-            '[workspace]\n\n[workspace.package]\nversion = "0.1.0"\n'
-        )
-        (tmp_path / "microservices").mkdir()
+        (tmp_path / "microservices").mkdir(exist_ok=True)
         (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n\n[workspace.package]\nversion = "0.1.0"\n'
         )
@@ -265,20 +257,19 @@ class TestRun:
 
         assert rc == 0
         assert 'version = "0.1.1"' in (tmp_path / "Cargo.toml").read_text()
-        assert 'version = "0.1.1"' in (tmp_path / "components" / "Cargo.toml").read_text()
         assert 'version = "0.1.1"' in (tmp_path / "microservices" / "Cargo.toml").read_text()
         assert 'version = "0.1.1"' in (tmp_path / "entities" / "Cargo.toml").read_text()
 
-    def test_fails_without_components(self, tmp_path: Path) -> None:
+    def test_fails_without_microservices(self, tmp_path: Path) -> None:
         assert run(tmp_path, "patch") == 1
 
-    def test_root_updated_when_drifted_from_components(self, tmp_path: Path) -> None:
-        # Root has 0.1.0, components has 0.2.0: main loop won't replace root; _set_workspace_package_version does.
+    def test_root_updated_when_drifted_from_microservices(self, tmp_path: Path) -> None:
+        # Root has 0.1.0, microservices has 0.2.0: main loop won't replace root; _set_workspace_package_version does.
         (tmp_path / "Cargo.toml").write_text(
-            '[workspace]\nmembers = ["components"]\n\n[workspace.package]\nversion = "0.1.0"\n'
+            '[workspace]\nmembers = ["microservices"]\n\n[workspace.package]\nversion = "0.1.0"\n'
         )
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n\n[workspace.package]\nversion = "0.2.0"\n'
         )
         (tmp_path / "entities").mkdir()
@@ -290,11 +281,11 @@ class TestRun:
 
         assert rc == 0
         assert 'version = "0.2.1"' in (tmp_path / "Cargo.toml").read_text()
-        assert 'version = "0.2.1"' in (tmp_path / "components" / "Cargo.toml").read_text()
+        assert 'version = "0.2.1"' in (tmp_path / "microservices" / "Cargo.toml").read_text()
 
     def test_invalid_bump_raises_system_exit(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
         )
         (tmp_path / "Cargo.toml").write_text(
@@ -304,8 +295,8 @@ class TestRun:
             run(tmp_path, "invalid")
 
     def test_appends_to_github_output_when_set(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.1.0"\n'
         )
         (tmp_path / "Cargo.toml").write_text(
@@ -319,8 +310,8 @@ class TestRun:
         assert "version=0.1.1\n" in gh_out.read_text()
 
     def test_run_bump_rc(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
         )
         (tmp_path / "Cargo.toml").write_text(
@@ -332,12 +323,12 @@ class TestRun:
         )
         rc = run(tmp_path, "rc")
         assert rc == 0
-        assert 'version = "0.39.0-rc.3"' in (tmp_path / "components" / "Cargo.toml").read_text()
+        assert 'version = "0.39.0-rc.3"' in (tmp_path / "microservices" / "Cargo.toml").read_text()
         assert 'version = "0.39.0-rc.3"' in (tmp_path / "entities" / "Cargo.toml").read_text()
 
     def test_run_release_promotes_rc_to_full(self, tmp_path: Path) -> None:
-        (tmp_path / "components").mkdir()
-        (tmp_path / "components" / "Cargo.toml").write_text(
+        (tmp_path / "microservices").mkdir(exist_ok=True)
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
             '[workspace]\n[workspace.package]\nversion = "0.39.0-rc.2"\n'
         )
         (tmp_path / "Cargo.toml").write_text(
@@ -349,7 +340,7 @@ class TestRun:
         )
         rc = run(tmp_path, "release")
         assert rc == 0
-        assert 'version = "0.39.0"' in (tmp_path / "components" / "Cargo.toml").read_text()
+        assert 'version = "0.39.0"' in (tmp_path / "microservices" / "Cargo.toml").read_text()
         assert 'version = "0.39.0"' in (tmp_path / "entities" / "Cargo.toml").read_text()
 
 
