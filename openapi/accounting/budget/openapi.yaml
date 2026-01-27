@@ -1127,7 +1127,7 @@ components:
           format: money
         variance_percent:
           type: number
-          format: money
+          format: decimal
         currency_code:
           type: string
           minLength: 3
@@ -1173,7 +1173,7 @@ components:
           format: money
         variance_percent:
           type: number
-          format: money
+          format: decimal
         is_favorable:
           type: boolean
         exceeds_threshold:

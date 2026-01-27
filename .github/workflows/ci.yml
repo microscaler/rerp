@@ -254,7 +254,7 @@ jobs:
       - name: Build example service (amd64)
         run: |
           echo "🔨 Building example service (accounting/general-ledger) for amd64..."
-          tooling/.venv/bin/rerp build microservice general-ledger
+          tooling/.venv/bin/rerp build microservice general-ledger amd64
       
       - name: Build accounting microservices (amd64) - smoke test
         run: |
