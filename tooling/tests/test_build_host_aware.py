@@ -160,8 +160,10 @@ class TestBuildMicroservices:
     def test_run_accounting_gen_if_missing_noop_when_probe_exists(self, tmp_path: Path):
         from rerp_tooling.build.microservices import run_accounting_gen_if_missing
 
-        (tmp_path / "microservices" / "accounting" / "general-ledger").mkdir(parents=True)
-        (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
+        (tmp_path / "microservices" / "accounting" / "general-ledger" / "gen").mkdir(parents=True)
+        (
+            tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
+        ).write_text("")
         run_accounting_gen_if_missing(tmp_path)  # no raise, no subprocess
 
     def test_build_microservices_workspace_success_mocked(self, tmp_path: Path, monkeypatch):
@@ -169,8 +171,10 @@ class TestBuildMicroservices:
 
         (tmp_path / "microservices").mkdir(parents=True)
         (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\n")
-        (tmp_path / "microservices" / "accounting" / "general-ledger").mkdir(parents=True)
-        (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
+        (tmp_path / "microservices" / "accounting" / "general-ledger" / "gen").mkdir(parents=True)
+        (
+            tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
+        ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "")
         with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()
@@ -186,8 +190,10 @@ class TestBuildMicroservices:
 
         (tmp_path / "microservices").mkdir(parents=True)
         (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\n")
-        (tmp_path / "microservices" / "accounting" / "general-ledger").mkdir(parents=True)
-        (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
+        (tmp_path / "microservices" / "accounting" / "general-ledger" / "gen").mkdir(parents=True)
+        (
+            tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
+        ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "1")
         with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()

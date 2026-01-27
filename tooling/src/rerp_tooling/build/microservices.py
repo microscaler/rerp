@@ -35,7 +35,8 @@ PACKAGE_NAMES: Dict[str, str] = {
 
 
 def run_accounting_gen_if_missing(project_root: Path) -> None:
-    probe = project_root / "microservices" / "accounting" / "general-ledger" / "Cargo.toml"
+    # Check for gen/Cargo.toml in the new structure
+    probe = project_root / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
     if probe.exists():
         return
     print("📦 microservices/accounting crates missing; running brrtrouter-gen for all accounting services...")
@@ -48,7 +49,8 @@ def run_accounting_gen_if_missing(project_root: Path) -> None:
         spec = project_root / "openapi" / "accounting" / name / "openapi.yaml"
         if not spec.exists():
             continue
-        out = project_root / "microservices" / "accounting" / name
+        # Output to gen/ subdirectory in the new structure
+        out = project_root / "microservices" / "accounting" / name / "gen"
         out.mkdir(parents=True, exist_ok=True)
         cmd = [str(brrt), "generate", "--spec", str(spec), "--output", str(out), "--force"] if brrt.exists() else [
             "cargo", "run", "--manifest-path", str(brrt_manifest), "--bin", "brrtrouter-gen", "--",
