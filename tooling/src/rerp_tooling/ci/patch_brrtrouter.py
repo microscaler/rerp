@@ -100,22 +100,62 @@ def patch_file(
 
 
 def run_cargo_update(workspace_dir: Path) -> None:
-    """Run cargo update -p for brrtrouter, brrtrouter_macros, lifeguard*."""
+    """Run cargo update -p for brrtrouter, brrtrouter_macros, lifeguard*.
+
+    Uses --workspace flag to only update workspace dependencies, not resolve
+    all workspace members. This avoids errors when gen crates don't exist yet.
+    """
     for packages in (
         ["brrtrouter", "brrtrouter_macros"],
         ["lifeguard", "lifeguard-derive", "lifeguard-migrate"],
     ):
         try:
-            cmd = ["cargo", "update"] + [x for p in packages for x in ("-p", p)]
+            # Use --workspace to only update workspace deps, not resolve all members
+            # This prevents errors when gen crates don't exist yet in CI
+            cmd = ["cargo", "update", "--workspace"] + [x for p in packages for x in ("-p", p)]
             r = subprocess.run(cmd, cwd=workspace_dir, capture_output=True, text=True)
-            if r.returncode != 0 and "did not match any packages" in (r.stderr or ""):
-                continue
-            r.check_returncode()
+            if r.returncode != 0:
+                # Check for specific errors we can ignore
+                stderr = r.stderr or ""
+                stdout = r.stdout or ""
+                combined = stderr + stdout
+
+                # Ignore "did not match any packages" - package might not be in workspace
+                if "did not match any packages" in combined:
+                    continue
+
+                # Ignore errors about missing workspace members (gen crates might not exist yet)
+                if "no matching package named" in combined and "gen" in combined:
+                    log.debug(
+                        "Skipping cargo update error (gen crates may not exist yet): %s",
+                        combined[:200],
+                    )
+                    continue
+
+                # For other errors, fail
+                print(
+                    f"error: cargo update failed in {workspace_dir}: {stderr or stdout}",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
         except FileNotFoundError as e:
             log.debug("cargo not in PATH, skipping cargo update: %s", e)
         except subprocess.CalledProcessError as e:
+            # This shouldn't be reached due to manual error handling above, but keep for safety
+            stderr = (e.stderr or "") if hasattr(e, "stderr") else ""
+            stdout = (e.stdout or "") if hasattr(e, "stdout") else ""
+            combined = stderr + stdout
+
+            # Ignore missing gen crate errors
+            if "no matching package named" in combined and "gen" in combined:
+                log.debug(
+                    "Skipping cargo update error (gen crates may not exist yet): %s",
+                    combined[:200],
+                )
+                continue
+
             print(
-                f"error: cargo update failed in {workspace_dir}: {e.stderr or e}",
+                f"error: cargo update failed in {workspace_dir}: {stderr or stdout}",
                 file=sys.stderr,
             )
             sys.exit(1)
