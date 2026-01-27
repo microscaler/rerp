@@ -251,11 +251,6 @@ jobs:
           echo "🔨 Building RERP workspace for amd64..."
           tooling/.venv/bin/rerp build workspace amd64
       
-      - name: Build example service (amd64)
-        run: |
-          echo "🔨 Building example service (auth/idam) for amd64..."
-          tooling/.venv/bin/rerp build auth_idam amd64
-      
       - name: Build accounting microservices (amd64) - smoke test
         run: |
           echo "🔨 Building accounting microservices (workspace) for amd64..."
