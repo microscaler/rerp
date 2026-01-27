@@ -15,9 +15,9 @@ COPY ./build_artifacts/${TARGETARCH}/{{binary_name}} /app/{{binary_name}}
 RUN chmod +x /app/{{binary_name}}
 
 # Copy configuration and assets to writable locations
-COPY ./components/{{system}}/{{module}}_impl/config /app/config
-COPY ./components/{{system}}/{{module}}/doc /app/doc
-COPY ./components/{{system}}/{{module}}_impl/static_site /app/static_site
+COPY ./microservices/{{system}}/{{module}}/impl/config /app/config
+COPY ./microservices/{{system}}/{{module}}/gen/doc /app/doc
+COPY ./microservices/{{system}}/{{module}}/gen/static_site /app/static_site
 
 # Expose HTTP port
 EXPOSE {{port}}
