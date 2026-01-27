@@ -1,6 +1,6 @@
 [package]
 name = "rerp-entities"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "RERP accounting domain entities using Lifeguard ORM"
 authors = ["RERP Team <dev@rerp.io>"]
