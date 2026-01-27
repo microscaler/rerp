@@ -206,6 +206,49 @@ m = re.search(r"(ports\s*=\s*\{)(.*?)(\s*\})", content, re.DOTALL)
 
 ---
 
+## Fixed: BRRTRouter dummy_value uses 3.14 which triggers clippy::approx_constant (2025-01-26)
+
+**File:** `../BRRTRouter/src/dummy_value.rs` line 7
+
+**Issue:** The `dummy_value()` function returns `"3.14"` as the default example value for `f64` types. This value is too close to `f32::consts::PI` (approximately 3.14159...), causing clippy's `approx_constant` lint to flag it as a potential mistake. When BRRTRouter generates code from OpenAPI specs with decimal/number fields, it uses this dummy value in generated controller stubs, resulting in clippy errors like:
+
+```
+error: approximate value of `f{32, 64}::consts::PI` found
+  --> accounting/invoice/gen/src/controllers/create_invoice_line.rs:45:24
+   |
+45 |         tax_rate: Some(3.14),
+   |                        ^^^^
+```
+
+**Root Cause:** The dummy value `3.14` was chosen as a simple example for decimal types, but it inadvertently matches the mathematical constant PI, which clippy flags to prevent accidental use of approximate constants instead of the exact `f32::consts::PI` or `f64::consts::PI`.
+
+**Fix:** Changed the dummy value from `3.14` to `1.23` for `f64` types. This value:
+- Is clearly not a mathematical constant (unlike 3.14 ≈ PI)
+- Is a common example value for financial/decimal data
+- Won't trigger any clippy warnings
+- Still serves as a reasonable placeholder for decimal types
+
+**Impact:** All future code generation from BRRTRouter will use `1.23` instead of `3.14` for decimal fields, eliminating clippy warnings in generated code. Existing generated code will need to be regenerated to pick up the fix.
+
+**Note:** This is a BRRTRouter fix, not a RERP fix. The change must be made in the BRRTRouter repository and then RERP services regenerated.
+
+**⚠️ IMPORTANT - This is a WORKAROUND, not a complete solution:**
+
+The fix of changing `3.14` to `1.23` is a temporary workaround. The real issue is that we need a proper money/currency type in OpenAPI specs. Using `f64` for financial values has several problems:
+
+1. **Precision loss**: Floating-point numbers are not suitable for financial calculations
+2. **No semantic distinction**: Can't distinguish between mathematical numbers and money values
+3. **Clippy conflicts**: Any value close to mathematical constants will trigger warnings
+
+**Proper Solution Required:**
+- Create a `Money` schema component in OpenAPI specs
+- Update BRRTRouter to map `format: decimal` or `format: money` to `rust_decimal::Decimal`
+- Replace all `type: number, format: decimal` with `$ref: '#/components/schemas/Money'`
+
+See `docs/MONEY_TYPE_ANALYSIS.md` for detailed analysis and implementation plan.
+
+---
+
 ## Fixed: Error suppression check `"gen" in combined` too broad (2025-01-26)
 
 **File:** `tooling/src/rerp_tooling/ci/patch_brrtrouter.py` lines 127-128, 149-150

@@ -56,5 +56,6 @@ tikv-jemallocator = { version = "0.5", features = ["profiling"] }
 # Database
 may-postgres = "0.1"
 rust_decimal = "1.33"
+rusty-money = { version = "0.5", features = ["serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
