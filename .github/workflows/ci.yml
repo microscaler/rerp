@@ -229,16 +229,25 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: tooling/.venv/bin/rerp ci patch-brrtrouter
 
-      - name: Cache cargo registry
+      - name: Cache cargo registry and git
         uses: actions/cache@v5
+        id: cache-cargo-registry
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            microservices/target
-          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('microservices/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-rerp-
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo target directory
+        uses: actions/cache@v5
+        id: cache-cargo-target
+        with:
+          path: microservices/target
+          key: ${{ runner.os }}-cargo-target-amd64-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-amd64-
       
       - name: Install musl target and tools
         run: |
@@ -319,29 +328,23 @@ jobs:
 
       - name: Cache cargo registry and git
         uses: actions/cache@v5
+        id: cache-cargo-registry
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('microservices/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
-      
+
       - name: Cache cargo target (per-architecture)
         uses: actions/cache@v5
+        id: cache-cargo-target
         with:
           path: microservices/target
-          key: ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-target-${{ matrix.architecture }}-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-rerp-target-${{ matrix.architecture }}-
-
-      - name: Cache microservices target (per-architecture)
-        uses: actions/cache@v5
-        with:
-          path: microservices/target
-          key: ${{ runner.os }}-cargo-microservices-${{ matrix.architecture }}-${{ hashFiles('microservices/**/Cargo.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-microservices-${{ matrix.architecture }}-
+            ${{ runner.os }}-cargo-target-${{ matrix.architecture }}-
 
       - name: Install cross
         run: cargo install cross
