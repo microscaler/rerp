@@ -16,8 +16,10 @@ from typing import Optional
 def fix_cargo_toml(cargo_toml_path: Path, project_root: Optional[Path] = None) -> bool:
     """
     Fix BRRTRouter paths in a Cargo.toml file.
-    Assumes Cargo.toml at microservices/accounting/{service}/Cargo.toml; project_root
-    defaults to 3 levels up from the file's parent. BRRTRouter is project_root.parent / "BRRTRouter".
+    For gen/ Cargo.toml files, also updates package name and version to match workspace.
+    Assumes Cargo.toml at microservices/accounting/{service}/gen/Cargo.toml or similar;
+    project_root defaults to 3 levels up from the file's parent.
+    BRRTRouter is project_root.parent / "BRRTRouter".
     Returns True if content was changed.
     """
     if not cargo_toml_path.exists():
@@ -31,8 +33,12 @@ def fix_cargo_toml(cargo_toml_path: Path, project_root: Optional[Path] = None) -
     if project_root is not None:
         root = Path(project_root).resolve()
     else:
-        # microservices/accounting/{service}/ -> accounting -> microservices -> repo root
-        root = cargo_toml_dir.parent.parent.parent
+        # microservices/accounting/{service}/gen/ -> gen -> service -> accounting -> microservices -> repo root
+        # or microservices/accounting/{service}/ -> service -> accounting -> microservices -> repo root
+        if cargo_toml_dir.name == "gen":
+            root = cargo_toml_dir.parent.parent.parent.parent
+        else:
+            root = cargo_toml_dir.parent.parent.parent
 
     brrtrouter_path = root.parent / "BRRTRouter"
     try:
@@ -54,6 +60,29 @@ def fix_cargo_toml(cargo_toml_path: Path, project_root: Optional[Path] = None) -
         f'brrtrouter_macros = {{ path = "{rel_macros}" }}',
         content,
     )
+
+    # If this is a gen/ Cargo.toml, also update package name and version
+    if cargo_toml_dir.name == "gen" and "accounting" in cargo_toml_dir.parts:
+        # Extract service name from path: microservices/accounting/{service}/gen/
+        service_name = cargo_toml_dir.parent.name
+        service_snake = service_name.replace("-", "_")
+        gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+
+        # Update package name if it doesn't match
+        if f'name = "{gen_crate_name}"' not in content:
+            content = re.sub(r'name = "[^"]+"', f'name = "{gen_crate_name}"', content, count=1)
+
+        # Update version to match workspace (0.1.3)
+        content = re.sub(r'version = "[^"]+"', 'version = "0.1.3"', content, count=1)
+
+        # Add [lib] section if not present
+        if "[lib]" not in content:
+            content = re.sub(
+                r"(\[package\][^\[]+)",
+                r'\1\n[lib]\nname = "' + gen_crate_name + '"\npath = "src/lib.rs"\n',
+                content,
+                count=1,
+            )
 
     if content != original:
         cargo_toml_path.write_text(content)
