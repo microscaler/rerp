@@ -125,7 +125,8 @@ def run_cargo_update(workspace_dir: Path) -> None:
                     continue
 
                 # Ignore errors about missing workspace members (gen crates might not exist yet)
-                if "no matching package named" in combined and "gen" in combined:
+                # Check for package names ending in _gen (not just "gen" which matches "generate", etc.)
+                if "no matching package named" in combined and re.search(r'_gen["\'`\s]', combined):
                     log.debug(
                         "Skipping cargo update error (gen crates may not exist yet): %s",
                         combined[:200],
@@ -147,7 +148,8 @@ def run_cargo_update(workspace_dir: Path) -> None:
             combined = stderr + stdout
 
             # Ignore missing gen crate errors
-            if "no matching package named" in combined and "gen" in combined:
+            # Check for package names ending in _gen (not just "gen" which matches "generate", etc.)
+            if "no matching package named" in combined and re.search(r'_gen["\'`\s]', combined):
                 log.debug(
                     "Skipping cargo update error (gen crates may not exist yet): %s",
                     combined[:200],

@@ -203,3 +203,28 @@ m = re.search(r"(ports\s*=\s*\{)(.*?)(\s*\})", content, re.DOTALL)
 - `test_exhausts_retries_and_raises`: Verifies SystemExit after all retries
 - `test_fibonacci_backoff_sequence`: Verifies backoff sequence generation
 - `test_run_fails_after_retries_exhausted`: Verifies run() returns 1 on failure
+
+---
+
+## Fixed: Error suppression check `"gen" in combined` too broad (2025-01-26)
+
+**File:** `tooling/src/rerp_tooling/ci/patch_brrtrouter.py` lines 127-128, 149-150
+
+**Issue:** The error suppression check `"gen" in combined` is too broad. The PR intends to suppress errors about packages ending in `_gen` (like `rerp_accounting_api_gen`), but the substring `"gen"` could match common words in cargo output such as "generate", "generated", "generic", or "regenerate". If cargo reports a legitimate error about a non-gen package (like `brrtrouter`) and the error message happens to contain any of these words, the error would be incorrectly suppressed, allowing CI to pass when it should fail.
+
+**Example of false positive:** If cargo reports:
+```
+error: no matching package named `brrtrouter` found
+error: failed to generate dependency graph
+```
+The check `"gen" in combined` would match "generate" and suppress the legitimate error about `brrtrouter`.
+
+**Fix:** Replace the substring check with a regex pattern that specifically matches package names ending in `_gen`:
+- Changed from: `"gen" in combined`
+- Changed to: `re.search(r'_gen["\'`\s]', combined)`
+
+This pattern matches `_gen` followed by a quote (`"` or `'`), backtick (`` ` ``), or whitespace, which accurately identifies package names ending in `_gen` (e.g., `rerp_accounting_general_ledger_gen`) without matching unrelated words like "generate" or "generic".
+
+**Applied to:** Both error handling locations:
+- Line 128: In `run_cargo_update()` when handling `subprocess.run()` return code
+- Line 150: In `run_cargo_update()` when handling `subprocess.CalledProcessError` exception
