@@ -50,20 +50,58 @@ def run(
             print(f"❌ Template not found: {template_path}", file=sys.stderr)
             return 1
 
-        # Check if base image exists, build it if missing
-        check_base = subprocess.run(
-            ["docker", "images", "-q", "rerp/base:latest"],
+        # Check if base image exists locally or in GHCR
+        # Try local first (rerp-base:latest), then GHCR (ghcr.io/microscaler/rerp-base:latest)
+        import os
+
+        owner = (
+            os.environ.get("GHCR_OWNER")
+            or os.environ.get("GITHUB_REPOSITORY_OWNER")
+            or "microscaler"
+        )
+        base_image_local = "rerp-base:latest"
+        base_image_ghcr = f"ghcr.io/{owner}/rerp-base:latest"
+
+        check_local = subprocess.run(
+            ["docker", "images", "-q", base_image_local],
             capture_output=True,
             text=True,
             cwd=str(root),
         )
-        if not (check_base.stdout and check_base.stdout.strip()):
-            print("📦 Base image rerp/base:latest not found, building it...")
-            from rerp_tooling.docker.build_base import run as run_build_base
+        check_ghcr = subprocess.run(
+            ["docker", "images", "-q", base_image_ghcr],
+            capture_output=True,
+            text=True,
+            cwd=str(root),
+        )
 
-            if run_build_base(root, push=False, dry_run=False) != 0:
-                print("❌ Failed to build base image", file=sys.stderr)
-                return 1
+        if not (check_local.stdout and check_local.stdout.strip()) and not (
+            check_ghcr.stdout and check_ghcr.stdout.strip()
+        ):
+            print(f"📦 Base image {base_image_local} or {base_image_ghcr} not found")
+            print(f"   Attempting to pull from GHCR: {base_image_ghcr}")
+            pull_result = subprocess.run(
+                ["docker", "pull", base_image_ghcr],
+                capture_output=True,
+                text=True,
+                cwd=str(root),
+            )
+            if pull_result.returncode != 0:
+                print(f"   Pull failed, building locally as {base_image_local}...")
+                from rerp_tooling.docker.build_base import run as run_build_base
+
+                if run_build_base(root, push=False, dry_run=False) != 0:
+                    print("❌ Failed to build base image", file=sys.stderr)
+                    return 1
+                # Tag the local build with the GHCR name for consistency
+                tag_result = subprocess.run(
+                    ["docker", "tag", base_image_local, base_image_ghcr],
+                    capture_output=True,
+                    text=True,
+                    cwd=str(root),
+                )
+                if tag_result.returncode == 0:
+                    print(f"   Tagged local image as {base_image_ghcr}")
 
         dockerfile_path = template_path
         build_args = [

@@ -4,7 +4,7 @@ This directory contains the base Docker image for all RERP microservices.
 
 ## Base Image
 
-The base image (`rerp/base:latest`) provides:
+The base image (`ghcr.io/microscaler/rerp-base:latest`) provides:
 - Minimal Alpine Linux 3.19 runtime
 - Runtime dependencies (ca-certificates, libgcc, tzdata)
 - Standard directory structure (`/app/config`, `/app/doc`, `/app/static_site`)
@@ -12,16 +12,19 @@ The base image (`rerp/base:latest`) provides:
 
 ## Building the Base Image
 
+CI builds and pushes the image to GHCR (`.github/workflows/base-images.yml`). Locally:
 ```bash
-docker build -t rerp/base:latest -f docker/base/Dockerfile .
+rerp docker build-base
 ```
+This builds from `docker/base/Dockerfile` and tags both `rerp-base:latest` and `ghcr.io/microscaler/rerp-base:latest`.
 
 ## Usage
 
-Service-specific Dockerfiles inherit from this base image:
+Service Dockerfiles use the base image via build-arg (see `docker/microservices/Dockerfile.template`):
 
 ```dockerfile
-FROM rerp/base:latest
+ARG BASE_IMAGE=ghcr.io/microscaler/rerp-base:latest
+FROM ${BASE_IMAGE}
 # ... service-specific configuration
 ```
 

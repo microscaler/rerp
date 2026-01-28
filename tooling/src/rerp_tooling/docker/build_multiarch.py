@@ -63,35 +63,63 @@ def run(
         return 1
 
     # 4. Build base images per arch if needed
+    import os
+
+    owner = (
+        os.environ.get("GHCR_OWNER") or os.environ.get("GITHUB_REPOSITORY_OWNER") or "microscaler"
+    )
+
     print("🔨 Building base images for all architectures...")
     for arch in ["amd64", "arm64", "arm7"]:
         platform = ARCH_PLATFORMS[arch]
-        base_img = f"rerp/base:{arch}"
-        check = subprocess.run(
-            ["docker", "images", "-q", base_img],
+        base_img_ghcr = f"ghcr.io/{owner}/rerp-base:{arch}"
+        base_img_local = f"rerp-base:{arch}"
+
+        # Check both local and GHCR tags
+        check_ghcr = subprocess.run(
+            ["docker", "images", "-q", base_img_ghcr],
             capture_output=True,
             text=True,
             cwd=str(root),
         )
-        if not (check.stdout and check.stdout.strip()):
-            print(f"  Building base image for {arch}...")
-            subprocess.run(
-                [
-                    "docker",
-                    "buildx",
-                    "build",
-                    "--platform",
-                    platform,
-                    "--tag",
-                    base_img,
-                    "--load",
-                    "-f",
-                    "docker/base/Dockerfile",
-                    ".",
-                ],
+        check_local = subprocess.run(
+            ["docker", "images", "-q", base_img_local],
+            capture_output=True,
+            text=True,
+            cwd=str(root),
+        )
+
+        if not (check_ghcr.stdout and check_ghcr.stdout.strip()) and not (
+            check_local.stdout and check_local.stdout.strip()
+        ):
+            print(f"  Pulling base image for {arch} from GHCR: {base_img_ghcr}")
+            pull_result = subprocess.run(
+                ["docker", "pull", base_img_ghcr],
+                capture_output=True,
+                text=True,
                 cwd=str(root),
-                check=True,
             )
+            if pull_result.returncode != 0:
+                print(f"  Pull failed, building base image for {arch} locally...")
+                subprocess.run(
+                    [
+                        "docker",
+                        "buildx",
+                        "build",
+                        "--platform",
+                        platform,
+                        "--tag",
+                        base_img_local,
+                        "--tag",
+                        base_img_ghcr,
+                        "--load",
+                        "-f",
+                        "docker/base/Dockerfile",
+                        ".",
+                    ],
+                    cwd=str(root),
+                    check=True,
+                )
 
     # 5. Build image per arch
     print("🔨 Building Docker images for all architectures...")
@@ -104,8 +132,16 @@ def run(
 
         # For multi-arch, we need to modify the base image and COPY path
         # Read template and modify for this architecture
+        # The template uses ARG BASE_IMAGE=ghcr.io/microscaler/rerp-base:latest
+        # We need to replace both the ARG default and ensure FROM uses the arch-specific tag
+        base_image_default = f"ghcr.io/{owner}/rerp-base:latest"
+        base_image_arch = f"ghcr.io/{owner}/rerp-base:{arch}"
+
         template_content = template_path.read_text()
-        mod = template_content.replace("rerp/base:latest", f"rerp/base:{arch}")
+        # Replace the default base image in ARG with arch-specific one
+        mod = template_content.replace(
+            f"ARG BASE_IMAGE={base_image_default}", f"ARG BASE_IMAGE={base_image_arch}"
+        )
         mod = mod.replace(
             "./build_artifacts/${TARGETARCH}/",
             f"./build_artifacts/{system}_{module}/{arch}/",

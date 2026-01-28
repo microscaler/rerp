@@ -19,16 +19,22 @@ docker/
 
 ## Base Image
 
-The base image (`rerp/base:latest`) provides a minimal runtime environment:
+The base image (`ghcr.io/microscaler/rerp-base:latest`) provides a minimal runtime environment:
 - Alpine Linux 3.19
 - Runtime dependencies (ca-certificates, libgcc, tzdata)
 - Standard directory structure
 - Proper permissions for Tilt live updates
 
-Build the base image:
+The base image is built and pushed by CI (`.github/workflows/base-images.yml`). Locally, build and tag it with:
 ```bash
-docker build -t rerp/base:latest -f docker/base/Dockerfile .
+rerp docker build-base
 ```
+This tags the image with all three names:
+- **Local**: `rerp-base:latest`
+- **GHCR**: `ghcr.io/<owner>/rerp-base:latest` (owner from `GHCR_OWNER` or `GITHUB_REPOSITORY_OWNER`, default `microscaler`)
+- **Kind registry**: `localhost:5001/rerp-base:latest` (for Tilt / local Kind cluster)
+
+If `DOCKERHUB_ORG` (or `DOCKERHUB_OWNER`) is set, it also tags `docker.io/<org>/rerp-base:latest`. Use `rerp docker build-base --push` to push to remote registries (requires login). Service builds pull or use the GHCR image when available.
 
 ## Service Images
 

@@ -59,7 +59,7 @@ cd tooling && uv venv && uv pip install -e ".[dev]"
 - **`rerp docker build-image-simple <image_name> <dockerfile> <hash_path> <artifact_path>`** — Ensure hash/artifact/dockerfile exist; `docker build -t {image_name}:tilt`; push to registry or `kind load`. Used by Tilt. Replaces `build-microservice-docker-simple.sh`.
 - **`rerp docker copy-multiarch <suite> <service> [arch]`** — Copy microservice binaries from `microservices/target/{triple}/release/` to `build_artifacts/{suite}_{service}/{arch}/`. `arch`: amd64, arm64, arm7, or all. Replaces `copy-multiarch-binary.sh`.
 - **`rerp docker build-multiarch <suite> <service> <image_name> [--tag N] [--push]`** — Build for all archs, copy, generate Dockerfile if missing, buildx base+images, manifest; optional push. Replaces `build-multiarch-docker.sh`.
-- **`rerp docker build-base [--push] [--dry-run]`** — Build `docker/base/Dockerfile` as `rerp-base:latest`. `--push` pushes to `ghcr.io/$GHCR_OWNER/rerp-base:latest` (requires login). **Publishing** uses `.github/workflows/base-images.yml` (change detection, registry cache).
+- **`rerp docker build-base [--push] [--dry-run]`** — Build `docker/base/Dockerfile` and tag with: local (`rerp-base:latest`), GHCR (`ghcr.io/<owner>/rerp-base:latest`), Kind registry (`localhost:5001/rerp-base:latest`), and optionally Docker Hub (`docker.io/<DOCKERHUB_ORG>/rerp-base:latest`). `--push` pushes to remote registries (requires login). **Publishing** uses `.github/workflows/base-images.yml` (change detection, registry cache).
 
 **Build**
 - **`rerp build <target> [arch]`** — Host-aware build: `workspace` or `<suite>_<service>` (e.g. `accounting_general_ledger`). Optional `arch`: `amd64`, `arm64`, `arm7`, or `all` (default: host). Replaces `scripts/host-aware-build.py`.

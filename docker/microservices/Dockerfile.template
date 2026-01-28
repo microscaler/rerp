@@ -7,9 +7,12 @@
 
 ARG TARGETPLATFORM=linux/amd64
 ARG BUILDPLATFORM
-# Base image: rerp/base:latest (built from docker/base/Dockerfile)
-# If base image doesn't exist, build it first: rerp docker build-base
-FROM --platform=${TARGETPLATFORM} rerp/base:latest
+# Base image: ghcr.io/microscaler/rerp-base:latest
+# Built and pushed by .github/workflows/base-images.yml
+# For local development, build locally: rerp docker build-base (creates rerp-base:latest)
+# Then tag it: docker tag rerp-base:latest ghcr.io/microscaler/rerp-base:latest
+ARG BASE_IMAGE=ghcr.io/microscaler/rerp-base:latest
+FROM --platform=${TARGETPLATFORM} ${BASE_IMAGE}
 
 # TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
 ARG TARGETARCH=amd64

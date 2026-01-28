@@ -89,7 +89,7 @@ local_resource(
 # Note: Base image is not currently used - each service builds its own image
 # Uncomment if you want to use a shared base image:
 # docker_build(
-#     'rerp/base',
+#     'ghcr.io/microscaler/rerp-base',
 #     '.',
 #     dockerfile='./docker/base/Dockerfile',
 #     platform='linux/amd64',
@@ -161,19 +161,19 @@ def create_microservice_gen(name, spec_file, output_dir, suite='accounting'):
         allow_parallel=True,
     )
 
-# Cargo [package] names from brrtrouter-gen (for cargo -p and for binary output path)
-# BFF: brrtrouter-gen derives "rerp_accounting_backend_for_frontend_api" from OpenAPI info.title
+# Cargo [package] names (impl crate) — must match tooling PACKAGE_NAMES for binary path
+# Binary path: microservices/target/x86_64-unknown-linux-musl/debug/<package_name>
 PACKAGE_NAMES = {
-    'general-ledger': 'general_ledger',
-    'invoice': 'invoice_management',
-    'accounts-receivable': 'accounts_receivable',
-    'accounts-payable': 'accounts_payable',
-    'bank-sync': 'bank_synchronization',
-    'asset': 'asset_management',
-    'budget': 'budgeting',
-    'edi': 'edi___compliance',
-    'financial-reports': 'financial_reports',
-    'bff': 'rerp_accounting_backend_for_frontend_api',
+    'general-ledger': 'rerp_accounting_general_ledger',
+    'invoice': 'rerp_accounting_invoice',
+    'accounts-receivable': 'rerp_accounting_accounts_receivable',
+    'accounts-payable': 'rerp_accounting_accounts_payable',
+    'bank-sync': 'rerp_accounting_bank_sync',
+    'asset': 'rerp_accounting_asset',
+    'budget': 'rerp_accounting_budget',
+    'edi': 'rerp_accounting_edi',
+    'financial-reports': 'rerp_accounting_financial_reports',
+    'bff': 'rerp_accounting_bff',
 }
 
 # Artifact and container binary names (build_artifacts/, /app/, Helm app.binaryName)
