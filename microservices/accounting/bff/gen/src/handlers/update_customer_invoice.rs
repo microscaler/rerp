@@ -19,11 +19,11 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<f64>,
+    pub outstanding_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "write_off_amount")]
-    pub write_off_amount: Option<f64>,
+    pub write_off_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "write_off_date")]
@@ -54,11 +54,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "credit_limit")]
-    pub credit_limit: Option<f64>,
+    pub credit_limit: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "credit_used")]
-    pub credit_used: Option<f64>,
+    pub credit_used: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "customer_id")]
     pub customer_id: String,
@@ -75,7 +75,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "last_payment_amount")]
-    pub last_payment_amount: Option<f64>,
+    pub last_payment_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "last_payment_date")]
@@ -87,7 +87,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<f64>,
+    pub outstanding_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
@@ -95,7 +95,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "write_off_amount")]
-    pub write_off_amount: Option<f64>,
+    pub write_off_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "write_off_date")]

@@ -1,0 +1,12 @@
+# BRRTRouter Dependencies Configuration for Invoice Service
+#
+# This file specifies additional dependencies for the invoice microservice.
+# BRRTRouter will auto-detect this file alongside openapi.yaml
+
+[dependencies]
+# Always include these dependencies
+# Example: serde_with = { workspace = true, features = ["chrono"] }
+
+[conditional]
+# Include rust_decimal if rust_decimal::Decimal is detected in generated code
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }

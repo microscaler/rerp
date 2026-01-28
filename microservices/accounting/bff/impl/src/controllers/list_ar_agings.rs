@@ -16,13 +16,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
     //       "created_at": "2024-01-31T10:00:00Z",
     //       "currency_code": "USD",
-    //       "current": 5500.0,
+    //       "current": rust_decimal::Decimal::new(5500, 0),
     //       "customer_id": "111e8400-e29b-41d4-a716-446655440001",
-    //       "days_31_60": 0.0,
-    //       "days_61_90": 0.0,
-    //       "days_91_120": 0.0,
+    //       "days_31_60": rust_decimal::Decimal::new(0, 0),
+    //       "days_61_90": rust_decimal::Decimal::new(0, 0),
+    //       "days_91_120": rust_decimal::Decimal::new(0, 0),
     //       "id": "a00a0e8400-e29b-41d4-a716-446655440000",
-    //       "over_120": 0.0,
+    //       "over_120": rust_decimal::Decimal::new(0, 0),
     //       "total_outstanding": 5500.0
     //     }
     //   ],

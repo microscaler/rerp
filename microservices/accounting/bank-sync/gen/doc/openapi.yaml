@@ -1055,10 +1055,10 @@ components:
           maxLength: 3
         current_balance:
           type: number
-          format: decimal
+          format: money
         reconciled_balance:
           type: number
-          format: decimal
+          format: money
         last_reconciled_at:
           type: string
           format: date-time
@@ -1127,10 +1127,10 @@ components:
           maxLength: 255
         amount:
           type: number
-          format: decimal
+          format: money
         balance_after:
           type: number
-          format: decimal
+          format: money
         transaction_type:
           type: string
           enum:
@@ -1212,16 +1212,16 @@ components:
           nullable: true
         opening_balance:
           type: number
-          format: decimal
+          format: money
         closing_balance:
           type: number
-          format: decimal
+          format: money
         total_debits:
           type: number
-          format: decimal
+          format: money
         total_credits:
           type: number
-          format: decimal
+          format: money
         transaction_count:
           type: integer
         status:
@@ -1310,10 +1310,10 @@ components:
           format: date
         book_balance:
           type: number
-          format: decimal
+          format: money
         bank_balance:
           type: number
-          format: decimal
+          format: money
         difference:
           type: number
           format: decimal
@@ -1321,12 +1321,12 @@ components:
           type: integer
         outstanding_deposits_amount:
           type: number
-          format: decimal
+          format: money
         outstanding_withdrawals_count:
           type: integer
         outstanding_withdrawals_amount:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:
@@ -1458,7 +1458,7 @@ components:
           maxLength: 255
         amount:
           type: number
-          format: decimal
+          format: money
         transaction_type:
           type: string
           enum:
@@ -1524,10 +1524,10 @@ components:
           format: date
         opening_balance:
           type: number
-          format: decimal
+          format: money
         closing_balance:
           type: number
-          format: decimal
+          format: money
         import_format:
           type: string
           enum:
@@ -1594,10 +1594,10 @@ components:
       properties:
         book_balance:
           type: number
-          format: decimal
+          format: money
         bank_balance:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:

@@ -15,7 +15,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //   "fiscal_year": 2024,
     //   "id": "a0140e8400-e29b-41d4-a716-446655440000",
     //   "status": "DRAFT",
-    //   "total_budget_amount": 0.0,
+    //   "total_budget_amount": rust_decimal::Decimal::new(0, 0),
     //   "updated_at": "2024-01-15T10:00:00Z"
     // }
 
@@ -37,9 +37,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         period_end: "example".to_string(),
         period_start: "example".to_string(),
         status: "DRAFT".to_string(),
-        total_actual_amount: Some(3.14),
-        total_budget_amount: Some(0.0),
-        total_variance: Some(3.14),
+        total_actual_amount: Some(rust_decimal::Decimal::new(314, 2)),
+        total_budget_amount: Some(rust_decimal::Decimal::new(0, 0)),
+        total_variance: Some(rust_decimal::Decimal::new(314, 2)),
         updated_at: Some("2024-01-15T10:00:00Z".to_string()),
         updated_by: Some("example".to_string()),
     }

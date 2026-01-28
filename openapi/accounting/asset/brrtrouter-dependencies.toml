@@ -1,0 +1,5 @@
+# BRRTRouter Dependencies Configuration for Asset Service
+
+[conditional]
+# Include rust_decimal if rust_decimal::Decimal is detected
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }

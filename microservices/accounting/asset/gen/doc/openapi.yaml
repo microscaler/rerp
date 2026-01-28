@@ -987,16 +987,16 @@ components:
           format: uuid
         purchase_cost:
           type: number
-          format: decimal
+          format: money
         current_value:
           type: number
-          format: decimal
+          format: money
         accumulated_depreciation:
           type: number
           format: decimal
         salvage_value:
           type: number
-          format: decimal
+          format: money
         purchase_date:
           type: string
           format: date
@@ -1095,7 +1095,7 @@ components:
           format: date
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         accumulated_depreciation:
           type: number
           format: decimal
@@ -1203,7 +1203,7 @@ components:
           - ADJUSTMENT
         transaction_amount:
           type: number
-          format: decimal
+          format: money
         sale_proceeds:
           type: number
           format: decimal
@@ -1221,7 +1221,7 @@ components:
           nullable: true
         impairment_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         impairment_reason:
           type: string
@@ -1284,10 +1284,10 @@ components:
           format: uuid
         purchase_cost:
           type: number
-          format: decimal
+          format: money
         salvage_value:
           type: number
-          format: decimal
+          format: money
         purchase_date:
           type: string
           format: date
@@ -1364,7 +1364,7 @@ components:
           format: date
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1374,7 +1374,7 @@ components:
       properties:
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:

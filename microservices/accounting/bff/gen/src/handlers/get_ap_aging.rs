@@ -32,30 +32,30 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "current")]
-    pub current: Option<f64>,
+    pub current: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "days_31_60")]
-    pub days_31_60: Option<f64>,
+    pub days_31_60: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "days_61_90")]
-    pub days_61_90: Option<f64>,
+    pub days_61_90: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "days_91_120")]
-    pub days_91_120: Option<f64>,
+    pub days_91_120: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "over_120")]
-    pub over_120: Option<f64>,
+    pub over_120: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_outstanding")]
-    pub total_outstanding: Option<f64>,
+    pub total_outstanding: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

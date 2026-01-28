@@ -13,12 +13,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //   "items": [
     //     {
     //       "bank_account_id": "a00d0e8400-e29b-41d4-a716-446655440000",
-    //       "closing_balance": 50000.0,
+    //       "closing_balance": rust_decimal::Decimal::new(50000, 0),
     //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
     //       "created_at": "2024-01-31T10:00:00Z",
     //       "currency_code": "USD",
     //       "id": "a00e0e8400-e29b-41d4-a716-446655440000",
-    //       "opening_balance": 45000.0,
+    //       "opening_balance": rust_decimal::Decimal::new(45000, 0),
     //       "statement_date": "2024-01-31",
     //       "status": "RECONCILED",
     //       "updated_at": "2024-01-31T10:00:00Z"

@@ -912,22 +912,22 @@ components:
           nullable: true
         subtotal:
           type: number
-          format: decimal
+          format: money
         tax_amount:
           type: number
-          format: decimal
+          format: money
         discount_amount:
           type: number
-          format: decimal
+          format: money
         total_amount:
           type: number
-          format: decimal
+          format: money
         paid_amount:
           type: number
-          format: decimal
+          format: money
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1014,22 +1014,22 @@ components:
           nullable: true
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         line_subtotal:
           type: number
-          format: decimal
+          format: money
         tax_amount:
           type: number
-          format: decimal
+          format: money
         line_total:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid
@@ -1165,13 +1165,13 @@ components:
           type: string
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid
@@ -1188,13 +1188,13 @@ components:
           format: decimal
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid

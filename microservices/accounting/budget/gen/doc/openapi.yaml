@@ -1059,13 +1059,13 @@ components:
           nullable: true
         total_budget_amount:
           type: number
-          format: decimal
+          format: money
         total_actual_amount:
           type: number
-          format: decimal
+          format: money
         total_variance:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1118,13 +1118,13 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         variance_percent:
           type: number
           format: decimal
@@ -1164,13 +1164,13 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         variance_percent:
           type: number
           format: decimal
@@ -1268,7 +1268,7 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -1280,10 +1280,10 @@ components:
       properties:
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     CreateBudgetVarianceRequest:
@@ -1312,13 +1312,13 @@ components:
       properties:
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         is_favorable:
           type: boolean
         exceeds_threshold:

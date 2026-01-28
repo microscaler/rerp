@@ -269,9 +269,10 @@ def test_docker_build_image_simple_missing_hash_exits_1(tmp_path, monkeypatch, c
             "docker",
             "build-image-simple",
             "img",
-            "Dockerfile",
             "missing.sha256",
             "art",
+            "--dockerfile",
+            "Dockerfile",
         ]
     )
     err = capsys.readouterr().err

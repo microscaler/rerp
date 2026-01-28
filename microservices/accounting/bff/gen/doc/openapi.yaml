@@ -6969,22 +6969,22 @@ components:
           format: date
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -7025,7 +7025,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -7055,7 +7055,7 @@ components:
           - CANCELLED
         applied_amount:
           type: number
-          format: decimal
+          format: money
         company_id:
           type: string
           format: uuid
@@ -7099,7 +7099,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         applied_at:
           type: string
           format: date-time
@@ -7135,22 +7135,22 @@ components:
           format: date
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -7193,16 +7193,16 @@ components:
           format: uuid
         purchase_cost:
           type: number
-          format: decimal
+          format: money
         current_value:
           type: number
-          format: decimal
+          format: money
         accumulated_depreciation:
           type: number
           format: decimal
         salvage_value:
           type: number
-          format: decimal
+          format: money
         purchase_date:
           type: string
           format: date
@@ -7349,7 +7349,7 @@ components:
           - ADJUSTMENT
         transaction_amount:
           type: number
-          format: decimal
+          format: money
         sale_proceeds:
           type: number
           format: decimal
@@ -7367,7 +7367,7 @@ components:
           nullable: true
         impairment_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         impairment_reason:
           type: string
@@ -7449,10 +7449,10 @@ components:
           maxLength: 3
         current_balance:
           type: number
-          format: decimal
+          format: money
         reconciled_balance:
           type: number
-          format: decimal
+          format: money
         last_reconciled_at:
           type: string
           format: date-time
@@ -7524,16 +7524,16 @@ components:
           nullable: true
         opening_balance:
           type: number
-          format: decimal
+          format: money
         closing_balance:
           type: number
-          format: decimal
+          format: money
         total_debits:
           type: number
-          format: decimal
+          format: money
         total_credits:
           type: number
-          format: decimal
+          format: money
         transaction_count:
           type: integer
         status:
@@ -7627,10 +7627,10 @@ components:
           maxLength: 255
         amount:
           type: number
-          format: decimal
+          format: money
         balance_after:
           type: number
-          format: decimal
+          format: money
         transaction_type:
           type: string
           enum:
@@ -7740,13 +7740,13 @@ components:
           nullable: true
         total_budget_amount:
           type: number
-          format: decimal
+          format: money
         total_actual_amount:
           type: number
-          format: decimal
+          format: money
         total_variance:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -7799,13 +7799,13 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         variance_percent:
           type: number
           format: decimal
@@ -7845,13 +7845,13 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         variance_percent:
           type: number
           format: decimal
@@ -7991,7 +7991,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     CreateApPaymentRequest:
@@ -8015,7 +8015,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -8109,10 +8109,10 @@ components:
           format: uuid
         purchase_cost:
           type: number
-          format: decimal
+          format: money
         salvage_value:
           type: number
-          format: decimal
+          format: money
         purchase_date:
           type: string
           format: date
@@ -8211,10 +8211,10 @@ components:
           format: date
         opening_balance:
           type: number
-          format: decimal
+          format: money
         closing_balance:
           type: number
-          format: decimal
+          format: money
         import_format:
           type: string
           enum:
@@ -8257,7 +8257,7 @@ components:
           maxLength: 255
         amount:
           type: number
-          format: decimal
+          format: money
         transaction_type:
           type: string
           enum:
@@ -8297,7 +8297,7 @@ components:
           format: uuid
         budget_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -8400,7 +8400,7 @@ components:
           format: uuid
         credit_limit:
           type: number
-          format: decimal
+          format: money
         collection_status:
           type: string
           enum:
@@ -8428,7 +8428,7 @@ components:
           format: date
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -8557,13 +8557,13 @@ components:
           type: string
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid
@@ -8680,7 +8680,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     CreatePaymentRequest:
@@ -8704,7 +8704,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -8847,7 +8847,7 @@ components:
           format: uuid
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         days_overdue:
           type: integer
         aging_bucket:
@@ -8861,11 +8861,11 @@ components:
           nullable: true
         credit_limit:
           type: number
-          format: decimal
+          format: money
           nullable: true
         credit_used:
           type: number
-          format: decimal
+          format: money
           nullable: true
         collection_status:
           type: string
@@ -8881,11 +8881,11 @@ components:
           nullable: true
         last_payment_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         write_off_amount:
           type: number
-          format: decimal
+          format: money
           nullable: true
         write_off_date:
           type: string
@@ -8928,7 +8928,7 @@ components:
           format: date
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         accumulated_depreciation:
           type: number
           format: decimal
@@ -9339,22 +9339,22 @@ components:
           nullable: true
         subtotal:
           type: number
-          format: decimal
+          format: money
         tax_amount:
           type: number
-          format: decimal
+          format: money
         discount_amount:
           type: number
-          format: decimal
+          format: money
         total_amount:
           type: number
-          format: decimal
+          format: money
         paid_amount:
           type: number
-          format: decimal
+          format: money
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -9441,22 +9441,22 @@ components:
           nullable: true
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         line_subtotal:
           type: number
-          format: decimal
+          format: money
         tax_amount:
           type: number
-          format: decimal
+          format: money
         line_total:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid
@@ -9539,10 +9539,10 @@ components:
           nullable: true
         total_debit:
           type: number
-          format: decimal
+          format: money
         total_credit:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -9597,7 +9597,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         currency_code:
           type: string
           minLength: 3
@@ -9638,10 +9638,10 @@ components:
           nullable: true
         applied_amount:
           type: number
-          format: decimal
+          format: money
         unapplied_amount:
           type: number
-          format: decimal
+          format: money
         company_id:
           type: string
           format: uuid
@@ -9685,7 +9685,7 @@ components:
           format: uuid
         applied_amount:
           type: number
-          format: decimal
+          format: money
         applied_at:
           type: string
           format: date-time
@@ -9726,10 +9726,10 @@ components:
           format: date
         book_balance:
           type: number
-          format: decimal
+          format: money
         bank_balance:
           type: number
-          format: decimal
+          format: money
         difference:
           type: number
           format: decimal
@@ -9737,12 +9737,12 @@ components:
           type: integer
         outstanding_deposits_amount:
           type: number
-          format: decimal
+          format: money
         outstanding_withdrawals_count:
           type: integer
         outstanding_withdrawals_amount:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:
@@ -10059,28 +10059,28 @@ components:
       properties:
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
     UpdateApPaymentApplicationRequest:
       type: object
       properties:
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     UpdateApPaymentRequest:
@@ -10091,7 +10091,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         payment_method:
           type: string
           enum:
@@ -10115,22 +10115,22 @@ components:
       properties:
         current:
           type: number
-          format: decimal
+          format: money
         days_31_60:
           type: number
-          format: decimal
+          format: money
         days_61_90:
           type: number
-          format: decimal
+          format: money
         days_91_120:
           type: number
-          format: decimal
+          format: money
         over_120:
           type: number
-          format: decimal
+          format: money
         total_outstanding:
           type: number
-          format: decimal
+          format: money
     UpdateAssetRegisterRequest:
       type: object
       properties:
@@ -10243,10 +10243,10 @@ components:
       properties:
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     UpdateBudgetRequest:
@@ -10275,13 +10275,13 @@ components:
       properties:
         budget_amount:
           type: number
-          format: decimal
+          format: money
         actual_amount:
           type: number
-          format: decimal
+          format: money
         variance:
           type: number
-          format: decimal
+          format: money
         is_favorable:
           type: boolean
         exceeds_threshold:
@@ -10309,7 +10309,7 @@ components:
       properties:
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         aging_bucket:
           type: string
           enum:
@@ -10327,7 +10327,7 @@ components:
           - LEGAL
         write_off_amount:
           type: number
-          format: decimal
+          format: money
         write_off_date:
           type: string
           format: date
@@ -10338,7 +10338,7 @@ components:
       properties:
         depreciation_amount:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:
@@ -10409,13 +10409,13 @@ components:
           format: decimal
         unit_price:
           type: number
-          format: decimal
+          format: money
         discount_percent:
           type: number
           format: decimal
         discount_amount:
           type: number
-          format: decimal
+          format: money
         tax_id:
           type: string
           format: uuid
@@ -10475,7 +10475,7 @@ components:
       properties:
         applied_amount:
           type: number
-          format: decimal
+          format: money
         notes:
           type: string
     UpdatePaymentRequest:
@@ -10486,7 +10486,7 @@ components:
           format: date
         payment_amount:
           type: number
-          format: decimal
+          format: money
         payment_method:
           type: string
           enum:
@@ -10510,10 +10510,10 @@ components:
       properties:
         book_balance:
           type: number
-          format: decimal
+          format: money
         bank_balance:
           type: number
-          format: decimal
+          format: money
         status:
           type: string
           enum:
@@ -10547,7 +10547,7 @@ components:
       properties:
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         aging_bucket:
           type: string
           enum:
@@ -10586,7 +10586,7 @@ components:
           format: uuid
         outstanding_amount:
           type: number
-          format: decimal
+          format: money
         days_until_due:
           type: integer
         aging_bucket:

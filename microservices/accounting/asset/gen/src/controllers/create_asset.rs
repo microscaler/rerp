@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // }
 
     Response {
-        accumulated_depreciation: Some(3.14),
+        accumulated_depreciation: Some(rust_decimal::Decimal::new(12345, 2)),
         accumulated_depreciation_account_id: Some("example".to_string()),
         asset_account_id: Some("example".to_string()),
         asset_number: "AST-2024-001".to_string(),
@@ -33,10 +33,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         created_at: Some("2024-01-15T10:00:00Z".to_string()),
         created_by: Some("example".to_string()),
         currency_code: "USD".to_string(),
-        current_value: Some(5000000.0),
+        current_value: Some(rust_decimal::Decimal::new(50000000, 1)),
         depreciation_expense_account_id: Some("example".to_string()),
         depreciation_method: Some("STRAIGHT_LINE".to_string()),
-        depreciation_rate: Some(3.14),
+        depreciation_rate: Some(rust_decimal::Decimal::new(12345, 2)),
         description: Some("example".to_string()),
         disposal_date: Some("example".to_string()),
         id: "a0100e8400-e29b-41d4-a716-446655440000".to_string(),
@@ -44,9 +44,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         location: Some("example".to_string()),
         metadata: Some(Default::default()),
         name: "Office Building - Main Campus".to_string(),
-        purchase_cost: Some(5000000.0),
+        purchase_cost: Some(rust_decimal::Decimal::new(50000000, 1)),
         purchase_date: "2020-01-15".to_string(),
-        salvage_value: Some(3.14),
+        salvage_value: Some(rust_decimal::Decimal::new(12345, 2)),
         status: "ACTIVE".to_string(),
         updated_at: Some("2024-01-15T10:00:00Z".to_string()),
         updated_by: Some("example".to_string()),

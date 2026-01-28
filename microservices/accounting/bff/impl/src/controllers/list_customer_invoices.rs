@@ -19,8 +19,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //       "customer_id": "111e8400-e29b-41d4-a716-446655440001",
     //       "id": "a0030e8400-e29b-41d4-a716-446655440000",
     //       "invoice_id": "a0010e8400-e29b-41d4-a716-446655440000",
-    //       "original_amount": 11000.0,
-    //       "outstanding_amount": 11000.0,
+    //       "original_amount": rust_decimal::Decimal::new(11000, 0),
+    //       "outstanding_amount": rust_decimal::Decimal::new(11000, 0),
     //       "status": "OUTSTANDING",
     //       "updated_at": "2024-01-15T09:00:00Z"
     //     }

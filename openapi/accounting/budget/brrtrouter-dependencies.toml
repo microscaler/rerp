@@ -1,0 +1,11 @@
+# BRRTRouter Dependencies Configuration for Budget Service
+#
+# This file specifies additional dependencies for the budget microservice.
+
+[dependencies]
+# Always include these dependencies
+# Example: budget-calculator = { workspace = true }
+
+[conditional]
+# Include rust_decimal if rust_decimal::Decimal is detected
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }

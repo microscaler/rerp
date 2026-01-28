@@ -13,7 +13,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //   "items": [
     //     {
     //       "account_id": "a0070e8400-e29b-41d4-a716-446655440000",
-    //       "budget_amount": 100000.0,
+    //       "budget_amount": rust_decimal::Decimal::new(100000, 0),
     //       "budget_id": "a0140e8400-e29b-41d4-a716-446655440000",
     //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
     //       "created_at": "2024-01-15T10:00:00Z",

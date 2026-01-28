@@ -35,15 +35,15 @@ PACKAGE_NAMES: Dict[str, str] = {
 
 
 def run_accounting_gen_if_missing(project_root: Path) -> None:
+    """Generate gen crates if they don't exist using BRRTRouter."""
     # Check for gen/Cargo.toml in the new structure
     probe = project_root / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
     if probe.exists():
         return
     print("📦 microservices/accounting crates missing; running brrtrouter-gen for all accounting services...")
-    brrt = project_root.parent / "BRRTRouter" / "target" / "debug" / "brrtrouter-gen"
-    brrt_manifest = project_root.parent / "BRRTRouter" / "Cargo.toml"
-    if not brrt_manifest.exists():
-        raise FileNotFoundError(f"BRRTRouter not found at {brrt_manifest.parent}")
+    
+    from rerp_tooling.gen.brrtrouter import call_brrtrouter_generate
+    from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 
     for name in suite_sub_service_names(project_root, "accounting"):
         spec = project_root / "openapi" / "accounting" / name / "openapi.yaml"
@@ -52,15 +52,28 @@ def run_accounting_gen_if_missing(project_root: Path) -> None:
         # Output to gen/ subdirectory in the new structure
         out = project_root / "microservices" / "accounting" / name / "gen"
         out.mkdir(parents=True, exist_ok=True)
-        cmd = [str(brrt), "generate", "--spec", str(spec), "--output", str(out), "--force"] if brrt.exists() else [
-            "cargo", "run", "--manifest-path", str(brrt_manifest), "--bin", "brrtrouter-gen", "--",
-            "generate", "--spec", str(spec), "--output", str(out), "--force",
-        ]
-        subprocess.run(cmd, check=True, cwd=str(project_root), capture_output=True, text=True)
+        
+        # Check for dependencies config
+        deps_config_path = spec.parent / "brrtrouter-dependencies.toml"
+        deps_config = deps_config_path if deps_config_path.exists() else None
+        
+        result = call_brrtrouter_generate(
+            spec_path=spec,
+            output_dir=out,
+            project_root=project_root,
+            deps_config_path=deps_config,
+            capture_output=True,
+        )
+        
+        if result.returncode != 0:
+            print(f"⚠️  Failed to generate {name}: {result.stderr}")
+            continue
+        
+        # Fix Cargo.toml paths
         ct = out / "Cargo.toml"
         if ct.exists():
-            from rerp_tooling.ci.fix_cargo_paths import run as run_fix
-            run_fix(ct, project_root)
+            run_fix_cargo_paths(ct, project_root)
+    
     print("✅ accounting codegen complete")
 
 

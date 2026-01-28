@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //       "fiscal_year": 2024,
     //       "id": "a0140e8400-e29b-41d4-a716-446655440000",
     //       "status": "APPROVED",
-    //       "total_budget_amount": 10000000.0,
+    //       "total_budget_amount": rust_decimal::Decimal::new(10000000, 0),
     //       "updated_at": "2024-01-15T10:00:00Z"
     //     }
     //   ],

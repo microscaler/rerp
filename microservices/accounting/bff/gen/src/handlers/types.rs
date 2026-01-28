@@ -43,19 +43,19 @@ pub struct ApAging {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -64,7 +64,7 @@ pub struct ApAging {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ApPayment {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -82,7 +82,7 @@ pub struct ApPayment {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -103,7 +103,7 @@ pub struct ApPayment {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ApPaymentApplication {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub applied_at: String,
 
@@ -132,28 +132,28 @@ pub struct ArAging {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Asset {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -171,13 +171,13 @@ pub struct Asset {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -193,11 +193,11 @@ pub struct Asset {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -243,11 +243,11 @@ pub struct AssetTransaction {
 
     pub currency_code: String,
 
-    pub gain_loss: f64,
+    pub gain_loss: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub impairment_amount: f64,
+    pub impairment_amount: rust_decimal::Decimal,
 
     pub impairment_reason: String,
 
@@ -259,9 +259,9 @@ pub struct AssetTransaction {
 
     pub reference_number: String,
 
-    pub sale_proceeds: f64,
+    pub sale_proceeds: rust_decimal::Decimal,
 
-    pub transaction_amount: f64,
+    pub transaction_amount: rust_decimal::Decimal,
 
     pub transaction_date: String,
 
@@ -296,7 +296,7 @@ pub struct BankAccount {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -308,7 +308,7 @@ pub struct BankAccount {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -323,7 +323,7 @@ pub struct BankAccount {
 pub struct BankStatement {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -345,7 +345,7 @@ pub struct BankStatement {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -361,9 +361,9 @@ pub struct BankStatement {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -374,9 +374,9 @@ pub struct BankStatement {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankTransaction {
-    pub amount: f64,
+    pub amount: rust_decimal::Decimal,
 
-    pub balance_after: f64,
+    pub balance_after: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -447,11 +447,11 @@ pub struct Budget {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -462,9 +462,9 @@ pub struct Budget {
 pub struct BudgetLine {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -480,9 +480,9 @@ pub struct BudgetLine {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -491,9 +491,9 @@ pub struct BudgetLine {
 pub struct BudgetVariance {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -513,9 +513,9 @@ pub struct BudgetVariance {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -610,19 +610,19 @@ pub struct CreateApAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -631,7 +631,7 @@ pub struct CreateApAgingResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateApPaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub invoice_id: String,
 
@@ -650,7 +650,7 @@ pub struct CreateApPaymentRequest {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -684,21 +684,21 @@ pub struct CreateArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -769,18 +769,18 @@ pub struct CreateAssetRequest {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub useful_life_months: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -798,13 +798,13 @@ pub struct CreateAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -820,11 +820,11 @@ pub struct CreateAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -876,7 +876,7 @@ pub struct CreateBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -888,7 +888,7 @@ pub struct CreateBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -903,7 +903,7 @@ pub struct CreateBankAccountResponse {
 pub struct CreateBankStatementRequest {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -913,7 +913,7 @@ pub struct CreateBankStatementRequest {
 
     pub import_source: String,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -928,7 +928,7 @@ pub struct CreateBankStatementRequest {
 pub struct CreateBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -950,7 +950,7 @@ pub struct CreateBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -966,9 +966,9 @@ pub struct CreateBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -979,7 +979,7 @@ pub struct CreateBankStatementResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankTransactionRequest {
-    pub amount: f64,
+    pub amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -1000,7 +1000,7 @@ pub struct CreateBankTransactionRequest {
 pub struct CreateBudgetLineRequest {
     pub account_id: String,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -1017,9 +1017,9 @@ pub struct CreateBudgetLineRequest {
 pub struct CreateBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -1035,9 +1035,9 @@ pub struct CreateBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -1097,11 +1097,11 @@ pub struct CreateBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -1123,9 +1123,9 @@ pub struct CreateBudgetVarianceRequest {
 pub struct CreateBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -1145,9 +1145,9 @@ pub struct CreateBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1192,7 +1192,7 @@ pub struct CreateChartOfAccountResponse {
 pub struct CreateCustomerInvoiceRequest {
     pub collection_status: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -1207,9 +1207,9 @@ pub struct CreateCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -1219,17 +1219,17 @@ pub struct CreateCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -1242,7 +1242,7 @@ pub struct CreateDepreciationRequest {
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -1251,17 +1251,17 @@ pub struct CreateDepreciationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1454,9 +1454,9 @@ pub struct CreateFinancialStatementResponse {
 pub struct CreateInvoiceLineRequest {
     pub account_id: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub invoice_id: String,
 
@@ -1470,15 +1470,15 @@ pub struct CreateInvoiceLineRequest {
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub unit_of_measure: String,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1489,9 +1489,9 @@ pub struct CreateInvoiceLineResponse {
 
     pub currency_code: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1499,9 +1499,9 @@ pub struct CreateInvoiceLineResponse {
 
     pub line_number: i32,
 
-    pub line_subtotal: f64,
+    pub line_subtotal: rust_decimal::Decimal,
 
-    pub line_total: f64,
+    pub line_total: rust_decimal::Decimal,
 
     pub metadata: serde_json::Value,
 
@@ -1513,17 +1513,17 @@ pub struct CreateInvoiceLineResponse {
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub unit_of_measure: String,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -1538,7 +1538,7 @@ pub struct CreateInvoiceRequest {
 
     pub due_date: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub internal_notes: String,
 
@@ -1571,11 +1571,11 @@ pub struct CreateInvoiceResponse {
 
     pub customer_id: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
     pub due_date: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1591,9 +1591,9 @@ pub struct CreateInvoiceResponse {
 
     pub notes: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub paid_amount: f64,
+    pub paid_amount: rust_decimal::Decimal,
 
     pub paid_at: String,
 
@@ -1607,11 +1607,11 @@ pub struct CreateInvoiceResponse {
 
     pub status: String,
 
-    pub subtotal: f64,
+    pub subtotal: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
-    pub total_amount: f64,
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -1632,7 +1632,7 @@ pub struct CreateJournalEntryRequest {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -1659,7 +1659,7 @@ pub struct CreateJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -1679,9 +1679,9 @@ pub struct CreateJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -1690,7 +1690,7 @@ pub struct CreateJournalEntryResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreatePaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub invoice_id: String,
 
@@ -1709,11 +1709,11 @@ pub struct CreatePaymentRequest {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -1726,7 +1726,7 @@ pub struct CreatePaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreatePaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -1740,7 +1740,7 @@ pub struct CreatePaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1748,7 +1748,7 @@ pub struct CreatePaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -1764,7 +1764,7 @@ pub struct CreatePaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -1790,9 +1790,9 @@ pub struct CreateReconciliationRequest {
 pub struct CreateReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -1802,7 +1802,7 @@ pub struct CreateReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1810,11 +1810,11 @@ pub struct CreateReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -1913,7 +1913,7 @@ pub struct CreateVendorInvoiceRequest {
 
     pub early_payment_discount_date: String,
 
-    pub early_payment_discount_percent: f64,
+    pub early_payment_discount_percent: rust_decimal::Decimal,
 
     pub invoice_id: String,
 
@@ -1938,7 +1938,7 @@ pub struct CreateVendorInvoiceResponse {
 
     pub early_payment_discount_date: String,
 
-    pub early_payment_discount_percent: f64,
+    pub early_payment_discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -1948,7 +1948,7 @@ pub struct CreateVendorInvoiceResponse {
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub purchase_order_id: String,
 
@@ -1965,9 +1965,9 @@ pub struct CustomerInvoice {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -1977,17 +1977,17 @@ pub struct CustomerInvoice {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -1996,17 +1996,17 @@ pub struct CustomerInvoice {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Depreciation {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2233,19 +2233,19 @@ pub struct GetApAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -2262,21 +2262,21 @@ pub struct GetArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -2306,7 +2306,7 @@ pub struct GetAssetRegisterResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -2324,13 +2324,13 @@ pub struct GetAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -2346,11 +2346,11 @@ pub struct GetAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -2381,7 +2381,7 @@ pub struct GetBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2393,7 +2393,7 @@ pub struct GetBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -2408,7 +2408,7 @@ pub struct GetBankAccountResponse {
 pub struct GetBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -2430,7 +2430,7 @@ pub struct GetBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -2446,9 +2446,9 @@ pub struct GetBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -2461,9 +2461,9 @@ pub struct GetBankStatementResponse {
 pub struct GetBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -2479,9 +2479,9 @@ pub struct GetBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -2522,11 +2522,11 @@ pub struct GetBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -2537,9 +2537,9 @@ pub struct GetBudgetResponse {
 pub struct GetBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -2559,9 +2559,9 @@ pub struct GetBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2595,9 +2595,9 @@ pub struct GetCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -2607,17 +2607,17 @@ pub struct GetCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -2626,17 +2626,17 @@ pub struct GetCustomerInvoiceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2780,9 +2780,9 @@ pub struct GetInvoiceLineResponse {
 
     pub currency_code: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2790,9 +2790,9 @@ pub struct GetInvoiceLineResponse {
 
     pub line_number: i32,
 
-    pub line_subtotal: f64,
+    pub line_subtotal: rust_decimal::Decimal,
 
-    pub line_total: f64,
+    pub line_total: rust_decimal::Decimal,
 
     pub metadata: serde_json::Value,
 
@@ -2804,17 +2804,17 @@ pub struct GetInvoiceLineResponse {
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub unit_of_measure: String,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -2831,11 +2831,11 @@ pub struct GetInvoiceResponse {
 
     pub customer_id: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
     pub due_date: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2851,9 +2851,9 @@ pub struct GetInvoiceResponse {
 
     pub notes: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub paid_amount: f64,
+    pub paid_amount: rust_decimal::Decimal,
 
     pub paid_at: String,
 
@@ -2867,11 +2867,11 @@ pub struct GetInvoiceResponse {
 
     pub status: String,
 
-    pub subtotal: f64,
+    pub subtotal: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
-    pub total_amount: f64,
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -2896,7 +2896,7 @@ pub struct GetJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -2916,9 +2916,9 @@ pub struct GetJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -2927,7 +2927,7 @@ pub struct GetJournalEntryResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetPaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -2941,7 +2941,7 @@ pub struct GetPaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2949,7 +2949,7 @@ pub struct GetPaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -2965,7 +2965,7 @@ pub struct GetPaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -2976,9 +2976,9 @@ pub struct GetPaymentResponse {
 pub struct GetReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -2988,7 +2988,7 @@ pub struct GetReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -2996,11 +2996,11 @@ pub struct GetReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -3084,7 +3084,7 @@ pub struct GetVendorInvoiceResponse {
 
     pub early_payment_discount_date: String,
 
-    pub early_payment_discount_percent: f64,
+    pub early_payment_discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -3094,7 +3094,7 @@ pub struct GetVendorInvoiceResponse {
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub purchase_order_id: String,
 
@@ -3115,11 +3115,11 @@ pub struct Invoice {
 
     pub customer_id: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
     pub due_date: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -3135,9 +3135,9 @@ pub struct Invoice {
 
     pub notes: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub paid_amount: f64,
+    pub paid_amount: rust_decimal::Decimal,
 
     pub paid_at: String,
 
@@ -3151,11 +3151,11 @@ pub struct Invoice {
 
     pub status: String,
 
-    pub subtotal: f64,
+    pub subtotal: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
-    pub total_amount: f64,
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -3172,9 +3172,9 @@ pub struct InvoiceLine {
 
     pub currency_code: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -3182,9 +3182,9 @@ pub struct InvoiceLine {
 
     pub line_number: i32,
 
-    pub line_subtotal: f64,
+    pub line_subtotal: rust_decimal::Decimal,
 
-    pub line_total: f64,
+    pub line_total: rust_decimal::Decimal,
 
     pub metadata: serde_json::Value,
 
@@ -3196,17 +3196,17 @@ pub struct InvoiceLine {
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub unit_of_measure: String,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -3227,7 +3227,7 @@ pub struct JournalEntry {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -3247,9 +3247,9 @@ pub struct JournalEntry {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -3511,7 +3511,7 @@ pub struct ListVendorInvoicesResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Payment {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -3525,7 +3525,7 @@ pub struct Payment {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -3533,7 +3533,7 @@ pub struct Payment {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -3549,7 +3549,7 @@ pub struct Payment {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -3558,7 +3558,7 @@ pub struct Payment {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaymentApplication {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub applied_at: String,
 
@@ -3581,9 +3581,9 @@ pub struct PaymentApplication {
 pub struct Reconciliation {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -3593,7 +3593,7 @@ pub struct Reconciliation {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -3601,11 +3601,11 @@ pub struct Reconciliation {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -3791,17 +3791,17 @@ pub struct UpdateAccountResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateApAgingRequest {
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -3814,19 +3814,19 @@ pub struct UpdateApAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -3835,7 +3835,7 @@ pub struct UpdateApAgingResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateApPaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub notes: String,
 }
@@ -3844,7 +3844,7 @@ pub struct UpdateApPaymentApplicationRequest {
 pub struct UpdateApPaymentRequest {
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -3855,17 +3855,17 @@ pub struct UpdateApPaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateArAgingRequest {
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -3878,21 +3878,21 @@ pub struct UpdateArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -3948,7 +3948,7 @@ pub struct UpdateAssetRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -3966,13 +3966,13 @@ pub struct UpdateAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -3988,11 +3988,11 @@ pub struct UpdateAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -4038,7 +4038,7 @@ pub struct UpdateBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4050,7 +4050,7 @@ pub struct UpdateBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -4074,7 +4074,7 @@ pub struct UpdateBankStatementRequest {
 pub struct UpdateBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -4096,7 +4096,7 @@ pub struct UpdateBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -4112,9 +4112,9 @@ pub struct UpdateBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -4136,9 +4136,9 @@ pub struct UpdateBankTransactionRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetLineRequest {
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub notes: String,
 }
@@ -4147,9 +4147,9 @@ pub struct UpdateBudgetLineRequest {
 pub struct UpdateBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -4165,9 +4165,9 @@ pub struct UpdateBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -4219,11 +4219,11 @@ pub struct UpdateBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -4232,24 +4232,24 @@ pub struct UpdateBudgetResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetVarianceRequest {
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub exceeds_threshold: bool,
 
     pub is_favorable: bool,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -4269,9 +4269,9 @@ pub struct UpdateBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -4314,9 +4314,9 @@ pub struct UpdateCustomerInvoiceRequest {
 
     pub collection_status: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -4331,9 +4331,9 @@ pub struct UpdateCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -4343,17 +4343,17 @@ pub struct UpdateCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -4362,7 +4362,7 @@ pub struct UpdateCustomerInvoiceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateDepreciationRequest {
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub journal_entry_id: String,
 
@@ -4371,17 +4371,17 @@ pub struct UpdateDepreciationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4560,19 +4560,19 @@ pub struct UpdateFinancialStatementResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateInvoiceLineRequest {
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -4583,9 +4583,9 @@ pub struct UpdateInvoiceLineResponse {
 
     pub currency_code: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
-    pub discount_percent: f64,
+    pub discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4593,9 +4593,9 @@ pub struct UpdateInvoiceLineResponse {
 
     pub line_number: i32,
 
-    pub line_subtotal: f64,
+    pub line_subtotal: rust_decimal::Decimal,
 
-    pub line_total: f64,
+    pub line_total: rust_decimal::Decimal,
 
     pub metadata: serde_json::Value,
 
@@ -4607,17 +4607,17 @@ pub struct UpdateInvoiceLineResponse {
 
     pub product_name: String,
 
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
     pub tax_id: String,
 
-    pub tax_rate: f64,
+    pub tax_rate: rust_decimal::Decimal,
 
     pub unit_of_measure: String,
 
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -4651,11 +4651,11 @@ pub struct UpdateInvoiceResponse {
 
     pub customer_id: String,
 
-    pub discount_amount: f64,
+    pub discount_amount: rust_decimal::Decimal,
 
     pub due_date: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4671,9 +4671,9 @@ pub struct UpdateInvoiceResponse {
 
     pub notes: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub paid_amount: f64,
+    pub paid_amount: rust_decimal::Decimal,
 
     pub paid_at: String,
 
@@ -4687,11 +4687,11 @@ pub struct UpdateInvoiceResponse {
 
     pub status: String,
 
-    pub subtotal: f64,
+    pub subtotal: rust_decimal::Decimal,
 
-    pub tax_amount: f64,
+    pub tax_amount: rust_decimal::Decimal,
 
-    pub total_amount: f64,
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -4727,7 +4727,7 @@ pub struct UpdateJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -4747,9 +4747,9 @@ pub struct UpdateJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -4758,7 +4758,7 @@ pub struct UpdateJournalEntryResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub notes: String,
 }
@@ -4767,7 +4767,7 @@ pub struct UpdatePaymentApplicationRequest {
 pub struct UpdatePaymentRequest {
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -4778,7 +4778,7 @@ pub struct UpdatePaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -4792,7 +4792,7 @@ pub struct UpdatePaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4800,7 +4800,7 @@ pub struct UpdatePaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -4816,7 +4816,7 @@ pub struct UpdatePaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -4825,9 +4825,9 @@ pub struct UpdatePaymentResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateReconciliationRequest {
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub notes: String,
 
@@ -4838,9 +4838,9 @@ pub struct UpdateReconciliationRequest {
 pub struct UpdateReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -4850,7 +4850,7 @@ pub struct UpdateReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4858,11 +4858,11 @@ pub struct UpdateReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -4951,7 +4951,7 @@ pub struct UpdateVendorInvoiceRequest {
 
     pub matching_status: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -4970,7 +4970,7 @@ pub struct UpdateVendorInvoiceResponse {
 
     pub early_payment_discount_date: String,
 
-    pub early_payment_discount_percent: f64,
+    pub early_payment_discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -4980,7 +4980,7 @@ pub struct UpdateVendorInvoiceResponse {
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub purchase_order_id: String,
 
@@ -5005,7 +5005,7 @@ pub struct VendorInvoice {
 
     pub early_payment_discount_date: String,
 
-    pub early_payment_discount_percent: f64,
+    pub early_payment_discount_percent: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -5015,7 +5015,7 @@ pub struct VendorInvoice {
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub purchase_order_id: String,
 

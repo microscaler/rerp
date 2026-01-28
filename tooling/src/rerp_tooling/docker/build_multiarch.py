@@ -21,9 +21,30 @@ def run(
     push: bool,
     project_root: Path,
 ) -> int:
-    """Build binaries, copy, generate Dockerfile if needed, buildx base+images, manifest, optional push. Returns 0 or 1."""
+    """Build binaries, copy, generate Dockerfile from template, buildx base+images, manifest, optional push. Returns 0 or 1."""
     root = project_root
-    dockerfile = root / "docker" / "microservices" / f"Dockerfile.{system}_{module}"
+
+    # Use template with build args - no need to generate content, use template directly
+    template_path = root / "docker" / "microservices" / "Dockerfile.template"
+    if not template_path.exists():
+        print(f"❌ Template not found: {template_path}", file=sys.stderr)
+        return 1
+
+    # Determine port (default to 8000, could be enhanced to read from port registry)
+    port = 8000
+    binary_name = f"rerp_{system}_{module.replace('-', '_')}_impl"
+
+    # Build args for template
+    build_args = [
+        "--build-arg",
+        f"SYSTEM={system}",
+        "--build-arg",
+        f"MODULE={module}",
+        "--build-arg",
+        f"PORT={port}",
+        "--build-arg",
+        f"BINARY_NAME={binary_name}",
+    ]
 
     # 1. Build for all archs
     print("🔨 Building binaries for all architectures...")
@@ -40,24 +61,6 @@ def run(
 
     if copy_run(system, module, "all", root) != 0:
         return 1
-
-    # 3. Generate Dockerfile if missing
-    if not dockerfile.exists():
-        print("📝 Generating Dockerfile...")
-        r = subprocess.run(
-            [
-                "tooling/.venv/bin/rerp",
-                "docker",
-                "generate-dockerfile",
-                system,
-                module,
-                "--port",
-                "8000",
-            ],
-            cwd=str(root),
-        )
-        if r.returncode != 0:
-            return 1
 
     # 4. Build base images per arch if needed
     print("🔨 Building base images for all architectures...")
@@ -93,15 +96,16 @@ def run(
     # 5. Build image per arch
     print("🔨 Building Docker images for all architectures...")
     image_tags = []
-    df_content = dockerfile.read_text()
 
     for arch in ["amd64", "arm64", "arm7"]:
         platform = ARCH_PLATFORMS[arch]
         arch_tag = f"{image_name}:{tag}-{arch}"
         image_tags.append(arch_tag)
 
-        # Per-arch Dockerfile: FROM rerp/base:arch, COPY from build_artifacts/{system}_{module}/{arch}/
-        mod = df_content.replace("rerp/base:latest", f"rerp/base:{arch}")
+        # For multi-arch, we need to modify the base image and COPY path
+        # Read template and modify for this architecture
+        template_content = template_path.read_text()
+        mod = template_content.replace("rerp/base:latest", f"rerp/base:{arch}")
         mod = mod.replace(
             "./build_artifacts/${TARGETARCH}/",
             f"./build_artifacts/{system}_{module}/{arch}/",
@@ -109,6 +113,7 @@ def run(
         arch_df = root / "docker" / "microservices" / f"Dockerfile.{system}_{module}.{arch}"
         arch_df.write_text(mod)
         try:
+            # Use build args with the modified Dockerfile
             r = subprocess.run(
                 [
                     "docker",
@@ -120,6 +125,7 @@ def run(
                     arch_tag,
                     "--file",
                     str(arch_df),
+                    *build_args,
                     "--load",
                     ".",
                 ],

@@ -11,11 +11,11 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "bank_balance")]
-    pub bank_balance: Option<f64>,
+    pub bank_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "book_balance")]
-    pub book_balance: Option<f64>,
+    pub book_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
@@ -37,11 +37,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "bank_balance")]
-    pub bank_balance: Option<f64>,
+    pub bank_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "book_balance")]
-    pub book_balance: Option<f64>,
+    pub book_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
@@ -60,7 +60,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "difference")]
-    pub difference: Option<f64>,
+    pub difference: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -75,7 +75,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_deposits_amount")]
-    pub outstanding_deposits_amount: Option<f64>,
+    pub outstanding_deposits_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_deposits_count")]
@@ -83,7 +83,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_withdrawals_amount")]
-    pub outstanding_withdrawals_amount: Option<f64>,
+    pub outstanding_withdrawals_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_withdrawals_count")]

@@ -15,7 +15,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     //       "account_name": "Operating Account",
     //       "account_number": "CHASE-001",
     //       "account_type": "CHECKING",
-    //       "balance": 50000.0,
+    //       "balance": rust_decimal::Decimal::new(50000, 0),
     //       "bank_name": "Chase Bank",
     //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
     //       "created_at": "2024-01-15T10:00:00Z",

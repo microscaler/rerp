@@ -46,12 +46,25 @@ def run_docker(args, project_root: Path) -> None:
         )
         sys.exit(rc)
     if args.docker_cmd == "build-image-simple":
+        # Support both old (static Dockerfile) and new (template-based) approaches
+        dockerfile = (
+            Path(args.dockerfile) if hasattr(args, "dockerfile") and args.dockerfile else None
+        )
+        system = getattr(args, "system", None)
+        module = getattr(args, "module", None)
+        port = getattr(args, "port", None)
+        binary_name = getattr(args, "binary_name", None)
+
         rc = run_build_image_simple(
             args.image_name,
-            Path(args.dockerfile),
             Path(args.hash_path),
             Path(args.artifact_path),
             project_root,
+            system=system,
+            module=module,
+            port=port,
+            binary_name=binary_name,
+            dockerfile=dockerfile,
         )
         sys.exit(rc)
     if args.docker_cmd == "copy-multiarch":

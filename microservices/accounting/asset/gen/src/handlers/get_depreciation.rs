@@ -18,14 +18,14 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "accumulated_depreciation")]
-    pub accumulated_depreciation: Option<f64>,
+    pub accumulated_depreciation: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "asset_id")]
     pub asset_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "book_value")]
-    pub book_value: Option<f64>,
+    pub book_value: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -35,7 +35,7 @@ pub struct Response {
     pub currency_code: String,
 
     #[serde(rename = "depreciation_amount")]
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     #[serde(rename = "id")]
     pub id: String,

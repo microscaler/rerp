@@ -94,15 +94,15 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_actual_amount")]
-    pub total_actual_amount: Option<f64>,
+    pub total_actual_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_budget_amount")]
-    pub total_budget_amount: Option<f64>,
+    pub total_budget_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_variance")]
-    pub total_variance: Option<f64>,
+    pub total_variance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

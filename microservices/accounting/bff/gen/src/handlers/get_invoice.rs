@@ -37,7 +37,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_amount")]
-    pub discount_amount: Option<f64>,
+    pub discount_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "due_date")]
@@ -45,7 +45,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exchange_rate")]
-    pub exchange_rate: Option<f64>,
+    pub exchange_rate: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -73,11 +73,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<f64>,
+    pub outstanding_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "paid_amount")]
-    pub paid_amount: Option<f64>,
+    pub paid_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "paid_at")]
@@ -103,15 +103,15 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subtotal")]
-    pub subtotal: Option<f64>,
+    pub subtotal: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_amount")]
-    pub tax_amount: Option<f64>,
+    pub tax_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_amount")]
-    pub total_amount: Option<f64>,
+    pub total_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

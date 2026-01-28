@@ -9,6 +9,7 @@ from . import bootstrap as bootstrap_cli
 from . import build as build_cli
 from . import ci as ci_cli
 from . import docker as docker_cli
+from . import gen as gen_cli
 from . import openapi as openapi_cli
 from . import ports as ports_cli
 from . import pre_commit as pre_commit_cli
@@ -77,6 +78,15 @@ def main() -> None:
         bff_cli.run_bff(args, project_root)
         return
 
+    if args.command == "gen":
+        if not getattr(args, "gen_cmd", None):
+            print("rerp gen: missing subcommand")
+            print("  suite")
+            print("  Use: rerp gen --help")
+            sys.exit(1)
+        gen_cli.run_gen(args, project_root)
+        return
+
     if args.command == "docker":
         if not getattr(args, "docker_cmd", None):
             print("rerp docker: missing subcommand")
@@ -128,7 +138,7 @@ def main() -> None:
 
     # Placeholder for future: brrtrouter
     print(
-        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp release', or 'rerp tilt'."
+        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp gen', 'rerp release', or 'rerp tilt'."
     )
     sys.exit(1)
 
@@ -138,7 +148,7 @@ def __build_parser():
 
     p = argparse.ArgumentParser(
         prog="rerp",
-        description="RERP development tooling: ports, build, docker, tilt, brrtrouter, bff",
+        description="RERP development tooling: ports, build, docker, tilt, brrtrouter, bff, gen",
     )
     sub = p.add_subparsers(dest="command", help="Command")
 
@@ -352,9 +362,14 @@ def __build_parser():
     pdbi.add_argument(
         "image_name", help="Image name (e.g. localhost:5001/rerp-accounting-general-ledger)"
     )
-    pdbi.add_argument("dockerfile", help="Path to Dockerfile")
     pdbi.add_argument("hash_path", help="Path to .sha256 file")
     pdbi.add_argument("artifact_path", help="Path to binary artifact")
+    # Support both old (static Dockerfile) and new (template-based) approaches
+    pdbi.add_argument("--dockerfile", help="Path to static Dockerfile (legacy mode)")
+    pdbi.add_argument("--system", help="System name (e.g. accounting) - for template mode")
+    pdbi.add_argument("--module", help="Module/service name (e.g. invoice) - for template mode")
+    pdbi.add_argument("--port", type=int, help="Service port (e.g. 8002) - for template mode")
+    pdbi.add_argument("--binary-name", help="Binary name (e.g. invoice) - for template mode")
     pdcm = pd_sub.add_parser(
         "copy-multiarch",
         help="Copy component binaries to build_artifacts/{system}_{module}/{arch} (replaces copy-multiarch-binary.sh)",
@@ -398,6 +413,22 @@ def __build_parser():
         help="Release build (microservices/microservice; microservices always release)",
     )
 
+    # --- gen ---
+    pgen = sub.add_parser(
+        "gen",
+        help="Regenerate services from OpenAPI specs using BRRTRouter",
+    )
+    pgen_sub = pgen.add_subparsers(dest="gen_cmd")
+    pgens = pgen_sub.add_parser(
+        "suite",
+        help="Regenerate all services in a suite (or a specific service with --service)",
+    )
+    pgens.add_argument("suite", help="Suite name (e.g. accounting, hr, sales)")
+    pgens.add_argument(
+        "--service",
+        help="Regenerate only this specific service (optional)",
+    )
+
     # --- bootstrap ---
     pbo = sub.add_parser(
         "bootstrap",
@@ -415,6 +446,11 @@ def __build_parser():
         type=int,
         default=None,
         help="Port (default: from port registry)",
+    )
+    pbom.add_argument(
+        "--add-dependencies-config",
+        action="store_true",
+        help="Create brrtrouter-dependencies.toml alongside OpenAPI spec",
     )
 
     # --- release ---

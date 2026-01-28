@@ -1,33 +1,42 @@
-# Minimal runtime-only Dockerfile for {{service_name}} Service (Tilt development)
+# Minimal runtime-only Dockerfile for RERP microservices (Tilt development)
 # Binary is cross-compiled on host and copied in.
-# This file is a template. Generate service-specific Dockerfiles using:
-#   rerp docker generate-dockerfile <system> <module> [--port N]
+# This file uses Docker build arguments. Pass values at build time:
+#   docker build --build-arg SYSTEM=accounting --build-arg MODULE=invoice --build-arg PORT=8002 --build-arg BINARY_NAME=invoice ...
 #
 # Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
 
 ARG TARGETPLATFORM=linux/amd64
 ARG BUILDPLATFORM
+# Base image: rerp/base:latest (built from docker/base/Dockerfile)
+# If base image doesn't exist, build it first: rerp docker build-base
 FROM --platform=${TARGETPLATFORM} rerp/base:latest
 
 # TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
 ARG TARGETARCH=amd64
-COPY ./build_artifacts/${TARGETARCH}/{{binary_name}} /app/{{binary_name}}
-RUN chmod +x /app/{{binary_name}}
+
+# Service-specific build arguments
+ARG SYSTEM=accounting
+ARG MODULE
+ARG PORT=8000
+ARG BINARY_NAME
+
+COPY ./build_artifacts/${TARGETARCH}/${BINARY_NAME} /app/${BINARY_NAME}
+RUN chmod +x /app/${BINARY_NAME}
 
 # Copy configuration and assets to writable locations
-COPY ./microservices/{{system}}/{{module}}/impl/config /app/config
-COPY ./microservices/{{system}}/{{module}}/gen/doc /app/doc
-COPY ./microservices/{{system}}/{{module}}/gen/static_site /app/static_site
+COPY ./microservices/${SYSTEM}/${MODULE}/impl/config /app/config
+COPY ./microservices/${SYSTEM}/${MODULE}/gen/doc /app/doc
+COPY ./microservices/${SYSTEM}/${MODULE}/gen/static_site /app/static_site
 
 # Expose HTTP port
-EXPOSE {{port}}
+EXPOSE ${PORT}
 
 # Set runtime environment
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=debug
 
 # Run the service
-ENTRYPOINT ["/app/{{binary_name}}", \
+ENTRYPOINT ["/app/${BINARY_NAME}", \
     "--spec", "/app/doc/openapi.yaml", \
     "--doc-dir", "/app/doc", \
     "--static-dir", "/app/static_site", \

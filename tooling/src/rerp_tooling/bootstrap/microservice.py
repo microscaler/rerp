@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import subprocess
 from pathlib import Path
 from typing import Any, Optional
 
@@ -129,6 +128,26 @@ http:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(config_content)
     print(f"✅ Created config.yaml: {output_path}")
+
+
+def create_dependencies_config_toml(output_path: Path) -> None:
+    """Create brrtrouter-dependencies.toml file alongside OpenAPI spec."""
+    config_content = """# BRRTRouter Dependencies Configuration
+#
+# This file specifies additional dependencies for code generation.
+# BRRTRouter will auto-detect this file alongside openapi.yaml
+
+[dependencies]
+# Always include these dependencies
+# Example: serde_with = { workspace = true, features = ["chrono"] }
+
+[conditional]
+# Include rust_decimal if rust_decimal::Decimal is detected in generated code
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }
+"""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(config_content)
+    print(f"✅ Created brrtrouter-dependencies.toml: {output_path}")
 
 
 def update_workspace_cargo_toml(service_name: str, cargo_toml_path: Path) -> None:
@@ -348,26 +367,43 @@ def _update_gen_cargo_toml(cargo_path: Path, service_name: str) -> None:
 
 
 def _create_impl_cargo_toml(cargo_path: Path, service_name: str) -> None:
-    """Create impl/Cargo.toml as a binary crate."""
+    """[DEPRECATED] Create impl/Cargo.toml as a binary crate.
+
+    This is a fallback only. Prefer using BRRTRouter's generate-impl-stubs command.
+    """
     service_snake = service_name.replace("-", "_")
     gen_crate_name = f"rerp_accounting_{service_snake}_gen"
     impl_crate_name = f"rerp_accounting_{service_snake}"
 
-    cargo_content = f"""[package]
-name = "{impl_crate_name}"
-version = "0.1.3"
-edition = "2021"
+    # Check if gen crate uses Decimal or Money types
+    gen_dir = cargo_path.parent.parent / "gen"
+    uses_decimal = False
+    uses_money = False
 
-[[bin]]
-name = "{impl_crate_name}"
-path = "src/main.rs"
+    if gen_dir.exists():
+        gen_cargo = gen_dir / "Cargo.toml"
+        if gen_cargo.exists():
+            gen_cargo_content = gen_cargo.read_text()
+            uses_decimal = "rust_decimal" in gen_cargo_content
+            uses_money = "rusty-money" in gen_cargo_content
+        else:
+            # Fallback: check generated source files
+            gen_src_dir = gen_dir / "src"
+            if gen_src_dir.exists():
+                for rust_file in gen_src_dir.rglob("*.rs"):
+                    try:
+                        file_content = rust_file.read_text()
+                        if "rust_decimal::Decimal" in file_content or "Decimal" in file_content:
+                            uses_decimal = True
+                        if "rusty_money::Money" in file_content or "Money<" in file_content:
+                            uses_money = True
+                        if uses_decimal and uses_money:
+                            break
+                    except (OSError, UnicodeDecodeError):
+                        continue
 
-[features]
-default = ["jemalloc"]
-jemalloc = ["tikv-jemallocator"]
-
-[dependencies]
-# Generated crate
+    # Build dependencies section
+    deps = f"""# Generated crate
 {gen_crate_name} = {{ path = "../gen" }}
 
 # BRRTRouter (re-exported from gen crate, but may need direct access)
@@ -384,7 +420,31 @@ may = {{ workspace = true }}
 may_minihttp = {{ workspace = true }}
 anyhow = {{ workspace = true }}
 clap = {{ workspace = true }}
-tikv-jemallocator = {{ workspace = true, optional = true }}
+tikv-jemallocator = {{ workspace = true, optional = true }}"""
+
+    # Add rust_decimal if gen crate uses Decimal types
+    if uses_decimal:
+        deps += "\nrust_decimal = { workspace = true }"
+
+    # Add rusty-money if gen crate uses Money types
+    if uses_money:
+        deps += "\nrusty-money = { workspace = true }"
+
+    cargo_content = f"""[package]
+name = "{impl_crate_name}"
+version = "0.1.3"
+edition = "2021"
+
+[[bin]]
+name = "{impl_crate_name}"
+path = "src/main.rs"
+
+[features]
+default = ["jemalloc"]
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+{deps}
 """
 
     cargo_path.parent.mkdir(parents=True, exist_ok=True)
@@ -392,7 +452,9 @@ tikv-jemallocator = {{ workspace = true, optional = true }}
 
 
 def _create_impl_main(gen_main_path: Path, impl_main_path: Path, service_name: str) -> None:
-    """Create impl/src/main.rs from gen/src/main.rs with necessary modifications.
+    """[DEPRECATED] Create impl/src/main.rs from gen/src/main.rs with necessary modifications.
+
+    This is a fallback only. Prefer using BRRTRouter's generate-impl-stubs command.
 
     Modifications:
     1. Change imports to use gen crate
@@ -484,43 +546,201 @@ use controllers::*;
     print(f"✅ Created {impl_main_path}")
 
 
+def _generate_impl_with_brrtrouter(
+    spec_path: Path, impl_dir: Path, service_name: str, project_root: Path
+) -> None:
+    """Generate impl crate using BRRTRouter's generate-stubs command.
+
+    Uses --component-name to specify the gen crate name directly, avoiding
+    the need for directory name conventions.
+    """
+    from rerp_tooling.gen.brrtrouter import call_brrtrouter_generate_stubs
+
+    # Use gen crate name as component name (BRRTRouter will use this for imports in main.rs)
+    # Note: BRRTRouter will generate {component_name}_impl as impl crate name,
+    # but we'll fix this in post-processing to match RERP conventions
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+
+    # Ensure impl directory exists
+    impl_dir.mkdir(parents=True, exist_ok=True)
+
+    result = call_brrtrouter_generate_stubs(
+        spec_path=spec_path,
+        impl_dir=impl_dir,
+        component_name=gen_crate_name,
+        project_root=project_root,
+        force=True,
+        capture_output=True,
+    )
+
+    if result.returncode != 0:
+        print(f"⚠️  BRRTRouter impl generation failed: {result.stderr}")
+        msg = f"BRRTRouter impl generation failed: {result.stderr}"
+        raise RuntimeError(msg)
+
+    # Post-process: Fix crate names to match RERP conventions
+    impl_cargo = impl_dir / "Cargo.toml"
+    if impl_cargo.exists():
+        _fix_impl_cargo_naming(impl_cargo, service_name)
+
+    impl_main = impl_dir / "src" / "main.rs"
+    if impl_main.exists():
+        _fix_impl_main_naming(impl_main, service_name)
+
+    print("✅ Generated impl crate with BRRTRouter")
+
+
+def _fix_impl_cargo_naming(cargo_path: Path, service_name: str) -> None:
+    """Fix impl Cargo.toml naming to match RERP conventions.
+
+    BRRTRouter generates with component_name, but we need RERP-specific naming.
+    """
+    if not cargo_path.exists():
+        return
+
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+    impl_crate_name = f"rerp_accounting_{service_snake}"
+
+    content = cargo_path.read_text()
+
+    # Replace crate name (BRRTRouter may generate {component}_impl, RERP needs rerp_accounting_{service})
+    # Check if it needs fixing
+    if f'name = "{impl_crate_name}"' not in content:
+        content = re.sub(
+            r'name = "[^"]+"',
+            f'name = "{impl_crate_name}"',
+            content,
+            count=1,
+        )
+
+    # Replace gen crate dependency path
+    # BRRTRouter generates: {component_name} = { path = "../{component_name}" }
+    # RERP needs: {gen_crate_name} = { path = "../gen" }
+    # Match the first dependency line (the gen crate) and fix both name and path
+    # Pattern matches: any_word = { path = "../anything" }
+    gen_dep_pattern = r'^(\w+) = \{ path = "\.\./[^"]+" \}'
+    if re.search(gen_dep_pattern, content, re.MULTILINE):
+        content = re.sub(
+            gen_dep_pattern,
+            f'{gen_crate_name} = {{ path = "../gen" }}',
+            content,
+            count=1,
+            flags=re.MULTILINE,
+        )
+
+    # Add RERP-specific dependencies that BRRTRouter doesn't include
+    additional_deps = []
+
+    # Ensure rust_decimal is included if gen uses it
+    gen_cargo = cargo_path.parent.parent / "gen" / "Cargo.toml"
+    if gen_cargo.exists():
+        gen_content = gen_cargo.read_text()
+        if "rust_decimal" in gen_content and "rust_decimal" not in content:
+            additional_deps.append("rust_decimal = { workspace = true }")
+        if "rusty-money" in gen_content and "rusty-money" not in content:
+            additional_deps.append("rusty-money = { workspace = true }")
+
+    # Add standard RERP dependencies that BRRTRouter template might not include
+    standard_deps = [
+        "serde_json = { workspace = true }",
+        "serde_yaml = { workspace = true }",
+        "config = { workspace = true }",
+        "http = { workspace = true }",
+        "may = { workspace = true }",
+        "may_minihttp = { workspace = true }",
+        "anyhow = { workspace = true }",
+        "clap = { workspace = true }",
+    ]
+
+    for dep in standard_deps:
+        dep_name = dep.split()[0]
+        if dep_name not in content:
+            additional_deps.append(dep)
+
+    # Insert additional dependencies before closing [dependencies] section
+    if additional_deps:
+        # Find the last dependency line
+        lines = content.split("\n")
+        deps_end_idx = None
+        for i, line in enumerate(lines):
+            if line.strip() == "[dependencies]" or line.strip().startswith("[dependencies"):
+                # Find where dependencies section ends
+                for j in range(i + 1, len(lines)):
+                    if lines[j].strip().startswith("[") and not lines[j].strip().startswith("#"):
+                        deps_end_idx = j
+                        break
+                if deps_end_idx is None:
+                    deps_end_idx = len(lines)
+                break
+
+        if deps_end_idx:
+            # Insert additional deps
+            for dep in reversed(additional_deps):
+                lines.insert(deps_end_idx, dep)
+            content = "\n".join(lines)
+
+    cargo_path.write_text(content)
+
+
+def _fix_impl_main_naming(main_path: Path, service_name: str) -> None:
+    """Fix impl main.rs to use correct crate names."""
+    if not main_path.exists():
+        return
+
+    service_snake = service_name.replace("-", "_")
+    gen_crate_name = f"rerp_accounting_{service_snake}_gen"
+
+    content = main_path.read_text()
+
+    # Replace gen crate name in imports
+    content = re.sub(
+        r"use (\w+)::",
+        f"use {gen_crate_name}::",
+        content,
+    )
+
+    main_path.write_text(content)
+
+
+def _create_impl_cargo_toml_fallback(cargo_path: Path, service_name: str) -> None:
+    """Fallback impl Cargo.toml creation if BRRTRouter fails.
+
+    This should only be used when BRRTRouter's generate-impl-stubs fails.
+    """
+    _create_impl_cargo_toml(cargo_path, service_name)
+
+
 def generate_code_with_brrtrouter(spec_path: Path, output_dir: Path, project_root: Path) -> None:
-    brrtrouter_bin = project_root.parent / "BRRTRouter" / "target" / "debug" / "brrtrouter-gen"
-    manifest = project_root.parent / "BRRTRouter" / "Cargo.toml"
-    if not manifest.exists():
-        msg = f"BRRTRouter not found at {manifest.parent}. Clone at same level as RERP."
-        raise FileNotFoundError(msg)
-    if brrtrouter_bin.exists():
-        cmd = [
-            str(brrtrouter_bin),
-            "generate",
-            "--spec",
-            str(spec_path),
-            "--output",
-            str(output_dir),
-            "--force",
-        ]
-    else:
-        cmd = [
-            "cargo",
-            "run",
-            "--manifest-path",
-            str(manifest),
-            "--bin",
-            "brrtrouter-gen",
-            "--",
-            "generate",
-            "--spec",
-            str(spec_path),
-            "--output",
-            str(output_dir),
-            "--force",
-        ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=str(project_root))
+    """Generate gen crate using BRRTRouter's generate command."""
+    from rerp_tooling.gen.brrtrouter import call_brrtrouter_generate
+
+    # Check for dependencies config
+    deps_config_path = spec_path.parent / "brrtrouter-dependencies.toml"
+    deps_config = deps_config_path if deps_config_path.exists() else None
+
+    result = call_brrtrouter_generate(
+        spec_path=spec_path,
+        output_dir=output_dir,
+        project_root=project_root,
+        deps_config_path=deps_config,
+        capture_output=True,
+    )
+
+    if result.returncode != 0:
+        msg = f"BRRTRouter generation failed: {result.stderr}"
+        raise RuntimeError(msg)
+
     print("✅ Code generation complete")
 
 
-def run_bootstrap_microservice(service_name: str, port: Optional[int], project_root: Path) -> int:
+def run_bootstrap_microservice(
+    service_name: str,
+    port: Optional[int],
+    project_root: Path,
+    add_dependencies_config: bool = False,
+) -> int:
     """Bootstrap microservice. Returns 0 on success, 1 on error."""
     if port is None:
         port = _get_port_from_registry(project_root, service_name)
@@ -567,16 +787,16 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
     if not config_path.exists():
         create_config_yaml(config_path)
 
-    # Create impl/Cargo.toml if it doesn't exist
-    impl_cargo = impl_dir / "Cargo.toml"
-    if not impl_cargo.exists():
-        _create_impl_cargo_toml(impl_cargo, service_name)
+    # Optionally create brrtrouter-dependencies.toml alongside OpenAPI spec
+    if add_dependencies_config:
+        deps_config_path = spec_path.parent / "brrtrouter-dependencies.toml"
+        if not deps_config_path.exists():
+            create_dependencies_config_toml(deps_config_path)
 
-    # Create impl/src/main.rs if gen/src/main.rs exists
-    impl_main = impl_dir / "src" / "main.rs"
-    gen_main = gen_dir / "src" / "main.rs"
-    if not impl_main.exists() and gen_main.exists():
-        _create_impl_main(gen_main, impl_main, service_name)
+    # Generate impl crate using BRRTRouter (removes duplication)
+    # BRRTRouter handles: impl/Cargo.toml, impl/src/main.rs, impl/src/controllers/*.rs
+    if not (impl_dir / "Cargo.toml").exists():
+        _generate_impl_with_brrtrouter(spec_path, impl_dir, service_name, project_root)
 
     create_dockerfile(service_name, binary_name, port, dockerfile_path)
     update_workspace_cargo_toml(service_name, cargo_toml_path)

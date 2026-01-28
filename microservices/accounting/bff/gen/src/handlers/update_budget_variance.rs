@@ -11,11 +11,11 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "actual_amount")]
-    pub actual_amount: Option<f64>,
+    pub actual_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "budget_amount")]
-    pub budget_amount: Option<f64>,
+    pub budget_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exceeds_threshold")]
@@ -27,7 +27,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variance")]
-    pub variance: Option<f64>,
+    pub variance: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -41,11 +41,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "actual_amount")]
-    pub actual_amount: Option<f64>,
+    pub actual_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "budget_amount")]
-    pub budget_amount: Option<f64>,
+    pub budget_amount: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "budget_id")]
     pub budget_id: String,
@@ -81,11 +81,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variance")]
-    pub variance: Option<f64>,
+    pub variance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variance_percent")]
-    pub variance_percent: Option<f64>,
+    pub variance_percent: Option<rust_decimal::Decimal>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

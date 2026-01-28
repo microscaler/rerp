@@ -11,11 +11,11 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_amount")]
-    pub discount_amount: Option<f64>,
+    pub discount_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_percent")]
-    pub discount_percent: Option<f64>,
+    pub discount_percent: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "product_name")]
@@ -23,7 +23,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "quantity")]
-    pub quantity: Option<f64>,
+    pub quantity: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_id")]
@@ -31,11 +31,11 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_rate")]
-    pub tax_rate: Option<f64>,
+    pub tax_rate: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "unit_price")]
-    pub unit_price: Option<f64>,
+    pub unit_price: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -57,11 +57,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_amount")]
-    pub discount_amount: Option<f64>,
+    pub discount_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_percent")]
-    pub discount_percent: Option<f64>,
+    pub discount_percent: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -75,11 +75,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "line_subtotal")]
-    pub line_subtotal: Option<f64>,
+    pub line_subtotal: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "line_total")]
-    pub line_total: Option<f64>,
+    pub line_total: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "metadata")]
@@ -101,11 +101,11 @@ pub struct Response {
     pub product_name: String,
 
     #[serde(rename = "quantity")]
-    pub quantity: f64,
+    pub quantity: rust_decimal::Decimal,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_amount")]
-    pub tax_amount: Option<f64>,
+    pub tax_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_id")]
@@ -113,14 +113,14 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_rate")]
-    pub tax_rate: Option<f64>,
+    pub tax_rate: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "unit_of_measure")]
     pub unit_of_measure: Option<String>,
 
     #[serde(rename = "unit_price")]
-    pub unit_price: f64,
+    pub unit_price: rust_decimal::Decimal,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

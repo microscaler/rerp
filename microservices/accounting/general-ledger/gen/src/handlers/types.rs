@@ -154,7 +154,7 @@ pub struct CreateJournalEntryRequest {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -181,7 +181,7 @@ pub struct CreateJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -201,9 +201,9 @@ pub struct CreateJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -278,7 +278,7 @@ pub struct GetJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -298,9 +298,9 @@ pub struct GetJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -323,7 +323,7 @@ pub struct JournalEntry {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -343,9 +343,9 @@ pub struct JournalEntry {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -486,7 +486,7 @@ pub struct UpdateJournalEntryResponse {
 
     pub entry_number: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub fiscal_period_id: String,
 
@@ -506,9 +506,9 @@ pub struct UpdateJournalEntryResponse {
 
     pub status: String,
 
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     pub updated_at: String,
 

@@ -58,7 +58,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exchange_rate")]
-    pub exchange_rate: Option<f64>,
+    pub exchange_rate: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "fiscal_period_id")]
@@ -95,10 +95,10 @@ pub struct Response {
     pub status: String,
 
     #[serde(rename = "total_credit")]
-    pub total_credit: f64,
+    pub total_credit: rust_decimal::Decimal,
 
     #[serde(rename = "total_debit")]
-    pub total_debit: f64,
+    pub total_debit: rust_decimal::Decimal,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
