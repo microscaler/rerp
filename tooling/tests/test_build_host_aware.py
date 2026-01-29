@@ -176,7 +176,7 @@ class TestBuildMicroservices:
             tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
         ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "")
-        with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
+        with patch("brrtrouter_tooling.build.workspace_build.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()
             rc = build_microservices_workspace(tmp_path, "amd64", release=False)
         assert rc == 0
@@ -195,7 +195,7 @@ class TestBuildMicroservices:
             tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
         ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "1")
-        with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
+        with patch("brrtrouter_tooling.build.workspace_build.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()
             rc = build_microservices_workspace(tmp_path, "arm7", release=True)
         assert rc == 0
