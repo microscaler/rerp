@@ -107,6 +107,10 @@ init:
         python3 -m venv tooling/.venv
     fi
     tooling/.venv/bin/pip install --upgrade pip
+    # BFF generation uses brrtrouter-tooling (Story 1.4). Install from sibling path when present.
+    if [ -d ../BRRTRouter/tooling ]; then
+        tooling/.venv/bin/pip install -e ../BRRTRouter/tooling
+    fi
     tooling/.venv/bin/pip install -e ./tooling[dev]
     echo "✅ Tooling .venv ready. Use: tooling/.venv/bin/rerp or add tooling/.venv/bin to PATH"
 
@@ -121,6 +125,9 @@ build-tooling:
         exit 1
     fi
     echo "🔨 Rebuilding tooling..."
+    if [ -d ../BRRTRouter/tooling ]; then
+        tooling/.venv/bin/pip install -e ../BRRTRouter/tooling
+    fi
     tooling/.venv/bin/pip install -e ./tooling[dev]
     echo "✅ Tooling rebuilt"
 

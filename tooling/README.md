@@ -48,7 +48,7 @@ cd tooling && uv venv && uv pip install -e ".[dev]"
 - **`rerp ci fix-cargo-paths PATH`** — Fix brrtrouter/brrtrouter_macros path deps in a Cargo.toml to ../BRRTRouter (local dev after brrtrouter-gen). Replaces `scripts/fix_cargo_toml_paths.py`.
 
 **BFF**
-- **`rerp bff generate-system [--system NAME] [--output PATH] [--openapi-dir DIR]`** — Merge `openapi/{suite}/{service}/openapi.yaml` into suite BFF at `openapi/{suite}/openapi_bff.yaml`. No `--system` ⇒ all suites with sub-services. Replaces `scripts/generate_system_bff.py`.
+- **`rerp bff generate-system [--system NAME] [--output PATH] [--openapi-dir DIR]`** — Merge `openapi/{suite}/{service}/openapi.yaml` into suite BFF at `openapi/{suite}/openapi.yaml`. No `--system` ⇒ all suites with sub-services. Implemented by **brrtrouter-tooling** (Story 1.4); RERP re-exports it. When both BRRTRouter and RERP are in the same workspace, `just init` installs brrtrouter-tooling from `../BRRTRouter/tooling`.
 
 **Docker**
 - **`rerp docker unpack-build-bins [--input-dir DIR]`** — Extract `rerp-binaries-{amd64,arm64,arm7}.zip` from `tmp/buildBins` (or `--input-dir`) into `microservices/target/`. Use after downloading Multi-Arch job artifacts. Then run `rerp docker copy-multiarch <suite> <service> all` and build images.
