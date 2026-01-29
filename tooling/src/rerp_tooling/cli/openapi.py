@@ -1,10 +1,9 @@
-"""`rerp openapi` subcommands: validate, generate, fix-operation-id-casing."""
+"""`rerp openapi` subcommands: validate, generate, fix-operation-id-casing. Delegates to brrtrouter_tooling.openapi."""
 
 from pathlib import Path
 from typing import Optional
 
-from rerp_tooling.openapi import validate_specs
-from rerp_tooling.openapi.fix_operation_id import run as fix_operation_id_run
+from rerp_tooling.openapi import fix_operation_id_run, validate_specs
 
 
 def run_openapi(args, project_root: Path) -> int:

@@ -15,7 +15,7 @@ class TestValidateSpecs:
     """Unit tests for validate_specs(openapi_dir) -> list[tuple[Path, Exception]]."""
 
     def test_openapi_dir_missing_returns_empty(self, tmp_path: Path):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         missing = tmp_path / "nonexistent"
         assert not missing.exists()
@@ -23,14 +23,14 @@ class TestValidateSpecs:
         assert errs == []
 
     def test_openapi_dir_empty_returns_empty(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         errs = validate_specs(openapi_dir)
         assert errs == []
 
     def test_one_valid_spec_returns_empty(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         (openapi_dir / "acct" / "gl").mkdir(parents=True)
@@ -42,7 +42,7 @@ class TestValidateSpecs:
         assert errs == []
 
     def test_one_invalid_yaml_returns_one_error(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         (openapi_dir / "bad").mkdir(parents=True)
@@ -55,7 +55,7 @@ class TestValidateSpecs:
         assert errs[0][1] is not None
 
     def test_one_non_dict_yaml_returns_one_error(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         (openapi_dir / "list").mkdir(parents=True)
@@ -65,7 +65,7 @@ class TestValidateSpecs:
         assert "list" in str(errs[0][0])
 
     def test_two_specs_one_invalid_returns_one_error(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         (openapi_dir / "a").mkdir(parents=True)
@@ -80,7 +80,7 @@ class TestValidateSpecs:
         assert "b" in str(errs[0][0])
 
     def test_nested_rglob_finds_openapi_yaml(self, tmp_openapi_dir):
-        from rerp_tooling.openapi.validate import validate_specs
+        from rerp_tooling.openapi import validate_specs
 
         _, openapi_dir = tmp_openapi_dir
         (openapi_dir / "x" / "y" / "z").mkdir(parents=True)
