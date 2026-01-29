@@ -5,7 +5,7 @@ from pathlib import Path
 
 class TestFindCargoTomls:
     def test_excludes_target_node_modules_git(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import find_cargo_tomls
+        from rerp_tooling.ci import find_cargo_tomls
 
         (tmp_path / "a" / "Cargo.toml").parent.mkdir(parents=True, exist_ok=True)
         (tmp_path / "a" / "Cargo.toml").write_text("[package]")
@@ -24,7 +24,7 @@ class TestFindCargoTomls:
         assert ".git" not in rel.parts
 
     def test_returns_sorted(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import find_cargo_tomls
+        from rerp_tooling.ci import find_cargo_tomls
 
         (tmp_path / "z" / "Cargo.toml").parent.mkdir(parents=True, exist_ok=True)
         (tmp_path / "z" / "Cargo.toml").write_text("[package]")
@@ -36,7 +36,7 @@ class TestFindCargoTomls:
 
 class TestFindMatches:
     def test_brrtrouter_path_dep_returns_replacement(self):
-        from rerp_tooling.ci.patch_brrtrouter import find_matches
+        from rerp_tooling.ci import find_matches
 
         text = '[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }'
         m = find_matches(text)
@@ -46,7 +46,7 @@ class TestFindMatches:
         assert "brrtrouter" in m[0][1]
 
     def test_brrtrouter_macros_path_dep_returns_replacement(self):
-        from rerp_tooling.ci.patch_brrtrouter import find_matches
+        from rerp_tooling.ci import find_matches
 
         text = 'brrtrouter_macros = { path = "../BRRTRouter/brrtrouter_macros" }'
         m = find_matches(text)
@@ -54,7 +54,7 @@ class TestFindMatches:
         assert "brrtrouter_macros" in m[0][1]
 
     def test_lifeguard_path_dep_returns_replacement(self):
-        from rerp_tooling.ci.patch_brrtrouter import find_matches
+        from rerp_tooling.ci import find_matches
 
         text = 'lifeguard = { path = "../../lifeguard" }'
         m = find_matches(text)
@@ -63,7 +63,7 @@ class TestFindMatches:
         assert "git" in m[0][1] and "lifeguard" in m[0][1]
 
     def test_no_path_dep_returns_empty(self):
-        from rerp_tooling.ci.patch_brrtrouter import find_matches
+        from rerp_tooling.ci import find_matches
 
         text = '[dependencies]\nserde = "1.0"'
         assert find_matches(text) == []
@@ -71,7 +71,7 @@ class TestFindMatches:
 
 class TestPatchFile:
     def test_dry_run_does_not_write(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import patch_file
+        from rerp_tooling.ci import patch_file
 
         f = tmp_path / "Cargo.toml"
         f.write_text('[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }')
@@ -81,7 +81,7 @@ class TestPatchFile:
         assert "path" in f.read_text() and "BRRTRouter" in f.read_text()
 
     def test_audit_does_not_write(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import patch_file
+        from rerp_tooling.ci import patch_file
 
         f = tmp_path / "Cargo.toml"
         orig = '[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }'
@@ -92,7 +92,7 @@ class TestPatchFile:
         assert f.read_text() == orig
 
     def test_patch_replaces_path_with_git(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import patch_file
+        from rerp_tooling.ci import patch_file
 
         f = tmp_path / "Cargo.toml"
         f.write_text('[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }')
@@ -103,7 +103,7 @@ class TestPatchFile:
         assert "git" in txt and "microscaler/BRRTRouter" in txt
 
     def test_patch_idempotent_second_run_no_matches(self, tmp_path: Path):
-        from rerp_tooling.ci.patch_brrtrouter import patch_file
+        from rerp_tooling.ci import patch_file
 
         f = tmp_path / "Cargo.toml"
         f.write_text('[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }')
@@ -117,7 +117,7 @@ class TestPatchFile:
 
 class TestRun:
     def test_run_no_matches(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.patch_brrtrouter import run
+        from rerp_tooling.ci import run_patch_brrtrouter as run
 
         (tmp_path / "Cargo.toml").write_text('[package]\nname = "x"\n')
         run(tmp_path, dry_run=False, audit=False)
@@ -125,7 +125,7 @@ class TestRun:
         assert "No Cargo.toml" in out or "nothing" in out.lower()
 
     def test_run_audit_with_matches(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.patch_brrtrouter import run
+        from rerp_tooling.ci import run_patch_brrtrouter as run
 
         (tmp_path / "Cargo.toml").write_text(
             '[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }\n'
@@ -135,7 +135,7 @@ class TestRun:
         assert "Audit" in out and "Cargo.toml" in out
 
     def test_run_dry_run_with_matches(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.patch_brrtrouter import run
+        from rerp_tooling.ci import run_patch_brrtrouter as run
 
         (tmp_path / "Cargo.toml").write_text(
             '[dependencies]\nbrrtrouter = { path = "../../BRRTRouter" }\n'
@@ -151,7 +151,7 @@ class TestRun:
     def test_run_patch_and_cargo_update_mocked(self, tmp_path: Path, capsys, monkeypatch):
         import subprocess
 
-        from rerp_tooling.ci import patch_brrtrouter
+        from rerp_tooling.ci import run_patch_brrtrouter
 
         (tmp_path / "microservices").mkdir()
         (tmp_path / "microservices" / "Cargo.toml").write_text(
@@ -170,7 +170,9 @@ class TestRun:
             return m
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        patch_brrtrouter.run(tmp_path, dry_run=False, audit=False)
+        run_patch_brrtrouter(
+            tmp_path, workspace_dir_name="microservices", dry_run=False, audit=False
+        )
         out, _ = capsys.readouterr()
         assert "Patched" in out or "cargo update" in out.lower()
         assert any("cargo" in str(c) for c in called) or "Ran cargo update" in out

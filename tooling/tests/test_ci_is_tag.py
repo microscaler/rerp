@@ -4,7 +4,7 @@ import os
 from io import StringIO
 from unittest.mock import patch
 
-from rerp_tooling.ci.is_tag import run
+from rerp_tooling.ci import run_is_tag as run
 
 
 class TestIsTag:

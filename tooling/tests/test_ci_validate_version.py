@@ -5,11 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from rerp_tooling.ci.validate_version import (
+from rerp_tooling.ci import (
     compare_versions,
-    run,
     run_validate_version_cli,
     validate_version,
+)
+from rerp_tooling.ci import (
+    run_validate_version as run,
 )
 
 
@@ -127,7 +129,7 @@ class TestRunValidateVersionCli:
         with (
             patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo", "GITHUB_TOKEN": "token"}),
             patch(
-                "rerp_tooling.ci.get_latest_tag.get_latest_tag",
+                "brrtrouter_tooling.ci.get_latest_tag.get_latest_tag",
                 return_value="0.39.0",
             ),
         ):

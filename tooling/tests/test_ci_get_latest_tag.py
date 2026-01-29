@@ -7,12 +7,10 @@ from unittest.mock import Mock, patch
 from urllib.error import HTTPError, URLError
 
 import pytest
+from brrtrouter_tooling.ci.get_latest_tag import _fibonacci_backoff_sequence
 
-from rerp_tooling.ci.get_latest_tag import (
-    _fibonacci_backoff_sequence,
-    get_latest_tag,
-    run,
-)
+from rerp_tooling.ci import get_latest_tag
+from rerp_tooling.ci import run_get_latest_tag as run
 
 
 def _fake_urlopen_success(tag_name: str):
@@ -37,42 +35,45 @@ def _fake_urlopen_404():
 class TestGetLatestTag:
     def test_returns_latest_tag_from_github_api(self) -> None:
         with patch(
-            "rerp_tooling.ci.get_latest_tag.urlopen", return_value=_fake_urlopen_success("v0.39.0")
+            "brrtrouter_tooling.ci.get_latest_tag.urlopen",
+            return_value=_fake_urlopen_success("v0.39.0"),
         ):
             result = get_latest_tag("owner/repo", "token")
             assert result == "0.39.0"
 
     def test_strips_v_prefix(self) -> None:
         with patch(
-            "rerp_tooling.ci.get_latest_tag.urlopen", return_value=_fake_urlopen_success("v1.2.3")
+            "brrtrouter_tooling.ci.get_latest_tag.urlopen",
+            return_value=_fake_urlopen_success("v1.2.3"),
         ):
             result = get_latest_tag("owner/repo", "token")
             assert result == "1.2.3"
 
     def test_handles_tag_without_v_prefix(self) -> None:
         with patch(
-            "rerp_tooling.ci.get_latest_tag.urlopen", return_value=_fake_urlopen_success("0.39.0")
+            "brrtrouter_tooling.ci.get_latest_tag.urlopen",
+            return_value=_fake_urlopen_success("0.39.0"),
         ):
             result = get_latest_tag("owner/repo", "token")
             assert result == "0.39.0"
 
     def test_handles_rc_tags(self) -> None:
         with patch(
-            "rerp_tooling.ci.get_latest_tag.urlopen",
+            "brrtrouter_tooling.ci.get_latest_tag.urlopen",
             return_value=_fake_urlopen_success("v0.39.0-rc.2"),
         ):
             result = get_latest_tag("owner/repo", "token")
             assert result == "0.39.0-rc.2"
 
     def test_returns_none_when_no_releases(self) -> None:
-        with patch("rerp_tooling.ci.get_latest_tag.urlopen", side_effect=_fake_urlopen_404()):
+        with patch("brrtrouter_tooling.ci.get_latest_tag.urlopen", side_effect=_fake_urlopen_404()):
             result = get_latest_tag("owner/repo", "token")
             assert result is None
 
     def test_run_prints_version_to_stdout(self) -> None:
         with (
             patch(
-                "rerp_tooling.ci.get_latest_tag.urlopen",
+                "brrtrouter_tooling.ci.get_latest_tag.urlopen",
                 return_value=_fake_urlopen_success("v0.39.0"),
             ),
             patch.dict(
@@ -88,7 +89,7 @@ class TestGetLatestTag:
 
     def test_run_handles_no_releases(self) -> None:
         with (
-            patch("rerp_tooling.ci.get_latest_tag.urlopen", side_effect=_fake_urlopen_404()),
+            patch("brrtrouter_tooling.ci.get_latest_tag.urlopen", side_effect=_fake_urlopen_404()),
             patch.dict(
                 os.environ,
                 {"GITHUB_REPOSITORY": "owner/repo", "GITHUB_TOKEN": "token"},
@@ -104,8 +105,8 @@ class TestGetLatestTag:
         """Test retry logic: fails twice with 503, then succeeds."""
         http_error = HTTPError("url", 503, "Service Unavailable", {}, None)
         with (
-            patch("rerp_tooling.ci.get_latest_tag.urlopen") as mock_urlopen,
-            patch("rerp_tooling.ci.get_latest_tag.time.sleep") as mock_sleep,
+            patch("brrtrouter_tooling.ci.get_latest_tag.urlopen") as mock_urlopen,
+            patch("brrtrouter_tooling.ci.get_latest_tag.time.sleep") as mock_sleep,
             patch("sys.stderr", new=StringIO()) as fake_err,
         ):
             # First two calls fail with 503, third succeeds
@@ -130,8 +131,8 @@ class TestGetLatestTag:
         """Test retry logic: fails with URLError, then succeeds."""
         url_error = URLError("Connection refused")
         with (
-            patch("rerp_tooling.ci.get_latest_tag.urlopen") as mock_urlopen,
-            patch("rerp_tooling.ci.get_latest_tag.time.sleep") as mock_sleep,
+            patch("brrtrouter_tooling.ci.get_latest_tag.urlopen") as mock_urlopen,
+            patch("brrtrouter_tooling.ci.get_latest_tag.time.sleep") as mock_sleep,
             patch("sys.stderr", new=StringIO()) as fake_err,
         ):
             # First call fails, second succeeds
@@ -150,13 +151,13 @@ class TestGetLatestTag:
         """Test that SystemExit is raised when all retries are exhausted."""
         http_error = HTTPError("url", 503, "Service Unavailable", {}, None)
         with (
-            patch("rerp_tooling.ci.get_latest_tag.urlopen", side_effect=http_error),
-            patch("rerp_tooling.ci.get_latest_tag.time.sleep"),
+            patch("brrtrouter_tooling.ci.get_latest_tag.urlopen", side_effect=http_error),
+            patch("brrtrouter_tooling.ci.get_latest_tag.time.sleep"),
             patch("sys.stderr", new=StringIO()) as fake_err,
         ):
             with pytest.raises(SystemExit) as exc_info:
                 get_latest_tag("owner/repo", "token", max_retries=3)
-            assert "Failed to fetch latest release from GitHub after 3 retries" in str(
+            assert "Failed to fetch" in str(exc_info.value) and "after 3 retries" in str(
                 exc_info.value
             )
             # Check that retry messages were logged
@@ -189,8 +190,8 @@ class TestGetLatestTag:
         """Test that run() returns 1 when retries are exhausted."""
         http_error = HTTPError("url", 503, "Service Unavailable", {}, None)
         with (
-            patch("rerp_tooling.ci.get_latest_tag.urlopen", side_effect=http_error),
-            patch("rerp_tooling.ci.get_latest_tag.time.sleep"),
+            patch("brrtrouter_tooling.ci.get_latest_tag.urlopen", side_effect=http_error),
+            patch("brrtrouter_tooling.ci.get_latest_tag.time.sleep"),
             patch.dict(
                 os.environ,
                 {"GITHUB_REPOSITORY": "owner/repo", "GITHUB_TOKEN": "token"},

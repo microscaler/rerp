@@ -5,7 +5,7 @@ from pathlib import Path
 
 class TestFixCargoToml:
     def test_missing_file_returns_false(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.fix_cargo_paths import fix_cargo_toml
+        from rerp_tooling.ci import fix_cargo_toml
 
         p = tmp_path / "nonexistent" / "Cargo.toml"
         assert fix_cargo_toml(p) is False
@@ -13,7 +13,7 @@ class TestFixCargoToml:
         assert "Warning" in out and "nonexistent" in out
 
     def test_no_brrtrouter_dep_no_change(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.fix_cargo_paths import fix_cargo_toml
+        from rerp_tooling.ci import fix_cargo_toml
 
         (tmp_path / "microservices" / "accounting" / "svc").mkdir(parents=True)
         cargo = tmp_path / "microservices" / "accounting" / "svc" / "Cargo.toml"
@@ -24,7 +24,7 @@ class TestFixCargoToml:
         assert "No changes" in out
 
     def test_replaces_brrtrouter_paths(self, tmp_path: Path, capsys):
-        from rerp_tooling.ci.fix_cargo_paths import fix_cargo_toml
+        from rerp_tooling.ci import fix_cargo_toml
 
         root = tmp_path / "root"
         (root / "microservices" / "accounting" / "svc").mkdir(parents=True)
@@ -46,7 +46,7 @@ class TestFixCargoToml:
 
 class TestRun:
     def test_run_returns_zero(self, tmp_path: Path):
-        from rerp_tooling.ci.fix_cargo_paths import run
+        from rerp_tooling.ci import run_fix_cargo_paths as run
 
         (tmp_path / "microservices" / "accounting" / "svc").mkdir(parents=True)
         cargo = tmp_path / "microservices" / "accounting" / "svc" / "Cargo.toml"

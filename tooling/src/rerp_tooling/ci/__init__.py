@@ -1,35 +1,40 @@
-"""CI-specific automation: patch Cargo for BRRTRouter/lifeguard from git; fix local path deps; check if ref is tag; validate versions."""
+"""CI automation. Re-exports from brrtrouter_tooling.ci; RERP keeps fix_cargo_paths wrapper for gen name/version."""
 
-from .get_latest_tag import get_latest_tag
-from .get_latest_tag import run as run_get_latest_tag
-from .is_tag import run as run_is_tag
-from .patch_brrtrouter import (
+from brrtrouter_tooling.ci import (
+    compare_versions,
     find_cargo_tomls,
     find_matches,
+    fix_all_impl_dependencies,
+    get_latest_tag,
     patch_file,
-    run,
     run_cargo_update,
-)
-from .validate_version import (
-    compare_versions,
+    run_get_latest_tag,
+    run_is_tag,
+    run_patch_brrtrouter,
+    run_validate_version,
     run_validate_version_cli,
+    update_impl_cargo_dependencies,
     validate_version,
 )
-from .validate_version import (
-    run as run_validate_version,
-)
+
+from rerp_tooling.ci.fix_cargo_paths import fix_cargo_toml
+from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 
 __all__ = [
     "compare_versions",
     "find_cargo_tomls",
     "find_matches",
+    "fix_all_impl_dependencies",
+    "fix_cargo_toml",
     "get_latest_tag",
     "patch_file",
-    "run",
     "run_cargo_update",
+    "run_fix_cargo_paths",
     "run_get_latest_tag",
     "run_is_tag",
+    "run_patch_brrtrouter",
     "run_validate_version",
     "run_validate_version_cli",
+    "update_impl_cargo_dependencies",
     "validate_version",
 ]
