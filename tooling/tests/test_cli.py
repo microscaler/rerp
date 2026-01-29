@@ -506,7 +506,7 @@ def test_release_generate_notes_provider_openai(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-fake")
     out = tmp_path / "notes.md"
     with (
-        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("brrtrouter_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
         patch("urllib.request.urlopen", return_value=_fake_http_resp(OPENAI_BASIC)),
     ):
         code = _run_main(
@@ -532,7 +532,7 @@ def test_release_generate_notes_provider_anthropic(tmp_path, monkeypatch, capsys
     monkeypatch.setenv("ANTHROPIC_API_KEY", "skant-fake")
     out = tmp_path / "notes.md"
     with (
-        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("brrtrouter_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
         patch("urllib.request.urlopen", return_value=_fake_http_resp(ANTHROPIC_BASIC)),
     ):
         code = _run_main(
@@ -560,7 +560,7 @@ def test_release_generate_notes_provider_via_env_anthropic(tmp_path, monkeypatch
     monkeypatch.setenv("RELEASE_NOTES_PROVIDER", "anthropic")
     out = tmp_path / "notes.md"
     with (
-        patch("rerp_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
+        patch("brrtrouter_tooling.release.notes._get_commits_since", return_value=["feat: a"]),
         patch("urllib.request.urlopen", return_value=_fake_http_resp(ANTHROPIC_BASIC)),
     ):
         code = _run_main(

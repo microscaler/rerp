@@ -22,7 +22,7 @@ class TestBuildBase:
             seen.append(cmd)
             return type("R", (), {"returncode": 0})()
 
-        monkeypatch.setattr("rerp_tooling.docker.build_base.subprocess.run", fake_run)
+        monkeypatch.setattr("brrtrouter_tooling.docker.build_base.subprocess.run", fake_run)
         assert run(tmp_path, push=False, dry_run=True) == 0
         assert not seen
 
@@ -46,7 +46,7 @@ class TestBuildBase:
             calls.append(cmd)
             return type("R", (), {"returncode": 0})()
 
-        monkeypatch.setattr("rerp_tooling.docker.build_base.subprocess.run", fake_run)
+        monkeypatch.setattr("brrtrouter_tooling.docker.build_base.subprocess.run", fake_run)
         assert run(tmp_path, push=False, dry_run=False) == 0
         assert len(calls) == 1
         assert calls[0][:2] == ["docker", "build"]
@@ -60,5 +60,5 @@ class TestBuildBase:
         def fake_run(*args, **kw):
             return type("R", (), {"returncode": 1})()
 
-        monkeypatch.setattr("rerp_tooling.docker.build_base.subprocess.run", fake_run)
+        monkeypatch.setattr("brrtrouter_tooling.docker.build_base.subprocess.run", fake_run)
         assert run(tmp_path, push=False, dry_run=False) == 1
