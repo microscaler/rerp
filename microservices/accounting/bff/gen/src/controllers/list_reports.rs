@@ -9,7 +9,7 @@ use crate::handlers::types::Report;
 #[handler(ListReportsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     Response {
-        items: Some(Default::default()),
+        items: Some(vec![]),
         limit: Some(42),
         page: Some(42),
         total: Some(42),
