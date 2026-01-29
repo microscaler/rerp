@@ -1,16 +1,14 @@
-"""Discovery: suites, BFFs, services, and port sources for validate/reconcile."""
+"""Discovery: re-export from brrtrouter_tooling.discovery (suites, sources)."""
 
-from .sources import (
+from brrtrouter_tooling.discovery import (
+    bff_service_to_suite,
+    bff_suite_config_path,
     discover_bff_suite_config,
     discover_helm,
     discover_kind_host_ports,
     discover_openapi_bff_localhost,
     discover_openapi_suite_microservice_localhost,
     discover_tiltfile,
-)
-from .suites import (
-    bff_service_to_suite,
-    bff_suite_config_path,
     get_bff_service_name_from_config,
     iter_bffs,
     load_suite_services,

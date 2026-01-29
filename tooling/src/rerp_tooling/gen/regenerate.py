@@ -6,7 +6,7 @@ from typing import Optional
 from brrtrouter_tooling.gen import call_brrtrouter_generate
 
 from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
-from rerp_tooling.discovery.suites import bff_service_to_suite
+from rerp_tooling.discovery import bff_service_to_suite
 
 
 def regenerate_service(

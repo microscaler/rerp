@@ -3,7 +3,7 @@
 import sys
 from pathlib import Path
 
-from rerp_tooling.discovery.suites import suite_sub_service_names
+from rerp_tooling.discovery import suite_sub_service_names
 from rerp_tooling.gen.regenerate import regenerate_service, regenerate_suite_services
 
 
