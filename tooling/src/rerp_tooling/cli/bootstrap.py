@@ -3,7 +3,7 @@
 import sys
 from pathlib import Path
 
-from rerp_tooling.bootstrap.microservice import run_bootstrap_microservice
+from rerp_tooling.bootstrap import run_bootstrap_microservice
 
 
 def run_bootstrap(args, project_root: Path) -> None:
