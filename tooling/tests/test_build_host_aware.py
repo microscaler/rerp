@@ -1,5 +1,6 @@
 """TDD: tests for rerp_tooling.build.host_aware (rerp build)."""
 
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -114,7 +115,9 @@ class TestDetermineArchitectures:
     def test_none_uses_host(self):
         from rerp_tooling.build.host_aware import _determine_architectures
 
-        with patch("rerp_tooling.build.host_aware.detect_host_architecture", return_value="amd64"):
+        with patch(
+            "brrtrouter_tooling.build.host_aware.detect_host_architecture", return_value="amd64"
+        ):
             assert _determine_architectures(None) == ["amd64"]
 
     def test_unknown_exits(self):
@@ -139,8 +142,10 @@ class TestRun:
         monkeypatch.setenv("RERP_USE_CROSS", "1")
         (tmp_path / "microservices").mkdir()
         (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\n")
-        # auth_idam → microservices/auth/idam/impl must exist for _build_service
-        rc = run("auth_idam", arch="amd64", project_root=tmp_path)
+        # auth_idam → build fails (no such package). Mock subprocess so we don't need cross.
+        with patch("brrtrouter_tooling.build.host_aware.subprocess.run") as m_run:
+            m_run.side_effect = subprocess.CalledProcessError(1, "cross")
+            rc = run("auth_idam", arch="amd64", project_root=tmp_path)
         assert rc == 1
 
 
