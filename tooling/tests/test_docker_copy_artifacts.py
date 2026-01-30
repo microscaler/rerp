@@ -2,16 +2,24 @@
 
 from pathlib import Path
 
+import pytest
+
 from rerp_tooling.docker.copy_artifacts import BINARY_NAMES
+
+
+def _skip_if_no_brt_copy_artifacts():
+    pytest.importorskip("brrtrouter_tooling.docker.copy_artifacts")
 
 
 class TestValidateBuildArtifacts:
     def test_missing_dir_returns_1(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
 
         assert validate_build_artifacts(tmp_path) == 1
 
     def test_missing_binary_in_dir_returns_1(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
 
         for arch in ("amd64", "arm64", "arm"):
@@ -21,6 +29,7 @@ class TestValidateBuildArtifacts:
         assert validate_build_artifacts(tmp_path) == 1
 
     def test_all_present_returns_0(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.docker.copy_artifacts import validate_build_artifacts
 
         for arch in ("amd64", "arm64", "arm"):
@@ -33,11 +42,13 @@ class TestValidateBuildArtifacts:
 
 class TestCopyArtifacts:
     def test_unknown_arch_returns_1(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.docker.copy_artifacts import run
 
         assert run("x64", tmp_path) == 1
 
     def test_missing_binary_returns_1(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.docker.copy_artifacts import run
 
         triple = "x86_64-unknown-linux-musl"
@@ -46,6 +57,7 @@ class TestCopyArtifacts:
         assert run("amd64", tmp_path) == 1
 
     def test_copies_all_to_build_artifacts_amd64(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.build.constants import PACKAGE_NAMES
         from rerp_tooling.docker.copy_artifacts import BINARY_NAMES, run
 
@@ -63,6 +75,7 @@ class TestCopyArtifacts:
             assert p.stat().st_mode & 0o111
 
     def test_arm7_uses_artifact_dir_arm(self, tmp_path: Path):
+        _skip_if_no_brt_copy_artifacts()
         from rerp_tooling.build.constants import PACKAGE_NAMES
         from rerp_tooling.docker.copy_artifacts import run
 

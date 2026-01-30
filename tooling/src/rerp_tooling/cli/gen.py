@@ -4,10 +4,18 @@ import sys
 from pathlib import Path
 
 from rerp_tooling.discovery import suite_sub_service_names
-from rerp_tooling.gen.regenerate import regenerate_service, regenerate_suite_services
 
 
 def run_gen(args, project_root: Path) -> None:
+    from rerp_tooling.gen import regenerate_service, regenerate_suite_services
+
+    if regenerate_service is None or regenerate_suite_services is None:
+        print(
+            "rerp gen: brrtrouter_tooling.gen.regenerate not available; need BRRTRouter with gen.regenerate",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     if args.gen_cmd == "suite":
         if not getattr(args, "suite", None):
             print("rerp gen suite: missing suite name")

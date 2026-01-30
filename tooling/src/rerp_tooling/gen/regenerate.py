@@ -3,8 +3,12 @@
 from pathlib import Path
 from typing import Optional
 
-from brrtrouter_tooling.gen import regenerate_service as brrt_regenerate_service
-from brrtrouter_tooling.gen import regenerate_suite_services as brrt_regenerate_suite_services
+from brrtrouter_tooling.gen.regenerate import (
+    regenerate_service as brrt_regenerate_service,
+)
+from brrtrouter_tooling.gen.regenerate import (
+    regenerate_suite_services as brrt_regenerate_suite_services,
+)
 
 from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 

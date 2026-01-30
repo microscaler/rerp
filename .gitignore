@@ -3,7 +3,7 @@
 # =============================================================================
 # Compiled output and build artifacts
 target/
-build/
+/build/
 debug/
 build_artifacts/
 ./components/

@@ -6,10 +6,6 @@ from pathlib import Path
 from brrtrouter_tooling.docker.build_base import run as run_build_base_brt
 from brrtrouter_tooling.docker.build_image_simple import run as run_build_image_simple_brt
 from brrtrouter_tooling.docker.build_multiarch import run as run_build_multiarch_brt
-from brrtrouter_tooling.docker.copy_artifacts import run as run_copy_artifacts_brt
-from brrtrouter_tooling.docker.copy_artifacts import (
-    validate_build_artifacts as validate_build_artifacts_brt,
-)
 from brrtrouter_tooling.docker.copy_binary import run as run_copy_binary_brt
 from brrtrouter_tooling.docker.copy_multiarch import run as run_copy_multiarch_brt
 from brrtrouter_tooling.docker.generate_dockerfile import run as run_generate_dockerfile_brt
@@ -34,9 +30,15 @@ def run_docker(args, project_root: Path) -> None:
         rc = run_unpack_build_bins_brt(inp, project_root)
         sys.exit(rc)
     if args.docker_cmd == "validate-build-artifacts":
+        from brrtrouter_tooling.docker.copy_artifacts import (
+            validate_build_artifacts as validate_build_artifacts_brt,
+        )
+
         rc = validate_build_artifacts_brt(project_root, BINARY_NAMES)
         sys.exit(rc)
     if args.docker_cmd == "copy-artifacts":
+        from brrtrouter_tooling.docker.copy_artifacts import run as run_copy_artifacts_brt
+
         rc = run_copy_artifacts_brt(
             args.arch,
             project_root,
