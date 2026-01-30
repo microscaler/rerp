@@ -499,7 +499,49 @@ def generate_impl_stubs_with_brrtrouter(
     print("✅ Implementation stubs generated (impl/src/controllers)")
 
 
-def run_bootstrap_microservice(service_name: str, port: Optional[int], project_root: Path) -> int:
+def regenerate_impl_stubs(
+    project_root: Path,
+    suite: str,
+    service: Optional[str] = None,
+    *,
+    force: bool = False,
+) -> int:
+    """Regenerate impl controller stubs for one or all services in a suite.
+
+    Uses brrtrouter-gen generate-stubs. With --force, overwrites existing stub
+    files (use when OpenAPI changed and you want impl to match; custom logic
+    in impl will be lost). Returns 0 on success, 1 on error.
+    """
+    from rerp_tooling.discovery import suite_sub_service_names
+
+    services = [service] if service else suite_sub_service_names(project_root, suite)
+    if not services:
+        print(f"⚠️  No services found for suite: {suite}")
+        return 1
+    for svc in services:
+        spec_path = project_root / "openapi" / suite / svc / "openapi.yaml"
+        impl_dir = project_root / "microservices" / suite / svc / "impl"
+        if not spec_path.exists():
+            print(f"⚠️  Skipping {svc}: spec not found at {spec_path}")
+            continue
+        if not impl_dir.exists():
+            print(f"⚠️  Skipping {svc}: impl dir not found at {impl_dir}")
+            continue
+        try:
+            generate_impl_stubs_with_brrtrouter(spec_path, impl_dir, project_root, svc, force=force)
+        except (ValueError, RuntimeError) as e:
+            print(f"❌ {svc}: {e}")
+            return 1
+    return 0
+
+
+def run_bootstrap_microservice(
+    service_name: str,
+    port: Optional[int],
+    project_root: Path,
+    *,
+    force_stubs: bool = False,
+) -> int:
     """Bootstrap microservice. Returns 0 on success, 1 on error."""
     if port is None:
         port = _get_port_from_registry(project_root, service_name)
@@ -559,7 +601,7 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
 
     # Generate impl controller stubs from OpenAPI (Decimal etc. come from brrtrouter-gen)
     generate_impl_stubs_with_brrtrouter(
-        spec_path, impl_dir, project_root, service_name, force=False
+        spec_path, impl_dir, project_root, service_name, force=force_stubs
     )
 
     create_dockerfile(service_name, binary_name, port, dockerfile_path)

@@ -92,6 +92,7 @@ def main() -> None:
         if not getattr(args, "gen_cmd", None):
             print("rerp gen: missing subcommand")
             print("  suite <suite-name> [--service <name>]")
+            print("  stubs <suite-name> [--service <name>] [--force]")
             print("  Use: rerp gen --help")
             sys.exit(1)
         gen_cli.run_gen(args, project_root)
@@ -414,18 +415,33 @@ def __build_parser():
     # --- gen (regenerate from OpenAPI via BRRTRouter; passes --package-name) ---
     pgen = sub.add_parser(
         "gen",
-        help="Regenerate gen crates from OpenAPI specs (BRRTRouter with --package-name, fix-cargo-paths)",
+        help="Regenerate gen crates and impl stubs from OpenAPI (BRRTRouter, fix-cargo-paths)",
     )
     pgen_sub = pgen.add_subparsers(dest="gen_cmd")
     pgen_suite = pgen_sub.add_parser(
         "suite",
-        help="Regenerate one or all services in a suite (e.g. accounting)",
+        help="Regenerate gen crates for one or all services in a suite (e.g. accounting)",
     )
     pgen_suite.add_argument("suite", help="Suite name (e.g. accounting)")
     pgen_suite.add_argument(
         "--service",
         metavar="NAME",
         help="Regenerate only this service (e.g. accounts-payable, general-ledger)",
+    )
+    pgen_stubs = pgen_sub.add_parser(
+        "stubs",
+        help="Regenerate impl controller stubs (brrtrouter-gen generate-stubs)",
+    )
+    pgen_stubs.add_argument("suite", help="Suite name (e.g. accounting)")
+    pgen_stubs.add_argument(
+        "--service",
+        metavar="NAME",
+        help="Regenerate stubs only for this service",
+    )
+    pgen_stubs.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing impl stubs (use when OpenAPI changed; custom impl logic is lost)",
     )
 
     # --- build (host-aware cargo/cross; microservices/ workspace) ---
@@ -466,6 +482,11 @@ def __build_parser():
         type=int,
         default=None,
         help="Port (default: from port registry)",
+    )
+    pbom.add_argument(
+        "--force-stubs",
+        action="store_true",
+        help="Overwrite existing impl controller stubs (brrtrouter-gen generate-stubs --force)",
     )
 
     # --- release ---
