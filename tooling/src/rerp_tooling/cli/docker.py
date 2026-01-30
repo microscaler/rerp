@@ -15,7 +15,7 @@ from brrtrouter_tooling.docker.copy_multiarch import run as run_copy_multiarch_b
 from brrtrouter_tooling.docker.generate_dockerfile import run as run_generate_dockerfile_brt
 from brrtrouter_tooling.docker.unpack_build_bins import run as run_unpack_build_bins_brt
 
-from rerp_tooling.build.microservices import PACKAGE_NAMES
+from rerp_tooling.build.constants import PACKAGE_NAMES
 from rerp_tooling.docker.copy_artifacts import BINARY_NAMES
 
 

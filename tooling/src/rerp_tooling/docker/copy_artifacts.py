@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rerp_tooling.build.microservices import PACKAGE_NAMES
+from rerp_tooling.build.constants import PACKAGE_NAMES
 
 # Service (directory) name -> binary name in build_artifacts (Dockerfile COPY expects this).
 BINARY_NAMES: dict[str, str] = {

@@ -69,10 +69,10 @@ local_resource(
     allow_parallel=True,
 )
 
-# Pytest for tooling (rerp_tooling).
+# Pytest for tooling (rerp_tooling). Same invocation as CI (coverage + cov-fail-under=65).
 local_resource(
     'test-tooling',
-    'tooling/.venv/bin/pytest tooling/tests -v --tb=short',
+    'cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-missing --cov-fail-under=65',
     deps=[
         './tooling/src',
         './tooling/tests',

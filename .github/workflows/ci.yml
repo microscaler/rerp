@@ -38,11 +38,17 @@ jobs:
       run_release_jobs: ${{ steps.set_vars.outputs.is_release_tag == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_release_jobs == 'true') }}
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
-      - run: pip install -e ./tooling
+      - run: pip install -e ./BRRTRouter/tooling && pip install -e ./tooling
       - id: set_vars
         run: echo "is_release_tag=$(rerp ci is-tag)" >> $GITHUB_OUTPUT
       - name: Validate version (prevent downgrade)
@@ -117,6 +123,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -127,6 +140,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling[dev]
 
       - name: Run tooling tests with coverage
@@ -144,6 +158,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -154,6 +175,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling
 
       - name: Validate OpenAPI specs
@@ -179,6 +201,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -189,6 +218,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling
 
       - name: Validate port assignments
@@ -209,6 +239,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
       
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -223,6 +260,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling
 
       - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
@@ -306,6 +344,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
       
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -320,6 +365,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling
 
       - name: Patch Cargo.toml to use BRRTRouter and lifeguard from git (CI)
@@ -398,6 +444,13 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - name: Checkout BRRTRouter (brrtrouter-tooling dependency)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/BRRTRouter
+          path: BRRTRouter
+          ref: main
+
       - name: Set up Python and tooling (for validate)
         uses: actions/setup-python@v5
         with:
@@ -408,6 +461,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./BRRTRouter/tooling
           tooling/.venv/bin/pip install -e ./tooling
 
       - name: Copy microservices binaries (amd64) from build-multiarch artifacts

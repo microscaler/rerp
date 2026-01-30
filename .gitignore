@@ -86,4 +86,5 @@ pip-delete-this-directory.txt
 # UI website (SolidJS build output, deps)
 # =============================================================================
 ui/website/dist/
+node_modules/
 ui/website/node_modules/

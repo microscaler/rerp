@@ -1,10 +1,17 @@
 # Pre-commit: https://pre-commit.com
 # Install: just init && just install-hooks
 # Run manually: pre-commit run --all-files
+# Commit message lint (commit-msg): same as CI (commitlint); requires Node and `npm install` at repo root.
 
 repos:
   - repo: local
     hooks:
+      - id: commitlint
+        name: commitlint (conventional commits, same as CI)
+        entry: npx commitlint --edit
+        language: system
+        stages: [commit-msg]
+        pass_filenames: true
       - id: qa
         name: Tooling QA (lint, format-check, tests)
         entry: just qa

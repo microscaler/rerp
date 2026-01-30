@@ -1,0 +1,9 @@
+{
+  "name": "rerp",
+  "private": true,
+  "description": "RERP repo root; commitlint for conventional commits (same as CI).",
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0"
+  }
+}

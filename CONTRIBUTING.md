@@ -34,9 +34,10 @@ This guide will help you get started with contributing to the project.
 
 3. **Generate system BFF specs** (optional, for testing): run `just init` then `rerp bff generate-system`.
 
-4. **Pre-commit hooks** (recommended): run `just init` then `just install-hooks`. Before each commit this runs:
+4. **Pre-commit hooks** (recommended): run **`just pre-commit-setup`** once (init + npm install + install-hooks). Or manually: `just init` then `just install-hooks`, and `npm install` at repo root for commit message lint. Before each commit this runs:
    - **Tooling QA**: `just qa` (lint, format-check, tooling tests)
    - **microservices-fmt**: if `microservices/` changed vs HEAD, runs `just fmt-rust` (cargo fmt in `microservices/`, rustfmt in `entities/`); fast if Tilt has recently built.
+   - **commitlint** (commit-msg): validates conventional commit format using the same config as CI (`commitlint.config.mjs`).
 
 ---
 
@@ -85,9 +86,9 @@ Examples:
 - `test: add tests for inventory service`
 - `chore(deps): bump crate-x to 1.2`
 
-Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`, `revert`.
+Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`, `build`, `revert`, `tooling`.
 
-To validate before pushing: `npx commitlint --from HEAD~1` (requires Node; or rely on CI).
+The pre-commit hook runs commitlint automatically on each commit (if you ran `just install-hooks` and `npm install`). To validate the last commit manually: `npx commitlint --from HEAD~1`.
 
 ### 5. Submit a Pull Request
 

@@ -46,7 +46,7 @@ class TestCopyArtifacts:
         assert run("amd64", tmp_path) == 1
 
     def test_copies_all_to_build_artifacts_amd64(self, tmp_path: Path):
-        from rerp_tooling.build.microservices import PACKAGE_NAMES
+        from rerp_tooling.build.constants import PACKAGE_NAMES
         from rerp_tooling.docker.copy_artifacts import BINARY_NAMES, run
 
         triple = "x86_64-unknown-linux-musl"
@@ -63,7 +63,7 @@ class TestCopyArtifacts:
             assert p.stat().st_mode & 0o111
 
     def test_arm7_uses_artifact_dir_arm(self, tmp_path: Path):
-        from rerp_tooling.build.microservices import PACKAGE_NAMES
+        from rerp_tooling.build.constants import PACKAGE_NAMES
         from rerp_tooling.docker.copy_artifacts import run
 
         triple = "armv7-unknown-linux-musleabihf"

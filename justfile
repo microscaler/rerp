@@ -247,13 +247,13 @@ format-check:
     fi
     tooling/.venv/bin/ruff format tooling/ --check
 
-# Full QA: lint + format-check + tooling tests. Run before commit or demo.
+# Full QA: lint + format-check + tooling tests (same as CI: coverage + cov-fail-under=65).
 qa:
     #!/usr/bin/env bash
     set -euo pipefail
     just lint
     just format-check
-    tooling/.venv/bin/pytest tooling/tests -v --tb=short
+    cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-missing --cov-fail-under=65
 
 # Auto-fix fixable ruff rules (including unsafe). Run `just init` first.
 lint-fix:
@@ -265,7 +265,24 @@ lint-fix:
     fi
     tooling/.venv/bin/ruff check tooling/ --fix --unsafe-fixes
 
-# Install pre-commit hooks (qa, microservices-fmt). Run `just init` first.
+# One-shot for new developers: init (if needed), npm install (commitlint), then install pre-commit hooks.
+# Run once after clone to install and activate pre-commit (qa, microservices-fmt, commitlint on commit-msg).
+pre-commit-setup:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "📋 Pre-commit setup (install and activate hooks for new developers)..."
+    just init
+    if [ -f package.json ] && command -v npm >/dev/null 2>&1; then
+        echo "📦 Installing Node deps for commitlint (conventional commits)..."
+        npm install
+    else
+        echo "⚠️  Skip npm install (no package.json or npm not found); commit-msg hook may fail until you run: npm install"
+    fi
+    just install-hooks
+    echo "✅ Pre-commit installed and active. Hooks will run on: pre-commit (qa, microservices-fmt) and commit-msg (commitlint)."
+
+# Install pre-commit hooks (qa, microservices-fmt, commitlint on commit-msg). Run `just init` first.
+# Commit message lint (commitlint) requires Node: run `npm install` at repo root once.
 install-hooks:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -274,7 +291,8 @@ install-hooks:
         exit 1
     fi
     tooling/.venv/bin/pre-commit install
-    echo "✅ Pre-commit hooks installed"
+    tooling/.venv/bin/pre-commit install --hook-type commit-msg
+    echo "✅ Pre-commit hooks installed (including commit-msg / commitlint)"
 
 # Find and remove unused imports in tooling (F401). Uses ruff. Run `just init` first.
 # --fix: edit files in place; run again to confirm clean.

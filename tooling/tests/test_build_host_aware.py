@@ -123,7 +123,7 @@ class TestDetermineArchitectures:
     def test_unknown_exits(self):
         from rerp_tooling.build.host_aware import _determine_architectures
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(ValueError, match="Unknown architecture"):
             _determine_architectures("unknown")
 
 
@@ -150,6 +150,11 @@ class TestRun:
 
 
 class TestBuildMicroservices:
+    """Requires brrtrouter_tooling.gen.regenerate (BRRTRouter main may not have it yet)."""
+
+    def setup_method(self):
+        pytest.importorskip("brrtrouter_tooling.gen.regenerate")
+
     def test_build_microservice_unknown_name_returns_1(self, tmp_path: Path):
         from rerp_tooling.build.microservices import build_microservice
 
@@ -181,7 +186,7 @@ class TestBuildMicroservices:
             tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
         ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "")
-        with patch("brrtrouter_tooling.build.workspace_build.subprocess.run") as m_run:
+        with patch("brrtrouter_tooling.build.host_aware.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()
             rc = build_microservices_workspace(tmp_path, "amd64", release=False)
         assert rc == 0
@@ -200,7 +205,7 @@ class TestBuildMicroservices:
             tmp_path / "microservices" / "accounting" / "general-ledger" / "gen" / "Cargo.toml"
         ).write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "1")
-        with patch("brrtrouter_tooling.build.workspace_build.subprocess.run") as m_run:
+        with patch("brrtrouter_tooling.build.host_aware.subprocess.run") as m_run:
             m_run.return_value = type("R", (), {"returncode": 0})()
             rc = build_microservices_workspace(tmp_path, "arm7", release=True)
         assert rc == 0
