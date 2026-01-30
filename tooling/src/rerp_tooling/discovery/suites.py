@@ -94,6 +94,19 @@ def suite_sub_service_names(project_root: Path, suite: str) -> list[str]:
     return sorted(x.name for x in d.iterdir() if x.is_dir() and (x / "openapi.yaml").exists())
 
 
+def iter_suite_services(project_root: Path) -> Iterator[tuple[str, str]]:
+    """Yield (suite, service_name) for every openapi/{suite}/{service_name}/openapi.yaml. No hardcoding."""
+    d = _openapi_dir(project_root)
+    if not d.exists() or not d.is_dir():
+        return
+    for suite_dir in sorted(d.iterdir()):
+        if not suite_dir.is_dir():
+            continue
+        suite = suite_dir.name
+        for name in suite_sub_service_names(project_root, suite):
+            yield (suite, name)
+
+
 def tilt_service_names(project_root: Path) -> list[str]:
     """Service names that Tilt runs (containers rerp-{name}-dev, images rerp-accounting-{name}:*). Sorted. From bff-suite-config + BFFs."""
     return sorted(load_suite_services(project_root))

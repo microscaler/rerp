@@ -8461,6 +8461,15 @@ components:
         receiver_id:
           type: string
           maxLength: 255
+        document_total_amount:
+          type: number
+          format: decimal
+          description: Total amount when document is an invoice or payment order.
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency when document has monetary amount.
         raw_content:
           type: string
         company_id:
@@ -9093,6 +9102,17 @@ components:
           type: string
           format: uuid
           nullable: true
+        document_total_amount:
+          type: number
+          format: decimal
+          description: Total amount when document is an invoice or payment order.
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency when document has monetary amount.
+          nullable: true
         error_message:
           type: string
           nullable: true
@@ -9251,6 +9271,21 @@ components:
           type: object
         summary:
           type: object
+          nullable: true
+        total_assets:
+          type: number
+          format: decimal
+          description: Sum of assets (balance sheet).
+          nullable: true
+        total_liabilities:
+          type: number
+          format: decimal
+          description: Sum of liabilities (balance sheet).
+          nullable: true
+        net_income:
+          type: number
+          format: decimal
+          description: Net income (P&L).
           nullable: true
         generated_at:
           type: string
@@ -9858,6 +9893,12 @@ components:
         report_data:
           type: object
           nullable: true
+        total_amount:
+          type: number
+          format: decimal
+          description: Aggregate report total when applicable (e.g. trial balance
+            total).
+          nullable: true
         parameters:
           type: object
           nullable: true
@@ -10368,6 +10409,15 @@ components:
         related_purchase_order_id:
           type: string
           format: uuid
+        document_total_amount:
+          type: number
+          format: decimal
+          description: Total amount when document is an invoice or payment order.
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: ISO 4217 currency when document has monetary amount.
         error_message:
           type: string
         acknowledgment_sent:

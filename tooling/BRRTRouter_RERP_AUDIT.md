@@ -26,6 +26,13 @@
 
 **Single action for BRRTRouter:** Merge/push the branch that contains the above (ci, gen, openapi, docker exports and copy_multiarch behavior) to **main**, so RERP CI’s `ref: main` checkout gets a complete API.
 
+**Docker parameterization (BRRTRouter):** All docker helpers live in BRRTRouter and are parameterized so RERP (and other projects) pass project-specific values: `build_base` (base_image_name, docker_dir, tag_kind_registry, tag_dockerhub), `build_image_simple` (kind_cluster_name, base_image_name, dockerfile), `build_multiarch` (build_cmd, base_image_name, docker_dir, base_image_local), `copy_artifacts` (package_names, binary_names, workspace_dir), `generate_dockerfile` (binary_name_pattern), `unpack_build_bins` (workspace_dir, zip_prefix), `copy_multiarch` (binary_name_fn, workspace_dir). RERP keeps only a thin `docker/copy_artifacts.py` wrapper and `cli/docker.py` that call BRRTRouter with RERP constants (e.g. rerp-base, rerp/base, kind cluster "rerp", rerp-binaries-*, tooling/.venv/bin/rerp build ...).
+
+**Gen package name (BRRTRouter):** `brrtrouter-gen generate` accepts `--package-name` for generated gen crate `[package].name`. BRRTRouter Python: `call_brrtrouter_generate(..., package_name=...)`, `regenerate_service(..., package_name=...)`, `regenerate_suite_services(..., package_name_for_service=...)`, `run_gen_if_missing_for_suite(..., package_name_for_service=...)`. RERP derives gen package names **on the fly** from `get_package_names(project_root)` (discovery from `openapi/{suite}/{service}/openapi.yaml`); no hardcoded `PACKAGE_NAMES`. **All call sites use this flow:** Tiltfile uses `rerp gen suite accounting --service <name>` (no raw brrtrouter-gen); bootstrap uses `call_brrtrouter_generate(..., package_name=...)` with service_name so new crates get the correct name from the start.
+
+**Dependencies config (brrtrouter-dependencies.toml):** BRRTRouter accepts `--dependencies-config` for additional gen Cargo.toml deps. When the OpenAPI spec uses decimal/money (`format: decimal` or `format: money`), brrtrouter-gen **auto-creates** `brrtrouter-dependencies.toml` alongside the spec if it does not exist (with `[conditional] rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }`). Manual creation is only needed if you want to customize the file; existing files are never overwritten. BRRTRouter `regenerate_service` still sets `deps_config_path` when the file exists; RERP can rely on gen creating the file on first run.
+
+
 ---
 
 ## 2. RERP: workarounds to remove (after BRRTRouter main is fixed)
@@ -49,9 +56,10 @@
 
 | Item | Reason |
 |------|--------|
-| **build/constants.py** | Single place for RERP-specific `PACKAGE_NAMES`; avoids pulling in `microservices` (and thus gen) when only names are needed. Valid design, not a BRRTRouter workaround. |
+| **build/constants.py** | Re-exports `get_package_names`, `get_binary_names`, `get_service_ports` from discovery; **no hardcoding** — all derived from openapi layout and specs. |
+| **discovery/services.py** | `get_package_names(project_root)`, `get_binary_names(project_root)`, `get_service_ports(project_root)` from `openapi/{suite}/{service}/openapi.yaml` and port sources (openapi servers, bff-suite-config, helm). |
 | **ci/fix_cargo_paths.py** | RERP wrapper that passes RERP gen-crate config to `brrtrouter_tooling.ci`; project-specific. |
-| **docker/copy_artifacts.py** | RERP wrapper that passes RERP `PACKAGE_NAMES`/`BINARY_NAMES` and delegates to BRRTRouter; project-specific. |
+| **docker/copy_artifacts.py** | Thin wrapper: `run`/`validate_build_artifacts` call `brrtrouter_tooling.docker.copy_artifacts` with discovery-derived `get_package_names(project_root)`/`get_binary_names(project_root)`. All other docker helpers live in BRRTRouter; RERP `cli/docker.py` calls them with RERP params (image names, kind cluster, zip prefix, build_cmd). |
 | **gen/regenerate.py** | RERP wrapper that wires RERP `fix_cargo_paths` into BRRTRouter regenerate; project-specific. |
 
 ---
@@ -75,5 +83,5 @@
 | gen: regenerate_service, regenerate_suite_services, run_gen_if_missing_for_suite | `brrtrouter_tooling.gen` (must be on main) |
 | openapi: check_openapi_dir, find_openapi_files, fix_impl_controller, fix_impl_controllers_dir, fix_operation_id_run, is_snake_case, process_file, to_snake_case, validate_specs | `brrtrouter_tooling.openapi` |
 | openapi: check_number_fields | `brrtrouter_tooling.openapi` (must be on main) |
-| docker: build_base, build_image_simple, build_multiarch, copy_binary, copy_multiarch, generate_dockerfile, unpack_build_bins | `brrtrouter_tooling.docker.*` |
-| docker: copy_artifacts run, validate_build_artifacts | `brrtrouter_tooling.docker.copy_artifacts` (must be on main) |
+| docker: build_base, build_image_simple, build_multiarch, copy_binary, copy_multiarch, generate_dockerfile, unpack_build_bins | `brrtrouter_tooling.docker.*` (parameterized: base_image_name, docker_dir, kind_cluster_name, base_image_local, zip_prefix, build_cmd, tag_kind_registry, tag_dockerhub, workspace_dir, binary_name_pattern) |
+| docker: copy_artifacts run, validate_build_artifacts | `brrtrouter_tooling.docker.copy_artifacts` (takes package_names, binary_names; RERP passes from build/constants) |

@@ -129,31 +129,11 @@ def create_microservice_lint(name, spec_file):
     )
 
 # Helper function to create a code generation resource for a microservice
+# Uses rerp gen suite so BRRTRouter gets --package-name and fix_cargo_paths runs (single source of truth).
 def create_microservice_gen(name, spec_file, output_dir):
     local_resource(
         '%s-service-gen' % name,
-        cmd='''
-            set -e
-            echo "🔄 Regenerating %s service from OpenAPI spec..."
-            # Use the built debug binary directly for speed (instant vs minutes for cargo run)
-            ../BRRTRouter/target/debug/brrtrouter-gen generate \
-                --spec ./openapi/%s \
-                --output ./microservices/accounting/%s/gen \
-                --force || \
-            cargo run --manifest-path ../BRRTRouter/Cargo.toml --bin brrtrouter-gen -- \
-                generate \
-                --spec ./openapi/%s \
-                --output ./microservices/accounting/%s/gen \
-                --force
-            
-            # Fix Cargo.toml paths to point to BRRTRouter repository
-            echo "🔧 Fixing Cargo.toml dependency paths..."
-            if [ -f ./microservices/accounting/%s/gen/Cargo.toml ]; then
-                tooling/.venv/bin/rerp ci fix-cargo-paths ./microservices/accounting/%s/gen/Cargo.toml
-            fi
-            
-            echo "✅ %s service regeneration complete"
-        ''' % (name, spec_file, output_dir, spec_file, output_dir, output_dir, output_dir, name),
+        cmd='tooling/.venv/bin/rerp gen suite accounting --service %s' % name,
         deps=[
             './openapi/%s' % spec_file,
             'tooling/pyproject.toml',
@@ -169,19 +149,19 @@ def create_microservice_gen(name, spec_file, output_dir):
         allow_parallel=True,
     )
 
-# Cargo [package] names from brrtrouter-gen (for cargo -p and for binary output path)
-# BFF: brrtrouter-gen derives "rerp_accounting_backend_for_frontend_api" from OpenAPI info.title
+# Cargo [package] names for impl crates (binary path under microservices/target/.../debug/).
+# Must match tooling/src/rerp_tooling/build/constants.py PACKAGE_NAMES.
 PACKAGE_NAMES = {
-    'general-ledger': 'general_ledger',
-    'invoice': 'invoice_management',
-    'accounts-receivable': 'accounts_receivable',
-    'accounts-payable': 'accounts_payable',
-    'bank-sync': 'bank_synchronization',
-    'asset': 'asset_management',
-    'budget': 'budgeting',
-    'edi': 'edi___compliance',
-    'financial-reports': 'financial_reports',
-    'bff': 'rerp_accounting_backend_for_frontend_api',
+    'general-ledger': 'rerp_accounting_general_ledger',
+    'invoice': 'rerp_accounting_invoice',
+    'accounts-receivable': 'rerp_accounting_accounts_receivable',
+    'accounts-payable': 'rerp_accounting_accounts_payable',
+    'bank-sync': 'rerp_accounting_bank_sync',
+    'asset': 'rerp_accounting_asset',
+    'budget': 'rerp_accounting_budget',
+    'edi': 'rerp_accounting_edi',
+    'financial-reports': 'rerp_accounting_financial_reports',
+    'bff': 'rerp_accounting_bff',
 }
 
 # Artifact and container binary names (build_artifacts/, /app/, Helm app.binaryName)
@@ -248,7 +228,8 @@ def create_microservice_deployment(name):
     # Use build_artifacts/amd64/ so Dockerfile build_artifacts/${TARGETARCH}/ works (Tilt = amd64).
     target_path = 'microservices/target/x86_64-unknown-linux-musl/debug/%s' % package_name
     artifact_path = 'build_artifacts/amd64/%s' % binary_name
-    dockerfile = 'docker/microservices/Dockerfile.%s' % name
+    # Single template driven by --service; no per-service Dockerfile
+    dockerfile_template = 'docker/microservices/Dockerfile.template'
     image_name = 'localhost:5001/rerp-accounting-%s' % name
 
     # 1. Copy binary from workspace build to artifacts and create SHA256 hash
@@ -262,11 +243,11 @@ def create_microservice_deployment(name):
         allow_parallel=True,
     )
     
-    # 2. Build and push Docker image
+    # 2. Build and push Docker image (template rendered on the fly with --service)
     local_resource(
         'docker-%s' % name,
-        'tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s' % (image_name, dockerfile, hash_path, artifact_path),
-        deps=[hash_path, artifact_path, dockerfile, 'tooling/pyproject.toml'],
+        'tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s' % (image_name, dockerfile_template, hash_path, artifact_path, name),
+        deps=[hash_path, artifact_path, dockerfile_template, 'tooling/pyproject.toml'],
         resource_deps=['copy-%s' % name],
         labels=['acc_' + name],
         allow_parallel=False,
@@ -277,7 +258,7 @@ def create_microservice_deployment(name):
     # or, if registry is not running, use kind load (no registry needed)
     custom_build(
         image_name,
-        ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s' % (image_name, image_name, dockerfile, hash_path, artifact_path)
+        ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s' % (image_name, image_name, dockerfile_template, hash_path, artifact_path, name)
          + ' && (docker push %s:tilt 2>/dev/null || kind load docker-image %s:tilt --name rerp)' % (image_name, image_name)),
         deps=[artifact_path, hash_path, 'microservices/accounting/%s/impl/config' % name, 'microservices/accounting/%s/gen/doc' % name, 'microservices/accounting/%s/gen/static_site' % name],
         tag='tilt',

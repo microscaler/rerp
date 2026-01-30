@@ -29,4 +29,5 @@ may = { workspace = true }
 may_minihttp = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
+rust_decimal = { workspace = true }
 tikv-jemallocator = { workspace = true, optional = true }

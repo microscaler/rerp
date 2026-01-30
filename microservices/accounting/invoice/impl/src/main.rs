@@ -6,6 +6,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
+#![allow(unused_imports)]
 // Use generated code from gen crate
 use rerp_accounting_invoice_gen::handlers::*;
 use rerp_accounting_invoice_gen::registry::*;

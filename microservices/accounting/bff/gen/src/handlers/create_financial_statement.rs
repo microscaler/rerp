@@ -65,6 +65,10 @@ pub struct Response {
     #[serde(rename = "metadata")]
     pub metadata: Option<serde_json::Value>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "net_income")]
+    pub net_income: Option<rust_decimal::Decimal>,
+
     #[serde(rename = "report_date")]
     pub report_date: String,
 
@@ -74,6 +78,14 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "summary")]
     pub summary: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_assets")]
+    pub total_assets: Option<rust_decimal::Decimal>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_liabilities")]
+    pub total_liabilities: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

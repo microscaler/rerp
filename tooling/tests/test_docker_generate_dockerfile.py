@@ -1,13 +1,15 @@
-"""TDD: tests for rerp_tooling.docker.generate_dockerfile (rerp docker generate-dockerfile)."""
+"""Tests for rerp docker generate-dockerfile (delegates to brrtrouter_tooling.docker.generate_dockerfile)."""
 
 from pathlib import Path
 
 import pytest
 
+pytest.importorskip("brrtrouter_tooling")
+
 
 class TestGenerateDockerfile:
     def test_generates_file_with_substitutions(self, tmp_path: Path):
-        from rerp_tooling.docker.generate_dockerfile import generate_dockerfile
+        from brrtrouter_tooling.docker.generate_dockerfile import generate_dockerfile
 
         (tmp_path / "docker" / "microservices").mkdir(parents=True)
         tpl = tmp_path / "docker" / "microservices" / "Dockerfile.template"
@@ -23,19 +25,17 @@ class TestGenerateDockerfile:
         assert "auth" in text
         assert "idam" in text
 
-    def test_template_missing_exits(self, tmp_path: Path):
-        from rerp_tooling.docker.generate_dockerfile import generate_dockerfile
+    def test_template_missing_returns_1(self, tmp_path: Path):
+        from brrtrouter_tooling.docker.generate_dockerfile import run
 
         (tmp_path / "docker" / "microservices").mkdir(parents=True)
-        # No template
-        with pytest.raises(SystemExit) as exc:
-            generate_dockerfile("x", "y", project_root=tmp_path)
-        assert exc.value.code == 1
+        # No template: run() catches FileNotFoundError and returns 1
+        assert run("x", "y", project_root=tmp_path) == 1
 
 
 class TestRun:
     def test_run_returns_zero(self, tmp_path: Path):
-        from rerp_tooling.docker.generate_dockerfile import run
+        from brrtrouter_tooling.docker.generate_dockerfile import run
 
         (tmp_path / "docker" / "microservices").mkdir(parents=True)
         (tmp_path / "docker" / "microservices" / "Dockerfile.template").write_text("FROM x\n")

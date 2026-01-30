@@ -74,7 +74,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "current_balance")]
-    pub current_balance: Option<f64>,
+    pub current_balance: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -96,7 +96,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reconciled_balance")]
-    pub reconciled_balance: Option<f64>,
+    pub reconciled_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "sync_credentials")]

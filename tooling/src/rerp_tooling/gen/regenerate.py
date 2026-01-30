@@ -10,11 +10,18 @@ from brrtrouter_tooling.gen import (
     regenerate_suite_services as brrt_regenerate_suite_services,
 )
 
+from rerp_tooling.build.constants import get_package_names
 from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 
 
 def _fix_cargo_paths_callback(cargo_toml_path: Path, project_root: Optional[Path]) -> None:
     run_fix_cargo_paths(cargo_toml_path, project_root=project_root)
+
+
+def _gen_package_name(project_root: Path, service_name: str) -> Optional[str]:
+    """Gen crate [package].name for a service (e.g. rerp_accounting_general_ledger_gen)."""
+    impl_name = get_package_names(project_root).get(service_name)
+    return f"{impl_name}_gen" if impl_name else None
 
 
 def regenerate_service(
@@ -24,12 +31,14 @@ def regenerate_service(
     brrtrouter_path: Optional[Path] = None,
 ) -> int:
     """Regenerate a single service. Returns 0 on success, 1 on error."""
+    package_name = _gen_package_name(project_root, service_name)
     return brrt_regenerate_service(
         project_root,
         suite,
         service_name,
         brrtrouter_path=brrtrouter_path,
         fix_cargo_paths_fn=_fix_cargo_paths_callback,
+        package_name=package_name,
     )
 
 
@@ -46,4 +55,5 @@ def regenerate_suite_services(
         service_names,
         brrtrouter_path=brrtrouter_path,
         fix_cargo_paths_fn=_fix_cargo_paths_callback,
+        package_name_for_service=lambda _s, sn: _gen_package_name(project_root, sn),
     )

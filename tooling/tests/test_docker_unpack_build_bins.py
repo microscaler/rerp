@@ -1,23 +1,27 @@
-"""Tests for rerp_tooling.docker.unpack_build_bins (rerp docker unpack-build-bins)."""
+"""Tests for rerp docker unpack-build-bins (delegates to brrtrouter_tooling.docker.unpack_build_bins)."""
 
 import zipfile
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("brrtrouter_tooling")
+
 
 class TestUnpackBuildBins:
     def test_missing_input_dir_returns_1(self, tmp_path: Path):
-        from rerp_tooling.docker.unpack_build_bins import run
+        from brrtrouter_tooling.docker.unpack_build_bins import run
 
         assert run(tmp_path / "nonexistent", tmp_path) == 1
 
     def test_no_zips_returns_1(self, tmp_path: Path):
-        from rerp_tooling.docker.unpack_build_bins import run
+        from brrtrouter_tooling.docker.unpack_build_bins import run
 
         (tmp_path / "empty").mkdir()
         assert run(tmp_path / "empty", tmp_path) == 1
 
     def test_extracts_into_microservices_target(self, tmp_path: Path):
-        from rerp_tooling.docker.unpack_build_bins import run
+        from brrtrouter_tooling.docker.unpack_build_bins import run
 
         ind = tmp_path / "zips"
         ind.mkdir()

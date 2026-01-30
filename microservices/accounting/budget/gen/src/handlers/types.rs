@@ -40,11 +40,11 @@ pub struct Budget {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -55,9 +55,9 @@ pub struct Budget {
 pub struct BudgetLine {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -73,9 +73,9 @@ pub struct BudgetLine {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -84,9 +84,9 @@ pub struct BudgetLine {
 pub struct BudgetVariance {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -106,16 +106,16 @@ pub struct BudgetVariance {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBudgetLineRequest {
     pub account_id: String,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -132,9 +132,9 @@ pub struct CreateBudgetLineRequest {
 pub struct CreateBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -150,9 +150,9 @@ pub struct CreateBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -212,11 +212,11 @@ pub struct CreateBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -238,9 +238,9 @@ pub struct CreateBudgetVarianceRequest {
 pub struct CreateBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -260,18 +260,18 @@ pub struct CreateBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -287,9 +287,9 @@ pub struct GetBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -330,11 +330,11 @@ pub struct GetBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -345,9 +345,9 @@ pub struct GetBudgetResponse {
 pub struct GetBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -367,9 +367,9 @@ pub struct GetBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -407,9 +407,9 @@ pub struct ListBudgetsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetLineRequest {
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub notes: String,
 }
@@ -418,9 +418,9 @@ pub struct UpdateBudgetLineRequest {
 pub struct UpdateBudgetLineResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -436,9 +436,9 @@ pub struct UpdateBudgetLineResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 
     pub version_id: String,
 }
@@ -490,11 +490,11 @@ pub struct UpdateBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: f64,
+    pub total_actual_amount: rust_decimal::Decimal,
 
-    pub total_budget_amount: f64,
+    pub total_budget_amount: rust_decimal::Decimal,
 
-    pub total_variance: f64,
+    pub total_variance: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -503,24 +503,24 @@ pub struct UpdateBudgetResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetVarianceRequest {
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub exceeds_threshold: bool,
 
     pub is_favorable: bool,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetVarianceResponse {
     pub account_id: String,
 
-    pub actual_amount: f64,
+    pub actual_amount: rust_decimal::Decimal,
 
-    pub budget_amount: f64,
+    pub budget_amount: rust_decimal::Decimal,
 
     pub budget_id: String,
 
@@ -540,7 +540,7 @@ pub struct UpdateBudgetVarianceResponse {
 
     pub updated_at: String,
 
-    pub variance: f64,
+    pub variance: rust_decimal::Decimal,
 
-    pub variance_percent: f64,
+    pub variance_percent: rust_decimal::Decimal,
 }

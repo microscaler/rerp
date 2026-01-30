@@ -35,8 +35,16 @@ pub struct Response {
     #[serde(rename = "created_by")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "currency_code")]
+    pub currency_code: Option<String>,
+
     #[serde(rename = "document_number")]
     pub document_number: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "document_total_amount")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "document_type")]
     pub document_type: String,

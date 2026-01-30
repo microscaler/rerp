@@ -1,5 +1,5 @@
 [package]
-name = "budgeting"
+name = "rerp_accounting_budget_gen"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,6 +11,12 @@ default = ["jemalloc"]
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]
+# NOTE: Additional dependencies can be configured via brrtrouter-dependencies.toml
+# Place brrtrouter-dependencies.toml alongside your openapi.yaml file.
+# BRRTRouter will auto-detect it and include dependencies from:
+#   - [dependencies] section (always included)
+#   - [conditional] section (included if types are detected)
+# See: https://github.com/microscaler/BRRTRouter/blob/main/DEPENDENCIES_CONFIG_GUIDE.md
 
 brrtrouter = { workspace = true }
 brrtrouter_macros = { workspace = true }
@@ -23,4 +29,5 @@ may = { workspace = true }
 may_minihttp = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
-tikv-jemallocator = { workspace = true, optional = true }
+tikv-jemallocator = { workspace = true, optional = true }# From brrtrouter-dependencies.toml [conditional] section (type detected)
+rust_decimal = { workspace = true }

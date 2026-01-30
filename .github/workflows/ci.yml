@@ -502,6 +502,20 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
           tags: type=raw,value=${{ needs.download-copy-package-push-containers.outputs.tag }}
 
+      - name: Set up tooling .venv
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m venv tooling/.venv
+      - run: tooling/.venv/bin/pip install --upgrade pip && tooling/.venv/bin/pip install -e ./tooling
+
+      - name: Render Dockerfile for ${{ matrix.service }}
+        run: |
+          tooling/.venv/bin/rerp docker render-dockerfile \
+            --template docker/microservices/Dockerfile.template \
+            --service ${{ matrix.service }} \
+            -o docker/microservices/Dockerfile.${{ matrix.service }}
+
       - name: Build and push ${{ matrix.service }}
         id: build
         uses: docker/build-push-action@v5

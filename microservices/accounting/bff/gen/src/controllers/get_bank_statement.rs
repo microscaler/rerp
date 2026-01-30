@@ -21,7 +21,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(),
-        closing_balance: Some(50000.0),
+        closing_balance: Some(rust_decimal::Decimal::new(500000, 1)),
         company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
         created_at: Some("2024-01-31T10:00:00Z".to_string()),
         created_by: Some("example".to_string()),
@@ -32,7 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         imported_at: Some("example".to_string()),
         imported_by: Some("example".to_string()),
         metadata: Some(Default::default()),
-        opening_balance: Some(45000.0),
+        opening_balance: Some(rust_decimal::Decimal::new(450000, 1)),
         period_end: Some("example".to_string()),
         period_start: Some("example".to_string()),
         reconciled_at: Some("example".to_string()),
@@ -40,8 +40,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         statement_date: "2024-01-31".to_string(),
         statement_number: Some("example".to_string()),
         status: "RECONCILED".to_string(),
-        total_credits: Some(3.14),
-        total_debits: Some(3.14),
+        total_credits: Some(rust_decimal::Decimal::new(12345, 2)),
+        total_debits: Some(rust_decimal::Decimal::new(12345, 2)),
         transaction_count: Some(42),
         updated_at: Some("2024-01-31T10:00:00Z".to_string()),
         updated_by: Some("example".to_string()),

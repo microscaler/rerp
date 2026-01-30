@@ -39,11 +39,17 @@ pub struct CreateFinancialStatementResponse {
 
     pub metadata: serde_json::Value,
 
+    pub net_income: rust_decimal::Decimal,
+
     pub report_date: String,
 
     pub report_id: String,
 
     pub summary: serde_json::Value,
+
+    pub total_assets: rust_decimal::Decimal,
+
+    pub total_liabilities: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -117,6 +123,8 @@ pub struct CreateReportResponse {
 
     pub template_id: String,
 
+    pub total_amount: rust_decimal::Decimal,
+
     pub updated_at: String,
 
     pub updated_by: String,
@@ -142,11 +150,17 @@ pub struct FinancialStatement {
 
     pub metadata: serde_json::Value,
 
+    pub net_income: rust_decimal::Decimal,
+
     pub report_date: String,
 
     pub report_id: String,
 
     pub summary: serde_json::Value,
+
+    pub total_assets: rust_decimal::Decimal,
+
+    pub total_liabilities: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -171,11 +185,17 @@ pub struct GetFinancialStatementResponse {
 
     pub metadata: serde_json::Value,
 
+    pub net_income: rust_decimal::Decimal,
+
     pub report_date: String,
 
     pub report_id: String,
 
     pub summary: serde_json::Value,
+
+    pub total_assets: rust_decimal::Decimal,
+
+    pub total_liabilities: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -223,6 +243,8 @@ pub struct GetReportResponse {
     pub status: String,
 
     pub template_id: String,
+
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -294,6 +316,8 @@ pub struct Report {
     pub status: String,
 
     pub template_id: String,
+
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -405,11 +429,17 @@ pub struct UpdateFinancialStatementResponse {
 
     pub metadata: serde_json::Value,
 
+    pub net_income: rust_decimal::Decimal,
+
     pub report_date: String,
 
     pub report_id: String,
 
     pub summary: serde_json::Value,
+
+    pub total_assets: rust_decimal::Decimal,
+
+    pub total_liabilities: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -470,6 +500,8 @@ pub struct UpdateReportResponse {
     pub status: String,
 
     pub template_id: String,
+
+    pub total_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 

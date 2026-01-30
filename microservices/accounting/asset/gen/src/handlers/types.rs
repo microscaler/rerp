@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Asset {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -24,13 +24,13 @@ pub struct Asset {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -46,11 +46,11 @@ pub struct Asset {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -96,11 +96,11 @@ pub struct AssetTransaction {
 
     pub currency_code: String,
 
-    pub gain_loss: f64,
+    pub gain_loss: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub impairment_amount: f64,
+    pub impairment_amount: rust_decimal::Decimal,
 
     pub impairment_reason: String,
 
@@ -112,9 +112,9 @@ pub struct AssetTransaction {
 
     pub reference_number: String,
 
-    pub sale_proceeds: f64,
+    pub sale_proceeds: rust_decimal::Decimal,
 
-    pub transaction_amount: f64,
+    pub transaction_amount: rust_decimal::Decimal,
 
     pub transaction_date: String,
 
@@ -195,18 +195,18 @@ pub struct CreateAssetRequest {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub useful_life_months: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -224,13 +224,13 @@ pub struct CreateAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -246,11 +246,11 @@ pub struct CreateAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -267,7 +267,7 @@ pub struct CreateDepreciationRequest {
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -276,17 +276,17 @@ pub struct CreateDepreciationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -307,17 +307,17 @@ pub struct CreateDepreciationResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Depreciation {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -361,7 +361,7 @@ pub struct GetAssetRegisterResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -379,13 +379,13 @@ pub struct GetAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -401,11 +401,11 @@ pub struct GetAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -418,17 +418,17 @@ pub struct GetAssetResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -531,7 +531,7 @@ pub struct UpdateAssetRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAssetResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub accumulated_depreciation_account_id: String,
 
@@ -549,13 +549,13 @@ pub struct UpdateAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: f64,
+    pub current_value: rust_decimal::Decimal,
 
     pub depreciation_expense_account_id: String,
 
     pub depreciation_method: String,
 
-    pub depreciation_rate: f64,
+    pub depreciation_rate: rust_decimal::Decimal,
 
     pub description: String,
 
@@ -571,11 +571,11 @@ pub struct UpdateAssetResponse {
 
     pub name: String,
 
-    pub purchase_cost: f64,
+    pub purchase_cost: rust_decimal::Decimal,
 
     pub purchase_date: String,
 
-    pub salvage_value: f64,
+    pub salvage_value: rust_decimal::Decimal,
 
     pub status: String,
 
@@ -588,7 +588,7 @@ pub struct UpdateAssetResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateDepreciationRequest {
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub journal_entry_id: String,
 
@@ -597,17 +597,17 @@ pub struct UpdateDepreciationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateDepreciationResponse {
-    pub accumulated_depreciation: f64,
+    pub accumulated_depreciation: rust_decimal::Decimal,
 
     pub asset_id: String,
 
-    pub book_value: f64,
+    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: f64,
+    pub depreciation_amount: rust_decimal::Decimal,
 
     pub id: String,
 

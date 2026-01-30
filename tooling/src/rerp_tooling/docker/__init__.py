@@ -1,6 +1,6 @@
-"""Docker helpers: generate Dockerfile from template."""
+"""RERP docker: copy_artifacts wrapper with discovery-derived names; all other helpers from brrtrouter_tooling.docker."""
 
-from .generate_dockerfile import generate_dockerfile
-from .generate_dockerfile import run as run_generate_dockerfile
+from .copy_artifacts import run as run_copy_artifacts
+from .copy_artifacts import validate_build_artifacts
 
-__all__ = ["generate_dockerfile", "run_generate_dockerfile"]
+__all__ = ["run_copy_artifacts", "validate_build_artifacts"]

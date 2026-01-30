@@ -1,0 +1,7 @@
+# Additional dependencies for BFF generated gen crate (BRRTRouter).
+# Used when generating from openapi/accounting/openapi_bff.yaml.
+
+[dependencies]
+
+[conditional]
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }

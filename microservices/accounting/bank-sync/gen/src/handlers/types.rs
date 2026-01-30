@@ -24,7 +24,7 @@ pub struct BankAccount {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -36,7 +36,7 @@ pub struct BankAccount {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -51,7 +51,7 @@ pub struct BankAccount {
 pub struct BankStatement {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -73,7 +73,7 @@ pub struct BankStatement {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -89,9 +89,9 @@ pub struct BankStatement {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -102,9 +102,9 @@ pub struct BankStatement {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankTransaction {
-    pub amount: f64,
+    pub amount: rust_decimal::Decimal,
 
-    pub balance_after: f64,
+    pub balance_after: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -180,7 +180,7 @@ pub struct CreateBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -192,7 +192,7 @@ pub struct CreateBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -207,7 +207,7 @@ pub struct CreateBankAccountResponse {
 pub struct CreateBankStatementRequest {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -217,7 +217,7 @@ pub struct CreateBankStatementRequest {
 
     pub import_source: String,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -232,7 +232,7 @@ pub struct CreateBankStatementRequest {
 pub struct CreateBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -254,7 +254,7 @@ pub struct CreateBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -270,9 +270,9 @@ pub struct CreateBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -283,7 +283,7 @@ pub struct CreateBankStatementResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankTransactionRequest {
-    pub amount: f64,
+    pub amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -319,9 +319,9 @@ pub struct CreateReconciliationRequest {
 pub struct CreateReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -331,7 +331,7 @@ pub struct CreateReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -339,11 +339,11 @@ pub struct CreateReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -382,7 +382,7 @@ pub struct GetBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -394,7 +394,7 @@ pub struct GetBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -409,7 +409,7 @@ pub struct GetBankAccountResponse {
 pub struct GetBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -431,7 +431,7 @@ pub struct GetBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -447,9 +447,9 @@ pub struct GetBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -462,9 +462,9 @@ pub struct GetBankStatementResponse {
 pub struct GetReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -474,7 +474,7 @@ pub struct GetReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -482,11 +482,11 @@ pub struct GetReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -542,9 +542,9 @@ pub struct ListReconciliationsResponse {
 pub struct Reconciliation {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -554,7 +554,7 @@ pub struct Reconciliation {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -562,11 +562,11 @@ pub struct Reconciliation {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 
@@ -620,7 +620,7 @@ pub struct UpdateBankAccountResponse {
 
     pub currency_code: String,
 
-    pub current_balance: f64,
+    pub current_balance: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -632,7 +632,7 @@ pub struct UpdateBankAccountResponse {
 
     pub metadata: serde_json::Value,
 
-    pub reconciled_balance: f64,
+    pub reconciled_balance: rust_decimal::Decimal,
 
     pub sync_credentials: String,
 
@@ -656,7 +656,7 @@ pub struct UpdateBankStatementRequest {
 pub struct UpdateBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    pub closing_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -678,7 +678,7 @@ pub struct UpdateBankStatementResponse {
 
     pub metadata: serde_json::Value,
 
-    pub opening_balance: f64,
+    pub opening_balance: rust_decimal::Decimal,
 
     pub period_end: String,
 
@@ -694,9 +694,9 @@ pub struct UpdateBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: f64,
+    pub total_credits: rust_decimal::Decimal,
 
-    pub total_debits: f64,
+    pub total_debits: rust_decimal::Decimal,
 
     pub transaction_count: i32,
 
@@ -718,9 +718,9 @@ pub struct UpdateBankTransactionRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateReconciliationRequest {
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub notes: String,
 
@@ -731,9 +731,9 @@ pub struct UpdateReconciliationRequest {
 pub struct UpdateReconciliationResponse {
     pub bank_account_id: String,
 
-    pub bank_balance: f64,
+    pub bank_balance: rust_decimal::Decimal,
 
-    pub book_balance: f64,
+    pub book_balance: rust_decimal::Decimal,
 
     pub company_id: String,
 
@@ -743,7 +743,7 @@ pub struct UpdateReconciliationResponse {
 
     pub currency_code: String,
 
-    pub difference: f64,
+    pub difference: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -751,11 +751,11 @@ pub struct UpdateReconciliationResponse {
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: f64,
+    pub outstanding_deposits_amount: rust_decimal::Decimal,
 
     pub outstanding_deposits_count: i32,
 
-    pub outstanding_withdrawals_amount: f64,
+    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
 
     pub outstanding_withdrawals_count: i32,
 

@@ -313,6 +313,11 @@ components:
         report_data:
           type: object
           nullable: true
+        total_amount:
+          type: number
+          format: decimal
+          description: Aggregate report total when applicable (e.g. trial balance total).
+          nullable: true
         parameters:
           type: object
           nullable: true
@@ -514,6 +519,21 @@ components:
           type: object
         summary:
           type: object
+          nullable: true
+        total_assets:
+          type: number
+          format: decimal
+          description: Sum of assets (balance sheet).
+          nullable: true
+        total_liabilities:
+          type: number
+          format: decimal
+          description: Sum of liabilities (balance sheet).
+          nullable: true
+        net_income:
+          type: number
+          format: decimal
+          description: Net income (P&L).
           nullable: true
         generated_at:
           type: string

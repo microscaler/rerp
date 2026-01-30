@@ -198,12 +198,18 @@ def test_docker_validate_build_artifacts_missing_exits_1(tmp_path, monkeypatch, 
 
 
 def test_docker_validate_build_artifacts_success_exits_0(tmp_path, monkeypatch, capsys):
-    from rerp_tooling.docker.copy_artifacts import BINARY_NAMES
+    from rerp_tooling.build.constants import get_binary_names
 
+    # Minimal openapi layout so discovery returns names
+    (tmp_path / "openapi" / "accounting" / "general-ledger").mkdir(parents=True)
+    (tmp_path / "openapi" / "accounting" / "general-ledger" / "openapi.yaml").write_text(
+        "openapi: 3.1.0\ninfo: {}\nservers:\n  - url: http://localhost:8001/api\n"
+    )
+    binary_names = get_binary_names(tmp_path)
     for arch in ("amd64", "arm64", "arm"):
         d = tmp_path / "build_artifacts" / arch
         d.mkdir(parents=True)
-        for name in BINARY_NAMES.values():
+        for name in binary_names.values():
             (d / name).write_bytes(b"\x7fELF")
     monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
     code = _run_main(["docker", "validate-build-artifacts"])
@@ -221,6 +227,11 @@ def test_docker_copy_artifacts_unknown_arch_exits_1(tmp_path, monkeypatch, capsy
 
 
 def test_docker_copy_artifacts_missing_binary_exits_1(tmp_path, monkeypatch, capsys):
+    # Discovery expects one service; we do not create its binary so run fails
+    (tmp_path / "openapi" / "accounting" / "general-ledger").mkdir(parents=True)
+    (tmp_path / "openapi" / "accounting" / "general-ledger" / "openapi.yaml").write_text(
+        "openapi: 3.1.0\ninfo: {}\nservers:\n  - url: http://localhost:8001/api\n"
+    )
     (tmp_path / "microservices" / "target" / "x86_64-unknown-linux-musl" / "release").mkdir(
         parents=True
     )

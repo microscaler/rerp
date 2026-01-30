@@ -18,7 +18,7 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "accumulated_depreciation")]
-    pub accumulated_depreciation: Option<f64>,
+    pub accumulated_depreciation: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "accumulated_depreciation_account_id")]
@@ -51,7 +51,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "current_value")]
-    pub current_value: Option<f64>,
+    pub current_value: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "depreciation_expense_account_id")]
@@ -63,7 +63,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "depreciation_rate")]
-    pub depreciation_rate: Option<f64>,
+    pub depreciation_rate: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
@@ -93,14 +93,14 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "purchase_cost")]
-    pub purchase_cost: Option<f64>,
+    pub purchase_cost: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "purchase_date")]
     pub purchase_date: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "salvage_value")]
-    pub salvage_value: Option<f64>,
+    pub salvage_value: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "status")]
     pub status: String,

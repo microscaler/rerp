@@ -27,6 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         report_type: "example".to_string(),
         status: "example".to_string(),
         template_id: Some("example".to_string()),
+        total_amount: None,
         updated_at: Some("example".to_string()),
         updated_by: Some("example".to_string()),
     }

@@ -14,21 +14,21 @@ pub struct ArAging {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -54,21 +54,21 @@ pub struct CreateArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -77,7 +77,7 @@ pub struct CreateArAgingResponse {
 pub struct CreateCustomerInvoiceRequest {
     pub collection_status: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -92,9 +92,9 @@ pub struct CreateCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -104,17 +104,17 @@ pub struct CreateCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -123,7 +123,7 @@ pub struct CreateCustomerInvoiceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreatePaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub invoice_id: String,
 
@@ -142,11 +142,11 @@ pub struct CreatePaymentRequest {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -159,7 +159,7 @@ pub struct CreatePaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreatePaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -173,7 +173,7 @@ pub struct CreatePaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -181,7 +181,7 @@ pub struct CreatePaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -197,7 +197,7 @@ pub struct CreatePaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -212,9 +212,9 @@ pub struct CustomerInvoice {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -224,17 +224,17 @@ pub struct CustomerInvoice {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -251,21 +251,21 @@ pub struct GetArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -278,9 +278,9 @@ pub struct GetCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -290,17 +290,17 @@ pub struct GetCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -309,7 +309,7 @@ pub struct GetCustomerInvoiceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetPaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -323,7 +323,7 @@ pub struct GetPaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -331,7 +331,7 @@ pub struct GetPaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -347,7 +347,7 @@ pub struct GetPaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -389,7 +389,7 @@ pub struct ListPaymentsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Payment {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -403,7 +403,7 @@ pub struct Payment {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -411,7 +411,7 @@ pub struct Payment {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -427,7 +427,7 @@ pub struct Payment {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
@@ -436,7 +436,7 @@ pub struct Payment {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaymentApplication {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub applied_at: String,
 
@@ -457,17 +457,17 @@ pub struct PaymentApplication {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateArAgingRequest {
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -480,21 +480,21 @@ pub struct UpdateArAgingResponse {
 
     pub currency_code: String,
 
-    pub current: f64,
+    pub current: rust_decimal::Decimal,
 
     pub customer_id: String,
 
-    pub days_31_60: f64,
+    pub days_31_60: rust_decimal::Decimal,
 
-    pub days_61_90: f64,
+    pub days_61_90: rust_decimal::Decimal,
 
-    pub days_91_120: f64,
+    pub days_91_120: rust_decimal::Decimal,
 
     pub id: String,
 
-    pub over_120: f64,
+    pub over_120: rust_decimal::Decimal,
 
-    pub total_outstanding: f64,
+    pub total_outstanding: rust_decimal::Decimal,
 
     pub updated_at: String,
 }
@@ -505,9 +505,9 @@ pub struct UpdateCustomerInvoiceRequest {
 
     pub collection_status: String,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -522,9 +522,9 @@ pub struct UpdateCustomerInvoiceResponse {
 
     pub created_at: String,
 
-    pub credit_limit: f64,
+    pub credit_limit: rust_decimal::Decimal,
 
-    pub credit_used: f64,
+    pub credit_used: rust_decimal::Decimal,
 
     pub customer_id: String,
 
@@ -534,17 +534,17 @@ pub struct UpdateCustomerInvoiceResponse {
 
     pub invoice_id: String,
 
-    pub last_payment_amount: f64,
+    pub last_payment_amount: rust_decimal::Decimal,
 
     pub last_payment_date: String,
 
     pub metadata: serde_json::Value,
 
-    pub outstanding_amount: f64,
+    pub outstanding_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 
-    pub write_off_amount: f64,
+    pub write_off_amount: rust_decimal::Decimal,
 
     pub write_off_date: String,
 
@@ -553,7 +553,7 @@ pub struct UpdateCustomerInvoiceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentApplicationRequest {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub notes: String,
 }
@@ -562,7 +562,7 @@ pub struct UpdatePaymentApplicationRequest {
 pub struct UpdatePaymentRequest {
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -573,7 +573,7 @@ pub struct UpdatePaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentResponse {
-    pub applied_amount: f64,
+    pub applied_amount: rust_decimal::Decimal,
 
     pub bank_account_id: String,
 
@@ -587,7 +587,7 @@ pub struct UpdatePaymentResponse {
 
     pub customer_id: String,
 
-    pub exchange_rate: f64,
+    pub exchange_rate: rust_decimal::Decimal,
 
     pub id: String,
 
@@ -595,7 +595,7 @@ pub struct UpdatePaymentResponse {
 
     pub notes: String,
 
-    pub payment_amount: f64,
+    pub payment_amount: rust_decimal::Decimal,
 
     pub payment_date: String,
 
@@ -611,7 +611,7 @@ pub struct UpdatePaymentResponse {
 
     pub status: String,
 
-    pub unapplied_amount: f64,
+    pub unapplied_amount: rust_decimal::Decimal,
 
     pub updated_at: String,
 

@@ -21,7 +21,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closing_balance")]
-    pub closing_balance: Option<f64>,
+    pub closing_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
@@ -63,7 +63,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opening_balance")]
-    pub opening_balance: Option<f64>,
+    pub opening_balance: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "period_end")]
@@ -93,11 +93,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_credits")]
-    pub total_credits: Option<f64>,
+    pub total_credits: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_debits")]
-    pub total_debits: Option<f64>,
+    pub total_debits: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "transaction_count")]

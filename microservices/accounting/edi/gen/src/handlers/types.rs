@@ -8,7 +8,11 @@ use serde::{Deserialize, Serialize};
 pub struct CreateEdiDocumentRequest {
     pub company_id: String,
 
+    pub currency_code: String,
+
     pub document_number: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
 
     pub document_type: String,
 
@@ -33,7 +37,11 @@ pub struct CreateEdiDocumentResponse {
 
     pub created_by: String,
 
+    pub currency_code: String,
+
     pub document_number: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
 
     pub document_type: String,
 
@@ -171,7 +179,11 @@ pub struct EdiDocument {
 
     pub created_by: String,
 
+    pub currency_code: String,
+
     pub document_number: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
 
     pub document_type: String,
 
@@ -282,7 +294,11 @@ pub struct GetEdiDocumentResponse {
 
     pub created_by: String,
 
+    pub currency_code: String,
+
     pub document_number: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
 
     pub document_type: String,
 
@@ -384,6 +400,10 @@ pub struct ListEdiMappingsResponse {
 pub struct UpdateEdiDocumentRequest {
     pub acknowledgment_sent: bool,
 
+    pub currency_code: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
+
     pub error_message: String,
 
     pub parsed_data: serde_json::Value,
@@ -407,7 +427,11 @@ pub struct UpdateEdiDocumentResponse {
 
     pub created_by: String,
 
+    pub currency_code: String,
+
     pub document_number: String,
+
+    pub document_total_amount: rust_decimal::Decimal,
 
     pub document_type: String,
 

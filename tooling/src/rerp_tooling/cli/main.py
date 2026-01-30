@@ -9,6 +9,7 @@ from . import bootstrap as bootstrap_cli
 from . import build as build_cli
 from . import ci as ci_cli
 from . import docker as docker_cli
+from . import gen as gen_cli
 from . import openapi as openapi_cli
 from . import ports as ports_cli
 from . import pre_commit as pre_commit_cli
@@ -87,6 +88,15 @@ def main() -> None:
             sys.exit(1)
         docker_cli.run_docker(args, project_root)
 
+    if args.command == "gen":
+        if not getattr(args, "gen_cmd", None):
+            print("rerp gen: missing subcommand")
+            print("  suite <suite-name> [--service <name>]")
+            print("  Use: rerp gen --help")
+            sys.exit(1)
+        gen_cli.run_gen(args, project_root)
+        return
+
     if args.command == "build":
         build_cli.run_build(args, project_root)
 
@@ -126,9 +136,8 @@ def main() -> None:
         pre_commit_cli.run_pre_commit(args, project_root)
         return
 
-    # Placeholder for future: brrtrouter
     print(
-        f"rerp {args.command}: not yet implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp release', or 'rerp tilt'."
+        f"rerp {args.command}: not implemented. Use 'rerp ports', 'rerp openapi', 'rerp ci', 'rerp gen', 'rerp bff', 'rerp docker', 'rerp build', 'rerp bootstrap', 'rerp release', or 'rerp tilt'."
     )
     sys.exit(1)
 
@@ -290,9 +299,26 @@ def __build_parser():
     # --- docker ---
     pd = sub.add_parser(
         "docker",
-        help="Docker: generate-dockerfile, copy-artifacts, copy-binary, build-image-simple, copy-multiarch, build-multiarch, build-base, unpack-build-bins, validate-build-artifacts",
+        help="Docker: generate-dockerfile, render-dockerfile, copy-artifacts, copy-binary, build-image-simple, copy-multiarch, build-multiarch, build-base, unpack-build-bins, validate-build-artifacts",
     )
     pd_sub = pd.add_subparsers(dest="docker_cmd")
+    pdr = pd_sub.add_parser(
+        "render-dockerfile",
+        help="Render Dockerfile.template to a file (for CI: render then docker build -f path)",
+    )
+    pdr.add_argument(
+        "--template",
+        default="docker/microservices/Dockerfile.template",
+        metavar="PATH",
+        help="Path to Dockerfile.template (default: docker/microservices/Dockerfile.template)",
+    )
+    pdr.add_argument("--service", required=True, metavar="NAME", help="Service name (e.g. invoice)")
+    pdr.add_argument(
+        "--system", metavar="SUITE", help="Suite/system (e.g. accounting). Default: from discovery"
+    )
+    pdr.add_argument(
+        "-o", "--output", required=True, metavar="PATH", help="Output path for rendered Dockerfile"
+    )
     pdub = pd_sub.add_parser(
         "unpack-build-bins",
         help="Extract rerp-binaries-*.zip into microservices/target (from Multi-Arch artifacts in tmp/buildBins)",
@@ -352,9 +378,17 @@ def __build_parser():
     pdbi.add_argument(
         "image_name", help="Image name (e.g. localhost:5001/rerp-accounting-general-ledger)"
     )
-    pdbi.add_argument("dockerfile", help="Path to Dockerfile")
+    pdbi.add_argument(
+        "dockerfile",
+        help="Path to Dockerfile or Dockerfile.template (use with --service to render on the fly)",
+    )
     pdbi.add_argument("hash_path", help="Path to .sha256 file")
     pdbi.add_argument("artifact_path", help="Path to binary artifact")
+    pdbi.add_argument(
+        "--service",
+        metavar="NAME",
+        help="Service name (e.g. invoice). When set, dockerfile is treated as Dockerfile.template and rendered with discovery-derived port/binary.",
+    )
     pdcm = pd_sub.add_parser(
         "copy-multiarch",
         help="Copy component binaries to build_artifacts/{system}_{module}/{arch} (replaces copy-multiarch-binary.sh)",
@@ -376,6 +410,23 @@ def __build_parser():
     pdbm.add_argument("image_name", help="Image name (e.g. rerp/auth-idam)")
     pdbm.add_argument("--tag", default="latest", help="Image tag (default: latest)")
     pdbm.add_argument("--push", action="store_true", help="Push images to registry")
+
+    # --- gen (regenerate from OpenAPI via BRRTRouter; passes --package-name) ---
+    pgen = sub.add_parser(
+        "gen",
+        help="Regenerate gen crates from OpenAPI specs (BRRTRouter with --package-name, fix-cargo-paths)",
+    )
+    pgen_sub = pgen.add_subparsers(dest="gen_cmd")
+    pgen_suite = pgen_sub.add_parser(
+        "suite",
+        help="Regenerate one or all services in a suite (e.g. accounting)",
+    )
+    pgen_suite.add_argument("suite", help="Suite name (e.g. accounting)")
+    pgen_suite.add_argument(
+        "--service",
+        metavar="NAME",
+        help="Regenerate only this service (e.g. accounts-payable, general-ledger)",
+    )
 
     # --- build (host-aware cargo/cross; microservices/ workspace) ---
     pbd = sub.add_parser(

@@ -19,7 +19,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "early_payment_discount_percent")]
-    pub early_payment_discount_percent: Option<f64>,
+    pub early_payment_discount_percent: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "invoice_id")]
     pub invoice_id: String,
@@ -65,7 +65,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "early_payment_discount_percent")]
-    pub early_payment_discount_percent: Option<f64>,
+    pub early_payment_discount_percent: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -83,7 +83,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<f64>,
+    pub outstanding_amount: Option<rust_decimal::Decimal>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "purchase_order_id")]

@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import subprocess
 from pathlib import Path
 from typing import Any, Optional
 
@@ -269,13 +268,12 @@ def update_tiltfile(
 
 
 def _update_gen_cargo_toml(cargo_path: Path, service_name: str) -> None:
-    """Update gen/Cargo.toml to be a library crate."""
+    """Update gen/Cargo.toml to be a library crate (version, [lib]). [package].name is NOT touched — it is set by brrtrouter-gen via --package-name."""
     content = cargo_path.read_text()
     service_snake = service_name.replace("-", "_")
     gen_crate_name = f"rerp_accounting_{service_snake}_gen"
 
-    # Update package name
-    content = re.sub(r'name = "[^"]+"', f'name = "{gen_crate_name}"', content, count=1)
+    # Do not overwrite [package].name — it is written by brrtrouter-gen when we pass --package-name.
     # Update version to match workspace
     content = re.sub(r'version = "[^"]+"', 'version = "0.1.3"', content, count=1)
 
@@ -318,6 +316,9 @@ jemalloc = ["tikv-jemallocator"]
 # BRRTRouter (re-exported from gen crate, but may need direct access)
 brrtrouter = {{ workspace = true }}
 brrtrouter_macros = {{ workspace = true }}
+
+# Decimal types from OpenAPI format: decimal / money (used in generated stubs)
+rust_decimal = {{ workspace = true }}
 
 # Standard dependencies
 serde = {{ workspace = true }}
@@ -429,40 +430,73 @@ use controllers::*;
     print(f"✅ Created {impl_main_path}")
 
 
-def generate_code_with_brrtrouter(spec_path: Path, output_dir: Path, project_root: Path) -> None:
-    brrtrouter_bin = project_root.parent / "BRRTRouter" / "target" / "debug" / "brrtrouter-gen"
-    manifest = project_root.parent / "BRRTRouter" / "Cargo.toml"
-    if not manifest.exists():
-        msg = f"BRRTRouter not found at {manifest.parent}. Clone at same level as RERP."
-        raise FileNotFoundError(msg)
-    if brrtrouter_bin.exists():
-        cmd = [
-            str(brrtrouter_bin),
-            "generate",
-            "--spec",
-            str(spec_path),
-            "--output",
-            str(output_dir),
-            "--force",
-        ]
-    else:
-        cmd = [
-            "cargo",
-            "run",
-            "--manifest-path",
-            str(manifest),
-            "--bin",
-            "brrtrouter-gen",
-            "--",
-            "generate",
-            "--spec",
-            str(spec_path),
-            "--output",
-            str(output_dir),
-            "--force",
-        ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=str(project_root))
+def generate_code_with_brrtrouter(
+    spec_path: Path,
+    output_dir: Path,
+    project_root: Path,
+    service_name: Optional[str] = None,
+) -> None:
+    """Generate gen crate via BRRTRouter; pass package_name so [package].name is correct."""
+    from brrtrouter_tooling.gen.brrtrouter import call_brrtrouter_generate
+
+    from rerp_tooling.build.constants import get_package_names
+
+    package_names = get_package_names(project_root)
+    package_name = None
+    if service_name and service_name in package_names:
+        package_name = f"{package_names[service_name]}_gen"
+
+    result = call_brrtrouter_generate(
+        spec_path=spec_path,
+        output_dir=output_dir,
+        project_root=project_root,
+        brrtrouter_path=project_root.parent / "BRRTRouter",
+        package_name=package_name,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        msg = f"brrtrouter-gen generate failed: {result.stderr or result.stdout or 'unknown'}"
+        raise RuntimeError(msg)
     print("✅ Code generation complete")
+
+
+def generate_impl_stubs_with_brrtrouter(
+    spec_path: Path,
+    impl_dir: Path,
+    project_root: Path,
+    service_name: str,
+    *,
+    force: bool = False,
+) -> None:
+    """Generate impl controller stubs via brrtrouter-gen generate-stubs.
+
+    Stubs use correct types from the OpenAPI spec (e.g. Decimal literals from
+    dummy_value/rust_literal_for_example). Do not edit impl controllers by hand
+    for initial creation; regenerate stubs with --force if needed.
+    """
+    from brrtrouter_tooling.gen.brrtrouter import call_brrtrouter_generate_stubs
+
+    from rerp_tooling.build.constants import get_package_names
+
+    package_names = get_package_names(project_root)
+    if service_name not in package_names:
+        msg = f"Unknown service_name for stub generation: {service_name!r}"
+        raise ValueError(msg)
+    component_name = f"{package_names[service_name]}_gen"
+
+    result = call_brrtrouter_generate_stubs(
+        spec_path=spec_path,
+        impl_dir=impl_dir,
+        component_name=component_name,
+        project_root=project_root,
+        brrtrouter_path=project_root.parent / "BRRTRouter",
+        force=force,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        msg = f"brrtrouter-gen generate-stubs failed: {result.stderr or result.stdout or 'unknown'}"
+        raise RuntimeError(msg)
+    print("✅ Implementation stubs generated (impl/src/controllers)")
 
 
 def run_bootstrap_microservice(service_name: str, port: Optional[int], project_root: Path) -> int:
@@ -493,8 +527,8 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
     binary_name = derive_binary_name(openapi_spec, service_name)
     print(f"🚀 Bootstrapping {service_name} (port {port}, binary {binary_name})")
 
-    # Generate code to gen/ directory
-    generate_code_with_brrtrouter(spec_path, gen_dir, project_root)
+    # Generate code to gen/ directory (pass service_name so --package-name is set)
+    generate_code_with_brrtrouter(spec_path, gen_dir, project_root, service_name=service_name)
 
     gen_cargo = gen_dir / "Cargo.toml"
     if gen_cargo.exists():
@@ -522,6 +556,11 @@ def run_bootstrap_microservice(service_name: str, port: Optional[int], project_r
     gen_main = gen_dir / "src" / "main.rs"
     if not impl_main.exists() and gen_main.exists():
         _create_impl_main(gen_main, impl_main, service_name)
+
+    # Generate impl controller stubs from OpenAPI (Decimal etc. come from brrtrouter-gen)
+    generate_impl_stubs_with_brrtrouter(
+        spec_path, impl_dir, project_root, service_name, force=False
+    )
 
     create_dockerfile(service_name, binary_name, port, dockerfile_path)
     update_workspace_cargo_toml(service_name, cargo_toml_path)

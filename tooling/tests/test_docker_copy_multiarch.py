@@ -1,23 +1,27 @@
-"""Tests for rerp_tooling.docker.copy_multiarch (rerp docker copy-multiarch)."""
+"""Tests for rerp docker copy-multiarch (delegates to brrtrouter_tooling.docker.copy_multiarch)."""
 
 from pathlib import Path
+
+import pytest
+
+pytest.importorskip("brrtrouter_tooling")
 
 
 class TestCopyMultiarch:
     def test_unknown_arch_returns_1(self, tmp_path: Path):
-        from rerp_tooling.docker.copy_multiarch import run
+        from brrtrouter_tooling.docker.copy_multiarch import run
 
         assert run("auth", "idam", "x64", tmp_path) == 1
 
     def test_missing_binary_continues_no_copies(self, tmp_path: Path):
-        from rerp_tooling.docker.copy_multiarch import run
+        from brrtrouter_tooling.docker.copy_multiarch import run
 
         # No microservices/target/.../release/rerp_auth_idam_impl
         assert run("auth", "idam", "amd64", tmp_path) == 1
         assert not (tmp_path / "build_artifacts").exists()
 
     def test_success_copies_and_writes_sha256(self, tmp_path: Path):
-        from rerp_tooling.docker.copy_multiarch import run
+        from brrtrouter_tooling.docker.copy_multiarch import run
 
         triple = "x86_64-unknown-linux-musl"
         src = tmp_path / "microservices" / "target" / triple / "release"
@@ -34,7 +38,7 @@ class TestCopyMultiarch:
         ).hexdigest()
 
     def test_all_copies_all_archs_that_exist(self, tmp_path: Path):
-        from rerp_tooling.docker.copy_multiarch import run
+        from brrtrouter_tooling.docker.copy_multiarch import run
 
         for triple in ["x86_64-unknown-linux-musl", "aarch64-unknown-linux-musl"]:
             src = tmp_path / "microservices" / "target" / triple / "release"

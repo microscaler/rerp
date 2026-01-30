@@ -17,9 +17,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         generated_by: Some("example".to_string()),
         id: "example".to_string(),
         metadata: Some(Default::default()),
+        net_income: None,
         report_date: "example".to_string(),
         report_id: "example".to_string(),
         summary: Some(Default::default()),
+        total_assets: None,
+        total_liabilities: None,
         updated_at: Some("example".to_string()),
     }
 }

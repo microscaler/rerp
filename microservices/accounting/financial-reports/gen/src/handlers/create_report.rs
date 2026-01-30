@@ -132,6 +132,10 @@ pub struct Response {
     pub template_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_amount")]
+    pub total_amount: Option<rust_decimal::Decimal>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
 

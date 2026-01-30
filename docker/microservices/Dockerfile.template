@@ -1,28 +1,29 @@
 # Minimal runtime-only Dockerfile for {{service_name}} Service (Tilt development)
 # Binary is cross-compiled on host and copied in.
-# This file is a template. Generate service-specific Dockerfiles using:
-#   rerp docker generate-dockerfile <system> <module> [--port N]
+# Rendered from this template with: rerp docker generate-dockerfile accounting <module> [--port N]
+# Build with: rerp docker build-image-simple <image> docker/microservices/Dockerfile.template <hash> <artifact> --service <module>
 #
-# Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
+# Multi-arch: buildx sets TARGETARCH (amd64 | arm64 | arm/v7). Defaults for local.
 
-ARG TARGETPLATFORM=linux/amd64
-ARG BUILDPLATFORM
-FROM --platform=${TARGETPLATFORM} rerp/base:latest
+FROM alpine:3.19
 
 # TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
 ARG TARGETARCH=amd64
 COPY ./build_artifacts/${TARGETARCH}/{{binary_name}} /app/{{binary_name}}
 RUN chmod +x /app/{{binary_name}}
 
-# Copy configuration and assets to writable locations
-COPY ./components/{{system}}/{{module}}_impl/config /app/config
-COPY ./components/{{system}}/{{module}}/doc /app/doc
-COPY ./components/{{system}}/{{module}}_impl/static_site /app/static_site
+# Create directories for configuration and assets with write permissions
+RUN mkdir -p /app/config /app/doc /app/static_site && chmod -R 777 /app
+
+# Copy configuration and assets (gen: doc/static_site; impl: config)
+COPY ./microservices/{{system}}/{{module}}/impl/config /app/config
+COPY ./microservices/{{system}}/{{module}}/gen/doc /app/doc
+COPY ./microservices/{{system}}/{{module}}/gen/static_site /app/static_site
 
 # Expose HTTP port
 EXPOSE {{port}}
 
-# Set runtime environment
+# Runtime environment
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=debug
 

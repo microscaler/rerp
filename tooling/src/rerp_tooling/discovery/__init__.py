@@ -1,5 +1,10 @@
 """Discovery: suites, BFFs, services, and port sources for validate/reconcile."""
 
+from .services import (
+    get_binary_names,
+    get_package_names,
+    get_service_ports,
+)
 from .sources import (
     discover_bff_suite_config,
     discover_helm,
@@ -13,6 +18,7 @@ from .suites import (
     bff_suite_config_path,
     get_bff_service_name_from_config,
     iter_bffs,
+    iter_suite_services,
     load_suite_services,
     openapi_bff_path,
     service_to_suite,
@@ -31,7 +37,11 @@ __all__ = [
     "discover_openapi_suite_microservice_localhost",
     "discover_tiltfile",
     "get_bff_service_name_from_config",
+    "get_binary_names",
+    "get_package_names",
+    "get_service_ports",
     "iter_bffs",
+    "iter_suite_services",
     "load_suite_services",
     "openapi_bff_path",
     "service_to_suite",

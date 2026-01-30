@@ -1,0 +1,6 @@
+# Additional dependencies for generated gen crate (BRRTRouter).
+
+[dependencies]
+
+[conditional]
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }

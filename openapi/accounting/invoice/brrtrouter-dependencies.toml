@@ -1,0 +1,9 @@
+# Additional dependencies for generated gen crate (BRRTRouter).
+# See: https://github.com/microscaler/BRRTRouter/blob/main/DEPENDENCIES_CONFIG_GUIDE.md
+
+[dependencies]
+# Always included in gen Cargo.toml
+
+[conditional]
+# Include rust_decimal when rust_decimal::Decimal is detected in generated types
+rust_decimal = { detect = "rust_decimal::Decimal", workspace = true }
