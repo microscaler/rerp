@@ -3,10 +3,10 @@
 from pathlib import Path
 from typing import Optional
 
-from brrtrouter_tooling.gen.regenerate import (
+from brrtrouter_tooling.gen import (
     regenerate_service as brrt_regenerate_service,
 )
-from brrtrouter_tooling.gen.regenerate import (
+from brrtrouter_tooling.gen import (
     regenerate_suite_services as brrt_regenerate_suite_services,
 )
 

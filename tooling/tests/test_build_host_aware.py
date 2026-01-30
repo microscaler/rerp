@@ -150,11 +150,6 @@ class TestRun:
 
 
 class TestBuildMicroservices:
-    """Requires brrtrouter_tooling.gen.regenerate (BRRTRouter main may not have it yet)."""
-
-    def setup_method(self):
-        pytest.importorskip("brrtrouter_tooling.gen.regenerate")
-
     def test_build_microservice_unknown_name_returns_1(self, tmp_path: Path):
         from rerp_tooling.build.microservices import build_microservice
 

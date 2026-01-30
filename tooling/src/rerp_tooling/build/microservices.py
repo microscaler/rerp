@@ -9,6 +9,7 @@ from brrtrouter_tooling.build import (
     build_package_with_options,
     build_workspace_with_options,
 )
+from brrtrouter_tooling.gen import run_gen_if_missing_for_suite
 
 from rerp_tooling.build.constants import PACKAGE_NAMES
 from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
@@ -21,8 +22,6 @@ def _fix_cargo_paths_callback(cargo_toml_path: Path, project_root: Path | None) 
 
 def run_accounting_gen_if_missing(project_root: Path) -> None:
     """Generate gen crates for accounting suite if missing (via brrtrouter_tooling)."""
-    from brrtrouter_tooling.gen.regenerate import run_gen_if_missing_for_suite
-
     run_gen_if_missing_for_suite(
         project_root,
         "accounting",
