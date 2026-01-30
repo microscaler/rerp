@@ -6,7 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from rerp_tooling.build.microservices import PACKAGE_NAMES
+from rerp_tooling.build.constants import PACKAGE_NAMES
 
 # arch -> artifact dir for build_artifacts (arm7 -> arm for TARGETARCH=arm in Dockerfiles)
 ARCH_TO_ARTIFACT_DIR: dict[str, str] = {

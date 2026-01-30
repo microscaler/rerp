@@ -1,0 +1,35 @@
+"""`rerp gen` — Regenerate services from OpenAPI specs."""
+
+import sys
+from pathlib import Path
+
+from rerp_tooling.discovery import suite_sub_service_names
+from rerp_tooling.gen.regenerate import regenerate_service, regenerate_suite_services
+
+
+def run_gen(args, project_root: Path) -> None:
+    if args.gen_cmd == "suite":
+        if not getattr(args, "suite", None):
+            print("rerp gen suite: missing suite name")
+            print("  Use: rerp gen suite <suite-name>")
+            sys.exit(1)
+        suite = args.suite
+
+        # If --service is specified, regenerate only that service
+        if hasattr(args, "service") and args.service:
+            print(f"🔄 Regenerating {args.service} service in suite '{suite}'...")
+            rc = regenerate_service(project_root, suite, args.service)
+            sys.exit(rc)
+
+        # Otherwise regenerate all services in the suite
+        services = suite_sub_service_names(project_root, suite)
+        if not services:
+            print(f"⚠️  No services found for suite: {suite}")
+            sys.exit(1)
+        print(f"🔄 Regenerating {len(services)} services in suite '{suite}'...")
+        rc = regenerate_suite_services(project_root, suite, services)
+        sys.exit(rc)
+    else:
+        print(f"rerp gen {args.gen_cmd}: unknown subcommand")
+        print("  Use: rerp gen suite <suite-name>")
+        sys.exit(1)

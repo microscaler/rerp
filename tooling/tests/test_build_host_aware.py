@@ -172,16 +172,18 @@ class TestBuildMicroservices:
         (tmp_path / "microservices" / "accounting" / "general-ledger").mkdir(parents=True)
         (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "")
-        with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
-            m_run.return_value = type("R", (), {"returncode": 0})()
+        with patch(
+            "rerp_tooling.build.microservices.build_workspace_with_options",
+            return_value=0,
+        ) as m_build:
             rc = build_microservices_workspace(tmp_path, "amd64", release=False)
         assert rc == 0
-        assert m_run.called
+        assert m_build.called
 
     def test_build_microservices_workspace_arm7_disables_jemalloc(
         self, tmp_path: Path, monkeypatch
     ):
-        """armv7 cross build uses --no-default-features to avoid jemalloc __ffsdi2 linker error."""
+        """armv7 is passed through to brrtrouter_tooling.build (which disables jemalloc)."""
         from rerp_tooling.build.microservices import build_microservices_workspace
 
         (tmp_path / "microservices").mkdir(parents=True)
@@ -189,10 +191,13 @@ class TestBuildMicroservices:
         (tmp_path / "microservices" / "accounting" / "general-ledger").mkdir(parents=True)
         (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "1")
-        with patch("rerp_tooling.build.microservices.subprocess.run") as m_run:
-            m_run.return_value = type("R", (), {"returncode": 0})()
+        with patch(
+            "rerp_tooling.build.microservices.build_workspace_with_options",
+            return_value=0,
+        ) as m_build:
             rc = build_microservices_workspace(tmp_path, "arm7", release=True)
         assert rc == 0
-        (cmd,) = m_run.call_args[0]
-        assert "--no-default-features" in cmd
-        assert "armv7-unknown-linux-musleabihf" in cmd
+        assert m_build.called
+        kwargs = m_build.call_args[1]
+        assert kwargs.get("arch") == "arm7"
+        assert kwargs.get("release") is True

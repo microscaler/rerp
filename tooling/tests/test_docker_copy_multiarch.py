@@ -40,7 +40,7 @@ class TestCopyMultiarch:
             src = tmp_path / "microservices" / "target" / triple / "release"
             src.mkdir(parents=True)
             (src / "rerp_auth_idam_impl").write_bytes(b"x")
-        # arm7 missing
+        # arm7 missing; BRRTRouter returns 0 when at least one arch copied
         assert run("auth", "idam", "all", tmp_path) == 0
         assert (
             tmp_path / "build_artifacts" / "auth_idam" / "amd64" / "rerp_auth_idam_impl"
