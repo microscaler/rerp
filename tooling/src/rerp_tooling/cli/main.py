@@ -441,7 +441,12 @@ def __build_parser():
     pgen_stubs.add_argument(
         "--force",
         action="store_true",
-        help="Overwrite existing impl stubs (use when OpenAPI changed; custom impl logic is lost)",
+        help="Overwrite existing impl stubs (handlers with sentinel are preserved)",
+    )
+    pgen_stubs.add_argument(
+        "--sync",
+        action="store_true",
+        help="Patch only signature/Response for stubs that have the user-owned sentinel (Option B)",
     )
 
     # --- build (host-aware cargo/cross; microservices/ workspace) ---

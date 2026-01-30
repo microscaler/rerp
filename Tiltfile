@@ -14,7 +14,7 @@ allow_k8s_contexts(['kind-rerp'])
 update_settings(k8s_upsert_timeout_secs=60)
 config.define_string('tilt_port', args=False, usage='Port for Tilt web UI')
 cfg = config.parse()
-tilt_port = cfg.get('tilt_port', '10352')  # Default to 10352 to avoid conflicts
+tilt_port = cfg.get('tilt_port', '10351')  # Default to 10351 to avoid conflicts
 
 # Set the Tilt UI port
 os.putenv('TILT_PORT', tilt_port)

@@ -67,6 +67,10 @@ def _get_cargo_env(rust_target: str) -> Dict[str, str]:
     return env
 
 
+# RERP workspace: microservices/ (root Cargo.toml has members = ["microservices"])
+WORKSPACE_DIR = "microservices"
+
+
 def _build_workspace(
     project_root: Path,
     rust_target: str,
@@ -75,10 +79,10 @@ def _build_workspace(
     use_cross: bool,
     extra_args: List[str],
 ) -> bool:
-    components = project_root / "components"
-    manifest = components / "Cargo.toml"
+    workspace_dir = project_root / WORKSPACE_DIR
+    manifest = workspace_dir / "Cargo.toml"
     if not manifest.exists():
-        print(f"❌ Error: Cargo.toml not found in {components}", file=sys.stderr)
+        print(f"❌ Error: Cargo.toml not found in {workspace_dir}", file=sys.stderr)
         return False
 
     if use_cross:
@@ -99,7 +103,7 @@ def _build_workspace(
         cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
-        subprocess.run(cmd, env=env, check=True, cwd=str(components))
+        subprocess.run(cmd, env=env, check=True, cwd=str(workspace_dir))
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
@@ -116,9 +120,10 @@ def _build_service(
     use_cross: bool,
     extra_args: List[str],
 ) -> bool:
+    # RERP: microservices/<system>/<module>/impl (e.g. microservices/accounting/general-ledger/impl)
     binary_name = f"rerp_{system}_{module.replace('-', '_')}_impl"
-    crate = project_root / "components" / system / f"{module}_impl"
-    manifest = project_root / "components" / "Cargo.toml"
+    crate = project_root / WORKSPACE_DIR / system / module / "impl"
+    manifest = project_root / WORKSPACE_DIR / "Cargo.toml"
     if not crate.exists():
         print(f"❌ Error: Crate not found: {crate}", file=sys.stderr)
         return False
@@ -141,7 +146,7 @@ def _build_service(
         cmd = ["cargo", "build", "--target", rust_target, "-p", binary_name, "--release"] + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
-        subprocess.run(cmd, env=env, check=True, cwd=str(project_root / "components"))
+        subprocess.run(cmd, env=env, check=True, cwd=str(project_root / WORKSPACE_DIR))
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)

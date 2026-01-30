@@ -29,4 +29,5 @@ may = { workspace = true }
 may_minihttp = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
-tikv-jemallocator = { workspace = true, optional = true }
+tikv-jemallocator = { workspace = true, optional = true }# From brrtrouter-dependencies.toml [conditional] section (type detected)
+rust_decimal = { workspace = true }

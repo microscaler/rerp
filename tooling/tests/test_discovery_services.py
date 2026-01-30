@@ -41,6 +41,27 @@ def test_get_binary_names_derived(tmp_path: Path) -> None:
     assert got == {"general-ledger": "general_ledger"}
 
 
+def test_get_package_names_includes_bff(tmp_path: Path) -> None:
+    """BFF from bff-suite-config is included so brrtrouter-gen gets --package-name (e.g. rerp_accounting_bff_gen)."""
+    _make_openapi_spec(tmp_path, "accounting", "general-ledger")
+    (tmp_path / "openapi" / "accounting").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "openapi" / "accounting" / "bff-suite-config.yaml").write_text(
+        "suite: accounting\nbff_service_name: bff\noutput_path: openapi/accounting/openapi_bff.yaml\n"
+    )
+    got = get_package_names(tmp_path)
+    assert got["general-ledger"] == "rerp_accounting_general_ledger"
+    assert got["bff"] == "rerp_accounting_bff"
+
+
+def test_get_binary_names_includes_bff(tmp_path: Path) -> None:
+    (tmp_path / "openapi" / "accounting").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "openapi" / "accounting" / "bff-suite-config.yaml").write_text(
+        "suite: accounting\nbff_service_name: bff\n"
+    )
+    got = get_binary_names(tmp_path)
+    assert got["bff"] == "bff"
+
+
 def test_get_service_ports_from_openapi(tmp_path: Path) -> None:
     _make_openapi_spec(tmp_path, "accounting", "general-ledger", port=8001)
     _make_openapi_spec(tmp_path, "accounting", "invoice", port=8002)

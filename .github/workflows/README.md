@@ -19,6 +19,8 @@
 
 **BFF generation**: `rerp bff generate-system` is exercised in the validate-openapi job. To regenerate and commit BFF specs, run `rerp bff generate-system` locally (e.g. `tooling/.venv/bin/rerp bff generate-system` after `just init`) and commit.
 
+**brrtrouter_tooling**: The `rerp` CLI and tooling tests depend on `brrtrouter_tooling` (build, gen, docker, openapi, ci). It is not a dependency in `tooling/pyproject.toml` because it lives in the separate [BRRTRouter](https://github.com/microscaler/BRRTRouter) repo. CI installs it from GitHub in every job that sets up the tooling venv: `pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"`. Locally, install it the same way or `pip install -e ../BRRTRouter/tooling` when BRRTRouter is a sibling of the repo.
+
 ---
 
 ## Containers published to GHCR and Docker Hub

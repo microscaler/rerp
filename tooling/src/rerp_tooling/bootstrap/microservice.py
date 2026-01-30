@@ -467,12 +467,14 @@ def generate_impl_stubs_with_brrtrouter(
     service_name: str,
     *,
     force: bool = False,
+    sync: bool = False,
 ) -> None:
     """Generate impl controller stubs via brrtrouter-gen generate-stubs.
 
     Stubs use correct types from the OpenAPI spec (e.g. Decimal literals from
     dummy_value/rust_literal_for_example). Do not edit impl controllers by hand
     for initial creation; regenerate stubs with --force if needed.
+    Use --sync to patch only signature/Response for stubs that have the user-owned sentinel.
     """
     from brrtrouter_tooling.gen.brrtrouter import call_brrtrouter_generate_stubs
 
@@ -491,6 +493,7 @@ def generate_impl_stubs_with_brrtrouter(
         project_root=project_root,
         brrtrouter_path=project_root.parent / "BRRTRouter",
         force=force,
+        sync=sync,
         capture_output=True,
     )
     if result.returncode != 0:
@@ -505,12 +508,14 @@ def regenerate_impl_stubs(
     service: Optional[str] = None,
     *,
     force: bool = False,
+    sync: bool = False,
 ) -> int:
     """Regenerate impl controller stubs for one or all services in a suite.
 
     Uses brrtrouter-gen generate-stubs. With --force, overwrites existing stub
-    files (use when OpenAPI changed and you want impl to match; custom logic
-    in impl will be lost). Returns 0 on success, 1 on error.
+    files (handlers with sentinel are preserved). With --sync, only patches
+    signature/Response for stubs that have the user-owned sentinel.
+    Returns 0 on success, 1 on error.
     """
     from rerp_tooling.discovery import suite_sub_service_names
 
@@ -528,7 +533,9 @@ def regenerate_impl_stubs(
             print(f"⚠️  Skipping {svc}: impl dir not found at {impl_dir}")
             continue
         try:
-            generate_impl_stubs_with_brrtrouter(spec_path, impl_dir, project_root, svc, force=force)
+            generate_impl_stubs_with_brrtrouter(
+                spec_path, impl_dir, project_root, svc, force=force, sync=sync
+            )
         except (ValueError, RuntimeError) as e:
             print(f"❌ {svc}: {e}")
             return 1

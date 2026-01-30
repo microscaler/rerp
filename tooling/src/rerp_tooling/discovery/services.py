@@ -9,31 +9,38 @@ from .sources import (
     discover_helm,
     discover_openapi_suite_microservice_localhost,
 )
-from .suites import iter_suite_services
+from .suites import iter_bffs, iter_suite_services
 
 
 def get_package_names(project_root: Path) -> dict[str, str]:
-    """Cargo [package].name per service: derived from openapi/{suite}/{service}/openapi.yaml.
+    """Cargo [package].name per service: from openapi/{suite}/{service}/openapi.yaml and BFFs.
 
-    Returns dict mapping service name (e.g. 'general-ledger') to package name
-    (e.g. 'rerp_accounting_general_ledger'). Key = directory name under openapi/{suite}/.
+    Returns dict mapping service name (e.g. 'general-ledger', 'bff') to package name
+    (e.g. 'rerp_accounting_general_ledger', 'rerp_accounting_bff'). Includes BFF services
+    from bff-suite-config so brrtrouter-gen receives --package-name and writes correct
+    [package].name in gen/Cargo.toml (e.g. rerp_accounting_bff_gen).
     """
     out: dict[str, str] = {}
     for suite, service_name in iter_suite_services(project_root):
         snake = service_name.replace("-", "_")
         out[service_name] = f"rerp_{suite}_{snake}"
+    for bff_svc, suite in iter_bffs(project_root):
+        snake = bff_svc.replace("-", "_")
+        out[bff_svc] = f"rerp_{suite}_{snake}"
     return out
 
 
 def get_binary_names(project_root: Path) -> dict[str, str]:
-    """Binary name in build_artifacts/ and Dockerfile COPY: derived from service name.
+    """Binary name in build_artifacts/ and Dockerfile COPY: from service name (incl. BFF).
 
-    Returns dict mapping service name (e.g. 'general-ledger') to artifact name
-    (e.g. 'general_ledger'). Key = directory name under openapi/{suite}/.
+    Returns dict mapping service name (e.g. 'general-ledger', 'bff') to artifact name
+    (e.g. 'general_ledger', 'bff').
     """
     out: dict[str, str] = {}
     for _suite, service_name in iter_suite_services(project_root):
         out[service_name] = service_name.replace("-", "_")
+    for bff_svc, _ in iter_bffs(project_root):
+        out[bff_svc] = bff_svc.replace("-", "_")
     return out
 
 

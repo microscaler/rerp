@@ -42,7 +42,7 @@ dev-up:
     
     # Start Tilt
     echo "🎯 Starting Tilt..."
-    tilt up --host=0.0.0.0 --port=10351
+    tilt up --host=0.0.0.0 --port=10350
 
 # Stop development environment (Kind cluster and Tilt; local registry is left running)
 dev-down:

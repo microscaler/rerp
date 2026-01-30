@@ -13,15 +13,16 @@ def run_gen(args, project_root: Path) -> None:
         suite = getattr(args, "suite", None)
         if not suite:
             print("rerp gen stubs: missing suite name")
-            print("  Use: rerp gen stubs <suite-name> [--service <name>] [--force]")
+            print("  Use: rerp gen stubs <suite-name> [--service <name>] [--force] [--sync]")
             sys.exit(1)
         service = getattr(args, "service", None)
         force = getattr(args, "force", False)
+        sync = getattr(args, "sync", False)
         if service:
             print(f"🔄 Regenerating impl stubs for {service} (suite {suite})...")
         else:
             print(f"🔄 Regenerating impl stubs for suite '{suite}'...")
-        rc = regenerate_impl_stubs(project_root, suite, service=service, force=force)
+        rc = regenerate_impl_stubs(project_root, suite, service=service, force=force, sync=sync)
         sys.exit(rc)
     if args.gen_cmd == "suite":
         if not getattr(args, "suite", None):
@@ -46,5 +47,7 @@ def run_gen(args, project_root: Path) -> None:
         sys.exit(rc)
     else:
         print(f"rerp gen {args.gen_cmd}: unknown subcommand")
-        print("  Use: rerp gen suite <suite-name> or rerp gen stubs <suite-name> [--force]")
+        print(
+            "  Use: rerp gen suite <suite-name> or rerp gen stubs <suite-name> [--force] [--sync]"
+        )
         sys.exit(1)
