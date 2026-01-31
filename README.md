@@ -730,3 +730,4 @@ RERP is inspired by:
 - **BRRTRouter**: OpenAPI-first development methodology
 
 Built with ❤️ using Rust and open-source principles.
+
