@@ -64,8 +64,10 @@ cd tooling && uv venv && uv pip install -e ".[dev]"
 
 **Build**
 - **`rerp build <target> [arch]`** — Host-aware build: `workspace` or `<suite>_<service>` (e.g. `accounting_general_ledger`). Optional `arch`: `amd64`, `arm64`, `arm7`, or `all` (default: host). Replaces `scripts/host-aware-build.py`.
-- **`rerp build microservices [arch] [--release]`** — Build `microservices/` workspace (accounting). `arch`: amd64, arm64, arm7 (default amd64). Replaces `scripts/build-microservice.sh workspace`.
+- **`rerp build microservices [arch] [--release]`** — Build `microservices/` workspace (accounting). `arch`: amd64, arm64, arm7 (default amd64). Replaces `scripts/build-microservice.sh workspace`. Jemalloc is opt-in (`--features jemalloc`) so arm7 musl avoids `__ffsdi2` link errors.
 - **`rerp build microservice <name> [--release]`** — Build one accounting microservice (e.g. general-ledger). Replaces `scripts/build-microservice.sh <name>`.
+
+**Local cross-build (faster arm7 cycles)** — To run the same multi-arch steps as CI locally (cross-compile with cross-rs): install cross once (`cargo install cross`), then from repo root run `just build-cross arm7` (or `just build-cross arm64`). This uses `RERP_USE_CROSS=1` and runs workspace + microservices + copy-artifacts. To match CI exactly (git deps), run `rerp ci patch-brrtrouter` first (restore with `rerp ci fix-cargo-paths` if needed).
 
 **Bootstrap**
 - **`rerp bootstrap microservice <name> [port]`** — Bootstrap accounting microservice from `openapi/accounting/<name>/openapi.yaml`: BRRTRouter codegen, Dockerfile, config, workspace Cargo.toml, Tiltfile. Port from registry or `[port]`. Replaces `scripts/bootstrap_microservice.py`.

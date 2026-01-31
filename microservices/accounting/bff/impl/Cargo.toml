@@ -8,7 +8,8 @@ name = "rerp_accounting_bff"
 path = "src/main.rs"
 
 [features]
-default = ["jemalloc"]
+default = []
+# Enable with --features jemalloc. Not default so arm7 musl avoids __ffsdi2 link error.
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]

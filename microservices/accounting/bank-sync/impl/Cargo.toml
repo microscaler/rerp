@@ -8,7 +8,7 @@ name = "rerp_accounting_bank_sync"
 path = "src/main.rs"
 
 [features]
-default = ["jemalloc"]
+default = []
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]

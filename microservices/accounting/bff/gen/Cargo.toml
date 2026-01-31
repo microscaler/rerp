@@ -4,10 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["jemalloc"]
-# Use jemalloc as the global allocator for better memory performance.
-# Disable this feature if brrtrouter is already providing jemalloc via its own feature,
-# or if you want to use the system allocator.
+default = []
+# Use jemalloc as the global allocator for better memory performance (opt-in).
+# Enable with --features jemalloc. Not default so arm7 musl avoids __ffsdi2 link error.
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]
