@@ -1,4 +1,8 @@
-// User-owned controller for handler 'list_bank_accounts'.
+// Implementation stub for handler 'list_bank_accounts'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_bank_accounts --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bank_sync_gen::handlers::list_bank_accounts::{Request, Response};
@@ -7,30 +11,24 @@ use rerp_accounting_bank_sync_gen::handlers::list_bank_accounts::{Request, Respo
 use rerp_accounting_bank_sync_gen::handlers::types::BankAccount;
 
 #[handler(ListBankAccountsController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "items": [
-    //     {
-    //       "account_name": "Operating Account",
-    //       "account_number": "CHASE-001",
-    //       "account_type": "CHECKING",
-    //       "balance": 50000.0,
-    //       "bank_name": "Chase Bank",
-    //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //       "created_at": "2024-01-15T10:00:00Z",
-    //       "currency_code": "USD",
-    //       "id": "a00d0e8400-e29b-41d4-a716-446655440000",
-    //       "is_active": true,
-    //       "updated_at": "2024-01-15T10:00:00Z"
-    //     }
-    //   ],
-    //   "limit": 20,
-    //   "page": 1,
-    //   "total": 1
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let page = req.inner.page;// let limit = req.inner.limit;// let search = req.inner.search;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        items: Some(vec![serde_json::from_value::<BankAccount>(serde_json::json!({"account_name":"Operating Account","account_number":"CHASE-001","account_type":"CHECKING","balance":50000.0,"bank_name":"Chase Bank","company_id":"550e8400-e29b-41d4-a716-446655440000","created_at":"2024-01-15T10:00:00Z","currency_code":"USD","id":"a00d0e8400-e29b-41d4-a716-446655440000","is_active":true,"updated_at":"2024-01-15T10:00:00Z"})).unwrap_or_default()]),limit: Some(20),page: Some(1),total: Some(1),
+        items: None, // TODO: Set from your business logic
+
+        limit: None, // TODO: Set from your business logic
+
+        page: None, // TODO: Set from your business logic
+
+        total: None, // TODO: Set from your business logic
     }
 }

@@ -1,4 +1,8 @@
-// User-owned controller for handler 'delete_financial_statement'.
+// Implementation stub for handler 'delete_financial_statement'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_financial_statement --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_financial_reports_gen::handlers::delete_financial_statement::{
@@ -6,6 +10,16 @@ use rerp_accounting_financial_reports_gen::handlers::delete_financial_statement:
 };
 
 #[handler(DeleteFinancialStatementController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
     Response {}
 }

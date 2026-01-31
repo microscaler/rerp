@@ -32,8 +32,8 @@ version = "0.1.3"
 edition = "2021"
 
 [workspace.dependencies]
-# BRRTRouter
-brrtrouter = { path = "../../BRRTRouter" }
+# BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
+brrtrouter = { path = "../../BRRTRouter", default-features = false }
 brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
 
 # Lifeguard ORM

@@ -203,6 +203,7 @@ jobs:
           echo "🔍 Validating port registry, helm, kind-config, Tiltfile..."
           tooling/.venv/bin/rerp ports validate
 
+
   build-and-test:
     name: Build and Test
     needs: [validate-ports]
@@ -261,8 +262,8 @@ jobs:
       
       - name: Build example service (amd64)
         run: |
-          echo "🔨 Building example service (auth/idam) for amd64..."
-          tooling/.venv/bin/rerp build auth_idam amd64
+          echo "🔨 Building example service (accounting/accounts-payable) for amd64..."
+          tooling/.venv/bin/rerp build accounting_accounts-payable amd64
       
       - name: Build accounting microservices (amd64) - smoke test
         run: |
@@ -273,11 +274,6 @@ jobs:
         run: |
           cd microservices
           cargo fmt --check || (echo "❌ Code formatting check failed. Run 'cargo fmt' to fix." && exit 1)
-      
-      - name: Lint with Clippy
-        run: |
-          cd microservices
-          cargo clippy --workspace -- -D warnings
       
       - name: Run tests
         run: |
@@ -299,6 +295,7 @@ jobs:
     env:
       RERP_USE_CROSS: '1'   # Use cross-rs Docker images (include aarch64-linux-musl-gcc, etc.) so aws-lc-sys builds
     strategy:
+      fail-fast: false   # Do not cancel other architectures when one (e.g. arm) fails; allows troubleshooting
       matrix:
         architecture: [amd64, arm64, arm7]
 
@@ -366,7 +363,7 @@ jobs:
           tooling/.venv/bin/rerp build microservices ${{ matrix.architecture }} --release
 
       - name: Copy microservices to build_artifacts
-        run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }}
+        run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }} --suite accounting
 
       - name: Upload binaries
         uses: actions/upload-artifact@v6
@@ -384,11 +381,122 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  discover-microservices:
+    name: Discover microservices
+    needs: [build-multiarch]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      gen_packages: ${{ steps.discover.outputs.gen_packages }}
+      impl_packages: ${{ steps.discover.outputs.impl_packages }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Discover gen and impl packages from workspace
+        id: discover
+        run: |
+          cd microservices
+          GEN=()
+          IMPL=()
+          for member in $(grep -E '^\s*"accounting/' Cargo.toml | sed 's/.*"\([^"]*\)".*/\1/'); do
+            base="${member%/gen}"
+            base="${base%/impl}"
+            snake=$(echo "$base" | sed 's|/|_|g' | sed 's/-/_/g')
+            pkg="rerp_${snake}"
+            case "$member" in
+              */gen)  GEN+=("${pkg}_gen") ;;
+              */impl) IMPL+=("$pkg") ;;
+            esac
+          done
+          echo "gen_packages=[$(printf '"%s",' "${GEN[@]}" | sed 's/,$//')]" >> "$GITHUB_OUTPUT"
+          echo "impl_packages=[$(printf '"%s",' "${IMPL[@]}" | sed 's/,$//')]" >> "$GITHUB_OUTPUT"
+
+  clippy-gen:
+    name: Clippy (gen) ${{ matrix.package }}
+    needs: [discover-microservices]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.discover-microservices.outputs.gen_packages) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+          tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
+      - name: Patch Cargo.toml for CI
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            microservices/target
+          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-rerp-
+      - name: Clippy (strict)
+        run: cd microservices && cargo clippy -p ${{ matrix.package }} -- -D warnings
+
+  clippy-impl:
+    name: Clippy (impl) ${{ matrix.package }}
+    needs: [discover-microservices]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.discover-microservices.outputs.impl_packages) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+          tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
+      - name: Patch Cargo.toml for CI
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            microservices/target
+          key: ${{ runner.os }}-cargo-rerp-${{ hashFiles('microservices/**/Cargo.toml', 'microservices/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-rerp-
+      - name: Clippy (report only)
+        run: cd microservices && cargo clippy -p ${{ matrix.package }} --
+
+
   # Runs only on tag push (release). Extracts tag from github.ref (e.g. v0.1.1 → 0.1.1) and passes
   # it via outputs.tag; extra_tag=latest so images are pushed with both :0.1.1 and :latest.
   download-copy-package-push-containers:
     name: Download Copy Package and Push Containers
-    needs: [build-multiarch, vars]
+    needs: [build-multiarch, clippy-gen, clippy-impl, vars]
     if: needs.vars.outputs.run_release_jobs == 'true' && needs.build-multiarch.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30

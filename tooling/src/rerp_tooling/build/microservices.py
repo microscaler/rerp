@@ -1,17 +1,15 @@
-"""Build microservices/accounting workspace (delegate to brrtrouter_tooling; RERP package list + gen)."""
+"""Build microservices/accounting workspace (host_aware for jemalloc opt-in; brrtrouter_tooling for single-package)."""
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-from brrtrouter_tooling.build import (
-    build_package_with_options,
-    build_workspace_with_options,
-)
+from brrtrouter_tooling.build import build_package_with_options
 from brrtrouter_tooling.gen import run_gen_if_missing_for_suite
 
 from rerp_tooling.build.constants import get_package_names
+from rerp_tooling.build.host_aware import run as run_host_aware
 from rerp_tooling.ci.fix_cargo_paths import run as run_fix_cargo_paths
 from rerp_tooling.discovery import suite_sub_service_names
 
@@ -39,13 +37,14 @@ def run_accounting_gen_if_missing(project_root: Path) -> None:
 
 
 def build_microservices_workspace(project_root: Path, arch: str, release: bool) -> int:
-    """Build microservices/ workspace. arch: amd64|arm64|arm7. Returns 0/1."""
-    return build_workspace_with_options(
-        project_root,
-        workspace_dir="microservices",
+    """Build microservices/ workspace. arch: amd64|arm64|arm7. Uses jemalloc for amd64/arm64 (CI opt-in). Returns 0/1."""
+    run_accounting_gen_if_missing(project_root)
+    return run_host_aware(
+        target="workspace",
         arch=arch,
+        extra_args=None,
+        project_root=project_root,
         release=release,
-        gen_if_missing_callback=run_accounting_gen_if_missing,
     )
 
 

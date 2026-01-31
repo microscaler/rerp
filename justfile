@@ -142,6 +142,63 @@ venv:
 # Build all Docker images
 build: build-rust
 
+# Cross-compile for an architecture (same steps as CI build-multiarch). Uses
+# cross-rs so you get the same toolchain as CI. Run `cargo install cross` once.
+# ARCH: amd64, arm64, arm7. To match CI exactly (git deps): run
+#   tooling/.venv/bin/rerp ci patch-brrtrouter
+# first (restore with rerp ci fix-cargo-paths if needed).
+# Usage: just build-cross arm7
+build-cross arch:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export PATH="${HOME}/.cargo/bin:${PATH:-}"
+    if ! command -v cross >/dev/null 2>&1; then
+        echo "❌ 'cross' not found. Install with: cargo install cross"
+        exit 1
+    fi
+    # Use an isolated CARGO_HOME so the cross container does not use the host's rustup.
+    # On macOS the host's rustup cannot add nightly-x86_64-unknown-linux-gnu, which
+    # some images try to use; an empty CARGO_HOME lets the container use its image toolchain.
+    export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
+    CROSS_CARGO_HOME="$HOME/.cargo-cross-{{arch}}"
+    mkdir -p "$CROSS_CARGO_HOME"
+    export CARGO_HOME="$CROSS_CARGO_HOME"
+    echo "🔨 Cross-building for {{arch}} (same as CI build-multiarch)..."
+    export RERP_USE_CROSS=1
+    tooling/.venv/bin/rerp build workspace {{arch}}
+    tooling/.venv/bin/rerp build microservices {{arch}} --release
+    tooling/.venv/bin/rerp docker copy-artifacts {{arch}} --suite accounting
+    echo "✅ Cross build for {{arch}} complete. Binaries in build_artifacts/{{arch}}/"
+
+# Cross-compile for arm7 only (fastest cycle for arm7 fixes)
+build-cross-arm7:
+    just build-cross arm7
+
+# Self-contained Docker build for an architecture (no socket, no justfile steps).
+# Uses docker/build/Dockerfile.self-contained: copies repo in, venv + patch + build + copy-artifacts.
+# Usage: just build-cross-docker [arch]   (default arch=arm7)
+# Extract binaries: docker create --name out rerp-build:{{arch}} && docker cp out:/artifacts ./build_artifacts && docker rm out
+build-cross-docker arch="arm7":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    RERP_ROOT="$$(pwd)"
+    while [ ! -f "$$RERP_ROOT/microservices/Cargo.toml" ] && [ "$$RERP_ROOT" != "/" ]; do RERP_ROOT="$$(dirname "$$RERP_ROOT")"; done
+    [ -f "$$RERP_ROOT/microservices/Cargo.toml" ] || { echo "❌ Run from repo root (must have microservices/Cargo.toml)"; exit 1; }
+    cd "$$RERP_ROOT"
+    case "{{arch}}" in
+        arm7)  CROSS_IMAGE="ghcr.io/cross-rs/armv7-unknown-linux-musleabihf:latest";;
+        amd64) CROSS_IMAGE="ghcr.io/cross-rs/x86_64-unknown-linux-musl:latest";;
+        arm64) CROSS_IMAGE="ghcr.io/cross-rs/aarch64-unknown-linux-musl:latest";;
+        *) echo "❌ Unknown arch {{arch}} (use arm7, amd64, arm64)"; exit 1;;
+    esac
+    echo "🔨 Building for {{arch}} (self-contained Dockerfile)..."
+    docker build --progress=plain \
+        -f docker/build/Dockerfile.self-contained \
+        --build-arg TARGET_ARCH={{arch}} \
+        --build-arg CROSS_IMAGE="$$CROSS_IMAGE" \
+        -t "rerp-build:{{arch}}" .
+    echo "✅ Image rerp-build:{{arch}} ready. Extract: docker create --name out rerp-build:{{arch}} && docker cp out:/artifacts ./build_artifacts && docker rm out"
+
 # Build Rust services
 build-rust:
     #!/usr/bin/env bash

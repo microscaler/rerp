@@ -8,7 +8,9 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-BRRTRouter_GIT = '{ git = "https://github.com/microscaler/BRRTRouter", branch = "main" }'
+# default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
+BRRTRouter_GIT = '{ git = "https://github.com/microscaler/BRRTRouter", branch = "main", default-features = false }'
+BRRTRouter_MACROS_GIT = '{ git = "https://github.com/microscaler/BRRTRouter", branch = "main" }'
 LIFEGUARD_GIT = '{ git = "https://github.com/microscaler/lifeguard", branch = "main" }'
 
 PATH_DEP_BRRTRouter = re.compile(
@@ -54,7 +56,9 @@ def find_matches(text: str) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     for m in PATH_DEP_BRRTRouter.finditer(text):
         full = m.group(1)
-        out.append((full, f"{_key_brrtrouter(full)} = {BRRTRouter_GIT}"))
+        key = _key_brrtrouter(full)
+        git_spec = BRRTRouter_GIT if key == "brrtrouter" else BRRTRouter_MACROS_GIT
+        out.append((full, f"{key} = {git_spec}"))
     for m in PATH_DEP_LIFEGUARD.finditer(text):
         full = m.group(1)
         out.append((full, f"{_key_lifeguard(full)} = {LIFEGUARD_GIT}"))

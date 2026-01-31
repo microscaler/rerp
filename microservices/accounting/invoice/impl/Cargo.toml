@@ -8,7 +8,7 @@ name = "rerp_accounting_invoice"
 path = "src/main.rs"
 
 [features]
-default = ["jemalloc"]
+default = []
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]

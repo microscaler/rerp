@@ -6,6 +6,13 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
+// Use generated code from gen crate
+use rerp_accounting_accounts_receivable_gen::handlers::*;
+use rerp_accounting_accounts_receivable_gen::registry::*;
+use rerp_accounting_accounts_receivable_gen::*;
+
+// Import implementation controllers (business logic)
+mod controllers;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
@@ -16,15 +23,7 @@ use brrtrouter::server::HttpServer;
 use brrtrouter::spec::SecurityScheme;
 use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
 use clap::Parser;
-// Use generated code from gen crate
-use rerp_accounting_accounts_receivable_gen::handlers::*;
-use rerp_accounting_accounts_receivable_gen::registry::*;
-use rerp_accounting_accounts_receivable_gen::*;
-
-// Import implementation controllers (business logic)
-mod controllers;
 use controllers::*;
-
 use std::fs;
 use std::io;
 use std::path::PathBuf;
@@ -137,7 +136,7 @@ struct Args {
     hot_reload: bool,
     #[arg(long)]
     test_api_key: Option<String>,
-    #[arg(long, default_value = "./impl/config/config.yaml")]
+    #[arg(long, default_value = "./config/config.yaml")]
     config: PathBuf,
 }
 

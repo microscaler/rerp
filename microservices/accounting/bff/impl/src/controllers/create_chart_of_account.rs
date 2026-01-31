@@ -1,33 +1,43 @@
-// User-owned controller for handler 'create_chart_of_account'.
+// Implementation stub for handler 'create_chart_of_account'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_chart_of_account --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bff_gen::handlers::create_chart_of_account::{Request, Response};
 
 #[handler(CreateChartOfAccountController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "account_type": "ASSET",
-    //   "code": "1",
-    //   "created_at": "2024-01-15T10:00:00Z",
-    //   "description": "Root asset account",
-    //   "id": "a00c0e8400-e29b-41d4-a716-446655440000",
-    //   "is_active": true,
-    //   "level": 0,
-    //   "name": "Assets",
-    //   "updated_at": "2024-01-15T10:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let account_type = req.inner.account_type;// let code = req.inner.code;// let description = req.inner.description;// let is_active = req.inner.is_active;// let name = req.inner.name;// let parent_id = req.inner.parent_id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        account_type: "ASSET".to_string(),
-        code: "1".to_string(),
-        created_at: Some("2024-01-15T10:00:00Z".to_string()),
-        description: Some("Root asset account".to_string()),
-        id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(),
-        is_active: true,
-        level: 0,
-        name: "Assets".to_string(),
-        parent_id: Some("example".to_string()),
-        updated_at: Some("2024-01-15T10:00:00Z".to_string()),
+        account_type: "ASSET".to_string(), // TODO: Set from your business logic
+
+        code: "1".to_string(), // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        level: 0, // TODO: Set from your business logic
+
+        name: "Assets".to_string(), // TODO: Set from your business logic
+
+        parent_id: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

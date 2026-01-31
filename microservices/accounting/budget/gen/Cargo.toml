@@ -4,11 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["jemalloc"]
-# Use jemalloc as the global allocator for better memory performance.
-# Disable this feature if brrtrouter is already providing jemalloc via its own feature,
-# or if you want to use the system allocator.
+default = []
+# Use jemalloc as the global allocator (opt-in: --features jemalloc). Not default for arm7 musl.
 jemalloc = ["tikv-jemallocator"]
+
+# Allow dead_code in gen crate: request/response types in handlers/types.rs are used by impl via serde.
+[lints.rust]
+dead_code = "allow"
 
 [dependencies]
 # NOTE: Additional dependencies can be configured via brrtrouter-dependencies.toml

@@ -48,16 +48,24 @@ def get_bff_service_name_from_config(data: dict) -> Optional[str]:
     return data.get("bff_service_name") or (data.get("metadata") or {}).get("bff_service_name")
 
 
-def iter_bffs(project_root: Path) -> Iterator[tuple[str, str]]:
-    """Yield (bff_service_name, suite) for each suite with bff-suite-config.yaml and bff_service_name set."""
-    for suite in suites_with_bff(project_root):
-        path = bff_suite_config_path(project_root, suite)
+def iter_bffs(project_root: Path, suite: Optional[str] = None) -> Iterator[tuple[str, str]]:
+    """Yield (bff_service_name, suite) for each suite with bff-suite-config.yaml and bff_service_name set.
+
+    When suite is set, only yield BFFs for that suite; when None, yield all suites.
+    """
+    suites = [suite] if suite is not None else suites_with_bff(project_root)
+    for s in suites:
+        if suite is not None and s != suite:
+            continue
+        path = bff_suite_config_path(project_root, s)
+        if not path.exists():
+            continue
         try:
             with path.open() as f:
                 data = yaml.safe_load(f) or {}
             name = get_bff_service_name_from_config(data)
             if name:
-                yield (name, suite)
+                yield (name, s)
         except (OSError, yaml.YAMLError, KeyError, TypeError, ValueError) as e:
             log.debug("Could not parse bff_suite_config %s: %s", path, e)
 
@@ -94,17 +102,28 @@ def suite_sub_service_names(project_root: Path, suite: str) -> list[str]:
     return sorted(x.name for x in d.iterdir() if x.is_dir() and (x / "openapi.yaml").exists())
 
 
-def iter_suite_services(project_root: Path) -> Iterator[tuple[str, str]]:
-    """Yield (suite, service_name) for every openapi/{suite}/{service_name}/openapi.yaml. No hardcoding."""
+def iter_suite_services(
+    project_root: Path, suite: Optional[str] = None
+) -> Iterator[tuple[str, str]]:
+    """Yield (suite, service_name) for every openapi/{suite}/{service_name}/openapi.yaml. No hardcoding.
+
+    When suite is set, only yield services for that suite; when None, yield all suites.
+    """
     d = _openapi_dir(project_root)
     if not d.exists() or not d.is_dir():
         return
-    for suite_dir in sorted(d.iterdir()):
-        if not suite_dir.is_dir():
-            continue
-        suite = suite_dir.name
-        for name in suite_sub_service_names(project_root, suite):
-            yield (suite, name)
+    suite_dirs = [d / suite] if suite is not None else sorted(d.iterdir())
+    for suite_dir in suite_dirs:
+        if suite is not None:
+            if not (suite_dir.exists() and suite_dir.is_dir()):
+                continue
+            s = suite
+        else:
+            if not suite_dir.is_dir():
+                continue
+            s = suite_dir.name
+        for name in suite_sub_service_names(project_root, s):
+            yield (s, name)
 
 
 def tilt_service_names(project_root: Path) -> list[str]:

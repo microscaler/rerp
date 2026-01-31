@@ -1,3 +1,34 @@
-# Website build (avoid copying into docker/website build)
+# Rust / Cargo (huge; rebuilt inside container)
+microservices/target
+**/target
+
+# Git and editor
+.git
+.gitignore
+.cursor
+.idea
+*.swp
+*.swo
+
+# Python
+tooling/.venv
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Build outputs (rebuilt in container)
+build_artifacts
+
+# Website / frontend (avoid copying into build context)
 ui/website/node_modules
 ui/website/dist
+**/node_modules
+
+# Env and logs
+.env
+.env.*
+*.log
+

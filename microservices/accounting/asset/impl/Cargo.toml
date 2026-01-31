@@ -8,7 +8,7 @@ name = "rerp_accounting_asset"
 path = "src/main.rs"
 
 [features]
-default = ["jemalloc"]
+default = []
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]
@@ -18,6 +18,9 @@ rerp_accounting_asset_gen = { path = "../gen" }
 # BRRTRouter (re-exported from gen crate, but may need direct access)
 brrtrouter = { workspace = true }
 brrtrouter_macros = { workspace = true }
+
+# Decimal types from OpenAPI format: decimal / money (used in generated stubs)
+rust_decimal = { workspace = true }
 
 # Standard dependencies
 serde = { workspace = true }

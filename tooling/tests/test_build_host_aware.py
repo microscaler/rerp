@@ -173,17 +173,19 @@ class TestBuildMicroservices:
         (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "")
         with patch(
-            "rerp_tooling.build.microservices.build_workspace_with_options",
+            "rerp_tooling.build.microservices.run_host_aware",
             return_value=0,
         ) as m_build:
             rc = build_microservices_workspace(tmp_path, "amd64", release=False)
         assert rc == 0
         assert m_build.called
+        assert m_build.call_args[1]["arch"] == "amd64"
+        assert m_build.call_args[1]["release"] is False
 
     def test_build_microservices_workspace_arm7_disables_jemalloc(
         self, tmp_path: Path, monkeypatch
     ):
-        """armv7 is passed through to brrtrouter_tooling.build (which disables jemalloc)."""
+        """armv7 uses host_aware (no jemalloc); amd64/arm64 use jemalloc (opt-in)."""
         from rerp_tooling.build.microservices import build_microservices_workspace
 
         (tmp_path / "microservices").mkdir(parents=True)
@@ -192,7 +194,7 @@ class TestBuildMicroservices:
         (tmp_path / "microservices" / "accounting" / "general-ledger" / "Cargo.toml").write_text("")
         monkeypatch.setenv("RERP_USE_CROSS", "1")
         with patch(
-            "rerp_tooling.build.microservices.build_workspace_with_options",
+            "rerp_tooling.build.microservices.run_host_aware",
             return_value=0,
         ) as m_build:
             rc = build_microservices_workspace(tmp_path, "arm7", release=True)

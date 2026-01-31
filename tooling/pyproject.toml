@@ -7,7 +7,7 @@ name = "rerp-tooling"
 version = "0.1.0"
 description = "RERP-specific development tooling: ports, build, docker, tilt, brrtrouter, bff"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "PyYAML>=6.0",
     "certifi>=2023.7.22",

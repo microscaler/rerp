@@ -1,49 +1,65 @@
-// User-owned controller for handler 'update_journal_entry'.
+// Implementation stub for handler 'update_journal_entry'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path update_journal_entry --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bff_gen::handlers::update_journal_entry::{Request, Response};
 
 #[handler(UpdateJournalEntryController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-15T09:00:00Z",
-    //   "currency_code": "USD",
-    //   "description": "Monthly accrual entry (Updated)",
-    //   "entry_date": "2024-01-15",
-    //   "entry_number": "JE-2024-001",
-    //   "exchange_rate": 1.0,
-    //   "id": "a0080e8400-e29b-41d4-a716-446655440000",
-    //   "posted_at": "2024-01-15T10:00:00Z",
-    //   "source_type": "MANUAL",
-    //   "status": "POSTED",
-    //   "total_credit": 5000.0,
-    //   "total_debit": 5000.0,
-    //   "updated_at": "2024-01-15T11:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let description = req.inner.description;// let posted_at = req.inner.posted_at;// let reference_number = req.inner.reference_number;// let status = req.inner.status;// let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
-        created_at: Some("2024-01-15T09:00:00Z".to_string()),
-        created_by: Some("example".to_string()),
-        currency_code: "USD".to_string(),
-        description: "Monthly accrual entry (Updated)".to_string(),
-        entry_date: "2024-01-15".to_string(),
-        entry_number: "JE-2024-001".to_string(),
-        exchange_rate: Some(1.0),
-        fiscal_period_id: Some("example".to_string()),
-        id: "a0080e8400-e29b-41d4-a716-446655440000".to_string(),
-        metadata: Some(Default::default()),
-        posted_at: Some("2024-01-15T10:00:00Z".to_string()),
-        posted_by: Some("example".to_string()),
-        reference_number: Some("example".to_string()),
-        source_id: Some("example".to_string()),
-        source_type: Some("MANUAL".to_string()),
-        status: "POSTED".to_string(),
-        total_credit: 5000.0,
-        total_debit: 5000.0,
-        updated_at: Some("2024-01-15T11:00:00Z".to_string()),
-        updated_by: Some("example".to_string()),
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        description: "Monthly accrual entry (Updated)".to_string(), // TODO: Set from your business logic
+
+        entry_date: "2024-01-15".to_string(), // TODO: Set from your business logic
+
+        entry_number: "JE-2024-001".to_string(), // TODO: Set from your business logic
+
+        exchange_rate: None, // TODO: Set from your business logic
+
+        fiscal_period_id: None, // TODO: Set from your business logic
+
+        id: "a0080e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        posted_at: None, // TODO: Set from your business logic
+
+        posted_by: None, // TODO: Set from your business logic
+
+        reference_number: None, // TODO: Set from your business logic
+
+        source_id: None, // TODO: Set from your business logic
+
+        source_type: None, // TODO: Set from your business logic
+
+        status: "POSTED".to_string(), // TODO: Set from your business logic
+
+        total_credit: rust_decimal::Decimal::new(50000, 1), // TODO: Set from your business logic
+
+        total_debit: rust_decimal::Decimal::new(50000, 1), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }

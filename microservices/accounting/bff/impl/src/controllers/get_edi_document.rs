@@ -1,37 +1,81 @@
-// User-owned controller for handler 'get_edi_document'.
+// Implementation stub for handler 'get_edi_document'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_edi_document --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bff_gen::handlers::get_edi_document::{Request, Response};
 
 #[handler(GetEdiDocumentController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
     Response {
-        acknowledgment_sent: true,
-        acknowledgment_sent_at: Some("example".to_string()),
-        company_id: Some("example".to_string()),
-        created_at: Some("example".to_string()),
-        created_by: Some("example".to_string()),
-        document_number: "example".to_string(),
-        document_type: "example".to_string(),
-        error_details: Some(Default::default()),
-        error_message: Some("example".to_string()),
-        format_id: "example".to_string(),
-        id: "example".to_string(),
-        last_retry_at: Some("example".to_string()),
-        metadata: Some(Default::default()),
-        parsed_at: Some("example".to_string()),
-        parsed_data: Some(Default::default()),
-        processed_at: Some("example".to_string()),
-        raw_content: Some("example".to_string()),
-        received_at: "example".to_string(),
-        receiver_id: Some("example".to_string()),
-        related_invoice_id: Some("example".to_string()),
-        related_purchase_order_id: Some("example".to_string()),
-        retry_count: 42,
-        sender_id: Some("example".to_string()),
-        status: "example".to_string(),
-        updated_at: Some("example".to_string()),
-        updated_by: Some("example".to_string()),
-        validated_at: Some("example".to_string()),
+        acknowledgment_sent: true, // TODO: Set from your business logic
+
+        acknowledgment_sent_at: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: None, // TODO: Set from your business logic
+
+        document_number: "example".to_string(), // TODO: Set from your business logic
+
+        document_total_amount: None, // TODO: Set from your business logic
+
+        document_type: "example".to_string(), // TODO: Set from your business logic
+
+        error_details: None, // TODO: Set from your business logic
+
+        error_message: None, // TODO: Set from your business logic
+
+        format_id: "example".to_string(), // TODO: Set from your business logic
+
+        id: "example".to_string(), // TODO: Set from your business logic
+
+        last_retry_at: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        parsed_at: None, // TODO: Set from your business logic
+
+        parsed_data: None, // TODO: Set from your business logic
+
+        processed_at: None, // TODO: Set from your business logic
+
+        raw_content: None, // TODO: Set from your business logic
+
+        received_at: "example".to_string(), // TODO: Set from your business logic
+
+        receiver_id: None, // TODO: Set from your business logic
+
+        related_invoice_id: None, // TODO: Set from your business logic
+
+        related_purchase_order_id: None, // TODO: Set from your business logic
+
+        retry_count: 42, // TODO: Set from your business logic
+
+        sender_id: None, // TODO: Set from your business logic
+
+        status: "example".to_string(), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
+
+        validated_at: None, // TODO: Set from your business logic
     }
 }

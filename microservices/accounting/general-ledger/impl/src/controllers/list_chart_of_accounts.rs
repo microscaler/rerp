@@ -1,4 +1,8 @@
-// User-owned controller for handler 'list_chart_of_accounts'.
+// Implementation stub for handler 'list_chart_of_accounts'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_chart_of_accounts --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_general_ledger_gen::handlers::list_chart_of_accounts::{Request, Response};
@@ -7,39 +11,24 @@ use rerp_accounting_general_ledger_gen::handlers::list_chart_of_accounts::{Reque
 use rerp_accounting_general_ledger_gen::handlers::types::ChartOfAccount;
 
 #[handler(ListChartOfAccountsController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "items": [
-    //     {
-    //       "account_type": "ASSET",
-    //       "code": "1",
-    //       "created_at": "2024-01-15T10:00:00Z",
-    //       "description": "Root asset account",
-    //       "id": "a00c0e8400-e29b-41d4-a716-446655440000",
-    //       "is_active": true,
-    //       "level": 0,
-    //       "name": "Assets",
-    //       "updated_at": "2024-01-15T10:00:00Z"
-    //     },
-    //     {
-    //       "account_type": "LIABILITY",
-    //       "code": "2",
-    //       "created_at": "2024-01-15T10:00:00Z",
-    //       "description": "Root liability account",
-    //       "id": "a00c1e8400-e29b-41d4-a716-446655440001",
-    //       "is_active": true,
-    //       "level": 0,
-    //       "name": "Liabilities",
-    //       "updated_at": "2024-01-15T10:00:00Z"
-    //     }
-    //   ],
-    //   "limit": 20,
-    //   "page": 1,
-    //   "total": 2
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let page = req.inner.page;// let limit = req.inner.limit;// let search = req.inner.search;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        items: Some(vec![serde_json::from_value::<ChartOfAccount>(serde_json::json!({"account_type":"ASSET","code":"1","created_at":"2024-01-15T10:00:00Z","description":"Root asset account","id":"a00c0e8400-e29b-41d4-a716-446655440000","is_active":true,"level":0,"name":"Assets","updated_at":"2024-01-15T10:00:00Z"})).unwrap_or_default(), serde_json::from_value::<ChartOfAccount>(serde_json::json!({"account_type":"LIABILITY","code":"2","created_at":"2024-01-15T10:00:00Z","description":"Root liability account","id":"a00c1e8400-e29b-41d4-a716-446655440001","is_active":true,"level":0,"name":"Liabilities","updated_at":"2024-01-15T10:00:00Z"})).unwrap_or_default()]),limit: Some(20),page: Some(1),total: Some(2),
+        items: None, // TODO: Set from your business logic
+
+        limit: None, // TODO: Set from your business logic
+
+        page: None, // TODO: Set from your business logic
+
+        total: None, // TODO: Set from your business logic
     }
 }

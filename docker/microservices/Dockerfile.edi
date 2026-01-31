@@ -1,0 +1,25 @@
+# Minimal runtime-only Dockerfile for EDI Service (Tilt development)
+# Binary is cross-compiled on host and copied in.
+# Multi-arch: buildx --platform linux/amd64,linux/arm64,linux/arm/v7 (arm64=Apple Silicon, arm=armv7). Defaults for local.
+
+ARG TARGETPLATFORM=linux/amd64
+FROM --platform=${TARGETPLATFORM} alpine:3.19
+
+RUN apk add --no-cache ca-certificates libgcc
+WORKDIR /app
+
+# TARGETARCH: amd64 | arm64 (Apple Silicon) | arm (armv7)
+ARG TARGETARCH=amd64
+COPY ./build_artifacts/${TARGETARCH}/edi /app/edi
+RUN chmod +x /app/edi
+
+RUN mkdir -p /app/config /app/doc /app/static_site && chmod -R 777 /app
+COPY ./microservices/accounting/edi/config /app/config
+COPY ./microservices/accounting/edi/doc /app/doc
+COPY ./microservices/accounting/edi/static_site /app/static_site
+
+EXPOSE 8008
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=debug
+
+ENTRYPOINT ["/app/edi", "--spec", "/app/doc/openapi.yaml", "--doc-dir", "/app/doc", "--static-dir", "/app/static_site", "--config", "/app/config/config.yaml"]

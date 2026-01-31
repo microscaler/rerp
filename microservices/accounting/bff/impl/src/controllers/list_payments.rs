@@ -1,4 +1,8 @@
-// User-owned controller for handler 'list_payments'.
+// Implementation stub for handler 'list_payments'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_payments --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bff_gen::handlers::list_payments::{Request, Response};
@@ -7,31 +11,24 @@ use rerp_accounting_bff_gen::handlers::list_payments::{Request, Response};
 use rerp_accounting_bff_gen::handlers::types::Payment;
 
 #[handler(ListPaymentsController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "items": [
-    //     {
-    //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //       "created_at": "2024-01-20T10:00:00Z",
-    //       "currency_code": "USD",
-    //       "customer_id": "111e8400-e29b-41d4-a716-446655440001",
-    //       "exchange_rate": 1.0,
-    //       "id": "a0040e8400-e29b-41d4-a716-446655440000",
-    //       "payment_amount": 5500.0,
-    //       "payment_date": "2024-01-20",
-    //       "payment_method": "WIRE",
-    //       "payment_number": "AR-PAY-2024-001",
-    //       "status": "POSTED",
-    //       "updated_at": "2024-01-20T10:00:00Z"
-    //     }
-    //   ],
-    //   "limit": 20,
-    //   "page": 1,
-    //   "total": 1
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        items: Some(vec![serde_json::from_value::<Payment>(serde_json::json!({"company_id":"550e8400-e29b-41d4-a716-446655440000","created_at":"2024-01-20T10:00:00Z","currency_code":"USD","customer_id":"111e8400-e29b-41d4-a716-446655440001","exchange_rate":1.0,"id":"a0040e8400-e29b-41d4-a716-446655440000","payment_amount":5500.0,"payment_date":"2024-01-20","payment_method":"WIRE","payment_number":"AR-PAY-2024-001","status":"POSTED","updated_at":"2024-01-20T10:00:00Z"})).unwrap_or_default()]),limit: Some(20),page: Some(1),total: Some(1),
+        items: None, // TODO: Set from your business logic
+
+        limit: None, // TODO: Set from your business logic
+
+        page: None, // TODO: Set from your business logic
+
+        total: None, // TODO: Set from your business logic
     }
 }

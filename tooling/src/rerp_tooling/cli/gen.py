@@ -15,7 +15,7 @@ def run_gen(args, project_root: Path) -> None:
             print("rerp gen stubs: missing suite name")
             print("  Use: rerp gen stubs <suite-name> [--service <name>] [--force] [--sync]")
             sys.exit(1)
-        service = getattr(args, "service", None)
+        service = getattr(args, "service_flag", None) or getattr(args, "service_positional", None)
         force = getattr(args, "force", False)
         sync = getattr(args, "sync", False)
         if service:

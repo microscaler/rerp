@@ -195,6 +195,24 @@ def get_service_port(name):
     }
     return ports.get(name, '8080')
 
+# Helper function to create a manual resource to regenerate impl stubs for a microservice
+# Run from Tilt UI: triggers "rerp gen stubs accounting <name> --force" (creates impl if missing)
+# spec_file: path under openapi/ (e.g. 'accounting/openapi_bff.yaml' for BFF, 'accounting/<name>/openapi.yaml' for others)
+def create_microservice_stubs_resource(name, spec_file):
+    local_resource(
+        'stubs-%s' % name,
+        'tooling/.venv/bin/rerp gen stubs accounting %s --force' % name,
+        deps=[
+            './openapi/%s' % spec_file,
+            './microservices/accounting/%s/gen' % name,
+            'tooling/pyproject.toml',
+        ],
+        resource_deps=[],
+        labels=['acc_' + name],
+        allow_parallel=True,
+        trigger_mode=TRIGGER_MODE_MANUAL,
+    )
+
 # Helper function to create build resource for a microservice
 def create_microservice_build_resource(name):
     # Build the service binary. rerp build microservice maps name -> Cargo [package] and
@@ -311,6 +329,7 @@ ACCOUNTING_SERVICES = [
 for name in ACCOUNTING_SERVICES:
     create_microservice_lint(name, 'accounting/%s/openapi.yaml' % name)
     create_microservice_gen(name, 'accounting/%s/openapi.yaml' % name, name)
+    create_microservice_stubs_resource(name, 'accounting/%s/openapi.yaml' % name)
 
 # All accounting gens must complete before any build (so microservices/Cargo.toml workspace members exist)
 # After reorganization, workspace members are: accounting/{service}/gen and accounting/{service}/impl
@@ -386,6 +405,7 @@ local_resource(
     allow_parallel=True,
 )
 create_microservice_gen('bff', 'accounting/openapi_bff.yaml', 'bff')
+create_microservice_stubs_resource('bff', 'accounting/openapi_bff.yaml')
 create_microservice_build_resource('bff')
 create_microservice_deployment('bff')
 
