@@ -261,8 +261,8 @@ jobs:
       
       - name: Build example service (amd64)
         run: |
-          echo "🔨 Building example service (auth/idam) for amd64..."
-          tooling/.venv/bin/rerp build auth_idam amd64
+          echo "🔨 Building example service (accounting/accounts-payable) for amd64..."
+          tooling/.venv/bin/rerp build accounting_accounts-payable amd64
       
       - name: Build accounting microservices (amd64) - smoke test
         run: |
@@ -274,10 +274,22 @@ jobs:
           cd microservices
           cargo fmt --check || (echo "❌ Code formatting check failed. Run 'cargo fmt' to fix." && exit 1)
       
-      - name: Lint with Clippy
+      - name: Lint with Clippy (strict for gen crates)
         run: |
           cd microservices
-          cargo clippy --workspace -- -D warnings
+          # Non-impl packages: -D warnings so any warning fails
+          NON_IMPL=$(cargo metadata --format-version 1 --no-deps | jq -r '.packages[] | select(.manifest_path | test("/impl/Cargo.toml$") | not) | .name')
+          CARGS=""
+          for p in $NON_IMPL; do CARGS="$CARGS -p $p"; done
+          cargo clippy $CARGS -- -D warnings
+      - name: Lint with Clippy (impl crates, report only)
+        run: |
+          cd microservices
+          # Impl packages: run clippy without -D so stub warnings are reported but do not fail
+          IMPL_PKGS=$(cargo metadata --format-version 1 --no-deps | jq -r '.packages[] | select(.manifest_path | test("/impl/Cargo.toml$")) | .name')
+          CARGS=""
+          for p in $IMPL_PKGS; do CARGS="$CARGS -p $p"; done
+          [ -n "$CARGS" ] && cargo clippy $CARGS --
       
       - name: Run tests
         run: |

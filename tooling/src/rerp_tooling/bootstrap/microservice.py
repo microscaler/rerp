@@ -548,14 +548,30 @@ def regenerate_impl_stubs(
     signature/Response for stubs that have the user-owned sentinel.
     Returns 0 on success, 1 on error.
     """
-    from rerp_tooling.discovery import suite_sub_service_names
+    from rerp_tooling.discovery import (
+        bff_service_to_suite,
+        iter_bffs,
+        openapi_bff_path,
+        suite_sub_service_names,
+    )
 
-    services = [service] if service else suite_sub_service_names(project_root, suite)
+    # When a specific service is requested (e.g. bff), include it; else sub-services + BFF if any
+    if service:
+        services = [service]
+    else:
+        services = suite_sub_service_names(project_root, suite)
+        bff_name = next((svc for svc, s in iter_bffs(project_root) if s == suite), None)
+        if bff_name:
+            services = sorted([*services, bff_name])
     if not services:
         print(f"⚠️  No services found for suite: {suite}")
         return 1
     for svc in services:
-        spec_path = project_root / "openapi" / suite / svc / "openapi.yaml"
+        # BFF spec is at openapi/{suite}/openapi_bff.yaml, not openapi/{suite}/bff/openapi.yaml
+        if bff_service_to_suite(project_root, svc) == suite:
+            spec_path = openapi_bff_path(project_root, suite)
+        else:
+            spec_path = project_root / "openapi" / suite / svc / "openapi.yaml"
         impl_dir = project_root / "microservices" / suite / svc / "impl"
         if not spec_path.exists():
             print(f"⚠️  Skipping {svc}: spec not found at {spec_path}")

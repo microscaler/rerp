@@ -121,7 +121,8 @@ def _build_service(
     extra_args: List[str],
 ) -> bool:
     # RERP: microservices/<system>/<module>/impl (e.g. microservices/accounting/general-ledger/impl)
-    binary_name = f"rerp_{system}_{module.replace('-', '_')}_impl"
+    # Package name in impl/Cargo.toml is rerp_<system>_<module_snake> (no _impl suffix)
+    package_name = f"rerp_{system}_{module.replace('-', '_')}"
     crate = project_root / WORKSPACE_DIR / system / module / "impl"
     manifest = project_root / WORKSPACE_DIR / "Cargo.toml"
     if not crate.exists():
@@ -131,7 +132,7 @@ def _build_service(
     if use_cross:
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
-            "-p", binary_name, "--target", rust_target, "--release",
+            "-p", package_name, "--target", rust_target, "--release",
         ] + extra_args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
@@ -141,9 +142,9 @@ def _build_service(
             return False
 
     if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", binary_name, "--release"] + extra_args
+        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", package_name, "--release"] + extra_args
     else:
-        cmd = ["cargo", "build", "--target", rust_target, "-p", binary_name, "--release"] + extra_args
+        cmd = ["cargo", "build", "--target", rust_target, "-p", package_name, "--release"] + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(project_root / WORKSPACE_DIR))
