@@ -1,49 +1,25 @@
-// User-owned controller for handler 'get_bank_statement'.
+// Implementation stub for handler 'get_bank_statement'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_bank_statement --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_bank_sync_gen::handlers::get_bank_statement::{Request, Response};
 
 #[handler(GetBankStatementController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "bank_account_id": "a00d0e8400-e29b-41d4-a716-446655440000",
-    //   "closing_balance": 50000.0,
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-31T10:00:00Z",
-    //   "currency_code": "USD",
-    //   "id": "a00e0e8400-e29b-41d4-a716-446655440000",
-    //   "opening_balance": 45000.0,
-    //   "statement_date": "2024-01-31",
-    //   "status": "RECONCILED",
-    //   "updated_at": "2024-01-31T10:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(),
-        closing_balance: Some(50000.0),
-        company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
-        created_at: Some("2024-01-31T10:00:00Z".to_string()),
-        created_by: Some("example".to_string()),
-        currency_code: "USD".to_string(),
-        id: "a00e0e8400-e29b-41d4-a716-446655440000".to_string(),
-        import_format: Some("example".to_string()),
-        import_source: Some("example".to_string()),
-        imported_at: Some("example".to_string()),
-        imported_by: Some("example".to_string()),
-        metadata: Some(Default::default()),
-        opening_balance: Some(45000.0),
-        period_end: Some("example".to_string()),
-        period_start: Some("example".to_string()),
-        reconciled_at: Some("example".to_string()),
-        reconciled_by: Some("example".to_string()),
-        statement_date: "2024-01-31".to_string(),
-        statement_number: Some("example".to_string()),
-        status: "RECONCILED".to_string(),
-        total_credits: Some(3.14),
-        total_debits: Some(3.14),
-        transaction_count: Some(42),
-        updated_at: Some("2024-01-31T10:00:00Z".to_string()),
-        updated_by: Some("example".to_string()),
+        bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logicclosing_balance: None,  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicid: "a00e0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicimport_format: None,  // TODO: Set from your business logicimport_source: None,  // TODO: Set from your business logicimported_at: None,  // TODO: Set from your business logicimported_by: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicopening_balance: None,  // TODO: Set from your business logicperiod_end: None,  // TODO: Set from your business logicperiod_start: None,  // TODO: Set from your business logicreconciled_at: None,  // TODO: Set from your business logicreconciled_by: None,  // TODO: Set from your business logicstatement_date: "2024-01-31".to_string(),  // TODO: Set from your business logicstatement_number: None,  // TODO: Set from your business logicstatus: "RECONCILED".to_string(),  // TODO: Set from your business logictotal_credits: None,  // TODO: Set from your business logictotal_debits: None,  // TODO: Set from your business logictransaction_count: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
     }
 }

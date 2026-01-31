@@ -1,46 +1,25 @@
-// User-owned controller for handler 'create_budget'.
+// Implementation stub for handler 'create_budget'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_budget --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_budget_gen::handlers::create_budget::{Request, Response};
 
 #[handler(CreateBudgetController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "budget_name": "2024 Annual Budget",
-    //   "budget_type": "ANNUAL",
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-15T10:00:00Z",
-    //   "currency_code": "USD",
-    //   "fiscal_year": 2024,
-    //   "id": "a0140e8400-e29b-41d4-a716-446655440000",
-    //   "status": "DRAFT",
-    //   "total_budget_amount": 0.0,
-    //   "updated_at": "2024-01-15T10:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let budget_number = req.inner.budget_number;// let company_id = req.inner.company_id;// let currency_code = req.inner.currency_code;// let description = req.inner.description;// let fiscal_year = req.inner.fiscal_year;// let name = req.inner.name;// let period_end = req.inner.period_end;// let period_start = req.inner.period_start;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        approval_status: Some("example".to_string()),
-        approved_at: Some("example".to_string()),
-        approved_by: Some("example".to_string()),
-        budget_number: "example".to_string(),
-        company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
-        created_at: Some("2024-01-15T10:00:00Z".to_string()),
-        created_by: Some("example".to_string()),
-        currency_code: "USD".to_string(),
-        current_version_id: Some("example".to_string()),
-        description: Some("example".to_string()),
-        fiscal_year: 2024,
-        id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(),
-        metadata: Some(Default::default()),
-        name: "example".to_string(),
-        period_end: "example".to_string(),
-        period_start: "example".to_string(),
-        status: "DRAFT".to_string(),
-        total_actual_amount: Some(3.14),
-        total_budget_amount: Some(0.0),
-        total_variance: Some(3.14),
-        updated_at: Some("2024-01-15T10:00:00Z".to_string()),
-        updated_by: Some("example".to_string()),
+        approval_status: None, // TODO: Set from your business logicapproved_at: None,  // TODO: Set from your business logicapproved_by: None,  // TODO: Set from your business logicbudget_number: "example".to_string(),  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccurrent_version_id: None,  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicfiscal_year: 2024,  // TODO: Set from your business logicid: "a0140e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicname: "example".to_string(),  // TODO: Set from your business logicperiod_end: "example".to_string(),  // TODO: Set from your business logicperiod_start: "example".to_string(),  // TODO: Set from your business logicstatus: "DRAFT".to_string(),  // TODO: Set from your business logictotal_actual_amount: None,  // TODO: Set from your business logictotal_budget_amount: None,  // TODO: Set from your business logictotal_variance: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
     }
 }

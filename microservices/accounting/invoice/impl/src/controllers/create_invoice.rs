@@ -1,63 +1,25 @@
-// User-owned controller for handler 'create_invoice'.
+// Implementation stub for handler 'create_invoice'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_invoice --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_invoice_gen::handlers::create_invoice::{Request, Response};
-use rust_decimal::Decimal;
 
 #[handler(CreateInvoiceController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-15T09:00:00Z",
-    //   "currency_code": "USD",
-    //   "customer_id": "111e8400-e29b-41d4-a716-446655440001",
-    //   "discount_amount": 0.0,
-    //   "due_date": "2024-02-15",
-    //   "exchange_rate": 1.0,
-    //   "id": "a0010e8400-e29b-41d4-a716-446655440000",
-    //   "invoice_date": "2024-01-15",
-    //   "invoice_number": "INV-2024-001",
-    //   "invoice_type": "CUSTOMER_INVOICE",
-    //   "outstanding_amount": 0.0,
-    //   "paid_amount": 0.0,
-    //   "payment_state": "NOT_PAID",
-    //   "status": "DRAFT",
-    //   "subtotal": 0.0,
-    //   "tax_amount": 0.0,
-    //   "total_amount": 0.0,
-    //   "updated_at": "2024-01-15T09:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let company_id = req.inner.company_id;// let currency_code = req.inner.currency_code;// let customer_id = req.inner.customer_id;// let due_date = req.inner.due_date;// let exchange_rate = req.inner.exchange_rate;// let internal_notes = req.inner.internal_notes;// let invoice_date = req.inner.invoice_date;// let invoice_number = req.inner.invoice_number;// let invoice_type = req.inner.invoice_type;// let notes = req.inner.notes;// let payment_term_id = req.inner.payment_term_id;// let reference_number = req.inner.reference_number;// let vendor_id = req.inner.vendor_id;// let vendor_reference = req.inner.vendor_reference;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        cancelled_at: Some("example".to_string()),
-        company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
-        created_at: Some("2024-01-15T09:00:00Z".to_string()),
-        currency_code: "USD".to_string(),
-        customer_id: Some("111e8400-e29b-41d4-a716-446655440001".to_string()),
-        discount_amount: Some(Decimal::ZERO),
-        due_date: Some("2024-02-15".to_string()),
-        exchange_rate: Some(Decimal::new(1, 0)),
-        id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),
-        internal_notes: Some("example".to_string()),
-        invoice_date: "2024-01-15".to_string(),
-        invoice_number: "INV-2024-001".to_string(),
-        invoice_type: "CUSTOMER_INVOICE".to_string(),
-        metadata: Some(Default::default()),
-        notes: Some("example".to_string()),
-        outstanding_amount: Some(Decimal::ZERO),
-        paid_amount: Some(Decimal::ZERO),
-        paid_at: Some("example".to_string()),
-        payment_state: "NOT_PAID".to_string(),
-        payment_term_id: Some("example".to_string()),
-        posted_at: Some("example".to_string()),
-        reference_number: Some("example".to_string()),
-        status: "DRAFT".to_string(),
-        subtotal: Some(Decimal::ZERO),
-        tax_amount: Some(Decimal::ZERO),
-        total_amount: Some(Decimal::ZERO),
-        updated_at: Some("2024-01-15T09:00:00Z".to_string()),
-        vendor_id: Some("example".to_string()),
-        vendor_reference: Some("example".to_string()),
+        cancelled_at: None, // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccustomer_id: None,  // TODO: Set from your business logicdiscount_amount: None,  // TODO: Set from your business logicdue_date: None,  // TODO: Set from your business logicexchange_rate: None,  // TODO: Set from your business logicid: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinternal_notes: None,  // TODO: Set from your business logicinvoice_date: "2024-01-15".to_string(),  // TODO: Set from your business logicinvoice_number: "INV-2024-001".to_string(),  // TODO: Set from your business logicinvoice_type: "CUSTOMER_INVOICE".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicnotes: None,  // TODO: Set from your business logicoutstanding_amount: None,  // TODO: Set from your business logicpaid_amount: None,  // TODO: Set from your business logicpaid_at: None,  // TODO: Set from your business logicpayment_state: "NOT_PAID".to_string(),  // TODO: Set from your business logicpayment_term_id: None,  // TODO: Set from your business logicposted_at: None,  // TODO: Set from your business logicreference_number: None,  // TODO: Set from your business logicstatus: "DRAFT".to_string(),  // TODO: Set from your business logicsubtotal: None,  // TODO: Set from your business logictax_amount: None,  // TODO: Set from your business logictotal_amount: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicvendor_id: None,  // TODO: Set from your business logicvendor_reference: None,  // TODO: Set from your business logic
     }
 }

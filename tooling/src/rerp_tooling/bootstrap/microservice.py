@@ -460,6 +460,37 @@ def generate_code_with_brrtrouter(
     print("✅ Code generation complete")
 
 
+def _ensure_impl_scaffold(project_root: Path, suite: str, service_name: str) -> None:
+    """Create impl directory structure, Cargo.toml, main.rs, and config if impl is missing.
+
+    Used when impl was deleted and user runs 'rerp gen stubs'; allows stubs to be
+    generated without full bootstrap. Requires gen/ to exist (for main.rs and types).
+    """
+    crate_dir = project_root / "microservices" / suite / service_name
+    gen_dir = crate_dir / "gen"
+    impl_dir = crate_dir / "impl"
+    if impl_dir.exists():
+        return
+    if not gen_dir.exists():
+        msg = f"gen/ not found at {gen_dir}; run 'rerp gen accounting {service_name}' first"
+        raise FileNotFoundError(msg)
+    impl_dir.mkdir(parents=True, exist_ok=True)
+    (impl_dir / "config").mkdir(parents=True, exist_ok=True)
+    (impl_dir / "src" / "controllers").mkdir(parents=True, exist_ok=True)
+    config_path = impl_dir / "config" / "config.yaml"
+    if not config_path.exists():
+        create_config_yaml(config_path)
+    impl_cargo = impl_dir / "Cargo.toml"
+    _create_impl_cargo_toml(impl_cargo, service_name)
+    gen_main = gen_dir / "src" / "main.rs"
+    impl_main = impl_dir / "src" / "main.rs"
+    if gen_main.exists():
+        _create_impl_main(gen_main, impl_main, service_name)
+    cargo_toml_path = project_root / "microservices" / "Cargo.toml"
+    update_workspace_cargo_toml(service_name, cargo_toml_path)
+    print(f"✅ Created impl scaffold for {service_name} (impl/, Cargo.toml, main.rs, config)")
+
+
 def generate_impl_stubs_with_brrtrouter(
     spec_path: Path,
     impl_dir: Path,
@@ -530,8 +561,11 @@ def regenerate_impl_stubs(
             print(f"⚠️  Skipping {svc}: spec not found at {spec_path}")
             continue
         if not impl_dir.exists():
-            print(f"⚠️  Skipping {svc}: impl dir not found at {impl_dir}")
-            continue
+            try:
+                _ensure_impl_scaffold(project_root, suite, svc)
+            except FileNotFoundError as e:
+                print(f"⚠️  Skipping {svc}: {e}")
+                continue
         try:
             generate_impl_stubs_with_brrtrouter(
                 spec_path, impl_dir, project_root, svc, force=force, sync=sync

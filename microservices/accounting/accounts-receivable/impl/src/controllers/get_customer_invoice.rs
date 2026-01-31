@@ -1,42 +1,25 @@
-// User-owned controller for handler 'get_customer_invoice'.
+// Implementation stub for handler 'get_customer_invoice'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_customer_invoice --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_accounts_receivable_gen::handlers::get_customer_invoice::{Request, Response};
 
 #[handler(GetCustomerInvoiceController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "aging_bucket": "CURRENT",
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-15T09:00:00Z",
-    //   "currency_code": "USD",
-    //   "customer_id": "111e8400-e29b-41d4-a716-446655440001",
-    //   "id": "a0030e8400-e29b-41d4-a716-446655440000",
-    //   "invoice_id": "a0010e8400-e29b-41d4-a716-446655440000",
-    //   "original_amount": 11000.0,
-    //   "outstanding_amount": 11000.0,
-    //   "status": "OUTSTANDING",
-    //   "updated_at": "2024-01-15T09:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        aging_bucket: Some("CURRENT".to_string()),
-        collection_status: Some("example".to_string()),
-        created_at: Some("2024-01-15T09:00:00Z".to_string()),
-        credit_limit: Some(3.14),
-        credit_used: Some(3.14),
-        customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(),
-        days_overdue: Some(42),
-        id: "a0030e8400-e29b-41d4-a716-446655440000".to_string(),
-        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),
-        last_payment_amount: Some(3.14),
-        last_payment_date: Some("example".to_string()),
-        metadata: Some(Default::default()),
-        outstanding_amount: Some(11000.0),
-        updated_at: Some("2024-01-15T09:00:00Z".to_string()),
-        write_off_amount: Some(3.14),
-        write_off_date: Some("example".to_string()),
-        write_off_reason: Some("example".to_string()),
+        aging_bucket: None, // TODO: Set from your business logiccollection_status: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccredit_limit: None,  // TODO: Set from your business logiccredit_used: None,  // TODO: Set from your business logiccustomer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(),  // TODO: Set from your business logicdays_overdue: None,  // TODO: Set from your business logicid: "a0030e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinvoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logiclast_payment_amount: None,  // TODO: Set from your business logiclast_payment_date: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicoutstanding_amount: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicwrite_off_amount: None,  // TODO: Set from your business logicwrite_off_date: None,  // TODO: Set from your business logicwrite_off_reason: None,  // TODO: Set from your business logic
     }
 }

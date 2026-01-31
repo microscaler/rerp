@@ -19,6 +19,9 @@ rerp_accounting_asset_gen = { path = "../gen" }
 brrtrouter = { workspace = true }
 brrtrouter_macros = { workspace = true }
 
+# Decimal types from OpenAPI format: decimal / money (used in generated stubs)
+rust_decimal = { workspace = true }
+
 # Standard dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from rerp_tooling.bootstrap.microservice import (
+    _ensure_impl_scaffold,
     _get_port_from_registry,
     derive_binary_name,
     load_openapi_spec,
@@ -210,3 +211,116 @@ class TestUpdateTiltfile:
         assert "        'accounts-receivable': '8003'," in text
         assert "        'asset': '8006'," in text
         assert "        'bank-sync': '8005'," in text
+
+
+class TestEnsureImplScaffold:
+    """When impl/ was deleted, 'rerp gen stubs' should recreate it via _ensure_impl_scaffold."""
+
+    def test_creates_impl_when_gen_exists_and_impl_missing(self, tmp_path: Path) -> None:
+        (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+        (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+            "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+        )
+        gen_dir = tmp_path / "microservices" / "accounting" / "budget" / "gen"
+        gen_dir.mkdir(parents=True)
+        (gen_dir / "Cargo.toml").write_text('[package]\nname = "rerp_accounting_budget_gen"\n')
+        (gen_dir / "src").mkdir(parents=True)
+        (gen_dir / "src" / "main.rs").write_text("fn main() {}")
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
+            '[workspace]\nmembers = ["accounting/budget/gen"]\n'
+        )
+        impl_dir = tmp_path / "microservices" / "accounting" / "budget" / "impl"
+        assert not impl_dir.exists()
+
+        _ensure_impl_scaffold(tmp_path, "accounting", "budget")
+
+        assert impl_dir.exists()
+        assert (impl_dir / "Cargo.toml").exists()
+        assert (impl_dir / "src" / "main.rs").exists()
+        assert (impl_dir / "config" / "config.yaml").exists()
+        assert (impl_dir / "src" / "controllers").exists()
+        cargo = (impl_dir / "Cargo.toml").read_text()
+        assert "rerp_accounting_budget" in cargo
+        assert "rerp_accounting_budget_gen" in cargo
+        workspace = (tmp_path / "microservices" / "Cargo.toml").read_text()
+        assert "accounting/budget/impl" in workspace
+
+    def test_raises_when_gen_missing(self, tmp_path: Path) -> None:
+        (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+        (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+            "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+        )
+        # No gen/ directory
+        import pytest
+
+        with pytest.raises(FileNotFoundError, match="gen/ not found"):
+            _ensure_impl_scaffold(tmp_path, "accounting", "budget")
+
+    def test_no_op_when_impl_already_exists(self, tmp_path: Path) -> None:
+        impl_dir = tmp_path / "microservices" / "accounting" / "budget" / "impl"
+        impl_dir.mkdir(parents=True)
+        (impl_dir / "Cargo.toml").write_text("existing")
+        gen_dir = tmp_path / "microservices" / "accounting" / "budget" / "gen"
+        gen_dir.mkdir(parents=True)
+        (gen_dir / "src").mkdir(parents=True)
+        (gen_dir / "src" / "main.rs").write_text("fn main() {}")
+
+        _ensure_impl_scaffold(tmp_path, "accounting", "budget")
+
+        assert (impl_dir / "Cargo.toml").read_text() == "existing"
+
+
+class TestRegenerateImplStubsCreatesImplWhenMissing:
+    """regenerate_impl_stubs should create impl scaffold when impl/ is missing, then generate stubs."""
+
+    def test_creates_impl_and_calls_stub_generator(self, tmp_path: Path) -> None:
+        from unittest.mock import patch
+
+        from rerp_tooling.bootstrap.microservice import regenerate_impl_stubs
+
+        (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+        (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+            "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+        )
+        gen_dir = tmp_path / "microservices" / "accounting" / "budget" / "gen"
+        gen_dir.mkdir(parents=True)
+        (gen_dir / "Cargo.toml").write_text('[package]\nname = "rerp_accounting_budget_gen"\n')
+        (gen_dir / "src").mkdir(parents=True)
+        (gen_dir / "src" / "main.rs").write_text("fn main() {}")
+        (tmp_path / "microservices" / "Cargo.toml").write_text(
+            '[workspace]\nmembers = ["accounting/budget/gen"]\n'
+        )
+        impl_dir = tmp_path / "microservices" / "accounting" / "budget" / "impl"
+        assert not impl_dir.exists()
+
+        with patch(
+            "rerp_tooling.bootstrap.microservice.generate_impl_stubs_with_brrtrouter"
+        ) as m_stubs:
+            rc = regenerate_impl_stubs(tmp_path, "accounting", service="budget")
+
+        assert rc == 0
+        assert impl_dir.exists()
+        assert (impl_dir / "Cargo.toml").exists()
+        assert (impl_dir / "src" / "main.rs").exists()
+        assert (impl_dir / "config" / "config.yaml").exists()
+        m_stubs.assert_called_once()
+        call_args, _call_kw = m_stubs.call_args
+        assert call_args[3] == "budget"  # 4th positional is svc (service_name)
+        assert call_args[1] == impl_dir
+
+    def test_skips_when_gen_missing_and_impl_missing(self, tmp_path: Path) -> None:
+        from rerp_tooling.bootstrap.microservice import regenerate_impl_stubs
+
+        (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+        (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+            "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+        )
+        # No gen/, no impl/
+        impl_dir = tmp_path / "microservices" / "accounting" / "budget" / "impl"
+        assert not impl_dir.exists()
+
+        rc = regenerate_impl_stubs(tmp_path, "accounting", service="budget")
+
+        # When gen is missing we skip (continue); impl is not created; function still returns 0
+        assert rc == 0
+        assert not impl_dir.exists()

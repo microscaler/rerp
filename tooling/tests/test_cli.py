@@ -381,6 +381,68 @@ def test_build_microservices_missing_manifest_exits_1(tmp_path, monkeypatch, cap
     assert "not found" in (out + err) or "Cargo.toml" in (out + err)
 
 
+# --- gen stubs (positional service and --service) ---
+
+
+def test_gen_stubs_positional_service_calls_regenerate_with_service(tmp_path, monkeypatch):
+    """rerp gen stubs accounting budget -> regenerate_impl_stubs(project_root, 'accounting', service='budget')."""
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+    (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+        "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+    )
+    gen_dir = tmp_path / "microservices" / "accounting" / "budget" / "gen"
+    gen_dir.mkdir(parents=True)
+    (gen_dir / "Cargo.toml").write_text("")
+    (gen_dir / "src").mkdir(parents=True, exist_ok=True)
+    (gen_dir / "src" / "main.rs").write_text("fn main() {}")
+    (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\nmembers = []\n")
+
+    with patch("rerp_tooling.cli.gen.regenerate_impl_stubs", return_value=0) as m:
+        code = _run_main(["gen", "stubs", "accounting", "budget"])
+
+    assert code == 0
+    m.assert_called_once()
+    call_args, call_kw = m.call_args
+    assert call_args[0] == tmp_path
+    assert call_args[1] == "accounting"
+    assert call_kw.get("service") == "budget"
+
+
+def test_gen_stubs_flag_service_calls_regenerate_with_service(tmp_path, monkeypatch):
+    """rerp gen stubs accounting --service budget -> same as positional."""
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    (tmp_path / "openapi" / "accounting" / "budget").mkdir(parents=True)
+    (tmp_path / "openapi" / "accounting" / "budget" / "openapi.yaml").write_text(
+        "openapi: 3.1.0\ninfo:\n  title: Budget\n"
+    )
+    gen_dir = tmp_path / "microservices" / "accounting" / "budget" / "gen"
+    gen_dir.mkdir(parents=True)
+    (gen_dir / "Cargo.toml").write_text("")
+    (gen_dir / "src").mkdir(parents=True, exist_ok=True)
+    (gen_dir / "src" / "main.rs").write_text("fn main() {}")
+    (tmp_path / "microservices" / "Cargo.toml").write_text("[workspace]\nmembers = []\n")
+
+    with patch("rerp_tooling.cli.gen.regenerate_impl_stubs", return_value=0) as m:
+        code = _run_main(["gen", "stubs", "accounting", "--service", "budget"])
+
+    assert code == 0
+    m.assert_called_once()
+    assert m.call_args[1].get("service") == "budget"
+
+
+def test_gen_stubs_missing_suite_exits_nonzero(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("RERP_PROJECT_ROOT", str(tmp_path))
+    code = _run_main(["gen", "stubs"])
+    out, err = capsys.readouterr()
+    assert code != 0
+    assert (
+        "suite" in (out + err).lower()
+        or "required" in (out + err).lower()
+        or "argument" in (out + err).lower()
+    )
+
+
 # --- ports ---
 
 

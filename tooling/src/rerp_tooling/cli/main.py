@@ -434,8 +434,16 @@ def __build_parser():
     )
     pgen_stubs.add_argument("suite", help="Suite name (e.g. accounting)")
     pgen_stubs.add_argument(
+        "service_positional",
+        nargs="?",
+        default=None,
+        metavar="service",
+        help="Service name (e.g. budget). Same as --service.",
+    )
+    pgen_stubs.add_argument(
         "--service",
         metavar="NAME",
+        dest="service_flag",
         help="Regenerate stubs only for this service",
     )
     pgen_stubs.add_argument(

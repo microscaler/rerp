@@ -1,51 +1,25 @@
-// User-owned controller for handler 'update_invoice_line'.
+// Implementation stub for handler 'update_invoice_line'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path update_invoice_line --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_invoice_gen::handlers::update_invoice_line::{Request, Response};
-use rust_decimal::Decimal;
 
 #[handler(UpdateInvoiceLineController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "created_at": "2024-01-15T09:00:00Z",
-    //   "currency_code": "USD",
-    //   "discount_amount": 562.5,
-    //   "discount_percent": 5.0,
-    //   "id": "a0020e8400-e29b-41d4-a716-446655440000",
-    //   "invoice_id": "a0010e8400-e29b-41d4-a716-446655440000",
-    //   "line_number": 1,
-    //   "line_subtotal": 10687.5,
-    //   "line_total": 11756.25,
-    //   "product_name": "Professional Services",
-    //   "quantity": 45.0,
-    //   "tax_amount": 1068.75,
-    //   "unit_price": 250.0,
-    //   "updated_at": "2024-01-15T11:00:00Z"
-    // }
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let discount_amount = req.inner.discount_amount;// let discount_percent = req.inner.discount_percent;// let product_name = req.inner.product_name;// let quantity = req.inner.quantity;// let tax_id = req.inner.tax_id;// let tax_rate = req.inner.tax_rate;// let unit_price = req.inner.unit_price;// let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
 
     Response {
-        account_id: Some("example".to_string()),
-        created_at: Some("2024-01-15T09:00:00Z".to_string()),
-        currency_code: "USD".to_string(),
-        discount_amount: Some(Decimal::new(5625, 1)),
-        discount_percent: Some(Decimal::new(5, 0)),
-        id: "a0020e8400-e29b-41d4-a716-446655440000".to_string(),
-        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),
-        line_number: Some(1),
-        line_subtotal: Some(Decimal::new(106875, 1)),
-        line_total: Some(Decimal::new(1175625, 2)),
-        metadata: Some(Default::default()),
-        product_code: Some("example".to_string()),
-        product_description: Some("example".to_string()),
-        product_id: Some("example".to_string()),
-        product_name: "Professional Services".to_string(),
-        quantity: Decimal::new(45, 0),
-        tax_amount: Some(Decimal::new(106875, 2)),
-        tax_id: Some("example".to_string()),
-        tax_rate: Some(Decimal::new(314, 2)),
-        unit_of_measure: Some("example".to_string()),
-        unit_price: Decimal::new(250, 0),
-        updated_at: Some("2024-01-15T11:00:00Z".to_string()),
+        account_id: None, // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicdiscount_amount: None,  // TODO: Set from your business logicdiscount_percent: None,  // TODO: Set from your business logicid: "a0020e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinvoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicline_number: None,  // TODO: Set from your business logicline_subtotal: None,  // TODO: Set from your business logicline_total: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicproduct_code: None,  // TODO: Set from your business logicproduct_description: None,  // TODO: Set from your business logicproduct_id: None,  // TODO: Set from your business logicproduct_name: "Professional Services".to_string(),  // TODO: Set from your business logicquantity: rust_decimal::Decimal::new(450, 1),  // TODO: Set from your business logictax_amount: None,  // TODO: Set from your business logictax_id: None,  // TODO: Set from your business logictax_rate: None,  // TODO: Set from your business logicunit_of_measure: None,  // TODO: Set from your business logicunit_price: rust_decimal::Decimal::new(2500, 1),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
     }
 }

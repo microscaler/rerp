@@ -1,4 +1,8 @@
-// User-owned controller for handler 'list_financial_statements'.
+// Implementation stub for handler 'list_financial_statements'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_financial_statements --force
+
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 use rerp_accounting_financial_reports_gen::handlers::list_financial_statements::{
@@ -9,11 +13,18 @@ use rerp_accounting_financial_reports_gen::handlers::list_financial_statements::
 use rerp_accounting_financial_reports_gen::handlers::types::FinancialStatement;
 
 #[handler(ListFinancialStatementsController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let page = req.inner.page;// let limit = req.inner.limit;// let search = req.inner.search;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
     Response {
-        items: Some(Default::default()),
-        limit: Some(42),
-        page: Some(42),
-        total: Some(42),
+        items: None, // TODO: Set from your business logiclimit: None,  // TODO: Set from your business logicpage: None,  // TODO: Set from your business logictotal: None,  // TODO: Set from your business logic
     }
 }
