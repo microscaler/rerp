@@ -74,6 +74,9 @@ WORKSPACE_DIR = "microservices"
 # armv7 cross toolchain does not provide __ffsdi2 (used by tikv-jemalloc-sys); disable jemalloc for arm7
 ARM7_TARGET = "armv7-unknown-linux-musleabihf"
 
+# Opt-in jemalloc (tikv) for amd64/arm64; not used for arm7 (musl __ffsdi2 link error)
+JEMALLOC_FEATURE_ARGS: List[str] = ["--features", "jemalloc"]
+
 
 def _workspace_packages(manifest: Path, project_root: Path) -> List[str]:
     """Return workspace member package names (for -p ...). Uses cargo metadata.
@@ -108,12 +111,16 @@ def _build_workspace(
     use_zigbuild: bool,
     use_cross: bool,
     extra_args: List[str],
+    release: bool = True,
 ) -> bool:
     workspace_dir = project_root / WORKSPACE_DIR
     manifest = workspace_dir / "Cargo.toml"
     if not manifest.exists():
         print(f"❌ Error: Cargo.toml not found in {workspace_dir}", file=sys.stderr)
         return False
+
+    use_jemalloc = rust_target != ARM7_TARGET
+    release_args = ["--release"] if release else []
 
     if use_cross:
         if rust_target == ARM7_TARGET:
@@ -125,7 +132,7 @@ def _build_workspace(
                 return False
             cmd = [
                 "cross", "build", "--manifest-path", str(manifest),
-                "--target", rust_target, "--release", "--no-default-features",
+                "--target", rust_target, *release_args, "--no-default-features",
             ]
             for pkg in packages:
                 cmd.extend(["-p", pkg])
@@ -138,8 +145,8 @@ def _build_workspace(
                 return False
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
-            "--target", rust_target, "--workspace", "--release",
-        ] + extra_args
+            "--target", rust_target, "--workspace", *release_args,
+        ] + (JEMALLOC_FEATURE_ARGS if use_jemalloc else []) + extra_args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
             return True
@@ -155,15 +162,16 @@ def _build_workspace(
             print(f"❌ Could not get workspace members for arm7", file=sys.stderr)
             return False
         base = ["cargo", "zigbuild"] if use_zigbuild else ["cargo", "build"]
-        cmd = base + ["--target", rust_target, "--release", "--no-default-features"]
+        cmd = base + ["--target", rust_target, *release_args, "--no-default-features"]
         for pkg in packages:
             cmd.extend(["-p", pkg])
         cmd.extend(extra_args)
     else:
+        jemalloc = JEMALLOC_FEATURE_ARGS if use_jemalloc else []
         if use_zigbuild:
-            cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", "--release"] + extra_args
+            cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", *release_args] + jemalloc + extra_args
         else:
-            cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + extra_args
+            cmd = ["cargo", "build", "--target", rust_target, "--workspace", *release_args] + jemalloc + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(workspace_dir))
@@ -182,6 +190,7 @@ def _build_service(
     use_zigbuild: bool,
     use_cross: bool,
     extra_args: List[str],
+    release: bool = True,
 ) -> bool:
     # RERP: microservices/<system>/<module>/impl (e.g. microservices/accounting/general-ledger/impl)
     # Package name in impl/Cargo.toml is rerp_<system>_<module_snake> (no _impl suffix)
@@ -192,13 +201,16 @@ def _build_service(
         print(f"❌ Error: Crate not found: {crate}", file=sys.stderr)
         return False
 
+    use_jemalloc = rust_target != ARM7_TARGET
+    release_args = ["--release"] if release else []
+
     if use_cross:
-        args = list(extra_args)
+        args = (JEMALLOC_FEATURE_ARGS if use_jemalloc else []) + list(extra_args)
         if rust_target == ARM7_TARGET:
             args.insert(0, "--no-default-features")  # avoid jemalloc __ffsdi2 link error on armv7 musl
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
-            "-p", package_name, "--target", rust_target, "--release",
+            "-p", package_name, "--target", rust_target, *release_args,
         ] + args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
@@ -208,14 +220,15 @@ def _build_service(
             return False
 
     arm7_no_jemalloc = rust_target == ARM7_TARGET
+    jemalloc = [] if arm7_no_jemalloc else JEMALLOC_FEATURE_ARGS
     if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", package_name, "--release"] + (
+        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", package_name, *release_args] + (
             ["--no-default-features"] if arm7_no_jemalloc else []
-        ) + extra_args
+        ) + jemalloc + extra_args
     else:
-        cmd = ["cargo", "build", "--target", rust_target, "-p", package_name, "--release"] + (
+        cmd = ["cargo", "build", "--target", rust_target, "-p", package_name, *release_args] + (
             ["--no-default-features"] if arm7_no_jemalloc else []
-        ) + extra_args
+        ) + jemalloc + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(project_root / WORKSPACE_DIR))
@@ -233,18 +246,23 @@ def _build_for_arch(
     use_zigbuild: bool,
     use_cross: bool,
     extra_args: List[str],
+    release: bool = True,
 ) -> bool:
     print(f"🔨 Building for {arch_name} ({rust_target})...")
     if not use_cross and not _install_rust_target(rust_target):
         return False
     if target == "workspace":
-        return _build_workspace(project_root, rust_target, arch_name, use_zigbuild, use_cross, extra_args)
+        return _build_workspace(
+            project_root, rust_target, arch_name, use_zigbuild, use_cross, extra_args, release
+        )
     parts = target.split("_", 1)
     if len(parts) < 2:
         print("❌ Error: Service name must be <system>_<module> (e.g., auth_idam)", file=sys.stderr)
         return False
     system, module = parts
-    return _build_service(project_root, system, module, rust_target, arch_name, use_zigbuild, use_cross, extra_args)
+    return _build_service(
+        project_root, system, module, rust_target, arch_name, use_zigbuild, use_cross, extra_args, release
+    )
 
 
 def _determine_architectures(requested: Optional[str]) -> List[str]:
@@ -263,6 +281,7 @@ def run(
     arch: Optional[str] = None,
     extra_args: Optional[List[str]] = None,
     project_root: Optional[Path] = None,
+    release: bool = True,
 ) -> int:
     """Run host-aware build. Returns 0 on success, 1 on failure."""
     root = Path(project_root) if project_root is not None else Path.cwd()
@@ -272,7 +291,9 @@ def run(
     use_cross = should_use_cross()
     ok = True
     for a in archs:
-        if not _build_for_arch(root, target, ARCH_TARGETS[a], a, use_zigbuild, use_cross, extra):
+        if not _build_for_arch(
+            root, target, ARCH_TARGETS[a], a, use_zigbuild, use_cross, extra, release
+        ):
             ok = False
     if ok:
         print("🎉 All builds complete!")
