@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import platform
 import subprocess
@@ -74,6 +75,32 @@ WORKSPACE_DIR = "microservices"
 ARM7_TARGET = "armv7-unknown-linux-musleabihf"
 
 
+def _workspace_packages(manifest: Path, project_root: Path) -> List[str]:
+    """Return workspace member package names (for -p ...). Uses cargo metadata.
+    workspace_members are package IDs like 'path+file:///.../gen#rerp_accounting_foo_gen@0.1.0'.
+    """
+    try:
+        r = subprocess.run(
+            ["cargo", "metadata", "--manifest-path", str(manifest), "--format-version", "1", "--no-deps"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=str(project_root),
+        )
+        data = json.loads(r.stdout)
+        raw = data.get("workspace_members", [])
+        out: List[str] = []
+        for pid in raw:
+            # pid is like "path+file:///.../gen#rerp_accounting_foo_gen@0.1.0" -> extract "rerp_accounting_foo_gen"
+            if "#" in pid and "@" in pid:
+                out.append(pid.split("#")[1].split("@")[0])
+            else:
+                out.append(pid)
+        return out
+    except (subprocess.CalledProcessError, json.JSONDecodeError, FileNotFoundError):
+        return []
+
+
 def _build_workspace(
     project_root: Path,
     rust_target: str,
@@ -89,13 +116,30 @@ def _build_workspace(
         return False
 
     if use_cross:
-        args = list(extra_args)
         if rust_target == ARM7_TARGET:
-            args.insert(0, "--no-default-features")  # avoid jemalloc __ffsdi2 link error on armv7 musl
+            # Cargo does not apply --no-default-features to workspace members when using --workspace;
+            # build each package with -p so jemalloc is disabled (avoids __ffsdi2 link error on armv7 musl).
+            packages = _workspace_packages(manifest, project_root)
+            if not packages:
+                print(f"❌ Could not get workspace members for arm7", file=sys.stderr)
+                return False
+            cmd = [
+                "cross", "build", "--manifest-path", str(manifest),
+                "--target", rust_target, "--release", "--no-default-features",
+            ]
+            for pkg in packages:
+                cmd.extend(["-p", pkg])
+            cmd.extend(extra_args)
+            try:
+                subprocess.run(cmd, check=True, cwd=str(project_root))
+                return True
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
+                return False
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
             "--target", rust_target, "--workspace", "--release",
-        ] + args
+        ] + extra_args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
             return True
@@ -103,15 +147,23 @@ def _build_workspace(
             print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
             return False
 
-    arm7_no_jemalloc = rust_target == ARM7_TARGET
-    if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", "--release"] + (
-            ["--no-default-features"] if arm7_no_jemalloc else []
-        ) + extra_args
+    if rust_target == ARM7_TARGET:
+        # Cargo does not apply --no-default-features to workspace members when using --workspace;
+        # build each package with -p so jemalloc is disabled (avoids __ffsdi2 link error on armv7 musl).
+        packages = _workspace_packages(manifest, project_root)
+        if not packages:
+            print(f"❌ Could not get workspace members for arm7", file=sys.stderr)
+            return False
+        base = ["cargo", "zigbuild"] if use_zigbuild else ["cargo", "build"]
+        cmd = base + ["--target", rust_target, "--release", "--no-default-features"]
+        for pkg in packages:
+            cmd.extend(["-p", pkg])
+        cmd.extend(extra_args)
     else:
-        cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + (
-            ["--no-default-features"] if arm7_no_jemalloc else []
-        ) + extra_args
+        if use_zigbuild:
+            cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", "--release"] + extra_args
+        else:
+            cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(workspace_dir))
