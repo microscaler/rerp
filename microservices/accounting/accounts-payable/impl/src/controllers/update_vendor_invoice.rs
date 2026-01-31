@@ -20,6 +20,36 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_bucket: None, // TODO: Set from your business logicapproval_status: None,  // TODO: Set from your business logicapproved_at: None,  // TODO: Set from your business logicapproved_by: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logicdays_until_due: None,  // TODO: Set from your business logicearly_payment_discount_date: None,  // TODO: Set from your business logicearly_payment_discount_percent: None,  // TODO: Set from your business logicid: "a0050e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinvoice_id: "a0011e8400-e29b-41d4-a716-446655440001".to_string(),  // TODO: Set from your business logicmatching_status: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicoutstanding_amount: None,  // TODO: Set from your business logicpurchase_order_id: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicvendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(),  // TODO: Set from your business logic
+        aging_bucket: None, // TODO: Set from your business logic
+
+        approval_status: None, // TODO: Set from your business logic
+
+        approved_at: None, // TODO: Set from your business logic
+
+        approved_by: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        days_until_due: None, // TODO: Set from your business logic
+
+        early_payment_discount_date: None, // TODO: Set from your business logic
+
+        early_payment_discount_percent: None, // TODO: Set from your business logic
+
+        id: "a0050e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        invoice_id: "a0011e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
+
+        matching_status: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        outstanding_amount: None, // TODO: Set from your business logic
+
+        purchase_order_id: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        vendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
     }
 }

@@ -20,6 +20,30 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        account_type: "ASSET".to_string(), // TODO: Set from your business logicchart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logiccode: "1010".to_string(),  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicid: "a0070e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicis_active: true,  // TODO: Set from your business logicis_system_account: false,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicname: "Cash - Operating Account (Updated)".to_string(),  // TODO: Set from your business logicnormal_balance: "DEBIT".to_string(),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        account_type: "ASSET".to_string(), // TODO: Set from your business logic
+
+        chart_of_account_id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        code: "1010".to_string(), // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        id: "a0070e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        is_system_account: false, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        name: "Cash - Operating Account (Updated)".to_string(), // TODO: Set from your business logic
+
+        normal_balance: "DEBIT".to_string(), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

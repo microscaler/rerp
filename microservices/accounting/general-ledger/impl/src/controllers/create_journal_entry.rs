@@ -20,6 +20,46 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        company_id: None, // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicdescription: "Monthly accrual entry".to_string(),  // TODO: Set from your business logicentry_date: "2024-01-15".to_string(),  // TODO: Set from your business logicentry_number: "JE-2024-001".to_string(),  // TODO: Set from your business logicexchange_rate: None,  // TODO: Set from your business logicfiscal_period_id: None,  // TODO: Set from your business logicid: "a0080e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicposted_at: None,  // TODO: Set from your business logicposted_by: None,  // TODO: Set from your business logicreference_number: None,  // TODO: Set from your business logicsource_id: None,  // TODO: Set from your business logicsource_type: None,  // TODO: Set from your business logicstatus: "DRAFT".to_string(),  // TODO: Set from your business logictotal_credit: rust_decimal::Decimal::new(0, 1),  // TODO: Set from your business logictotal_debit: rust_decimal::Decimal::new(0, 1),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        description: "Monthly accrual entry".to_string(), // TODO: Set from your business logic
+
+        entry_date: "2024-01-15".to_string(), // TODO: Set from your business logic
+
+        entry_number: "JE-2024-001".to_string(), // TODO: Set from your business logic
+
+        exchange_rate: None, // TODO: Set from your business logic
+
+        fiscal_period_id: None, // TODO: Set from your business logic
+
+        id: "a0080e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        posted_at: None, // TODO: Set from your business logic
+
+        posted_by: None, // TODO: Set from your business logic
+
+        reference_number: None, // TODO: Set from your business logic
+
+        source_id: None, // TODO: Set from your business logic
+
+        source_type: None, // TODO: Set from your business logic
+
+        status: "DRAFT".to_string(), // TODO: Set from your business logic
+
+        total_credit: rust_decimal::Decimal::new(0, 1), // TODO: Set from your business logic
+
+        total_debit: rust_decimal::Decimal::new(0, 1), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }

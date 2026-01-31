@@ -20,6 +20,52 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        approved_at: None, // TODO: Set from your business logicapproved_by: None,  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "example".to_string(),  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicgenerated_at: None,  // TODO: Set from your business logicgenerated_by: None,  // TODO: Set from your business logicid: "example".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicname: "example".to_string(),  // TODO: Set from your business logicparameters: None,  // TODO: Set from your business logicperiod_end: None,  // TODO: Set from your business logicperiod_start: None,  // TODO: Set from your business logicreport_code: "example".to_string(),  // TODO: Set from your business logicreport_data: None,  // TODO: Set from your business logicreport_date: None,  // TODO: Set from your business logicreport_type: "example".to_string(),  // TODO: Set from your business logicstatus: "example".to_string(),  // TODO: Set from your business logictemplate_id: None,  // TODO: Set from your business logictotal_amount: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
+        approved_at: None, // TODO: Set from your business logic
+
+        approved_by: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "example".to_string(), // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        generated_at: None, // TODO: Set from your business logic
+
+        generated_by: None, // TODO: Set from your business logic
+
+        id: "example".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        name: "example".to_string(), // TODO: Set from your business logic
+
+        parameters: None, // TODO: Set from your business logic
+
+        period_end: None, // TODO: Set from your business logic
+
+        period_start: None, // TODO: Set from your business logic
+
+        report_code: "example".to_string(), // TODO: Set from your business logic
+
+        report_data: None, // TODO: Set from your business logic
+
+        report_date: None, // TODO: Set from your business logic
+
+        report_type: "example".to_string(), // TODO: Set from your business logic
+
+        status: "example".to_string(), // TODO: Set from your business logic
+
+        template_id: None, // TODO: Set from your business logic
+
+        total_amount: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }

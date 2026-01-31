@@ -20,6 +20,24 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        code: "REAL_ESTATE".to_string(), // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logicdefault_depreciation_method: None,  // TODO: Set from your business logicdefault_useful_life_months: None,  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicid: "a0130e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicis_active: true,  // TODO: Set from your business logicname: "Real Estate Register".to_string(),  // TODO: Set from your business logicparent_id: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        code: "REAL_ESTATE".to_string(), // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        default_depreciation_method: None, // TODO: Set from your business logic
+
+        default_useful_life_months: None, // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        id: "a0130e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        name: "Real Estate Register".to_string(), // TODO: Set from your business logic
+
+        parent_id: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

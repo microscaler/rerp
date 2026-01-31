@@ -20,6 +20,36 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        company_id: None, // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "example".to_string(),  // TODO: Set from your business logicdata: Default::default(),  // TODO: Set from your business logicdata_version: 42,  // TODO: Set from your business logicgenerated_at: None,  // TODO: Set from your business logicgenerated_by: None,  // TODO: Set from your business logicid: "example".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicnet_income: None,  // TODO: Set from your business logicreport_date: "example".to_string(),  // TODO: Set from your business logicreport_id: "example".to_string(),  // TODO: Set from your business logicsummary: None,  // TODO: Set from your business logictotal_assets: None,  // TODO: Set from your business logictotal_liabilities: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "example".to_string(), // TODO: Set from your business logic
+
+        data: Default::default(), // TODO: Set from your business logic
+
+        data_version: 42, // TODO: Set from your business logic
+
+        generated_at: None, // TODO: Set from your business logic
+
+        generated_by: None, // TODO: Set from your business logic
+
+        id: "example".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        net_income: None, // TODO: Set from your business logic
+
+        report_date: "example".to_string(), // TODO: Set from your business logic
+
+        report_id: "example".to_string(), // TODO: Set from your business logic
+
+        summary: None, // TODO: Set from your business logic
+
+        total_assets: None, // TODO: Set from your business logic
+
+        total_liabilities: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

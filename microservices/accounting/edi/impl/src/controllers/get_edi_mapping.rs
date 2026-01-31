@@ -20,6 +20,32 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        created_at: None, // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logicdefault_values: None,  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicdocument_type: "example".to_string(),  // TODO: Set from your business logicfield_mappings: Default::default(),  // TODO: Set from your business logicformat_id: "example".to_string(),  // TODO: Set from your business logicid: "example".to_string(),  // TODO: Set from your business logicis_active: true,  // TODO: Set from your business logicmapping_name: "example".to_string(),  // TODO: Set from your business logictransformation_rules: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logicvalidation_rules: None,  // TODO: Set from your business logic
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        default_values: None, // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        document_type: "example".to_string(), // TODO: Set from your business logic
+
+        field_mappings: Default::default(), // TODO: Set from your business logic
+
+        format_id: "example".to_string(), // TODO: Set from your business logic
+
+        id: "example".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        mapping_name: "example".to_string(), // TODO: Set from your business logic
+
+        transformation_rules: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
+
+        validation_rules: None, // TODO: Set from your business logic
     }
 }

@@ -20,6 +20,38 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_bucket: None, // TODO: Set from your business logiccollection_status: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccredit_limit: None,  // TODO: Set from your business logiccredit_used: None,  // TODO: Set from your business logiccustomer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(),  // TODO: Set from your business logicdays_overdue: None,  // TODO: Set from your business logicid: "a0030e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinvoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logiclast_payment_amount: None,  // TODO: Set from your business logiclast_payment_date: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicoutstanding_amount: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicwrite_off_amount: None,  // TODO: Set from your business logicwrite_off_date: None,  // TODO: Set from your business logicwrite_off_reason: None,  // TODO: Set from your business logic
+        aging_bucket: None, // TODO: Set from your business logic
+
+        collection_status: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        credit_limit: None, // TODO: Set from your business logic
+
+        credit_used: None, // TODO: Set from your business logic
+
+        customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
+
+        days_overdue: None, // TODO: Set from your business logic
+
+        id: "a0030e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        last_payment_amount: None, // TODO: Set from your business logic
+
+        last_payment_date: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        outstanding_amount: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        write_off_amount: None, // TODO: Set from your business logic
+
+        write_off_date: None, // TODO: Set from your business logic
+
+        write_off_reason: None, // TODO: Set from your business logic
     }
 }

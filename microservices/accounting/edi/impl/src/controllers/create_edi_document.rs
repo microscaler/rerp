@@ -20,6 +20,62 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        acknowledgment_sent: true, // TODO: Set from your business logicacknowledgment_sent_at: None,  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: None,  // TODO: Set from your business logicdocument_number: "example".to_string(),  // TODO: Set from your business logicdocument_total_amount: None,  // TODO: Set from your business logicdocument_type: "example".to_string(),  // TODO: Set from your business logicerror_details: None,  // TODO: Set from your business logicerror_message: None,  // TODO: Set from your business logicformat_id: "example".to_string(),  // TODO: Set from your business logicid: "example".to_string(),  // TODO: Set from your business logiclast_retry_at: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicparsed_at: None,  // TODO: Set from your business logicparsed_data: None,  // TODO: Set from your business logicprocessed_at: None,  // TODO: Set from your business logicraw_content: None,  // TODO: Set from your business logicreceived_at: "example".to_string(),  // TODO: Set from your business logicreceiver_id: None,  // TODO: Set from your business logicrelated_invoice_id: None,  // TODO: Set from your business logicrelated_purchase_order_id: None,  // TODO: Set from your business logicretry_count: 42,  // TODO: Set from your business logicsender_id: None,  // TODO: Set from your business logicstatus: "example".to_string(),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logicvalidated_at: None,  // TODO: Set from your business logic
+        acknowledgment_sent: true, // TODO: Set from your business logic
+
+        acknowledgment_sent_at: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: None, // TODO: Set from your business logic
+
+        document_number: "example".to_string(), // TODO: Set from your business logic
+
+        document_total_amount: None, // TODO: Set from your business logic
+
+        document_type: "example".to_string(), // TODO: Set from your business logic
+
+        error_details: None, // TODO: Set from your business logic
+
+        error_message: None, // TODO: Set from your business logic
+
+        format_id: "example".to_string(), // TODO: Set from your business logic
+
+        id: "example".to_string(), // TODO: Set from your business logic
+
+        last_retry_at: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        parsed_at: None, // TODO: Set from your business logic
+
+        parsed_data: None, // TODO: Set from your business logic
+
+        processed_at: None, // TODO: Set from your business logic
+
+        raw_content: None, // TODO: Set from your business logic
+
+        received_at: "example".to_string(), // TODO: Set from your business logic
+
+        receiver_id: None, // TODO: Set from your business logic
+
+        related_invoice_id: None, // TODO: Set from your business logic
+
+        related_purchase_order_id: None, // TODO: Set from your business logic
+
+        retry_count: 42, // TODO: Set from your business logic
+
+        sender_id: None, // TODO: Set from your business logic
+
+        status: "example".to_string(), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
+
+        validated_at: None, // TODO: Set from your business logic
     }
 }

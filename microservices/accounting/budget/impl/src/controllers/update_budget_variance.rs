@@ -20,6 +20,32 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        account_id: "a0070e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logicactual_amount: None,  // TODO: Set from your business logicbudget_amount: None,  // TODO: Set from your business logicbudget_id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicexceeds_threshold: None,  // TODO: Set from your business logicid: "a0170e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicis_favorable: None,  // TODO: Set from your business logiclast_calculated_at: None,  // TODO: Set from your business logicperiod_id: "a0160e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicvariance: None,  // TODO: Set from your business logicvariance_percent: None,  // TODO: Set from your business logic
+        account_id: "a0070e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        actual_amount: None, // TODO: Set from your business logic
+
+        budget_amount: None, // TODO: Set from your business logic
+
+        budget_id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        exceeds_threshold: None, // TODO: Set from your business logic
+
+        id: "a0170e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_favorable: None, // TODO: Set from your business logic
+
+        last_calculated_at: None, // TODO: Set from your business logic
+
+        period_id: "a0160e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        variance: None, // TODO: Set from your business logic
+
+        variance_percent: None, // TODO: Set from your business logic
     }
 }

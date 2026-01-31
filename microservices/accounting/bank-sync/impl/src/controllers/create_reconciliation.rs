@@ -20,6 +20,48 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logicbank_balance: None,  // TODO: Set from your business logicbook_balance: None,  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicdifference: None,  // TODO: Set from your business logicid: "a00f0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicnotes: None,  // TODO: Set from your business logicoutstanding_deposits_amount: None,  // TODO: Set from your business logicoutstanding_deposits_count: None,  // TODO: Set from your business logicoutstanding_withdrawals_amount: None,  // TODO: Set from your business logicoutstanding_withdrawals_count: None,  // TODO: Set from your business logicreconciled_at: None,  // TODO: Set from your business logicreconciled_by: None,  // TODO: Set from your business logicreconciliation_date: "2024-01-31".to_string(),  // TODO: Set from your business logicstatement_id: "a00e0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicstatus: "PENDING".to_string(),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
+        bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        bank_balance: None, // TODO: Set from your business logic
+
+        book_balance: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        difference: None, // TODO: Set from your business logic
+
+        id: "a00f0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        notes: None, // TODO: Set from your business logic
+
+        outstanding_deposits_amount: None, // TODO: Set from your business logic
+
+        outstanding_deposits_count: None, // TODO: Set from your business logic
+
+        outstanding_withdrawals_amount: None, // TODO: Set from your business logic
+
+        outstanding_withdrawals_count: None, // TODO: Set from your business logic
+
+        reconciled_at: None, // TODO: Set from your business logic
+
+        reconciled_by: None, // TODO: Set from your business logic
+
+        reconciliation_date: "2024-01-31".to_string(), // TODO: Set from your business logic
+
+        statement_id: "a00e0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        status: "PENDING".to_string(), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }

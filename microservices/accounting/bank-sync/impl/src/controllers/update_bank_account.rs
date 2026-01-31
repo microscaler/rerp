@@ -20,6 +20,44 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        account_name: "Operating Account (Updated)".to_string(), // TODO: Set from your business logicaccount_number: "CHASE-001".to_string(),  // TODO: Set from your business logicaccount_type: "CHECKING".to_string(),  // TODO: Set from your business logicbank_code: None,  // TODO: Set from your business logicbank_name: None,  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccurrent_balance: None,  // TODO: Set from your business logicid: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicis_active: true,  // TODO: Set from your business logiclast_reconciled_at: None,  // TODO: Set from your business logiclast_synced_at: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicreconciled_balance: None,  // TODO: Set from your business logicsync_credentials: None,  // TODO: Set from your business logicsync_provider: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
+        account_name: "Operating Account (Updated)".to_string(), // TODO: Set from your business logic
+
+        account_number: "CHASE-001".to_string(), // TODO: Set from your business logic
+
+        account_type: "CHECKING".to_string(), // TODO: Set from your business logic
+
+        bank_code: None, // TODO: Set from your business logic
+
+        bank_name: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        current_balance: None, // TODO: Set from your business logic
+
+        id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        last_reconciled_at: None, // TODO: Set from your business logic
+
+        last_synced_at: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        reconciled_balance: None, // TODO: Set from your business logic
+
+        sync_credentials: None, // TODO: Set from your business logic
+
+        sync_provider: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }

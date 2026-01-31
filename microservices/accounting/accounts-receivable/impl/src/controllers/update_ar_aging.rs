@@ -20,6 +20,30 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_date: "2024-01-31".to_string(), // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccurrent: None,  // TODO: Set from your business logiccustomer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(),  // TODO: Set from your business logicdays_31_60: None,  // TODO: Set from your business logicdays_61_90: None,  // TODO: Set from your business logicdays_91_120: None,  // TODO: Set from your business logicid: "a00a0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicover_120: None,  // TODO: Set from your business logictotal_outstanding: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        aging_date: "2024-01-31".to_string(), // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        current: None, // TODO: Set from your business logic
+
+        customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
+
+        days_31_60: None, // TODO: Set from your business logic
+
+        days_61_90: None, // TODO: Set from your business logic
+
+        days_91_120: None, // TODO: Set from your business logic
+
+        id: "a00a0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        over_120: None, // TODO: Set from your business logic
+
+        total_outstanding: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

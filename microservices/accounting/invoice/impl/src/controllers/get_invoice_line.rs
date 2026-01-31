@@ -20,6 +20,48 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        account_id: None, // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logicdiscount_amount: None,  // TODO: Set from your business logicdiscount_percent: None,  // TODO: Set from your business logicid: "a0020e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinvoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicline_number: None,  // TODO: Set from your business logicline_subtotal: None,  // TODO: Set from your business logicline_total: None,  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicproduct_code: None,  // TODO: Set from your business logicproduct_description: None,  // TODO: Set from your business logicproduct_id: None,  // TODO: Set from your business logicproduct_name: "Professional Services".to_string(),  // TODO: Set from your business logicquantity: rust_decimal::Decimal::new(400, 1),  // TODO: Set from your business logictax_amount: None,  // TODO: Set from your business logictax_id: None,  // TODO: Set from your business logictax_rate: None,  // TODO: Set from your business logicunit_of_measure: None,  // TODO: Set from your business logicunit_price: rust_decimal::Decimal::new(2500, 1),  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        account_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        discount_amount: None, // TODO: Set from your business logic
+
+        discount_percent: None, // TODO: Set from your business logic
+
+        id: "a0020e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        line_number: None, // TODO: Set from your business logic
+
+        line_subtotal: None, // TODO: Set from your business logic
+
+        line_total: None, // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        product_code: None, // TODO: Set from your business logic
+
+        product_description: None, // TODO: Set from your business logic
+
+        product_id: None, // TODO: Set from your business logic
+
+        product_name: "Professional Services".to_string(), // TODO: Set from your business logic
+
+        quantity: rust_decimal::Decimal::new(400, 1), // TODO: Set from your business logic
+
+        tax_amount: None, // TODO: Set from your business logic
+
+        tax_id: None, // TODO: Set from your business logic
+
+        tax_rate: None, // TODO: Set from your business logic
+
+        unit_of_measure: None, // TODO: Set from your business logic
+
+        unit_price: rust_decimal::Decimal::new(2500, 1), // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

@@ -20,6 +20,62 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        cancelled_at: None, // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccustomer_id: None,  // TODO: Set from your business logicdiscount_amount: None,  // TODO: Set from your business logicdue_date: None,  // TODO: Set from your business logicexchange_rate: None,  // TODO: Set from your business logicid: "a0010e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicinternal_notes: None,  // TODO: Set from your business logicinvoice_date: "2024-01-15".to_string(),  // TODO: Set from your business logicinvoice_number: "INV-2024-001".to_string(),  // TODO: Set from your business logicinvoice_type: "CUSTOMER_INVOICE".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicnotes: None,  // TODO: Set from your business logicoutstanding_amount: None,  // TODO: Set from your business logicpaid_amount: None,  // TODO: Set from your business logicpaid_at: None,  // TODO: Set from your business logicpayment_state: "NOT_PAID".to_string(),  // TODO: Set from your business logicpayment_term_id: None,  // TODO: Set from your business logicposted_at: None,  // TODO: Set from your business logicreference_number: None,  // TODO: Set from your business logicstatus: "DRAFT".to_string(),  // TODO: Set from your business logicsubtotal: None,  // TODO: Set from your business logictax_amount: None,  // TODO: Set from your business logictotal_amount: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicvendor_id: None,  // TODO: Set from your business logicvendor_reference: None,  // TODO: Set from your business logic
+        cancelled_at: None, // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        customer_id: None, // TODO: Set from your business logic
+
+        discount_amount: None, // TODO: Set from your business logic
+
+        due_date: None, // TODO: Set from your business logic
+
+        exchange_rate: None, // TODO: Set from your business logic
+
+        id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        internal_notes: None, // TODO: Set from your business logic
+
+        invoice_date: "2024-01-15".to_string(), // TODO: Set from your business logic
+
+        invoice_number: "INV-2024-001".to_string(), // TODO: Set from your business logic
+
+        invoice_type: "CUSTOMER_INVOICE".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        notes: None, // TODO: Set from your business logic
+
+        outstanding_amount: None, // TODO: Set from your business logic
+
+        paid_amount: None, // TODO: Set from your business logic
+
+        paid_at: None, // TODO: Set from your business logic
+
+        payment_state: "NOT_PAID".to_string(), // TODO: Set from your business logic
+
+        payment_term_id: None, // TODO: Set from your business logic
+
+        posted_at: None, // TODO: Set from your business logic
+
+        reference_number: None, // TODO: Set from your business logic
+
+        status: "DRAFT".to_string(), // TODO: Set from your business logic
+
+        subtotal: None, // TODO: Set from your business logic
+
+        tax_amount: None, // TODO: Set from your business logic
+
+        total_amount: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        vendor_id: None, // TODO: Set from your business logic
+
+        vendor_reference: None, // TODO: Set from your business logic
     }
 }

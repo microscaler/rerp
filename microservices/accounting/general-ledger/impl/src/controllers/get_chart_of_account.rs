@@ -20,6 +20,24 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        account_type: "ASSET".to_string(), // TODO: Set from your business logiccode: "1".to_string(),  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicid: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicis_active: true,  // TODO: Set from your business logiclevel: 0,  // TODO: Set from your business logicname: "Assets".to_string(),  // TODO: Set from your business logicparent_id: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logic
+        account_type: "ASSET".to_string(), // TODO: Set from your business logic
+
+        code: "1".to_string(), // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        is_active: true, // TODO: Set from your business logic
+
+        level: 0, // TODO: Set from your business logic
+
+        name: "Assets".to_string(), // TODO: Set from your business logic
+
+        parent_id: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
     }
 }

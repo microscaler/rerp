@@ -20,6 +20,48 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        approval_status: None, // TODO: Set from your business logicapproved_at: None,  // TODO: Set from your business logicapproved_by: None,  // TODO: Set from your business logicbudget_number: "example".to_string(),  // TODO: Set from your business logiccompany_id: None,  // TODO: Set from your business logiccreated_at: None,  // TODO: Set from your business logiccreated_by: None,  // TODO: Set from your business logiccurrency_code: "USD".to_string(),  // TODO: Set from your business logiccurrent_version_id: None,  // TODO: Set from your business logicdescription: None,  // TODO: Set from your business logicfiscal_year: 2024,  // TODO: Set from your business logicid: "a0140e8400-e29b-41d4-a716-446655440000".to_string(),  // TODO: Set from your business logicmetadata: None,  // TODO: Set from your business logicname: "example".to_string(),  // TODO: Set from your business logicperiod_end: "example".to_string(),  // TODO: Set from your business logicperiod_start: "example".to_string(),  // TODO: Set from your business logicstatus: "DRAFT".to_string(),  // TODO: Set from your business logictotal_actual_amount: None,  // TODO: Set from your business logictotal_budget_amount: None,  // TODO: Set from your business logictotal_variance: None,  // TODO: Set from your business logicupdated_at: None,  // TODO: Set from your business logicupdated_by: None,  // TODO: Set from your business logic
+        approval_status: None, // TODO: Set from your business logic
+
+        approved_at: None, // TODO: Set from your business logic
+
+        approved_by: None, // TODO: Set from your business logic
+
+        budget_number: "example".to_string(), // TODO: Set from your business logic
+
+        company_id: None, // TODO: Set from your business logic
+
+        created_at: None, // TODO: Set from your business logic
+
+        created_by: None, // TODO: Set from your business logic
+
+        currency_code: "USD".to_string(), // TODO: Set from your business logic
+
+        current_version_id: None, // TODO: Set from your business logic
+
+        description: None, // TODO: Set from your business logic
+
+        fiscal_year: 2024, // TODO: Set from your business logic
+
+        id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
+
+        metadata: None, // TODO: Set from your business logic
+
+        name: "example".to_string(), // TODO: Set from your business logic
+
+        period_end: "example".to_string(), // TODO: Set from your business logic
+
+        period_start: "example".to_string(), // TODO: Set from your business logic
+
+        status: "DRAFT".to_string(), // TODO: Set from your business logic
+
+        total_actual_amount: None, // TODO: Set from your business logic
+
+        total_budget_amount: None, // TODO: Set from your business logic
+
+        total_variance: None, // TODO: Set from your business logic
+
+        updated_at: None, // TODO: Set from your business logic
+
+        updated_by: None, // TODO: Set from your business logic
     }
 }
