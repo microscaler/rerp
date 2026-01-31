@@ -8,6 +8,10 @@ default = []
 # Use jemalloc as the global allocator (opt-in: --features jemalloc). Not default for arm7 musl.
 jemalloc = ["tikv-jemallocator"]
 
+# Allow dead_code in gen crate: request/response types in handlers/types.rs are used by impl via serde.
+[lints.rust]
+dead_code = "allow"
+
 [dependencies]
 # NOTE: Additional dependencies can be configured via brrtrouter-dependencies.toml
 # Place brrtrouter-dependencies.toml alongside your openapi.yaml file.
