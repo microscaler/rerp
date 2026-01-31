@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from .sources import (
     discover_bff_suite_config,
@@ -12,34 +13,38 @@ from .sources import (
 from .suites import iter_bffs, iter_suite_services
 
 
-def get_package_names(project_root: Path) -> dict[str, str]:
+def get_package_names(project_root: Path, suite: Optional[str] = None) -> dict[str, str]:
     """Cargo [package].name per service: from openapi/{suite}/{service}/openapi.yaml and BFFs.
 
     Returns dict mapping service name (e.g. 'general-ledger', 'bff') to package name
     (e.g. 'rerp_accounting_general_ledger', 'rerp_accounting_bff'). Includes BFF services
     from bff-suite-config so brrtrouter-gen receives --package-name and writes correct
     [package].name in gen/Cargo.toml (e.g. rerp_accounting_bff_gen).
+
+    When suite is set, only include services from that suite; when None, include all suites.
     """
     out: dict[str, str] = {}
-    for suite, service_name in iter_suite_services(project_root):
+    for s, service_name in iter_suite_services(project_root, suite=suite):
         snake = service_name.replace("-", "_")
-        out[service_name] = f"rerp_{suite}_{snake}"
-    for bff_svc, suite in iter_bffs(project_root):
+        out[service_name] = f"rerp_{s}_{snake}"
+    for bff_svc, s in iter_bffs(project_root, suite=suite):
         snake = bff_svc.replace("-", "_")
-        out[bff_svc] = f"rerp_{suite}_{snake}"
+        out[bff_svc] = f"rerp_{s}_{snake}"
     return out
 
 
-def get_binary_names(project_root: Path) -> dict[str, str]:
+def get_binary_names(project_root: Path, suite: Optional[str] = None) -> dict[str, str]:
     """Binary name in build_artifacts/ and Dockerfile COPY: from service name (incl. BFF).
 
     Returns dict mapping service name (e.g. 'general-ledger', 'bff') to artifact name
     (e.g. 'general_ledger', 'bff').
+
+    When suite is set, only include services from that suite; when None, include all suites.
     """
     out: dict[str, str] = {}
-    for _suite, service_name in iter_suite_services(project_root):
+    for _s, service_name in iter_suite_services(project_root, suite=suite):
         out[service_name] = service_name.replace("-", "_")
-    for bff_svc, _ in iter_bffs(project_root):
+    for bff_svc, _ in iter_bffs(project_root, suite=suite):
         out[bff_svc] = bff_svc.replace("-", "_")
     return out
 

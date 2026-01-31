@@ -343,15 +343,27 @@ def __build_parser():
         metavar="N",
         help="Service port (default: 8000)",
     )
-    pd_sub.add_parser(
+    pd_validate = pd_sub.add_parser(
         "validate-build-artifacts",
         help="Check build_artifacts/{amd64,arm64,arm} contain expected microservice binaries (after download from Multi-Arch)",
+    )
+    pd_validate.add_argument(
+        "--suite",
+        metavar="SUITE",
+        default=None,
+        help="Limit to one suite (e.g. accounting). Omit for all suites (matrix later).",
     )
     pdc = pd_sub.add_parser(
         "copy-artifacts",
         help="Copy microservice binaries from microservices/target to build_artifacts/{arch}",
     )
     pdc.add_argument("arch", help="Architecture: amd64, arm64, or arm7")
+    pdc.add_argument(
+        "--suite",
+        metavar="SUITE",
+        default=None,
+        help="Limit to one suite (e.g. accounting). Omit for all suites (matrix later).",
+    )
     pdb = pd_sub.add_parser(
         "build-base",
         help="Build docker/base/Dockerfile as rerp-base:latest (local; use base-images.yml to publish)",

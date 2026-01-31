@@ -52,10 +52,10 @@ def run_docker(args, project_root: Path) -> None:
         rc = run_unpack_build_bins(inp, project_root, zip_prefix=RERP_ZIP_PREFIX)
         sys.exit(rc)
     if args.docker_cmd == "validate-build-artifacts":
-        rc = validate_build_artifacts(project_root)
+        rc = validate_build_artifacts(project_root, suite=getattr(args, "suite", None))
         sys.exit(rc)
     if args.docker_cmd == "copy-artifacts":
-        rc = run_copy_artifacts(args.arch, project_root)
+        rc = run_copy_artifacts(args.arch, project_root, suite=getattr(args, "suite", None))
         sys.exit(rc)
     if args.docker_cmd == "build-base":
         from brrtrouter_tooling.docker.build_base import run as run_build_base

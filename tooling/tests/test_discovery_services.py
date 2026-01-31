@@ -72,3 +72,32 @@ def test_get_service_ports_from_openapi(tmp_path: Path) -> None:
 
 def test_get_service_ports_empty(tmp_path: Path) -> None:
     assert get_service_ports(tmp_path) == {}
+
+
+def test_get_package_names_suite_scoped(tmp_path: Path) -> None:
+    """When suite=accounting, only accounting services are returned (enables matrix later)."""
+    _make_openapi_spec(tmp_path, "accounting", "general-ledger")
+    _make_openapi_spec(tmp_path, "accounting", "invoice")
+    _make_openapi_spec(tmp_path, "sales", "core")
+    got_all = get_package_names(tmp_path)
+    assert "general-ledger" in got_all
+    assert "invoice" in got_all
+    assert "core" in got_all
+    got_accounting = get_package_names(tmp_path, suite="accounting")
+    assert got_accounting == {
+        "general-ledger": "rerp_accounting_general_ledger",
+        "invoice": "rerp_accounting_invoice",
+    }
+    got_sales = get_package_names(tmp_path, suite="sales")
+    assert got_sales == {"core": "rerp_sales_core"}
+
+
+def test_get_binary_names_suite_scoped(tmp_path: Path) -> None:
+    """When suite=accounting, only accounting binaries are returned."""
+    _make_openapi_spec(tmp_path, "accounting", "general-ledger")
+    _make_openapi_spec(tmp_path, "sales", "core")
+    got_all = get_binary_names(tmp_path)
+    assert "general_ledger" in got_all.values()
+    assert "core" in got_all.values()
+    got_accounting = get_binary_names(tmp_path, suite="accounting")
+    assert got_accounting == {"general-ledger": "general_ledger"}

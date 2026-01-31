@@ -363,7 +363,7 @@ jobs:
           tooling/.venv/bin/rerp build microservices ${{ matrix.architecture }} --release
 
       - name: Copy microservices to build_artifacts
-        run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }}
+        run: tooling/.venv/bin/rerp docker copy-artifacts ${{ matrix.architecture }} --suite accounting
 
       - name: Upload binaries
         uses: actions/upload-artifact@v6
