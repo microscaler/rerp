@@ -70,6 +70,9 @@ def _get_cargo_env(rust_target: str) -> Dict[str, str]:
 # RERP workspace: microservices/ (root Cargo.toml has members = ["microservices"])
 WORKSPACE_DIR = "microservices"
 
+# armv7 cross toolchain does not provide __ffsdi2 (used by tikv-jemalloc-sys); disable jemalloc for arm7
+ARM7_TARGET = "armv7-unknown-linux-musleabihf"
+
 
 def _build_workspace(
     project_root: Path,
@@ -86,10 +89,13 @@ def _build_workspace(
         return False
 
     if use_cross:
+        args = list(extra_args)
+        if rust_target == ARM7_TARGET:
+            args.insert(0, "--no-default-features")  # avoid jemalloc __ffsdi2 link error on armv7 musl
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
             "--target", rust_target, "--workspace", "--release",
-        ] + extra_args
+        ] + args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
             return True
@@ -97,10 +103,15 @@ def _build_workspace(
             print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
             return False
 
+    arm7_no_jemalloc = rust_target == ARM7_TARGET
     if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", "--release"] + extra_args
+        cmd = ["cargo", "zigbuild", "--target", rust_target, "--workspace", "--release"] + (
+            ["--no-default-features"] if arm7_no_jemalloc else []
+        ) + extra_args
     else:
-        cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + extra_args
+        cmd = ["cargo", "build", "--target", rust_target, "--workspace", "--release"] + (
+            ["--no-default-features"] if arm7_no_jemalloc else []
+        ) + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(workspace_dir))
@@ -130,10 +141,13 @@ def _build_service(
         return False
 
     if use_cross:
+        args = list(extra_args)
+        if rust_target == ARM7_TARGET:
+            args.insert(0, "--no-default-features")  # avoid jemalloc __ffsdi2 link error on armv7 musl
         cmd = [
             "cross", "build", "--manifest-path", str(manifest),
             "-p", package_name, "--target", rust_target, "--release",
-        ] + extra_args
+        ] + args
         try:
             subprocess.run(cmd, check=True, cwd=str(project_root))
             return True
@@ -141,10 +155,15 @@ def _build_service(
             print(f"❌ Build failed for {arch_name}: {e}", file=sys.stderr)
             return False
 
+    arm7_no_jemalloc = rust_target == ARM7_TARGET
     if use_zigbuild:
-        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", package_name, "--release"] + extra_args
+        cmd = ["cargo", "zigbuild", "--target", rust_target, "-p", package_name, "--release"] + (
+            ["--no-default-features"] if arm7_no_jemalloc else []
+        ) + extra_args
     else:
-        cmd = ["cargo", "build", "--target", rust_target, "-p", package_name, "--release"] + extra_args
+        cmd = ["cargo", "build", "--target", rust_target, "-p", package_name, "--release"] + (
+            ["--no-default-features"] if arm7_no_jemalloc else []
+        ) + extra_args
     try:
         env = _get_cargo_env(rust_target) if not use_zigbuild else os.environ.copy()
         subprocess.run(cmd, env=env, check=True, cwd=str(project_root / WORKSPACE_DIR))
