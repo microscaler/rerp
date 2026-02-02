@@ -95,7 +95,7 @@ jobs:
       - name: Build and push rerp-base
         id: build
         if: steps.check-changes.outputs.changed == 'true' || github.event.inputs.force == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/base/Dockerfile
