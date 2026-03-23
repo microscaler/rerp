@@ -526,19 +526,19 @@ jobs:
           tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
 
       - name: Copy microservices binaries (amd64) from build-multiarch artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: microservices-binaries-amd64
           path: build_artifacts/amd64
 
       - name: Copy microservices binaries (arm64) from build-multiarch artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: microservices-binaries-arm64
           path: build_artifacts/arm64
 
       - name: Copy microservices binaries (arm) from build-multiarch artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: microservices-binaries-arm
           path: build_artifacts/arm
@@ -591,7 +591,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Copy microservices binaries from artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: build-artifacts
           path: build_artifacts
