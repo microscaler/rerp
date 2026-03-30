@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
-    "solid-js": "^1.9.11"
+    "solid-js": "^1.9.12"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/postcss": "^4.2.2",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
