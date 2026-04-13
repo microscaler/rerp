@@ -9,7 +9,7 @@ description = "RERP-specific development tooling: ports, build, docker, tilt, br
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "PyYAML>=6.0",
+    "PyYAML>=6.0.3",
     "certifi>=2023.7.22",
 ]
 
