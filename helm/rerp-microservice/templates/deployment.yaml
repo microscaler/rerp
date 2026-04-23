@@ -28,6 +28,17 @@ spec:
             - name: http
               containerPort: {{ .Values.service.containerPort }}
               protocol: TCP
+          command: ["/dev-entrypoint.sh"]
+          args:
+            - "/app/{{ .Values.app.binaryName }}"
+            - "--spec"
+            - "/app/doc/openapi.yaml"
+            - "--doc-dir"
+            - "/app/doc"
+            - "--static-dir"
+            - "/app/static_site"
+            - "--config"
+            - "/app/config/config.yaml"
           env:
             # PORT environment variable: Set from service.containerPort
             # The application reads this to determine which port to listen on.

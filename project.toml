@@ -1,0 +1,38 @@
+# Project descriptor for RERP buildpack builds.
+# Use with: pack build <image> --path . --builder rerp-builder --descriptor project.toml
+#   -e BP_RUST_WORKSPACE_DIR=microservices
+#   -e BP_RUST_PACKAGE=rerp_accounting_general_ledger
+#
+# BP_RUST_PACKAGE and BP_RUST_WORKSPACE_DIR are passed via pack -e (not hardcoded here)
+# so one project.toml works for all services.
+
+[_]
+schema-version = "0.2"
+id = "io.buildpacks.rerp"
+
+[[io.buildpacks.group]]
+uri = "docker://ghcr.io/octopilot/rust:0.1.5"
+
+[[io.buildpacks.group]]
+id = "rerp/copy-layout"
+
+[io.buildpacks.group.script]
+api = "0.10"
+inline = """
+set -e
+OUT="${CNB_OUTPUT_DIR:-/workspace}"
+WS="${CNB_BUILD_DIR:-/workspace}/${BP_RUST_WORKSPACE_DIR:-.}"
+PKG="${BP_RUST_PACKAGE}"
+if [ -z "$PKG" ]; then
+  echo "BP_RUST_PACKAGE not set; skipping RERP layout copy"
+  exit 0
+fi
+# Derive service dir: rerp_accounting_general_ledger -> accounting/general-ledger
+SVC=$(echo "$PKG" | sed 's/^rerp_//' | sed 's/_/\\//' | sed 's/_/-/g')
+for d in impl/config gen/doc gen/static_site; do
+  if [ -d "$WS/$SVC/$d" ]; then
+    cp -r "$WS/$SVC/$d" "$OUT/"
+    echo "Copied $SVC/$d"
+  fi
+done
+"""

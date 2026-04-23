@@ -1,0 +1,63 @@
+# Buildpack smoke test: validate octopilot/rust can build RERP.
+# Runs pack build for general-ledger; does not require the image to run (no DB).
+# See docs/DESIGN-BUILDPACKS-INTEGRATION.md Phase 1.
+
+name: Buildpack Smoke
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main, chore/implement-octopilot-build]
+    paths:
+      - ".github/workflows/buildpack-smoke.yml"
+      - ".github/buildpack-builder.toml"
+      - "project.toml"
+      - "microservices/**"
+
+jobs:
+  buildpack-smoke:
+    name: Pack build general-ledger
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling
+          tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
+
+      - name: Patch Cargo.toml (BRRTRouter/Lifeguard from git)
+        run: tooling/.venv/bin/rerp ci patch-brrtrouter
+
+      - name: Install Pack
+        uses: buildpacks/github-actions/setup-pack@main
+        with:
+          pack-version: "0.40.0"
+
+      - name: Create builder
+        run: pack builder create rerp-builder --config .github/buildpack-builder.toml
+
+      - name: Pack build general-ledger
+        run: |
+          pack build rerp-accounting-general-ledger:buildpack-smoke \
+            --path . \
+            --builder rerp-builder \
+            --descriptor project.toml \
+            -e BP_RUST_WORKSPACE_DIR=microservices \
+            -e BP_RUST_PACKAGE=rerp_accounting_general_ledger
+
+      - name: Assert image exists
+        run: |
+          docker image inspect rerp-accounting-general-ledger:buildpack-smoke
+          echo "✅ Buildpack smoke passed: image created"

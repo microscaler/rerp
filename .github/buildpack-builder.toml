@@ -1,0 +1,22 @@
+# Minimal builder for RERP buildpack smoke test.
+# Uses octopilot/rust 0.1.5+ (0.1.5 fixes rm target/ in some environments).
+# Create with: pack builder create rerp-builder --config .github/buildpack-builder.toml
+
+description = "RERP buildpack smoke: Rust only (octopilot/rust + Paketo stack)"
+
+[[buildpacks]]
+  uri = "docker://ghcr.io/octopilot/rust:0.1.5"
+  version = "0.1.5"
+
+[lifecycle]
+  version = "0.21.1"
+
+[[order]]
+  [[order.group]]
+    id = "octopilot/rust"
+    version = "0.1.5"
+
+[stack]
+  build-image = "docker.io/paketobuildpacks/build-jammy-base:0.1.197"
+  id = "io.buildpacks.stacks.jammy"
+  run-image = "index.docker.io/paketobuildpacks/run-jammy-base:latest"

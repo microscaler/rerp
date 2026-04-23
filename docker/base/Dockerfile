@@ -26,6 +26,10 @@ ENV TZ=UTC
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=info
 
+# Add dev synchronization script
+COPY dev-entrypoint.sh /dev-entrypoint.sh
+RUN chmod +x /dev-entrypoint.sh
+
 # Labels for identification
 LABEL org.opencontainers.image.title="RERP Base Runtime"
 LABEL org.opencontainers.image.description="Base runtime image for RERP microservices"
