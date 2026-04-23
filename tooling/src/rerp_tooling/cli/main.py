@@ -402,6 +402,11 @@ def __build_parser():
         metavar="NAME",
         help="Service name (e.g. invoice). When set, dockerfile is treated as Dockerfile.template and rendered with discovery-derived port/binary.",
     )
+    pdbi.add_argument(
+        "--dev-sync-only",
+        action="store_true",
+        help="Only alias and tag the base image to the target, bypassing docker build (for live_update).",
+    )
     pdcm = pd_sub.add_parser(
         "copy-multiarch",
         help="Copy component binaries to build_artifacts/{system}_{module}/{arch} (replaces copy-multiarch-binary.sh)",

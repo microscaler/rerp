@@ -79,17 +79,17 @@ teardown:
 # Start services with Tilt (local Docker mode)
 up:
     @echo "Starting all services with Tilt (local Docker mode)..."
-    @tilt up
+    @tilt up --host=0.0.0.0 --port=10350
 
 # Start with Kind cluster (cluster and rerp namespace must exist; see dev-up)
 up-k8s:
     @kubectl apply -f k8s/microservices/namespace.yaml 2>/dev/null || true
     @echo "Starting all services with Tilt (Kubernetes mode)..."
-    @tilt up -- --use-kind
+    @tilt up --host=0.0.0.0 --port=10350 -- --use-kind
 
 # Stop services
 down:
-    @tilt down
+    @tilt down --port 10350
 
 # ============================================================================
 # Tooling (.venv and rerp CLI)

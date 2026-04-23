@@ -1,0 +1,3 @@
+# RERP Project Brief
+
+**RERP** = modular, cloud-native open-source ERP (not a monolith). **Suites:** RERP is composed of **suites of systems**; each suite has its own microservices and **one BFF** that aggregates them (e.g. accounting: general-ledger, invoice, …, + BFF). `openapi/{suite}/bff-suite-config.yaml`, `openapi/{suite}/openapi_bff.yaml`, `openapi/{suite}/{name}/openapi.yaml`. Details: `.agent/memory-bank/suiteArchitecture.md`. **Vision (RERP_MUSINGS):** Fill gaps vs Odoo/ERPNext — enterprise-scale, microservices-as-LEGO, API-first, AI in core, better UX. Rust, OpenAPI, 71 services planned. **Now:** Accounting suite (10 + BFF) bootstrapped; entities, Helm, K8s, Tilt. PolyForm Shield.

@@ -264,7 +264,7 @@ def create_microservice_deployment(name):
     # 2. Build and push Docker image (template rendered on the fly with --service)
     local_resource(
         'docker-%s' % name,
-        'tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s' % (image_name, dockerfile_template, hash_path, artifact_path, name),
+        'tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s --dev-sync-only' % (image_name, dockerfile_template, hash_path, artifact_path, name),
         deps=[hash_path, artifact_path, dockerfile_template, 'tooling/pyproject.toml'],
         resource_deps=['copy-%s' % name],
         labels=['acc_' + name],
@@ -276,7 +276,7 @@ def create_microservice_deployment(name):
     # or, if registry is not running, use kind load (no registry needed)
     custom_build(
         image_name,
-        ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s' % (image_name, image_name, dockerfile_template, hash_path, artifact_path, name)
+        ('(docker image inspect %s:tilt >/dev/null 2>&1) || tooling/.venv/bin/rerp docker build-image-simple %s %s %s %s --service %s --dev-sync-only' % (image_name, image_name, dockerfile_template, hash_path, artifact_path, name)
          + ' && (docker push %s:tilt 2>/dev/null || kind load docker-image %s:tilt --name rerp)' % (image_name, image_name)),
         deps=[artifact_path, hash_path, 'microservices/accounting/%s/impl/config' % name, 'microservices/accounting/%s/gen/doc' % name, 'microservices/accounting/%s/gen/static_site' % name],
         tag='tilt',
