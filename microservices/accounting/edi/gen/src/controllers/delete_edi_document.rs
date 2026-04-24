@@ -1,20 +1,10 @@
-
 // User-owned controller for handler 'delete_edi_document'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::delete_edi_document::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::delete_edi_document::{ Request, Response };
-
-
+use brrtrouter_macros::handler;
 
 #[handler(DeleteEdiDocumentController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
-    Response {
-        
-    }
-    
-    
+    Response {}
 }

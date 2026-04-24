@@ -35,6 +35,10 @@ edition = "2021"
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
 brrtrouter = { path = "../../BRRTRouter", default-features = false }
 brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
+# Gen crate dependencies (from brrtrouter-gen Phase 1)
+arc-swap = "1.7"
+may_http = { git = "https://github.com/rust-may/may_http.git" }
+http_legacy = { package = "http", version = "0.2" }
 
 # Lifeguard ORM
 lifeguard = { path = "../../lifeguard" }

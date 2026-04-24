@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_edi_gen::handlers::delete_edi_mapping::{Request, Response};
+use edi_service_api::handlers::delete_edi_mapping::{Request, Response};
 
 #[handler(DeleteEdiMappingController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

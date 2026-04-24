@@ -1,19 +1,15 @@
 # Minimal runtime-only Dockerfile for {{service_name}} Service (Tilt development)
 # Binary is cross-compiled on host and copied in.
-# Rendered from this template with: rerp docker generate-dockerfile accounting <module> [--port N]
-# Build with: rerp docker build-image-simple <image> docker/microservices/Dockerfile.template <hash> <artifact> --service <module>
+# Rendered from this template with: rerp docker generate-dockerfile <suite> <module> [--port N]
+# Build with: rerp docker build-image-simple <image> docker/microservices/Dockerfile.template <hash> <artifact> --suite <suite> --service <module>
 #
 # Multi-arch: buildx sets TARGETARCH (amd64 | arm64 | arm/v7). Defaults for local.
-#
-# NOTE: {{target_arch}} is a template placeholder — DO NOT use shell variable syntax
-# like ${TARGETARCH}. The render_dockerfile.py replaces {{target_arch}} at render time.
 
 ARG BASE_IMAGE=rerp-base:latest
 FROM ${BASE_IMAGE}
 
-# TARGETARCH: injected at render time by render_dockerfile.py as the host arch (amd64 or arm64)
+# TARGETARCH injected via python template processing
 COPY ./build_artifacts/{{target_arch}}/{{binary_name}} /app/{{binary_name}}
-RUN chmod +x /app/{{binary_name}}
 
 # Create directories for configuration and assets with write permissions
 RUN mkdir -p /app/config /app/doc /app/static_site && chmod -R 777 /app
@@ -30,9 +26,7 @@ EXPOSE {{port}}
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=debug
 
-# Run via dev-entrypoint.sh so Tilt's kill -HUP 1 hot-reload works:
-# the entrypoint script traps SIGHUP and restarts the child process
-# without restarting the container.
+# Run the service
 ENTRYPOINT ["/dev-entrypoint.sh", "/app/{{binary_name}}", \
     "--spec", "/app/doc/openapi.yaml", \
     "--doc-dir", "/app/doc", \

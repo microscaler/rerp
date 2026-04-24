@@ -1,5 +1,5 @@
 [package]
-name = "general_ledger_service_api"
+name = "rerp_accounting_general_ledger_gen"
 version = "0.1.0"
 edition = "2021"
 

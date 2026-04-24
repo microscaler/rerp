@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_edi_gen::handlers::create_edi_document::{Request, Response};
+use edi_service_api::handlers::create_edi_document::{Request, Response};
 
 #[handler(CreateEdiDocumentController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,62 +20,34 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        acknowledgment_sent: true, // TODO: Set from your business logic
-
+        acknowledgment_sent: true,    // TODO: Set from your business logic
         acknowledgment_sent_at: None, // TODO: Set from your business logic
-
-        company_id: None, // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
-        created_by: None, // TODO: Set from your business logic
-
-        currency_code: None, // TODO: Set from your business logic
-
+        company_id: None,             // TODO: Set from your business logic
+        created_at: None,             // TODO: Set from your business logic
+        created_by: None,             // TODO: Set from your business logic
+        currency_code: None,          // TODO: Set from your business logic
         document_number: "example".to_string(), // TODO: Set from your business logic
-
-        document_total_amount: None, // TODO: Set from your business logic
-
+        document_total_amount: None,  // TODO: Set from your business logic
         document_type: "example".to_string(), // TODO: Set from your business logic
-
-        error_details: None, // TODO: Set from your business logic
-
-        error_message: None, // TODO: Set from your business logic
-
+        error_details: None,          // TODO: Set from your business logic
+        error_message: None,          // TODO: Set from your business logic
         format_id: "example".to_string(), // TODO: Set from your business logic
-
-        id: "example".to_string(), // TODO: Set from your business logic
-
-        last_retry_at: None, // TODO: Set from your business logic
-
-        metadata: None, // TODO: Set from your business logic
-
-        parsed_at: None, // TODO: Set from your business logic
-
-        parsed_data: None, // TODO: Set from your business logic
-
-        processed_at: None, // TODO: Set from your business logic
-
-        raw_content: None, // TODO: Set from your business logic
-
+        id: "example".to_string(),    // TODO: Set from your business logic
+        last_retry_at: None,          // TODO: Set from your business logic
+        metadata: None,               // TODO: Set from your business logic
+        parsed_at: None,              // TODO: Set from your business logic
+        parsed_data: None,            // TODO: Set from your business logic
+        processed_at: None,           // TODO: Set from your business logic
+        raw_content: None,            // TODO: Set from your business logic
         received_at: "example".to_string(), // TODO: Set from your business logic
-
-        receiver_id: None, // TODO: Set from your business logic
-
-        related_invoice_id: None, // TODO: Set from your business logic
-
+        receiver_id: None,            // TODO: Set from your business logic
+        related_invoice_id: None,     // TODO: Set from your business logic
         related_purchase_order_id: None, // TODO: Set from your business logic
-
-        retry_count: 42, // TODO: Set from your business logic
-
-        sender_id: None, // TODO: Set from your business logic
-
+        retry_count: 42,              // TODO: Set from your business logic
+        sender_id: None,              // TODO: Set from your business logic
         status: "example".to_string(), // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
-
-        updated_by: None, // TODO: Set from your business logic
-
-        validated_at: None, // TODO: Set from your business logic
+        updated_at: None,             // TODO: Set from your business logic
+        updated_by: None,             // TODO: Set from your business logic
+        validated_at: None,           // TODO: Set from your business logic
     }
 }

@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_edi_gen::handlers::create_edi_mapping::{Request, Response};
+use edi_service_api::handlers::create_edi_mapping::{Request, Response};
 
 #[handler(CreateEdiMappingController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,32 +20,19 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        created_at: None, // TODO: Set from your business logic
-
-        created_by: None, // TODO: Set from your business logic
-
-        default_values: None, // TODO: Set from your business logic
-
-        description: None, // TODO: Set from your business logic
-
+        created_at: None,                     // TODO: Set from your business logic
+        created_by: None,                     // TODO: Set from your business logic
+        default_values: None,                 // TODO: Set from your business logic
+        description: None,                    // TODO: Set from your business logic
         document_type: "example".to_string(), // TODO: Set from your business logic
-
-        field_mappings: Default::default(), // TODO: Set from your business logic
-
-        format_id: "example".to_string(), // TODO: Set from your business logic
-
-        id: "example".to_string(), // TODO: Set from your business logic
-
-        is_active: true, // TODO: Set from your business logic
-
-        mapping_name: "example".to_string(), // TODO: Set from your business logic
-
-        transformation_rules: None, // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
-
-        updated_by: None, // TODO: Set from your business logic
-
-        validation_rules: None, // TODO: Set from your business logic
+        field_mappings: Default::default(),   // TODO: Set from your business logic
+        format_id: "example".to_string(),     // TODO: Set from your business logic
+        id: "example".to_string(),            // TODO: Set from your business logic
+        is_active: true,                      // TODO: Set from your business logic
+        mapping_name: "example".to_string(),  // TODO: Set from your business logic
+        transformation_rules: None,           // TODO: Set from your business logic
+        updated_at: None,                     // TODO: Set from your business logic
+        updated_by: None,                     // TODO: Set from your business logic
+        validation_rules: None,               // TODO: Set from your business logic
     }
 }
