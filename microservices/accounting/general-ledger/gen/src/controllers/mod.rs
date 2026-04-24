@@ -25,6 +25,18 @@ pub mod update_chart_of_account;
 
 pub mod delete_chart_of_account;
 
+pub mod list_chart_templates;
+
+pub mod create_chart_template;
+
+pub mod get_chart_template;
+
+pub mod update_chart_template;
+
+pub mod delete_chart_template;
+
+pub mod deploy_chart_template;
+
 pub mod list_fiscal_periods;
 
 pub mod create_fiscal_period;
@@ -34,6 +46,34 @@ pub mod get_fiscal_period;
 pub mod update_fiscal_period;
 
 pub mod delete_fiscal_period;
+
+pub mod list_fiscal_positions;
+
+pub mod create_fiscal_position;
+
+pub mod get_fiscal_position;
+
+pub mod update_fiscal_position;
+
+pub mod delete_fiscal_position;
+
+pub mod list_fiscal_years;
+
+pub mod create_fiscal_year;
+
+pub mod get_fiscal_year;
+
+pub mod update_fiscal_year;
+
+pub mod delete_fiscal_year;
+
+pub mod close_fiscal_year;
+
+pub mod reopen_fiscal_year;
+
+pub mod list_fiscal_year_periods;
+
+pub mod generate_fiscal_year_periods;
 
 pub mod list_journal_entries;
 
@@ -69,8 +109,40 @@ pub mod delete_journal;
 
 pub mod list_journal_entries_by_journal;
 
+pub mod list_payment_methods;
+
+pub mod create_payment_method;
+
+pub mod get_payment_method;
+
+pub mod update_payment_method;
+
+pub mod delete_payment_method;
+
+pub mod list_payment_method_journal_mappings;
+
+pub mod list_payment_terms;
+
+pub mod create_payment_term;
+
+pub mod get_payment_term;
+
+pub mod update_payment_term;
+
+pub mod delete_payment_term;
+
 pub mod account_balances_report;
 
 pub mod ledger_report;
 
 pub mod trial_balance;
+
+pub mod list_tax_repartition_lines;
+
+pub mod create_tax_repartition_line;
+
+pub mod get_tax_repartition_line;
+
+pub mod update_tax_repartition_line;
+
+pub mod delete_tax_repartition_line;

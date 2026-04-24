@@ -78,6 +78,42 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "list_chart_templates",
+        crate::controllers::list_chart_templates::ListChartTemplatesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_chart_template",
+        crate::controllers::create_chart_template::CreateChartTemplateController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_chart_template",
+        crate::controllers::get_chart_template::GetChartTemplateController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_chart_template",
+        crate::controllers::update_chart_template::UpdateChartTemplateController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_chart_template",
+        crate::controllers::delete_chart_template::DeleteChartTemplateController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "deploy_chart_template",
+        crate::controllers::deploy_chart_template::DeployChartTemplateController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_fiscal_periods",
         crate::controllers::list_fiscal_periods::ListFiscalPeriodsController,
         20480,
@@ -104,6 +140,90 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "delete_fiscal_period",
         crate::controllers::delete_fiscal_period::DeleteFiscalPeriodController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_fiscal_positions",
+        crate::controllers::list_fiscal_positions::ListFiscalPositionsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_fiscal_position",
+        crate::controllers::create_fiscal_position::CreateFiscalPositionController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_fiscal_position",
+        crate::controllers::get_fiscal_position::GetFiscalPositionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_fiscal_position",
+        crate::controllers::update_fiscal_position::UpdateFiscalPositionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_fiscal_position",
+        crate::controllers::delete_fiscal_position::DeleteFiscalPositionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_fiscal_years",
+        crate::controllers::list_fiscal_years::ListFiscalYearsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_fiscal_year",
+        crate::controllers::create_fiscal_year::CreateFiscalYearController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_fiscal_year",
+        crate::controllers::get_fiscal_year::GetFiscalYearController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_fiscal_year",
+        crate::controllers::update_fiscal_year::UpdateFiscalYearController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_fiscal_year",
+        crate::controllers::delete_fiscal_year::DeleteFiscalYearController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "close_fiscal_year",
+        crate::controllers::close_fiscal_year::CloseFiscalYearController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "reopen_fiscal_year",
+        crate::controllers::reopen_fiscal_year::ReopenFiscalYearController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_fiscal_year_periods",
+        crate::controllers::list_fiscal_year_periods::ListFiscalYearPeriodsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "generate_fiscal_year_periods",
+        crate::controllers::generate_fiscal_year_periods::GenerateFiscalYearPeriodsController,
         20480,
     );
 
@@ -210,6 +330,72 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "list_payment_methods",
+        crate::controllers::list_payment_methods::ListPaymentMethodsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_payment_method",
+        crate::controllers::create_payment_method::CreatePaymentMethodController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_payment_method",
+        crate::controllers::get_payment_method::GetPaymentMethodController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_payment_method",
+        crate::controllers::update_payment_method::UpdatePaymentMethodController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_payment_method",
+        crate::controllers::delete_payment_method::DeletePaymentMethodController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_payment_method_journal_mappings",
+        crate::controllers::list_payment_method_journal_mappings::ListPaymentMethodJournalMappingsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_payment_terms",
+        crate::controllers::list_payment_terms::ListPaymentTermsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_payment_term",
+        crate::controllers::create_payment_term::CreatePaymentTermController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_payment_term",
+        crate::controllers::get_payment_term::GetPaymentTermController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_payment_term",
+        crate::controllers::update_payment_term::UpdatePaymentTermController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_payment_term",
+        crate::controllers::delete_payment_term::DeletePaymentTermController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "account_balances_report",
         crate::controllers::account_balances_report::AccountBalancesReportController,
         20480,
@@ -225,6 +411,36 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         "trial_balance",
         crate::controllers::trial_balance::TrialBalanceController,
         24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_tax_repartition_lines",
+        crate::controllers::list_tax_repartition_lines::ListTaxRepartitionLinesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_tax_repartition_line",
+        crate::controllers::create_tax_repartition_line::CreateTaxRepartitionLineController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_tax_repartition_line",
+        crate::controllers::get_tax_repartition_line::GetTaxRepartitionLineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_tax_repartition_line",
+        crate::controllers::update_tax_repartition_line::UpdateTaxRepartitionLineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_tax_repartition_line",
+        crate::controllers::delete_tax_repartition_line::DeleteTaxRepartitionLineController,
+        20480,
     );
 }
 
@@ -333,6 +549,54 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "list_chart_templates" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_chart_templates::ListChartTemplatesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_chart_template" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_chart_template::CreateChartTemplateController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_chart_template" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_chart_template::GetChartTemplateController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_chart_template" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_chart_template::UpdateChartTemplateController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_chart_template" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_chart_template::DeleteChartTemplateController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "deploy_chart_template" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::deploy_chart_template::DeployChartTemplateController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_fiscal_periods" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_fiscal_periods::ListFiscalPeriodsController,
@@ -368,6 +632,118 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "delete_fiscal_period" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_fiscal_period::DeleteFiscalPeriodController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_fiscal_positions" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_fiscal_positions::ListFiscalPositionsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_fiscal_position" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_fiscal_position::CreateFiscalPositionController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_fiscal_position" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_fiscal_position::GetFiscalPositionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_fiscal_position" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_fiscal_position::UpdateFiscalPositionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_fiscal_position" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_fiscal_position::DeleteFiscalPositionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_fiscal_years" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_fiscal_years::ListFiscalYearsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_fiscal_year::CreateFiscalYearController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_fiscal_year::GetFiscalYearController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_fiscal_year::UpdateFiscalYearController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_fiscal_year::DeleteFiscalYearController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "close_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::close_fiscal_year::CloseFiscalYearController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "reopen_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reopen_fiscal_year::ReopenFiscalYearController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_fiscal_year_periods" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_fiscal_year_periods::ListFiscalYearPeriodsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "generate_fiscal_year_periods" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::generate_fiscal_year_periods::GenerateFiscalYearPeriodsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
@@ -509,6 +885,94 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "list_payment_methods" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_payment_methods::ListPaymentMethodsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_payment_method" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_payment_method::CreatePaymentMethodController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_payment_method" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_payment_method::GetPaymentMethodController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_payment_method" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_payment_method::UpdatePaymentMethodController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_payment_method" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_payment_method::DeletePaymentMethodController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_payment_method_journal_mappings" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_payment_method_journal_mappings::ListPaymentMethodJournalMappingsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_payment_terms" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_payment_terms::ListPaymentTermsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_payment_term" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_payment_term::CreatePaymentTermController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_payment_term" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_payment_term::GetPaymentTermController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_payment_term" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_payment_term::UpdatePaymentTermController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_payment_term" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_payment_term::DeletePaymentTermController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "account_balances_report" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::account_balances_report::AccountBalancesReportController,
@@ -529,6 +993,46 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::trial_balance::TrialBalanceController,
                     24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_tax_repartition_lines" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_tax_repartition_lines::ListTaxRepartitionLinesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_tax_repartition_line" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_tax_repartition_line::CreateTaxRepartitionLineController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_tax_repartition_line" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_tax_repartition_line::GetTaxRepartitionLineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_tax_repartition_line" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_tax_repartition_line::UpdateTaxRepartitionLineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_tax_repartition_line" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_tax_repartition_line::DeleteTaxRepartitionLineController,
+                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

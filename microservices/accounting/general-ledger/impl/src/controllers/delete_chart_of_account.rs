@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger_gen::handlers::delete_chart_of_account::{Request, Response};
+use rerp_accounting_general_ledger::handlers::delete_chart_of_account::{Request, Response};
 
 #[handler(DeleteChartOfAccountController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

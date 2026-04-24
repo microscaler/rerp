@@ -163,11 +163,13 @@ def main():
                     i += 1
 
             # Rebuild args with suite name, passing --service if provided
-            new_rest = ["suite", suite]
+            # run_gen_argv() reads sys.argv[2] as the subcommand, so we need:
+            # sys.argv[0] = 'brrtrouter', sys.argv[1] = 'gen', sys.argv[2] = 'suite'
+            new_rest = ["brrtrouter", "gen", "suite", suite]
             if service:
                 new_rest += ["--service", service]
             new_rest += extra
-            sys.argv = ["brrtrouter"] + new_rest
+            sys.argv = new_rest
 
             # Patch the package_name callback to use RERP naming
             import brrtrouter_tooling.cli.gen_cmd as gen_mod

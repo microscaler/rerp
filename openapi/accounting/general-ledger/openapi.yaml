@@ -26,6 +26,18 @@ tags:
   description: Trial balance, ledger, and account balance reports
 - name: reconciliations
   description: Account reconciliation management
+- name: chart-templates
+  description: Chart of accounts templates for multi-company deployments
+- name: fiscal-years
+  description: Fiscal year management with lock dates and period generation
+- name: fiscal-positions
+  description: Fiscal positions for tax and account mapping across jurisdictions
+- name: payment-terms
+  description: Payment term definitions (net 30, 60, 90, early payment discounts)
+- name: payment-methods
+  description: Payment method definitions (check, wire, card, digital wallet)
+- name: tax-repartition
+  description: Tax repartition lines for splitting taxes across multiple accounts
 paths:
   /accounts:
     get:
@@ -1359,6 +1371,1223 @@ paths:
                   $ref: '#/components/schemas/JournalEntryLine'
         '404':
           description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /chart-templates:
+    get:
+      operationId: list_chart_templates
+      summary: List chart of accounts templates
+      description: List all available chart of accounts templates. Templates are reusable COA definitions that can be deployed to new companies. Supports filtering by jurisdiction, status, and version.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: jurisdiction_code
+        in: query
+        schema:
+          type: string
+        description: Filter by jurisdiction (e.g., 'US', 'FR', 'DE')
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - ACTIVE
+          - DEPRECATED
+        description: Filter by template status
+      responses:
+        '200':
+          description: Paginated list of chart templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChartTemplates'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_chart_template
+      summary: Create chart template
+      description: Create a new chart of accounts template. Templates define a complete COA structure including account hierarchy, default accounts, and fiscal year settings. Can be deployed to create a new company's accounting setup.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChartTemplateRequest'
+      responses:
+        '201':
+          description: Chart template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartTemplate'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /chart-templates/{id}:
+    get:
+      operationId: get_chart_template
+      summary: Get chart template by id
+      description: Retrieve a chart of accounts template with its full account hierarchy and configuration.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ChartTemplate details with account hierarchy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartTemplateWithAccounts'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_chart_template
+      summary: Update chart template
+      description: Update a chart of accounts template. Only templates in DRAFT status can be modified.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChartTemplateRequest'
+      responses:
+        '200':
+          description: ChartTemplate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartTemplate'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update ACTIVE or DEPRECATED templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_chart_template
+      summary: Delete chart template
+      description: Soft delete a chart template. Only templates in DRAFT status can be deleted.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ChartTemplate deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete ACTIVE or DEPRECATED templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /chart-templates/{id}/deploy:
+    post:
+      operationId: deploy_chart_template
+      summary: Deploy chart template
+      description: Deploy a chart of accounts template to create a new company's accounting setup. Creates a new ChartOfAccount hierarchy, default accounts, and fiscal year configuration.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployChartTemplateRequest'
+      responses:
+        '201':
+          description: Chart template deployed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChartTemplateDeployment'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Template is not in ACTIVE status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years:
+    get:
+      operationId: list_fiscal_years
+      summary: List fiscal years
+      description: List all fiscal years with their periods, lock status, and closing information. Supports filtering by year, company, and open/closed status.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by company
+      - name: year
+        in: query
+        schema:
+          type: integer
+        description: Filter by fiscal year (e.g., 2024)
+      - name: is_open
+        in: query
+        schema:
+          type: boolean
+        description: Filter by open/closed status
+      responses:
+        '200':
+          description: Paginated list of fiscal years
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiscalYears'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_fiscal_year
+      summary: Create fiscal year
+      description: Create a new fiscal year with auto-generated periods based on the company's fiscal calendar configuration. A fiscal year must be created before any journal entries can be posted.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFiscalYearRequest'
+      responses:
+        '201':
+          description: FiscalYear created with periods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalYear'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Fiscal year already exists for this company and year
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years/{id}:
+    get:
+      operationId: get_fiscal_year
+      summary: Get fiscal year by id
+      description: Retrieve fiscal year details including all periods, lock status, and closing information.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FiscalYear details with periods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalYearWithPeriods'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_fiscal_year
+      summary: Update fiscal year
+      description: Update a fiscal year's name or fiscal month/day settings. Cannot update if the year has any closed periods with posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFiscalYearRequest'
+      responses:
+        '200':
+          description: FiscalYear updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalYear'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update year with closed periods containing entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_fiscal_year
+      summary: Delete fiscal year
+      description: Delete a fiscal year. Only years with no periods or no posted entries can be deleted.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: FiscalYear deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete year with posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years/{id}/close:
+    post:
+      operationId: close_fiscal_year
+      summary: Close fiscal year
+      description: Close a fiscal year, locking all periods. No journal entries can be added or modified in closed periods. The year is marked as closed and a closing date is recorded.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseFiscalYearRequest'
+      responses:
+        '200':
+          description: FiscalYear closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalYear'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot close year with unclosed periods or unbalanced entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years/{id}/open:
+    post:
+      operationId: reopen_fiscal_year
+      summary: Reopen fiscal year
+      description: Reopen a closed fiscal year. This allows modifications to periods within the year. Requires appropriate permissions.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FiscalYear reopened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalYear'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Year is not currently closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years/{id}/periods:
+    get:
+      operationId: list_fiscal_year_periods
+      summary: List periods in fiscal year
+      description: Get all fiscal periods within a fiscal year, including their dates, lock status, and number of posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Paginated list of periods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiscalYearPeriods'
+        '404':
+          description: Fiscal year not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-years/{id}/periods/generate:
+    post:
+      operationId: generate_fiscal_year_periods
+      summary: Generate periods for fiscal year
+      description: Generate all fiscal periods for a fiscal year based on its calendar configuration (monthly, quarterly, or custom periods). Periods are created in DRAFT status.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneratePeriodsRequest'
+      responses:
+        '200':
+          description: Periods generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratePeriodsResult'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Periods already exist for this fiscal year
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /fiscal-positions:
+    get:
+      operationId: list_fiscal_positions
+      summary: List fiscal positions
+      description: List all fiscal positions. Fiscal positions map accounts and taxes from one jurisdiction to another (e.g., domestic vs. export sales tax mapping).
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by company
+      - name: is_active
+        in: query
+        schema:
+          type: boolean
+        description: Filter by active status
+      responses:
+        '200':
+          description: Paginated list of fiscal positions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiscalPositions'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_fiscal_position
+      summary: Create fiscal position
+      description: Create a new fiscal position with account and tax mapping rules. Fiscal positions are used to automatically map accounts/taxes based on partner country, sale/purchase type, or other conditions.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFiscalPositionRequest'
+      responses:
+        '201':
+          description: FiscalPosition created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPosition'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /fiscal-positions/{id}:
+    get:
+      operationId: get_fiscal_position
+      summary: Get fiscal position by id
+      description: Retrieve fiscal position details including all account and tax mapping rules.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FiscalPosition details with mappings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPositionWithMappings'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_fiscal_position
+      summary: Update fiscal position
+      description: Update a fiscal position's name, description, or mapping rules.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFiscalPositionRequest'
+      responses:
+        '200':
+          description: FiscalPosition updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPosition'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_fiscal_position
+      summary: Delete fiscal position
+      description: Soft delete a fiscal position. Cannot delete if referenced by posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: FiscalPosition deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete fiscal position referenced by posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payment-terms:
+    get:
+      operationId: list_payment_terms
+      summary: List payment terms
+      description: List all payment term definitions. Payment terms define when payments are due (net 30, 60, 90), early payment discounts, and installment schedules.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by company
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - NET
+          - DISCOUNT
+          - INSTALLMENT
+          - CUSTOM
+        description: Filter by payment term type
+      responses:
+        '200':
+          description: Paginated list of payment terms
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentTerms'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_payment_term
+      summary: Create payment term
+      description: Create a new payment term definition. Supports net payment (e.g., net 30), early payment discounts (e.g., 2/10 net 30), installment schedules, and custom terms.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentTermRequest'
+      responses:
+        '201':
+          description: PaymentTerm created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTerm'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /payment-terms/{id}:
+    get:
+      operationId: get_payment_term
+      summary: Get payment term by id
+      description: Retrieve a payment term with its complete installment schedule and discount rules.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PaymentTerm with installment lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTermWithLines'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_payment_term
+      summary: Update payment term
+      description: Update a payment term's name, description, or installment lines.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentTermRequest'
+      responses:
+        '200':
+          description: PaymentTerm updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTerm'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_payment_term
+      summary: Delete payment term
+      description: Soft delete a payment term. Cannot delete if referenced by posted invoices or entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PaymentTerm deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete payment term referenced by posted documents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payment-methods:
+    get:
+      operationId: list_payment_methods
+      summary: List payment methods
+      description: List all payment method definitions used across journals and payments. Payment methods include checks, wire transfers, credit cards, digital wallets, and bank transfers.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - CHECK
+          - WIRE
+          - CREDIT_CARD
+          - DEBIT_CARD
+          - DIGITAL_WALLET
+          - BANK_TRANSFER
+          - CASH
+          - OTHER
+        description: Filter by payment method type
+      - name: is_receivable
+        in: query
+        schema:
+          type: boolean
+        description: Filter by whether method is used for customer payments
+      - name: is_payable
+        in: query
+        schema:
+          type: boolean
+        description: Filter by whether method is used for vendor payments
+      responses:
+        '200':
+          description: Paginated list of payment methods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentMethods'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_payment_method
+      summary: Create payment method
+      description: Create a new payment method definition. Includes type, associated bank account/journal, and routing details for electronic payments.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentMethodRequest'
+      responses:
+        '201':
+          description: PaymentMethod created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /payment-methods/{id}:
+    get:
+      operationId: get_payment_method
+      summary: Get payment method by id
+      description: Retrieve payment method details including associated payment method lines (account mappings).
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: PaymentMethod details with lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodWithLines'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_payment_method
+      summary: Update payment method
+      description: Update a payment method's name, type, or associated account mappings.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentMethodRequest'
+      responses:
+        '200':
+          description: PaymentMethod updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_payment_method
+      summary: Delete payment method
+      description: Soft delete a payment method. Cannot delete if referenced by posted payments.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: PaymentMethod deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete payment method referenced by posted payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payment-methods/{id}/journal-mappings:
+    get:
+      operationId: list_payment_method_journal_mappings
+      summary: List journal mappings for payment method
+      description: Get all journal-to-account mappings for a payment method. Each mapping defines which journal and account is used when this payment method is selected.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: payment_direction
+        in: query
+        schema:
+          type: string
+          enum:
+          - RECEIPT
+          - PAYMENT
+          - BOTH
+        description: Filter by payment direction
+      responses:
+        '200':
+          description: List of journal mappings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethodJournalMapping'
+        '404':
+          description: Payment method not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /tax-repartition-lines:
+    get:
+      operationId: list_tax_repartition_lines
+      summary: List tax repartition lines
+      description: List all tax repartition line definitions. Tax repartition lines define how a tax is split across multiple accounts (e.g., 80% to tax expense, 20% to tax payable).
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: tax_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by parent tax
+      - name: repartition_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - TAX
+          - BASE
+        description: Filter by repartition type (TAX for tax accounts, BASE for base accounts)
+      responses:
+        '200':
+          description: Paginated list of tax repartition lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxRepartitionLines'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_tax_repartition_line
+      summary: Create tax repartition line
+      description: Create a new tax repartition line that defines how a tax amount is allocated to accounts. Used in conjunction with tax definitions to split taxes across base and tax accounts.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRepartitionLineRequest'
+      responses:
+        '201':
+          description: TaxRepartitionLine created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRepartitionLine'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /tax-repartition-lines/{id}:
+    get:
+      operationId: get_tax_repartition_line
+      summary: Get tax repartition line by id
+      description: Retrieve a tax repartition line definition with its account mapping and ratio.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: TaxRepartitionLine details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRepartitionLine'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_tax_repartition_line
+      summary: Update tax repartition line
+      description: Update a tax repartition line's account, ratio, or tag. Cannot update if referenced by posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxRepartitionLineRequest'
+      responses:
+        '200':
+          description: TaxRepartitionLine updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRepartitionLine'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update line referenced by posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_tax_repartition_line
+      summary: Delete tax repartition line
+      description: Soft delete a tax repartition line. Cannot delete if referenced by posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: TaxRepartitionLine deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete line referenced by posted entries
           content:
             application/json:
               schema:
@@ -2753,5 +3982,1331 @@ components:
           type: string
           description: Human-readable error for this line field
           example: Debit exceeds expected amount
+    # Chart of Accounts Templates (AccountChartTemplate)
+    ChartTemplate:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      - jurisdiction_code
+      - version
+      - status
+      - company_id
+      - is_active
+      - is_default
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the chart template
+        name:
+          type: string
+          maxLength: 255
+          description: Display name of the chart template
+        code:
+          type: string
+          maxLength: 50
+          pattern: ^[A-Z0-9._-]+$
+          description: Template code (unique identifier)
+        jurisdiction_code:
+          type: string
+          minLength: 2
+          maxLength: 5
+          description: ISO 3166-1 alpha-2 or ISO 4217 currency code (e.g., 'US', 'FR', 'DE')
+        version:
+          type: string
+          maxLength: 20
+          description: Template version (e.g., '1.0', '2.1')
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - ACTIVE
+          - DEPRECATED
+          description: Template lifecycle status
+        company_id:
+          type: string
+          format: uuid
+          description: Owner company (templates are company-scoped or global)
+        is_active:
+          type: boolean
+          description: Whether the template is available for use
+        is_default:
+          type: boolean
+          description: Whether this is the default template for the company/jurisdiction
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Default currency for this chart template
+        fiscal_month:
+          type: integer
+          minimum: 1
+          maximum: 12
+          nullable: true
+          description: Month the fiscal year starts (NULL = calendar year)
+        fiscal_day:
+          type: integer
+          minimum: 1
+          maximum: 7
+          nullable: true
+          description: Day of week for fiscal week start (1=Mon, 7=Sun)
+        number_of_periods:
+          type: integer
+          minimum: 1
+          maximum: 24
+          description: Default number of periods in fiscal year
+        include_subperiods:
+          type: boolean
+          default: false
+          description: Whether to create subperiods within periods
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+    ChartTemplateWithAccounts:
+      allOf:
+      - $ref: '#/components/schemas/ChartTemplate'
+      - type: object
+        properties:
+          account_count:
+            type: integer
+            description: Total number of accounts in this template
+          account_hierarchy:
+            type: array
+            items:
+              $ref: '#/components/schemas/ChartTemplateAccountNode'
+            description: Full account hierarchy tree
+          period_count:
+            type: integer
+            description: Number of periods defined
+    ChartTemplateAccountNode:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        account_code:
+          type: string
+          maxLength: 50
+        account_name:
+          type: string
+          maxLength: 255
+        account_type:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        is_parent:
+          type: boolean
+          description: Whether this is a parent/summary account
+        parent_account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent account ID (for flat list representation)
+        level:
+          type: integer
+          nullable: true
+          description: Hierarchy level (0 = root)
+        child_count:
+          type: integer
+          nullable: true
+          description: Number of direct child accounts
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+    ChartTemplateDeployment:
+      type: object
+      required:
+      - chart_of_account_id
+      - fiscal_year_id
+      - account_count
+      properties:
+        id:
+          type: string
+          format: uuid
+        chart_template_id:
+          type: string
+          format: uuid
+        chart_of_account_id:
+          type: string
+          format: uuid
+          description: Created chart of accounts hierarchy
+        fiscal_year_id:
+          type: string
+          format: uuid
+          description: Created fiscal year
+        account_count:
+          type: integer
+          description: Number of accounts created
+        created_periods:
+          type: integer
+          description: Number of fiscal periods created
+        created_at:
+          type: string
+          format: date-time
+    PaginatedChartTemplates:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartTemplate'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreateChartTemplateRequest:
+      type: object
+      required:
+      - name
+      - code
+      - jurisdiction_code
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          description: Display name
+        code:
+          type: string
+          maxLength: 50
+          pattern: ^[A-Z0-9._-]+$
+          description: Unique template code
+        jurisdiction_code:
+          type: string
+          minLength: 2
+          maxLength: 5
+          description: Country/currency code
+        version:
+          type: string
+          maxLength: 20
+          default: '1.0'
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        fiscal_month:
+          type: integer
+          minimum: 1
+          maximum: 12
+        fiscal_day:
+          type: integer
+          minimum: 1
+          maximum: 7
+        number_of_periods:
+          type: integer
+          minimum: 1
+          maximum: 24
+          default: 12
+        include_subperiods:
+          type: boolean
+          default: false
+    UpdateChartTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+        is_default:
+          type: boolean
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    DeployChartTemplateRequest:
+      type: object
+      required:
+      - company_id
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          description: Target company to deploy to
+        year:
+          type: integer
+          description: Fiscal year for the initial fiscal year
+        chart_of_account_code:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Override code for created chart of accounts
+    # Fiscal Year Management (AccountFiscalYear)
+    FiscalYear:
+      type: object
+      required:
+      - id
+      - company_id
+      - year
+      - start_date
+      - end_date
+      - is_open
+      - is_closed
+      - period_count
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+          description: Company this fiscal year belongs to
+        year:
+          type: integer
+          description: Fiscal year number (e.g., 2024)
+        start_date:
+          type: string
+          format: date
+          description: First day of fiscal year
+        end_date:
+          type: string
+          format: date
+          description: Last day of fiscal year
+        is_open:
+          type: boolean
+          description: Whether the fiscal year is currently open for entries
+        is_closed:
+          type: boolean
+          description: Whether the fiscal year is fully closed
+        period_count:
+          type: integer
+          description: Number of periods in this fiscal year
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the fiscal year was closed
+        closed_by:
+          type: string
+          format: uuid
+          nullable: true
+          description: User who closed the fiscal year
+        closing_date:
+          type: string
+          format: date
+          nullable: true
+          description: The closing accounting date
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    FiscalYearWithPeriods:
+      allOf:
+      - $ref: '#/components/schemas/FiscalYear'
+      - type: object
+        properties:
+          periods:
+            type: array
+            items:
+              $ref: '#/components/schemas/FiscalPeriod'
+            description: All periods in this fiscal year
+    PaginatedFiscalYears:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalYear'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedFiscalYearPeriods:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPeriod'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreateFiscalYearRequest:
+      type: object
+      required:
+      - company_id
+      - year
+      - start_date
+      - end_date
+      - period_type
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          description: Company this fiscal year belongs to
+        year:
+          type: integer
+          description: Fiscal year (e.g., 2024)
+        start_date:
+          type: string
+          format: date
+          description: First day of fiscal year
+        end_date:
+          type: string
+          format: date
+          description: Last day of fiscal year
+        period_type:
+          type: string
+          enum:
+          - MONTHLY
+          - QUARTERLY
+          - CUSTOM
+          description: How periods are divided within the fiscal year
+        number_of_periods:
+          type: integer
+          minimum: 1
+          maximum: 24
+          description: 'Number of periods (default: 12 for monthly, 4 for quarterly)'
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+    UpdateFiscalYearRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+    CloseFiscalYearRequest:
+      type: object
+      properties:
+        closing_date:
+          type: string
+          format: date
+          description: Accounting closing date
+    GeneratePeriodsRequest:
+      type: object
+      required:
+      - period_type
+      properties:
+        period_type:
+          type: string
+          enum:
+          - MONTHLY
+          - QUARTERLY
+          - CUSTOM
+        number_of_periods:
+          type: integer
+          minimum: 1
+          maximum: 24
+    GeneratePeriodsResult:
+      type: object
+      required:
+      - periods_created
+      properties:
+        periods_created:
+          type: integer
+          description: Number of periods generated
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPeriod'
+    # Fiscal Position (AccountFiscalPosition + AccountFiscalPositionAccount)
+    FiscalPosition:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      - company_id
+      - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+          description: Fiscal position name
+        code:
+          type: string
+          maxLength: 50
+          description: Position code (unique within company)
+        company_id:
+          type: string
+          format: uuid
+          description: Company this fiscal position belongs to
+        is_active:
+          type: boolean
+          description: Whether this fiscal position is active
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        auto_apply:
+          type: boolean
+          default: false
+          description: Whether this position is auto-applied to transactions
+        country_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Country this position applies to (for tax mapping)
+        state_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: States/provinces this position applies to
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    FiscalPositionWithMappings:
+      allOf:
+      - $ref: '#/components/schemas/FiscalPosition'
+      - type: object
+        properties:
+          account_mappings:
+            type: array
+            items:
+              $ref: '#/components/schemas/FiscalPositionAccountMapping'
+            description: Account mappings for this position
+          tax_mappings:
+            type: array
+            items:
+              $ref: '#/components/schemas/FiscalPositionTaxMapping'
+            description: Tax mappings for this position
+    FiscalPositionAccountMapping:
+      type: object
+      required:
+      - id
+      - source_account_id
+      - destination_account_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        fiscal_position_id:
+          type: string
+          format: uuid
+        source_account_id:
+          type: string
+          format: uuid
+          description: Account that gets mapped
+        source_account_code:
+          type: string
+          maxLength: 50
+          description: Source account code for display
+        source_account_name:
+          type: string
+          maxLength: 255
+          description: Source account name for display
+        destination_account_id:
+          type: string
+          format: uuid
+          description: Account to map to
+        destination_account_code:
+          type: string
+          maxLength: 50
+          description: Destination account code for display
+        destination_account_name:
+          type: string
+          maxLength: 255
+          description: Destination account name for display
+        created_at:
+          type: string
+          format: date-time
+    FiscalPositionTaxMapping:
+      type: object
+      required:
+      - id
+      - source_tax_id
+      - destination_tax_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        fiscal_position_id:
+          type: string
+          format: uuid
+        source_tax_id:
+          type: string
+          format: uuid
+          description: Source tax to be mapped
+        source_tax_name:
+          type: string
+          maxLength: 255
+          description: Source tax name for display
+        destination_tax_id:
+          type: string
+          format: uuid
+          description: Destination tax to map to
+        destination_tax_name:
+          type: string
+          maxLength: 255
+          description: Destination tax name for display
+        created_at:
+          type: string
+          format: date-time
+    PaginatedFiscalPositions:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPosition'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreateFiscalPositionRequest:
+      type: object
+      required:
+      - name
+      - code
+      - company_id
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        code:
+          type: string
+          maxLength: 50
+        company_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        auto_apply:
+          type: boolean
+          default: false
+        country_id:
+          type: string
+          format: uuid
+          nullable: true
+        state_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+        account_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPositionAccountMappingRequest'
+          nullable: true
+        tax_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPositionTaxMappingRequest'
+          nullable: true
+    UpdateFiscalPositionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+        auto_apply:
+          type: boolean
+        country_id:
+          type: string
+          format: uuid
+          nullable: true
+        state_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+        account_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPositionAccountMappingRequest'
+          nullable: true
+        tax_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPositionTaxMappingRequest'
+          nullable: true
+    FiscalPositionAccountMappingRequest:
+      type: object
+      required:
+      - source_account_id
+      - destination_account_id
+      properties:
+        source_account_id:
+          type: string
+          format: uuid
+        destination_account_id:
+          type: string
+          format: uuid
+    FiscalPositionTaxMappingRequest:
+      type: object
+      required:
+      - source_tax_id
+      - destination_tax_id
+      properties:
+        source_tax_id:
+          type: string
+          format: uuid
+        destination_tax_id:
+          type: string
+          format: uuid
+    # Payment Terms (AccountPaymentTerm + AccountPaymentTermLine)
+    PaymentTerm:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      - company_id
+      - is_active
+      - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+          description: Payment term name (e.g., 'Net 30', '2/10 Net 30')
+        code:
+          type: string
+          maxLength: 50
+          description: Payment term code
+        company_id:
+          type: string
+          format: uuid
+          description: Company this payment term belongs to
+        is_active:
+          type: boolean
+          description: Whether this payment term is active
+        type:
+          type: string
+          enum:
+          - NET
+          - DISCOUNT
+          - INSTALLMENT
+          - CUSTOM
+          description: Type of payment term
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency for discount amounts (if applicable)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaymentTermWithLines:
+      allOf:
+      - $ref: '#/components/schemas/PaymentTerm'
+      - type: object
+        properties:
+          installment_lines:
+            type: array
+            items:
+              $ref: '#/components/schemas/PaymentTermLine'
+            description: Installment schedule lines
+    PaymentTermLine:
+      type: object
+      required:
+      - id
+      - payment_term_id
+      - date_percentage
+      - amount_percentage
+      properties:
+        id:
+          type: string
+          format: uuid
+        payment_term_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: Line description (e.g., 'Installment 1 of 3')
+        date_percentage:
+          type: number
+          format: double
+          description: Days after invoice date when this installment is due
+        amount_percentage:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Percentage of total amount due on this date
+        discount_days:
+          type: integer
+          nullable: true
+          description: Days within which discount applies
+        discount_percentage:
+          type: number
+          format: double
+          nullable: true
+          description: Discount percentage if paid within discount_days
+        discount_amount:
+          type: number
+          format: double
+          nullable: true
+          description: Fixed discount amount (if applicable)
+        created_at:
+          type: string
+          format: date-time
+    PaginatedPaymentTerms:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTerm'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreatePaymentTermRequest:
+      type: object
+      required:
+      - name
+      - code
+      - company_id
+      - type
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        code:
+          type: string
+          maxLength: 50
+        company_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - NET
+          - DISCOUNT
+          - INSTALLMENT
+          - CUSTOM
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        installment_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTermLineRequest'
+          nullable: true
+    UpdatePaymentTermRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+        installment_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentTermLineRequest'
+          nullable: true
+    PaymentTermLineRequest:
+      type: object
+      required:
+      - date_percentage
+      - amount_percentage
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          nullable: true
+        date_percentage:
+          type: number
+          format: double
+          description: Days after invoice date
+        amount_percentage:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Percentage of total amount
+        discount_days:
+          type: integer
+          nullable: true
+        discount_percentage:
+          type: number
+          format: double
+          nullable: true
+        discount_amount:
+          type: number
+          format: double
+          nullable: true
+    # Payment Methods (AccountPaymentMethod + AccountPaymentMethodLine)
+    PaymentMethod:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      - payment_method_type
+      - company_id
+      - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+          description: Payment method name (e.g., 'Checks', 'Bank Wire')
+        code:
+          type: string
+          maxLength: 50
+          description: Payment method code
+        payment_method_type:
+          type: string
+          enum:
+          - CHECK
+          - WIRE
+          - CREDIT_CARD
+          - DEBIT_CARD
+          - DIGITAL_WALLET
+          - BANK_TRANSFER
+          - CASH
+          - OTHER
+          description: Type of payment method
+        company_id:
+          type: string
+          format: uuid
+          description: Company this payment method belongs to
+        is_active:
+          type: boolean
+          description: Whether this payment method is active
+        is_receivable:
+          type: boolean
+          default: true
+          description: Whether this method is used for customer receipts
+        is_payable:
+          type: boolean
+          default: true
+          description: Whether this method is used for vendor payments
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaymentMethodWithLines:
+      allOf:
+      - $ref: '#/components/schemas/PaymentMethod'
+      - type: object
+        properties:
+          journal_mappings:
+            type: array
+            items:
+              $ref: '#/components/schemas/PaymentMethodJournalMapping'
+            description: Journal-to-account mappings for this payment method
+    PaymentMethodJournalMapping:
+      type: object
+      required:
+      - id
+      - payment_method_id
+      - journal_id
+      - payment_direction
+      properties:
+        id:
+          type: string
+          format: uuid
+        payment_method_id:
+          type: string
+          format: uuid
+        journal_id:
+          type: string
+          format: uuid
+          description: Journal associated with this payment method
+        journal_code:
+          type: string
+          maxLength: 10
+          description: Journal code for display
+        journal_name:
+          type: string
+          maxLength: 255
+          description: Journal name for display
+        payment_direction:
+          type: string
+          enum:
+          - RECEIPT
+          - PAYMENT
+          - BOTH
+          description: Direction this mapping applies to
+        account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Override account for this mapping
+        is_default:
+          type: boolean
+          default: false
+          description: Whether this is the default journal for this payment method
+        created_at:
+          type: string
+          format: date-time
+    PaginatedPaymentMethods:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreatePaymentMethodRequest:
+      type: object
+      required:
+      - name
+      - code
+      - payment_method_type
+      - company_id
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        code:
+          type: string
+          maxLength: 50
+        payment_method_type:
+          type: string
+          enum:
+          - CHECK
+          - WIRE
+          - CREDIT_CARD
+          - DEBIT_CARD
+          - DIGITAL_WALLET
+          - BANK_TRANSFER
+          - CASH
+          - OTHER
+        company_id:
+          type: string
+          format: uuid
+        is_active:
+          type: boolean
+          default: true
+        is_receivable:
+          type: boolean
+          default: true
+        is_payable:
+          type: boolean
+          default: true
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        journal_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethodJournalMappingRequest'
+          nullable: true
+    UpdatePaymentMethodRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+        is_receivable:
+          type: boolean
+        is_payable:
+          type: boolean
+        journal_mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethodJournalMappingRequest'
+          nullable: true
+    PaymentMethodJournalMappingRequest:
+      type: object
+      required:
+      - journal_id
+      - payment_direction
+      properties:
+        journal_id:
+          type: string
+          format: uuid
+        payment_direction:
+          type: string
+          enum:
+          - RECEIPT
+          - PAYMENT
+          - BOTH
+        account_id:
+          type: string
+          format: uuid
+          nullable: true
+        is_default:
+          type: boolean
+          default: false
+    # Tax Repartition Lines (AccountTaxRepartitionLine)
+    TaxRepartitionLine:
+      type: object
+      required:
+      - id
+      - tax_id
+      - repartition_type
+      - account_id
+      - ratio
+      - percentage
+      properties:
+        id:
+          type: string
+          format: uuid
+        tax_id:
+          type: string
+          format: uuid
+          description: Parent tax this repartition line belongs to
+        tax_name:
+          type: string
+          maxLength: 255
+          description: Parent tax name for display
+        repartition_type:
+          type: string
+          enum:
+          - TAX
+          - BASE
+          description: Whether this line maps to a tax account (TAX) or base account (BASE)
+        account_id:
+          type: string
+          format: uuid
+          description: Account to map this repartition line to
+        account_code:
+          type: string
+          maxLength: 50
+          description: Account code for display
+        account_name:
+          type: string
+          maxLength: 255
+          description: Account name for display
+        ratio:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: Ratio of the total tax amount to allocate to this account (0-1)
+        percentage:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Percentage representation of the ratio
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: Analytic tags to apply on this line
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaginatedTaxRepartitionLines:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxRepartitionLine'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreateTaxRepartitionLineRequest:
+      type: object
+      required:
+      - tax_id
+      - repartition_type
+      - account_id
+      - ratio
+      properties:
+        tax_id:
+          type: string
+          format: uuid
+          description: Parent tax this line belongs to
+        repartition_type:
+          type: string
+          enum:
+          - TAX
+          - BASE
+        account_id:
+          type: string
+          format: uuid
+          description: Account to allocate this repartition to
+        ratio:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          description: Fraction of total amount (sum of ratios should equal 1.0)
+        percentage:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          description: Percentage equivalent of ratio
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+    UpdateTaxRepartitionLineRequest:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        ratio:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
 security:
 - bearerAuth: []

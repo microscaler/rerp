@@ -230,6 +230,121 @@ pub struct ChartOfAccount {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChartTemplate {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub fiscal_day: i32,
+
+    pub fiscal_month: i32,
+
+    pub id: String,
+
+    pub include_subperiods: bool,
+
+    pub is_active: bool,
+
+    pub is_default: bool,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub number_of_periods: i32,
+
+    pub status: String,
+
+    pub updated_at: String,
+
+    pub updated_by: String,
+
+    pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChartTemplateAccountNode {
+    pub account_code: String,
+
+    pub account_id: String,
+
+    pub account_name: String,
+
+    pub account_type: String,
+
+    pub child_count: i32,
+
+    pub is_parent: bool,
+
+    pub level: i32,
+
+    pub parent_account_id: String,
+
+    pub tags: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChartTemplateDeployment {
+    pub account_count: i32,
+
+    pub chart_of_account_id: String,
+
+    pub chart_template_id: String,
+
+    pub created_at: String,
+
+    pub created_periods: i32,
+
+    pub fiscal_year_id: String,
+
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CloseFiscalYearRequest {
+    pub closing_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CloseFiscalYearResponse {
+    pub closed_at: String,
+
+    pub closed_by: String,
+
+    pub closing_date: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub is_closed: bool,
+
+    pub is_open: bool,
+
+    pub period_count: i32,
+
+    pub start_date: String,
+
+    pub updated_at: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountRequest {
     pub account_type: String,
 
@@ -320,6 +435,70 @@ pub struct CreateChartOfAccountResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateChartTemplateRequest {
+    pub code: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub fiscal_day: i32,
+
+    pub fiscal_month: i32,
+
+    pub include_subperiods: bool,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub number_of_periods: i32,
+
+    pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateChartTemplateResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub fiscal_day: i32,
+
+    pub fiscal_month: i32,
+
+    pub id: String,
+
+    pub include_subperiods: bool,
+
+    pub is_active: bool,
+
+    pub is_default: bool,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub number_of_periods: i32,
+
+    pub status: String,
+
+    pub updated_at: String,
+
+    pub updated_by: String,
+
+    pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPeriodRequest {
     pub company_id: String,
 
@@ -351,6 +530,100 @@ pub struct CreateFiscalPeriodResponse {
     pub month: i32,
 
     pub name: String,
+
+    pub start_date: String,
+
+    pub updated_at: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalPositionRequest {
+    pub account_mappings: Vec<FiscalPositionAccountMappingRequest>,
+
+    pub auto_apply: bool,
+
+    pub code: String,
+
+    pub company_id: String,
+
+    pub country_id: String,
+
+    pub description: String,
+
+    pub name: String,
+
+    pub state_ids: Vec<String>,
+
+    pub tax_mappings: Vec<FiscalPositionTaxMappingRequest>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalPositionResponse {
+    pub auto_apply: bool,
+
+    pub code: String,
+
+    pub company_id: String,
+
+    pub country_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    pub state_ids: Vec<String>,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalYearRequest {
+    pub company_id: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub number_of_periods: i32,
+
+    pub period_type: String,
+
+    pub start_date: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalYearResponse {
+    pub closed_at: String,
+
+    pub closed_by: String,
+
+    pub closing_date: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub is_closed: bool,
+
+    pub is_open: bool,
+
+    pub period_count: i32,
 
     pub start_date: String,
 
@@ -482,6 +755,136 @@ pub struct CreateJournalResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePaymentMethodRequest {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub description: String,
+
+    pub is_active: bool,
+
+    pub is_payable: bool,
+
+    pub is_receivable: bool,
+
+    pub journal_mappings: Vec<PaymentMethodJournalMappingRequest>,
+
+    pub name: String,
+
+    pub payment_method_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePaymentMethodResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub is_payable: bool,
+
+    pub is_receivable: bool,
+
+    pub name: String,
+
+    pub payment_method_type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePaymentTermRequest {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub installment_lines: Vec<PaymentTermLineRequest>,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePaymentTermResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTaxRepartitionLineRequest {
+    pub account_id: String,
+
+    pub percentage: f64,
+
+    pub ratio: f64,
+
+    pub repartition_type: String,
+
+    pub tag_ids: Vec<String>,
+
+    pub tax_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTaxRepartitionLineResponse {
+    pub account_code: String,
+
+    pub account_id: String,
+
+    pub account_name: String,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub percentage: f64,
+
+    pub ratio: f64,
+
+    pub repartition_type: String,
+
+    pub tag_ids: Vec<String>,
+
+    pub tax_id: String,
+
+    pub tax_name: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DeleteAccountResponse {
     pub code: String,
 
@@ -500,7 +903,34 @@ pub struct DeleteChartOfAccountResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteChartTemplateResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DeleteFiscalPeriodResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteFiscalPositionResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteFiscalYearResponse {
     pub code: String,
 
     pub details: serde_json::Value,
@@ -524,6 +954,59 @@ pub struct DeleteJournalResponse {
     pub details: serde_json::Value,
 
     pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeletePaymentMethodResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeletePaymentTermResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteTaxRepartitionLineResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeployChartTemplateRequest {
+    pub chart_of_account_code: String,
+
+    pub company_id: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeployChartTemplateResponse {
+    pub account_count: i32,
+
+    pub chart_of_account_id: String,
+
+    pub chart_template_id: String,
+
+    pub created_at: String,
+
+    pub created_periods: i32,
+
+    pub fiscal_year_id: String,
+
+    pub id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -567,6 +1050,142 @@ pub struct FiscalPeriod {
     pub updated_at: String,
 
     pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalPosition {
+    pub auto_apply: bool,
+
+    pub code: String,
+
+    pub company_id: String,
+
+    pub country_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    pub state_ids: Vec<String>,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalPositionAccountMapping {
+    pub created_at: String,
+
+    pub destination_account_code: String,
+
+    pub destination_account_id: String,
+
+    pub destination_account_name: String,
+
+    pub fiscal_position_id: String,
+
+    pub id: String,
+
+    pub source_account_code: String,
+
+    pub source_account_id: String,
+
+    pub source_account_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalPositionAccountMappingRequest {
+    pub destination_account_id: String,
+
+    pub source_account_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalPositionTaxMapping {
+    pub created_at: String,
+
+    pub destination_tax_id: String,
+
+    pub destination_tax_name: String,
+
+    pub fiscal_position_id: String,
+
+    pub id: String,
+
+    pub source_tax_id: String,
+
+    pub source_tax_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalPositionTaxMappingRequest {
+    pub destination_tax_id: String,
+
+    pub source_tax_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct FiscalYear {
+    pub closed_at: String,
+
+    pub closed_by: String,
+
+    pub closing_date: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub is_closed: bool,
+
+    pub is_open: bool,
+
+    pub period_count: i32,
+
+    pub start_date: String,
+
+    pub updated_at: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateFiscalYearPeriodsRequest {
+    pub number_of_periods: i32,
+
+    pub period_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateFiscalYearPeriodsResponse {
+    pub periods: Vec<FiscalPeriod>,
+
+    pub periods_created: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GeneratePeriodsRequest {
+    pub number_of_periods: i32,
+
+    pub period_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GeneratePeriodsResult {
+    pub periods: Vec<FiscalPeriod>,
+
+    pub periods_created: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -672,6 +1291,33 @@ pub struct GetJournalResponse {
 
     #[serde(rename = "type")]
     pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetTaxRepartitionLineResponse {
+    pub account_code: String,
+
+    pub account_id: String,
+
+    pub account_name: String,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub percentage: f64,
+
+    pub ratio: f64,
+
+    pub repartition_type: String,
+
+    pub tag_ids: Vec<String>,
+
+    pub tax_id: String,
+
+    pub tax_name: String,
 
     pub updated_at: String,
 }
@@ -918,10 +1564,62 @@ pub struct ListChartOfAccountsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListChartTemplatesResponse {
+    pub has_more: bool,
+
+    pub items: Vec<ChartTemplate>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListFiscalPeriodsResponse {
     pub has_more: bool,
 
     pub items: Vec<FiscalPeriod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListFiscalPositionsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalPosition>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListFiscalYearPeriodsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalPeriod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListFiscalYearsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalYear>,
 
     pub limit: i32,
 
@@ -975,6 +1673,50 @@ pub struct ListJournalsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListPaymentMethodJournalMappingsResponse {
+    pub items: Vec<PaymentMethodJournalMapping>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListPaymentMethodsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<PaymentMethod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListPaymentTermsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<PaymentTerm>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxRepartitionLinesResponse {
+    pub has_more: bool,
+
+    pub items: Vec<TaxRepartitionLine>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedAccounts {
     pub has_more: bool,
 
@@ -1001,10 +1743,62 @@ pub struct PaginatedChartOfAccounts {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedChartTemplates {
+    pub has_more: bool,
+
+    pub items: Vec<ChartTemplate>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedFiscalPeriods {
     pub has_more: bool,
 
     pub items: Vec<FiscalPeriod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedFiscalPositions {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalPosition>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedFiscalYearPeriods {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalPeriod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedFiscalYears {
+    pub has_more: bool,
+
+    pub items: Vec<FiscalYear>,
 
     pub limit: i32,
 
@@ -1037,6 +1831,162 @@ pub struct PaginatedJournals {
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedPaymentMethods {
+    pub has_more: bool,
+
+    pub items: Vec<PaymentMethod>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedPaymentTerms {
+    pub has_more: bool,
+
+    pub items: Vec<PaymentTerm>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxRepartitionLines {
+    pub has_more: bool,
+
+    pub items: Vec<TaxRepartitionLine>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentMethod {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub is_payable: bool,
+
+    pub is_receivable: bool,
+
+    pub name: String,
+
+    pub payment_method_type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentMethodJournalMapping {
+    pub account_id: String,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub is_default: bool,
+
+    pub journal_code: String,
+
+    pub journal_id: String,
+
+    pub journal_name: String,
+
+    pub payment_direction: String,
+
+    pub payment_method_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentMethodJournalMappingRequest {
+    pub account_id: String,
+
+    pub is_default: bool,
+
+    pub journal_id: String,
+
+    pub payment_direction: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentTerm {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentTermLine {
+    pub amount_percentage: f64,
+
+    pub created_at: String,
+
+    pub date_percentage: f64,
+
+    pub discount_amount: f64,
+
+    pub discount_days: i32,
+
+    pub discount_percentage: f64,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub payment_term_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaymentTermLineRequest {
+    pub amount_percentage: f64,
+
+    pub date_percentage: f64,
+
+    pub discount_amount: f64,
+
+    pub discount_days: i32,
+
+    pub discount_percentage: f64,
+
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1082,6 +2032,37 @@ pub struct PostJournalEntryResponse {
     pub updated_at: String,
 
     pub updated_by: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReopenFiscalYearResponse {
+    pub closed_at: String,
+
+    pub closed_by: String,
+
+    pub closing_date: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub is_closed: bool,
+
+    pub is_open: bool,
+
+    pub period_count: i32,
+
+    pub start_date: String,
+
+    pub updated_at: String,
+
+    pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1134,6 +2115,33 @@ pub struct ReverseJournalEntryResponse {
     pub updated_at: String,
 
     pub updated_by: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TaxRepartitionLine {
+    pub account_code: String,
+
+    pub account_id: String,
+
+    pub account_name: String,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub percentage: f64,
+
+    pub ratio: f64,
+
+    pub repartition_type: String,
+
+    pub tag_ids: Vec<String>,
+
+    pub tax_id: String,
+
+    pub tax_name: String,
+
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1274,6 +2282,60 @@ pub struct UpdateChartOfAccountResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateChartTemplateRequest {
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub is_active: bool,
+
+    pub is_default: bool,
+
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateChartTemplateResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub fiscal_day: i32,
+
+    pub fiscal_month: i32,
+
+    pub id: String,
+
+    pub include_subperiods: bool,
+
+    pub is_active: bool,
+
+    pub is_default: bool,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub number_of_periods: i32,
+
+    pub status: String,
+
+    pub updated_at: String,
+
+    pub updated_by: String,
+
+    pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalPeriodRequest {
     pub end_date: String,
 
@@ -1303,6 +2365,88 @@ pub struct UpdateFiscalPeriodResponse {
     pub month: i32,
 
     pub name: String,
+
+    pub start_date: String,
+
+    pub updated_at: String,
+
+    pub year: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateFiscalPositionRequest {
+    pub account_mappings: Vec<FiscalPositionAccountMappingRequest>,
+
+    pub auto_apply: bool,
+
+    pub country_id: String,
+
+    pub description: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    pub state_ids: Vec<String>,
+
+    pub tax_mappings: Vec<FiscalPositionTaxMappingRequest>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateFiscalPositionResponse {
+    pub auto_apply: bool,
+
+    pub code: String,
+
+    pub company_id: String,
+
+    pub country_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    pub state_ids: Vec<String>,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateFiscalYearRequest {
+    pub description: String,
+
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateFiscalYearResponse {
+    pub closed_at: String,
+
+    pub closed_by: String,
+
+    pub closing_date: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub is_closed: bool,
+
+    pub is_open: bool,
+
+    pub period_count: i32,
 
     pub start_date: String,
 
@@ -1410,6 +2554,117 @@ pub struct UpdateJournalResponse {
 
     #[serde(rename = "type")]
     pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePaymentMethodRequest {
+    pub description: String,
+
+    pub is_active: bool,
+
+    pub is_payable: bool,
+
+    pub is_receivable: bool,
+
+    pub journal_mappings: Vec<PaymentMethodJournalMappingRequest>,
+
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePaymentMethodResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub is_payable: bool,
+
+    pub is_receivable: bool,
+
+    pub name: String,
+
+    pub payment_method_type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePaymentTermRequest {
+    pub description: String,
+
+    pub installment_lines: Vec<PaymentTermLineRequest>,
+
+    pub is_active: bool,
+
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePaymentTermResponse {
+    pub code: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_active: bool,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateTaxRepartitionLineRequest {
+    pub account_id: String,
+
+    pub ratio: f64,
+
+    pub tag_ids: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateTaxRepartitionLineResponse {
+    pub account_code: String,
+
+    pub account_id: String,
+
+    pub account_name: String,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub percentage: f64,
+
+    pub ratio: f64,
+
+    pub repartition_type: String,
+
+    pub tag_ids: Vec<String>,
+
+    pub tax_id: String,
+
+    pub tax_name: String,
 
     pub updated_at: String,
 }

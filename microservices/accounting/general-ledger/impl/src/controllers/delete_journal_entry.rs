@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger_gen::handlers::delete_journal_entry::{Request, Response};
+use rerp_accounting_general_ledger::handlers::delete_journal_entry::{Request, Response};
 
 #[handler(DeleteJournalEntryController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -12,34 +12,35 @@ default:
 # Development Environment
 # ============================================================================
 
-# Start development environment (Kind + Tilt)
+# Start development environment (uses shared Kind cluster; owned by shared-kind-cluster).
 dev-up:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🚀 Starting RERP development environment..."
-    
-    # Create Kind cluster
-    echo "📦 Creating Kind cluster..."
-    kind create cluster --config kind-config.yaml || true
+
+    # Verify shared Kind cluster exists (owned by shared-kind-cluster; DO NOT create/delete here)
+    echo "📦 Checking shared Kind cluster..."
+    if ! kind get clusters 2>/dev/null | grep -q '^kind$'; then
+        echo "[FAIL] Shared Kind cluster not found."
+        echo "  Create it: cd ../shared-kind-cluster && just dev-up"
+        exit 1
+    fi
+    echo "[OK] Shared Kind cluster exists"
 
     # Start local registry and connect to kind network (so docker push localhost:5001/... works)
     echo "📦 Setting up local registry (localhost:5001)..."
     tooling/.venv/bin/rerp tilt setup-kind-registry
-    
-    # Wait for cluster to be ready
-    echo "⏳ Waiting for cluster to be ready..."
-    kubectl wait --for=condition=Ready nodes --all --timeout=300s
-    
+
     # Create rerp namespace (at cluster creation; Tilt does not manage it)
     echo "📁 Creating rerp namespace..."
     kubectl apply -f k8s/microservices/namespace.yaml
-    
+
     # Create PersistentVolumes (outside of Tilt management)
     echo "💾 Creating PersistentVolumes..."
     tooling/.venv/bin/rerp tilt setup-persistent-volumes || {
         echo "⚠️  Warning: Some PVs may already exist (this is OK)"
     }
-    
+
     # Start Tilt via systemd (port 10350, avoid clashing with Tiffany on 10350)
     echo "Starting RERP Tilt via systemd (port 10350)..."
     systemctl --user start tilt-rerp.service
@@ -54,22 +55,18 @@ dev-up:
     echo "WARNING: Tilt did not become ready within 2 minutes"
     exit 1
 
-# Stop development environment (Kind cluster and Tilt via systemd; local registry is left running)
+# Stop development environment (Tilt via systemd only; Kind cluster owned by shared-kind-cluster)
 dev-down:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🛑 Stopping RERP development environment..."
-    
+
     # Stop Tilt via systemd
     echo "Stopping RERP Tilt service..."
     systemctl --user stop tilt-rerp.service || true
-    
-    # Delete Kind cluster
-    echo "🗑️ Deleting Kind cluster..."
-    kind delete cluster --name rerp 2>/dev/null || true
-    
+
     echo "✅ Development environment stopped"
-    echo "   (Local registry kind-registry is left running. To remove: just dev-down-full)"
+    echo "   (Kind cluster unchanged — owned by shared-kind-cluster. Registry kind-registry left running.)"
 
 # Stop development environment and remove the local registry
 dev-down-full: dev-down

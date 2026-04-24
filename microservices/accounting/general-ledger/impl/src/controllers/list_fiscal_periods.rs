@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger_gen::handlers::list_fiscal_periods::{Request, Response};
+use rerp_accounting_general_ledger::handlers::list_fiscal_periods::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_general_ledger_gen::handlers::types::FiscalPeriod;
+use rerp_accounting_general_ledger::handlers::types::FiscalPeriod;
 
 #[handler(ListFiscalPeriodsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
