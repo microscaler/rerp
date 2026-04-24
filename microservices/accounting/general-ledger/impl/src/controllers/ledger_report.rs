@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use general_ledger_service_api::handlers::ledger_report::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::ledger_report::{Request, Response};
 
 #[allow(unused_imports)]
-use general_ledger_service_api::handlers::types::LedgerReportLine;
+use rerp_accounting_general_ledger_gen::handlers::types::LedgerReportLine;
 
 #[handler(LedgerReportController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

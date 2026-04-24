@@ -23,8 +23,6 @@ pub mod update_chart_of_account;
 
 pub mod delete_chart_of_account;
 
-pub mod list_journal_entrys;
-
 pub mod create_journal_entry;
 
 pub mod get_journal_entry;

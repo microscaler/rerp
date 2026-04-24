@@ -1,4 +1,4 @@
-// This file uses generated code from the general_ledger_service_api crate
+// This file uses generated code from the rerp_accounting_general_ledger_gen crate
 // Business logic controllers are in impl/src/controllers/
 // This file is based on gen/src/main.rs but uses impl controllers
 
@@ -17,9 +17,9 @@ use brrtrouter::spec::SecurityScheme;
 use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
 use clap::Parser;
 // Use generated code from gen crate
-use general_ledger_service_api::handlers::*;
-use general_ledger_service_api::registry;
-use general_ledger_service_api::*;
+use rerp_accounting_general_ledger_gen::handlers::*;
+use rerp_accounting_general_ledger_gen::registry;
+use rerp_accounting_general_ledger_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
@@ -325,10 +325,10 @@ fn main() -> io::Result<()> {
     // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
     // set for local testing.
     // This returns a coroutine JoinHandle; we join on it to keep the server running
-    let router = std::sync::Arc::new(std::sync::RwLock::new(Router::new(routes.clone())));
-    // Dump initial route table
-    router.read().unwrap().dump_routes();
-    let dispatcher = std::sync::Arc::new(std::sync::RwLock::new(dispatcher));
+    let router = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(Router::new(routes.clone())));
+    // Dump initial route table — ArcSwap load is infallible.
+    router.load().dump_routes();
+    let dispatcher = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(dispatcher));
     let mut service = AppService::new(
         router,
         dispatcher,

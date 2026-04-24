@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use general_ledger_service_api::handlers::create_journal::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::create_journal::{Request, Response};
 
 #[handler(CreateJournalController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

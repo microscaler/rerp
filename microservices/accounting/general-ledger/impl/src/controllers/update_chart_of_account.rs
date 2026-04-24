@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use general_ledger_service_api::handlers::update_chart_of_account::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::update_chart_of_account::{Request, Response};
 
 #[handler(UpdateChartOfAccountController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use general_ledger_service_api::handlers::delete_fiscal_period::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::delete_fiscal_period::{Request, Response};
 
 #[handler(DeleteFiscalPeriodController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

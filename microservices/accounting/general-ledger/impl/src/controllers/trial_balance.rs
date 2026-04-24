@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use general_ledger_service_api::handlers::trial_balance::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::trial_balance::{Request, Response};
 
 #[allow(unused_imports)]
-use general_ledger_service_api::handlers::types::TrialBalanceLine;
+use rerp_accounting_general_ledger_gen::handlers::types::TrialBalanceLine;
 
 #[handler(TrialBalanceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
