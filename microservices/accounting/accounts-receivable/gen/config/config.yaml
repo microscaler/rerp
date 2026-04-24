@@ -55,14 +55,15 @@ http:
   max_requests: 5000
 
 cors:
-  # CORS configuration - origins are environment-specific and should be in config.yaml
+  # Allowed Origins for browser clients — not listed in openapi.yaml; set here per environment.
+  # OpenAPI: per-operation `x-cors` (inherit | false | object); see info.description in openapi.yaml.
   # Route-specific CORS settings (methods, headers, credentials) can be defined in OpenAPI x-cors extension
-  # 
+  #
   # IMPORTANT: If any route has allowCredentials: true in OpenAPI x-cors extension,
   # you MUST configure at least one origin here (wildcard "*" is not allowed with credentials).
   # For development, you can use localhost origins. For production, use your actual domain.
   origins:
-    - "http://localhost:3000"  # Development frontend (uncomment and adjust as needed)
+    - "http://localhost:3000"  # Align with sample-ui / integration tests (ui_scenarios_pet_store)
     # - "https://example.com"   # Production origin (uncomment and set for production)
     # - "https://api.example.com"
     # Use "*" to allow all origins (insecure, not recommended for production)
