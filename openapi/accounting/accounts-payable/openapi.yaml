@@ -2,126 +2,138 @@ openapi: 3.1.0
 info:
   title: Accounts Payable
   version: 1.0.0
-  description: Accounts payable service managing vendor invoices and payments.
+  description: 'Accounts payable management service handling vendor invoices, payments, approvals, and cash flow forecasting. Supports the full AP lifecycle: invoice receipt, approval workflow, payment scheduling, and vendor reconciliation. Integrates with the general ledger for account posting.'
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
 - url: http://localhost:8004/api/v1/accounting/accounts-payable
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/accounts-payable
   description: Accounts Payable API
-tags: []
+tags:
+- name: vendor-invoices
+  description: Vendor invoices and approval workflow
+- name: payments
+  description: Vendor payments and payment scheduling
+- name: approvals
+  description: Invoice approval workflow and hierarchy
+- name: vendors
+  description: Vendor payment terms and reconciliation
+- name: cash-flow
+  description: AP cash flow forecasting and commitments
 paths:
   /vendor-invoices:
     get:
       operationId: list_vendor_invoices
-      summary: List vendor-invoices
+      summary: List vendor invoices
+      description: Paginated list of all vendor invoices with AP-specific fields including approval status and payment status.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by vendor name, invoice number, or status
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - PENDING_APPROVAL
+          - APPROVED
+          - REJECTED
+          - POSTED
+      - name: approval_status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - CANCELLED
+      - name: payment_status
+        in: query
+        schema:
+          type: string
+          enum:
+          - UNPAID
+          - SCHEDULED
+          - PARTIAL
+          - PAID
+          - DISPUTED
+      - name: vendor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Invoice date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Invoice date to
       responses:
         '200':
-          description: List of vendor-invoices
+          description: Paginated list of vendor invoices
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/VendorInvoice'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Vendor invoices
-                  value:
-                    items:
-                    - id: a0050e8400-e29b-41d4-a716-446655440000
-                      invoice_id: a0011e8400-e29b-41d4-a716-446655440001
-                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                      original_amount: 15000.0
-                      outstanding_amount: 15000.0
-                      currency_code: USD
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T09:00:00Z'
-                      updated_at: '2024-01-15T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Vendor invoices
-                  value:
-                    items:
-                    - id: b0050e8400-e29b-41d4-a716-446655440000
-                      invoice_id: b0011e8400-e29b-41d4-a716-446655440001
-                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                      original_amount: 800.0
-                      outstanding_amount: 800.0
-                      currency_code: USD
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency vendor invoices
-                  value:
-                    items:
-                    - id: c0050e8400-e29b-41d4-a716-446655440000
-                      invoice_id: c0011e8400-e29b-41d4-a716-446655440001
-                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                      original_amount: 15000.0
-                      outstanding_amount: 15000.0
-                      currency_code: EUR
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T07:00:00Z'
-                      updated_at: '2024-01-25T07:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedVendorInvoices'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_vendor_invoice
-      summary: Create vendor-invoice
+      summary: Create vendor invoice
+      description: Create a new AP record for a vendor invoice. Links the invoice to the vendor and initializes the approval workflow.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateVendorInvoiceRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create vendor invoice for Acme Corporation
-                value:
-                  invoice_id: a0011e8400-e29b-41d4-a716-446655440001
-                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create vendor invoice for TechStart Inc
-                value:
-                  invoice_id: b0011e8400-e29b-41d4-a716-446655440001
-                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency vendor invoice
-                value:
-                  invoice_id: c0011e8400-e29b-41d4-a716-446655440001
-                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: VendorInvoice created
@@ -129,52 +141,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VendorInvoice'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation vendor invoice created
-                  value:
-                    id: a0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T09:00:00Z'
-                techStartResponse:
-                  summary: TechStart vendor invoice created
-                  value:
-                    id: b0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing vendor invoice created
-                  value:
-                    id: c0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: EUR
-                    status: OUTSTANDING
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T07:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /vendor-invoices/{id}:
     get:
       operationId: get_vendor_invoice
-      summary: Get vendor-invoice by id
+      summary: Get vendor invoice by id
+      description: Retrieve a single vendor invoice with its full AP details including approval history and payment status.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -184,59 +162,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: VendorInvoice details
+          description: VendorInvoice details with AP context
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VendorInvoice'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation vendor invoice
-                  value:
-                    id: a0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    original_amount: 15000.0
-                    outstanding_amount: 15000.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T09:00:00Z'
-                techStartExample:
-                  summary: TechStart vendor invoice
-                  value:
-                    id: b0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    original_amount: 800.0
-                    outstanding_amount: 800.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing vendor invoice
-                  value:
-                    id: c0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    original_amount: 15000.0
-                    outstanding_amount: 15000.0
-                    currency_code: EUR
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T07:00:00Z'
+                $ref: '#/components/schemas/VendorInvoiceWithDetails'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_vendor_invoice
-      summary: Update vendor-invoice
+      summary: Update vendor invoice
+      description: Update an AP record's details. Does not modify the base invoice - use the Invoice service for that.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -250,22 +191,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateVendorInvoiceRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation vendor invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
-              techStartUpdate:
-                summary: Update TechStart vendor invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing vendor invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
       responses:
         '200':
           description: VendorInvoice updated
@@ -273,54 +198,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VendorInvoice'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation vendor invoice updated
-                  value:
-                    id: a0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    original_amount: 15000.0
-                    outstanding_amount: 7500.0
-                    currency_code: USD
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart vendor invoice updated
-                  value:
-                    id: b0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    original_amount: 800.0
-                    outstanding_amount: 400.0
-                    currency_code: USD
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing vendor invoice updated
-                  value:
-                    id: c0050e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0011e8400-e29b-41d4-a716-446655440001
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    original_amount: 15000.0
-                    outstanding_amount: 7500.0
-                    currency_code: EUR
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_vendor_invoice
-      summary: Delete vendor-invoice
+      summary: Delete vendor invoice
+      description: Delete a vendor invoice record. Only allowed for invoices in DRAFT status.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -333,192 +221,133 @@ paths:
           description: VendorInvoice deleted
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete approved or posted invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
       operationId: list_payments
       summary: List payments
+      description: Paginated list of all vendor payments with filtering by status, date range, and vendor.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by reference number or vendor
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - SCHEDULED
+          - PENDING
+          - SENT
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+      - name: payment_method
+        in: query
+        schema:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+      - name: vendor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Payment date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Payment date to
       responses:
         '200':
-          description: List of payments
+          description: Paginated list of payments
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ApPayment'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - AP payments
-                  value:
-                    items:
-                    - id: a0060e8400-e29b-41d4-a716-446655440000
-                      payment_number: AP-PAY-2024-001
-                      payment_date: '2024-01-20'
-                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 7500.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      payment_method: WIRE
-                      status: POSTED
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-20T10:00:00Z'
-                      updated_at: '2024-01-20T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - AP payments
-                  value:
-                    items:
-                    - id: b0060e8400-e29b-41d4-a716-446655440000
-                      payment_number: AP-PAY-2024-100
-                      payment_date: '2024-01-25'
-                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 400.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      payment_method: CHECK
-                      status: POSTED
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-25T09:00:00Z'
-                      updated_at: '2024-01-25T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency AP payments
-                  value:
-                    items:
-                    - id: c0060e8400-e29b-41d4-a716-446655440000
-                      payment_number: AP-PAY-2024-200
-                      payment_date: '2024-01-30'
-                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 7500.0
-                      currency_code: EUR
-                      exchange_rate: 0.92
-                      payment_method: WIRE
-                      status: POSTED
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-30T08:00:00Z'
-                      updated_at: '2024-01-30T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedVendorPayments'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_payment
       summary: Create payment
+      description: Schedule a new vendor payment. Optionally auto-disburse if auto_disburse is true.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateApPaymentRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create AP payment for Acme Corporation
-                value:
-                  payment_number: AP-PAY-2024-001
-                  payment_date: '2024-01-20'
-                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 7500.0
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  payment_method: WIRE
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create AP payment for TechStart Inc
-                value:
-                  payment_number: AP-PAY-2024-100
-                  payment_date: '2024-01-25'
-                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 400.0
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  payment_method: CHECK
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency AP payment
-                value:
-                  payment_number: AP-PAY-2024-200
-                  payment_date: '2024-01-30'
-                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 7500.0
-                  currency_code: EUR
-                  exchange_rate: 0.92
-                  payment_method: WIRE
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
+              $ref: '#/components/schemas/CreateVendorPaymentRequest'
       responses:
         '201':
           description: Payment created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApPayment'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AP payment created
-                  value:
-                    id: a0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: DRAFT
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AP payment created
-                  value:
-                    id: b0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 400.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: DRAFT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AP payment created
-                  value:
-                    id: c0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: DRAFT
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T08:00:00Z'
+                $ref: '#/components/schemas/VendorPayment'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /payments/{id}:
     get:
       operationId: get_payment
       summary: Get payment by id
+      description: Retrieve payment details.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -532,58 +361,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApPayment'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation AP payment
-                  value:
-                    id: a0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                techStartExample:
-                  summary: TechStart AP payment
-                  value:
-                    id: b0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 400.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing AP payment
-                  value:
-                    id: c0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T08:00:00Z'
+                $ref: '#/components/schemas/VendorPayment'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_payment
       summary: Update payment
+      description: Update a payment's details. Only scheduled or pending payments can be modified.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -596,81 +385,31 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateApPaymentRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation AP payment
-                value:
-                  status: POSTED
-                  payment_method: WIRE
-              techStartUpdate:
-                summary: Update TechStart AP payment
-                value:
-                  status: POSTED
-                  payment_method: CHECK
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing AP payment
-                value:
-                  status: POSTED
-                  payment_method: WIRE
+              $ref: '#/components/schemas/UpdateVendorPaymentRequest'
       responses:
         '200':
           description: Payment updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApPayment'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AP payment updated
-                  value:
-                    id: a0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart AP payment updated
-                  value:
-                    id: b0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 400.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AP payment updated
-                  value:
-                    id: c0060e8400-e29b-41d4-a716-446655440000
-                    payment_number: AP-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 7500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T09:00:00Z'
+                $ref: '#/components/schemas/VendorPayment'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update completed or cancelled payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_payment
       summary: Delete payment
+      description: Delete a payment. Only scheduled or pending payments can be deleted.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -683,366 +422,221 @@ paths:
           description: Payment deleted
         '404':
           description: Not found
-  /ap-agings:
-    get:
-      operationId: list_ap_agings
-      summary: List ap-agings
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of ap-agings
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ApAging'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - AP aging analysis
-                  value:
-                    items:
-                    - id: a00b0e8400-e29b-41d4-a716-446655440000
-                      vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 7500.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 7500.0
-                      currency_code: USD
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-31T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - AP aging analysis
-                  value:
-                    items:
-                    - id: b00b0e8400-e29b-41d4-a716-446655440000
-                      vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 400.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 400.0
-                      currency_code: USD
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-31T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency AP aging
-                  value:
-                    items:
-                    - id: c00b0e8400-e29b-41d4-a716-446655440000
-                      vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 7500.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 7500.0
-                      currency_code: EUR
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-31T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete completed payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /approvals:
+    get:
+      operationId: list_approvals
+      summary: List approvals
+      description: List all approval records with filtering by invoice, approver, and status.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: invoice_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: approver_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: action
+        in: query
+        schema:
+          type: string
+          enum:
+          - APPROVE
+          - REJECT
+          - REQUEST_INFO
+          - DELEGATE
+      responses:
+        '200':
+          description: Paginated list of approval records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApprovals'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_ap_aging
-      summary: Create ap-aging
+      operationId: create_approval
+      summary: Submit approval action
+      description: Approve, reject, or request more information on an invoice as part of the approval workflow.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateApAgingRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create AP aging for Acme Corporation
-                value:
-                  vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create AP aging for TechStart Inc
-                value:
-                  vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency AP aging
-                value:
-                  vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
+              $ref: '#/components/schemas/CreateApprovalRequest'
       responses:
         '201':
-          description: ApAging created
+          description: ApprovalRecord created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApAging'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AP aging created
-                  value:
-                    id: a00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AP aging created
-                  value:
-                    id: b00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AP aging created
-                  value:
-                    id: c00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
+                $ref: '#/components/schemas/ApprovalRecord'
         '400':
-          description: Invalid request
-  /ap-agings/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '403':
+          description: Forbidden - user not authorized to approve this invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /commitments:
     get:
-      operationId: get_ap_aging
-      summary: Get ap-aging by id
+      operationId: list_payment_commitments
+      summary: List payment commitments
+      description: List all payment commitments (approved invoices awaiting payment) with filtering by vendor and due date.
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: vendor_id
+        in: query
         schema:
           type: string
           format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: due_before
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Due before this date
+      - name: due_after
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Due after this date
       responses:
         '200':
-          description: ApAging details
+          description: Paginated list of payment commitments
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApAging'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation AP aging
-                  value:
-                    id: a00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 7500.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 7500.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart AP aging
-                  value:
-                    id: b00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 400.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 400.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing AP aging
-                  value:
-                    id: c00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 7500.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 7500.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_ap_aging
-      summary: Update ap-aging
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateApAgingRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation AP aging
-                value:
-                  current: 8000.0
-                  total_outstanding: 8000.0
-              techStartUpdate:
-                summary: Update TechStart AP aging
-                value:
-                  current: 450.0
-                  total_outstanding: 450.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing AP aging
-                value:
-                  current: 8000.0
-                  total_outstanding: 8000.0
-      responses:
-        '200':
-          description: ApAging updated
+                $ref: '#/components/schemas/PaginatedCommitments'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApAging'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AP aging updated
-                  value:
-                    id: a00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 411e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 8000.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 8000.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AP aging updated
-                  value:
-                    id: b00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 422e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 450.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 450.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AP aging updated
-                  value:
-                    id: c00b0e8400-e29b-41d4-a716-446655440000
-                    vendor_id: 433e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 8000.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 8000.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_ap_aging
-      summary: Delete ap-aging
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/cash-flow-forecast:
+    get:
+      operationId: cash_flow_forecast
+      summary: Cash flow forecast
+      description: Generate a cash flow forecast for the AP service showing upcoming payment commitments and scheduled payments.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: company_id
+        in: query
         schema:
           type: string
           format: uuid
+        description: Filter by company
+      - name: period_start
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Forecast start date
+      - name: period_end
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Forecast end date
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description: Currency for the forecast
       responses:
-        '204':
-          description: ApAging deleted
-        '404':
-          description: Not found
+        '200':
+          description: Cash flow forecast with daily breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashFlowForecast'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     VendorInvoice:
       type: object
@@ -1050,428 +644,790 @@ components:
       - id
       - invoice_id
       - vendor_id
+      - currency_code
+      - status
+      - approval_status
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for this AP record
         invoice_id:
           type: string
           format: uuid
+          description: Reference to the base Invoice entity in the Invoice service
         vendor_id:
           type: string
           format: uuid
-        outstanding_amount:
+          description: Vendor this invoice is for
+        invoice_number:
+          type: string
+          maxLength: 100
+          description: Vendor's invoice number for reference
+        invoice_date:
+          type: string
+          format: date
+          description: Date on the vendor invoice
+        amount:
           type: number
-          format: decimal
-        days_until_due:
-          type: integer
-        aging_bucket:
+          format: double
+          minimum: 0
+          description: Total invoice amount
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        tax_amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Tax amount on this invoice
+        net_amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Net amount (total - tax)
+        status:
           type: string
           enum:
-          - CURRENT
-          - 1-30
-          - 31-60
-          - 61-90
-          - 90+
-          nullable: true
-        purchase_order_id:
-          type: string
-          format: uuid
-          nullable: true
-        matching_status:
-          type: string
-          enum:
-          - NOT_MATCHED
-          - PARTIAL
-          - MATCHED
-          nullable: true
+          - DRAFT
+          - PENDING_APPROVAL
+          - APPROVED
+          - REJECTED
+          - POSTED
+          description: AP status of this invoice
         approval_status:
           type: string
           enum:
           - PENDING
           - APPROVED
           - REJECTED
-          nullable: true
-        approved_at:
+          - CANCELLED
+          description: Approval workflow status
+        payment_status:
           type: string
-          format: date-time
-          nullable: true
+          enum:
+          - UNPAID
+          - SCHEDULED
+          - PARTIAL
+          - PAID
+          - DISPUTED
+          description: Payment lifecycle state
+        due_date:
+          type: string
+          format: date
+          description: Payment due date
+        terms:
+          type: string
+          enum:
+          - DUE_ON_RECEIPT
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - CUSTOM
+          description: Payment terms with this vendor
+        company_id:
+          type: string
+          format: uuid
+          description: Company this invoice belongs to
         approved_by:
           type: string
           format: uuid
           nullable: true
-        early_payment_discount_percent:
-          type: number
-          format: decimal
-          nullable: true
-        early_payment_discount_date:
+          description: User who approved this invoice
+        approved_at:
           type: string
-          format: date
+          format: date-time
           nullable: true
-        metadata:
-          type: object
+          description: When the invoice was approved
+        description:
+          type: string
+          maxLength: 2000
           nullable: true
+          description: Invoice description/memo
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-    ApPayment:
-      type: object
-      required:
-      - id
-      - vendor_id
-      - payment_number
-      - payment_date
-      - payment_amount
-      - payment_method
-      - status
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        vendor_id:
-          type: string
-          format: uuid
-        payment_number:
-          type: string
-          maxLength: 100
-        payment_date:
-          type: string
-          format: date
-        payment_amount:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        payment_method:
-          type: string
-          enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
-          - OTHER
-        payment_reference:
-          type: string
-          nullable: true
-        bank_account_id:
-          type: string
-          format: uuid
-          nullable: true
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - POSTED
-          - RECONCILED
-          - CANCELLED
-        applied_amount:
-          type: number
-          format: decimal
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    ApPaymentApplication:
-      type: object
-      required:
-      - id
-      - payment_id
-      - invoice_id
-      - applied_amount
-      properties:
-        id:
-          type: string
-          format: uuid
-        payment_id:
-          type: string
-          format: uuid
-        invoice_id:
-          type: string
-          format: uuid
-        applied_amount:
-          type: number
-          format: decimal
-        applied_at:
-          type: string
-          format: date-time
-        applied_by:
-          type: string
-          format: uuid
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    ApAging:
-      type: object
-      required:
-      - id
-      - vendor_id
-      - aging_date
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        vendor_id:
-          type: string
-          format: uuid
-        aging_date:
-          type: string
-          format: date
-        current:
-          type: number
-          format: decimal
-        days_31_60:
-          type: number
-          format: decimal
-        days_61_90:
-          type: number
-          format: decimal
-        days_91_120:
-          type: number
-          format: decimal
-        over_120:
-          type: number
-          format: decimal
-        total_outstanding:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
+    VendorInvoiceWithDetails:
+      allOf:
+      - $ref: '#/components/schemas/VendorInvoice'
+      - type: object
+        properties:
+          approval_history:
+            type: array
+            items:
+              $ref: '#/components/schemas/ApprovalRecord'
+            description: Approval workflow history
+          payment_history:
+            type: array
+            items:
+              $ref: '#/components/schemas/VendorPayment'
+            description: Payment history for this invoice
+          line_items:
+            type: array
+            items:
+              $ref: '#/components/schemas/VendorInvoiceLineItem'
+            description: Invoice line items
     CreateVendorInvoiceRequest:
       type: object
       required:
       - invoice_id
       - vendor_id
+      - currency_code
+      - amount
       properties:
         invoice_id:
           type: string
           format: uuid
+          description: Base Invoice entity reference
         vendor_id:
           type: string
           format: uuid
-        purchase_order_id:
-          type: string
-          format: uuid
-        approval_status:
-          type: string
-          enum:
-          - PENDING
-          - APPROVED
-          - REJECTED
-        early_payment_discount_percent:
-          type: number
-          format: decimal
-        early_payment_discount_date:
-          type: string
-          format: date
-    UpdateVendorInvoiceRequest:
-      type: object
-      properties:
-        outstanding_amount:
-          type: number
-          format: decimal
-        aging_bucket:
-          type: string
-          enum:
-          - CURRENT
-          - 1-30
-          - 31-60
-          - 61-90
-          - 90+
-        matching_status:
-          type: string
-          enum:
-          - NOT_MATCHED
-          - PARTIAL
-          - MATCHED
-        approval_status:
-          type: string
-          enum:
-          - PENDING
-          - APPROVED
-          - REJECTED
-    CreateApPaymentRequest:
-      type: object
-      required:
-      - vendor_id
-      - payment_number
-      - payment_date
-      - payment_amount
-      - payment_method
-      - currency_code
-      properties:
-        vendor_id:
-          type: string
-          format: uuid
-        payment_number:
+          description: Vendor
+        invoice_number:
           type: string
           maxLength: 100
-        payment_date:
+          description: Vendor's invoice number
+        invoice_date:
           type: string
           format: date
-        payment_amount:
+          description: Date on the vendor invoice
+        amount:
           type: number
-          format: decimal
+          format: double
+          minimum: 0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        payment_method:
+        tax_amount:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          description: Payment due date. Defaults to invoice_date + terms.
+        terms:
           type: string
           enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
-          - OTHER
-        payment_reference:
+          - DUE_ON_RECEIPT
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - CUSTOM
+        description:
           type: string
-        bank_account_id:
-          type: string
-          format: uuid
-        notes:
-          type: string
+          maxLength: 2000
+          nullable: true
         company_id:
           type: string
           format: uuid
-    UpdateApPaymentRequest:
+        line_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
+          description: Invoice line items for GL posting
+        auto_approve:
+          type: boolean
+          default: false
+          description: Bypass approval workflow for invoices below threshold
+    UpdateVendorInvoiceRequest:
       type: object
       properties:
-        payment_date:
-          type: string
-          format: date
-        payment_amount:
-          type: number
-          format: decimal
-        payment_method:
-          type: string
-          enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
-          - OTHER
         status:
           type: string
           enum:
           - DRAFT
+          - PENDING_APPROVAL
+          - APPROVED
+          - REJECTED
           - POSTED
-          - RECONCILED
+        approval_status:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - CANCELLED
+        payment_status:
+          type: string
+          enum:
+          - UNPAID
+          - SCHEDULED
+          - PARTIAL
+          - PAID
+          - DISPUTED
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        tax_amount:
+          type: number
+          format: double
+          minimum: 0
+        due_date:
+          type: string
+          format: date
+        terms:
+          type: string
+          enum:
+          - DUE_ON_RECEIPT
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - CUSTOM
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+    VendorPayment:
+      type: object
+      required:
+      - id
+      - amount
+      - currency_code
+      - payment_method
+      - payment_date
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the payment
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: Payment reference (check number, wire reference)
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Payment amount
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+          description: Scheduled or actual payment date
+        actual_payment_date:
+          type: string
+          format: date
+          nullable: true
+          description: When payment was actually sent
+        status:
+          type: string
+          enum:
+          - SCHEDULED
+          - PENDING
+          - SENT
+          - COMPLETED
+          - FAILED
+          - CANCELLED
+        vendor_id:
+          type: string
+          format: uuid
+          description: Vendor this payment is for
+        company_id:
+          type: string
+          format: uuid
+          description: Company this payment belongs to
+        posted_to_gl:
+          type: boolean
+          default: false
+          description: Whether payment has been posted to general ledger
+        gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL journal entry created for this payment
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Payment notes
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateVendorPaymentRequest:
+      type: object
+      required:
+      - vendor_id
+      - amount
+      - currency_code
+      - payment_method
+      - payment_date
+      properties:
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+          description: Scheduled payment date
+        vendor_id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+        auto_disburse:
+          type: boolean
+          default: false
+          description: Immediately disburse the payment
+    UpdateVendorPaymentRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - SCHEDULED
+          - PENDING
+          - SENT
+          - COMPLETED
+          - FAILED
           - CANCELLED
         notes:
           type: string
-    CreateApPaymentApplicationRequest:
+          maxLength: 1000
+          nullable: true
+    VendorInvoiceLineItem:
       type: object
       required:
-      - payment_id
+      - id
       - invoice_id
-      - applied_amount
+      - description
+      - amount
       properties:
-        payment_id:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this line item
+        invoice_id:
+          type: string
+          format: uuid
+          description: Parent vendor invoice
+        product_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Product this line item relates to
+        quantity:
+          type: number
+          format: double
+          minimum: 0
+          description: Quantity invoiced
+        unit_price:
+          type: number
+          format: double
+          minimum: 0
+          description: Price per unit
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Line total (quantity * unit_price)
+        tax_code:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Tax code for this line
+        description:
+          type: string
+          maxLength: 1000
+          description: Line item description
+        gl_account:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL account for posting
+    CreateInvoiceLineItemRequest:
+      type: object
+      required:
+      - description
+      - amount
+      properties:
+        product_id:
+          type: string
+          format: uuid
+          nullable: true
+        quantity:
+          type: number
+          format: double
+          minimum: 0
+          default: 1
+        unit_price:
+          type: number
+          format: double
+          minimum: 0
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        tax_code:
+          type: string
+          maxLength: 50
+          nullable: true
+        description:
+          type: string
+          maxLength: 1000
+        gl_account:
+          type: string
+          format: uuid
+          nullable: true
+    ApprovalRecord:
+      type: object
+      required:
+      - id
+      - invoice_id
+      - approver_id
+      - action
+      - date
+      properties:
+        id:
           type: string
           format: uuid
         invoice_id:
           type: string
           format: uuid
-        applied_amount:
-          type: number
-          format: decimal
+          description: Invoice being approved
+        approver_id:
+          type: string
+          format: uuid
+          description: User who approved/rejected
+        action:
+          type: string
+          enum:
+          - APPROVE
+          - REJECT
+          - REQUEST_INFO
+          - DELEGATE
+        date:
+          type: string
+          format: date-time
+          description: When the action was taken
         notes:
           type: string
-    UpdateApPaymentApplicationRequest:
-      type: object
-      properties:
-        applied_amount:
+          maxLength: 2000
+          nullable: true
+          description: Approval/rejection notes
+        threshold_met:
           type: number
-          format: decimal
-        notes:
-          type: string
-    CreateApAgingRequest:
+          format: double
+          nullable: true
+          description: Approval threshold that was met
+    CreateApprovalRequest:
       type: object
       required:
-      - vendor_id
-      - aging_date
-      - currency_code
+      - invoice_id
+      - action
       properties:
+        invoice_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum:
+          - APPROVE
+          - REJECT
+          - REQUEST_INFO
+          - DELEGATE
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+    PaymentCommitment:
+      type: object
+      required:
+      - id
+      - vendor_id
+      - company_id
+      - amount
+      - due_date
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Related approved invoice
         vendor_id:
           type: string
           format: uuid
-        aging_date:
+          description: Vendor this commitment is for
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Commitment amount
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency of the commitment
+        due_date:
+          type: string
+          format: date
+          description: Payment due date
+        status:
+          type: string
+          enum:
+          - APPROVED
+          - SCHEDULED
+          - PAID
+          - CANCELLED
+          description: Commitment status
+        company_id:
+          type: string
+          format: uuid
+          description: Company this commitment belongs to
+        created_at:
+          type: string
+          format: date-time
+    CashFlowForecast:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      - total_commitments
+      - total_payments
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
           type: string
           format: date
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-    UpdateApAgingRequest:
+        total_commitments:
+          type: number
+          format: double
+          description: Total approved invoices not yet paid
+        total_payments:
+          type: number
+          format: double
+          description: Total scheduled payments in period
+        net_cash_flow:
+          type: number
+          format: double
+          description: Total commitments - total payments
+        by_day:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              commitments:
+                type: number
+                format: double
+              payments:
+                type: number
+                format: double
+          description: Daily breakdown
+    PaginatedVendorInvoices:
       type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
       properties:
-        current:
-          type: number
-          format: decimal
-        days_31_60:
-          type: number
-          format: decimal
-        days_61_90:
-          type: number
-          format: decimal
-        days_91_120:
-          type: number
-          format: decimal
-        over_120:
-          type: number
-          format: decimal
-        total_outstanding:
-          type: number
-          format: decimal
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorInvoice'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedVendorPayments:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorPayment'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedApprovals:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalRecord'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedCommitments:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentCommitment'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Vendor invoice not found
+        details:
+          type: object
+          nullable: true
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Amount exceeds invoice total
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: amount
+              message:
+                type: string
+                example: Payment amount cannot exceed invoice total
+security:
+- bearerAuth: []

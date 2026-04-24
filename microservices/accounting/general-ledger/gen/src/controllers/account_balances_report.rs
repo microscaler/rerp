@@ -1,24 +1,24 @@
-
 // User-owned controller for handler 'account_balances_report'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::account_balances_report::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::account_balances_report::{ Request, Response };
-
+use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
 use crate::handlers::types::AccountBalance;
 
-
-
 #[handler(AccountBalancesReportController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
     Response {
-        company_id: Some("example".to_string()),currency_code: Some("example".to_string()),lines: Some(vec![]),net_income: Some(3.14),report_date: Some("example".to_string()),total_assets: Some(3.14),total_equity: Some(3.14),total_expenses: Some(3.14),total_liabilities: Some(3.14),total_revenue: Some(3.14),
+        company_id: Some("example".to_string()),
+        currency_code: Some("example".to_string()),
+        lines: Some(vec![]),
+        net_income: Some(3.14),
+        report_date: Some("example".to_string()),
+        total_assets: Some(3.14),
+        total_equity: Some(3.14),
+        total_expenses: Some(3.14),
+        total_liabilities: Some(3.14),
+        total_revenue: Some(3.14),
     }
-    
-    
 }

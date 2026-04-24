@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::delete_budget::{Request, Response};
+use budget_service_api::handlers::delete_budget::{Request, Response};
 
 #[handler(DeleteBudgetController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

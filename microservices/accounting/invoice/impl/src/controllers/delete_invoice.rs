@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_invoice_gen::handlers::delete_invoice::{Request, Response};
+use invoice_service_api::handlers::delete_invoice::{Request, Response};
 
 #[handler(DeleteInvoiceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

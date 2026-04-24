@@ -3,11 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_customer_invoice --force
 
+use accounts_receivable_service_api::handlers::delete_customer_invoice::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::delete_customer_invoice::{
-    Request, Response,
-};
 
 #[handler(DeleteCustomerInvoiceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -21,5 +19,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {}
+    Response {
+        code: "example".to_string(),    // TODO: Set from your business logic
+        details: None,                  // TODO: Set from your business logic
+        message: "example".to_string(), // TODO: Set from your business logic
+    }
 }

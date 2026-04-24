@@ -3,18 +3,16 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path update_customer_invoice --force
 
+use accounts_receivable_service_api::handlers::update_customer_invoice::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::update_customer_invoice::{
-    Request, Response,
-};
 
 #[handler(UpdateCustomerInvoiceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
-    // let aging_bucket = req.inner.aging_bucket;// let collection_status = req.inner.collection_status;// let outstanding_amount = req.inner.outstanding_amount;// let write_off_amount = req.inner.write_off_amount;// let write_off_date = req.inner.write_off_date;// let write_off_reason = req.inner.write_off_reason;// let id = req.inner.id;
+    // let aging_bucket = req.inner.aging_bucket;// let credit_limit_check = req.inner.credit_limit_check;// let due_date = req.inner.due_date;// let status = req.inner.status;// let terms = req.inner.terms;// let id = req.inner.id;
     //
     // Example: Database query, validation, etc.
     // let result = your_service.process(&req.inner)?;
@@ -22,38 +20,19 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_bucket: None, // TODO: Set from your business logic
-
-        collection_status: None, // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
-        credit_limit: None, // TODO: Set from your business logic
-
-        credit_used: None, // TODO: Set from your business logic
-
-        customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
-
-        days_overdue: None, // TODO: Set from your business logic
-
-        id: "a0030e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        last_payment_amount: None, // TODO: Set from your business logic
-
-        last_payment_date: None, // TODO: Set from your business logic
-
-        metadata: None, // TODO: Set from your business logic
-
-        outstanding_amount: None, // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
-
-        write_off_amount: None, // TODO: Set from your business logic
-
-        write_off_date: None, // TODO: Set from your business logic
-
-        write_off_reason: None, // TODO: Set from your business logic
+        aging_bucket: None,                   // TODO: Set from your business logic
+        company_id: None,                     // TODO: Set from your business logic
+        created_at: None,                     // TODO: Set from your business logic
+        credit_limit_check: None,             // TODO: Set from your business logic
+        currency_code: "example".to_string(), // TODO: Set from your business logic
+        customer_id: "example".to_string(),   // TODO: Set from your business logic
+        due_date: None,                       // TODO: Set from your business logic
+        id: "example".to_string(),            // TODO: Set from your business logic
+        invoice_id: "example".to_string(),    // TODO: Set from your business logic
+        original_amount: None,                // TODO: Set from your business logic
+        outstanding_amount: None,             // TODO: Set from your business logic
+        status: "example".to_string(),        // TODO: Set from your business logic
+        terms: None,                          // TODO: Set from your business logic
+        updated_at: None,                     // TODO: Set from your business logic
     }
 }

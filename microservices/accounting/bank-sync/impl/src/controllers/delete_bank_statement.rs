@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_bank_statement --force
 
+use bank_sync_service_api::handlers::delete_bank_statement::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_bank_sync_gen::handlers::delete_bank_statement::{Request, Response};
 
 #[handler(DeleteBankStatementController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

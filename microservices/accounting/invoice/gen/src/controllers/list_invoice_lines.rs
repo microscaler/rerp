@@ -1,44 +1,40 @@
-
 // User-owned controller for handler 'list_invoice_lines'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::list_invoice_lines::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::list_invoice_lines::{ Request, Response };
-
+use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
 use crate::handlers::types::InvoiceLine;
 
-
-
 #[handler(ListInvoiceLinesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
     // Example response:
-        // {
-        //   "items": [
-        //     {
-        //       "created_at": "2024-01-15T09:00:00Z",
-        //       "currency_code": "USD",
-        //       "discount_amount": 0.0,
-        //       "discount_percent": 0.0,
-        //       "id": "a0020e8400-e29b-41d4-a716-446655440000",
-        //       "invoice_id": "a0010e8400-e29b-41d4-a716-446655440000",
-        //       "line_number": 1,
-        //       "line_subtotal": 10000.0,
-        //       "line_total": 11000.0,
-        //       "product_name": "Professional Services",
-        //       "quantity": 40.0,
-        //       "tax_amount": 1000.0,
-        //       "unit_price": 250.0,
-        //       "updated_at": "2024-01-15T09:00:00Z"
-        //     }
-        //   ],
-        //   "limit": 20,
-        //   "page": 1,
-        //   "total": 1
-        // }
-    match serde_json::from_str::<Response>(r###"{
+    // {
+    //   "items": [
+    //     {
+    //       "created_at": "2024-01-15T09:00:00Z",
+    //       "currency_code": "USD",
+    //       "discount_amount": 0.0,
+    //       "discount_percent": 0.0,
+    //       "id": "a0020e8400-e29b-41d4-a716-446655440000",
+    //       "invoice_id": "a0010e8400-e29b-41d4-a716-446655440000",
+    //       "line_number": 1,
+    //       "line_subtotal": 10000.0,
+    //       "line_total": 11000.0,
+    //       "product_name": "Professional Services",
+    //       "quantity": 40.0,
+    //       "tax_amount": 1000.0,
+    //       "unit_price": 250.0,
+    //       "updated_at": "2024-01-15T09:00:00Z"
+    //     }
+    //   ],
+    //   "limit": 20,
+    //   "page": 1,
+    //   "total": 1
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
   "items": [
     {
       "created_at": "2024-01-15T09:00:00Z",
@@ -60,17 +56,16 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
   "limit": 20,
   "page": 1,
   "total": 1
-}"###) {
+}"###,
+    ) {
         Ok(parsed) => return parsed,
         Err(e) => {
             eprintln!("Failed to parse mock example JSON into Response: {}", e);
             // Fallback to empty default structs below
         }
     }
-    
+
     Response {
         items: Some(vec![serde_json::from_value::<InvoiceLine>(serde_json::json!({"created_at":"2024-01-15T09:00:00Z","currency_code":"USD","discount_amount":0.0,"discount_percent":0.0,"id":"a0020e8400-e29b-41d4-a716-446655440000","invoice_id":"a0010e8400-e29b-41d4-a716-446655440000","line_number":1,"line_subtotal":10000.0,"line_total":11000.0,"product_name":"Professional Services","quantity":40.0,"tax_amount":1000.0,"unit_price":250.0,"updated_at":"2024-01-15T09:00:00Z"})).unwrap_or_default()]),limit: Some(20),page: Some(1),total: Some(1),
     }
-    
-    
 }

@@ -1,20 +1,10 @@
-
 // User-owned controller for handler 'get_account'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::get_account::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::get_account::{ Request, Response };
-
-
+use brrtrouter_macros::handler;
 
 #[handler(GetAccountController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
-    Response {
-        
-    }
-    
-    
+    Response {}
 }

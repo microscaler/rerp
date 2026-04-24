@@ -5,12 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_financial_reports_gen::handlers::list_financial_statements::{
-    Request, Response,
-};
+use financial_reports_service_api::handlers::list_financial_statements::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_financial_reports_gen::handlers::types::FinancialStatement;
+use financial_reports_service_api::handlers::types::FinancialStatement;
 
 #[handler(ListFinancialStatementsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -26,11 +24,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         items: None, // TODO: Set from your business logic
-
         limit: None, // TODO: Set from your business logic
-
-        page: None, // TODO: Set from your business logic
-
+        page: None,  // TODO: Set from your business logic
         total: None, // TODO: Set from your business logic
     }
 }

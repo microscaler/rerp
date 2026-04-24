@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_financial_reports_gen::handlers::delete_report::{Request, Response};
+use financial_reports_service_api::handlers::delete_report::{Request, Response};
 
 #[handler(DeleteReportController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

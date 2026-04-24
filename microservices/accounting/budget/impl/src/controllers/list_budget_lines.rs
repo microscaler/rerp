@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::list_budget_lines::{Request, Response};
+use budget_service_api::handlers::list_budget_lines::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_budget_gen::handlers::types::BudgetLine;
+use budget_service_api::handlers::types::BudgetLine;
 
 #[handler(ListBudgetLinesController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -24,11 +24,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         items: None, // TODO: Set from your business logic
-
         limit: None, // TODO: Set from your business logic
-
-        page: None, // TODO: Set from your business logic
-
+        page: None,  // TODO: Set from your business logic
         total: None, // TODO: Set from your business logic
     }
 }

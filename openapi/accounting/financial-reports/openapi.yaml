@@ -2,62 +2,302 @@ openapi: 3.1.0
 info:
   title: Financial Reports
   version: 1.0.0
-  description: Financial reporting service generating P&L and balance sheets.
+  description: 'Financial reporting service providing the full suite of accounting reports: Balance Sheet, Profit & Loss (Income Statement), Cash Flow Statement, General Ledger, Trial Balance, and Custom Reports. All reports integrate with the general ledger for accurate financial data.'
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
-- url: http://localhost:8009/api/v1/accounting/financial-reports
+- url: http://localhost:8006/api/v1/accounting/financial-reports
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/financial-reports
   description: Financial Reports API
-tags: []
+tags:
+- name: balance-sheet
+  description: Balance Sheet report - assets, liabilities, equity
+- name: income-statement
+  description: Profit & Loss report - revenues, expenses, net income
+- name: cash-flow
+  description: Cash Flow Statement - operating, investing, financing activities
+- name: general-ledger
+  description: General Ledger detail and summary reports
+- name: trial-balance
+  description: Trial Balance report
+- name: custom-reports
+  description: Custom report definitions and execution
 paths:
-  /reports:
+  /reports/balance-sheet:
     get:
-      operationId: list_reports
-      summary: List reports
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of reports
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Report'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-    post:
-      operationId: create_report
-      summary: Create report
+      operationId: generate_balance_sheet
+      summary: Generate Balance Sheet
+      description: Generate a Balance Sheet report for a company at a given date, showing assets, liabilities, and equity with account-level detail.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateReportRequest'
+              $ref: '#/components/schemas/CreateBalanceSheetRequest'
+      responses:
+        '200':
+          description: Balance Sheet report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceSheet'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/income-statement:
+    get:
+      operationId: generate_income_statement
+      summary: Generate Income Statement
+      description: Generate a Profit & Loss report for a period, showing revenue, COGS, operating expenses, and net income.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIncomeStatementRequest'
+      responses:
+        '200':
+          description: Income Statement report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeStatement'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/cash-flow:
+    get:
+      operationId: generate_cash_flow
+      summary: Generate Cash Flow Statement
+      description: Generate a Cash Flow Statement showing operating, investing, and financing activities.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCashFlowStatementRequest'
+      responses:
+        '200':
+          description: Cash Flow Statement data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashFlowStatement'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/general-ledger:
+    get:
+      operationId: generate_general_ledger
+      summary: Generate General Ledger Report
+      description: Generate a General Ledger report showing all journal entries with debits, credits, and running balances for a period.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGeneralLedgerReportRequest'
+      responses:
+        '200':
+          description: General Ledger report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralLedgerReport'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/trial-balance:
+    get:
+      operationId: generate_trial_balance
+      summary: Generate Trial Balance
+      description: Generate a Trial Balance report showing all account balances at a point in time, with debits and credits.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrialBalanceRequest'
+      responses:
+        '200':
+          description: Trial Balance report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialBalance'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /custom-reports:
+    get:
+      operationId: list_custom_reports
+      summary: List custom reports
+      description: List all custom report definitions with filtering by type and company.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - BALANCE_SHEET
+          - INCOME_STATEMENT
+          - CASH_FLOW
+          - GENERAL_LEDGER
+          - CUSTOM_SQL
+          - AGGREGATION
+      - name: is_shared
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Paginated list of custom reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomReports'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_custom_report
+      summary: Create custom report
+      description: Create a new custom report definition with SQL or aggregation rules.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomReportRequest'
       responses:
         '201':
-          description: Report created
+          description: Custom report created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Report'
+                $ref: '#/components/schemas/CustomReport'
         '400':
-          description: Invalid request
-  /reports/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /custom-reports/{id}:
     get:
-      operationId: get_report
-      summary: Get report by id
+      operationId: get_custom_report
+      summary: Get custom report by id
+      description: Get a specific custom report definition.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -67,16 +307,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: Report details
+          description: Custom report details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Report'
+                $ref: '#/components/schemas/CustomReport'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
-      operationId: update_report
-      summary: Update report
+      operationId: update_custom_report
+      summary: Update custom report
+      description: Update a custom report definition.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -89,19 +335,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateReportRequest'
+              $ref: '#/components/schemas/UpdateCustomReportRequest'
       responses:
         '200':
-          description: Report updated
+          description: Custom report updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Report'
+                $ref: '#/components/schemas/CustomReport'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
-      operationId: delete_report
-      summary: Delete report
+      operationId: delete_custom_report
+      summary: Delete custom report
+      description: Delete a custom report definition.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -111,551 +363,906 @@ paths:
           format: uuid
       responses:
         '204':
-          description: Report deleted
+          description: Custom report deleted
         '404':
           description: Not found
-  /financial-statements:
-    get:
-      operationId: list_financial_statements
-      summary: List financial-statements
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of financial-statements
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/FinancialStatement'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/ErrorResponse'
+  /custom-reports/{id}/execute:
     post:
-      operationId: create_financial_statement
-      summary: Create financial-statement
+      operationId: execute_custom_report
+      summary: Execute custom report
+      description: Execute a custom report with specified parameters and return results.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateFinancialStatementRequest'
+              type: object
+              properties:
+                period_start:
+                  type: string
+                  format: date
+                period_end:
+                  type: string
+                  format: date
+                currency_code:
+                  type: string
+                parameters:
+                  type: object
       responses:
-        '201':
-          description: FinancialStatement created
+        '200':
+          description: Report execution results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialStatement'
+                $ref: '#/components/schemas/ReportExecution'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '400':
-          description: Invalid request
-  /financial-statements/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /report-executions:
     get:
-      operationId: get_financial_statement
-      summary: Get financial-statement by id
+      operationId: list_report_executions
+      summary: List report executions
+      description: List all report executions with status filtering.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: report_id
+        in: query
         schema:
           type: string
           format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - RUNNING
+          - COMPLETED
+          - FAILED
       responses:
         '200':
-          description: FinancialStatement details
+          description: Paginated list of report executions
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialStatement'
-        '404':
-          description: Not found
-    put:
-      operationId: update_financial_statement
-      summary: Update financial-statement
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateFinancialStatementRequest'
-      responses:
-        '200':
-          description: FinancialStatement updated
+                $ref: '#/components/schemas/PaginatedReportExecutions'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FinancialStatement'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_financial_statement
-      summary: Delete financial-statement
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: FinancialStatement deleted
-        '404':
-          description: Not found
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
-    Report:
+    BalanceSheet:
       type: object
       required:
-      - id
-      - report_code
-      - name
-      - report_type
-      - status
-      - currency_code
+      - company_id
+      - period_end
+      - total_assets
+      - total_liabilities
+      - total_equity
       properties:
         id:
           type: string
           format: uuid
-        report_code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-          nullable: true
-        report_type:
-          type: string
-          enum:
-          - PROFIT_LOSS
-          - BALANCE_SHEET
-          - CASH_FLOW
-          - TRIAL_BALANCE
-          - CUSTOM
-        template_id:
+          description: Unique identifier for this report run
+        company_id:
           type: string
           format: uuid
-          nullable: true
-        report_date:
-          type: string
-          format: date
-          nullable: true
+          description: Company this report is for
         period_start:
           type: string
           format: date
-          nullable: true
+          description: Start of reporting period
         period_end:
           type: string
           format: date
-          nullable: true
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - GENERATED
-          - APPROVED
-          - PUBLISHED
-        generated_at:
-          type: string
-          format: date-time
-          nullable: true
-        generated_by:
-          type: string
-          format: uuid
-          nullable: true
-        approved_at:
-          type: string
-          format: date-time
-          nullable: true
-        approved_by:
-          type: string
-          format: uuid
-          nullable: true
-        report_data:
-          type: object
-          nullable: true
-        total_amount:
-          type: number
-          format: decimal
-          description: Aggregate report total when applicable (e.g. trial balance total).
-          nullable: true
-        parameters:
-          type: object
-          nullable: true
+          description: End of reporting period
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          description: Report currency
+        assets:
+          type: object
+          properties:
+            current_assets:
+              type: number
+              format: double
+            non_current_assets:
+              type: number
+              format: double
+            total_assets:
+              type: number
+              format: double
+          description: Assets breakdown
+        liabilities:
+          type: object
+          properties:
+            current_liabilities:
+              type: number
+              format: double
+            non_current_liabilities:
+              type: number
+              format: double
+            total_liabilities:
+              type: number
+              format: double
+          description: Liabilities breakdown
+        equity:
+          type: object
+          properties:
+            share_capital:
+              type: number
+              format: double
+            retained_earnings:
+              type: number
+              format: double
+            other_equity:
+              type: number
+              format: double
+            total_equity:
+              type: number
+              format: double
+          description: Equity breakdown
+        account_details:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              account_code:
+                type: string
+              account_name:
+                type: string
+              balance:
+                type: number
+                format: double
+              category:
+                type: string
+                enum:
+                - ASSET
+                - LIABILITY
+                - EQUITY
+          description: Detail lines
+        created_at:
+          type: string
+          format: date-time
+    CreateBalanceSheetRequest:
+      type: object
+      required:
+      - company_id
+      - period_end
+      properties:
         company_id:
           type: string
           format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    ReportTemplate:
-      type: object
-      required:
-      - id
-      - template_code
-      - name
-      - report_type
-      - template_structure
-      - is_active
-      - is_system_template
-      - version
-      properties:
-        id:
-          type: string
-          format: uuid
-        template_code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-          nullable: true
-        report_type:
-          type: string
-          enum:
-          - PROFIT_LOSS
-          - BALANCE_SHEET
-          - CASH_FLOW
-          - TRIAL_BALANCE
-          - CUSTOM
-        template_structure:
-          type: object
-        formulas:
-          type: object
-          nullable: true
-        formatting:
-          type: object
-          nullable: true
-        account_mappings:
-          type: object
-          nullable: true
-        is_active:
-          type: boolean
-        is_system_template:
-          type: boolean
-        version:
-          type: integer
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    ReportSchedule:
-      type: object
-      required:
-      - id
-      - template_id
-      - name
-      - frequency
-      - status
-      - run_count
-      properties:
-        id:
-          type: string
-          format: uuid
-        template_id:
-          type: string
-          format: uuid
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-          nullable: true
-        frequency:
-          type: string
-          enum:
-          - DAILY
-          - WEEKLY
-          - MONTHLY
-          - QUARTERLY
-          - YEARLY
-          - CUSTOM
-        schedule_config:
-          type: object
-          nullable: true
-        next_run_at:
-          type: string
-          format: date-time
-          nullable: true
-        last_run_at:
-          type: string
-          format: date-time
-          nullable: true
-        run_count:
-          type: integer
-        status:
-          type: string
-          enum:
-          - ACTIVE
-          - PAUSED
-          - COMPLETED
-          - ERROR
-        recipients:
-          type: object
-          nullable: true
-        default_parameters:
-          type: object
-          nullable: true
-        output_format:
-          type: string
-          enum:
-          - PDF
-          - EXCEL
-          - CSV
-          - JSON
-          - HTML
-          nullable: true
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    FinancialStatement:
-      type: object
-      required:
-      - id
-      - report_id
-      - report_date
-      - data
-      - currency_code
-      - data_version
-      properties:
-        id:
-          type: string
-          format: uuid
-        report_id:
-          type: string
-          format: uuid
-        report_date:
+        period_end:
           type: string
           format: date
-        data:
+          description: End date of the reporting period
+        period_start:
+          type: string
+          format: date
+          nullable: true
+          description: Start date. Defaults to beginning of fiscal year.
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+          description: Report currency. Defaults to company currency.
+        include_detail:
+          type: boolean
+          default: true
+          description: Include account-level detail lines
+    IncomeStatement:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      - total_revenue
+      - net_income
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        revenue:
           type: object
-        summary:
+          properties:
+            sales_revenue:
+              type: number
+              format: double
+            service_revenue:
+              type: number
+              format: double
+            other_revenue:
+              type: number
+              format: double
+            total_revenue:
+              type: number
+              format: double
+          description: Revenue breakdown
+        cost_of_goods_sold:
+          type: number
+          format: double
+          description: Total COGS
+        gross_profit:
+          type: number
+          format: double
+          description: Revenue - COGS
+        operating_expenses:
           type: object
-          nullable: true
-        total_assets:
+          properties:
+            salary_expense:
+              type: number
+              format: double
+            rent_expense:
+              type: number
+              format: double
+            utilities_expense:
+              type: number
+              format: double
+            marketing_expense:
+              type: number
+              format: double
+            other_expense:
+              type: number
+              format: double
+            total_operating_expenses:
+              type: number
+              format: double
+          description: Operating expenses breakdown
+        operating_income:
           type: number
-          format: decimal
-          description: Sum of assets (balance sheet).
-          nullable: true
-        total_liabilities:
+          format: double
+          description: Gross profit - operating expenses
+        other_income_expense:
           type: number
-          format: decimal
-          description: Sum of liabilities (balance sheet).
-          nullable: true
+          format: double
+          description: Non-operating items
+        tax_expense:
+          type: number
+          format: double
+          description: Income tax expense
         net_income:
           type: number
-          format: decimal
-          description: Net income (P&L).
-          nullable: true
-        generated_at:
-          type: string
-          format: date-time
-        generated_by:
-          type: string
-          format: uuid
-          nullable: true
-        data_version:
-          type: integer
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
+          format: double
+          description: Bottom line profit
+        net_margin:
+          type: number
+          format: double
+          description: Net income as percentage of revenue
+        account_details:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              account_code:
+                type: string
+              account_name:
+                type: string
+              balance:
+                type: number
+                format: double
+              category:
+                type: string
+                enum:
+                - REVENUE
+                - EXPENSE
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    CreateReportRequest:
+    CreateIncomeStatementRequest:
       type: object
       required:
-      - report_code
-      - name
-      - report_type
-      - currency_code
+      - company_id
+      - period_start
+      - period_end
       properties:
-        report_code:
-          type: string
-          maxLength: 100
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-        report_type:
-          type: string
-          enum:
-          - PROFIT_LOSS
-          - BALANCE_SHEET
-          - CASH_FLOW
-          - TRIAL_BALANCE
-          - CUSTOM
-        template_id:
+        company_id:
           type: string
           format: uuid
-        report_date:
-          type: string
-          format: date
         period_start:
           type: string
           format: date
         period_end:
           type: string
           format: date
-        parameters:
-          type: object
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          nullable: true
+        include_detail:
+          type: boolean
+          default: true
+        compare_previous_period:
+          type: boolean
+          default: false
+          description: Include previous period comparison
+    CashFlowStatement:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      - net_cash_flow
+      properties:
+        id:
+          type: string
+          format: uuid
         company_id:
           type: string
           format: uuid
-    UpdateReportRequest:
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        operating_activities:
+          type: number
+          format: double
+          description: Cash from operations
+        investing_activities:
+          type: number
+          format: double
+          description: Cash from investing
+        financing_activities:
+          type: number
+          format: double
+          description: Cash from financing
+        net_cash_flow:
+          type: number
+          format: double
+          description: Total change in cash
+        beginning_cash:
+          type: number
+          format: double
+          description: Cash balance at period start
+        ending_cash:
+          type: number
+          format: double
+          description: Cash balance at period end
+        account_details:
+          type: array
+          items:
+            type: object
+            properties:
+              activity_type:
+                type: string
+                enum:
+                - OPERATING
+                - INVESTING
+                - FINANCING
+              description:
+                type: string
+              amount:
+                type: number
+                format: double
+        created_at:
+          type: string
+          format: date-time
+    CreateCashFlowStatementRequest:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+    GeneralLedgerReport:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        entries:
+          type: array
+          items:
+            type: object
+            properties:
+              entry_id:
+                type: string
+                format: uuid
+              entry_date:
+                type: string
+                format: date
+              journal_id:
+                type: string
+                format: uuid
+              journal_name:
+                type: string
+              account_id:
+                type: string
+                format: uuid
+              account_code:
+                type: string
+              account_name:
+                type: string
+              debit:
+                type: number
+                format: double
+              credit:
+                type: number
+                format: double
+              balance:
+                type: number
+                format: double
+              description:
+                type: string
+              reference:
+                type: string
+                nullable: true
+          description: GL entries with running balance
+        total_debits:
+          type: number
+          format: double
+        total_credits:
+          type: number
+          format: double
+        is_balanced:
+          type: boolean
+          description: True if total debits equal total credits
+        created_at:
+          type: string
+          format: date-time
+    CreateGeneralLedgerReportRequest:
+      type: object
+      required:
+      - company_id
+      - period_start
+      - period_end
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+        account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Filter by specific account
+        include_empty_accounts:
+          type: boolean
+          default: false
+          description: Include accounts with no entries
+        group_by_account:
+          type: boolean
+          default: true
+          description: Group entries by account
+    TrialBalance:
+      type: object
+      required:
+      - company_id
+      - period_end
+      - total_debits
+      - total_credits
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              account_code:
+                type: string
+              account_name:
+                type: string
+              category:
+                type: string
+                enum:
+                - ASSET
+                - LIABILITY
+                - EQUITY
+                - REVENUE
+                - EXPENSE
+              beginning_balance:
+                type: number
+                format: double
+              period_debits:
+                type: number
+                format: double
+              period_credits:
+                type: number
+                format: double
+              ending_balance:
+                type: number
+                format: double
+          description: Account balances
+        total_debits:
+          type: number
+          format: double
+        total_credits:
+          type: number
+          format: double
+        is_balanced:
+          type: boolean
+          description: True if debits equal credits
+        created_at:
+          type: string
+          format: date-time
+    CreateTrialBalanceRequest:
+      type: object
+      required:
+      - company_id
+      - period_end
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+    CustomReport:
+      type: object
+      required:
+      - id
+      - name
+      - type
+      - company_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+          description: Report name
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Report description
+        type:
+          type: string
+          enum:
+          - BALANCE_SHEET
+          - INCOME_STATEMENT
+          - CASH_FLOW
+          - GENERAL_LEDGER
+          - CUSTOM_SQL
+          - AGGREGATION
+          description: Report type
+        company_id:
+          type: string
+          format: uuid
+        definition:
+          type: object
+          nullable: true
+          description: Report configuration (SQL, aggregation rules, etc.)
+        is_shared:
+          type: boolean
+          default: false
+          description: Whether this report is shared across companies
+        created_by:
+          type: string
+          format: uuid
+          description: User who created the report
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateCustomReportRequest:
+      type: object
+      required:
+      - name
+      - type
+      - company_id
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        type:
+          type: string
+          enum:
+          - BALANCE_SHEET
+          - INCOME_STATEMENT
+          - CASH_FLOW
+          - GENERAL_LEDGER
+          - CUSTOM_SQL
+          - AGGREGATION
+        company_id:
+          type: string
+          format: uuid
+        definition:
+          type: object
+          nullable: true
+          description: Report definition (SQL query, aggregation rules, column mappings)
+        is_shared:
+          type: boolean
+          default: false
+    UpdateCustomReportRequest:
       type: object
       properties:
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
         description:
           type: string
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - GENERATED
-          - APPROVED
-          - PUBLISHED
-        report_data:
+          maxLength: 1000
+          nullable: true
+        definition:
           type: object
-        parameters:
-          type: object
-    CreateFinancialStatementRequest:
+          nullable: true
+        is_shared:
+          type: boolean
+    ReportExecution:
       type: object
       required:
+      - id
       - report_id
-      - report_date
-      - data
-      - currency_code
+      - status
       properties:
+        id:
+          type: string
+          format: uuid
         report_id:
           type: string
           format: uuid
-        report_date:
+          description: Report that was executed
+        status:
           type: string
-          format: date
+          enum:
+          - PENDING
+          - RUNNING
+          - COMPLETED
+          - FAILED
         data:
           type: object
-        summary:
-          type: object
+          nullable: true
+          description: Report results data
+        error_message:
+          type: string
+          nullable: true
+          description: Error if report failed
+        period_start:
+          type: string
+          format: date
+          nullable: true
+        period_end:
+          type: string
+          format: date
+          nullable: true
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        company_id:
+          nullable: true
+        created_at:
           type: string
-          format: uuid
-    UpdateFinancialStatementRequest:
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    PaginatedCustomReports:
       type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
       properties:
-        data:
-          type: object
-        summary:
-          type: object
-        data_version:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomReport'
+        total:
           type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedReportExecutions:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportExecution'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Report generation failed
+        details:
+          type: object
+          nullable: true
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Period end must be after period start
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: period_end
+              message:
+                type: string
+                example: Period end must be after period start
+security:
+- bearerAuth: []

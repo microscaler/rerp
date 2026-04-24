@@ -1,20 +1,10 @@
-
 // User-owned controller for handler 'delete_budget'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::delete_budget::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::delete_budget::{ Request, Response };
-
-
+use brrtrouter_macros::handler;
 
 #[handler(DeleteBudgetController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
-    Response {
-        
-    }
-    
-    
+    Response {}
 }

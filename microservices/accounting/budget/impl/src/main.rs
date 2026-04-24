@@ -1,4 +1,4 @@
-// This file uses generated code from the rerp_accounting_budget_gen crate
+// This file uses generated code from the budget_service_api crate
 // Business logic controllers are in impl/src/controllers/
 // This file is based on gen/src/main.rs but uses impl controllers
 
@@ -7,9 +7,9 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
 // Use generated code from gen crate
-use rerp_accounting_budget_gen::handlers::*;
-use rerp_accounting_budget_gen::registry::*;
-use rerp_accounting_budget_gen::*;
+use budget_service_api::handlers::*;
+use budget_service_api::registry::*;
+use budget_service_api::*;
 
 // Import implementation controllers (business logic)
 mod controllers;

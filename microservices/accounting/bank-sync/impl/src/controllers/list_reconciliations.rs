@@ -3,12 +3,12 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_reconciliations --force
 
+use bank_sync_service_api::handlers::list_reconciliations::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_bank_sync_gen::handlers::list_reconciliations::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_bank_sync_gen::handlers::types::Reconciliation;
+use bank_sync_service_api::handlers::types::Reconciliation;
 
 #[handler(ListReconciliationsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -24,11 +24,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         items: None, // TODO: Set from your business logic
-
         limit: None, // TODO: Set from your business logic
-
-        page: None, // TODO: Set from your business logic
-
+        page: None,  // TODO: Set from your business logic
         total: None, // TODO: Set from your business logic
     }
 }

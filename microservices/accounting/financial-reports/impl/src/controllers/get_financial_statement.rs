@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_financial_reports_gen::handlers::get_financial_statement::{Request, Response};
+use financial_reports_service_api::handlers::get_financial_statement::{Request, Response};
 
 #[handler(GetFinancialStatementController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,36 +20,21 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        company_id: None, // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
+        company_id: None,                     // TODO: Set from your business logic
+        created_at: None,                     // TODO: Set from your business logic
         currency_code: "example".to_string(), // TODO: Set from your business logic
-
-        data: Default::default(), // TODO: Set from your business logic
-
-        data_version: 42, // TODO: Set from your business logic
-
-        generated_at: None, // TODO: Set from your business logic
-
-        generated_by: None, // TODO: Set from your business logic
-
-        id: "example".to_string(), // TODO: Set from your business logic
-
-        metadata: None, // TODO: Set from your business logic
-
-        net_income: None, // TODO: Set from your business logic
-
-        report_date: "example".to_string(), // TODO: Set from your business logic
-
-        report_id: "example".to_string(), // TODO: Set from your business logic
-
-        summary: None, // TODO: Set from your business logic
-
-        total_assets: None, // TODO: Set from your business logic
-
-        total_liabilities: None, // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
+        data: Default::default(),             // TODO: Set from your business logic
+        data_version: 42,                     // TODO: Set from your business logic
+        generated_at: None,                   // TODO: Set from your business logic
+        generated_by: None,                   // TODO: Set from your business logic
+        id: "example".to_string(),            // TODO: Set from your business logic
+        metadata: None,                       // TODO: Set from your business logic
+        net_income: None,                     // TODO: Set from your business logic
+        report_date: "example".to_string(),   // TODO: Set from your business logic
+        report_id: "example".to_string(),     // TODO: Set from your business logic
+        summary: None,                        // TODO: Set from your business logic
+        total_assets: None,                   // TODO: Set from your business logic
+        total_liabilities: None,              // TODO: Set from your business logic
+        updated_at: None,                     // TODO: Set from your business logic
     }
 }

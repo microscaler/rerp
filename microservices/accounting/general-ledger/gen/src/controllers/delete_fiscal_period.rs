@@ -1,20 +1,14 @@
-
 // User-owned controller for handler 'delete_fiscal_period'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::delete_fiscal_period::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::delete_fiscal_period::{ Request, Response };
-
-
+use brrtrouter_macros::handler;
 
 #[handler(DeleteFiscalPeriodController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
     Response {
-        code: "example".to_string(),details: Some(Default::default()),message: "example".to_string(),
+        code: "example".to_string(),
+        details: Some(Default::default()),
+        message: "example".to_string(),
     }
-    
-    
 }

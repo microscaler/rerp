@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_ar_aging --force
 
+use accounts_receivable_service_api::handlers::get_ar_aging::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::get_ar_aging::{Request, Response};
 
 #[handler(GetArAgingController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,30 +20,18 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_date: "2024-01-31".to_string(), // TODO: Set from your business logic
-
-        company_id: None, // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
-        currency_code: "USD".to_string(), // TODO: Set from your business logic
-
-        current: None, // TODO: Set from your business logic
-
-        customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
-
-        days_31_60: None, // TODO: Set from your business logic
-
-        days_61_90: None, // TODO: Set from your business logic
-
-        days_91_120: None, // TODO: Set from your business logic
-
-        id: "a00a0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        over_120: None, // TODO: Set from your business logic
-
-        total_outstanding: None, // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
+        as_of_date: "example".to_string(), // TODO: Set from your business logic
+        bucket_1_30: 3.14,                 // TODO: Set from your business logic
+        bucket_31_60: 3.14,                // TODO: Set from your business logic
+        bucket_61_90: 3.14,                // TODO: Set from your business logic
+        bucket_90_plus: 3.14,              // TODO: Set from your business logic
+        company_id: "example".to_string(), // TODO: Set from your business logic
+        created_at: None,                  // TODO: Set from your business logic
+        currency_code: None,               // TODO: Set from your business logic
+        current: 3.14,                     // TODO: Set from your business logic
+        customer_id: "example".to_string(), // TODO: Set from your business logic
+        id: "example".to_string(),         // TODO: Set from your business logic
+        invoice_count: None,               // TODO: Set from your business logic
+        total_outstanding: None,           // TODO: Set from your business logic
     }
 }

@@ -1,133 +1,120 @@
 openapi: 3.1.0
 info:
-  title: Bank Synchronization
+  title: Bank Sync
   version: 1.0.0
-  description: Bank synchronization service importing bank statements and reconciliation.
+  description: Bank synchronization service managing bank account connections, statement imports, reconciliations, and cash management. Supports multiple bank integrations, automated reconciliation, and bank feed monitoring.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
-- url: http://localhost:8005/api/v1/accounting/bank-sync
+- url: http://localhost:8008/api/v1/accounting/bank-sync
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/bank-sync
-  description: Bank Synchronization API
-tags: []
+  description: Bank Sync API
+tags:
+- name: bank-accounts
+  description: Bank account management and connections
+- name: statements
+  description: Bank statement imports and management
+- name: reconciliation
+  description: Bank reconciliation matching and posting
+- name: transactions
+  description: Raw bank transaction feed monitoring
+- name: reports
+  description: Bank reporting and cash management
 paths:
   /bank-accounts:
     get:
       operationId: list_bank_accounts
-      summary: List bank-accounts
+      summary: List bank accounts
+      description: Paginated list of all bank accounts with filtering by type, status, and company.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by account name or number
+      - name: account_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          - CREDIT_CARD
+          - LOAN
+          - MONEY_MARKET
+          - CASH
+          - OTHER
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CLOSED
+          - SYNCING
+          - ERROR
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: sync_enabled
+        in: query
+        schema:
+          type: boolean
+        description: Filter by sync enabled status
       responses:
         '200':
-          description: List of bank-accounts
+          description: Paginated list of bank accounts
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BankAccount'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Bank accounts
-                  value:
-                    items:
-                    - id: a00d0e8400-e29b-41d4-a716-446655440000
-                      account_number: CHASE-001
-                      account_name: Operating Account
-                      bank_name: Chase Bank
-                      account_type: CHECKING
-                      currency_code: USD
-                      balance: 50000.0
-                      is_active: true
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Bank accounts
-                  value:
-                    items:
-                    - id: b00d0e8400-e29b-41d4-a716-446655440000
-                      account_number: LOCAL-001
-                      account_name: Main Checking
-                      bank_name: Local Community Bank
-                      account_type: CHECKING
-                      currency_code: USD
-                      balance: 5000.0
-                      is_active: true
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency bank accounts
-                  value:
-                    items:
-                    - id: c00d0e8400-e29b-41d4-a716-446655440000
-                      account_number: EUR-BANK-001
-                      account_name: European Operating Account
-                      bank_name: European Bank
-                      account_type: CHECKING
-                      currency_code: EUR
-                      balance: 50000.0
-                      is_active: true
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedBankAccounts'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_bank_account
-      summary: Create bank-account
+      summary: Create bank account
+      description: Create a new bank account with optional opening balance.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankAccountRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create bank account for Acme Corporation
-                value:
-                  account_number: CHASE-001
-                  account_name: Operating Account
-                  bank_name: Chase Bank
-                  account_type: CHECKING
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create bank account for TechStart Inc
-                value:
-                  account_number: LOCAL-001
-                  account_name: Main Checking
-                  bank_name: Local Community Bank
-                  account_type: CHECKING
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency bank account
-                value:
-                  account_number: EUR-BANK-001
-                  account_name: European Operating Account
-                  bank_name: European Bank
-                  account_type: CHECKING
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: BankAccount created
@@ -135,55 +122,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankAccount'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank account created
-                  value:
-                    id: a00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: CHASE-001
-                    account_name: Operating Account
-                    bank_name: Chase Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 0.0
-                    is_active: true
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank account created
-                  value:
-                    id: b00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: LOCAL-001
-                    account_name: Main Checking
-                    bank_name: Local Community Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 0.0
-                    is_active: true
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank account created
-                  value:
-                    id: c00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: EUR-BANK-001
-                    account_name: European Operating Account
-                    bank_name: European Bank
-                    account_type: CHECKING
-                    currency_code: EUR
-                    balance: 0.0
-                    is_active: true
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /bank-accounts/{id}:
     get:
       operationId: get_bank_account
-      summary: Get bank-account by id
+      summary: Get bank account by id
+      description: Retrieve bank account details with recent transactions.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -198,54 +148,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankAccount'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation bank account
-                  value:
-                    id: a00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: CHASE-001
-                    account_name: Operating Account
-                    bank_name: Chase Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 50000.0
-                    is_active: true
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart bank account
-                  value:
-                    id: b00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: LOCAL-001
-                    account_name: Main Checking
-                    bank_name: Local Community Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 5000.0
-                    is_active: true
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing bank account
-                  value:
-                    id: c00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: EUR-BANK-001
-                    account_name: European Operating Account
-                    bank_name: European Bank
-                    account_type: CHECKING
-                    currency_code: EUR
-                    balance: 50000.0
-                    is_active: true
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_bank_account
-      summary: Update bank-account
+      summary: Update bank account
+      description: Update bank account details.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -259,22 +172,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateBankAccountRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation bank account
-                value:
-                  account_name: Operating Account (Updated)
-                  balance: 55000.0
-              techStartUpdate:
-                summary: Update TechStart bank account
-                value:
-                  account_name: Main Checking (Updated)
-                  balance: 5500.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing bank account
-                value:
-                  account_name: European Operating Account (Updated)
-                  balance: 55000.0
       responses:
         '200':
           description: BankAccount updated
@@ -282,54 +179,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankAccount'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank account updated
-                  value:
-                    id: a00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: CHASE-001
-                    account_name: Operating Account (Updated)
-                    bank_name: Chase Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 55000.0
-                    is_active: true
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank account updated
-                  value:
-                    id: b00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: LOCAL-001
-                    account_name: Main Checking (Updated)
-                    bank_name: Local Community Bank
-                    account_type: CHECKING
-                    currency_code: USD
-                    balance: 5500.0
-                    is_active: true
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank account updated
-                  value:
-                    id: c00d0e8400-e29b-41d4-a716-446655440000
-                    account_number: EUR-BANK-001
-                    account_name: European Operating Account (Updated)
-                    bank_name: European Bank
-                    account_type: CHECKING
-                    currency_code: EUR
-                    balance: 55000.0
-                    is_active: true
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_bank_account
-      summary: Delete bank-account
+      summary: Delete bank account
+      description: Delete a bank account. Only allowed for closed or inactive accounts with no transactions.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -342,121 +202,95 @@ paths:
           description: BankAccount deleted
         '404':
           description: Not found
-  /bank-statements:
-    get:
-      operationId: list_bank_statements
-      summary: List bank-statements
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of bank-statements
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BankStatement'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Bank statements
-                  value:
-                    items:
-                    - id: a00e0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                      statement_date: '2024-01-31'
-                      opening_balance: 45000.0
-                      closing_balance: 50000.0
-                      currency_code: USD
-                      status: RECONCILED
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-31T10:00:00Z'
-                      updated_at: '2024-01-31T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Bank statements
-                  value:
-                    items:
-                    - id: b00e0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                      statement_date: '2024-01-31'
-                      opening_balance: 4500.0
-                      closing_balance: 5000.0
-                      currency_code: USD
-                      status: RECONCILED
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-31T09:00:00Z'
-                      updated_at: '2024-01-31T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency bank statements
-                  value:
-                    items:
-                    - id: c00e0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                      statement_date: '2024-01-31'
-                      opening_balance: 45000.0
-                      closing_balance: 50000.0
-                      currency_code: EUR
-                      status: RECONCILED
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-31T08:00:00Z'
-                      updated_at: '2024-01-31T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete active account with transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /statements:
+    get:
+      operationId: list_bank_statements
+      summary: List bank statements
+      description: List all bank statements with filtering by account, date, and status.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: bank_account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - IMPORTED
+          - PROCESSING
+          - MATCHED
+          - PARTIALLY_MATCHED
+          - READY_FOR_RECONCILIATION
+          - RECONCILED
+          - ERROR
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Statement date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Statement date to
+      responses:
+        '200':
+          description: Paginated list of bank statements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBankStatements'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_bank_statement
-      summary: Create bank-statement
+      summary: Import bank statement
+      description: Import a new bank statement with transactions. Supports CSV, OFX, QIF, and MT940 formats.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankStatementRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create bank statement for Acme Corporation
-                value:
-                  bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                  statement_date: '2024-01-31'
-                  opening_balance: 45000.0
-                  closing_balance: 50000.0
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create bank statement for TechStart Inc
-                value:
-                  bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                  statement_date: '2024-01-31'
-                  opening_balance: 4500.0
-                  closing_balance: 5000.0
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency bank statement
-                value:
-                  bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                  statement_date: '2024-01-31'
-                  opening_balance: 45000.0
-                  closing_balance: 50000.0
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: BankStatement created
@@ -464,52 +298,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankStatement'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank statement created
-                  value:
-                    id: a00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 50000.0
-                    currency_code: USD
-                    status: PENDING
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank statement created
-                  value:
-                    id: b00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 4500.0
-                    closing_balance: 5000.0
-                    currency_code: USD
-                    status: PENDING
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank statement created
-                  value:
-                    id: c00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 50000.0
-                    currency_code: EUR
-                    status: PENDING
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
         '400':
-          description: Invalid request
-  /bank-statements/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /statements/{id}:
     get:
       operationId: get_bank_statement
-      summary: Get bank-statement by id
+      summary: Get bank statement by id
+      description: Get a bank statement with all transactions.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -524,132 +324,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankStatement'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation bank statement
-                  value:
-                    id: a00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 50000.0
-                    currency_code: USD
-                    status: RECONCILED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart bank statement
-                  value:
-                    id: b00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 4500.0
-                    closing_balance: 5000.0
-                    currency_code: USD
-                    status: RECONCILED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing bank statement
-                  value:
-                    id: c00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 50000.0
-                    currency_code: EUR
-                    status: RECONCILED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
         '404':
           description: Not found
-    put:
-      operationId: update_bank_statement
-      summary: Update bank-statement
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBankStatementRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation bank statement
-                value:
-                  status: RECONCILED
-                  closing_balance: 51000.0
-              techStartUpdate:
-                summary: Update TechStart bank statement
-                value:
-                  status: RECONCILED
-                  closing_balance: 5100.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing bank statement
-                value:
-                  status: RECONCILED
-                  closing_balance: 51000.0
-      responses:
-        '200':
-          description: BankStatement updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BankStatement'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank statement updated
-                  value:
-                    id: a00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 51000.0
-                    currency_code: USD
-                    status: RECONCILED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank statement updated
-                  value:
-                    id: b00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 4500.0
-                    closing_balance: 5100.0
-                    currency_code: USD
-                    status: RECONCILED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank statement updated
-                  value:
-                    id: c00e0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_date: '2024-01-31'
-                    opening_balance: 45000.0
-                    closing_balance: 51000.0
-                    currency_code: EUR
-                    status: RECONCILED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_bank_statement
-      summary: Delete bank-statement
+                $ref: '#/components/schemas/ErrorResponse'
+  /statements/{id}/trigger-sync:
+    post:
+      operationId: trigger_statement_sync
+      summary: Trigger statement sync
+      description: Trigger a sync with the bank to fetch new statements for an account.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -658,431 +344,526 @@ paths:
           type: string
           format: uuid
       responses:
-        '204':
-          description: BankStatement deleted
-        '404':
-          description: Not found
-  /reconciliations:
-    get:
-      operationId: list_reconciliations
-      summary: List reconciliations
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
         '200':
-          description: List of reconciliations
+          description: Sync triggered
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Reconciliation'
-                  total:
+                  sync_status:
+                    type: string
+                  statements_found:
                     type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Bank reconciliations
-                  value:
-                    items:
-                    - id: a00f0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                      statement_id: a00e0e8400-e29b-41d4-a716-446655440000
-                      reconciliation_date: '2024-01-31'
-                      starting_balance: 45000.0
-                      ending_balance: 50000.0
-                      currency_code: USD
-                      status: COMPLETED
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-31T10:00:00Z'
-                      updated_at: '2024-01-31T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Bank reconciliations
-                  value:
-                    items:
-                    - id: b00f0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                      statement_id: b00e0e8400-e29b-41d4-a716-446655440000
-                      reconciliation_date: '2024-01-31'
-                      starting_balance: 4500.0
-                      ending_balance: 5000.0
-                      currency_code: USD
-                      status: COMPLETED
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-31T09:00:00Z'
-                      updated_at: '2024-01-31T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency reconciliations
-                  value:
-                    items:
-                    - id: c00f0e8400-e29b-41d4-a716-446655440000
-                      bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                      statement_id: c00e0e8400-e29b-41d4-a716-446655440000
-                      reconciliation_date: '2024-01-31'
-                      starting_balance: 45000.0
-                      ending_balance: 50000.0
-                      currency_code: EUR
-                      status: COMPLETED
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-31T08:00:00Z'
-                      updated_at: '2024-01-31T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /transactions:
+    get:
+      operationId: list_bank_transactions
+      summary: List bank transactions
+      description: List all bank transactions with filtering by account, date, status, and counterparty.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: bank_account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - RAW
+          - MATCHED
+          - RECONCILED
+          - DISPUTED
+          - FILTERED
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Transaction date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Transaction date to
+      - name: description_contains
+        in: query
+        schema:
+          type: string
+        description: Filter by description substring
+      - name: min_amount
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Minimum amount
+      - name: max_amount
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Maximum amount
+      responses:
+        '200':
+          description: Paginated list of bank transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBankTransactions'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /transactions/{id}/match:
     post:
-      operationId: create_reconciliation
-      summary: Create reconciliation
+      operationId: match_transaction
+      summary: Match transaction to entry
+      description: Match a raw bank transaction to a GL entry, invoice, or payment.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateReconciliationRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create bank reconciliation for Acme Corporation
-                value:
-                  bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                  statement_id: a00e0e8400-e29b-41d4-a716-446655440000
-                  reconciliation_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create bank reconciliation for TechStart Inc
-                value:
-                  bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                  statement_id: b00e0e8400-e29b-41d4-a716-446655440000
-                  reconciliation_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency bank reconciliation
-                value:
-                  bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                  statement_id: c00e0e8400-e29b-41d4-a716-446655440000
-                  reconciliation_date: '2024-01-31'
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
+              $ref: '#/components/schemas/CreateBankTransactionMatchingRequest'
+      responses:
+        '200':
+          description: Transaction matched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankTransaction'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Transaction or matched entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Transaction is already matched or reconciled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /transactions/auto-match:
+    post:
+      operationId: auto_match_transactions
+      summary: Auto-match transactions
+      description: Automatically match raw transactions to existing entries using amount, date, and description matching.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - bank_account_id
+              properties:
+                bank_account_id:
+                  type: string
+                  format: uuid
+                date_range_from:
+                  type: string
+                  format: date
+                date_range_to:
+                  type: string
+                  format: date
+                match_tolerance:
+                  type: number
+                  format: double
+                  description: Amount match tolerance in seconds
+                description_similarity_threshold:
+                  type: number
+                  format: double
+                  description: 0-1 threshold for description matching
+      responses:
+        '200':
+          description: Auto-match results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matched_count:
+                    type: integer
+                  remaining_unmatched:
+                    type: integer
+                  matches:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /reconciliations:
+    get:
+      operationId: list_reconciliations
+      summary: List reconciliations
+      description: List all bank reconciliations with filtering by account and date.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: bank_account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - IN_PROGRESS
+          - BALANCED
+          - IMBALANCED
+          - COMPLETED
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Reconciliation date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Reconciliation date to
+      responses:
+        '200':
+          description: Paginated list of reconciliations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReconciliations'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_reconciliation
+      summary: Create bank reconciliation
+      description: Start a new bank reconciliation for a bank account and statement.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankReconciliationRequest'
       responses:
         '201':
           description: Reconciliation created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reconciliation'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank reconciliation created
-                  value:
-                    id: a00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: a00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 0.0
-                    ending_balance: 0.0
-                    currency_code: USD
-                    status: PENDING
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank reconciliation created
-                  value:
-                    id: b00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: b00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 0.0
-                    ending_balance: 0.0
-                    currency_code: USD
-                    status: PENDING
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank reconciliation created
-                  value:
-                    id: c00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: c00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 0.0
-                    ending_balance: 0.0
-                    currency_code: EUR
-                    status: PENDING
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
+                $ref: '#/components/schemas/BankReconciliation'
         '400':
-          description: Invalid request
-  /reconciliations/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Reconciliation already exists for this account and date
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reconciliations/{id}/complete:
+    post:
+      operationId: complete_reconciliation
+      summary: Complete bank reconciliation
+      description: Complete a bank reconciliation. Only allowed when the difference is zero (balanced).
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Reconciliation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankReconciliation'
+        '400':
+          description: Reconciliation is not balanced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Reconciliation is already completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/reconciliation:
     get:
-      operationId: get_reconciliation
-      summary: Get reconciliation by id
+      operationId: reconciliation_report
+      summary: Bank reconciliation report
+      description: Generate a reconciliation report for a bank account over a period.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: bank_account_id
+        in: query
         schema:
           type: string
           format: uuid
+        description: Bank account
+      - name: period_start
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period start
+      - name: period_end
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period end
       responses:
         '200':
-          description: Reconciliation details
+          description: Reconciliation report data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reconciliation'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation bank reconciliation
-                  value:
-                    id: a00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: a00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 45000.0
-                    ending_balance: 50000.0
-                    currency_code: USD
-                    status: COMPLETED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart bank reconciliation
-                  value:
-                    id: b00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: b00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 4500.0
-                    ending_balance: 5000.0
-                    currency_code: USD
-                    status: COMPLETED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing bank reconciliation
-                  value:
-                    id: c00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: c00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 45000.0
-                    ending_balance: 50000.0
-                    currency_code: EUR
-                    status: COMPLETED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_reconciliation
-      summary: Update reconciliation
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateReconciliationRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation bank reconciliation
-                value:
-                  status: COMPLETED
-                  ending_balance: 51000.0
-              techStartUpdate:
-                summary: Update TechStart bank reconciliation
-                value:
-                  status: COMPLETED
-                  ending_balance: 5100.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing bank reconciliation
-                value:
-                  status: COMPLETED
-                  ending_balance: 51000.0
-      responses:
-        '200':
-          description: Reconciliation updated
+                $ref: '#/components/schemas/BankReconciliationReport'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reconciliation'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation bank reconciliation updated
-                  value:
-                    id: a00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: a00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: a00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 45000.0
-                    ending_balance: 51000.0
-                    currency_code: USD
-                    status: COMPLETED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart bank reconciliation updated
-                  value:
-                    id: b00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: b00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: b00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 4500.0
-                    ending_balance: 5100.0
-                    currency_code: USD
-                    status: COMPLETED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing bank reconciliation updated
-                  value:
-                    id: c00f0e8400-e29b-41d4-a716-446655440000
-                    bank_account_id: c00d0e8400-e29b-41d4-a716-446655440000
-                    statement_id: c00e0e8400-e29b-41d4-a716-446655440000
-                    reconciliation_date: '2024-01-31'
-                    starting_balance: 45000.0
-                    ending_balance: 51000.0
-                    currency_code: EUR
-                    status: COMPLETED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_reconciliation
-      summary: Delete reconciliation
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/cash-position:
+    get:
+      operationId: cash_position
+      summary: Cash position report
+      description: Get current cash position across all bank accounts for a company.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: company_id
+        in: query
         schema:
           type: string
           format: uuid
+        description: Company ID
+      - name: as_of_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Date for snapshot. Defaults to today.
       responses:
-        '204':
-          description: Reconciliation deleted
-        '404':
-          description: Not found
+        '200':
+          description: Cash position report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashPosition'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     BankAccount:
       type: object
       required:
       - id
+      - name
       - account_number
-      - account_name
-      - account_type
       - currency_code
-      - is_active
+      - company_id
+      - status
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for this bank account
+        name:
+          type: string
+          maxLength: 200
+          description: Bank account name/label
         account_number:
           type: string
-          maxLength: 100
-        account_name:
-          type: string
-          maxLength: 100
-        bank_code:
-          type: string
           maxLength: 50
+          description: Bank account number
+        routing_number:
+          type: string
+          maxLength: 20
           nullable: true
+          description: Bank routing/SWIFT/IBAN code
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Account currency
         bank_name:
           type: string
-          maxLength: 255
+          maxLength: 200
+          description: Name of the banking institution
+        bank_id:
+          type: string
+          format: uuid
           nullable: true
+          description: Linked bank institution record
         account_type:
           type: string
           enum:
           - CHECKING
           - SAVINGS
+          - CREDIT_CARD
+          - LOAN
           - MONEY_MARKET
-          - CREDIT_LINE
+          - CASH
           - OTHER
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        current_balance:
-          type: number
-          format: decimal
-        reconciled_balance:
-          type: number
-          format: decimal
-        last_reconciled_at:
-          type: string
-          format: date-time
-          nullable: true
-        sync_provider:
-          type: string
-          maxLength: 50
-          nullable: true
-        sync_credentials:
-          type: string
-          maxLength: 255
-          nullable: true
-        last_synced_at:
-          type: string
-          format: date-time
-          nullable: true
-        is_active:
-          type: boolean
-        company_id:
+          description: Type of bank account
+        gl_account_id:
           type: string
           format: uuid
           nullable: true
-        metadata:
-          type: object
+          description: Linked GL account for reconciliation
+        opening_balance:
+          type: number
+          format: double
+          description: Opening balance at account setup
+        opening_balance_date:
+          type: string
+          format: date
+          description: Date of the opening balance
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - CLOSED
+          - SYNCING
+          - ERROR
+          description: Bank account status
+        sync_enabled:
+          type: boolean
+          default: true
+          description: Whether automatic sync is enabled
+        last_sync_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last successful sync date
+        sync_frequency:
+          type: string
+          enum:
+          - DAILY
+          - HOURLY
+          - MANUAL
+          default: DAILY
+          description: Sync frequency
+        company_id:
+          type: string
+          format: uuid
+          description: Company this account belongs to
+        notes:
+          type: string
+          maxLength: 1000
           nullable: true
         created_at:
           type: string
@@ -1090,108 +871,197 @@ components:
         updated_at:
           type: string
           format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    BankTransaction:
+    CreateBankAccountRequest:
       type: object
       required:
-      - id
-      - bank_account_id
-      - transaction_date
-      - description
-      - amount
-      - status
+      - name
+      - account_number
       - currency_code
+      - company_id
       properties:
-        id:
+        name:
           type: string
-          format: uuid
-        bank_account_id:
+          maxLength: 200
+        account_number:
           type: string
-          format: uuid
-        transaction_date:
+          maxLength: 50
+        routing_number:
           type: string
-          format: date
-        reference:
-          type: string
-          maxLength: 100
+          maxLength: 20
           nullable: true
-        description:
+        currency_code:
           type: string
-          maxLength: 255
-        amount:
-          type: number
-          format: decimal
-        balance_after:
-          type: number
-          format: decimal
-        transaction_type:
+          minLength: 3
+          maxLength: 3
+        bank_name:
+          type: string
+          maxLength: 200
+        account_type:
           type: string
           enum:
-          - DEBIT
-          - CREDIT
-          - FEE
-          - INTEREST
-          - TRANSFER
+          - CHECKING
+          - SAVINGS
+          - CREDIT_CARD
+          - LOAN
+          - MONEY_MARKET
+          - CASH
           - OTHER
+        gl_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        opening_balance:
+          type: number
+          format: double
+          default: 0
+        opening_balance_date:
+          type: string
+          format: date
+        company_id:
+          type: string
+          format: uuid
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+    UpdateBankAccountRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        account_number:
+          type: string
+          maxLength: 50
+        routing_number:
+          type: string
+          maxLength: 20
+          nullable: true
+        bank_name:
+          type: string
+          maxLength: 200
+        account_type:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          - CREDIT_CARD
+          - LOAN
+          - MONEY_MARKET
+          - CASH
+          - OTHER
+        gl_account_id:
+          type: string
+          format: uuid
           nullable: true
         status:
           type: string
           enum:
-          - UNMATCHED
-          - MATCHED
-          - RECONCILED
-          - IGNORED
-        matched_payment_id:
+          - ACTIVE
+          - INACTIVE
+          - CLOSED
+          - SYNCING
+          - ERROR
+        sync_enabled:
+          type: boolean
+        sync_frequency:
           type: string
-          format: uuid
+          enum:
+          - DAILY
+          - HOURLY
+          - MANUAL
+        notes:
+          type: string
+          maxLength: 1000
           nullable: true
-        matched_at:
-          type: string
-          format: date-time
-          nullable: true
-        reconciled_statement_id:
-          type: string
-          format: uuid
-          nullable: true
-        statement_id:
-          type: string
-          format: uuid
-          nullable: true
-        statement_line_number:
-          type: integer
-          nullable: true
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
     BankStatement:
       type: object
       required:
       - id
       - bank_account_id
       - statement_date
-      - status
       - currency_code
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for this statement
+        bank_account_id:
+          type: string
+          format: uuid
+          description: Bank account this statement belongs to
+        statement_number:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: External statement reference number
+        statement_date:
+          type: string
+          format: date
+          description: End date of the statement period
+        start_date:
+          type: string
+          format: date
+          description: Start date of the statement period
+        opening_balance:
+          type: number
+          format: double
+          description: Balance at start of period
+        closing_balance:
+          type: number
+          format: double
+          description: Balance at end of period
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        status:
+          type: string
+          enum:
+          - IMPORTED
+          - PROCESSING
+          - MATCHED
+          - PARTIALLY_MATCHED
+          - READY_FOR_RECONCILIATION
+          - RECONCILED
+          - ERROR
+          description: Statement processing status
+        transaction_count:
+          type: integer
+          description: Number of transactions in the statement
+        matched_count:
+          type: integer
+          description: Number of transactions successfully matched
+        unmatched_count:
+          type: integer
+          description: Number of transactions not yet matched
+        file_reference:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Reference to the uploaded file
+        imported_at:
+          type: string
+          format: date-time
+          description: When the statement was imported
+        imported_by:
+          type: string
+          format: uuid
+          nullable: true
+          description: User who imported the statement
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateBankStatementRequest:
+      type: object
+      required:
+      - bank_account_id
+      - statement_date
+      - transactions
+      properties:
         bank_account_id:
           type: string
           format: uuid
@@ -1199,102 +1069,405 @@ components:
           type: string
           maxLength: 100
           nullable: true
+        start_date:
+          type: string
+          format: date
+          description: Statement period start. Auto-derived from transactions if not provided.
         statement_date:
           type: string
           format: date
-        period_start:
-          type: string
-          format: date
-          nullable: true
-        period_end:
-          type: string
-          format: date
-          nullable: true
+          description: Statement end date
         opening_balance:
           type: number
-          format: decimal
+          format: double
+          description: Opening balance
         closing_balance:
           type: number
-          format: decimal
-        total_debits:
-          type: number
-          format: decimal
-        total_credits:
-          type: number
-          format: decimal
-        transaction_count:
-          type: integer
-        status:
-          type: string
-          enum:
-          - IMPORTED
-          - PROCESSING
-          - RECONCILED
-          - ERROR
-        reconciled_at:
-          type: string
-          format: date-time
-          nullable: true
-        reconciled_by:
-          type: string
-          format: uuid
-          nullable: true
-        import_format:
-          type: string
-          enum:
-          - OFX
-          - CSV
-          - MT940
-          - QIF
-          - JSON
-          - OTHER
-          nullable: true
-        import_source:
-          type: string
-          maxLength: 255
-          nullable: true
-        imported_at:
-          type: string
-          format: date-time
-          nullable: true
-        imported_by:
-          type: string
-          format: uuid
-          nullable: true
+          format: double
+          description: Closing balance
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        company_id:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateBankTransactionRequest'
+          description: Transactions in this statement
+        file_reference:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Reference to uploaded statement file
+    BankTransaction:
+      type: object
+      required:
+      - id
+      - statement_id
+      - transaction_date
+      - amount
+      - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this transaction
+        statement_id:
+          type: string
+          format: uuid
+          description: Statement this transaction belongs to
+        bank_account_id:
+          type: string
+          format: uuid
+          description: Bank account this transaction is on
+        transaction_date:
+          type: string
+          format: date
+          description: Transaction date
+        value_date:
+          type: string
+          format: date
+          nullable: true
+          description: Value/settlement date
+        amount:
+          type: number
+          format: double
+          description: Transaction amount (positive = credit, negative = debit)
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description:
+          type: string
+          maxLength: 500
+          description: Transaction description/narrative
+        reference:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: Transaction reference number
+        counterparty_name:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: Counterparty name
+        counterparty_account:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Counterparty account number
+        status:
+          type: string
+          enum:
+          - RAW
+          - MATCHED
+          - RECONCILED
+          - DISPUTED
+          - FILTERED
+          description: Transaction reconciliation status
+        matched_entry_id:
           type: string
           format: uuid
           nullable: true
-        metadata:
-          type: object
+          description: Linked GL entry or invoice
+        matched_entry_type:
+          type: string
+          enum:
+          - INVOICE
+          - PAYMENT
+          - JOURNAL_ENTRY
+          - TRANSFER
+          - OTHER
           nullable: true
+          description: Type of matched entry
+        matched_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the transaction was matched
+        matched_by:
+          type: string
+          format: uuid
+          nullable: true
+          description: User who matched the transaction
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Notes about this transaction
+        dispute_reason:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Reason for dispute if applicable
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-        created_by:
+    CreateBankTransactionRequest:
+      type: object
+      required:
+      - transaction_date
+      - amount
+      - description
+      properties:
+        transaction_date:
+          type: string
+          format: date
+        value_date:
+          type: string
+          format: date
+          nullable: true
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description:
+          type: string
+          maxLength: 500
+        reference:
+          type: string
+          maxLength: 100
+          nullable: true
+        counterparty_name:
+          type: string
+          maxLength: 200
+          nullable: true
+        counterparty_account:
+          type: string
+          maxLength: 50
+          nullable: true
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+    CreateBankTransactionMatchingRequest:
+      type: object
+      required:
+      - transaction_id
+      - matched_entry_id
+      - matched_entry_type
+      properties:
+        transaction_id:
           type: string
           format: uuid
-          nullable: true
-        updated_by:
+          description: Bank transaction to match
+        matched_entry_id:
           type: string
           format: uuid
+          description: GL entry, invoice, or payment to match against
+        matched_entry_type:
+          type: string
+          enum:
+          - INVOICE
+          - PAYMENT
+          - JOURNAL_ENTRY
+          - TRANSFER
+          - OTHER
+        notes:
+          type: string
+          maxLength: 1000
           nullable: true
-    Reconciliation:
+          description: Matching notes
+    BankReconciliation:
       type: object
       required:
       - id
       - bank_account_id
       - statement_id
       - reconciliation_date
-      - status
-      - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this reconciliation
+        bank_account_id:
+          type: string
+          format: uuid
+          description: Bank account being reconciled
+        statement_id:
+          type: string
+          format: uuid
+          description: Statement used for reconciliation
+        reconciliation_date:
+          type: string
+          format: date
+          description: Date the reconciliation was performed
+        statement_balance:
+          type: number
+          format: double
+          description: Closing balance from the bank statement
+        book_balance:
+          type: number
+          format: double
+          description: Balance per books before reconciliation
+        adjusted_balance:
+          type: number
+          format: double
+          description: Adjusted book balance after reconciliation
+        difference:
+          type: number
+          format: double
+          description: Difference (should be zero for a balanced reconciliation)
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - IN_PROGRESS
+          - BALANCED
+          - IMBALANCED
+          - COMPLETED
+          description: Reconciliation status
+        total_matched:
+          type: number
+          format: double
+          description: Total matched amount
+        total_unmatched:
+          type: number
+          format: double
+          description: Total unmatched amount
+        matched_transactions:
+          type: integer
+          description: Number of matched transactions
+        unmatched_transactions:
+          type: integer
+          description: Number of unmatched transactions
+        reconciled_by:
+          type: string
+          format: uuid
+          nullable: true
+          description: User who completed the reconciliation
+        reconciled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When reconciliation was completed
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+          description: Reconciliation notes
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateBankReconciliationRequest:
+      type: object
+      required:
+      - bank_account_id
+      - statement_id
+      - reconciliation_date
+      properties:
+        bank_account_id:
+          type: string
+          format: uuid
+        statement_id:
+          type: string
+          format: uuid
+        reconciliation_date:
+          type: string
+          format: date
+        book_balance:
+          type: number
+          format: double
+          description: Balance per books before reconciliation
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+    PaginatedBankAccounts:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankAccount'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedBankStatements:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankStatement'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedBankTransactions:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankTransaction'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedReconciliations:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BankReconciliation'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    BankReconciliationReport:
+      type: object
+      required:
+      - bank_account_id
+      - period_start
+      - period_end
       properties:
         id:
           type: string
@@ -1302,308 +1475,138 @@ components:
         bank_account_id:
           type: string
           format: uuid
-        statement_id:
+        bank_account_name:
           type: string
-          format: uuid
-        reconciliation_date:
-          type: string
-          format: date
-        book_balance:
-          type: number
-          format: decimal
-        bank_balance:
-          type: number
-          format: decimal
-        difference:
-          type: number
-          format: decimal
-        outstanding_deposits_count:
-          type: integer
-        outstanding_deposits_amount:
-          type: number
-          format: decimal
-        outstanding_withdrawals_count:
-          type: integer
-        outstanding_withdrawals_amount:
-          type: number
-          format: decimal
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - IN_PROGRESS
-          - RECONCILED
-          - DISPUTED
-        reconciled_at:
-          type: string
-          format: date-time
-          nullable: true
-        reconciled_by:
-          type: string
-          format: uuid
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    CreateBankAccountRequest:
-      type: object
-      required:
-      - account_number
-      - account_name
-      - account_type
-      - currency_code
-      properties:
-        account_number:
-          type: string
-          maxLength: 100
-        account_name:
-          type: string
-          maxLength: 100
-        bank_code:
-          type: string
-          maxLength: 50
-        bank_name:
-          type: string
-          maxLength: 255
-        account_type:
-          type: string
-          enum:
-          - CHECKING
-          - SAVINGS
-          - MONEY_MARKET
-          - CREDIT_LINE
-          - OTHER
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        sync_provider:
-          type: string
-          maxLength: 50
-        is_active:
-          type: boolean
-        company_id:
-          type: string
-          format: uuid
-    UpdateBankAccountRequest:
-      type: object
-      properties:
-        account_name:
-          type: string
-          maxLength: 100
-        bank_code:
-          type: string
-          maxLength: 50
-        bank_name:
-          type: string
-          maxLength: 255
-        account_type:
-          type: string
-          enum:
-          - CHECKING
-          - SAVINGS
-          - MONEY_MARKET
-          - CREDIT_LINE
-          - OTHER
-        is_active:
-          type: boolean
-        sync_provider:
-          type: string
-          maxLength: 50
-    CreateBankTransactionRequest:
-      type: object
-      required:
-      - bank_account_id
-      - transaction_date
-      - description
-      - amount
-      - currency_code
-      properties:
-        bank_account_id:
-          type: string
-          format: uuid
-        transaction_date:
-          type: string
-          format: date
-        reference:
-          type: string
-          maxLength: 100
-        description:
-          type: string
-          maxLength: 255
-        amount:
-          type: number
-          format: decimal
-        transaction_type:
-          type: string
-          enum:
-          - DEBIT
-          - CREDIT
-          - FEE
-          - INTEREST
-          - TRANSFER
-          - OTHER
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        statement_id:
-          type: string
-          format: uuid
-    UpdateBankTransactionRequest:
-      type: object
-      properties:
-        description:
-          type: string
-          maxLength: 255
-        transaction_type:
-          type: string
-          enum:
-          - DEBIT
-          - CREDIT
-          - FEE
-          - INTEREST
-          - TRANSFER
-          - OTHER
-        status:
-          type: string
-          enum:
-          - UNMATCHED
-          - MATCHED
-          - RECONCILED
-          - IGNORED
-        matched_payment_id:
-          type: string
-          format: uuid
-    CreateBankStatementRequest:
-      type: object
-      required:
-      - bank_account_id
-      - statement_date
-      - currency_code
-      properties:
-        bank_account_id:
-          type: string
-          format: uuid
-        statement_number:
-          type: string
-          maxLength: 100
-        statement_date:
-          type: string
-          format: date
         period_start:
           type: string
           format: date
         period_end:
           type: string
           format: date
-        opening_balance:
-          type: number
-          format: decimal
-        closing_balance:
-          type: number
-          format: decimal
-        import_format:
-          type: string
-          enum:
-          - OFX
-          - CSV
-          - MT940
-          - QIF
-          - JSON
-          - OTHER
-        import_source:
-          type: string
-          maxLength: 255
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+        opening_balance:
+          type: number
+          format: double
+        closing_balance:
+          type: number
+          format: double
+        total_deposits:
+          type: number
+          format: double
+        total_withdrawals:
+          type: number
+          format: double
+        reconciled_amount:
+          type: number
+          format: double
+        unreconciled_amount:
+          type: number
+          format: double
+        reconciliation_percentage:
+          type: number
+          format: double
+          description: Percentage of transactions reconciled
+        created_at:
+          type: string
+          format: date-time
+    CashPosition:
+      type: object
+      required:
+      - company_id
+      - as_of_date
+      - total_cash
+      properties:
         company_id:
           type: string
           format: uuid
-    UpdateBankStatementRequest:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - IMPORTED
-          - PROCESSING
-          - RECONCILED
-          - ERROR
-        reconciled_at:
-          type: string
-          format: date-time
-        reconciled_by:
-          type: string
-          format: uuid
-    CreateReconciliationRequest:
-      type: object
-      required:
-      - bank_account_id
-      - statement_id
-      - reconciliation_date
-      - currency_code
-      properties:
-        bank_account_id:
-          type: string
-          format: uuid
-        statement_id:
-          type: string
-          format: uuid
-        reconciliation_date:
+        as_of_date:
           type: string
           format: date
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-        notes:
-          type: string
-    UpdateReconciliationRequest:
+        total_cash:
+          type: number
+          format: double
+          description: Total cash across all bank accounts
+        by_account:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              account_name:
+                type: string
+              balance:
+                type: number
+                format: double
+              currency_code:
+                type: string
+          description: Cash position by account
+        pending_transactions:
+          type: number
+          format: double
+          description: Total pending/uncleared transactions
+        available_balance:
+          type: number
+          format: double
+          description: Available balance (total - pending)
+    ErrorResponse:
       type: object
+      required:
+      - code
+      - message
       properties:
-        book_balance:
-          type: number
-          format: decimal
-        bank_balance:
-          type: number
-          format: decimal
-        status:
+        code:
           type: string
           enum:
-          - DRAFT
-          - IN_PROGRESS
-          - RECONCILED
-          - DISPUTED
-        notes:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
           type: string
+          example: Bank account not found
+        details:
+          type: object
+          nullable: true
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Statement balance does not match expected
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: closing_balance
+              message:
+                type: string
+                example: Statement closing balance does not match expected
+security:
+- bearerAuth: []

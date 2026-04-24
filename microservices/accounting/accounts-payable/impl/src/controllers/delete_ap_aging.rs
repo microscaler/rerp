@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_ap_aging --force
 
+use accounts_payable_service_api::handlers::delete_ap_aging::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_payable_gen::handlers::delete_ap_aging::{Request, Response};
 
 #[handler(DeleteApAgingController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

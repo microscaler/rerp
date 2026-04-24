@@ -1,20 +1,21 @@
-
 // User-owned controller for handler 'update_chart_of_account'.
 
-use brrtrouter_macros::handler;
+use crate::handlers::update_chart_of_account::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
-use crate::handlers::update_chart_of_account::{ Request, Response };
-
-
+use brrtrouter_macros::handler;
 
 #[handler(UpdateChartOfAccountController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    
-    
-    
     Response {
-        account_type: "example".to_string(),code: "example".to_string(),created_at: Some("example".to_string()),description: Some("example".to_string()),id: "example".to_string(),is_active: true,level: 42,name: "example".to_string(),parent_id: Some("example".to_string()),updated_at: Some("example".to_string()),
+        account_type: "example".to_string(),
+        code: "example".to_string(),
+        created_at: Some("example".to_string()),
+        description: Some("example".to_string()),
+        id: "example".to_string(),
+        is_active: true,
+        level: 42,
+        name: "example".to_string(),
+        parent_id: Some("example".to_string()),
+        updated_at: Some("example".to_string()),
     }
-    
-    
 }

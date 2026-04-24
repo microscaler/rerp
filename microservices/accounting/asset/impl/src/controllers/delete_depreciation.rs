@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_depreciation --force
 
+use asset_service_api::handlers::delete_depreciation::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_asset_gen::handlers::delete_depreciation::{Request, Response};
 
 #[handler(DeleteDepreciationController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

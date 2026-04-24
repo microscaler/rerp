@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::update_budget_variance::{Request, Response};
+use budget_service_api::handlers::update_budget_variance::{Request, Response};
 
 #[handler(UpdateBudgetVarianceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -21,31 +21,18 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         account_id: "a0070e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
         actual_amount: None, // TODO: Set from your business logic
-
         budget_amount: None, // TODO: Set from your business logic
-
         budget_id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
+        created_at: None,                 // TODO: Set from your business logic
         currency_code: "USD".to_string(), // TODO: Set from your business logic
-
-        exceeds_threshold: None, // TODO: Set from your business logic
-
+        exceeds_threshold: None,          // TODO: Set from your business logic
         id: "a0170e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        is_favorable: None, // TODO: Set from your business logic
-
+        is_favorable: None,       // TODO: Set from your business logic
         last_calculated_at: None, // TODO: Set from your business logic
-
         period_id: "a0160e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
-
-        variance: None, // TODO: Set from your business logic
-
+        updated_at: None,       // TODO: Set from your business logic
+        variance: None,         // TODO: Set from your business logic
         variance_percent: None, // TODO: Set from your business logic
     }
 }

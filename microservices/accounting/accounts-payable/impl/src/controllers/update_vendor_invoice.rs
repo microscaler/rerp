@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path update_vendor_invoice --force
 
+use accounts_payable_service_api::handlers::update_vendor_invoice::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_payable_gen::handlers::update_vendor_invoice::{Request, Response};
 
 #[handler(UpdateVendorInvoiceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,36 +20,21 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_bucket: None, // TODO: Set from your business logic
-
-        approval_status: None, // TODO: Set from your business logic
-
-        approved_at: None, // TODO: Set from your business logic
-
-        approved_by: None, // TODO: Set from your business logic
-
-        created_at: None, // TODO: Set from your business logic
-
-        days_until_due: None, // TODO: Set from your business logic
-
-        early_payment_discount_date: None, // TODO: Set from your business logic
-
+        aging_bucket: None,                   // TODO: Set from your business logic
+        approval_status: None,                // TODO: Set from your business logic
+        approved_at: None,                    // TODO: Set from your business logic
+        approved_by: None,                    // TODO: Set from your business logic
+        created_at: None,                     // TODO: Set from your business logic
+        days_until_due: None,                 // TODO: Set from your business logic
+        early_payment_discount_date: None,    // TODO: Set from your business logic
         early_payment_discount_percent: None, // TODO: Set from your business logic
-
         id: "a0050e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-
         invoice_id: "a0011e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
-
-        matching_status: None, // TODO: Set from your business logic
-
-        metadata: None, // TODO: Set from your business logic
-
+        matching_status: None,    // TODO: Set from your business logic
+        metadata: None,           // TODO: Set from your business logic
         outstanding_amount: None, // TODO: Set from your business logic
-
-        purchase_order_id: None, // TODO: Set from your business logic
-
-        updated_at: None, // TODO: Set from your business logic
-
+        purchase_order_id: None,  // TODO: Set from your business logic
+        updated_at: None,         // TODO: Set from your business logic
         vendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
     }
 }

@@ -3,19 +3,19 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_ar_agings --force
 
+use accounts_receivable_service_api::handlers::list_ar_agings::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::list_ar_agings::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_accounts_receivable_gen::handlers::types::ArAging;
+use accounts_receivable_service_api::handlers::types::ArAging;
 
 #[handler(ListArAgingsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
-    // let page = req.inner.page;// let limit = req.inner.limit;// let search = req.inner.search;
+    // let page = req.inner.page;// let limit = req.inner.limit;// let company_id = req.inner.company_id;// let customer_id = req.inner.customer_id;
     //
     // Example: Database query, validation, etc.
     // let result = your_service.process(&req.inner)?;
@@ -23,12 +23,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        items: None, // TODO: Set from your business logic
-
-        limit: None, // TODO: Set from your business logic
-
-        page: None, // TODO: Set from your business logic
-
-        total: None, // TODO: Set from your business logic
+        has_more: None, // TODO: Set from your business logic
+        items: vec![],  // TODO: Set from your business logic
+        limit: 42,      // TODO: Set from your business logic
+        page: 42,       // TODO: Set from your business logic
+        total: 42,      // TODO: Set from your business logic
     }
 }

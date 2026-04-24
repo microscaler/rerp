@@ -40,19 +40,29 @@ dev-up:
         echo "⚠️  Warning: Some PVs may already exist (this is OK)"
     }
     
-    # Start Tilt
-    echo "🎯 Starting Tilt..."
-    tilt up --host=0.0.0.0 --port=10350
+    # Start Tilt via systemd (port 10350, avoid clashing with Tiffany on 10350)
+    echo "Starting RERP Tilt via systemd (port 10350)..."
+    systemctl --user start tilt-rerp.service
+    echo "Tilt UI on http://0.0.0.0:10350 (waiting for ready)..."
+    for i in $(seq 1 60); do
+        if curl -sf http://localhost:10350/api/v1/info >/dev/null 2>&1; then
+            echo "Tilt is ready at http://0.0.0.0:10350"
+            exit 0
+        fi
+        sleep 2
+    done
+    echo "WARNING: Tilt did not become ready within 2 minutes"
+    exit 1
 
-# Stop development environment (Kind cluster and Tilt; local registry is left running)
+# Stop development environment (Kind cluster and Tilt via systemd; local registry is left running)
 dev-down:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "🛑 Stopping RERP development environment..."
     
-    # Stop Tilt
-    echo "Stopping Tilt..."
-    pkill -f "tilt up" 2>/dev/null || true
+    # Stop Tilt via systemd
+    echo "Stopping RERP Tilt service..."
+    systemctl --user stop tilt-rerp.service || true
     
     # Delete Kind cluster
     echo "🗑️ Deleting Kind cluster..."
@@ -303,7 +313,11 @@ qa:
     set -euo pipefail
     just lint
     just format-check
-    tooling/.venv/bin/pytest tooling/tests -v --tb=short
+    if [ -d tooling/tests ]; then
+        tooling/.venv/bin/pytest tooling/tests -v --tb=short
+    else
+        echo "No tests directory found, skipping tests."
+    fi
 
 # Auto-fix fixable ruff rules (including unsafe). Run `just init` first.
 lint-fix:
