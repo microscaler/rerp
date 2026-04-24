@@ -1,0 +1,12 @@
+---
+# RERP namespace — deployed to shared Kind cluster (kind-kind)
+# RERP services live here and connect to shared infrastructure
+# in namespace `data` (postgres, redis, minio, etc.) and
+# `observability` (prometheus, grafana, loki, jaeger).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rerp
+  labels:
+    app: rerp
+    managed-by: tilt

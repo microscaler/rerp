@@ -2,165 +2,111 @@ openapi: 3.1.0
 info:
   title: General Ledger
   version: 1.0.0
-  description: Core accounting service managing general ledger and journal entries.
+  description: 'Core accounting service managing general ledger accounts, chart of accounts, journals, journal entries with debit/credit lines, fiscal periods, and trial balance reporting. Supports full double-entry accounting lifecycle: draft, approved, posted, reconciled, and reversed.'
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
 - url: http://localhost:8001/api/v1/accounting/general-ledger
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/general-ledger
   description: General Ledger API
-tags: []
+tags:
+- name: accounts
+  description: General ledger accounts and their properties
+- name: chart-of-accounts
+  description: Chart of accounts hierarchy and structure
+- name: journals
+  description: Accounting journals (sales, purchase, cash, bank, general)
+- name: journal-entries
+  description: Journal entries and their debit/credit line items
+- name: fiscal-periods
+  description: Accounting fiscal periods and lock dates
+- name: reports
+  description: Trial balance, ledger, and account balance reports
+- name: reconciliations
+  description: Account reconciliation management
 paths:
   /accounts:
     get:
       operationId: list_accounts
-      summary: List accounts
+      summary: List ledger accounts
+      description: Paginated list of all general ledger accounts, filtered by type, parent, and active status.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Free-text search on code and name
+      - name: account_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+      - name: parent_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by parent chart of account
+      - name: active
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
-          description: List of accounts
+          description: Paginated list of accounts
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Account'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Large enterprise accounts
-                  value:
-                    items:
-                    - id: a0070e8400-e29b-41d4-a716-446655440000
-                      chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1010'
-                      name: Cash - Operating Account
-                      account_type: ASSET
-                      normal_balance: DEBIT
-                      currency_code: USD
-                      is_active: true
-                      is_system_account: false
-                      description: Primary operating cash account
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    - id: a0071e8400-e29b-41d4-a716-446655440001
-                      chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1200'
-                      name: Accounts Receivable
-                      account_type: ASSET
-                      normal_balance: DEBIT
-                      currency_code: USD
-                      is_active: true
-                      is_system_account: false
-                      description: Trade receivables from customers
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 2
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Small business accounts
-                  value:
-                    items:
-                    - id: b0070e8400-e29b-41d4-a716-446655440000
-                      chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1000'
-                      name: Cash Account
-                      account_type: ASSET
-                      normal_balance: DEBIT
-                      currency_code: USD
-                      is_active: true
-                      is_system_account: false
-                      description: Main cash account
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency accounts
-                  value:
-                    items:
-                    - id: c0070e8400-e29b-41d4-a716-446655440000
-                      chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1010'
-                      name: Cash - USD Account
-                      account_type: ASSET
-                      normal_balance: DEBIT
-                      currency_code: USD
-                      is_active: true
-                      is_system_account: false
-                      description: US Dollar cash account
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    - id: c0071e8400-e29b-41d4-a716-446655440001
-                      chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1011'
-                      name: Cash - EUR Account
-                      account_type: ASSET
-                      normal_balance: DEBIT
-                      currency_code: EUR
-                      is_active: true
-                      is_system_account: false
-                      description: Euro cash account
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 2
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedAccounts'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_account
       summary: Create account
+      description: Create a new general ledger account with chart of account hierarchy.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccountRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create account for Acme Corporation
-                value:
-                  chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                  code: '1010'
-                  name: Cash - Operating Account
-                  account_type: ASSET
-                  normal_balance: DEBIT
-                  currency_code: USD
-                  description: Primary operating cash account
-                  is_active: true
-              techStartRequest:
-                summary: Create account for TechStart Inc
-                value:
-                  chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
-                  code: '1000'
-                  name: Cash Account
-                  account_type: ASSET
-                  normal_balance: DEBIT
-                  currency_code: USD
-                  description: Main cash account
-                  is_active: true
-              globalManufacturingRequest:
-                summary: Create multi-currency account
-                value:
-                  chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                  code: '1010'
-                  name: Cash - USD Account
-                  account_type: ASSET
-                  normal_balance: DEBIT
-                  currency_code: USD
-                  description: US Dollar cash account
-                  is_active: true
       responses:
         '201':
           description: Account created
@@ -168,58 +114,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation account created
-                  value:
-                    id: a0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - Operating Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Primary operating cash account
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart account created
-                  value:
-                    id: b0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1000'
-                    name: Cash Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Main cash account
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing account created
-                  value:
-                    id: c0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - USD Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: US Dollar cash account
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Account code already exists in this chart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /accounts/{id}:
     get:
       operationId: get_account
       summary: Get account by id
+      description: Retrieve a single general ledger account with its full hierarchy and balance information.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -229,62 +141,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: Account details
+          description: Account details with balances
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Account'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation account
-                  value:
-                    id: a0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - Operating Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Primary operating cash account
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart account
-                  value:
-                    id: b0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1000'
-                    name: Cash Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Main cash account
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing account
-                  value:
-                    id: c0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - USD Account
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: US Dollar cash account
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/AccountWithBalance'
         '404':
-          description: Not found
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_account
       summary: Update account
+      description: 'Update an existing account. Note: posting an account''s code or type may be restricted if posted entries reference it.'
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -298,25 +170,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAccountRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation account
-                value:
-                  name: Cash - Operating Account (Updated)
-                  description: Updated description
-                  is_active: true
-              techStartUpdate:
-                summary: Update TechStart account
-                value:
-                  name: Cash Account (Updated)
-                  description: Updated description
-                  is_active: true
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing account
-                value:
-                  name: Cash - USD Account (Updated)
-                  description: Updated description
-                  is_active: true
       responses:
         '200':
           description: Account updated
@@ -324,57 +177,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation account updated
-                  value:
-                    id: a0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - Operating Account (Updated)
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Updated description
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart account updated
-                  value:
-                    id: b0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1000'
-                    name: Cash Account (Updated)
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Updated description
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing account updated
-                  value:
-                    id: c0070e8400-e29b-41d4-a716-446655440000
-                    chart_of_account_id: c00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1010'
-                    name: Cash - USD Account (Updated)
-                    account_type: ASSET
-                    normal_balance: DEBIT
-                    currency_code: USD
-                    is_active: true
-                    is_system_account: false
-                    description: Updated description
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
-          description: Not found
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_account
       summary: Delete account
+      description: Soft delete an account. Cannot delete if the account has posted entries or is referenced by posted journal entries.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -386,213 +199,17 @@ paths:
         '204':
           description: Account deleted
         '404':
-          description: Not found
-  /journal-entrys:
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /accounts/{id}/balance:
     get:
-      operationId: list_journal_entrys
-      summary: List journal-entrys
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of journal-entrys
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/JournalEntry'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Large enterprise journal entries
-                  value:
-                    items:
-                    - id: a0080e8400-e29b-41d4-a716-446655440000
-                      entry_number: JE-2024-001
-                      entry_date: '2024-01-15'
-                      description: Monthly accrual entry
-                      status: POSTED
-                      total_debit: 5000.0
-                      total_credit: 5000.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      source_type: MANUAL
-                      posted_at: '2024-01-15T10:00:00Z'
-                      created_at: '2024-01-15T09:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    - id: a0081e8400-e29b-41d4-a716-446655440001
-                      entry_number: JE-2024-002
-                      entry_date: '2024-01-16'
-                      description: Invoice posting entry
-                      status: POSTED
-                      total_debit: 1200.0
-                      total_credit: 1200.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      source_type: INVOICE
-                      source_id: a0010e8400-e29b-41d4-a716-446655440000
-                      posted_at: '2024-01-16T11:00:00Z'
-                      created_at: '2024-01-16T10:00:00Z'
-                      updated_at: '2024-01-16T11:00:00Z'
-                    total: 2
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Small business journal entries
-                  value:
-                    items:
-                    - id: b0080e8400-e29b-41d4-a716-446655440000
-                      entry_number: JE-2024-100
-                      entry_date: '2024-01-20'
-                      description: Monthly adjustment
-                      status: DRAFT
-                      total_debit: 500.0
-                      total_credit: 500.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      source_type: MANUAL
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency journal entries
-                  value:
-                    items:
-                    - id: c0080e8400-e29b-41d4-a716-446655440000
-                      entry_number: JE-2024-200
-                      entry_date: '2024-01-25'
-                      description: Multi-currency invoice entry
-                      status: POSTED
-                      total_debit: 10000.0
-                      total_credit: 10000.0
-                      currency_code: EUR
-                      exchange_rate: 0.92
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      source_type: INVOICE
-                      posted_at: '2024-01-25T08:00:00Z'
-                      created_at: '2024-01-25T07:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-    post:
-      operationId: create_journal_entry
-      summary: Create journal-entry
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateJournalEntryRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create journal entry for Acme Corporation
-                value:
-                  entry_number: JE-2024-001
-                  entry_date: '2024-01-15'
-                  description: Monthly accrual entry
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-                  source_type: MANUAL
-              techStartRequest:
-                summary: Create journal entry for TechStart Inc
-                value:
-                  entry_number: JE-2024-100
-                  entry_date: '2024-01-20'
-                  description: Monthly adjustment
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-                  source_type: MANUAL
-              globalManufacturingRequest:
-                summary: Create multi-currency journal entry
-                value:
-                  entry_number: JE-2024-200
-                  entry_date: '2024-01-25'
-                  description: Multi-currency invoice entry
-                  currency_code: EUR
-                  exchange_rate: 0.92
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
-                  source_type: INVOICE
-      responses:
-        '201':
-          description: JournalEntry created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JournalEntry'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation journal entry created
-                  value:
-                    id: a0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-001
-                    entry_date: '2024-01-15'
-                    description: Monthly accrual entry
-                    status: DRAFT
-                    total_debit: 0.0
-                    total_credit: 0.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    source_type: MANUAL
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T09:00:00Z'
-                techStartResponse:
-                  summary: TechStart journal entry created
-                  value:
-                    id: b0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-100
-                    entry_date: '2024-01-20'
-                    description: Monthly adjustment
-                    status: DRAFT
-                    total_debit: 0.0
-                    total_credit: 0.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    source_type: MANUAL
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing journal entry created
-                  value:
-                    id: c0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-200
-                    entry_date: '2024-01-25'
-                    description: Multi-currency invoice entry
-                    status: DRAFT
-                    total_debit: 0.0
-                    total_credit: 0.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    source_type: INVOICE
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T07:00:00Z'
-        '400':
-          description: Invalid request
-  /journal-entrys/{id}:
-    get:
-      operationId: get_journal_entry
-      summary: Get journal-entry by id
+      operationId: get_account_balance
+      summary: Get account balance
+      description: Get the current balance of an account for a specified period, including opening balance, debits, credits, and closing balance.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -600,306 +217,95 @@ paths:
         schema:
           type: string
           format: uuid
-      responses:
-        '200':
-          description: JournalEntry details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JournalEntry'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation journal entry
-                  value:
-                    id: a0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-001
-                    entry_date: '2024-01-15'
-                    description: Monthly accrual entry
-                    status: POSTED
-                    total_debit: 5000.0
-                    total_credit: 5000.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    source_type: MANUAL
-                    posted_at: '2024-01-15T10:00:00Z'
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart journal entry
-                  value:
-                    id: b0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-100
-                    entry_date: '2024-01-20'
-                    description: Monthly adjustment
-                    status: DRAFT
-                    total_debit: 500.0
-                    total_credit: 500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    source_type: MANUAL
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing journal entry
-                  value:
-                    id: c0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-200
-                    entry_date: '2024-01-25'
-                    description: Multi-currency invoice entry
-                    status: POSTED
-                    total_debit: 10000.0
-                    total_credit: 10000.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    source_type: INVOICE
-                    posted_at: '2024-01-25T08:00:00Z'
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_journal_entry
-      summary: Update journal-entry
-      parameters:
-      - name: id
-        in: path
-        required: true
+      - name: period_id
+        in: query
+        required: false
         schema:
           type: string
           format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateJournalEntryRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation journal entry
-                value:
-                  description: Monthly accrual entry (Updated)
-                  status: POSTED
-                  posted_at: '2024-01-15T10:00:00Z'
-              techStartUpdate:
-                summary: Update TechStart journal entry
-                value:
-                  description: Monthly adjustment (Updated)
-                  status: POSTED
-                  posted_at: '2024-01-20T10:00:00Z'
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing journal entry
-                value:
-                  description: Multi-currency invoice entry (Updated)
-                  status: POSTED
-                  posted_at: '2024-01-25T09:00:00Z'
+        description: Fiscal period to calculate balance for. If omitted, returns total balance.
+      - name: currency_code
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description: Currency to calculate balance in. Defaults to account's currency.
       responses:
         '200':
-          description: JournalEntry updated
+          description: Account balance details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JournalEntry'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation journal entry updated
-                  value:
-                    id: a0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-001
-                    entry_date: '2024-01-15'
-                    description: Monthly accrual entry (Updated)
-                    status: POSTED
-                    total_debit: 5000.0
-                    total_credit: 5000.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    source_type: MANUAL
-                    posted_at: '2024-01-15T10:00:00Z'
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart journal entry updated
-                  value:
-                    id: b0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-100
-                    entry_date: '2024-01-20'
-                    description: Monthly adjustment (Updated)
-                    status: POSTED
-                    total_debit: 500.0
-                    total_credit: 500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    source_type: MANUAL
-                    posted_at: '2024-01-20T10:00:00Z'
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T11:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing journal entry updated
-                  value:
-                    id: c0080e8400-e29b-41d4-a716-446655440000
-                    entry_number: JE-2024-200
-                    entry_date: '2024-01-25'
-                    description: Multi-currency invoice entry (Updated)
-                    status: POSTED
-                    total_debit: 10000.0
-                    total_credit: 10000.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    source_type: INVOICE
-                    posted_at: '2024-01-25T09:00:00Z'
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T10:00:00Z'
+                $ref: '#/components/schemas/AccountBalance'
         '404':
-          description: Not found
-    delete:
-      operationId: delete_journal_entry
-      summary: Delete journal-entry
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: JournalEntry deleted
-        '404':
-          description: Not found
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /chart-of-accounts:
     get:
       operationId: list_chart_of_accounts
-      summary: List chart-of-accounts
+      summary: List chart of accounts
+      description: List all chart of accounts hierarchies. Supports filtering by parent to get sub-accounts.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: parent_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by parent chart of account (returns children)
+      - name: level
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+        description: Filter by hierarchy level
       responses:
         '200':
-          description: List of chart-of-accounts
+          description: Paginated list of chart of accounts
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ChartOfAccount'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Large enterprise chart of accounts
-                  value:
-                    items:
-                    - id: a00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1'
-                      name: Assets
-                      account_type: ASSET
-                      level: 0
-                      is_active: true
-                      description: Root asset account
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    - id: a00c1e8400-e29b-41d4-a716-446655440001
-                      code: '2'
-                      name: Liabilities
-                      account_type: LIABILITY
-                      level: 0
-                      is_active: true
-                      description: Root liability account
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 2
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Small business chart of accounts
-                  value:
-                    items:
-                    - id: b00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1'
-                      name: Assets
-                      account_type: ASSET
-                      level: 0
-                      is_active: true
-                      description: Root asset account
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency chart of accounts
-                  value:
-                    items:
-                    - id: c00c0e8400-e29b-41d4-a716-446655440000
-                      code: '1'
-                      name: Assets
-                      account_type: ASSET
-                      level: 0
-                      is_active: true
-                      description: Root asset account
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    - id: c00c3e8400-e29b-41d4-a716-446655440003
-                      code: '1.1'
-                      name: Multi-Currency Assets
-                      account_type: ASSET
-                      level: 1
-                      parent_id: c00c0e8400-e29b-41d4-a716-446655440000
-                      is_active: true
-                      description: Multi-currency asset sub-account
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 2
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedChartOfAccounts'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_chart_of_account
-      summary: Create chart-of-account
+      summary: Create chart of account
+      description: Create a new chart of accounts hierarchy node.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateChartOfAccountRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create chart of account for Acme Corporation
-                value:
-                  code: '1'
-                  name: Assets
-                  account_type: ASSET
-                  description: Root asset account
-                  is_active: true
-              techStartRequest:
-                summary: Create chart of account for TechStart Inc
-                value:
-                  code: '1'
-                  name: Assets
-                  account_type: ASSET
-                  description: Root asset account
-                  is_active: true
-              globalManufacturingRequest:
-                summary: Create multi-currency chart of account
-                value:
-                  code: '1.1'
-                  name: Multi-Currency Assets
-                  account_type: ASSET
-                  parent_id: c00c0e8400-e29b-41d4-a716-446655440000
-                  description: Multi-currency asset sub-account
-                  is_active: true
       responses:
         '201':
           description: ChartOfAccount created
@@ -907,50 +313,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChartOfAccount'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation chart of account created
-                  value:
-                    id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Root asset account
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart chart of account created
-                  value:
-                    id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Root asset account
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing chart of account created
-                  value:
-                    id: c00c3e8400-e29b-41d4-a716-446655440003
-                    code: '1.1'
-                    name: Multi-Currency Assets
-                    account_type: ASSET
-                    level: 1
-                    parent_id: c00c0e8400-e29b-41d4-a716-446655440000
-                    is_active: true
-                    description: Multi-currency asset sub-account
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /chart-of-accounts/{id}:
     get:
       operationId: get_chart_of_account
-      summary: Get chart-of-account by id
+      summary: Get chart of account by id
+      description: Get chart of account details
       parameters:
       - name: id
         in: path
@@ -965,48 +338,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChartOfAccount'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation chart of account
-                  value:
-                    id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Root asset account
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart chart of account
-                  value:
-                    id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Root asset account
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing chart of account
-                  value:
-                    id: c00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Root asset account
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_chart_of_account
-      summary: Update chart-of-account
+      summary: Update chart of account
+      description: Update a chart of accounts node
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -1020,25 +362,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateChartOfAccountRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation chart of account
-                value:
-                  name: Assets (Updated)
-                  description: Updated description
-                  is_active: true
-              techStartUpdate:
-                summary: Update TechStart chart of account
-                value:
-                  name: Assets (Updated)
-                  description: Updated description
-                  is_active: true
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing chart of account
-                value:
-                  name: Assets (Updated)
-                  description: Updated description
-                  is_active: true
       responses:
         '200':
           description: ChartOfAccount updated
@@ -1046,48 +369,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChartOfAccount'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation chart of account updated
-                  value:
-                    id: a00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets (Updated)
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Updated description
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart chart of account updated
-                  value:
-                    id: b00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets (Updated)
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Updated description
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing chart of account updated
-                  value:
-                    id: c00c0e8400-e29b-41d4-a716-446655440000
-                    code: '1'
-                    name: Assets (Updated)
-                    account_type: ASSET
-                    level: 0
-                    is_active: true
-                    description: Updated description
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_chart_of_account
-      summary: Delete chart-of-account
+      summary: Delete chart of account
+      description: Delete a chart of accounts node
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -1100,28 +392,984 @@ paths:
           description: ChartOfAccount deleted
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journals:
+    get:
+      operationId: list_journals
+      summary: List accounting journals
+      description: List all accounting journals with their configuration, types, and sequences.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - ENTRY
+          - SALE
+          - PURCHASE
+          - CASH
+          - BANK
+          - MISC
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated list of journals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJournals'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_journal
+      summary: Create journal
+      description: Create a new accounting journal. Journals define the source of entries and control numbering sequences.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalRequest'
+      responses:
+        '201':
+          description: Journal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /journals/{id}:
+    get:
+      operationId: get_journal
+      summary: Get journal by id
+      description: Get journal details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Journal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_journal
+      summary: Update journal
+      description: Update a journal's configuration
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJournalRequest'
+      responses:
+        '200':
+          description: Journal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journal'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_journal
+      summary: Archive journal
+      description: Archive a journal (soft delete). Cannot archive if the journal has posted entries in open periods.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Journal archived
+        '409':
+          description: Cannot archive journal with posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries:
+    get:
+      operationId: list_journal_entries
+      summary: List journal entries
+      description: Paginated list of all journal entries with optional filtering by status, date range, journal, account, and fiscal period.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by entry number, reference, or description
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - APPROVED
+          - POSTED
+          - REVERSED
+        description: Filter by entry status
+      - name: journal_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by journal
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by account (returns entries containing this account)
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter entries from this date (inclusive)
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Filter entries up to this date (inclusive)
+      - name: fiscal_period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by fiscal period
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      responses:
+        '200':
+          description: Paginated list of journal entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJournalEntries'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_journal_entry
+      summary: Create journal entry
+      description: Create a new journal entry with mandatory debit/credit line items. Total debits must equal total credits (double-entry accounting). Entries start in DRAFT status and must be approved and posted.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalEntryRequest'
+      responses:
+        '201':
+          description: 'JournalEntry created (status: DRAFT)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Validation error (e.g., unbalanced debits/credits, invalid date)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Journal entry date is in a closed fiscal period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}:
+    get:
+      operationId: get_journal_entry
+      summary: Get journal entry by id
+      description: Retrieve a single journal entry with its full debit/credit line items.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: JournalEntry details with lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntryWithLines'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_journal_entry
+      summary: Update journal entry
+      description: Update a journal entry. Only entries in DRAFT status can be modified. Entries with lines must remain balanced after update.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJournalEntryRequest'
+      responses:
+        '200':
+          description: JournalEntry updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update posted or reversed entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_journal_entry
+      summary: Delete journal entry
+      description: Delete a journal entry. Only entries in DRAFT status can be deleted. Posted entries must be reversed instead.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: JournalEntry deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete posted entries; reverse them instead
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}/approve:
+    post:
+      operationId: approve_journal_entry
+      summary: Approve journal entry
+      description: Transition a journal entry from DRAFT to APPROVED status. An approved entry cannot be modified but can be posted. The entry must have balanced lines (total debit = total credit).
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: JournalEntry approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Cannot approve - entry must be in DRAFT status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Entry is not balanced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}/post:
+    post:
+      operationId: post_journal_entry
+      summary: Post journal entry
+      description: Transition a journal entry from APPROVED to POSTED status. Posting finalizes the entry and updates all account balances. Cannot post entries with dates in closed fiscal periods.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: JournalEntry posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Cannot post - entry must be in APPROVED status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Entry date is in a closed fiscal period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}/reverse:
+    post:
+      operationId: reverse_journal_entry
+      summary: Reverse journal entry
+      description: Create a reversing entry for a posted journal entry. The new entry has opposite debits/credits and same amount. The original entry is marked as REVERSED.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverseJournalEntryRequest'
+      responses:
+        '201':
+          description: Reversing entry created and original marked as REVERSED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Only posted entries can be reversed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/bulk-approve:
+    post:
+      operationId: bulk_approve_journal_entries
+      summary: Bulk approve journal entries
+      description: Approve multiple journal entries in a single operation. Returns success/failure for each entry ID.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkApproveRequest'
+      responses:
+        '200':
+          description: Bulk approval results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkActionResult'
+        '400':
+          description: No entry IDs provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /journal-entries/bulk-post:
+    post:
+      operationId: bulk_post_journal_entries
+      summary: Bulk post journal entries
+      description: Post multiple approved journal entries in a single operation.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkPostRequest'
+      responses:
+        '200':
+          description: Bulk post results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkActionResult'
+        '400':
+          description: No entry IDs provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /fiscal-periods:
+    get:
+      operationId: list_fiscal_periods
+      summary: List fiscal periods
+      description: List all accounting fiscal periods with their date ranges and lock status.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: year
+        in: query
+        schema:
+          type: integer
+      - name: locked
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Paginated list of fiscal periods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiscalPeriods'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_fiscal_period
+      summary: Create fiscal period
+      description: Create a new accounting fiscal period with date range and lock settings.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFiscalPeriodRequest'
+      responses:
+        '201':
+          description: FiscalPeriod created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /fiscal-periods/{id}:
+    get:
+      operationId: get_fiscal_period
+      summary: Get fiscal period by id
+      description: Get fiscal period details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: FiscalPeriod details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: update_fiscal_period
+      summary: Update fiscal period
+      description: Update a fiscal period's date range or lock settings. Cannot modify dates if the period has posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFiscalPeriodRequest'
+      responses:
+        '200':
+          description: FiscalPeriod updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiscalPeriod'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot modify dates of period with posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: delete_fiscal_period
+      summary: Delete fiscal period
+      description: Delete a fiscal period. Cannot delete if the period has posted entries.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: FiscalPeriod deleted
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete period with posted entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/trial-balance:
+    get:
+      operationId: trial_balance
+      summary: Trial balance report
+      description: Generate a trial balance report showing all account balances at a point in time or for a period.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Fiscal period to generate trial balance for
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Date range start
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Date range end
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by company
+      - name: account_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        description: Filter by account type
+      - name: include_zero_balance
+        in: query
+        schema:
+          type: boolean
+          default: false
+        description: Include accounts with zero balance
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description: Currency for report. Defaults to company currency.
+      responses:
+        '200':
+          description: Trial balance report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrialBalanceReport'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/ledger:
+    get:
+      operationId: ledger_report
+      summary: General ledger report
+      description: Generate a detailed general ledger report showing all journal entry lines for a period, filtered by accounts, journals, and date range.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: account_ids
+        in: query
+        schema:
+          type: string
+        description: Comma-separated list of account IDs
+      - name: journal_ids
+        in: query
+        schema:
+          type: string
+        description: Comma-separated list of journal IDs
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      responses:
+        '200':
+          description: General ledger report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerReport'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/account-balances:
+    get:
+      operationId: account_balances_report
+      summary: Account balances report
+      description: Get balances for multiple accounts with opening, debit, credit, and closing amounts. Returns a summary across all accounts.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      responses:
+        '200':
+          description: Account balances summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountBalancesReport'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journals/{id}/entries:
+    get:
+      operationId: list_journal_entries_by_journal
+      summary: List entries for a journal
+      description: Get all journal entries posted through a specific journal.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - APPROVED
+          - POSTED
+          - REVERSED
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Paginated list of entries for this journal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJournalEntries'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /journal-entries/{id}/lines:
+    get:
+      operationId: list_journal_entry_lines
+      summary: List journal entry lines
+      description: Get all debit/credit line items for a journal entry.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: List of journal entry lines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalEntryLine'
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     Account:
       type: object
@@ -1139,15 +1387,20 @@ components:
         id:
           type: string
           format: uuid
+          description: Unique identifier for the account
         chart_of_account_id:
           type: string
           format: uuid
+          description: Parent chart of accounts node
         code:
           type: string
           maxLength: 50
+          pattern: ^[A-Z0-9._-]+$
+          description: Account code (e.g., '1010', '2000.1', '5.1.2')
         name:
           type: string
           maxLength: 255
+          description: Account display name
         account_type:
           type: string
           enum:
@@ -1156,110 +1409,41 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          description: Account classification determining normal balance direction
         normal_balance:
           type: string
           enum:
           - DEBIT
           - CREDIT
+          description: Expected normal balance side for this account type
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code (e.g., USD, EUR, GBP)
         is_active:
           type: boolean
+          description: Whether the account is active (inactive accounts can still be referenced by historical entries)
         is_system_account:
           type: boolean
+          description: System-defined account that cannot be modified or deleted
         description:
           type: string
+          maxLength: 1000
           nullable: true
+          description: Optional account description
         metadata:
           type: object
           nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    JournalEntry:
-      type: object
-      required:
-      - id
-      - entry_number
-      - entry_date
-      - description
-      - status
-      - total_debit
-      - total_credit
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        entry_number:
-          type: string
-          maxLength: 50
-        entry_date:
-          type: string
-          format: date
-        description:
-          type: string
-        reference_number:
-          type: string
-          maxLength: 100
-          nullable: true
-        source_type:
-          type: string
-          enum:
-          - MANUAL
-          - INVOICE
-          - PAYMENT
-          - ADJUSTMENT
-          - RECURRING
-          - REVERSAL
-          nullable: true
-        source_id:
-          type: string
-          format: uuid
-          nullable: true
-        fiscal_period_id:
-          type: string
-          format: uuid
-          nullable: true
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - POSTED
-          - REVERSED
-        posted_at:
-          type: string
-          format: date-time
-          nullable: true
-        posted_by:
-          type: string
-          format: uuid
-          nullable: true
-        total_debit:
-          type: number
-          format: decimal
-        total_credit:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        exchange_rate:
-          type: number
-          format: decimal
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
+          description: Arbitrary metadata for extensions
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+            custom_fields:
+              type: object
         created_at:
           type: string
           format: date-time
@@ -1274,6 +1458,81 @@ components:
           type: string
           format: uuid
           nullable: true
+    AccountWithBalance:
+      allOf:
+      - $ref: '#/components/schemas/Account'
+      - type: object
+        properties:
+          current_balance:
+            type: number
+            format: double
+            description: Current account balance (debit - credit)
+          opening_balance:
+            type: number
+            format: double
+            description: Balance at start of current period
+          period_debits:
+            type: number
+            format: double
+            description: Total debits in current period
+          period_credits:
+            type: number
+            format: double
+            description: Total credits in current period
+          child_accounts:
+            type: array
+            items:
+              $ref: '#/components/schemas/Account'
+            description: Direct child accounts in chart hierarchy
+    AccountBalance:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        account_code:
+          type: string
+          maxLength: 50
+        account_name:
+          type: string
+          maxLength: 255
+        account_type:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        opening_balance:
+          type: number
+          format: double
+          description: Balance at start of period
+        period_debits:
+          type: number
+          format: double
+          description: Total debits in period
+        period_credits:
+          type: number
+          format: double
+          description: Total credits in period
+        closing_balance:
+          type: number
+          format: double
+          description: Balance at end of period
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        period_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Fiscal period this balance is for
+        as_of_date:
+          type: string
+          format: date
+          description: Date as of which balance is calculated
     ChartOfAccount:
       type: object
       required:
@@ -1290,9 +1549,11 @@ components:
         code:
           type: string
           maxLength: 50
+          description: Chart code for grouping accounts
         name:
           type: string
           maxLength: 255
+          description: Chart display name
         account_type:
           type: string
           enum:
@@ -1301,12 +1562,16 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          description: Default account type for accounts in this chart
         parent_id:
           type: string
           format: uuid
           nullable: true
+          description: Parent chart node for hierarchy
         level:
           type: integer
+          minimum: 0
+          description: Hierarchy depth level
         is_active:
           type: boolean
         description:
@@ -1316,125 +1581,6 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: string
-          format: date-time
-    CreateAccountRequest:
-      type: object
-      required:
-      - chart_of_account_id
-      - code
-      - name
-      - account_type
-      - normal_balance
-      - currency_code
-      properties:
-        chart_of_account_id:
-          type: string
-          format: uuid
-        code:
-          type: string
-          maxLength: 50
-        name:
-          type: string
-          maxLength: 255
-        account_type:
-          type: string
-          enum:
-          - ASSET
-          - LIABILITY
-          - EQUITY
-          - REVENUE
-          - EXPENSE
-        normal_balance:
-          type: string
-          enum:
-          - DEBIT
-          - CREDIT
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        description:
-          type: string
-        is_active:
-          type: boolean
-    UpdateAccountRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-        is_active:
-          type: boolean
-        account_type:
-          type: string
-          enum:
-          - ASSET
-          - LIABILITY
-          - EQUITY
-          - REVENUE
-          - EXPENSE
-    CreateJournalEntryRequest:
-      type: object
-      required:
-      - entry_number
-      - entry_date
-      - description
-      - currency_code
-      properties:
-        entry_number:
-          type: string
-          maxLength: 50
-        entry_date:
-          type: string
-          format: date
-        description:
-          type: string
-        reference_number:
-          type: string
-          maxLength: 100
-        source_type:
-          type: string
-          enum:
-          - MANUAL
-          - INVOICE
-          - PAYMENT
-          - ADJUSTMENT
-          - RECURRING
-          - REVERSAL
-        source_id:
-          type: string
-          format: uuid
-        fiscal_period_id:
-          type: string
-          format: uuid
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        exchange_rate:
-          type: number
-          format: decimal
-        company_id:
-          type: string
-          format: uuid
-    UpdateJournalEntryRequest:
-      type: object
-      properties:
-        description:
-          type: string
-        reference_number:
-          type: string
-          maxLength: 100
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - POSTED
-          - REVERSED
-        posted_at:
           type: string
           format: date-time
     CreateChartOfAccountRequest:
@@ -1461,10 +1607,13 @@ components:
         parent_id:
           type: string
           format: uuid
+          nullable: true
         description:
           type: string
+          nullable: true
         is_active:
           type: boolean
+          default: true
     UpdateChartOfAccountRequest:
       type: object
       properties:
@@ -1473,6 +1622,7 @@ components:
           maxLength: 255
         description:
           type: string
+          nullable: true
         is_active:
           type: boolean
         account_type:
@@ -1483,3 +1633,1125 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+    Journal:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      - type
+      - company_id
+      - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 100
+          description: Journal display name (e.g., 'General Journal', 'Sales Journal')
+        code:
+          type: string
+          maxLength: 10
+          pattern: ^[A-Z]{1,5}$
+          description: Short code used as prefix for entry numbers (e.g., 'GEN', 'SAL', 'PCH')
+        type:
+          type: string
+          enum:
+          - ENTRY
+          - SALE
+          - PURCHASE
+          - CASH
+          - BANK
+          - MISC
+          description: Journal type determines default account and entry number format
+        company_id:
+          type: string
+          format: uuid
+          description: Company that owns this journal
+        currency_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Default currency for entries in this journal
+        default_account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Default account for entries when not specified
+        suspense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Account for entries awaiting classification
+        sequence_number_next:
+          type: integer
+          description: Next sequence number for entry numbering
+        sequence_prefix:
+          type: string
+          maxLength: 10
+          description: Prefix for entry numbering (e.g., 'GEN-2024-')
+        company_code:
+          type: string
+          maxLength: 50
+          description: Company code used in entry numbers
+        is_active:
+          type: boolean
+          description: Whether the journal is available for new entries
+        restrict_mode_hash_table:
+          type: boolean
+          description: If true, posted entries are secured with a hash (cannot be modified)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateJournalRequest:
+      type: object
+      required:
+      - name
+      - code
+      - type
+      - company_id
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Journal display name
+        code:
+          type: string
+          maxLength: 10
+          pattern: ^[A-Z]{1,5}$
+          description: Short code for entry numbering prefix
+        type:
+          type: string
+          enum:
+          - ENTRY
+          - SALE
+          - PURCHASE
+          - CASH
+          - BANK
+          - MISC
+          description: Journal type
+        company_id:
+          type: string
+          format: uuid
+        currency_id:
+          type: string
+          format: uuid
+          nullable: true
+        default_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        suspense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        is_active:
+          type: boolean
+          default: true
+    UpdateJournalRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        code:
+          type: string
+          maxLength: 10
+        default_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        suspense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        is_active:
+          type: boolean
+    JournalEntry:
+      type: object
+      required:
+      - id
+      - entry_number
+      - entry_date
+      - description
+      - status
+      - total_debit
+      - total_credit
+      - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        entry_number:
+          type: string
+          maxLength: 50
+          pattern: ^[A-Z0-9\-]+$
+          description: Auto-generated or manual entry number (e.g., 'GEN-2024-0001')
+        entry_date:
+          type: string
+          format: date
+          description: Accounting date of the entry
+        description:
+          type: string
+          maxLength: 500
+          description: Entry description/narration
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: External reference number
+        journal_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Journal this entry belongs to
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - APPROVED
+          - POSTED
+          - REVERSED
+          description: Entry lifecycle state
+          example: DRAFT
+        total_debit:
+          type: number
+          format: double
+          description: Sum of all line debits
+          example: 5000.0
+        total_credit:
+          type: number
+          format: double
+          description: Sum of all line credits
+          example: 5000.0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code
+        exchange_rate:
+          type: number
+          format: double
+          minimum: 0.0001
+          description: Exchange rate to company currency (1 foreign = X company currency)
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Company this entry belongs to
+        fiscal_period_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Fiscal period this entry is posted to
+        posted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the entry was posted
+        posted_by:
+          type: string
+          format: uuid
+          nullable: true
+          description: User who posted the entry
+        reversed_at:
+          type: string
+          format: date-time
+          nullable: true
+        reversed_by:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+          format: uuid
+          nullable: true
+        updated_by:
+          type: string
+          format: uuid
+          nullable: true
+    JournalEntryWithLines:
+      allOf:
+      - $ref: '#/components/schemas/JournalEntry'
+      - type: object
+        properties:
+          lines:
+            type: array
+            description: Must have at least 2 lines with balanced debits and credits
+            items:
+              $ref: '#/components/schemas/JournalEntryLine'
+            minItems: 2
+    JournalEntryLine:
+      type: object
+      required:
+      - id
+      - account_id
+      - debit
+      - credit
+      properties:
+        id:
+          type: string
+          format: uuid
+        journal_entry_id:
+          type: string
+          format: uuid
+          description: Parent journal entry
+        account_id:
+          type: string
+          format: uuid
+          description: GL account for this line item
+        debit:
+          type: number
+          format: double
+          minimum: 0
+          description: Debit amount (positive only)
+          example: 5000.0
+        credit:
+          type: number
+          format: double
+          minimum: 0
+          description: Credit amount (positive only)
+          example: 0.0
+        name:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Line description/narration
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: External reference for this line
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+          description: Currency for this line (if different from entry currency)
+        amount_currency:
+          type: number
+          format: double
+          nullable: true
+          description: Amount in foreign currency (for multi-currency entries)
+        balance:
+          type: number
+          format: double
+          description: Computed balance (debit - credit)
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: Line-specific date (defaults to entry date)
+        date_maturity:
+          type: string
+          format: date
+          nullable: true
+          description: Due date for payable/receivable lines
+        partner_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Customer/vendor partner for this line
+        analytic_distribution:
+          type: object
+          nullable: true
+          description: 'Analytic/accounting distribution (e.g., {1: 50.0, 2: 50.0} for 50/50 split across cost centers)'
+        tax_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: Associated tax IDs
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateJournalEntryRequest:
+      type: object
+      required:
+      - journal_id
+      - entry_date
+      - description
+      - currency_code
+      - lines
+      properties:
+        journal_id:
+          type: string
+          format: uuid
+          description: Journal to post this entry to
+        entry_number:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Auto-generated if not provided
+        entry_date:
+          type: string
+          format: date
+          description: Accounting date for this entry
+        description:
+          type: string
+          maxLength: 500
+          description: Entry narration/description
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Company for this entry
+        fiscal_period_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Fiscal period to assign
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code
+        exchange_rate:
+          type: number
+          format: double
+          minimum: 0.0001
+          default: 1.0
+          description: Exchange rate to company currency
+        lines:
+          type: array
+          description: Debit/credit line items. At least 2 lines required. Total debits must equal total credits.
+          items:
+            $ref: '#/components/schemas/LineItemRequest'
+          minItems: 2
+          maxItems: 100
+    LineItemRequest:
+      type: object
+      required:
+      - account_id
+      properties:
+        account_id:
+          type: string
+          format: uuid
+          description: GL account for this line
+        debit:
+          type: number
+          format: double
+          minimum: 0
+          default: 0.0
+          description: Debit amount (positive, non-negative)
+        credit:
+          type: number
+          format: double
+          minimum: 0
+          default: 0.0
+          description: Credit amount (positive, non-negative)
+        name:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Line narration
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          nullable: true
+        amount_currency:
+          type: number
+          format: double
+          nullable: true
+        partner_id:
+          type: string
+          format: uuid
+          nullable: true
+        analytic_distribution:
+          type: object
+          nullable: true
+        tax_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+    UpdateJournalEntryRequest:
+      type: object
+      properties:
+        entry_date:
+          type: string
+          format: date
+        description:
+          type: string
+          maxLength: 500
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItemRequest'
+          description: Replacement line items (entire lines array replaced on update)
+    ReverseJournalEntryRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Override description for the reversing entry. Auto-generated if not provided.
+        use_original_date:
+          type: boolean
+          default: false
+          description: If true, use the original entry date. If false, use current date.
+    FiscalPeriod:
+      type: object
+      required:
+      - id
+      - name
+      - company_id
+      - start_date
+      - end_date
+      - year
+      - month
+      - is_locked
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 100
+          description: Period display name (e.g., 'January 2024')
+        company_id:
+          type: string
+          format: uuid
+          description: Company this period belongs to
+        start_date:
+          type: string
+          format: date
+          description: Period start date (inclusive)
+        end_date:
+          type: string
+          format: date
+          description: Period end date (inclusive)
+        year:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+          description: Fiscal year
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+          description: Month number (1-12). Null for annual periods.
+        is_locked:
+          type: boolean
+          description: When true, no new entries can be created/modified in this period
+        is_open:
+          type: boolean
+          nullable: true
+          description: Computed field - true if current date is within period and not locked
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateFiscalPeriodRequest:
+      type: object
+      required:
+      - name
+      - company_id
+      - start_date
+      - end_date
+      - year
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        company_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        year:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+        month:
+          type: integer
+          minimum: 1
+          maximum: 12
+          nullable: true
+          description: Null for annual periods
+    UpdateFiscalPeriodRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_locked:
+          type: boolean
+        is_open:
+          type: boolean
+    TrialBalanceReport:
+      type: object
+      required:
+      - report_date
+      - total_debits
+      - total_credits
+      - lines
+      properties:
+        report_date:
+          type: string
+          format: date
+          description: Report generation date
+        company_id:
+          type: string
+          format: uuid
+          description: Company this report is for
+        period_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Fiscal period this report covers
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Report currency
+        total_debits:
+          type: number
+          format: double
+          description: Sum of all debit balances
+          example: 1250000.0
+        total_credits:
+          type: number
+          format: double
+          description: Sum of all credit balances
+          example: 1250000.0
+        difference:
+          type: number
+          format: double
+          description: Difference (should be 0 for balanced trial balance)
+          example: 0.0
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrialBalanceLine'
+          description: One line per account
+    TrialBalanceLine:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        account_code:
+          type: string
+          maxLength: 50
+        account_name:
+          type: string
+          maxLength: 255
+        account_type:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        opening_balance:
+          type: number
+          format: double
+          description: Balance at start of period
+        period_debits:
+          type: number
+          format: double
+          description: Total debits during period
+        period_credits:
+          type: number
+          format: double
+          description: Total credits during period
+        closing_balance:
+          type: number
+          format: double
+          description: Balance at end of period
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    AccountBalancesReport:
+      type: object
+      properties:
+        report_date:
+          type: string
+          format: date
+        company_id:
+          type: string
+          format: uuid
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        total_assets:
+          type: number
+          format: double
+        total_liabilities:
+          type: number
+          format: double
+        total_equity:
+          type: number
+          format: double
+        total_revenue:
+          type: number
+          format: double
+        total_expenses:
+          type: number
+          format: double
+        net_income:
+          type: number
+          format: double
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountBalance'
+    LedgerReport:
+      type: object
+      properties:
+        report_date:
+          type: string
+          format: date
+        company_id:
+          type: string
+          format: uuid
+        period_id:
+          type: string
+          format: uuid
+          nullable: true
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        total_lines:
+          type: integer
+          description: Number of line items in report
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/LedgerReportLine'
+    LedgerReportLine:
+      type: object
+      properties:
+        entry_id:
+          type: string
+          format: uuid
+        entry_number:
+          type: string
+          maxLength: 50
+        entry_date:
+          type: string
+          format: date
+        entry_description:
+          type: string
+        journal_code:
+          type: string
+          maxLength: 10
+        line_number:
+          type: integer
+          description: Line number within the entry
+        account_code:
+          type: string
+          maxLength: 50
+        account_name:
+          type: string
+          maxLength: 255
+        debit:
+          type: number
+          format: double
+        credit:
+          type: number
+          format: double
+        balance:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        reference:
+          type: string
+          maxLength: 100
+    PaginatedAccounts:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        total:
+          type: integer
+          description: Total number of accounts matching the query
+          example: 150
+        page:
+          type: integer
+          description: Current page number
+          example: 1
+        limit:
+          type: integer
+          description: Number of items per page
+          example: 20
+        has_more:
+          type: boolean
+          description: Whether more pages exist
+    PaginatedChartOfAccounts:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChartOfAccount'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedJournalEntries:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalEntry'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedJournals:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Journal'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedFiscalPeriods:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiscalPeriod'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    CreateAccountRequest:
+      type: object
+      required:
+      - chart_of_account_id
+      - code
+      - name
+      - account_type
+      - normal_balance
+      - currency_code
+      properties:
+        chart_of_account_id:
+          type: string
+          format: uuid
+          description: Parent chart of accounts node
+        code:
+          type: string
+          maxLength: 50
+          pattern: ^[A-Z0-9._-]+$
+          description: Account code (unique within chart)
+        name:
+          type: string
+          maxLength: 255
+          description: Account display name
+        account_type:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        normal_balance:
+          type: string
+          enum:
+          - DEBIT
+          - CREDIT
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+          default: true
+    UpdateAccountRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        is_active:
+          type: boolean
+        account_type:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+    BulkApproveRequest:
+      type: object
+      required:
+      - entry_ids
+      properties:
+        entry_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 100
+          description: List of entry IDs to approve
+    BulkPostRequest:
+      type: object
+      required:
+      - entry_ids
+      properties:
+        entry_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 100
+          description: List of entry IDs to post
+    BulkActionResult:
+      type: object
+      required:
+      - total
+      - succeeded
+      - failed
+      - results
+      properties:
+        total:
+          type: integer
+          description: Total entries processed
+        succeeded:
+          type: integer
+          description: Number of successful operations
+        failed:
+          type: integer
+          description: Number of failed operations
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              entry_id:
+                type: string
+                format: uuid
+              success:
+                type: boolean
+              error:
+                type: string
+                nullable: true
+              result:
+                nullable: true
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          enum:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          description: Human-readable error message
+          example: Account not found
+        details:
+          type: object
+          nullable: true
+          description: Additional error context
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          description: Validation error code
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          description: Human-readable validation error message
+          example: Journal entry must be balanced
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          description: List of field-level validation errors
+        line_errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineError'
+          nullable: true
+          description: Line-level validation errors (for journal entries)
+        total_debit:
+          type: number
+          format: double
+          nullable: true
+        total_credit:
+          type: number
+          format: double
+          nullable: true
+        difference:
+          type: number
+          format: double
+          nullable: true
+        tolerance:
+          type: number
+          format: double
+          default: 0.01
+          description: Balancing tolerance in the entry's currency
+    FieldError:
+      type: object
+      required:
+      - field
+      - message
+      properties:
+        field:
+          type: string
+          description: Field name that failed validation
+          example: lines
+        message:
+          type: string
+          description: Human-readable error for this field
+          example: Total debits do not equal total credits
+        details:
+          type: object
+          nullable: true
+    LineError:
+      type: object
+      required:
+      - index
+      - field
+      - message
+      properties:
+        index:
+          type: integer
+          description: Line item index (0-based)
+        field:
+          type: string
+          description: Field that failed validation
+          example: debit
+        message:
+          type: string
+          description: Human-readable error for this line field
+          example: Debit exceeds expected amount
+security:
+- bearerAuth: []

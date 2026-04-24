@@ -12,5 +12,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: general_ledger_service_api
+  binaryName: general_ledger
   serviceName: general-ledger

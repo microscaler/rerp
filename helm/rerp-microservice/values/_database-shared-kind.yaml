@@ -1,0 +1,16 @@
+# Database configuration for RERP — connects to shared-kind-cluster Postgres
+#
+# The shared Kind cluster (kind-kind, managed by microscaler/shared-kind-cluster)
+# provides Postgres in namespace `data`. RERP microservices connect via DNS.
+#
+# This file is merged into helm values AFTER the per-service values file,
+# so it overrides any database config in the base values.yaml.
+app:
+  config:
+    database:
+      host: "postgres.data.svc.cluster.local"
+      port: 5432
+      name: "rerp"
+      user: "rerp"
+      password: "dev_password_change_in_prod"
+      max_connections: 10

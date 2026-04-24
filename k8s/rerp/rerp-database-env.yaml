@@ -1,0 +1,36 @@
+# RERP database environment — connects to shared-kind-cluster infrastructure
+#
+# This ConfigMap + Secret is deployed into the `rerp` namespace and provides
+# the connection info that Helm microservices read at runtime.
+#
+# Infrastructure comes from microscaler/shared-kind-cluster:
+#   - Postgres:   postgres.data.svc.cluster.local:5432
+#   - Redis:      redis.data.svc.cluster.local:6379
+#   - MinIO:      minio.data.svc.cluster.local:9000
+#   - OTel:       otel-collector.observability.svc.cluster.local:4317
+
+---
+# Shared DB settings for impl/src/db.rs (Helm + any workers).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rerp-database-config
+  namespace: rerp
+  labels:
+    app: rerp
+data:
+  DB_HOST: "postgres.data.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "rerp"
+  DB_USER: "rerp"
+---
+# Must match scripts/setup-db.sh RERP_DB_PASSWORD and helm app.config.database.password.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rerp-db-credentials
+  namespace: rerp
+type: Opaque
+stringData:
+  DB_PASS: dev_password_change_in_prod
+  RERP_DB_PASSWORD: dev_password_change_in_prod
