@@ -1,0 +1,446 @@
+openapi: 3.1.0
+info:
+  title: Treasury
+  version: 1.0.0
+  description: Treasury service for liquidity planning, cash positioning, cash forecasts, bank relationships, and cash transfer planning.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8018/api/v1/accounting/treasury
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/treasury
+  description: Treasury API
+tags:
+- name: cash-positions
+  description: Consolidated and projected cash positions
+- name: cash-forecasts
+  description: Cash forecast assumptions and forecast runs
+- name: liquidity-plans
+  description: Liquidity plans and funding recommendations
+- name: bank-relationships
+  description: Banking relationships and facility metadata
+- name: cash-transfers
+  description: Planned and executed cash transfers
+paths:
+  /cash-positions:
+    get:
+      operationId: list_cash_positions
+      summary: List cash positions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/CompanyId'
+      - name: as_of_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Paginated cash positions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCashPositions'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /cash-forecasts:
+    get:
+      operationId: list_cash_forecasts
+      summary: List cash forecasts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: horizon
+        in: query
+        schema:
+          $ref: '#/components/schemas/ForecastHorizon'
+      responses:
+        '200':
+          description: Paginated cash forecasts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCashForecasts'
+    post:
+      operationId: create_cash_forecast
+      summary: Create cash forecast
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCashForecastRequest'
+      responses:
+        '201':
+          description: Cash forecast created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashForecast'
+  /liquidity-plans:
+    get:
+      operationId: list_liquidity_plans
+      summary: List liquidity plans
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/PlanStatus'
+      responses:
+        '200':
+          description: Paginated liquidity plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLiquidityPlans'
+    post:
+      operationId: create_liquidity_plan
+      summary: Create liquidity plan
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLiquidityPlanRequest'
+      responses:
+        '201':
+          description: Liquidity plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidityPlan'
+  /bank-relationships:
+    get:
+      operationId: list_bank_relationships
+      summary: List bank relationships
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated bank relationships
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBankRelationships'
+    post:
+      operationId: create_bank_relationship
+      summary: Create bank relationship
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankRelationshipRequest'
+      responses:
+        '201':
+          description: Bank relationship created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankRelationship'
+  /cash-transfers:
+    get:
+      operationId: list_cash_transfers
+      summary: List cash transfers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/TransferStatus'
+      responses:
+        '200':
+          description: Paginated cash transfers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCashTransfers'
+    post:
+      operationId: create_cash_transfer
+      summary: Create cash transfer
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCashTransferRequest'
+      responses:
+        '201':
+          description: Cash transfer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashTransfer'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    CompanyId:
+      name: company_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ForecastHorizon:
+      type: string
+      enum: [DAILY_13_WEEK, MONTHLY_12_MONTH, QUARTERLY_8_QUARTER, CUSTOM]
+    PlanStatus:
+      type: string
+      enum: [DRAFT, APPROVED, ACTIVE, COMPLETED, CANCELLED]
+    TransferStatus:
+      type: string
+      enum: [PLANNED, APPROVED, SENT, SETTLED, CANCELLED, FAILED]
+    CashPosition:
+      type: object
+      required: [id, company_id, as_of_date, currency_code, available_cash]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        as_of_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        available_cash:
+          type: number
+          format: double
+        restricted_cash:
+          type: number
+          format: double
+        forecast_net_cash:
+          type: number
+          format: double
+    CashForecast:
+      type: object
+      required: [id, company_id, horizon, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        horizon:
+          $ref: '#/components/schemas/ForecastHorizon'
+        status:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    CreateCashForecastRequest:
+      type: object
+      required: [company_id, horizon, start_date, end_date]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        horizon:
+          $ref: '#/components/schemas/ForecastHorizon'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    LiquidityPlan:
+      type: object
+      required: [id, company_id, status, plan_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/PlanStatus'
+        plan_date:
+          type: string
+          format: date
+        minimum_cash_threshold:
+          type: number
+          format: double
+    CreateLiquidityPlanRequest:
+      type: object
+      required: [company_id, plan_date]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        plan_date:
+          type: string
+          format: date
+        minimum_cash_threshold:
+          type: number
+          format: double
+    BankRelationship:
+      type: object
+      required: [id, bank_name, relationship_type, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        bank_name:
+          type: string
+        relationship_type:
+          type: string
+          enum: [OPERATING, CREDIT_FACILITY, INVESTMENT, CASH_POOL, OTHER]
+        active:
+          type: boolean
+    CreateBankRelationshipRequest:
+      type: object
+      required: [bank_name, relationship_type]
+      properties:
+        bank_name:
+          type: string
+        relationship_type:
+          type: string
+    CashTransfer:
+      type: object
+      required: [id, source_account_id, destination_account_id, amount, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        source_account_id:
+          type: string
+          format: uuid
+        destination_account_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        status:
+          $ref: '#/components/schemas/TransferStatus'
+    CreateCashTransferRequest:
+      type: object
+      required: [source_account_id, destination_account_id, amount, currency_code]
+      properties:
+        source_account_id:
+          type: string
+          format: uuid
+        destination_account_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    PaginatedCashPositions:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CashPosition'
+    PaginatedCashForecasts:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CashForecast'
+    PaginatedLiquidityPlans:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LiquidityPlan'
+    PaginatedBankRelationships:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/BankRelationship'
+    PaginatedCashTransfers:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CashTransfer'
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+security:
+- bearerAuth: []

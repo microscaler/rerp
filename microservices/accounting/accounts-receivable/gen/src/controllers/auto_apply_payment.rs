@@ -1,0 +1,20 @@
+
+// User-owned controller for handler 'auto_apply_payment'.
+
+use brrtrouter_macros::handler;
+use brrtrouter::typed::TypedHandlerRequest;
+use crate::handlers::auto_apply_payment::{ Request, Response };
+
+
+
+#[handler(AutoApplyPaymentController)]
+pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+    
+    
+    
+    Response {
+        applications: vec![],payment_id: "example".to_string(),total_applied: 3.14,unapplied_amount: 3.14,
+    }
+    
+    
+}

@@ -1,0 +1,387 @@
+openapi: 3.1.0
+info:
+  title: Revenue Recognition
+  version: 1.0.0
+  description: Revenue and expense recognition service for deferred revenue, deferred expenses, recognition schedules, recognition rules, and recognition runs.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8020/api/v1/accounting/revenue-recognition
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/revenue-recognition
+  description: Revenue Recognition API
+tags:
+- name: recognition-rules
+  description: Revenue and expense recognition rules
+- name: recognition-schedules
+  description: Recognition schedules and schedule lines
+- name: deferred-revenues
+  description: Deferred revenue contracts and balances
+- name: deferred-expenses
+  description: Deferred expense contracts and balances
+- name: recognition-runs
+  description: Periodic recognition posting runs
+paths:
+  /recognition-rules:
+    get:
+      operationId: list_recognition_rules
+      summary: List recognition rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated recognition rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecognitionRules'
+    post:
+      operationId: create_recognition_rule
+      summary: Create recognition rule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecognitionRuleRequest'
+      responses:
+        '201':
+          description: Recognition rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionRule'
+  /recognition-schedules:
+    get:
+      operationId: list_recognition_schedules
+      summary: List recognition schedules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: source_invoice_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated recognition schedules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecognitionSchedules'
+    post:
+      operationId: create_recognition_schedule
+      summary: Create recognition schedule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecognitionScheduleRequest'
+      responses:
+        '201':
+          description: Recognition schedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionSchedule'
+  /deferred-revenues:
+    get:
+      operationId: list_deferred_revenues
+      summary: List deferred revenues
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated deferred revenues
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDeferredRevenues'
+    post:
+      operationId: create_deferred_revenue
+      summary: Create deferred revenue
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeferredItemRequest'
+      responses:
+        '201':
+          description: Deferred revenue created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeferredItem'
+  /deferred-expenses:
+    get:
+      operationId: list_deferred_expenses
+      summary: List deferred expenses
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated deferred expenses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDeferredExpenses'
+    post:
+      operationId: create_deferred_expense
+      summary: Create deferred expense
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeferredItemRequest'
+      responses:
+        '201':
+          description: Deferred expense created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeferredItem'
+  /recognition-runs:
+    get:
+      operationId: list_recognition_runs
+      summary: List recognition runs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/RecognitionRunStatus'
+      responses:
+        '200':
+          description: Paginated recognition runs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecognitionRuns'
+    post:
+      operationId: create_recognition_run
+      summary: Create recognition run
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecognitionRunRequest'
+      responses:
+        '201':
+          description: Recognition run created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionRun'
+  /recognition-runs/{id}/post:
+    post:
+      operationId: post_recognition_run
+      summary: Post recognition run
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Recognition run posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognitionRun'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    Conflict:
+      description: Invalid recognition state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    RecognitionMethod:
+      type: string
+      enum: [STRAIGHT_LINE, MILESTONE, USAGE_BASED, PERCENT_COMPLETE, MANUAL]
+    RecognitionRunStatus:
+      type: string
+      enum: [DRAFT, READY, POSTED, REVERSED, FAILED]
+    RecognitionRule:
+      type: object
+      required: [id, name, method, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        method:
+          $ref: '#/components/schemas/RecognitionMethod'
+        active:
+          type: boolean
+    CreateRecognitionRuleRequest:
+      type: object
+      required: [name, method]
+      properties:
+        name:
+          type: string
+        method:
+          $ref: '#/components/schemas/RecognitionMethod'
+    RecognitionSchedule:
+      type: object
+      required: [id, rule_id, source_invoice_id, total_amount, recognized_amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        rule_id:
+          type: string
+          format: uuid
+        source_invoice_id:
+          type: string
+          format: uuid
+        total_amount:
+          type: number
+          format: double
+        recognized_amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    CreateRecognitionScheduleRequest:
+      type: object
+      required: [rule_id, source_invoice_id, total_amount, currency_code]
+      properties:
+        rule_id:
+          type: string
+          format: uuid
+        source_invoice_id:
+          type: string
+          format: uuid
+        total_amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    DeferredItem:
+      type: object
+      required: [id, schedule_id, item_type, balance]
+      properties:
+        id:
+          type: string
+          format: uuid
+        schedule_id:
+          type: string
+          format: uuid
+        item_type:
+          type: string
+          enum: [REVENUE, EXPENSE]
+        balance:
+          type: number
+          format: double
+    CreateDeferredItemRequest:
+      type: object
+      required: [schedule_id, balance]
+      properties:
+        schedule_id:
+          type: string
+          format: uuid
+        balance:
+          type: number
+          format: double
+    RecognitionRun:
+      type: object
+      required: [id, fiscal_period_id, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        fiscal_period_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/RecognitionRunStatus'
+        posted_journal_entry_id:
+          type: string
+          format: uuid
+    CreateRecognitionRunRequest:
+      type: object
+      required: [fiscal_period_id]
+      properties:
+        fiscal_period_id:
+          type: string
+          format: uuid
+    PaginatedRecognitionRules:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRule' } } } }]
+    PaginatedRecognitionSchedules:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionSchedule' } } } }]
+    PaginatedDeferredRevenues:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+    PaginatedDeferredExpenses:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+    PaginatedRecognitionRuns:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRun' } } } }]
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+security:
+- bearerAuth: []

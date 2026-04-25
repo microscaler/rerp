@@ -1,0 +1,483 @@
+openapi: 3.1.0
+info:
+  title: Documents Extraction
+  version: 1.0.0
+  description: Accounting document ingestion and extraction service for OCR, classification, review, approval, and linkage to invoices, bills, bank statements, and EDI documents.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8017/api/v1/accounting/documents-extraction
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/documents-extraction
+  description: Documents Extraction API
+tags:
+- name: documents
+  description: Accounting documents and source files
+- name: extraction
+  description: OCR and structured data extraction jobs
+- name: review
+  description: Human review and extraction approval
+- name: linkage
+  description: Links between documents and accounting records
+paths:
+  /accounting-documents:
+    get:
+      operationId: list_accounting_documents
+      summary: List accounting documents
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: document_type
+        in: query
+        schema:
+          $ref: '#/components/schemas/DocumentType'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/DocumentStatus'
+      responses:
+        '200':
+          description: Paginated accounting documents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAccountingDocuments'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: create_accounting_document
+      summary: Create accounting document
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountingDocumentRequest'
+      responses:
+        '201':
+          description: Accounting document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountingDocument'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /accounting-documents/{id}/classify:
+    post:
+      operationId: classify_accounting_document
+      summary: Classify accounting document
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifyDocumentRequest'
+      responses:
+        '200':
+          description: Document classification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentClassification'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /extraction-jobs:
+    get:
+      operationId: list_extraction_jobs
+      summary: List extraction jobs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: document_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated extraction jobs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExtractionJobs'
+    post:
+      operationId: create_extraction_job
+      summary: Create extraction job
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExtractionJobRequest'
+      responses:
+        '202':
+          description: Extraction job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionJob'
+  /extraction-results:
+    get:
+      operationId: list_extraction_results
+      summary: List extraction results
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: job_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated extraction results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExtractionResults'
+  /documents/{id}/approve-extraction:
+    post:
+      operationId: approve_document_extraction
+      summary: Approve document extraction
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveExtractionRequest'
+      responses:
+        '200':
+          description: Extraction approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionApproval'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /documents/{id}/link-invoice:
+    post:
+      operationId: link_document_to_invoice
+      summary: Link document to invoice
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkDocumentRequest'
+      responses:
+        '200':
+          description: Document linked to invoice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentLink'
+  /documents/{id}/link-bank-statement:
+    post:
+      operationId: link_document_to_bank_statement
+      summary: Link document to bank statement
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkDocumentRequest'
+      responses:
+        '200':
+          description: Document linked to bank statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentLink'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Invalid workflow state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+  schemas:
+    DocumentType:
+      type: string
+      enum: [CUSTOMER_INVOICE, VENDOR_BILL, CREDIT_MEMO, BANK_STATEMENT, EDI_DOCUMENT, TAX_DOCUMENT, OTHER]
+    DocumentStatus:
+      type: string
+      enum: [UPLOADED, CLASSIFIED, EXTRACTING, REVIEW_REQUIRED, APPROVED, LINKED, REJECTED, ARCHIVED]
+    ExtractionStatus:
+      type: string
+      enum: [PENDING, RUNNING, COMPLETED, FAILED, CANCELLED]
+    AccountingDocument:
+      type: object
+      required: [id, document_type, status, file_name, uploaded_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        document_type:
+          $ref: '#/components/schemas/DocumentType'
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        file_name:
+          type: string
+        content_type:
+          type: string
+        source_uri:
+          type: string
+        uploaded_at:
+          type: string
+          format: date-time
+    CreateAccountingDocumentRequest:
+      type: object
+      required: [file_name, source_uri]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        document_type:
+          $ref: '#/components/schemas/DocumentType'
+        file_name:
+          type: string
+        content_type:
+          type: string
+        source_uri:
+          type: string
+    ClassifyDocumentRequest:
+      type: object
+      properties:
+        force_reclassify:
+          type: boolean
+          default: false
+    DocumentClassification:
+      type: object
+      required: [document_id, document_type, confidence]
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        document_type:
+          $ref: '#/components/schemas/DocumentType'
+        confidence:
+          type: number
+          format: double
+        reasons:
+          type: array
+          items:
+            type: string
+    ExtractionJob:
+      type: object
+      required: [id, document_id, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        profile:
+          type: string
+        status:
+          $ref: '#/components/schemas/ExtractionStatus'
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+    CreateExtractionJobRequest:
+      type: object
+      required: [document_id]
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        profile:
+          type: string
+    ExtractionResult:
+      type: object
+      required: [id, job_id, document_id, extracted_fields]
+      properties:
+        id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        extracted_fields:
+          type: object
+          additionalProperties: true
+        confidence:
+          type: number
+          format: double
+    ApproveExtractionRequest:
+      type: object
+      required: [approved_by]
+      properties:
+        approved_by:
+          type: string
+          format: uuid
+        corrections:
+          type: object
+          additionalProperties: true
+    ExtractionApproval:
+      type: object
+      required: [document_id, approved_by, approved_at]
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        approved_by:
+          type: string
+          format: uuid
+        approved_at:
+          type: string
+          format: date-time
+    LinkDocumentRequest:
+      type: object
+      required: [target_id]
+      properties:
+        target_id:
+          type: string
+          format: uuid
+        link_reason:
+          type: string
+    DocumentLink:
+      type: object
+      required: [id, document_id, target_id, target_type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        target_id:
+          type: string
+          format: uuid
+        target_type:
+          type: string
+    PaginatedAccountingDocuments:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AccountingDocument'
+    PaginatedExtractionJobs:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExtractionJob'
+    PaginatedExtractionResults:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExtractionResult'
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+    ValidationError:
+      type: object
+      required: [error, message, fields]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        fields:
+          type: array
+          items:
+            type: string
+security:
+- bearerAuth: []

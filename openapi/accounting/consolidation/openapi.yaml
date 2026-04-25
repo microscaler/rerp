@@ -1,0 +1,395 @@
+openapi: 3.1.0
+info:
+  title: Consolidation
+  version: 1.0.0
+  description: Multi-company consolidation service for consolidation groups, consolidation runs, elimination rules, elimination entries, and group reporting packs.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8019/api/v1/accounting/consolidation
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/consolidation
+  description: Consolidation API
+tags:
+- name: consolidation-groups
+  description: Groups of companies included in consolidation
+- name: consolidation-runs
+  description: Periodic consolidation execution and state
+- name: elimination-rules
+  description: Rules for intercompany elimination
+- name: elimination-entries
+  description: Generated elimination accounting entries
+- name: reporting-packs
+  description: Group reporting pack artifacts
+paths:
+  /consolidation-groups:
+    get:
+      operationId: list_consolidation_groups
+      summary: List consolidation groups
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated consolidation groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConsolidationGroups'
+    post:
+      operationId: create_consolidation_group
+      summary: Create consolidation group
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsolidationGroupRequest'
+      responses:
+        '201':
+          description: Consolidation group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsolidationGroup'
+  /consolidation-runs:
+    get:
+      operationId: list_consolidation_runs
+      summary: List consolidation runs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: group_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated consolidation runs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConsolidationRuns'
+    post:
+      operationId: create_consolidation_run
+      summary: Create consolidation run
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsolidationRunRequest'
+      responses:
+        '201':
+          description: Consolidation run created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsolidationRun'
+  /consolidation-runs/{id}/execute:
+    post:
+      operationId: execute_consolidation_run
+      summary: Execute consolidation run
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '202':
+          description: Consolidation run execution accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsolidationRun'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /elimination-rules:
+    get:
+      operationId: list_elimination_rules
+      summary: List elimination rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated elimination rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEliminationRules'
+    post:
+      operationId: create_elimination_rule
+      summary: Create elimination rule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEliminationRuleRequest'
+      responses:
+        '201':
+          description: Elimination rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EliminationRule'
+  /elimination-entries:
+    get:
+      operationId: list_elimination_entries
+      summary: List elimination entries
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: run_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated elimination entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEliminationEntries'
+  /group-reporting-packs:
+    get:
+      operationId: list_group_reporting_packs
+      summary: List group reporting packs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: run_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated group reporting packs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGroupReportingPacks'
+    post:
+      operationId: create_group_reporting_pack
+      summary: Create group reporting pack
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupReportingPackRequest'
+      responses:
+        '201':
+          description: Group reporting pack created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupReportingPack'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    Conflict:
+      description: Invalid consolidation state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ConsolidationRunStatus:
+      type: string
+      enum: [DRAFT, READY, RUNNING, COMPLETED, FAILED, APPROVED, ARCHIVED]
+    ConsolidationGroup:
+      type: object
+      required: [id, name, reporting_currency_code]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        reporting_currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        parent_company_id:
+          type: string
+          format: uuid
+    CreateConsolidationGroupRequest:
+      type: object
+      required: [name, reporting_currency_code]
+      properties:
+        name:
+          type: string
+        reporting_currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        company_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    ConsolidationRun:
+      type: object
+      required: [id, group_id, fiscal_period_id, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        fiscal_period_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ConsolidationRunStatus'
+        executed_at:
+          type: string
+          format: date-time
+    CreateConsolidationRunRequest:
+      type: object
+      required: [group_id, fiscal_period_id]
+      properties:
+        group_id:
+          type: string
+          format: uuid
+        fiscal_period_id:
+          type: string
+          format: uuid
+    EliminationRule:
+      type: object
+      required: [id, group_id, name, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        rule_type:
+          type: string
+          enum: [INTERCOMPANY_AR_AP, INTERCOMPANY_REVENUE_EXPENSE, INVESTMENT_EQUITY, CUSTOM]
+        active:
+          type: boolean
+    CreateEliminationRuleRequest:
+      type: object
+      required: [group_id, name, rule_type]
+      properties:
+        group_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        rule_type:
+          type: string
+    EliminationEntry:
+      type: object
+      required: [id, run_id, rule_id, amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        rule_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        source_company_id:
+          type: string
+          format: uuid
+        target_company_id:
+          type: string
+          format: uuid
+    GroupReportingPack:
+      type: object
+      required: [id, run_id, status, artifact_uri]
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [GENERATING, READY, ARCHIVED]
+        artifact_uri:
+          type: string
+    CreateGroupReportingPackRequest:
+      type: object
+      required: [run_id]
+      properties:
+        run_id:
+          type: string
+          format: uuid
+    PaginatedConsolidationGroups:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ConsolidationGroup' } } } }]
+    PaginatedConsolidationRuns:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ConsolidationRun' } } } }]
+    PaginatedEliminationRules:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/EliminationRule' } } } }]
+    PaginatedEliminationEntries:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/EliminationEntry' } } } }]
+    PaginatedGroupReportingPacks:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/GroupReportingPack' } } } }]
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+security:
+- bearerAuth: []

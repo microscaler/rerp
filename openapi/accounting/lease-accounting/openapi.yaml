@@ -1,0 +1,375 @@
+openapi: 3.1.0
+info:
+  title: Lease Accounting
+  version: 1.0.0
+  description: Lease accounting service for leases, payment schedules, lease liabilities, right-of-use assets, and lease modifications.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8021/api/v1/accounting/lease-accounting
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/lease-accounting
+  description: Lease Accounting API
+tags:
+- name: leases
+  description: Lease contracts and accounting classification
+- name: payment-schedules
+  description: Lease payment schedules
+- name: liabilities
+  description: Lease liability balances and amortization
+- name: right-of-use-assets
+  description: Right-of-use asset records
+- name: modifications
+  description: Lease modification workflows
+paths:
+  /leases:
+    get:
+      operationId: list_leases
+      summary: List leases
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/LeaseStatus'
+      responses:
+        '200':
+          description: Paginated leases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeases'
+    post:
+      operationId: create_lease
+      summary: Create lease
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaseRequest'
+      responses:
+        '201':
+          description: Lease created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+  /lease-payment-schedules:
+    get:
+      operationId: list_lease_payment_schedules
+      summary: List lease payment schedules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: lease_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated lease payment schedules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeasePaymentSchedules'
+    post:
+      operationId: create_lease_payment_schedule
+      summary: Create lease payment schedule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeasePaymentScheduleRequest'
+      responses:
+        '201':
+          description: Lease payment schedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeasePaymentSchedule'
+  /lease-liabilities:
+    get:
+      operationId: list_lease_liabilities
+      summary: List lease liabilities
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated lease liabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaseLiabilities'
+  /right-of-use-assets:
+    get:
+      operationId: list_right_of_use_assets
+      summary: List right-of-use assets
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated right-of-use assets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRightOfUseAssets'
+  /lease-modifications:
+    get:
+      operationId: list_lease_modifications
+      summary: List lease modifications
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: lease_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated lease modifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaseModifications'
+    post:
+      operationId: create_lease_modification
+      summary: Create lease modification
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLeaseModificationRequest'
+      responses:
+        '201':
+          description: Lease modification created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaseModification'
+  /lease-modifications/{id}/approve:
+    post:
+      operationId: approve_lease_modification
+      summary: Approve lease modification
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Lease modification approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaseModification'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    LeaseStatus:
+      type: string
+      enum: [DRAFT, ACTIVE, MODIFIED, TERMINATED, EXPIRED]
+    LeaseClassification:
+      type: string
+      enum: [OPERATING, FINANCE, SHORT_TERM, LOW_VALUE]
+    Lease:
+      type: object
+      required: [id, lease_number, classification, status, commencement_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lease_number:
+          type: string
+        classification:
+          $ref: '#/components/schemas/LeaseClassification'
+        status:
+          $ref: '#/components/schemas/LeaseStatus'
+        commencement_date:
+          type: string
+          format: date
+        termination_date:
+          type: string
+          format: date
+        discount_rate:
+          type: number
+          format: double
+    CreateLeaseRequest:
+      type: object
+      required: [lease_number, classification, commencement_date]
+      properties:
+        lease_number:
+          type: string
+        classification:
+          $ref: '#/components/schemas/LeaseClassification'
+        commencement_date:
+          type: string
+          format: date
+        discount_rate:
+          type: number
+          format: double
+    LeasePaymentSchedule:
+      type: object
+      required: [id, lease_id, payment_date, amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lease_id:
+          type: string
+          format: uuid
+        payment_date:
+          type: string
+          format: date
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    CreateLeasePaymentScheduleRequest:
+      type: object
+      required: [lease_id, payment_date, amount, currency_code]
+      properties:
+        lease_id:
+          type: string
+          format: uuid
+        payment_date:
+          type: string
+          format: date
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    LeaseLiability:
+      type: object
+      required: [id, lease_id, opening_balance, closing_balance]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lease_id:
+          type: string
+          format: uuid
+        opening_balance:
+          type: number
+          format: double
+        closing_balance:
+          type: number
+          format: double
+    RightOfUseAsset:
+      type: object
+      required: [id, lease_id, asset_id, carrying_value]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lease_id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+        carrying_value:
+          type: number
+          format: double
+    LeaseModification:
+      type: object
+      required: [id, lease_id, status, effective_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lease_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [DRAFT, APPROVED, POSTED, CANCELLED]
+        effective_date:
+          type: string
+          format: date
+        reason:
+          type: string
+    CreateLeaseModificationRequest:
+      type: object
+      required: [lease_id, effective_date, reason]
+      properties:
+        lease_id:
+          type: string
+          format: uuid
+        effective_date:
+          type: string
+          format: date
+        reason:
+          type: string
+    PaginatedLeases:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/Lease' } } } }]
+    PaginatedLeasePaymentSchedules:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeasePaymentSchedule' } } } }]
+    PaginatedLeaseLiabilities:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseLiability' } } } }]
+    PaginatedRightOfUseAssets:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RightOfUseAsset' } } } }]
+    PaginatedLeaseModifications:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseModification' } } } }]
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+security:
+- bearerAuth: []

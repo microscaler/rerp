@@ -1,0 +1,622 @@
+openapi: 3.1.0
+info:
+  title: Tax Compliance
+  version: 1.0.0
+  description: Tax compliance service for tax periods, jurisdiction rules, statutory tax returns, tax payments, and audit packs.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8016/api/v1/accounting/tax-compliance
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/tax-compliance
+  description: Tax Compliance API
+tags:
+- name: tax-periods
+  description: Tax reporting periods and filing windows
+- name: tax-rules
+  description: Jurisdiction tax rules and return profiles
+- name: tax-returns
+  description: Statutory tax return lifecycle
+- name: tax-payments
+  description: Tax payment tracking and settlement
+- name: audit-packs
+  description: Audit evidence packages for statutory filings
+paths:
+  /tax-periods:
+    get:
+      operationId: list_tax_periods
+      summary: List tax periods
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/CompanyId'
+      - name: jurisdiction_code
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated tax periods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxPeriods'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: create_tax_period
+      summary: Create tax period
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxPeriodRequest'
+      responses:
+        '201':
+          description: Tax period created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxPeriod'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /tax-rules:
+    get:
+      operationId: list_tax_rules
+      summary: List tax rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: jurisdiction_code
+        in: query
+        schema:
+          type: string
+      - name: tax_type
+        in: query
+        schema:
+          $ref: '#/components/schemas/TaxType'
+      responses:
+        '200':
+          description: Paginated tax rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxRules'
+    post:
+      operationId: create_tax_rule
+      summary: Create tax rule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxRuleRequest'
+      responses:
+        '201':
+          description: Tax rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxRule'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /tax-returns:
+    get:
+      operationId: list_tax_returns
+      summary: List tax returns
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/CompanyId'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/TaxReturnStatus'
+      - name: period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated tax returns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxReturns'
+    post:
+      operationId: create_tax_return
+      summary: Create tax return
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxReturnRequest'
+      responses:
+        '201':
+          description: Tax return created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxReturn'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /tax-returns/{id}/validate:
+    post:
+      operationId: validate_tax_return
+      summary: Validate tax return
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tax return validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxReturnValidationResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /tax-returns/{id}/submit:
+    post:
+      operationId: submit_tax_return
+      summary: Submit tax return
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitTaxReturnRequest'
+      responses:
+        '202':
+          description: Tax return submission accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxReturnSubmission'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /tax-payments:
+    get:
+      operationId: list_tax_payments
+      summary: List tax payments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: return_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated tax payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxPayments'
+    post:
+      operationId: create_tax_payment
+      summary: Create tax payment
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxPaymentRequest'
+      responses:
+        '201':
+          description: Tax payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxPayment'
+  /tax-audit-packs:
+    get:
+      operationId: list_tax_audit_packs
+      summary: List tax audit packs
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: return_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated tax audit packs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaxAuditPacks'
+    post:
+      operationId: create_tax_audit_pack
+      summary: Create tax audit pack
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxAuditPackRequest'
+      responses:
+        '201':
+          description: Tax audit pack created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxAuditPack'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    CompanyId:
+      name: company_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Invalid state transition or conflicting data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+  schemas:
+    TaxType:
+      type: string
+      enum: [VAT, GST, SALES_TAX, WITHHOLDING, PAYROLL, CORPORATE_INCOME, OTHER]
+    TaxPeriodStatus:
+      type: string
+      enum: [OPEN, LOCKED, FILED, CLOSED]
+    TaxReturnStatus:
+      type: string
+      enum: [DRAFT, READY_FOR_VALIDATION, VALIDATED, SUBMITTED, ACCEPTED, REJECTED, PAID, ARCHIVED]
+    PaymentStatus:
+      type: string
+      enum: [SCHEDULED, SENT, SETTLED, FAILED, CANCELLED]
+    TaxPeriod:
+      type: object
+      required: [id, company_id, jurisdiction_code, tax_type, start_date, end_date, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        jurisdiction_code:
+          type: string
+        tax_type:
+          $ref: '#/components/schemas/TaxType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/TaxPeriodStatus'
+    CreateTaxPeriodRequest:
+      type: object
+      required: [company_id, jurisdiction_code, tax_type, start_date, end_date]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        jurisdiction_code:
+          type: string
+        tax_type:
+          $ref: '#/components/schemas/TaxType'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+    TaxRule:
+      type: object
+      required: [id, jurisdiction_code, tax_type, name, effective_from, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        jurisdiction_code:
+          type: string
+        tax_type:
+          $ref: '#/components/schemas/TaxType'
+        name:
+          type: string
+        rate:
+          type: number
+          format: double
+        effective_from:
+          type: string
+          format: date
+        effective_to:
+          type: string
+          format: date
+        active:
+          type: boolean
+    CreateTaxRuleRequest:
+      type: object
+      required: [jurisdiction_code, tax_type, name, effective_from]
+      properties:
+        jurisdiction_code:
+          type: string
+        tax_type:
+          $ref: '#/components/schemas/TaxType'
+        name:
+          type: string
+        rate:
+          type: number
+          format: double
+        effective_from:
+          type: string
+          format: date
+        effective_to:
+          type: string
+          format: date
+    TaxReturn:
+      type: object
+      required: [id, company_id, period_id, return_type, status, total_due]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        period_id:
+          type: string
+          format: uuid
+        return_type:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaxReturnStatus'
+        total_due:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        submitted_at:
+          type: string
+          format: date-time
+    CreateTaxReturnRequest:
+      type: object
+      required: [company_id, period_id, return_type]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        period_id:
+          type: string
+          format: uuid
+        return_type:
+          type: string
+    TaxReturnValidationResult:
+      type: object
+      required: [return_id, valid, issues]
+      properties:
+        return_id:
+          type: string
+          format: uuid
+        valid:
+          type: boolean
+        issues:
+          type: array
+          items:
+            type: string
+    SubmitTaxReturnRequest:
+      type: object
+      required: [submitted_by, declaration]
+      properties:
+        submitted_by:
+          type: string
+          format: uuid
+        declaration:
+          type: string
+    TaxReturnSubmission:
+      type: object
+      required: [id, return_id, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        return_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        external_reference:
+          type: string
+    TaxPayment:
+      type: object
+      required: [id, return_id, amount, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        return_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        paid_at:
+          type: string
+          format: date-time
+    CreateTaxPaymentRequest:
+      type: object
+      required: [return_id, amount]
+      properties:
+        return_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+    TaxAuditPack:
+      type: object
+      required: [id, return_id, status, artifact_count]
+      properties:
+        id:
+          type: string
+          format: uuid
+        return_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [DRAFT, GENERATING, READY, ARCHIVED]
+        artifact_count:
+          type: integer
+    CreateTaxAuditPackRequest:
+      type: object
+      required: [return_id]
+      properties:
+        return_id:
+          type: string
+          format: uuid
+    PaginatedTaxPeriods:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaxPeriod'
+    PaginatedTaxRules:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaxRule'
+    PaginatedTaxReturns:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaxReturn'
+    PaginatedTaxPayments:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaxPayment'
+    PaginatedTaxAuditPacks:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TaxAuditPack'
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+    ValidationError:
+      type: object
+      required: [error, message, fields]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        fields:
+          type: array
+          items:
+            type: string
+security:
+- bearerAuth: []

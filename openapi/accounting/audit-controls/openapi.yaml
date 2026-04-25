@@ -1,0 +1,405 @@
+openapi: 3.1.0
+info:
+  title: Audit Controls
+  version: 1.0.0
+  description: Cross-service accounting controls service for approval policies, segregation rules, signature requests, audit events, and control exceptions.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
+servers:
+- url: http://localhost:8022/api/v1/accounting/audit-controls
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/accounting/audit-controls
+  description: Audit Controls API
+tags:
+- name: approval-policies
+  description: Approval policies and matrices
+- name: segregation-rules
+  description: Segregation-of-duties rules
+- name: signatures
+  description: Electronic signature requests
+- name: audit-events
+  description: Immutable audit event stream
+- name: control-exceptions
+  description: Accounting control exceptions and remediation
+paths:
+  /approval-policies:
+    get:
+      operationId: list_approval_policies
+      summary: List approval policies
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: service_name
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated approval policies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApprovalPolicies'
+    post:
+      operationId: create_approval_policy
+      summary: Create approval policy
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApprovalPolicyRequest'
+      responses:
+        '201':
+          description: Approval policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalPolicy'
+  /segregation-rules:
+    get:
+      operationId: list_segregation_rules
+      summary: List segregation rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated segregation rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSegregationRules'
+    post:
+      operationId: create_segregation_rule
+      summary: Create segregation rule
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegregationRuleRequest'
+      responses:
+        '201':
+          description: Segregation rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegregationRule'
+  /signature-requests:
+    get:
+      operationId: list_signature_requests
+      summary: List signature requests
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SignatureStatus'
+      responses:
+        '200':
+          description: Paginated signature requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSignatureRequests'
+    post:
+      operationId: create_signature_request
+      summary: Create signature request
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSignatureRequest'
+      responses:
+        '201':
+          description: Signature request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignatureRequest'
+  /signature-requests/{id}/sign:
+    post:
+      operationId: sign_signature_request
+      summary: Sign signature request
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+      responses:
+        '200':
+          description: Signature request signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignatureRequest'
+  /audit-events:
+    get:
+      operationId: list_audit_events
+      summary: List audit events
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: service_name
+        in: query
+        schema:
+          type: string
+      - name: entity_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated audit events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditEvents'
+  /control-exceptions:
+    get:
+      operationId: list_control_exceptions
+      summary: List control exceptions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/ExceptionStatus'
+      responses:
+        '200':
+          description: Paginated control exceptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedControlExceptions'
+    post:
+      operationId: create_control_exception
+      summary: Create control exception
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateControlExceptionRequest'
+      responses:
+        '201':
+          description: Control exception created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlException'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    SignatureStatus:
+      type: string
+      enum: [REQUESTED, SIGNED, REJECTED, EXPIRED, CANCELLED]
+    ExceptionStatus:
+      type: string
+      enum: [OPEN, WAIVED, REMEDIATED, REJECTED, CLOSED]
+    ApprovalPolicy:
+      type: object
+      required: [id, service_name, action_name, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        action_name:
+          type: string
+        active:
+          type: boolean
+        minimum_approvals:
+          type: integer
+    CreateApprovalPolicyRequest:
+      type: object
+      required: [service_name, action_name]
+      properties:
+        service_name:
+          type: string
+        action_name:
+          type: string
+        minimum_approvals:
+          type: integer
+    SegregationRule:
+      type: object
+      required: [id, service_name, initiator_role, approver_role, active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        initiator_role:
+          type: string
+        approver_role:
+          type: string
+        active:
+          type: boolean
+    CreateSegregationRuleRequest:
+      type: object
+      required: [service_name, initiator_role, approver_role]
+      properties:
+        service_name:
+          type: string
+        initiator_role:
+          type: string
+        approver_role:
+          type: string
+    SignatureRequest:
+      type: object
+      required: [id, service_name, entity_id, requested_by, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        entity_id:
+          type: string
+          format: uuid
+        requested_by:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/SignatureStatus'
+    CreateSignatureRequest:
+      type: object
+      required: [service_name, entity_id, requested_by]
+      properties:
+        service_name:
+          type: string
+        entity_id:
+          type: string
+          format: uuid
+        requested_by:
+          type: string
+          format: uuid
+    SignRequest:
+      type: object
+      required: [signed_by, declaration]
+      properties:
+        signed_by:
+          type: string
+          format: uuid
+        declaration:
+          type: string
+    AuditEvent:
+      type: object
+      required: [id, service_name, entity_id, action, actor_id, occurred_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        entity_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+        actor_id:
+          type: string
+          format: uuid
+        occurred_at:
+          type: string
+          format: date-time
+    ControlException:
+      type: object
+      required: [id, service_name, entity_id, status, reason]
+      properties:
+        id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        entity_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ExceptionStatus'
+        reason:
+          type: string
+    CreateControlExceptionRequest:
+      type: object
+      required: [service_name, entity_id, reason]
+      properties:
+        service_name:
+          type: string
+        entity_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+    PaginatedApprovalPolicies:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ApprovalPolicy' } } } }]
+    PaginatedSegregationRules:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SegregationRule' } } } }]
+    PaginatedSignatureRequests:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SignatureRequest' } } } }]
+    PaginatedAuditEvents:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/AuditEvent' } } } }]
+    PaginatedControlExceptions:
+      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ControlException' } } } }]
+    PaginatedResponse:
+      type: object
+      required: [total, page, limit]
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+security:
+- bearerAuth: []
