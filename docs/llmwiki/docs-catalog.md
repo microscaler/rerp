@@ -17,6 +17,7 @@ Inventory of source material that this wiki synthesizes. This is not a complete 
 
 - [`docs/OPENAPI_SPEC_AUDIT.md`](../OPENAPI_SPEC_AUDIT.md) — Current maturity/gap analysis across suites.
 - [`docs/OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md`](../OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md) — Accounting suite benchmark against Odoo Enterprise, including the canonical target state and definition-of-done criteria for world-class accounting engines.
+- [`docs/ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md`](../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md) — Second-phase accounting gap analysis versus SAP S/4HANA Finance, Microsoft Dynamics 365 Finance, NetSuite, Sage Intacct, Workday, and other enterprise finance systems after the current documented target is delivered.
 - [`docs/OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md`](../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md) — Actionable service-by-service mapping from RERP accounting specs to Odoo Enterprise workflow/module anchors and proposed OpenAPI backlog resources.
 - [`docs/ACCOUNTING_BDD_FEATURE_BACKLOG.md`](../ACCOUNTING_BDD_FEATURE_BACKLOG.md) — Broad behavior-driven accounting feature backlog; maps maturity themes to high-level Given/When/Then scenarios before granular feature/test explosion.
 - [`docs/accounting/rules-engines/`](../accounting/rules-engines/) — Contract-first design dossiers for accounting rules engines, including detailed reconciliation and report expression engine designs plus scaffold dossiers for later engines.

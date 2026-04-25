@@ -9,7 +9,7 @@
 
 RERP accounting service specs have grown beyond the older skeleton assessment: the service-level OpenAPI files cover general ledger, invoicing, AR/AP, bank sync, assets, budgets, EDI, financial reports, tax compliance, documents extraction, treasury, consolidation, revenue recognition, lease accounting, and audit controls.
 
-Compared to Odoo Enterprise, the remaining gap is enterprise depth rather than basic scaffolding.
+Compared to Odoo Enterprise, the remaining gap is enterprise depth rather than basic scaffolding. A second-phase benchmark now lives in `docs/ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md`; use it when planning beyond the current documented target toward SAP S/4HANA Finance, Microsoft Dynamics 365 Finance, NetSuite, Sage Intacct, or Workday-level parity.
 
 ## Generator Coverage Status
 
@@ -90,6 +90,22 @@ The accounting suite now has a broader service contract baseline:
 
 For a world-class accounting deliverable, the next work should turn these contracts into deeper accounting engines: reconciliation rule semantics, report expression models, AR follow-up policy execution, AP payment rails, tax filing adapters, extraction confidence/review models, consolidation eliminations, recognition posting controls, and audit evidence immutability.
 
+## Enterprise ERP Parity Gaps
+
+If the documented accounting target is delivered, RERP should be considered competitive with serious cloud ERP accounting products on core workflows and especially strong for OpenAPI-first automation. It should not yet be positioned as SAP S/4HANA Finance or Microsoft Dynamics 365 Finance equivalent.
+
+Second-phase parity work should capture:
+
+- Multi-ledger, accounting principles, adjustment books, parallel posting, and GAAP/IFRS reporting semantics.
+- Enterprise close management with task orchestration, dependencies, evidence packs, approvals, balance certifications, and variance explanations.
+- Deep consolidation: ownership structures, consolidation methods, currency translation, minority interest, intercompany matching, eliminations, and consolidation journals.
+- Localization factory: country tax packs, legal updates, statutory filings, e-invoicing, EDI, payment formats, audit files, and certification tracking.
+- Governance, risk, and compliance: segregation of duties, access review, approval limits, policy attestations, control testing, and audit evidence retention.
+- Enterprise integration ecosystem for banks, tax providers, payroll, expenses, procurement, inventory, projects, subscriptions, data warehouses, and spreadsheet workflows.
+- Implementation and production proof: data migration, opening balances, cutover validation, benchmarks, SLOs, observability, disaster recovery, and support playbooks.
+
+Use `docs/ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md` before making enterprise parity claims or planning post-Odoo-gap workstreams.
+
 ## Service Map Addendum
 
 `docs/OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md` converts the comparison into a backlog-style map. Use it before editing accounting specs because it ties each RERP service to Odoo Enterprise module anchors and suggested OpenAPI resources.
@@ -105,6 +121,7 @@ Highest-priority targets from that map now that generator coverage is fixed:
 ## Cross-References
 
 - [`../../OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md`](../../OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md) — Full analysis.
+- [`../../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md`](../../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md) — Enterprise ERP parity gaps after the current target is delivered.
 - [`../../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md`](../../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md) — Actionable service-by-service backlog map.
 - [`suite-aware-brrtrouter-wrapper.md`](./suite-aware-brrtrouter-wrapper.md) — BFF generation path guardrails.
 - [`service-implementation-and-database-layout.md`](./service-implementation-and-database-layout.md) — Service/entity/database responsibilities.

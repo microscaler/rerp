@@ -135,3 +135,11 @@ Aligned the RERP Tiltfile with the suite-aware microservice discovery model.
 - Service ports come from the suite config, the BFF/legacy fallback comes from `port-registry.json`, and Rust package names are read from each service's `impl/Cargo.toml`.
 - `bff-spec-gen` watches all configured accounting specs, including contract-only services, and runs `rerp bff generate-system --suite accounting`.
 - Fixed the namespace resource binding and verified the Tiltfile with `tilt alpha tiltfile-result --file Tiltfile`.
+
+## [2026-04-25] analysis | accounting enterprise ERP parity gaps
+
+Captured the second-phase accounting gaps after the current documented target is delivered.
+
+- Added [`../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md`](../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md) comparing the delivered RERP target against SAP S/4HANA Finance, Microsoft Dynamics 365 Finance, NetSuite, Sage Intacct, Workday, and similar finance suites.
+- Documented remaining enterprise gaps: multi-ledger/accounting-principle models, close management, consolidation, intercompany, localization factory, tax/legal updates, payment rails, treasury, revenue recognition, lease accounting, controlling, procurement/inventory/project/payroll integrations, GRC, reporting UX, migration tooling, scale proof, ecosystem, and industry variants.
+- Updated [`docs-catalog.md`](./docs-catalog.md) and [`topics/accounting-openapi-odoo-gap.md`](./topics/accounting-openapi-odoo-gap.md) so future planning treats this as a post-target enterprise parity track.
