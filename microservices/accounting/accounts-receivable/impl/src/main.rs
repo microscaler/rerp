@@ -7,9 +7,9 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
 // Use generated code from gen crate
-use accounts_receivable_service_api::handlers::*;
-use accounts_receivable_service_api::registry::*;
-use accounts_receivable_service_api::*;
+use rerp_accounting_accounts_receivable::handlers::*;
+use rerp_accounting_accounts_receivable::registry::*;
+use rerp_accounting_accounts_receivable::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
@@ -319,10 +319,10 @@ fn main() -> io::Result<()> {
     // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
     // set for local testing.
     // This returns a coroutine JoinHandle; we join on it to keep the server running
-    let router = std::sync::Arc::new(std::sync::RwLock::new(Router::new(routes.clone())));
-    // Dump initial route table
-    router.read().unwrap().dump_routes();
-    let dispatcher = std::sync::Arc::new(std::sync::RwLock::new(dispatcher));
+    let router = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(Router::new(routes.clone())));
+    // Dump initial route table — ArcSwap load is infallible.
+    router.load().dump_routes();
+    let dispatcher = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(dispatcher));
     let mut service = AppService::new(
         router,
         dispatcher,

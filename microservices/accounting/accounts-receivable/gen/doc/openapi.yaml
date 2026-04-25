@@ -2,126 +2,131 @@ openapi: 3.1.0
 info:
   title: Accounts Receivable
   version: 1.0.0
-  description: Accounts receivable service managing customer invoices and collections.
+  description: 'Accounts receivable management service handling customer invoices, payments, collections, and aging analysis. Supports the full AR lifecycle: invoice creation, payment application, credit memos, dispute management, and aging reporting. Integrates with the general ledger for account posting.'
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
 - url: http://localhost:8003/api/v1/accounting/accounts-receivable
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/accounts-receivable
   description: Accounts Receivable API
-tags: []
+tags:
+- name: customer-invoices
+  description: Customer invoices and their AR status
+- name: payments
+  description: Customer payments and payment applications
+- name: credit-memos
+  description: Credit memos for returns, adjustments, and disputes
+- name: collections
+  description: Collection activities, dunning, and follow-ups
+- name: aging
+  description: Accounts receivable aging analysis and bucketing
+- name: reports
+  description: Aging summary and collections reports
 paths:
   /customer-invoices:
     get:
       operationId: list_customer_invoices
-      summary: List customer-invoices
+      summary: List customer invoices
+      description: Paginated list of all customer invoices with AR-specific fields including aging bucket and outstanding amounts.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by customer name, invoice reference, or status
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - PARTIAL
+          - PAID
+          - WRITTEN_OFF
+          - DISPUTED
+      - name: aging_bucket
+        in: query
+        schema:
+          type: string
+          enum:
+          - CURRENT
+          - 1-30
+          - 31-60
+          - 61-90
+          - 90+
+          - INVALID
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 3
+      - name: days_overdue_min
+        in: query
+        schema:
+          type: integer
+        description: Minimum days overdue filter
+      - name: days_overdue_max
+        in: query
+        schema:
+          type: integer
+        description: Maximum days overdue filter
       responses:
         '200':
-          description: List of customer-invoices
+          description: Paginated list of customer invoices
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CustomerInvoice'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Customer invoices
-                  value:
-                    items:
-                    - id: a0030e8400-e29b-41d4-a716-446655440000
-                      invoice_id: a0010e8400-e29b-41d4-a716-446655440000
-                      customer_id: 111e8400-e29b-41d4-a716-446655440001
-                      original_amount: 11000.0
-                      outstanding_amount: 11000.0
-                      currency_code: USD
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T09:00:00Z'
-                      updated_at: '2024-01-15T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Customer invoices
-                  value:
-                    items:
-                    - id: b0030e8400-e29b-41d4-a716-446655440000
-                      invoice_id: b0010e8400-e29b-41d4-a716-446655440000
-                      customer_id: 222e8400-e29b-41d4-a716-446655440001
-                      original_amount: 550.0
-                      outstanding_amount: 550.0
-                      currency_code: USD
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency customer invoices
-                  value:
-                    items:
-                    - id: c0030e8400-e29b-41d4-a716-446655440000
-                      invoice_id: c0010e8400-e29b-41d4-a716-446655440000
-                      customer_id: 333e8400-e29b-41d4-a716-446655440001
-                      original_amount: 11000.0
-                      outstanding_amount: 11000.0
-                      currency_code: EUR
-                      status: OUTSTANDING
-                      aging_bucket: CURRENT
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T07:00:00Z'
-                      updated_at: '2024-01-25T07:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedCustomerInvoices'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_customer_invoice
-      summary: Create customer-invoice
+      summary: Create customer invoice
+      description: Create a new AR record for an invoice. Links the invoice to the customer and initializes the outstanding amount tracking.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create customer invoice for Acme Corporation
-                value:
-                  invoice_id: a0010e8400-e29b-41d4-a716-446655440000
-                  customer_id: 111e8400-e29b-41d4-a716-446655440001
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create customer invoice for TechStart Inc
-                value:
-                  invoice_id: b0010e8400-e29b-41d4-a716-446655440000
-                  customer_id: 222e8400-e29b-41d4-a716-446655440001
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency customer invoice
-                value:
-                  invoice_id: c0010e8400-e29b-41d4-a716-446655440000
-                  customer_id: 333e8400-e29b-41d4-a716-446655440001
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: CustomerInvoice created
@@ -129,52 +134,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerInvoice'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation customer invoice created
-                  value:
-                    id: a0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T09:00:00Z'
-                techStartResponse:
-                  summary: TechStart customer invoice created
-                  value:
-                    id: b0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing customer invoice created
-                  value:
-                    id: c0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    original_amount: 0.0
-                    outstanding_amount: 0.0
-                    currency_code: EUR
-                    status: OUTSTANDING
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T07:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Credit limit exceeded for customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /customer-invoices/{id}:
     get:
       operationId: get_customer_invoice
-      summary: Get customer-invoice by id
+      summary: Get customer invoice by id
+      description: Retrieve a single customer invoice with its full AR details including aging, payment history, and credit memo history.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -184,59 +161,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: CustomerInvoice details
+          description: CustomerInvoice details with AR context
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerInvoice'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation customer invoice
-                  value:
-                    id: a0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    original_amount: 11000.0
-                    outstanding_amount: 11000.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T09:00:00Z'
-                techStartExample:
-                  summary: TechStart customer invoice
-                  value:
-                    id: b0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    original_amount: 550.0
-                    outstanding_amount: 550.0
-                    currency_code: USD
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing customer invoice
-                  value:
-                    id: c0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    original_amount: 11000.0
-                    outstanding_amount: 11000.0
-                    currency_code: EUR
-                    status: OUTSTANDING
-                    aging_bucket: CURRENT
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T07:00:00Z'
+                $ref: '#/components/schemas/CustomerInvoiceWithDetails'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_customer_invoice
-      summary: Update customer-invoice
+      summary: Update customer invoice
+      description: Update an AR record's status or aging bucket. Does not modify the base invoice.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -250,22 +190,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation customer invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
-              techStartUpdate:
-                summary: Update TechStart customer invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing customer invoice
-                value:
-                  status: PARTIAL
-                  aging_bucket: 1-30
       responses:
         '200':
           description: CustomerInvoice updated
@@ -273,54 +197,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerInvoice'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation customer invoice updated
-                  value:
-                    id: a0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: a0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    original_amount: 11000.0
-                    outstanding_amount: 5500.0
-                    currency_code: USD
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T09:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart customer invoice updated
-                  value:
-                    id: b0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: b0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    original_amount: 550.0
-                    outstanding_amount: 275.0
-                    currency_code: USD
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing customer invoice updated
-                  value:
-                    id: c0030e8400-e29b-41d4-a716-446655440000
-                    invoice_id: c0010e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    original_amount: 11000.0
-                    outstanding_amount: 5500.0
-                    currency_code: EUR
-                    status: PARTIAL
-                    aging_bucket: 1-30
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T07:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_customer_invoice
-      summary: Delete customer-invoice
+      summary: Delete customer invoice
+      description: Delete a customer invoice record. Only allowed for invoices in DRAFT status.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -333,133 +220,115 @@ paths:
           description: CustomerInvoice deleted
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete confirmed or paid invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
       operationId: list_payments
       summary: List payments
+      description: Paginated list of all customer payments with filtering by status, date range, customer, and payment method.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by reference number or customer
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - APPLIED
+          - APPLIED_PARTIAL
+          - REFUNDED
+          - FAILED
+      - name: payment_method
+        in: query
+        schema:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - CREDIT_CARD
+          - ACH
+          - CASH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Payment date from (inclusive)
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Payment date to (inclusive)
       responses:
         '200':
-          description: List of payments
+          description: Paginated list of payments
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Payment'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - AR payments
-                  value:
-                    items:
-                    - id: a0040e8400-e29b-41d4-a716-446655440000
-                      payment_number: AR-PAY-2024-001
-                      payment_date: '2024-01-20'
-                      customer_id: 111e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 5500.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      payment_method: WIRE
-                      status: POSTED
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-20T10:00:00Z'
-                      updated_at: '2024-01-20T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - AR payments
-                  value:
-                    items:
-                    - id: b0040e8400-e29b-41d4-a716-446655440000
-                      payment_number: AR-PAY-2024-100
-                      payment_date: '2024-01-25'
-                      customer_id: 222e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 275.0
-                      currency_code: USD
-                      exchange_rate: 1.0
-                      payment_method: CHECK
-                      status: POSTED
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-25T09:00:00Z'
-                      updated_at: '2024-01-25T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency AR payments
-                  value:
-                    items:
-                    - id: c0040e8400-e29b-41d4-a716-446655440000
-                      payment_number: AR-PAY-2024-200
-                      payment_date: '2024-01-30'
-                      customer_id: 333e8400-e29b-41d4-a716-446655440001
-                      payment_amount: 5500.0
-                      currency_code: EUR
-                      exchange_rate: 0.92
-                      payment_method: WIRE
-                      status: POSTED
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-30T08:00:00Z'
-                      updated_at: '2024-01-30T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedPayments'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_payment
       summary: Create payment
+      description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is true.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create AR payment for Acme Corporation
-                value:
-                  payment_number: AR-PAY-2024-001
-                  payment_date: '2024-01-20'
-                  customer_id: 111e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 5500.0
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  payment_method: WIRE
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create AR payment for TechStart Inc
-                value:
-                  payment_number: AR-PAY-2024-100
-                  payment_date: '2024-01-25'
-                  customer_id: 222e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 275.0
-                  currency_code: USD
-                  exchange_rate: 1.0
-                  payment_method: CHECK
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency AR payment
-                value:
-                  payment_number: AR-PAY-2024-200
-                  payment_date: '2024-01-30'
-                  customer_id: 333e8400-e29b-41d4-a716-446655440001
-                  payment_amount: 5500.0
-                  currency_code: EUR
-                  exchange_rate: 0.92
-                  payment_method: WIRE
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: Payment created
@@ -467,58 +336,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AR payment created
-                  value:
-                    id: a0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: DRAFT
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AR payment created
-                  value:
-                    id: b0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 275.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: DRAFT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AR payment created
-                  value:
-                    id: c0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: DRAFT
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T08:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /payments/{id}:
     get:
       operationId: get_payment
       summary: Get payment by id
+      description: Retrieve payment details with full application history.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -528,62 +357,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: Payment details
+          description: Payment details with applications
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation AR payment
-                  value:
-                    id: a0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                techStartExample:
-                  summary: TechStart AR payment
-                  value:
-                    id: b0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 275.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing AR payment
-                  value:
-                    id: c0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T08:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_payment
       summary: Update payment
+      description: Update a payment's details. Only pending or partially applied payments can be modified.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -597,22 +386,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePaymentRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation AR payment
-                value:
-                  status: POSTED
-                  payment_method: WIRE
-              techStartUpdate:
-                summary: Update TechStart AR payment
-                value:
-                  status: POSTED
-                  payment_method: CHECK
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing AR payment
-                value:
-                  status: POSTED
-                  payment_method: WIRE
       responses:
         '200':
           description: Payment updated
@@ -620,57 +393,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payment'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AR payment updated
-                  value:
-                    id: a0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-001
-                    payment_date: '2024-01-20'
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-20T10:00:00Z'
-                    updated_at: '2024-01-20T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart AR payment updated
-                  value:
-                    id: b0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-100
-                    payment_date: '2024-01-25'
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 275.0
-                    currency_code: USD
-                    exchange_rate: 1.0
-                    payment_method: CHECK
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-25T09:00:00Z'
-                    updated_at: '2024-01-25T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AR payment updated
-                  value:
-                    id: c0040e8400-e29b-41d4-a716-446655440000
-                    payment_number: AR-PAY-2024-200
-                    payment_date: '2024-01-30'
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    payment_amount: 5500.0
-                    currency_code: EUR
-                    exchange_rate: 0.92
-                    payment_method: WIRE
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-30T08:00:00Z'
-                    updated_at: '2024-01-30T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update fully applied or refunded payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_payment
       summary: Delete payment
+      description: Delete a payment. Only pending payments can be deleted. Applied payments must be voided instead.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -683,121 +422,349 @@ paths:
           description: Payment deleted
         '404':
           description: Not found
-  /ar-agings:
-    get:
-      operationId: list_ar_agings
-      summary: List ar-agings
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of ar-agings
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ArAging'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - AR aging analysis
-                  value:
-                    items:
-                    - id: a00a0e8400-e29b-41d4-a716-446655440000
-                      customer_id: 111e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 5500.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 5500.0
-                      currency_code: USD
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-31T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - AR aging analysis
-                  value:
-                    items:
-                    - id: b00a0e8400-e29b-41d4-a716-446655440000
-                      customer_id: 222e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 275.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 275.0
-                      currency_code: USD
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-31T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency AR aging
-                  value:
-                    items:
-                    - id: c00a0e8400-e29b-41d4-a716-446655440000
-                      customer_id: 333e8400-e29b-41d4-a716-446655440001
-                      aging_date: '2024-01-31'
-                      current: 5500.0
-                      days_31_60: 0.0
-                      days_61_90: 0.0
-                      days_91_120: 0.0
-                      over_120: 0.0
-                      total_outstanding: 5500.0
-                      currency_code: EUR
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-31T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete applied payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/{id}/applications:
+    get:
+      operationId: list_payment_applications
+      summary: List payment applications
+      description: Get all payment applications for a specific payment.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: List of payment applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentApplication'
+        '404':
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/applications:
+    post:
+      operationId: create_payment_application
+      summary: Apply payment to invoice
+      description: Apply an amount from a payment to a specific customer invoice. Supports partial applications.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentApplicationRequest'
+      responses:
+        '201':
+          description: Payment application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentApplication'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Payment or invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Payment or invoice is in invalid state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /payments/{id}/auto-apply:
+    post:
+      operationId: auto_apply_payment
+      summary: Auto-apply payment
+      description: Automatically apply a payment to the oldest outstanding customer invoices.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Auto-apply results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentApplicationResult'
+        '404':
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /credit-memos:
+    get:
+      operationId: list_credit_memos
+      summary: List credit memos
+      description: Paginated list of all credit memos with filtering by customer, reason, and status.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: reason
+        in: query
+        schema:
+          type: string
+          enum:
+          - RETURN
+          - OVERCHARGE
+          - DAMAGE
+          - DISCOUNT
+          - DISPUTE
+          - ADJUSTMENT
+          - OTHER
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - APPLIED
+          - AVAILABLE
+      responses:
+        '200':
+          description: Paginated list of credit memos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCreditMemos'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_credit_memo
+      summary: Create credit memo
+      description: Create a new credit memo for returns, adjustments, or dispute settlements.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCreditMemoRequest'
+      responses:
+        '201':
+          description: CreditMemo created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditMemo'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /collections:
+    get:
+      operationId: list_collection_activities
+      summary: List collection activities
+      description: Paginated list of all collection activities with filtering by customer, type, and follow-up status.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: activity_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - PHONE
+          - EMAIL
+          - LETTER
+          - VISIT
+          - REMINDER
+          - DUNNING
+          - DISPUTE
+          - PAYMENT_PLAN
+      - name: assigned_to
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: due_before
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Follow-up due before this date
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated list of collection activities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCollections'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_collection_activity
+      summary: Create collection activity
+      description: Record a new collection activity (call, email, letter, etc.) against a customer invoice.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCollectionActivityRequest'
+      responses:
+        '201':
+          description: CollectionActivity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionActivity'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /ar-agings:
+    get:
+      operationId: list_ar_agings
+      summary: List AR aging records
+      description: List all AR aging analysis records, optionally filtered by customer or company.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated list of AR aging records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedArAgings'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_ar_aging
-      summary: Create ar-aging
+      summary: Create AR aging record
+      description: Create a new AR aging record for analysis. Usually auto-generated by scheduled jobs.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateArAgingRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create AR aging for Acme Corporation
-                value:
-                  customer_id: 111e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create AR aging for TechStart Inc
-                value:
-                  customer_id: 222e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency AR aging
-                value:
-                  customer_id: 333e8400-e29b-41d4-a716-446655440001
-                  aging_date: '2024-01-31'
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: ArAging created
@@ -805,58 +772,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArAging'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AR aging created
-                  value:
-                    id: a00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AR aging created
-                  value:
-                    id: b00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AR aging created
-                  value:
-                    id: c00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 0.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 0.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /ar-agings/{id}:
     get:
       operationId: get_ar_aging
-      summary: Get ar-aging by id
+      summary: Get AR aging record by id
+      description: Get a specific AR aging record with detailed bucket breakdown.
       parameters:
       - name: id
         in: path
@@ -871,178 +797,113 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArAging'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation AR aging
-                  value:
-                    id: a00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 5500.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 5500.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart AR aging
-                  value:
-                    id: b00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 275.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 275.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing AR aging
-                  value:
-                    id: c00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 5500.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 5500.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
         '404':
           description: Not found
-    put:
-      operationId: update_ar_aging
-      summary: Update ar-aging
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateArAgingRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation AR aging
-                value:
-                  current: 6000.0
-                  total_outstanding: 6000.0
-              techStartUpdate:
-                summary: Update TechStart AR aging
-                value:
-                  current: 300.0
-                  total_outstanding: 300.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing AR aging
-                value:
-                  current: 6000.0
-                  total_outstanding: 6000.0
-      responses:
-        '200':
-          description: ArAging updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArAging'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation AR aging updated
-                  value:
-                    id: a00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 111e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 6000.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 6000.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart AR aging updated
-                  value:
-                    id: b00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 222e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 300.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 300.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing AR aging updated
-                  value:
-                    id: c00a0e8400-e29b-41d4-a716-446655440000
-                    customer_id: 333e8400-e29b-41d4-a716-446655440001
-                    aging_date: '2024-01-31'
-                    current: 6000.0
-                    days_31_60: 0.0
-                    days_61_90: 0.0
-                    days_91_120: 0.0
-                    over_120: 0.0
-                    total_outstanding: 6000.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_ar_aging
-      summary: Delete ar-aging
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/aging-summary:
+    get:
+      operationId: aging_summary
+      summary: Aging summary report
+      description: Generate a company-wide or customer-specific AR aging summary with DSO and collection efficiency metrics.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: company_id
+        in: query
         schema:
           type: string
           format: uuid
+        description: Filter by company
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by customer
+      - name: as_of_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Date for aging calculation. Defaults to today.
       responses:
-        '204':
-          description: ArAging deleted
-        '404':
-          description: Not found
+        '200':
+          description: Aging summary with metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgingSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reports/collections-summary:
+    get:
+      operationId: collections_summary
+      summary: Collections summary report
+      description: Generate a summary of all collection activities for a period.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Collections summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_activities:
+                    type: integer
+                  by_type:
+                    type: object
+                  response_rate:
+                    type: number
+                  upcoming_follow_ups:
+                    type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     CustomerInvoice:
       type: object
@@ -1050,21 +911,47 @@ components:
       - id
       - invoice_id
       - customer_id
+      - currency_code
+      - status
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for this AR record
         invoice_id:
           type: string
           format: uuid
+          description: Reference to the base Invoice entity in the Invoice service
         customer_id:
           type: string
           format: uuid
+          description: Customer/partner this invoice is for
+        original_amount:
+          type: number
+          format: double
+          description: Original invoice amount in invoice currency
+          example: 11000.0
         outstanding_amount:
           type: number
-          format: decimal
-        days_overdue:
-          type: integer
+          format: double
+          description: Remaining unpaid amount
+          example: 11000.0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+          description: ISO 4217 currency code
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - PARTIAL
+          - PAID
+          - WRITTEN_OFF
+          - DISPUTED
+          description: AR status of this invoice
         aging_bucket:
           type: string
           enum:
@@ -1073,421 +960,910 @@ components:
           - 31-60
           - 61-90
           - 90+
+          - INVALID
+          description: Aging bucket calculated from due date and current date
+        company_id:
+          type: string
+          format: uuid
+          description: Company this invoice belongs to
+        due_date:
+          type: string
+          format: date
           nullable: true
-        credit_limit:
-          type: number
-          format: decimal
-          nullable: true
-        credit_used:
-          type: number
-          format: decimal
-          nullable: true
-        collection_status:
+          description: Payment due date
+        terms:
           type: string
           enum:
-          - NORMAL
-          - WARNING
-          - COLLECTION
-          - LEGAL
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - DUE_ON_RECEIPT
+          - CUSTOM
+          description: Payment terms
+        credit_limit_check:
+          type: boolean
           nullable: true
-        last_payment_date:
-          type: string
-          format: date
-          nullable: true
-        last_payment_amount:
-          type: number
-          format: decimal
-          nullable: true
-        write_off_amount:
-          type: number
-          format: decimal
-          nullable: true
-        write_off_date:
-          type: string
-          format: date
-          nullable: true
-        write_off_reason:
-          type: string
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
+          description: Whether this invoice passed credit limit validation
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-    Payment:
+    CustomerInvoiceWithDetails:
+      allOf:
+      - $ref: '#/components/schemas/CustomerInvoice'
+      - type: object
+        properties:
+          days_overdue:
+            type: integer
+            nullable: true
+            description: Days past due (0 if not overdue)
+          payment_history:
+            type: array
+            items:
+              $ref: '#/components/schemas/PaymentApplication'
+            description: Payment applications against this invoice
+          credit_memo_history:
+            type: array
+            items:
+              $ref: '#/components/schemas/CreditMemo'
+            description: Credit memos applied to this invoice
+    CreateCustomerInvoiceRequest:
       type: object
       required:
-      - id
+      - invoice_id
       - customer_id
-      - payment_number
-      - payment_date
-      - payment_amount
-      - payment_method
-      - status
       - currency_code
       properties:
-        id:
+        invoice_id:
           type: string
           format: uuid
+          description: Base Invoice entity reference
         customer_id:
           type: string
           format: uuid
-        payment_number:
-          type: string
-          maxLength: 100
-        payment_date:
-          type: string
-          format: date
-        payment_amount:
-          type: number
-          format: decimal
+          description: Customer/partner
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        exchange_rate:
-          type: number
-          format: decimal
-        payment_method:
+          pattern: ^[A-Z]{3}$
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          description: Payment due date. Defaults to invoice date + terms if not provided.
+        terms:
           type: string
           enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
-          - OTHER
-        payment_reference:
-          type: string
-          nullable: true
-        bank_account_id:
-          type: string
-          format: uuid
-          nullable: true
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - POSTED
-          - RECONCILED
-          - CANCELLED
-        reconciled_at:
-          type: string
-          format: date-time
-          nullable: true
-        reconciled_by:
-          type: string
-          format: uuid
-          nullable: true
-        applied_amount:
-          type: number
-          format: decimal
-        unapplied_amount:
-          type: number
-          format: decimal
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - DUE_ON_RECEIPT
+          - CUSTOM
+        credit_limit_check:
+          type: boolean
+          default: true
+          description: Whether to check customer credit limit
         company_id:
           type: string
           format: uuid
           nullable: true
+    UpdateCustomerInvoiceRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - PARTIAL
+          - PAID
+          - WRITTEN_OFF
+          - DISPUTED
+        aging_bucket:
+          type: string
+          enum:
+          - CURRENT
+          - 1-30
+          - 31-60
+          - 61-90
+          - 90+
+          - INVALID
+        due_date:
+          type: string
+          format: date
+        terms:
+          type: string
+          enum:
+          - NET_15
+          - NET_30
+          - NET_45
+          - NET_60
+          - DUE_ON_RECEIPT
+          - CUSTOM
+        credit_limit_check:
+          type: boolean
+    Payment:
+      type: object
+      required:
+      - id
+      - amount
+      - currency_code
+      - payment_method
+      - payment_date
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the payment
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: External reference (check number, wire reference, etc.)
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Payment amount
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: ^[A-Z]{3}$
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - CREDIT_CARD
+          - ACH
+          - CASH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+          description: Date the payment was received
+        status:
+          type: string
+          enum:
+          - PENDING
+          - APPLIED
+          - APPLIED_PARTIAL
+          - REFUNDED
+          - FAILED
+        customer_id:
+          type: string
+          format: uuid
+          description: Customer who made the payment
+        company_id:
+          type: string
+          format: uuid
+          description: Company this payment belongs to
+        posted_to_gl:
+          type: boolean
+          default: false
+          description: Whether payment has been posted to general ledger
+        gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL journal entry created for this payment
         notes:
           type: string
+          maxLength: 1000
           nullable: true
-        metadata:
-          type: object
-          nullable: true
+          description: Payment notes
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-        created_by:
+        applied_at:
           type: string
-          format: uuid
+          format: date-time
           nullable: true
-        updated_by:
+          description: When payment was applied to invoices
+    CreatePaymentRequest:
+      type: object
+      required:
+      - amount
+      - currency_code
+      - payment_method
+      - payment_date
+      - customer_id
+      properties:
+        reference_number:
+          type: string
+          maxLength: 100
+          nullable: true
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - CREDIT_CARD
+          - ACH
+          - CASH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+        customer_id:
           type: string
           format: uuid
+        company_id:
+          type: string
+          format: uuid
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+        auto_apply:
+          type: boolean
+          default: false
+          description: Automatically apply this payment to oldest outstanding invoices
+    UpdatePaymentRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - CREDIT_CARD
+          - ACH
+          - CASH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - PENDING
+          - APPLIED
+          - APPLIED_PARTIAL
+          - REFUNDED
+          - FAILED
+        notes:
+          type: string
+          maxLength: 1000
           nullable: true
     PaymentApplication:
       type: object
       required:
       - id
       - payment_id
-      - invoice_id
+      - customer_invoice_id
       - applied_amount
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for the application record
         payment_id:
           type: string
           format: uuid
-        invoice_id:
+          description: Payment being applied
+        customer_invoice_id:
+          type: string
+          format: uuid
+          description: Customer invoice being paid
+        applied_amount:
+          type: number
+          format: double
+          minimum: 0
+          description: Amount applied from payment to this invoice
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency of the applied amount
+        created_at:
+          type: string
+          format: date-time
+    CreatePaymentApplicationRequest:
+      type: object
+      required:
+      - payment_id
+      - customer_invoice_id
+      - applied_amount
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+        customer_invoice_id:
           type: string
           format: uuid
         applied_amount:
           type: number
-          format: decimal
-        applied_at:
-          type: string
-          format: date-time
-        applied_by:
-          type: string
-          format: uuid
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    ArAging:
+          format: double
+          minimum: 0
+    CreditMemo:
       type: object
       required:
       - id
-      - customer_id
-      - aging_date
+      - customer_invoice_id
+      - amount
       - currency_code
+      - reason
       properties:
         id:
           type: string
           format: uuid
-        customer_id:
-          type: string
-          format: uuid
-        aging_date:
-          type: string
-          format: date
-        current:
-          type: number
-          format: decimal
-        days_31_60:
-          type: number
-          format: decimal
-        days_61_90:
-          type: number
-          format: decimal
-        days_91_120:
-          type: number
-          format: decimal
-        over_120:
-          type: number
-          format: decimal
-        total_outstanding:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
+          description: Unique identifier for this credit memo
+        reference_id:
           type: string
           format: uuid
           nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    CreateCustomerInvoiceRequest:
-      type: object
-      required:
-      - invoice_id
-      - customer_id
-      properties:
-        invoice_id:
+          description: Optional external reference (RMA number, etc.)
+        customer_invoice_id:
           type: string
           format: uuid
+          description: Invoice this credit memo relates to
         customer_id:
           type: string
           format: uuid
-        credit_limit:
+          description: Customer this credit memo is for
+        amount:
           type: number
-          format: decimal
-        collection_status:
-          type: string
-          enum:
-          - NORMAL
-          - WARNING
-          - COLLECTION
-          - LEGAL
-    UpdateCustomerInvoiceRequest:
-      type: object
-      properties:
-        outstanding_amount:
+          format: double
+          minimum: 0
+          description: Credit memo amount
+        remaining_amount:
           type: number
-          format: decimal
-        aging_bucket:
-          type: string
-          enum:
-          - CURRENT
-          - 1-30
-          - 31-60
-          - 61-90
-          - 90+
-        collection_status:
-          type: string
-          enum:
-          - NORMAL
-          - WARNING
-          - COLLECTION
-          - LEGAL
-        write_off_amount:
-          type: number
-          format: decimal
-        write_off_date:
-          type: string
-          format: date
-        write_off_reason:
-          type: string
-    CreatePaymentRequest:
-      type: object
-      required:
-      - customer_id
-      - payment_number
-      - payment_date
-      - payment_amount
-      - payment_method
-      - currency_code
-      properties:
-        customer_id:
-          type: string
-          format: uuid
-        payment_number:
-          type: string
-          maxLength: 100
-        payment_date:
-          type: string
-          format: date
-        payment_amount:
-          type: number
-          format: decimal
+          format: double
+          description: Remaining unapplied credit
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        exchange_rate:
-          type: number
-          format: decimal
-        payment_method:
+        reason:
           type: string
           enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
-          - OTHER
-        payment_reference:
-          type: string
-        bank_account_id:
-          type: string
-          format: uuid
-        notes:
-          type: string
-        company_id:
-          type: string
-          format: uuid
-    UpdatePaymentRequest:
-      type: object
-      properties:
-        payment_date:
-          type: string
-          format: date
-        payment_amount:
-          type: number
-          format: decimal
-        payment_method:
-          type: string
-          enum:
-          - CHECK
-          - WIRE
-          - ACH
-          - CASH
-          - CREDIT_CARD
+          - RETURN
+          - OVERCHARGE
+          - DAMAGE
+          - DISCOUNT
+          - DISPUTE
+          - ADJUSTMENT
           - OTHER
         status:
           type: string
           enum:
           - DRAFT
-          - POSTED
-          - RECONCILED
-          - CANCELLED
-        notes:
+          - APPLIED
+          - AVAILABLE
+        description:
           type: string
-    CreatePaymentApplicationRequest:
+          maxLength: 1000
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateCreditMemoRequest:
       type: object
       required:
-      - payment_id
-      - invoice_id
-      - applied_amount
+      - customer_invoice_id
+      - amount
+      - currency_code
+      - reason
       properties:
-        payment_id:
+        reference_id:
           type: string
           format: uuid
-        invoice_id:
+          nullable: true
+        customer_invoice_id:
           type: string
           format: uuid
-        applied_amount:
+        amount:
           type: number
-          format: decimal
-        notes:
+          format: double
+          minimum: 0
+        currency_code:
           type: string
-    UpdatePaymentApplicationRequest:
+          minLength: 3
+          maxLength: 3
+        reason:
+          type: string
+          enum:
+          - RETURN
+          - OVERCHARGE
+          - DAMAGE
+          - DISCOUNT
+          - DISPUTE
+          - ADJUSTMENT
+          - OTHER
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+    CollectionActivity:
       type: object
+      required:
+      - id
+      - customer_invoice_id
+      - activity_type
+      - date
       properties:
-        applied_amount:
-          type: number
-          format: decimal
+        id:
+          type: string
+          format: uuid
+        customer_invoice_id:
+          type: string
+          format: uuid
+          description: Invoice this activity relates to
+        activity_type:
+          type: string
+          enum:
+          - PHONE
+          - EMAIL
+          - LETTER
+          - VISIT
+          - REMINDER
+          - DUNNING
+          - DISPUTE
+          - PAYMENT_PLAN
+        date:
+          type: string
+          format: date
         notes:
           type: string
+          maxLength: 2000
+          nullable: true
+        next_follow_up_date:
+          type: string
+          format: date
+          nullable: true
+        assigned_to:
+          type: string
+          format: uuid
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateCollectionActivityRequest:
+      type: object
+      required:
+      - customer_invoice_id
+      - activity_type
+      - date
+      properties:
+        customer_invoice_id:
+          type: string
+          format: uuid
+        activity_type:
+          type: string
+          enum:
+          - PHONE
+          - EMAIL
+          - LETTER
+          - VISIT
+          - REMINDER
+          - DUNNING
+          - DISPUTE
+          - PAYMENT_PLAN
+        date:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+        next_follow_up_date:
+          type: string
+          format: date
+          nullable: true
+        assigned_to:
+          type: string
+          format: uuid
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+    ArAging:
+      type: object
+      required:
+      - id
+      - customer_id
+      - company_id
+      - as_of_date
+      - current
+      - bucket_1_30
+      - bucket_31_60
+      - bucket_61_90
+      - bucket_90_plus
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+          description: Customer this aging report is for
+        company_id:
+          type: string
+          format: uuid
+          description: Company this aging report is for
+        as_of_date:
+          type: string
+          format: date
+          description: Date as of which aging is calculated
+        current:
+          type: number
+          format: double
+          description: Total outstanding in CURRENT bucket
+        bucket_1_30:
+          type: number
+          format: double
+          description: Total outstanding in 1-30 days bucket
+        bucket_31_60:
+          type: number
+          format: double
+          description: Total outstanding in 31-60 days bucket
+        bucket_61_90:
+          type: number
+          format: double
+          description: Total outstanding in 61-90 days bucket
+        bucket_90_plus:
+          type: number
+          format: double
+          description: Total outstanding in 90+ days bucket
+        total_outstanding:
+          type: number
+          format: double
+          description: Sum of all buckets
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency of the aging amounts
+        invoice_count:
+          type: integer
+          description: Number of invoices in aging
+        created_at:
+          type: string
+          format: date-time
     CreateArAgingRequest:
       type: object
       required:
       - customer_id
-      - aging_date
-      - currency_code
+      - company_id
+      - as_of_date
       properties:
         customer_id:
           type: string
           format: uuid
-        aging_date:
+        company_id:
+          type: string
+          format: uuid
+        as_of_date:
+          type: string
+          format: date
+    UpdateArAgingRequest:
+      type: object
+      properties: {}
+    CustomerCreditLimit:
+      type: object
+      required:
+      - customer_id
+      - company_id
+      - credit_limit
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        credit_limit:
+          type: number
+          format: double
+          minimum: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        current_exposure:
+          type: number
+          format: double
+        available_credit:
+          type: number
+          format: double
+        allow_over_limit:
+          type: boolean
+          default: false
+        review_date:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaginatedCustomerInvoices:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerInvoice'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedPayments:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedCreditMemos:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditMemo'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedCollections:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollectionActivity'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedArAgings:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArAging'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Customer invoice not found
+        details:
+          type: object
+          nullable: true
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Payment exceeds outstanding amount
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: amount
+              message:
+                type: string
+                example: Payment amount exceeds outstanding invoice balance
+    AgingSummary:
+      type: object
+      required:
+      - company_id
+      - as_of_date
+      - total_outstanding
+      - current
+      - bucket_1_30
+      - bucket_31_60
+      - bucket_61_90
+      - bucket_90_plus
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        as_of_date:
           type: string
           format: date
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-    UpdateArAgingRequest:
-      type: object
-      properties:
-        current:
-          type: number
-          format: decimal
-        days_31_60:
-          type: number
-          format: decimal
-        days_61_90:
-          type: number
-          format: decimal
-        days_91_120:
-          type: number
-          format: decimal
-        over_120:
-          type: number
-          format: decimal
         total_outstanding:
           type: number
-          format: decimal
+          format: double
+        current:
+          type: number
+          format: double
+        bucket_1_30:
+          type: number
+          format: double
+        bucket_31_60:
+          type: number
+          format: double
+        bucket_61_90:
+          type: number
+          format: double
+        bucket_90_plus:
+          type: number
+          format: double
+        days_sales_outstanding:
+          type: number
+          format: double
+          description: DSO metric
+        collection_efficiency_index:
+          type: number
+          format: double
+          description: CEI metric
+        bad_debt_reserves:
+          type: number
+          format: double
+          description: Estimated bad debt (90+ bucket * reserve_rate)
+    PaymentApplicationResult:
+      type: object
+      required:
+      - payment_id
+      - total_applied
+      - unapplied_amount
+      - applications
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+        total_applied:
+          type: number
+          format: double
+          description: Total amount applied across all invoices
+        unapplied_amount:
+          type: number
+          format: double
+          description: Remaining unapplied amount
+        applications:
+          type: array
+          items:
+            type: object
+            properties:
+              customer_invoice_id:
+                type: string
+                format: uuid
+              applied_amount:
+                type: number
+                format: double
+              invoice_outstanding_before:
+                type: number
+                format: double
+              invoice_outstanding_after:
+                type: number
+                format: double
+security:
+- bearerAuth: []

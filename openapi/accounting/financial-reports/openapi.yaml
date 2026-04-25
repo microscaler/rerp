@@ -472,6 +472,99 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /report-definitions:
+    get:
+      operationId: list_report_definitions
+      summary: List report definitions
+      responses:
+        '200':
+          description: Report definitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportDefinitions'
+    post:
+      operationId: create_report_definition
+      summary: Create report definition
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportDefinitionRequest'
+      responses:
+        '201':
+          description: Report definition created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDefinition'
+  /report-definitions/{id}/lines:
+    get:
+      operationId: list_report_definition_lines
+      summary: List report definition lines
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Report definition lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReportDefinitionLines'
+  /report-cells/{id}/drill-down:
+    get:
+      operationId: drill_down_report_cell
+      summary: Drill down from a report cell to source lines
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Source-line drill-down result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportCellDrillDown'
+  /report-exports:
+    post:
+      operationId: create_report_export
+      summary: Create report export
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportExportRequest'
+      responses:
+        '202':
+          description: Report export accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportExport'
+  /statutory-report-packs:
+    get:
+      operationId: list_statutory_report_packs
+      summary: List statutory report packs
+      responses:
+        '200':
+          description: Statutory report packs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStatutoryReportPacks'
 components:
   securitySchemes:
     bearerAuth:
@@ -1173,6 +1266,185 @@ components:
           type: string
           format: date-time
           nullable: true
+    ReportDefinition:
+      type: object
+      required:
+      - id
+      - name
+      - report_type
+      - active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        report_type:
+          type: string
+          enum:
+          - BALANCE_SHEET
+          - INCOME_STATEMENT
+          - CASH_FLOW
+          - GENERAL_LEDGER
+          - PARTNER_LEDGER
+          - AGED_RECEIVABLE
+          - AGED_PAYABLE
+          - TAX_REPORT
+          - STATUTORY
+        active:
+          type: boolean
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+    CreateReportDefinitionRequest:
+      type: object
+      required:
+      - name
+      - report_type
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        report_type:
+          type: string
+          enum:
+          - BALANCE_SHEET
+          - INCOME_STATEMENT
+          - CASH_FLOW
+          - GENERAL_LEDGER
+          - PARTNER_LEDGER
+          - AGED_RECEIVABLE
+          - AGED_PAYABLE
+          - TAX_REPORT
+          - STATUTORY
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        active:
+          type: boolean
+          default: true
+    ReportDefinitionLine:
+      type: object
+      required:
+      - id
+      - definition_id
+      - sequence
+      - label
+      - expression
+      properties:
+        id:
+          type: string
+          format: uuid
+        definition_id:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+        label:
+          type: string
+        expression:
+          type: string
+          description: Expression evaluated by the report engine.
+        parent_line_id:
+          type: string
+          format: uuid
+          nullable: true
+    ReportCellDrillDown:
+      type: object
+      required:
+      - cell_id
+      - source_lines
+      properties:
+        cell_id:
+          type: string
+          format: uuid
+        source_lines:
+          type: array
+          items:
+            type: object
+            required:
+            - source_id
+            - source_type
+            - amount
+            properties:
+              source_id:
+                type: string
+                format: uuid
+              source_type:
+                type: string
+              amount:
+                type: number
+                format: double
+              description:
+                type: string
+    CreateReportExportRequest:
+      type: object
+      required:
+      - report_execution_id
+      - format
+      properties:
+        report_execution_id:
+          type: string
+          format: uuid
+        format:
+          type: string
+          enum:
+          - PDF
+          - XLSX
+          - CSV
+          - JSON
+        requested_by:
+          type: string
+          format: uuid
+    ReportExport:
+      type: object
+      required:
+      - id
+      - report_execution_id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_execution_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - GENERATING
+          - READY
+          - FAILED
+        artifact_uri:
+          type: string
+          nullable: true
+    StatutoryReportPack:
+      type: object
+      required:
+      - id
+      - jurisdiction_code
+      - report_type
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        jurisdiction_code:
+          type: string
+        report_type:
+          type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - GENERATING
+          - READY
+          - FILED
+          - ARCHIVED
     PaginatedCustomReports:
       type: object
       required:
@@ -1193,6 +1465,42 @@ components:
           type: integer
         has_more:
           type: boolean
+    PaginatedReportDefinitions:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportDefinition'
+        total:
+          type: integer
+    PaginatedReportDefinitionLines:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReportDefinitionLine'
+        total:
+          type: integer
+    PaginatedStatutoryReportPacks:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatutoryReportPack'
+        total:
+          type: integer
     PaginatedReportExecutions:
       type: object
       required:

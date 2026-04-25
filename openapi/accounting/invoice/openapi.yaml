@@ -714,6 +714,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /invoices/{id}/register-payment:
+    post:
+      operationId: register_invoice_payment
+      summary: Register invoice payment
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInvoicePaymentRequest'
+      responses:
+        '201':
+          description: Invoice payment registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoicePayment'
+  /invoices/{id}/payment-matches:
+    get:
+      operationId: list_invoice_payment_matches
+      summary: List invoice payment matches
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Invoice payment matches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoicePaymentMatches'
+  /invoices/{id}/credit-note:
+    post:
+      operationId: create_invoice_credit_note
+      summary: Create invoice credit note
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceCreditNoteRequest'
+      responses:
+        '201':
+          description: Credit note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+  /invoices/{id}/e-invoice-handoff:
+    post:
+      operationId: handoff_invoice_to_einvoice
+      summary: Handoff invoice to e-invoicing
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: E-invoice handoff accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceHandoff'
+  /invoices/{id}/deferral-handoff:
+    post:
+      operationId: handoff_invoice_to_deferral
+      summary: Handoff invoice to revenue recognition deferral
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Deferral handoff accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceHandoff'
 components:
   securitySchemes:
     bearerAuth:
@@ -1266,6 +1372,100 @@ components:
           maxLength: 1000
           nullable: true
           description: Action notes
+    RegisterInvoicePaymentRequest:
+      type: object
+      required: [amount, currency_code, payment_date, payment_method]
+      properties:
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_date:
+          type: string
+          format: date
+        payment_method:
+          type: string
+        external_reference:
+          type: string
+          nullable: true
+    InvoicePayment:
+      type: object
+      required: [id, invoice_id, amount, currency_code, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        status:
+          type: string
+          enum: [REGISTERED, MATCHED, POSTED, REVERSED]
+    InvoicePaymentMatch:
+      type: object
+      required: [id, invoice_id, payment_id, amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+    CreateInvoiceCreditNoteRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+        amount:
+          type: number
+          format: double
+          nullable: true
+    InvoiceHandoff:
+      type: object
+      required: [id, invoice_id, target_service, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        target_service:
+          type: string
+          enum: [EDI, REVENUE_RECOGNITION]
+        status:
+          type: string
+          enum: [QUEUED, ACCEPTED, FAILED]
+        external_reference:
+          type: string
+          nullable: true
+    PaginatedInvoicePaymentMatches:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicePaymentMatch'
+        total:
+          type: integer
     PaginatedInvoices:
       type: object
       required:

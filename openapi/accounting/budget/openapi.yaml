@@ -465,6 +465,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationError'
+  /budgets/{id}/confirm:
+    post:
+      operationId: confirm_budget
+      summary: Confirm budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget confirmed
+  /budgets/{id}/cancel:
+    post:
+      operationId: cancel_budget
+      summary: Cancel budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget cancelled
+  /budgets/{id}/complete:
+    post:
+      operationId: complete_budget
+      summary: Complete budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget completed
+  /budgets/{id}/reopen:
+    post:
+      operationId: reopen_budget
+      summary: Reopen budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget reopened
+  /budget-revisions:
+    get:
+      operationId: list_budget_revisions
+      summary: List budget revisions
+      responses:
+        '200':
+          description: Budget revisions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBudgetRevisions'
+    post:
+      operationId: create_budget_revision
+      summary: Create budget revision
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBudgetRevisionRequest'
+      responses:
+        '201':
+          description: Budget revision created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetRevision'
 components:
   securitySchemes:
     bearerAuth:
@@ -1039,6 +1127,63 @@ components:
         updated_at:
           type: string
           format: date-time
+    BudgetRevision:
+      type: object
+      required: [id, budget_id, revision_number, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        budget_id:
+          type: string
+          format: uuid
+        revision_number:
+          type: integer
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED, REJECTED, APPLIED]
+        reason:
+          type: string
+          nullable: true
+        requested_by:
+          type: string
+          format: uuid
+          nullable: true
+    CreateBudgetRevisionRequest:
+      type: object
+      required: [budget_id, reason]
+      properties:
+        budget_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+        line_adjustments:
+          type: array
+          items:
+            type: object
+            required: [budget_line_id, revised_amount]
+            properties:
+              budget_line_id:
+                type: string
+                format: uuid
+              revised_amount:
+                type: number
+                format: double
+        requested_by:
+          type: string
+          format: uuid
+          nullable: true
+    PaginatedBudgetRevisions:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetRevision'
+        total:
+          type: integer
     PaginatedBudgets:
       type: object
       required:

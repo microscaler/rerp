@@ -758,6 +758,142 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /reconciliation-models:
+    get:
+      operationId: list_reconciliation_models
+      summary: List reconciliation models
+      responses:
+        '200':
+          description: Reconciliation models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReconciliationModels'
+    post:
+      operationId: create_reconciliation_model
+      summary: Create reconciliation model
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReconciliationModelRequest'
+      responses:
+        '201':
+          description: Reconciliation model created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationModel'
+  /transactions/{id}/suggestions:
+    get:
+      operationId: get_transaction_reconciliation_suggestions
+      summary: Get reconciliation suggestions for a transaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Ranked reconciliation suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationSuggestions'
+  /transactions/{id}/reconcile:
+    post:
+      operationId: reconcile_transaction
+      summary: Reconcile transaction
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconcileTransactionRequest'
+      responses:
+        '200':
+          description: Transaction reconciled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationResult'
+  /transactions/{id}/unreconcile:
+    post:
+      operationId: unreconcile_transaction
+      summary: Unreconcile transaction
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Transaction unreconciled
+  /transactions/{id}/write-off:
+    post:
+      operationId: create_transaction_write_off
+      summary: Create transaction write-off
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionWriteOffRequest'
+      responses:
+        '201':
+          description: Write-off created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationAdjustment'
+  /transactions/{id}/exchange-difference:
+    post:
+      operationId: create_transaction_exchange_difference
+      summary: Create exchange-difference entry for transaction
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExchangeDifferenceRequest'
+      responses:
+        '201':
+          description: Exchange-difference entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationAdjustment'
 components:
   securitySchemes:
     bearerAuth:
@@ -1557,6 +1693,246 @@ components:
           type: number
           format: double
           description: Available balance (total - pending)
+    ReconciliationModel:
+      type: object
+      required:
+      - id
+      - name
+      - rule_type
+      - active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        rule_type:
+          type: string
+          enum:
+          - EXACT_MATCH
+          - AMOUNT_TOLERANCE
+          - REFERENCE_MATCH
+          - COUNTERPARTY_MATCH
+          - WRITE_OFF
+          - TRANSFER
+        sequence:
+          type: integer
+          minimum: 1
+        active:
+          type: boolean
+        match_tolerance_amount:
+          type: number
+          format: double
+          nullable: true
+        match_tolerance_days:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateReconciliationModelRequest:
+      type: object
+      required:
+      - name
+      - rule_type
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        rule_type:
+          type: string
+          enum:
+          - EXACT_MATCH
+          - AMOUNT_TOLERANCE
+          - REFERENCE_MATCH
+          - COUNTERPARTY_MATCH
+          - WRITE_OFF
+          - TRANSFER
+        sequence:
+          type: integer
+          minimum: 1
+        active:
+          type: boolean
+          default: true
+        match_tolerance_amount:
+          type: number
+          format: double
+          nullable: true
+        match_tolerance_days:
+          type: integer
+          nullable: true
+    ReconciliationSuggestion:
+      type: object
+      required:
+      - candidate_id
+      - candidate_type
+      - confidence
+      properties:
+        candidate_id:
+          type: string
+          format: uuid
+        candidate_type:
+          type: string
+          enum:
+          - INVOICE
+          - PAYMENT
+          - JOURNAL_ENTRY
+          - TRANSFER
+          - WRITE_OFF
+        confidence:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        model_id:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+    ReconciliationSuggestions:
+      type: object
+      required:
+      - transaction_id
+      - suggestions
+      properties:
+        transaction_id:
+          type: string
+          format: uuid
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReconciliationSuggestion'
+    ReconcileTransactionRequest:
+      type: object
+      required:
+      - matched_entry_id
+      - matched_entry_type
+      properties:
+        matched_entry_id:
+          type: string
+          format: uuid
+        matched_entry_type:
+          type: string
+          enum:
+          - INVOICE
+          - PAYMENT
+          - JOURNAL_ENTRY
+          - TRANSFER
+          - OTHER
+        write_off_amount:
+          type: number
+          format: double
+          nullable: true
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+    ReconciliationResult:
+      type: object
+      required:
+      - transaction_id
+      - status
+      properties:
+        transaction_id:
+          type: string
+          format: uuid
+        reconciliation_id:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum:
+          - MATCHED
+          - RECONCILED
+          - PARTIALLY_RECONCILED
+        journal_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+    CreateTransactionWriteOffRequest:
+      type: object
+      required:
+      - amount
+      - account_id
+      - reason
+      properties:
+        amount:
+          type: number
+          format: double
+        account_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 500
+        tax_code:
+          type: string
+          nullable: true
+    CreateExchangeDifferenceRequest:
+      type: object
+      required:
+      - amount
+      - currency_code
+      - account_id
+      properties:
+        amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        account_id:
+          type: string
+          format: uuid
+        exchange_rate_id:
+          type: string
+          format: uuid
+          nullable: true
+    ReconciliationAdjustment:
+      type: object
+      required:
+      - id
+      - transaction_id
+      - adjustment_type
+      - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        transaction_id:
+          type: string
+          format: uuid
+        adjustment_type:
+          type: string
+          enum:
+          - WRITE_OFF
+          - EXCHANGE_DIFFERENCE
+        amount:
+          type: number
+          format: double
+        journal_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+    PaginatedReconciliationModels:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReconciliationModel'
+        total:
+          type: integer
     ErrorResponse:
       type: object
       required:

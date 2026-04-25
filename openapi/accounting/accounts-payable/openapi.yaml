@@ -630,6 +630,124 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /payment-batches:
+    get:
+      operationId: list_payment_batches
+      summary: List payment batches
+      responses:
+        '200':
+          description: Payment batches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentBatches'
+    post:
+      operationId: create_payment_batch
+      summary: Create payment batch
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentBatchRequest'
+      responses:
+        '201':
+          description: Payment batch created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentBatch'
+  /payment-batches/{id}/approve:
+    post:
+      operationId: approve_payment_batch
+      summary: Approve payment batch
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Payment batch approved
+  /payment-batches/{id}/export-payment-file:
+    post:
+      operationId: export_payment_batch_file
+      summary: Export payment batch file
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportPaymentFileRequest'
+      responses:
+        '202':
+          description: Payment file generation accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFileExport'
+  /vendor-invoices/{id}/register-payment:
+    post:
+      operationId: register_vendor_invoice_payment
+      summary: Register vendor invoice payment
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterVendorInvoicePaymentRequest'
+      responses:
+        '201':
+          description: Vendor payment registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorPayment'
+  /vendor-invoices/{id}/three-way-match:
+    post:
+      operationId: perform_vendor_invoice_three_way_match
+      summary: Perform three-way match for vendor invoice
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreeWayMatchRequest'
+      responses:
+        '200':
+          description: Three-way match result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreeWayMatchResult'
 components:
   securitySchemes:
     bearerAuth:
@@ -1298,6 +1416,218 @@ components:
                 type: number
                 format: double
           description: Daily breakdown
+    PaymentBatch:
+      type: object
+      required:
+      - id
+      - company_id
+      - status
+      - payment_method
+      - total_amount
+      - currency_code
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PENDING_APPROVAL
+          - APPROVED
+          - FILE_GENERATING
+          - EXPORTED
+          - SENT
+          - CANCELLED
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        total_amount:
+          type: number
+          format: double
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_count:
+          type: integer
+        scheduled_payment_date:
+          type: string
+          format: date
+    CreatePaymentBatchRequest:
+      type: object
+      required:
+      - company_id
+      - payment_method
+      - vendor_invoice_ids
+      - scheduled_payment_date
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        vendor_invoice_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        scheduled_payment_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+    ExportPaymentFileRequest:
+      type: object
+      required:
+      - file_format
+      properties:
+        file_format:
+          type: string
+          enum:
+          - ISO20022
+          - SEPA_CREDIT_TRANSFER
+          - NACHA
+          - CHECK_PRINT
+          - CSV
+        requested_by:
+          type: string
+          format: uuid
+    PaymentFileExport:
+      type: object
+      required:
+      - id
+      - batch_id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        batch_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - GENERATING
+          - READY
+          - FAILED
+        artifact_uri:
+          type: string
+          nullable: true
+    RegisterVendorInvoicePaymentRequest:
+      type: object
+      required:
+      - amount
+      - currency_code
+      - payment_method
+      - payment_date
+      properties:
+        amount:
+          type: number
+          format: double
+          minimum: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        payment_method:
+          type: string
+          enum:
+          - WIRE
+          - CHECK
+          - ACH
+          - BANK_TRANSFER
+          - PAYMENT_GATEWAY
+          - COUNTER_SERVICE
+        payment_date:
+          type: string
+          format: date
+        reference_number:
+          type: string
+          nullable: true
+    ThreeWayMatchRequest:
+      type: object
+      required:
+      - purchase_order_id
+      - receipt_ids
+      properties:
+        purchase_order_id:
+          type: string
+          format: uuid
+        receipt_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        tolerance_amount:
+          type: number
+          format: double
+          nullable: true
+        tolerance_percent:
+          type: number
+          format: double
+          nullable: true
+    ThreeWayMatchResult:
+      type: object
+      required:
+      - vendor_invoice_id
+      - matched
+      - variance_count
+      properties:
+        vendor_invoice_id:
+          type: string
+          format: uuid
+        matched:
+          type: boolean
+        variance_count:
+          type: integer
+        variances:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - expected
+            - actual
+            properties:
+              field:
+                type: string
+              expected:
+                type: string
+              actual:
+                type: string
+    PaginatedPaymentBatches:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentBatch'
+        total:
+          type: integer
     PaginatedVendorInvoices:
       type: object
       required:

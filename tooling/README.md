@@ -1,9 +1,17 @@
 # RERP Tooling — `rerp` CLI
 
-Thin wrapper around `brrtrouter_tooling` that translates brrtrouter commands into
+Suite-aware wrapper around `brrtrouter_tooling` that translates brrtrouter commands into
 RERP-style names and conventions. The wrapper lives in
 `tooling/src/rerp_tooling/cli/main.py` and is installed as the `rerp` entry
 point via `pyproject.toml`.
+
+> **Important for future LLM sessions**
+>
+> RERP must stay suite-nested because it contains multiple suites of systems:
+> `openapi/{suite}/{service}` and `microservices/{suite}/{service}`. Do not
+> flatten it to Hauliage's directory layout. Hauliage is the working reference
+> for naming and build semantics only: implementation crates are separate from
+> generated crates, and generated crates use the `_gen` suffix.
 
 ## Setup
 
@@ -75,8 +83,13 @@ Translates to:
 cargo build -p rerp_accounting_general_ledger
 ```
 
-**Note:** The suite is currently hardcoded to `accounting`. A future improvement
-is to derive it from the crate name or from `--suite`.
+The wrapper resolves the suite from `openapi/{suite}/{service}/openapi.yaml`,
+then reads `microservices/{suite}/{service}/impl/Cargo.toml` to find the actual
+implementation package. This prevents `cargo build -p` from accidentally
+targeting the generated crate when a checkout is mid-migration.
+
+Use `--suite <name>` or `RERP_SUITE=<name>` when the same service name exists in
+more than one suite.
 
 ### `docker build-image-simple <image> <template> <hash> <artifact>`
 
@@ -118,10 +131,17 @@ rerp docker build-base
 
 ### `bff generate-system`
 
-Generate the system-level BFF spec by aggregating all suite BFFs.
+Generate suite-local BFF specs by aggregating each suite's microservices.
 
 ```bash
 rerp bff generate-system
+```
+
+Default output is `openapi/{suite}/openapi_bff.yaml` for every suite with a
+`bff-suite-config.yaml`. For one suite:
+
+```bash
+rerp bff generate-system --suite accounting
 ```
 
 ### `bff generate`
@@ -154,8 +174,40 @@ Example: `general-ledger` in the `accounting` suite produces:
 - `rerp_accounting_general_ledger_gen` (gen lib crate)
 - `rerp_accounting_general_ledger` (impl binary crate)
 
-This is enforced by overriding `gen_cmd.default_gen_package_name` at runtime
-(see `main.py` lines 172-191).
+This is enforced by the wrapper's suite-aware package-name callbacks in
+`tooling/src/rerp_tooling/cli/main.py`.
+
+> **Naming Drift Guardrail (April 2026)**
+>
+> The wrapper now protects the Hauliage-style split while preserving RERP's
+> nested suites:
+> 1. `rerp gen suite <suite> --service <name>` names generated crates
+>    `rerp_<suite>_<module>_gen`.
+> 2. `rerp build microservice <name>` reads the impl manifest and builds the
+>    implementation package, not the generated package.
+> 3. `rerp bff generate-system` writes `openapi/{suite}/openapi_bff.yaml`.
+>
+> If an agent sees existing mixed names such as `<module>_service_api` or
+> `*_impl`, treat them as migration state. Do not encode those names as the
+> desired convention.
+
+## Known Issues
+
+### ArcSwap Pattern (Phase 1)
+
+All impl crates must use `arc_swap::ArcSwap<Router>` instead of `RwLock<Router>`:
+
+```rust
+// ✅ Correct (ArcSwap — used by AppService::new())
+let router = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(Router::new(routes.clone())));
+router.load().dump_routes();
+
+// ❌ Wrong (RwLock — causes type mismatch with AppService::new())
+let router = std::sync::Arc::new(std::sync::RwLock::new(Router::new(routes.clone())));
+router.read().unwrap().dump_routes();
+```
+
+Every impl crate needs `arc-swap = { workspace = true }` in its Cargo.toml.
 
 ## Architecture
 
@@ -166,11 +218,10 @@ rerp (tooling/.venv/bin/rerp)
         ├── gen stubs     → brrtrouter_tooling.cli.gen_cmd.run_gen_argv()
         ├── build         → brrtrouter_tooling.cli.build.run_build_argv()
         ├── docker        → brrtrouter_tooling.cli.docker_cmd.run_docker_argv()
-        ├── bff           → brrtrouter_tooling.cli.bff.run_bff_*_argv()
+        ├── bff           → suite planner + brrtrouter_tooling.cli.bff.run_bff_generate_system()
         └── pre-commit    → inline script (cargo fmt + rustfmt)
 ```
 
-The wrapper prepends the brrtrouter_tooling source path to `sys.path` so that
-imports resolve without the hauliage-style workspace patches. It then translates
-RERP-style commands into the brrtrouter equivalents and rewrites `sys.argv`
-before delegating.
+The wrapper prepends the brrtrouter_tooling source path to `sys.path`, derives
+suite/package data from the nested RERP tree, then translates RERP-style
+commands into the brrtrouter equivalents before delegating.

@@ -641,6 +641,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /asset-models:
+    get:
+      operationId: list_asset_models
+      summary: List asset models
+      responses:
+        '200':
+          description: Asset models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssetModels'
+    post:
+      operationId: create_asset_model
+      summary: Create asset model
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetModelRequest'
+      responses:
+        '201':
+          description: Asset model created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetModel'
+  /assets/{id}/validate:
+    post:
+      operationId: validate_asset
+      summary: Validate asset
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset validated
+  /assets/{id}/pause-depreciation:
+    post:
+      operationId: pause_asset_depreciation
+      summary: Pause asset depreciation
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset depreciation paused
+  /assets/{id}/resume-depreciation:
+    post:
+      operationId: resume_asset_depreciation
+      summary: Resume asset depreciation
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset depreciation resumed
+  /assets/{id}/modify:
+    post:
+      operationId: modify_asset
+      summary: Modify asset accounting values
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyAssetRequest'
+      responses:
+        '200':
+          description: Asset modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
 components:
   securitySchemes:
     bearerAuth:
@@ -1355,6 +1453,85 @@ components:
         company_id:
           type: string
           format: uuid
+    AssetModel:
+      type: object
+      required: [id, name, depreciation_method, useful_life_months]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+        useful_life_months:
+          type: integer
+          minimum: 1
+        residual_value_percent:
+          type: number
+          format: double
+          nullable: true
+        asset_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        depreciation_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        expense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+    CreateAssetModelRequest:
+      type: object
+      required: [name, depreciation_method, useful_life_months]
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+        useful_life_months:
+          type: integer
+          minimum: 1
+        residual_value_percent:
+          type: number
+          format: double
+          nullable: true
+    ModifyAssetRequest:
+      type: object
+      required: [effective_date, reason]
+      properties:
+        effective_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        new_useful_life_months:
+          type: integer
+          nullable: true
+        new_residual_value:
+          type: number
+          format: double
+          nullable: true
+        value_adjustment:
+          type: number
+          format: double
+          nullable: true
+    PaginatedAssetModels:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetModel'
+        total:
+          type: integer
     PaginatedAssets:
       type: object
       required:

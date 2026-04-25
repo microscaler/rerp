@@ -3,7 +3,7 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path aging_summary --force
 
-use accounts_receivable_service_api::handlers::aging_summary::{Request, Response};
+use rerp_accounting_accounts_receivable::handlers::aging_summary::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 

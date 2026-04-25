@@ -3,12 +3,12 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_credit_memos --force
 
-use accounts_receivable_service_api::handlers::list_credit_memos::{Request, Response};
+use rerp_accounting_accounts_receivable::handlers::list_credit_memos::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
-use accounts_receivable_service_api::handlers::types::CreditMemo;
+use rerp_accounting_accounts_receivable::handlers::types::CreditMemo;
 
 #[handler(ListCreditMemosController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -41,6 +41,34 @@ services:
     base_path: /api/financial-reports
     port: 8009
     spec_path: financial-reports/openapi.yaml
+  tax-compliance:
+    base_path: /api/tax-compliance
+    port: 8016
+    spec_path: tax-compliance/openapi.yaml
+  documents-extraction:
+    base_path: /api/documents-extraction
+    port: 8017
+    spec_path: documents-extraction/openapi.yaml
+  treasury:
+    base_path: /api/treasury
+    port: 8018
+    spec_path: treasury/openapi.yaml
+  consolidation:
+    base_path: /api/consolidation
+    port: 8019
+    spec_path: consolidation/openapi.yaml
+  revenue-recognition:
+    base_path: /api/revenue-recognition
+    port: 8020
+    spec_path: revenue-recognition/openapi.yaml
+  lease-accounting:
+    base_path: /api/lease-accounting
+    port: 8021
+    spec_path: lease-accounting/openapi.yaml
+  audit-controls:
+    base_path: /api/audit-controls
+    port: 8022
+    spec_path: audit-controls/openapi.yaml
 metadata:
   title: RERP Accounting Backend for Frontend API
   version: 1.0.0
