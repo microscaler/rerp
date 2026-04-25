@@ -16,4 +16,5 @@ RERP is composed of **suites of systems**. Each suite has:
 
 **Tooling (fully dynamic, no hardcoded suites)**
 - `assign-port.py`: Discovers suites via `_suites_with_bff()` (list `openapi/*/bff-suite-config.yaml`), BFF registry names from `bff_service_name` in each config, microservices by walking `openapi/{suite}/{name}/openapi.yaml`. No `BFF_SERVICE_TO_SUITE` or accounting-specific logic.
+- `rerp` CLI wrapper: RERP stays nested. Do **not** flatten to Hauliage's directory layout. Use Hauliage as the naming/build reference only: impl crate `rerp_{suite}_{service}`, generated crate `rerp_{suite}_{service}_gen`. The wrapper resolves suite from `openapi/{suite}/{service}/openapi.yaml`, reads the impl `Cargo.toml` package for builds, and writes BFF output to `openapi/{suite}/openapi_bff.yaml`.
 - `bff-generator`: `--config openapi/{suite}/bff-suite-config.yaml --output openapi/{suite}/openapi_bff.yaml`
