@@ -125,3 +125,13 @@ Added contract-first rules-engine design documentation.
 - Added detailed first-build dossiers for [`reconciliation-rules-engine.md`](../accounting/rules-engines/reconciliation-rules-engine.md) and [`report-expression-engine.md`](../accounting/rules-engines/report-expression-engine.md).
 - Added scaffold dossiers for tax compliance, document extraction/classification, consolidation eliminations, revenue recognition, lease accounting, and audit controls.
 - Updated [`docs-catalog.md`](./docs-catalog.md) and [`topics/accounting-openapi-odoo-gap.md`](./topics/accounting-openapi-odoo-gap.md).
+
+## [2026-04-25] implementation | Tilt accounting service autodetection
+
+Aligned the RERP Tiltfile with the suite-aware microservice discovery model.
+
+- Updated `Tiltfile` so accounting service contracts are discovered from `openapi/accounting/bff-suite-config.yaml` instead of a hardcoded `ACCOUNTING_SERVICES` list.
+- Runtime resources are now filtered by scaffold readiness: service OpenAPI spec, `gen` crate, `impl` crate, and Helm values must exist before Tilt stands up that service.
+- Service ports come from the suite config, the BFF/legacy fallback comes from `port-registry.json`, and Rust package names are read from each service's `impl/Cargo.toml`.
+- `bff-spec-gen` watches all configured accounting specs, including contract-only services, and runs `rerp bff generate-system --suite accounting`.
+- Fixed the namespace resource binding and verified the Tiltfile with `tilt alpha tiltfile-result --file Tiltfile`.

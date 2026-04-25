@@ -45,6 +45,12 @@ Use `--suite <name>` or `--system <name>` for one suite. `rerp bff generate --su
 
 The suite config is also the path namespacing contract. Each service can keep local paths such as `/payments`; the generated BFF must publish them under the configured service `base_path`, such as `/api/accounts-payable/payments` and `/api/accounts-receivable/payments`. Do not hand-rename service-local OpenAPI paths to avoid collisions.
 
+## Tilt Autodetection
+
+The root `Tiltfile` discovers accounting service contracts from `openapi/accounting/bff-suite-config.yaml` rather than maintaining a separate hardcoded service list. Tilt also reads service ports from that suite config, reads the BFF port from `port-registry.json`, and derives Rust implementation package names from each runtime service's `microservices/{suite}/{service}/impl/Cargo.toml`.
+
+Tilt intentionally separates **contract discovery** from **runtime readiness**. All configured service specs are watched by `bff-spec-gen`, including contract-only services such as `tax-compliance` and `documents-extraction`, so the generated BFF remains complete. Only services with `gen` and `impl` crates plus Helm values are stood up as runtime resources. When a new accounting service is scaffolded, adding it to `bff-suite-config.yaml` and providing the standard runtime files is enough for Tilt to include it.
+
 ## Gotchas And Drift
 
 > **Do not flatten RERP to Hauliage.**
@@ -59,6 +65,9 @@ The suite config is also the path namespacing contract. Each service can keep lo
 > **BFF public paths are namespaced.**
 > The BFF generator must prefix public paths with each service `base_path` from `bff-suite-config.yaml`. Local service path collisions are valid when they belong to different service namespaces.
 
+> **Do not reintroduce Tilt service lists.**
+> The accounting service inventory belongs in `openapi/accounting/bff-suite-config.yaml`. Tilt should derive runtime resources from that config and file-system readiness checks, not from duplicated arrays, package maps, or port maps.
+
 ## Verification
 
 Focused wrapper verification:
@@ -70,6 +79,14 @@ ruff format --check tooling/src/rerp_tooling/cli/main.py tooling/tests/test_rerp
 ```
 
 The 2026-04-25 wrapper update passed all focused tests and lints.
+
+Tiltfile evaluation:
+
+```bash
+tilt alpha tiltfile-result --file Tiltfile
+```
+
+The 2026-04-25 Tilt autodetection update passed Tiltfile evaluation.
 
 ## Cross-References
 

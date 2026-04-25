@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "next_port": 8016,
+  "next_port": 8023,
   "reserved_ports": [
     8080
   ],
@@ -19,11 +19,18 @@
     "idam": 8012,
     "amd": 8013,
     "marketing": 8014,
-    "billing": 8015
+    "billing": 8015,
+    "tax-compliance": 8016,
+    "documents-extraction": 8017,
+    "treasury": 8018,
+    "consolidation": 8019,
+    "revenue-recognition": 8020,
+    "lease-accounting": 8021,
+    "audit-controls": 8022
   },
   "metadata": {
     "description": "Port registry for RERP microservices",
-    "last_updated": "2026-01-24T02:42:39.708365",
+    "last_updated": "2026-04-25T02:52:00+03:00",
     "notes": "Ports start at 8001. Port 8080 is reserved due to conflicts."
   }
 }

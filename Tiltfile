@@ -56,6 +56,139 @@ docker_prune_settings(
 # RERP suite name (currently only "accounting" is implemented)
 RERP_SUITE = 'accounting'
 RERP_SUITE_NAME = 'rerp-' + RERP_SUITE
+RERP_SUITE_CONFIG = 'openapi/%s/bff-suite-config.yaml' % RERP_SUITE
+
+def _unquote(value):
+    return value.strip().strip('"').strip("'")
+
+def _parse_bff_suite_config(path):
+    content = str(read_file(path))
+    services = []
+    service_ports = {}
+    service_spec_paths = {}
+    bff_service_name = 'bff'
+    in_services = False
+    current = None
+
+    for raw in content.split('\n'):
+        stripped = raw.strip()
+        if not stripped or stripped.startswith('#'):
+            continue
+
+        if stripped.startswith('bff_service_name:'):
+            bff_service_name = _unquote(stripped.split(':', 1)[1])
+            continue
+
+        if stripped == 'services:':
+            in_services = True
+            current = None
+            continue
+
+        if in_services and not raw.startswith('  '):
+            in_services = False
+            current = None
+
+        if not in_services:
+            continue
+
+        if raw.startswith('  ') and not raw.startswith('    ') and stripped.endswith(':'):
+            current = stripped[:-1]
+            services.append(current)
+            continue
+
+        if current and raw.startswith('    ') and stripped.startswith('port:'):
+            service_ports[current] = _unquote(stripped.split(':', 1)[1])
+            continue
+
+        if current and raw.startswith('    ') and stripped.startswith('spec_path:'):
+            service_spec_paths[current] = _unquote(stripped.split(':', 1)[1])
+            continue
+
+    return {
+        'bff_service_name': bff_service_name,
+        'services': services,
+        'ports': service_ports,
+        'spec_paths': service_spec_paths,
+    }
+
+def _parse_port_registry(path):
+    content = str(read_file(path))
+    assignments = {}
+    in_assignments = False
+
+    for raw in content.split('\n'):
+        stripped = raw.strip()
+        if stripped.startswith('"assignments"'):
+            in_assignments = True
+            continue
+        if in_assignments and stripped.startswith('}'):
+            in_assignments = False
+            continue
+        if not in_assignments or ':' not in stripped:
+            continue
+
+        key = _unquote(stripped.split(':', 1)[0])
+        value = stripped.split(':', 1)[1].strip().rstrip(',')
+        if value:
+            assignments[key] = _unquote(value)
+
+    return assignments
+
+def _file_exists(path):
+    return str(local('test -e "%s" && echo yes || true' % path, quiet=True)).strip() == 'yes'
+
+def _runtime_ready_service(name):
+    spec_path = SERVICE_SPEC_PATHS.get(name, '%s/openapi.yaml' % name)
+    required = [
+        'openapi/%s/%s' % (RERP_SUITE, spec_path),
+        'microservices/%s/%s/gen/Cargo.toml' % (RERP_SUITE, name),
+        'microservices/%s/%s/impl/Cargo.toml' % (RERP_SUITE, name),
+        'helm/rerp-microservice/values/%s.yaml' % name,
+    ]
+    for path in required:
+        if not _file_exists(path):
+            return False
+    return True
+
+def _read_cargo_package_name(name):
+    manifest = 'microservices/%s/%s/impl/Cargo.toml' % (RERP_SUITE, name)
+    fallback = 'rerp_%s_%s' % (RERP_SUITE, name.replace('-', '_'))
+    if not _file_exists(manifest):
+        return fallback
+
+    content = str(read_file(manifest))
+    in_package = False
+    for raw in content.split('\n'):
+        stripped = raw.strip()
+        if stripped == '[package]':
+            in_package = True
+            continue
+        if stripped.startswith('[') and stripped != '[package]':
+            in_package = False
+            continue
+        if in_package and stripped.startswith('name = '):
+            return _unquote(stripped.split('=', 1)[1])
+    return fallback
+
+SUITE_CONFIG = _parse_bff_suite_config(RERP_SUITE_CONFIG)
+PORT_REGISTRY = _parse_port_registry('port-registry.json')
+DISCOVERED_ACCOUNTING_SERVICES = SUITE_CONFIG['services']
+SERVICE_PORTS = SUITE_CONFIG['ports']
+SERVICE_SPEC_PATHS = SUITE_CONFIG['spec_paths']
+BFF_SERVICE_NAME = SUITE_CONFIG['bff_service_name']
+
+ACCOUNTING_SERVICES = []
+CONTRACT_ONLY_ACCOUNTING_SERVICES = []
+for _service in DISCOVERED_ACCOUNTING_SERVICES:
+    if _runtime_ready_service(_service):
+        ACCOUNTING_SERVICES.append(_service)
+    else:
+        CONTRACT_ONLY_ACCOUNTING_SERVICES.append(_service)
+
+print('RERP Tilt discovered %d accounting service contracts from %s' % (len(DISCOVERED_ACCOUNTING_SERVICES), RERP_SUITE_CONFIG))
+print('RERP Tilt runtime-ready accounting services: %s' % ', '.join(ACCOUNTING_SERVICES))
+if CONTRACT_ONLY_ACCOUNTING_SERVICES:
+    print('RERP Tilt contract-only accounting services skipped until scaffolded: %s' % ', '.join(CONTRACT_ONLY_ACCOUNTING_SERVICES))
 
 # ====================
 # Base Docker Image
@@ -239,51 +372,20 @@ def create_microservice_gen(name, spec_file, output_dir):
         allow_parallel=True,
     )
 
-# Cargo [package] names for impl crates (binary path under microservices/target/.../debug/).
-# Must match tooling/src/rerp_tooling/build/constants.py PACKAGE_NAMES.
-PACKAGE_NAMES = {
-    'general-ledger': 'rerp_accounting_general_ledger',
-    'invoice': 'rerp_accounting_invoice',
-    'accounts-receivable': 'rerp_accounting_accounts_receivable',
-    'accounts-payable': 'rerp_accounting_accounts_payable',
-    'bank-sync': 'rerp_accounting_bank_sync',
-    'asset': 'rerp_accounting_asset',
-    'budget': 'rerp_accounting_budget',
-    'edi': 'rerp_accounting_edi',
-    'financial-reports': 'rerp_accounting_financial_reports',
-    'bff': 'rerp_accounting_bff',
-}
-
-# Binary names (build_artifacts, /app/, Helm app.binaryName).
-# May differ from package name; these are the filenames inside the container.
-BINARY_NAMES = {
-    'general-ledger': 'general_ledger',
-    'invoice': 'invoice',
-    'accounts-receivable': 'accounts_receivable',
-    'accounts-payable': 'accounts_payable',
-    'bank-sync': 'bank_sync',
-    'asset': 'asset',
-    'budget': 'budget',
-    'edi': 'edi',
-    'financial-reports': 'financial_reports',
-    'bff': 'bff',
-}
-
-# Port mappings
+# Port mappings come from the suite BFF config for suite services and from the
+# shared registry for the BFF/legacy services.
 def get_service_port(name):
-    ports = {
-        'general-ledger': '8001',
-        'invoice': '8002',
-        'accounts-receivable': '8003',
-        'accounts-payable': '8004',
-        'bank-sync': '8005',
-        'asset': '8006',
-        'budget': '8007',
-        'edi': '8008',
-        'financial-reports': '8009',
-        'bff': '8010',
-    }
-    return ports.get(name, '8080')
+    if name in SERVICE_PORTS:
+        return SERVICE_PORTS[name]
+    if name in PORT_REGISTRY:
+        return PORT_REGISTRY[name]
+    return '8080'
+
+def get_package_name(name):
+    return _read_cargo_package_name(name)
+
+def get_binary_name(name):
+    return name.replace('-', '_')
 
 # Helper function to create a manual resource to regenerate impl stubs for a microservice
 def create_microservice_stubs_resource(name, spec_file):
@@ -326,7 +428,7 @@ def create_microservice_build_resource(name):
 
 # Helper function to create test resource for a microservice
 def create_microservice_test_resource(name):
-    package_name = PACKAGE_NAMES.get(name, 'rerp_accounting_%s' % name.replace('-', '_'))
+    package_name = get_package_name(name)
     local_resource(
         'test-%s' % name,
         'cd microservices && cargo test -p %s' % package_name,
@@ -343,9 +445,9 @@ def create_microservice_test_resource(name):
 
 # Helper function to create deployment resource for a microservice
 def create_microservice_deployment(name):
-    package_name = PACKAGE_NAMES.get(name, 'rerp_accounting_%s' % name.replace('-', '_'))
-    binary_name = BINARY_NAMES.get(name, name.replace('-', '_'))
-    # Binary on disk uses Cargo [package] name; Dockerfile uses BINARY_NAMES.
+    package_name = get_package_name(name)
+    binary_name = get_binary_name(name)
+    # Binary on disk uses Cargo [package] name; Dockerfile receives the service-derived runtime name.
     target_path = 'microservices/target/%s/debug/%s' % (TARGET_RUST_TRIPLE, package_name)
     artifact_path = 'build_artifacts/%s/%s' % (TARGET_ARCH_NAME, binary_name)
     # Single template driven by --service; no per-service Dockerfile
@@ -415,32 +517,23 @@ def create_microservice_deployment(name):
 # The "rerp" namespace is created at cluster creation (e.g. just dev-up).
 k8s_yaml('k8s/rerp/namespace.yaml')
 k8s_resource(
-    'rerp-namespace',
+    new_name='rerp-namespace',
+    objects=['rerp:namespace'],
     labels=['rerp'],
 )
 
 # ====================
 # Accounting Microservices
 # ====================
-# All accounting microservices: each has lint, gen, build, deploy. One label per resource with
-# rerp_ prefix (e.g. rerp_general-ledger, rerp_bff).
-
-ACCOUNTING_SERVICES = [
-    'general-ledger',
-    'invoice',
-    'accounts-receivable',
-    'accounts-payable',
-    'bank-sync',
-    'asset',
-    'budget',
-    'edi',
-    'financial-reports',
-]
+# All runtime-ready accounting microservices: each has lint, gen, build, deploy.
+# Discovery starts from openapi/accounting/bff-suite-config.yaml, then filters to
+# services that have generated/implementation crates and Helm values.
 
 for name in ACCOUNTING_SERVICES:
-    create_microservice_lint(name, 'accounting/%s/openapi.yaml' % name)
-    create_microservice_gen(name, 'accounting/%s/openapi.yaml' % name, name)
-    create_microservice_stubs_resource(name, 'accounting/%s/openapi.yaml' % name)
+    service_spec_file = '%s/%s' % (RERP_SUITE, SERVICE_SPEC_PATHS.get(name, '%s/openapi.yaml' % name))
+    create_microservice_lint(name, service_spec_file)
+    create_microservice_gen(name, service_spec_file, name)
+    create_microservice_stubs_resource(name, service_spec_file)
     create_microservice_test_resource(name)
 
 
@@ -469,15 +562,15 @@ local_resource(
     'bff-spec-gen',
     cmd='''
         set -e
-        echo "🔄 Regenerating Accounting BFF OpenAPI spec (rerp bff generate-system)..."
-        %s bff generate-system
+        echo "🔄 Regenerating Accounting BFF OpenAPI spec (rerp bff generate-system --suite %s)..."
+        %s bff generate-system --suite %s
         echo "✅ Accounting BFF spec regeneration complete"
-    ''' % (rerp_bin,),
+    ''' % (RERP_SUITE, rerp_bin, RERP_SUITE),
     deps=[
         # Suite config
-        './openapi/accounting/bff-suite-config.yaml',
-        # Accounting service OpenAPI specs
-    ] + ['./openapi/accounting/%s/openapi.yaml' % name for name in ACCOUNTING_SERVICES],
+        './%s' % RERP_SUITE_CONFIG,
+        # All accounting service OpenAPI specs, including contract-only services.
+    ] + ['./openapi/%s/%s' % (RERP_SUITE, SERVICE_SPEC_PATHS.get(name, '%s/openapi.yaml' % name)) for name in DISCOVERED_ACCOUNTING_SERVICES],
     ignore=[
         './openapi/accounting/openapi_bff.yaml',  # Don't watch the generated file
     ],
@@ -507,10 +600,10 @@ local_resource(
     labels=['rerp_bff'],
     allow_parallel=True,
 )
-create_microservice_gen('bff', 'accounting/openapi_bff.yaml', 'bff')
-create_microservice_stubs_resource('bff', 'accounting/openapi_bff.yaml')
-create_microservice_build_resource('bff')
-create_microservice_deployment('bff')
+create_microservice_gen(BFF_SERVICE_NAME, '%s/openapi_bff.yaml' % RERP_SUITE, BFF_SERVICE_NAME)
+create_microservice_stubs_resource(BFF_SERVICE_NAME, '%s/openapi_bff.yaml' % RERP_SUITE)
+create_microservice_build_resource(BFF_SERVICE_NAME)
+create_microservice_deployment(BFF_SERVICE_NAME)
 
 # ====================
 # Shared Infrastructure Configuration

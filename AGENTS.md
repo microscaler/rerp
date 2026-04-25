@@ -49,6 +49,17 @@ Suites are inferred **dynamically**: `rerp` and related tooling list `openapi/` 
 
 **⚠️ CRITICAL RULE: ALL planning, analysis, design proposals, and implementation status documents MUST be created in `./docs/` or its subdirectories. Creating planning documents in the project root or other locations is NOT ALLOWED.**
 
+### LLM Wiki
+
+RERP has a persistent LLM wiki at [`docs/llmwiki/`](docs/llmwiki/). For substantive tooling, architecture, generator, or operational changes:
+
+1. Read [`docs/llmwiki/SCHEMA.md`](docs/llmwiki/SCHEMA.md) and [`docs/llmwiki/index.md`](docs/llmwiki/index.md).
+2. Update or create the relevant topic/entity page under `docs/llmwiki/`.
+3. Update `docs/llmwiki/index.md` when adding pages.
+4. Append an entry to `docs/llmwiki/log.md`.
+
+The wiki is not a replacement for source code or ADRs. It is the reconciled, agent-facing synthesis that prevents future sessions from rediscovering and undoing known fixes.
+
 ### Document Organization
 
 Planning documents are organized in `docs/` as follows:
