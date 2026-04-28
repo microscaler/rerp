@@ -12,69 +12,21 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_budget_lines",
-        crate::controllers::list_budget_lines::ListBudgetLinesController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_budget_line",
-        crate::controllers::create_budget_line::CreateBudgetLineController,
+        "list_budget_revisions",
+        crate::controllers::list_budget_revisions::ListBudgetRevisionsController,
         16384,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "get_budget_line",
-        crate::controllers::get_budget_line::GetBudgetLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_budget_line",
-        crate::controllers::update_budget_line::UpdateBudgetLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_budget_line",
-        crate::controllers::delete_budget_line::DeleteBudgetLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_budget_variances",
-        crate::controllers::list_budget_variances::ListBudgetVariancesController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_budget_variance",
-        crate::controllers::create_budget_variance::CreateBudgetVarianceController,
+        "create_budget_revision",
+        crate::controllers::create_budget_revision::CreateBudgetRevisionController,
         16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "get_budget_variance",
-        crate::controllers::get_budget_variance::GetBudgetVarianceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_budget_variance",
-        crate::controllers::update_budget_variance::UpdateBudgetVarianceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_budget_variance",
-        crate::controllers::delete_budget_variance::DeleteBudgetVarianceController,
-        20480,
     );
 
     dispatcher.register_typed_with_stack_size(
         "list_budgets",
         crate::controllers::list_budgets::ListBudgetsController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -100,6 +52,66 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::delete_budget::DeleteBudgetController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "cancel_budget",
+        crate::controllers::cancel_budget::CancelBudgetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "complete_budget",
+        crate::controllers::complete_budget::CompleteBudgetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "confirm_budget",
+        crate::controllers::confirm_budget::ConfirmBudgetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_budget_lines",
+        crate::controllers::list_budget_lines::ListBudgetLinesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_budget_line",
+        crate::controllers::create_budget_line::CreateBudgetLineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "reopen_budget",
+        crate::controllers::reopen_budget::ReopenBudgetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "submit_budget",
+        crate::controllers::submit_budget::SubmitBudgetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_forecasts",
+        crate::controllers::list_forecasts::ListForecastsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_forecast",
+        crate::controllers::create_forecast::CreateForecastController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "variance_report",
+        crate::controllers::variance_report::VarianceReportController,
+        20480,
+    );
 }
 
 /// Dynamically register handlers for the provided routes using their handler names.
@@ -119,82 +131,18 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
-            "list_budget_lines" => {
+            "list_budget_revisions" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_budget_lines::ListBudgetLinesController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_budget_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_budget_line::CreateBudgetLineController,
+                    crate::controllers::list_budget_revisions::ListBudgetRevisionsController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_budget_line" => {
+            "create_budget_revision" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_budget_line::GetBudgetLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_budget_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_budget_line::UpdateBudgetLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_budget_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_budget_line::DeleteBudgetLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_budget_variances" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_budget_variances::ListBudgetVariancesController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_budget_variance" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_budget_variance::CreateBudgetVarianceController,
+                    crate::controllers::create_budget_revision::CreateBudgetRevisionController,
                     16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_budget_variance" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_budget_variance::GetBudgetVarianceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_budget_variance" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_budget_variance::UpdateBudgetVarianceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_budget_variance" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_budget_variance::DeleteBudgetVarianceController,
-                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -202,7 +150,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_budgets" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_budgets::ListBudgetsController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -234,6 +182,86 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "delete_budget" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_budget::DeleteBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "cancel_budget" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::cancel_budget::CancelBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "complete_budget" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::complete_budget::CompleteBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "confirm_budget" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::confirm_budget::ConfirmBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_budget_lines" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_budget_lines::ListBudgetLinesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_budget_line" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_budget_line::CreateBudgetLineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "reopen_budget" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reopen_budget::ReopenBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "submit_budget" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::submit_budget::SubmitBudgetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_forecasts" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_forecasts::ListForecastsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_forecast" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_forecast::CreateForecastController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "variance_report" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::variance_report::VarianceReportController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

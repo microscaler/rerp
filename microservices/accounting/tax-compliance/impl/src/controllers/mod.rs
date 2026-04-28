@@ -1,0 +1,12 @@
+pub mod list_tax_audit_packs;
+pub mod create_tax_audit_pack;
+pub mod list_tax_payments;
+pub mod create_tax_payment;
+pub mod list_tax_periods;
+pub mod create_tax_period;
+pub mod list_tax_returns;
+pub mod create_tax_return;
+pub mod submit_tax_return;
+pub mod validate_tax_return;
+pub mod list_tax_rules;
+pub mod create_tax_rule;

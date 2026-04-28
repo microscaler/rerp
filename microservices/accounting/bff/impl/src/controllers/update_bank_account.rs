@@ -26,38 +26,38 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         account_type: "CHECKING".to_string(), // TODO: Set from your business logic
 
-        bank_code: None, // TODO: Set from your business logic
+        bank_code: String::new(), // TODO: Set from your business logic
 
-        bank_name: None, // TODO: Set from your business logic
+        bank_name: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
-        current_balance: None, // TODO: Set from your business logic
+        current_balance: String::new(), // TODO: Set from your business logic
 
         id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
         is_active: true, // TODO: Set from your business logic
 
-        last_reconciled_at: None, // TODO: Set from your business logic
+        last_reconciled_at: String::new(), // TODO: Set from your business logic
 
-        last_synced_at: None, // TODO: Set from your business logic
+        last_synced_at: String::new(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        reconciled_balance: None, // TODO: Set from your business logic
+        reconciled_balance: String::new(), // TODO: Set from your business logic
 
-        sync_credentials: None, // TODO: Set from your business logic
+        sync_credentials: String::new(), // TODO: Set from your business logic
 
-        sync_provider: None, // TODO: Set from your business logic
+        sync_provider: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
     }
 }

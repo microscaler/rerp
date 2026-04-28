@@ -10,37 +10,44 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "page")]
-    pub page: Option<i32>,
+    #[serde(rename = "id")]
+    pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    #[serde(rename = "gl_account_id")]
+    pub gl_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "search")]
-    pub search: Option<String>,
+    #[serde(rename = "period_from")]
+    pub period_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_to")]
+    pub period_to: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "has_more")]
+    pub has_more: Option<bool>,
+
     #[serde(rename = "items")]
-    pub items: Option<Vec<BudgetLine>>,
+    pub items: Vec<BudgetLine>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    pub limit: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "page")]
-    pub page: Option<i32>,
+    pub page: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total")]
-    pub total: Option<i32>,
+    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -51,12 +58,26 @@ impl TryFrom<HandlerRequest> for Request {
 
         let mut data_map = Map::new();
 
-        if let Some(v) = req.get_query_param("page") {
+        if let Some(v) = req.get_path_param("id") {
             data_map.insert(
-                "page".to_string(),
+                "id".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
-                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+            return Err(anyhow::anyhow!("Missing required parameter 'id'"));
+        }
+
+        if let Some(v) = req.get_query_param("gl_account_id") {
+            data_map.insert(
+                "gl_account_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
                     None,
                     None,
                 ),
@@ -66,11 +87,14 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("limit") {
+        if let Some(v) = req.get_query_param("period_from") {
             data_map.insert(
-                "limit".to_string(),
+                "period_from".to_string(),
                 brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
+                    v,
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
                 ),
             );
         } else {
@@ -78,12 +102,27 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("search") {
+        if let Some(v) = req.get_query_param("period_to") {
             data_map.insert(
-                "search".to_string(),
+                "period_to".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
-                    Some(&serde_json::json!({"type":"string"})),
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("department_id") {
+            data_map.insert(
+                "department_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
                     None,
                     None,
                 ),

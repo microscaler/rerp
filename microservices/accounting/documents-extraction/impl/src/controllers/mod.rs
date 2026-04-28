@@ -1,0 +1,9 @@
+pub mod list_accounting_documents;
+pub mod create_accounting_document;
+pub mod classify_accounting_document;
+pub mod approve_document_extraction;
+pub mod link_document_to_bank_statement;
+pub mod link_document_to_invoice;
+pub mod list_extraction_jobs;
+pub mod create_extraction_job;
+pub mod list_extraction_results;

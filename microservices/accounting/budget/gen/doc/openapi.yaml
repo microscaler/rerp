@@ -1,180 +1,127 @@
 openapi: 3.1.0
 info:
-  title: Budgeting
+  title: Budget Management
   version: 1.0.0
-  description: Budgeting service for budget creation and budget vs actual analysis.
+  description: Budget management service for financial planning, budget creation, variance analysis, and forecasting. Supports multi-level budgets by department, cost center, GL account, and period. Tracks actuals against budget with real-time variance reporting.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
-- url: http://localhost:8007/api/v1/accounting/budget
+- url: http://localhost:8009/api/v1/accounting/budget
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/budget
-  description: Budgeting API
-tags: []
+  description: Budget Management API
+tags:
+- name: budgets
+  description: Budget creation and lifecycle management
+- name: budget-lines
+  description: Budget line items and allocations
+- name: variance
+  description: Budget vs actuals variance analysis
+- name: forecasting
+  description: Budget forecasting and scenario planning
+- name: approvals
+  description: Budget approval workflow
 paths:
   /budgets:
     get:
       operationId: list_budgets
       summary: List budgets
+      description: Paginated list of all budgets with filtering by fiscal year, status, department, and company.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by budget name
+      - name: fiscal_year
+        in: query
+        schema:
+          type: integer
+        description: Filter by fiscal year
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - SUBMITTED
+          - APPROVED
+          - ACTIVE
+          - ARCHIVED
+          - REJECTED
+      - name: department_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
-          description: List of budgets
+          description: Paginated list of budgets
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Budget'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Budgets
-                  value:
-                    items:
-                    - id: a0140e8400-e29b-41d4-a716-446655440000
-                      budget_name: 2024 Annual Budget
-                      fiscal_year: 2024
-                      budget_type: ANNUAL
-                      currency_code: USD
-                      total_budget_amount: 10000000.0
-                      status: APPROVED
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Budgets
-                  value:
-                    items:
-                    - id: b0140e8400-e29b-41d4-a716-446655440000
-                      budget_name: 2024 Q1 Budget
-                      fiscal_year: 2024
-                      budget_type: QUARTERLY
-                      currency_code: USD
-                      total_budget_amount: 50000.0
-                      status: DRAFT
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency budgets
-                  value:
-                    items:
-                    - id: c0140e8400-e29b-41d4-a716-446655440000
-                      budget_name: 2024 Annual Budget
-                      fiscal_year: 2024
-                      budget_type: ANNUAL
-                      currency_code: EUR
-                      total_budget_amount: 10000000.0
-                      status: APPROVED
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedBudgets'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_budget
       summary: Create budget
+      description: Create a new budget with line items by GL account and period.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBudgetRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create budget for Acme Corporation
-                value:
-                  budget_name: 2024 Annual Budget
-                  fiscal_year: 2024
-                  budget_type: ANNUAL
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create budget for TechStart Inc
-                value:
-                  budget_name: 2024 Q1 Budget
-                  fiscal_year: 2024
-                  budget_type: QUARTERLY
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency budget
-                value:
-                  budget_name: 2024 Annual Budget
-                  fiscal_year: 2024
-                  budget_type: ANNUAL
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: Budget created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Budget'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget created
-                  value:
-                    id: a0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: USD
-                    total_budget_amount: 0.0
-                    status: DRAFT
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget created
-                  value:
-                    id: b0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Q1 Budget
-                    fiscal_year: 2024
-                    budget_type: QUARTERLY
-                    currency_code: USD
-                    total_budget_amount: 0.0
-                    status: DRAFT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget created
-                  value:
-                    id: c0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: EUR
-                    total_budget_amount: 0.0
-                    status: DRAFT
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/BudgetWithLines'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /budgets/{id}:
     get:
       operationId: get_budget
       summary: Get budget by id
+      description: Get a budget with all line items and variance summary.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -184,56 +131,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: Budget details
+          description: Budget details with lines and variance
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Budget'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation budget
-                  value:
-                    id: a0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: USD
-                    total_budget_amount: 10000000.0
-                    status: APPROVED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart budget
-                  value:
-                    id: b0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Q1 Budget
-                    fiscal_year: 2024
-                    budget_type: QUARTERLY
-                    currency_code: USD
-                    total_budget_amount: 50000.0
-                    status: DRAFT
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing budget
-                  value:
-                    id: c0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: EUR
-                    total_budget_amount: 10000000.0
-                    status: APPROVED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/BudgetWithLines'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_budget
       summary: Update budget
+      description: Update a budget. Only allowed for DRAFT status budgets. To submit for approval, use the submit endpoint.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -247,22 +160,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateBudgetRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation budget
-                value:
-                  budget_name: 2024 Annual Budget (Updated)
-                  status: APPROVED
-              techStartUpdate:
-                summary: Update TechStart budget
-                value:
-                  budget_name: 2024 Q1 Budget (Updated)
-                  status: APPROVED
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing budget
-                value:
-                  budget_name: 2024 Annual Budget (Updated)
-                  status: APPROVED
       responses:
         '200':
           description: Budget updated
@@ -270,51 +167,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Budget'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget updated
-                  value:
-                    id: a0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget (Updated)
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: USD
-                    total_budget_amount: 10000000.0
-                    status: APPROVED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget updated
-                  value:
-                    id: b0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Q1 Budget (Updated)
-                    fiscal_year: 2024
-                    budget_type: QUARTERLY
-                    currency_code: USD
-                    total_budget_amount: 50000.0
-                    status: APPROVED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget updated
-                  value:
-                    id: c0140e8400-e29b-41d4-a716-446655440000
-                    budget_name: 2024 Annual Budget (Updated)
-                    fiscal_year: 2024
-                    budget_type: ANNUAL
-                    currency_code: EUR
-                    total_budget_amount: 10000000.0
-                    status: APPROVED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update non-draft budgets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_budget
       summary: Delete budget
+      description: Delete a budget. Only allowed for DRAFT status budgets.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -327,118 +196,114 @@ paths:
           description: Budget deleted
         '404':
           description: Not found
-  /budget-lines:
-    get:
-      operationId: list_budget_lines
-      summary: List budget-lines
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of budget-lines
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BudgetLine'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Budget line items
-                  value:
-                    items:
-                    - id: a0150e8400-e29b-41d4-a716-446655440000
-                      budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                      account_id: a0070e8400-e29b-41d4-a716-446655440000
-                      period_id: a0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 100000.0
-                      currency_code: USD
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Budget line items
-                  value:
-                    items:
-                    - id: b0150e8400-e29b-41d4-a716-446655440000
-                      budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                      account_id: b0070e8400-e29b-41d4-a716-446655440000
-                      period_id: b0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 5000.0
-                      currency_code: USD
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency budget lines
-                  value:
-                    items:
-                    - id: c0150e8400-e29b-41d4-a716-446655440000
-                      budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                      account_id: c0070e8400-e29b-41d4-a716-446655440000
-                      period_id: c0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 100000.0
-                      currency_code: EUR
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete non-draft budgets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /budgets/{id}/submit:
+    post:
+      operationId: submit_budget
+      summary: Submit budget for approval
+      description: Submit a budget for approval. Transitions status from DRAFT to SUBMITTED.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget submitted for approval
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Budget is not in DRAFT status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /budgets/{id}/lines:
+    get:
+      operationId: list_budget_lines
+      summary: List budget lines
+      description: Get all budget lines for a budget, filtered by period and GL account.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: gl_account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: period_from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period from
+      - name: period_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period to
+      - name: department_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: List of budget lines
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBudgetLines'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_budget_line
-      summary: Create budget-line
+      summary: Add budget line
+      description: Add a budget line item for a specific GL account and period.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBudgetLineRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create budget line for Acme Corporation
-                value:
-                  budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                  account_id: a0070e8400-e29b-41d4-a716-446655440000
-                  period_id: a0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 100000.0
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create budget line for TechStart Inc
-                value:
-                  budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                  account_id: b0070e8400-e29b-41d4-a716-446655440000
-                  period_id: b0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 5000.0
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency budget line
-                value:
-                  budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                  account_id: c0070e8400-e29b-41d4-a716-446655440000
-                  period_id: c0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 100000.0
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
           description: BudgetLine created
@@ -446,375 +311,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BudgetLine'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget line created
-                  value:
-                    id: a0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget line created
-                  value:
-                    id: b0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5000.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget line created
-                  value:
-                    id: c0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
         '400':
-          description: Invalid request
-  /budget-lines/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Budget not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /variance:
     get:
-      operationId: get_budget_line
-      summary: Get budget-line by id
+      operationId: variance_report
+      summary: Variance report
+      description: Generate a budget vs actuals variance report for a budget and period.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: budget_id
+        in: query
         schema:
           type: string
           format: uuid
+        description: Budget to analyze
+      - name: period_start
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period start
+      - name: period_end
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Period end
+      - name: warning_threshold
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Warning threshold (e.g., 0.05 for 5%)
+      - name: breach_threshold
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Breach threshold (e.g., 0.10 for 10%)
       responses:
         '200':
-          description: BudgetLine details
+          description: Variance report with line-by-line details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BudgetLine'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation budget line
-                  value:
-                    id: a0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart budget line
-                  value:
-                    id: b0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5000.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing budget line
-                  value:
-                    id: c0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_budget_line
-      summary: Update budget-line
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBudgetLineRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation budget line
-                value:
-                  budget_amount: 110000.0
-              techStartUpdate:
-                summary: Update TechStart budget line
-                value:
-                  budget_amount: 5500.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing budget line
-                value:
-                  budget_amount: 110000.0
-      responses:
-        '200':
-          description: BudgetLine updated
+                $ref: '#/components/schemas/VarianceReport'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BudgetLine'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget line updated
-                  value:
-                    id: a0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 110000.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget line updated
-                  value:
-                    id: b0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5500.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget line updated
-                  value:
-                    id: c0150e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 110000.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_budget_line
-      summary: Delete budget-line
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: BudgetLine deleted
-        '404':
-          description: Not found
-  /budget-variances:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /forecasts:
     get:
-      operationId: list_budget_variances
-      summary: List budget-variances
+      operationId: list_forecasts
+      summary: List forecasts
+      description: List all budget forecasts with filtering by budget and type.
+      x-brrtrouter-impl: true
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: budget_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: forecast_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - ROLLING
+          - ANNUAL
+          - QUARTERLY
+          - SPECIFIC
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - PENDING_REVIEW
+          - APPROVED
+          - ARCHIVED
       responses:
         '200':
-          description: List of budget-variances
+          description: Paginated list of forecasts
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BudgetVariance'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Budget variances
-                  value:
-                    items:
-                    - id: a0170e8400-e29b-41d4-a716-446655440000
-                      budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                      account_id: a0070e8400-e29b-41d4-a716-446655440000
-                      period_id: a0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 100000.0
-                      actual_amount: 95000.0
-                      variance_amount: -5000.0
-                      variance_percent: -5.0
-                      currency_code: USD
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-31T10:00:00Z'
-                      updated_at: '2024-01-31T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Budget variances
-                  value:
-                    items:
-                    - id: b0170e8400-e29b-41d4-a716-446655440000
-                      budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                      account_id: b0070e8400-e29b-41d4-a716-446655440000
-                      period_id: b0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 5000.0
-                      actual_amount: 4800.0
-                      variance_amount: -200.0
-                      variance_percent: -4.0
-                      currency_code: USD
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-31T09:00:00Z'
-                      updated_at: '2024-01-31T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency budget variances
-                  value:
-                    items:
-                    - id: c0170e8400-e29b-41d4-a716-446655440000
-                      budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                      account_id: c0070e8400-e29b-41d4-a716-446655440000
-                      period_id: c0160e8400-e29b-41d4-a716-446655440000
-                      budget_amount: 100000.0
-                      actual_amount: 95000.0
-                      variance_amount: -5000.0
-                      variance_percent: -5.0
-                      currency_code: EUR
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-31T08:00:00Z'
-                      updated_at: '2024-01-31T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedForecasts'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_budget_variance
-      summary: Create budget-variance
+      operationId: create_forecast
+      summary: Create forecast
+      description: Create a new budget forecast based on actuals and projections.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateBudgetVarianceRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create budget variance for Acme Corporation
-                value:
-                  budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                  account_id: a0070e8400-e29b-41d4-a716-446655440000
-                  period_id: a0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 100000.0
-                  actual_amount: 95000.0
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create budget variance for TechStart Inc
-                value:
-                  budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                  account_id: b0070e8400-e29b-41d4-a716-446655440000
-                  period_id: b0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 5000.0
-                  actual_amount: 4800.0
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency budget variance
-                value:
-                  budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                  account_id: c0070e8400-e29b-41d4-a716-446655440000
-                  period_id: c0160e8400-e29b-41d4-a716-446655440000
-                  budget_amount: 100000.0
-                  actual_amount: 95000.0
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
+              $ref: '#/components/schemas/CreateForecastRequest'
       responses:
         '201':
-          description: BudgetVariance created
+          description: Forecast created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BudgetVariance'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget variance created
-                  value:
-                    id: a0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 95000.0
-                    variance_amount: -5000.0
-                    variance_percent: -5.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget variance created
-                  value:
-                    id: b0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5000.0
-                    actual_amount: 4800.0
-                    variance_amount: -200.0
-                    variance_percent: -4.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget variance created
-                  value:
-                    id: c0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 95000.0
-                    variance_amount: -5000.0
-                    variance_percent: -5.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
+                $ref: '#/components/schemas/Forecast'
         '400':
-          description: Invalid request
-  /budget-variances/{id}:
-    get:
-      operationId: get_budget_variance
-      summary: Get budget-variance by id
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /budgets/{id}/confirm:
+    post:
+      operationId: confirm_budget
+      summary: Confirm budget
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -824,62 +479,12 @@ paths:
           format: uuid
       responses:
         '200':
-          description: BudgetVariance details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BudgetVariance'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation budget variance
-                  value:
-                    id: a0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 95000.0
-                    variance_amount: -5000.0
-                    variance_percent: -5.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart budget variance
-                  value:
-                    id: b0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5000.0
-                    actual_amount: 4800.0
-                    variance_amount: -200.0
-                    variance_percent: -4.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing budget variance
-                  value:
-                    id: c0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 95000.0
-                    variance_amount: -5000.0
-                    variance_percent: -5.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_budget_variance
-      summary: Update budget-variance
+          description: Budget confirmed
+  /budgets/{id}/cancel:
+    post:
+      operationId: cancel_budget
+      summary: Cancel budget
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -887,439 +492,808 @@ paths:
         schema:
           type: string
           format: uuid
+      responses:
+        '200':
+          description: Budget cancelled
+  /budgets/{id}/complete:
+    post:
+      operationId: complete_budget
+      summary: Complete budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget completed
+  /budgets/{id}/reopen:
+    post:
+      operationId: reopen_budget
+      summary: Reopen budget
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Budget reopened
+  /budget-revisions:
+    get:
+      operationId: list_budget_revisions
+      summary: List budget revisions
+      responses:
+        '200':
+          description: Budget revisions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBudgetRevisions'
+    post:
+      operationId: create_budget_revision
+      summary: Create budget revision
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateBudgetVarianceRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation budget variance
-                value:
-                  actual_amount: 98000.0
-              techStartUpdate:
-                summary: Update TechStart budget variance
-                value:
-                  actual_amount: 4900.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing budget variance
-                value:
-                  actual_amount: 98000.0
+              $ref: '#/components/schemas/CreateBudgetRevisionRequest'
       responses:
-        '200':
-          description: BudgetVariance updated
+        '201':
+          description: Budget revision created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BudgetVariance'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation budget variance updated
-                  value:
-                    id: a0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: a0140e8400-e29b-41d4-a716-446655440000
-                    account_id: a0070e8400-e29b-41d4-a716-446655440000
-                    period_id: a0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 98000.0
-                    variance_amount: -2000.0
-                    variance_percent: -2.0
-                    currency_code: USD
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart budget variance updated
-                  value:
-                    id: b0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: b0140e8400-e29b-41d4-a716-446655440000
-                    account_id: b0070e8400-e29b-41d4-a716-446655440000
-                    period_id: b0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 5000.0
-                    actual_amount: 4900.0
-                    variance_amount: -100.0
-                    variance_percent: -2.0
-                    currency_code: USD
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing budget variance updated
-                  value:
-                    id: c0170e8400-e29b-41d4-a716-446655440000
-                    budget_id: c0140e8400-e29b-41d4-a716-446655440000
-                    account_id: c0070e8400-e29b-41d4-a716-446655440000
-                    period_id: c0160e8400-e29b-41d4-a716-446655440000
-                    budget_amount: 100000.0
-                    actual_amount: 98000.0
-                    variance_amount: -2000.0
-                    variance_percent: -2.0
-                    currency_code: EUR
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_budget_variance
-      summary: Delete budget-variance
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: BudgetVariance deleted
-        '404':
-          description: Not found
+                $ref: '#/components/schemas/BudgetRevision'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     Budget:
       type: object
       required:
       - id
-      - budget_number
       - name
       - fiscal_year
-      - period_start
-      - period_end
+      - company_id
       - status
-      - currency_code
       properties:
         id:
           type: string
           format: uuid
-        budget_number:
-          type: string
-          maxLength: 100
+          description: Unique identifier for this budget
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
+          description: Budget name/title
         description:
           type: string
+          maxLength: 2000
           nullable: true
+          description: Budget description
         fiscal_year:
           type: integer
-        period_start:
+          minimum: 2000
+          maximum: 2100
+          description: Fiscal year this budget covers
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Budget version number
+        currency_code:
           type: string
-          format: date
-        period_end:
-          type: string
-          format: date
-        current_version_id:
-          type: string
-          format: uuid
-          nullable: true
+          minLength: 3
+          maxLength: 3
+          description: Budget currency
         status:
           type: string
           enum:
           - DRAFT
+          - SUBMITTED
+          - APPROVED
           - ACTIVE
-          - CLOSED
-          - CANCELLED
+          - ARCHIVED
+          - REJECTED
+          description: Budget lifecycle status
         approval_status:
           type: string
           enum:
           - PENDING
           - APPROVED
           - REJECTED
-          nullable: true
-        approved_at:
+          description: Approval workflow status
+        period_type:
           type: string
-          format: date-time
+          enum:
+          - MONTHLY
+          - QUARTERLY
+          - ANNUAL
+          - WEEKLY
+          default: MONTHLY
+          description: Budget period granularity
+        total_amount:
+          type: number
+          format: double
+          description: Total budget amount across all lines
+        approved_amount:
+          type: number
+          format: double
+          description: Approved budget amount
+        company_id:
+          type: string
+          format: uuid
+          description: Company this budget belongs to
+        department_id:
+          type: string
+          format: uuid
           nullable: true
+          description: Department this budget applies to (null = company-wide)
+        cost_center_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Cost center this budget applies to
         approved_by:
           type: string
           format: uuid
           nullable: true
-        total_budget_amount:
-          type: number
-          format: decimal
-        total_actual_amount:
-          type: number
-          format: decimal
-        total_variance:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
+          description: User who approved the budget
+        approved_at:
           type: string
           format: date-time
-        updated_at:
+          nullable: true
+          description: When the budget was approved
+        notes:
           type: string
-          format: date-time
+          maxLength: 2000
+          nullable: true
+          description: Budget notes
         created_by:
           type: string
           format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    BudgetLine:
-      type: object
-      required:
-      - id
-      - budget_id
-      - version_id
-      - account_id
-      - period_id
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        budget_id:
-          type: string
-          format: uuid
-        version_id:
-          type: string
-          format: uuid
-        account_id:
-          type: string
-          format: uuid
-        period_id:
-          type: string
-          format: uuid
-        budget_amount:
-          type: number
-          format: decimal
-        actual_amount:
-          type: number
-          format: decimal
-        variance:
-          type: number
-          format: decimal
-        variance_percent:
-          type: number
-          format: decimal
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        notes:
-          type: string
-          nullable: true
+          description: User who created the budget
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-    BudgetVariance:
-      type: object
-      required:
-      - id
-      - budget_id
-      - account_id
-      - period_id
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        budget_id:
-          type: string
-          format: uuid
-        account_id:
-          type: string
-          format: uuid
-        period_id:
-          type: string
-          format: uuid
-        budget_amount:
-          type: number
-          format: decimal
-        actual_amount:
-          type: number
-          format: decimal
-        variance:
-          type: number
-          format: decimal
-        variance_percent:
-          type: number
-          format: decimal
-        is_favorable:
-          type: boolean
-        exceeds_threshold:
-          type: boolean
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        last_calculated_at:
+        submitted_at:
           type: string
           format: date-time
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
+          nullable: true
+          description: When submitted for approval
+    BudgetWithLines:
+      allOf:
+      - $ref: '#/components/schemas/Budget'
+      - type: object
+        properties:
+          budget_lines:
+            type: array
+            items:
+              $ref: '#/components/schemas/BudgetLine'
+            description: Budget line items
+          variance_summary:
+            type: object
+            nullable: true
+            description: Summary of budget vs actuals variance
     CreateBudgetRequest:
       type: object
       required:
-      - budget_number
       - name
       - fiscal_year
-      - period_start
-      - period_end
-      - currency_code
+      - company_id
       properties:
-        budget_number:
-          type: string
-          maxLength: 100
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
         description:
           type: string
+          maxLength: 2000
+          nullable: true
         fiscal_year:
           type: integer
-        period_start:
-          type: string
-          format: date
-        period_end:
-          type: string
-          format: date
+          minimum: 2000
+          maximum: 2100
+        version:
+          type: integer
+          minimum: 1
+          default: 1
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          description: Defaults to company currency
+        period_type:
+          type: string
+          enum:
+          - MONTHLY
+          - QUARTERLY
+          - ANNUAL
+          - WEEKLY
         company_id:
           type: string
           format: uuid
+        department_id:
+          type: string
+          format: uuid
+          nullable: true
+        cost_center_id:
+          type: string
+          format: uuid
+          nullable: true
+        budget_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateBudgetLineRequest'
+          description: Budget line items
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
     UpdateBudgetRequest:
       type: object
       properties:
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
         description:
           type: string
+          maxLength: 2000
+          nullable: true
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
         status:
           type: string
           enum:
           - DRAFT
-          - ACTIVE
-          - CLOSED
-          - CANCELLED
-        approval_status:
-          type: string
-          enum:
-          - PENDING
+          - SUBMITTED
           - APPROVED
+          - ACTIVE
+          - ARCHIVED
           - REJECTED
+        budget_lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateBudgetLineRequest'
+          description: Replace all budget lines
+    BudgetLine:
+      type: object
+      required:
+      - id
+      - budget_id
+      - period
+      - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this budget line
+        budget_id:
+          type: string
+          format: uuid
+          description: Budget this line belongs to
+        gl_account_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL account this line is for
+        gl_account_code:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: GL account code
+        gl_account_name:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: GL account name
+        department_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Department for this line
+        cost_center_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Cost center for this line
+        period:
+          type: string
+          format: date
+          description: Period for this line (e.g., 2024-01-01 for January)
+        period_name:
+          type: string
+          maxLength: 50
+          description: Human-readable period name
+        amount:
+          type: number
+          format: double
+          description: Budgeted amount for this period
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency of the budgeted amount
+        actual_amount:
+          type: number
+          format: double
+          default: 0
+          description: Actual amount spent in this period
+        variance:
+          type: number
+          format: double
+          description: Variance (amount - actual_amount)
+        variance_percent:
+          type: number
+          format: double
+          nullable: true
+          description: Variance as percentage of budget
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+          description: Notes for this budget line
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     CreateBudgetLineRequest:
       type: object
       required:
-      - budget_id
-      - version_id
-      - account_id
-      - period_id
-      - currency_code
+      - period
+      - amount
       properties:
-        budget_id:
+        gl_account_id:
           type: string
           format: uuid
-        version_id:
+          nullable: true
+        gl_account_code:
+          type: string
+          maxLength: 50
+          nullable: true
+        department_id:
           type: string
           format: uuid
-        account_id:
+          nullable: true
+        cost_center_id:
           type: string
           format: uuid
-        period_id:
+          nullable: true
+        period:
           type: string
-          format: uuid
-        budget_amount:
+          format: date
+        period_name:
+          type: string
+          maxLength: 50
+        amount:
           type: number
-          format: decimal
+          format: double
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         notes:
           type: string
-    UpdateBudgetLineRequest:
-      type: object
-      properties:
-        budget_amount:
-          type: number
-          format: decimal
-        actual_amount:
-          type: number
-          format: decimal
-        notes:
-          type: string
-    CreateBudgetVarianceRequest:
+          maxLength: 1000
+          nullable: true
+    VarianceReport:
       type: object
       required:
       - budget_id
-      - account_id
-      - period_id
-      - currency_code
+      - period_start
+      - period_end
       properties:
+        id:
+          type: string
+          format: uuid
         budget_id:
           type: string
           format: uuid
-        account_id:
+          description: Budget this variance report is for
+        budget_name:
           type: string
-          format: uuid
-        period_id:
-          type: string
-          format: uuid
+        fiscal_year:
+          type: integer
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-    UpdateBudgetVarianceRequest:
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        total_budgeted:
+          type: number
+          format: double
+          description: Total budgeted amount for the period
+        total_actual:
+          type: number
+          format: double
+          description: Total actual amount for the period
+        total_variance:
+          type: number
+          format: double
+          description: Total variance
+        total_variance_percent:
+          type: number
+          format: double
+          description: Total variance as percentage
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              line_id:
+                type: string
+                format: uuid
+              gl_account_code:
+                type: string
+              gl_account_name:
+                type: string
+              period:
+                type: string
+                format: date
+              budgeted:
+                type: number
+                format: double
+              actual:
+                type: number
+                format: double
+              variance:
+                type: number
+                format: double
+              variance_percent:
+                type: number
+                format: double
+              status:
+                type: string
+                enum:
+                - ON_TRACK
+                - WARNING
+                - BREACH
+                description: Variance status
+          description: Line-by-line variance details
+        breach_threshold:
+          type: number
+          format: double
+          description: Variance percentage threshold for breach (e.g., 0.10 for 10%)
+        warning_threshold:
+          type: number
+          format: double
+          description: Variance percentage threshold for warning (e.g., 0.05 for 5%)
+        created_at:
+          type: string
+          format: date-time
+    Forecast:
       type: object
+      required:
+      - id
+      - budget_id
+      - forecast_type
+      - as_of_date
       properties:
-        budget_amount:
+        id:
+          type: string
+          format: uuid
+        budget_id:
+          type: string
+          format: uuid
+          description: Budget this forecast is based on
+        name:
+          type: string
+          maxLength: 200
+          description: Forecast name
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        forecast_type:
+          type: string
+          enum:
+          - ROLLING
+          - ANNUAL
+          - QUARTERLY
+          - SPECIFIC
+          description: Type of forecast
+        as_of_date:
+          type: string
+          format: date
+          description: Date the forecast was created
+        period_start:
+          type: string
+          format: date
+          description: Forecast period start
+        period_end:
+          type: string
+          format: date
+          description: Forecast period end
+        total_forecasted:
           type: number
-          format: decimal
-        actual_amount:
+          format: double
+          description: Total forecasted amount
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PENDING_REVIEW
+          - APPROVED
+          - ARCHIVED
+          description: Forecast status
+        created_by:
+          type: string
+          format: uuid
+          description: User who created the forecast
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateForecastRequest:
+      type: object
+      required:
+      - budget_id
+      - name
+      - forecast_type
+      - period_start
+      - period_end
+      properties:
+        budget_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        forecast_type:
+          type: string
+          enum:
+          - ROLLING
+          - ANNUAL
+          - QUARTERLY
+          - SPECIFIC
+        period_start:
+          type: string
+          format: date
+        period_end:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Defaults to budget currency
+    ForecastLine:
+      type: object
+      required:
+      - id
+      - forecast_id
+      - period
+      - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        forecast_id:
+          type: string
+          format: uuid
+          description: Forecast this line belongs to
+        period:
+          type: string
+          format: date
+          description: Forecast period
+        amount:
           type: number
-          format: decimal
-        variance:
-          type: number
-          format: decimal
-        is_favorable:
+          format: double
+          description: Forecasted amount
+        gl_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          maxLength: 1000
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    BudgetRevision:
+      type: object
+      required: [id, budget_id, revision_number, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        budget_id:
+          type: string
+          format: uuid
+        revision_number:
+          type: integer
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED, REJECTED, APPLIED]
+        reason:
+          type: string
+          nullable: true
+        requested_by:
+          type: string
+          format: uuid
+          nullable: true
+    CreateBudgetRevisionRequest:
+      type: object
+      required: [budget_id, reason]
+      properties:
+        budget_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+        line_adjustments:
+          type: array
+          items:
+            type: object
+            required: [budget_line_id, revised_amount]
+            properties:
+              budget_line_id:
+                type: string
+                format: uuid
+              revised_amount:
+                type: number
+                format: double
+        requested_by:
+          type: string
+          format: uuid
+          nullable: true
+    PaginatedBudgetRevisions:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetRevision'
+        total:
+          type: integer
+    PaginatedBudgets:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Budget'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
           type: boolean
-        exceeds_threshold:
+    PaginatedBudgetLines:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetLine'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
           type: boolean
+    PaginatedForecasts:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Forecast'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Budget not found
+        details:
+          type: object
+          nullable: true
+    ValidationError:
+      type: object
+      required:
+      - code
+      - message
+      - errors
+      properties:
+        code:
+          type: string
+          enum:
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Budget total exceeds maximum
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: fiscal_year
+              message:
+                type: string
+                example: Fiscal year must be in the future or current year
+security:
+- bearerAuth: []

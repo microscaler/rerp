@@ -22,37 +22,37 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         bank_account_id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        bank_balance: None, // TODO: Set from your business logic
+        bank_balance: String::new(), // TODO: Set from your business logic
 
-        book_balance: None, // TODO: Set from your business logic
+        book_balance: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
-        difference: None, // TODO: Set from your business logic
+        difference: String::new(), // TODO: Set from your business logic
 
         id: "a00f0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        notes: None, // TODO: Set from your business logic
+        notes: String::new(), // TODO: Set from your business logic
 
-        outstanding_deposits_amount: None, // TODO: Set from your business logic
+        outstanding_deposits_amount: String::new(), // TODO: Set from your business logic
 
-        outstanding_deposits_count: None, // TODO: Set from your business logic
+        outstanding_deposits_count: String::new(), // TODO: Set from your business logic
 
-        outstanding_withdrawals_amount: None, // TODO: Set from your business logic
+        outstanding_withdrawals_amount: String::new(), // TODO: Set from your business logic
 
-        outstanding_withdrawals_count: None, // TODO: Set from your business logic
+        outstanding_withdrawals_count: String::new(), // TODO: Set from your business logic
 
-        reconciled_at: None, // TODO: Set from your business logic
+        reconciled_at: String::new(), // TODO: Set from your business logic
 
-        reconciled_by: None, // TODO: Set from your business logic
+        reconciled_by: String::new(), // TODO: Set from your business logic
 
         reconciliation_date: "2024-01-31".to_string(), // TODO: Set from your business logic
 
@@ -60,8 +60,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         status: "COMPLETED".to_string(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
     }
 }

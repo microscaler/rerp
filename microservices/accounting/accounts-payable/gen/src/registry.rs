@@ -12,39 +12,51 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_ap_agings",
-        crate::controllers::list_ap_agings::ListApAgingsController,
+        "list_approvals",
+        crate::controllers::list_approvals::ListApprovalsController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "create_ap_aging",
-        crate::controllers::create_ap_aging::CreateApAgingController,
+        "create_approval",
+        crate::controllers::create_approval::CreateApprovalController,
         16384,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "get_ap_aging",
-        crate::controllers::get_ap_aging::GetApAgingController,
+        "list_payment_commitments",
+        crate::controllers::list_payment_commitments::ListPaymentCommitmentsController,
+        24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_payment_batches",
+        crate::controllers::list_payment_batches::ListPaymentBatchesController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_payment_batch",
+        crate::controllers::create_payment_batch::CreatePaymentBatchController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "approve_payment_batch",
+        crate::controllers::approve_payment_batch::ApprovePaymentBatchController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "update_ap_aging",
-        crate::controllers::update_ap_aging::UpdateApAgingController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_ap_aging",
-        crate::controllers::delete_ap_aging::DeleteApAgingController,
+        "export_payment_batch_file",
+        crate::controllers::export_payment_batch_file::ExportPaymentBatchFileController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
         "list_payments",
         crate::controllers::list_payments::ListPaymentsController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -72,9 +84,15 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "cash_flow_forecast",
+        crate::controllers::cash_flow_forecast::CashFlowForecastController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_vendor_invoices",
         crate::controllers::list_vendor_invoices::ListVendorInvoicesController,
-        20480,
+        28672,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -100,6 +118,18 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::delete_vendor_invoice::DeleteVendorInvoiceController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "register_vendor_invoice_payment",
+        crate::controllers::register_vendor_invoice_payment::RegisterVendorInvoicePaymentController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "perform_vendor_invoice_three_way_match",
+        crate::controllers::perform_vendor_invoice_three_way_match::PerformVendorInvoiceThreeWayMatchController,
+        20480,
+    );
 }
 
 /// Dynamically register handlers for the provided routes using their handler names.
@@ -119,41 +149,57 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
-            "list_ap_agings" => {
+            "list_approvals" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_ap_agings::ListApAgingsController,
+                    crate::controllers::list_approvals::ListApprovalsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "create_ap_aging" => {
+            "create_approval" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_ap_aging::CreateApAgingController,
+                    crate::controllers::create_approval::CreateApprovalController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_ap_aging" => {
+            "list_payment_commitments" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_ap_aging::GetApAgingController,
+                    crate::controllers::list_payment_commitments::ListPaymentCommitmentsController,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_payment_batches" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_payment_batches::ListPaymentBatchesController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_payment_batch" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_payment_batch::CreatePaymentBatchController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "approve_payment_batch" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::approve_payment_batch::ApprovePaymentBatchController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_ap_aging" => {
+            "export_payment_batch_file" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_ap_aging::UpdateApAgingController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_ap_aging" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_ap_aging::DeleteApAgingController,
+                    crate::controllers::export_payment_batch_file::ExportPaymentBatchFileController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
@@ -162,7 +208,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_payments" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_payments::ListPaymentsController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -199,10 +245,18 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "cash_flow_forecast" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::cash_flow_forecast::CashFlowForecastController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_vendor_invoices" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_vendor_invoices::ListVendorInvoicesController,
-                    20480,
+                    28672,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -234,6 +288,22 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "delete_vendor_invoice" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_vendor_invoice::DeleteVendorInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "register_vendor_invoice_payment" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::register_vendor_invoice_payment::RegisterVendorInvoicePaymentController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "perform_vendor_invoice_three_way_match" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::perform_vendor_invoice_three_way_match::PerformVendorInvoiceThreeWayMatchController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

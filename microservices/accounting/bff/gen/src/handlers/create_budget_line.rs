@@ -9,53 +9,84 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(rename = "account_id")]
-    pub account_id: String,
+    #[serde(rename = "amount")]
+    pub amount: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "budget_amount")]
-    pub budget_amount: Option<rust_decimal::Decimal>,
+    #[serde(rename = "cost_center_id")]
+    pub cost_center_id: Option<String>,
 
-    #[serde(rename = "budget_id")]
-    pub budget_id: String,
-
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_code")]
+    pub gl_account_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_id")]
+    pub gl_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
     pub notes: Option<String>,
 
-    #[serde(rename = "period_id")]
-    pub period_id: String,
+    #[serde(rename = "period")]
+    pub period: String,
 
-    #[serde(rename = "version_id")]
-    pub version_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_name")]
+    pub period_name: Option<String>,
+
+    #[serde(rename = "id")]
+    pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "account_id")]
-    pub account_id: String,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "actual_amount")]
-    pub actual_amount: Option<rust_decimal::Decimal>,
+    pub actual_amount: Option<f64>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "budget_amount")]
-    pub budget_amount: Option<rust_decimal::Decimal>,
+    #[serde(rename = "amount")]
+    pub amount: f64,
 
     #[serde(rename = "budget_id")]
     pub budget_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "cost_center_id")]
+    pub cost_center_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_code")]
+    pub gl_account_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_id")]
+    pub gl_account_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_name")]
+    pub gl_account_name: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -64,8 +95,12 @@ pub struct Response {
     #[serde(rename = "notes")]
     pub notes: Option<String>,
 
-    #[serde(rename = "period_id")]
-    pub period_id: String,
+    #[serde(rename = "period")]
+    pub period: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_name")]
+    pub period_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
@@ -73,14 +108,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variance")]
-    pub variance: Option<rust_decimal::Decimal>,
+    pub variance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variance_percent")]
-    pub variance_percent: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "version_id")]
-    pub version_id: String,
+    pub variance_percent: Option<f64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -90,6 +122,20 @@ impl TryFrom<HandlerRequest> for Request {
         use serde_json::{Map, Value};
 
         let mut data_map = Map::new();
+
+        if let Some(v) = req.get_path_param("id") {
+            data_map.insert(
+                "id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+            return Err(anyhow::anyhow!("Missing required parameter 'id'"));
+        }
 
         if let Some(body) = req.body {
             match body {
@@ -106,9 +152,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::create_budget_line::handle(req)
 }

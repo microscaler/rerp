@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::CreateBudgetLineRequest;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
@@ -10,8 +11,8 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approval_status")]
-    pub approval_status: Option<String>,
+    #[serde(rename = "budget_lines")]
+    pub budget_lines: Option<Vec<CreateBudgetLineRequest>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
@@ -20,6 +21,10 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "name")]
     pub name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
@@ -37,6 +42,10 @@ pub struct Response {
     pub approval_status: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "approved_amount")]
+    pub approved_amount: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "approved_at")]
     pub approved_at: Option<String>,
 
@@ -44,12 +53,12 @@ pub struct Response {
     #[serde(rename = "approved_by")]
     pub approved_by: Option<String>,
 
-    #[serde(rename = "budget_number")]
-    pub budget_number: String,
+    #[serde(rename = "company_id")]
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    #[serde(rename = "cost_center_id")]
+    pub cost_center_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -59,12 +68,13 @@ pub struct Response {
     #[serde(rename = "created_by")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "current_version_id")]
-    pub current_version_id: Option<String>,
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
@@ -76,41 +86,35 @@ pub struct Response {
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
     #[serde(rename = "name")]
     pub name: String,
 
-    #[serde(rename = "period_end")]
-    pub period_end: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
-    #[serde(rename = "period_start")]
-    pub period_start: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_type")]
+    pub period_type: Option<String>,
 
     #[serde(rename = "status")]
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_actual_amount")]
-    pub total_actual_amount: Option<rust_decimal::Decimal>,
+    #[serde(rename = "submitted_at")]
+    pub submitted_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_budget_amount")]
-    pub total_budget_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_variance")]
-    pub total_variance: Option<rust_decimal::Decimal>,
+    #[serde(rename = "total_amount")]
+    pub total_amount: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
+    #[serde(rename = "version")]
+    pub version: Option<i32>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

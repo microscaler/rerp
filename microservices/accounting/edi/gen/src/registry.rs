@@ -12,6 +12,12 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
+        "list_edi_acknowledgments",
+        crate::controllers::list_edi_acknowledgments::ListEdiAcknowledgmentsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_edi_documents",
         crate::controllers::list_edi_documents::ListEdiDocumentsController,
         20480,
@@ -38,6 +44,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "delete_edi_document",
         crate::controllers::delete_edi_document::DeleteEdiDocumentController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_edi_errors",
+        crate::controllers::list_edi_errors::ListEdiErrorsController,
         20480,
     );
 
@@ -70,6 +82,60 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::delete_edi_mapping::DeleteEdiMappingController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_edi_profiles",
+        crate::controllers::list_edi_profiles::ListEdiProfilesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_edi_profile",
+        crate::controllers::create_edi_profile::CreateEdiProfileController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_edi_submissions",
+        crate::controllers::list_edi_submissions::ListEdiSubmissionsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_edi_submission",
+        crate::controllers::create_edi_submission::CreateEdiSubmissionController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "retry_edi_submission",
+        crate::controllers::retry_edi_submission::RetryEdiSubmissionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_edi_submission_status",
+        crate::controllers::get_edi_submission_status::GetEdiSubmissionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "submit_edi_submission",
+        crate::controllers::submit_edi_submission::SubmitEdiSubmissionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_edi_validation_profiles",
+        crate::controllers::list_edi_validation_profiles::ListEdiValidationProfilesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_edi_validation_profile",
+        crate::controllers::create_edi_validation_profile::CreateEdiValidationProfileController,
+        16384,
+    );
 }
 
 /// Dynamically register handlers for the provided routes using their handler names.
@@ -89,6 +155,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
+            "list_edi_acknowledgments" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_edi_acknowledgments::ListEdiAcknowledgmentsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_edi_documents" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_edi_documents::ListEdiDocumentsController,
@@ -124,6 +198,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "delete_edi_document" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_edi_document::DeleteEdiDocumentController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_edi_errors" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_edi_errors::ListEdiErrorsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
@@ -165,6 +247,78 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_edi_mapping::DeleteEdiMappingController,
                     20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_edi_profiles" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_edi_profiles::ListEdiProfilesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_edi_profile" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_edi_profile::CreateEdiProfileController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_edi_submissions" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_edi_submissions::ListEdiSubmissionsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_edi_submission" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_edi_submission::CreateEdiSubmissionController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "retry_edi_submission" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::retry_edi_submission::RetryEdiSubmissionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_edi_submission_status" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_edi_submission_status::GetEdiSubmissionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "submit_edi_submission" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::submit_edi_submission::SubmitEdiSubmissionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_edi_validation_profiles" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_edi_validation_profiles::ListEdiValidationProfilesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_edi_validation_profile" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_edi_validation_profile::CreateEdiValidationProfileController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

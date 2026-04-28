@@ -30,7 +30,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
-        description: None, // TODO: Set from your business logic
+        description: String::new(), // TODO: Set from your business logic
 
         id: "a0070e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
@@ -38,12 +38,12 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         is_system_account: false, // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
         name: "Cash - Operating Account (Updated)".to_string(), // TODO: Set from your business logic
 
         normal_balance: "DEBIT".to_string(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
     }
 }

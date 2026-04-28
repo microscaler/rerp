@@ -1,0 +1,1327 @@
+openapi: 3.1.0
+info:
+  title: Inventory API Gateway
+  description: 'Complete inventory management from stock tracking to warehouse operations and logistics.. This aggregates
+    and proxies requests to Inventory microservices. This is the single entry point for the Inventory system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/inventory/core/*` → Core Service
+
+    - `/api/v1/inventory/dropshipping/*` → Dropshipping Service
+
+    - `/api/v1/inventory/logistics/*` → Logistics Service
+
+    - `/api/v1/inventory/warehouse/*` → Warehouse Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/inventory/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/inventory
+  description: Inventory API Gateway
+tags: []
+paths:
+  /carriers:
+    get:
+      operationId: list_carriers
+      summary: List carriers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of carriers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Carrier'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    post:
+      operationId: create_carrier
+      summary: Create carrier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCarrierRequest'
+      responses:
+        '201':
+          description: Carrier created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '400':
+          description: Invalid request
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /carriers/{id}:
+    get:
+      operationId: get_carrier
+      summary: Get carrier by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Carrier details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    put:
+      operationId: update_carrier
+      summary: Update carrier
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCarrierRequest'
+      responses:
+        '200':
+          description: Carrier updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    delete:
+      operationId: delete_carrier
+      summary: Delete carrier
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Carrier deleted
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /dropship-orders:
+    get:
+      operationId: list_dropship_orders
+      summary: List dropship-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of dropship-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DropshipOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    post:
+      operationId: create_dropship_order
+      summary: Create dropship-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDropshipOrderRequest'
+      responses:
+        '201':
+          description: DropshipOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '400':
+          description: Invalid request
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+  /dropship-orders/{id}:
+    get:
+      operationId: get_dropship_order
+      summary: Get dropship-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: DropshipOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    put:
+      operationId: update_dropship_order
+      summary: Update dropship-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDropshipOrderRequest'
+      responses:
+        '200':
+          description: DropshipOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropshipOrder'
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    delete:
+      operationId: delete_dropship_order
+      summary: Delete dropship-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: DropshipOrder deleted
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+  /locations:
+    get:
+      operationId: list_locations
+      summary: List locations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of locations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Location'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    post:
+      operationId: create_location
+      summary: Create location
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLocationRequest'
+      responses:
+        '201':
+          description: Location created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: Invalid request
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+  /locations/{id}:
+    get:
+      operationId: get_location
+      summary: Get location by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Location details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    put:
+      operationId: update_location
+      summary: Update location
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocationRequest'
+      responses:
+        '200':
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    delete:
+      operationId: delete_location
+      summary: Delete location
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Location deleted
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+  /shipments:
+    get:
+      operationId: list_shipments
+      summary: List shipments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of shipments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shipment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    post:
+      operationId: create_shipment
+      summary: Create shipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentRequest'
+      responses:
+        '201':
+          description: Shipment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '400':
+          description: Invalid request
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /shipments/{id}:
+    get:
+      operationId: get_shipment
+      summary: Get shipment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Shipment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    put:
+      operationId: update_shipment
+      summary: Update shipment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShipmentRequest'
+      responses:
+        '200':
+          description: Shipment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shipment'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    delete:
+      operationId: delete_shipment
+      summary: Delete shipment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Shipment deleted
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /shipping-rates:
+    get:
+      operationId: list_shipping_rates
+      summary: List shipping-rates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of shipping-rates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShippingRate'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    post:
+      operationId: create_shipping_rate
+      summary: Create shipping-rate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShippingRateRequest'
+      responses:
+        '201':
+          description: ShippingRate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '400':
+          description: Invalid request
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /shipping-rates/{id}:
+    get:
+      operationId: get_shipping_rate
+      summary: Get shipping-rate by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: ShippingRate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    put:
+      operationId: update_shipping_rate
+      summary: Update shipping-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShippingRateRequest'
+      responses:
+        '200':
+          description: ShippingRate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRate'
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+    delete:
+      operationId: delete_shipping_rate
+      summary: Delete shipping-rate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: ShippingRate deleted
+        '404':
+          description: Not found
+      x-service: logistics
+      x-service-base-path: /api/v1/inventory/logistics
+  /stock-movements:
+    get:
+      operationId: list_stock_movements
+      summary: List stock-movements
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stock-movements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockMovement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    post:
+      operationId: create_stock_movement
+      summary: Create stock-movement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockMovementRequest'
+      responses:
+        '201':
+          description: StockMovement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /stock-movements/{id}:
+    get:
+      operationId: get_stock_movement
+      summary: Get stock-movement by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: StockMovement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    put:
+      operationId: update_stock_movement
+      summary: Update stock-movement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockMovementRequest'
+      responses:
+        '200':
+          description: StockMovement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    delete:
+      operationId: delete_stock_movement
+      summary: Delete stock-movement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: StockMovement deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /stock-valuations:
+    get:
+      operationId: list_stock_valuations
+      summary: List stock-valuations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stock-valuations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockValuation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    post:
+      operationId: create_stock_valuation
+      summary: Create stock-valuation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockValuationRequest'
+      responses:
+        '201':
+          description: StockValuation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /stock-valuations/{id}:
+    get:
+      operationId: get_stock_valuation
+      summary: Get stock-valuation by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: StockValuation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    put:
+      operationId: update_stock_valuation
+      summary: Update stock-valuation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockValuationRequest'
+      responses:
+        '200':
+          description: StockValuation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    delete:
+      operationId: delete_stock_valuation
+      summary: Delete stock-valuation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: StockValuation deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /stocks:
+    get:
+      operationId: list_stocks
+      summary: List stocks
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stocks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Stock'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    post:
+      operationId: create_stock
+      summary: Create stock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockRequest'
+      responses:
+        '201':
+          description: Stock created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /stocks/{id}:
+    get:
+      operationId: get_stock
+      summary: Get stock by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    put:
+      operationId: update_stock
+      summary: Update stock
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockRequest'
+      responses:
+        '200':
+          description: Stock updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+    delete:
+      operationId: delete_stock
+      summary: Delete stock
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Stock deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/inventory/core
+  /transfers:
+    get:
+      operationId: list_transfers
+      summary: List transfers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of transfers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transfer'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    post:
+      operationId: create_transfer
+      summary: Create transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransferRequest'
+      responses:
+        '201':
+          description: Transfer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '400':
+          description: Invalid request
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+  /transfers/{id}:
+    get:
+      operationId: get_transfer
+      summary: Get transfer by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Transfer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    put:
+      operationId: update_transfer
+      summary: Update transfer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransferRequest'
+      responses:
+        '200':
+          description: Transfer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    delete:
+      operationId: delete_transfer
+      summary: Delete transfer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Transfer deleted
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+  /vendor-orders:
+    get:
+      operationId: list_vendor_orders
+      summary: List vendor-orders
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of vendor-orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VendorOrder'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    post:
+      operationId: create_vendor_order
+      summary: Create vendor-order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVendorOrderRequest'
+      responses:
+        '201':
+          description: VendorOrder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '400':
+          description: Invalid request
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+  /vendor-orders/{id}:
+    get:
+      operationId: get_vendor_order
+      summary: Get vendor-order by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: VendorOrder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    put:
+      operationId: update_vendor_order
+      summary: Update vendor-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVendorOrderRequest'
+      responses:
+        '200':
+          description: VendorOrder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorOrder'
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+    delete:
+      operationId: delete_vendor_order
+      summary: Delete vendor-order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: VendorOrder deleted
+        '404':
+          description: Not found
+      x-service: dropshipping
+      x-service-base-path: /api/v1/inventory/dropshipping
+  /warehouses:
+    get:
+      operationId: list_warehouses
+      summary: List warehouses
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of warehouses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Warehouse'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    post:
+      operationId: create_warehouse
+      summary: Create warehouse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWarehouseRequest'
+      responses:
+        '201':
+          description: Warehouse created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '400':
+          description: Invalid request
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+  /warehouses/{id}:
+    get:
+      operationId: get_warehouse
+      summary: Get warehouse by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Warehouse details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    put:
+      operationId: update_warehouse
+      summary: Update warehouse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWarehouseRequest'
+      responses:
+        '200':
+          description: Warehouse updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+    delete:
+      operationId: delete_warehouse
+      summary: Delete warehouse
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Warehouse deleted
+        '404':
+          description: Not found
+      x-service: warehouse
+      x-service-base-path: /api/v1/inventory/warehouse
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

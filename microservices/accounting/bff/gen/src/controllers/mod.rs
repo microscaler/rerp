@@ -3,195 +3,19 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_accounts;
+pub mod list_approvals;
 
-pub mod create_account;
+pub mod create_approval;
 
-pub mod get_account;
+pub mod list_payment_commitments;
 
-pub mod update_account;
+pub mod list_payment_batches;
 
-pub mod delete_account;
+pub mod create_payment_batch;
 
-pub mod list_ap_agings;
+pub mod approve_payment_batch;
 
-pub mod create_ap_aging;
-
-pub mod get_ap_aging;
-
-pub mod update_ap_aging;
-
-pub mod delete_ap_aging;
-
-pub mod list_ar_agings;
-
-pub mod create_ar_aging;
-
-pub mod get_ar_aging;
-
-pub mod update_ar_aging;
-
-pub mod delete_ar_aging;
-
-pub mod list_asset_registers;
-
-pub mod create_asset_register;
-
-pub mod get_asset_register;
-
-pub mod update_asset_register;
-
-pub mod delete_asset_register;
-
-pub mod list_assets;
-
-pub mod create_asset;
-
-pub mod get_asset;
-
-pub mod update_asset;
-
-pub mod delete_asset;
-
-pub mod list_bank_accounts;
-
-pub mod create_bank_account;
-
-pub mod get_bank_account;
-
-pub mod update_bank_account;
-
-pub mod delete_bank_account;
-
-pub mod list_bank_statements;
-
-pub mod create_bank_statement;
-
-pub mod get_bank_statement;
-
-pub mod update_bank_statement;
-
-pub mod delete_bank_statement;
-
-pub mod list_budget_lines;
-
-pub mod create_budget_line;
-
-pub mod get_budget_line;
-
-pub mod update_budget_line;
-
-pub mod delete_budget_line;
-
-pub mod list_budget_variances;
-
-pub mod create_budget_variance;
-
-pub mod get_budget_variance;
-
-pub mod update_budget_variance;
-
-pub mod delete_budget_variance;
-
-pub mod list_budgets;
-
-pub mod create_budget;
-
-pub mod get_budget;
-
-pub mod update_budget;
-
-pub mod delete_budget;
-
-pub mod list_chart_of_accounts;
-
-pub mod create_chart_of_account;
-
-pub mod get_chart_of_account;
-
-pub mod update_chart_of_account;
-
-pub mod delete_chart_of_account;
-
-pub mod list_customer_invoices;
-
-pub mod create_customer_invoice;
-
-pub mod get_customer_invoice;
-
-pub mod update_customer_invoice;
-
-pub mod delete_customer_invoice;
-
-pub mod list_depreciations;
-
-pub mod create_depreciation;
-
-pub mod get_depreciation;
-
-pub mod update_depreciation;
-
-pub mod delete_depreciation;
-
-pub mod list_edi_documents;
-
-pub mod create_edi_document;
-
-pub mod get_edi_document;
-
-pub mod update_edi_document;
-
-pub mod delete_edi_document;
-
-pub mod list_edi_mappings;
-
-pub mod create_edi_mapping;
-
-pub mod get_edi_mapping;
-
-pub mod update_edi_mapping;
-
-pub mod delete_edi_mapping;
-
-pub mod list_financial_statements;
-
-pub mod create_financial_statement;
-
-pub mod get_financial_statement;
-
-pub mod update_financial_statement;
-
-pub mod delete_financial_statement;
-
-pub mod list_invoice_lines;
-
-pub mod create_invoice_line;
-
-pub mod get_invoice_line;
-
-pub mod update_invoice_line;
-
-pub mod delete_invoice_line;
-
-pub mod list_invoices;
-
-pub mod create_invoice;
-
-pub mod get_invoice;
-
-pub mod update_invoice;
-
-pub mod delete_invoice;
-
-pub mod list_journal_entrys;
-
-pub mod create_journal_entry;
-
-pub mod get_journal_entry;
-
-pub mod update_journal_entry;
-
-pub mod delete_journal_entry;
+pub mod export_payment_batch_file;
 
 pub mod list_payments;
 
@@ -203,25 +27,7 @@ pub mod update_payment;
 
 pub mod delete_payment;
 
-pub mod list_reconciliations;
-
-pub mod create_reconciliation;
-
-pub mod get_reconciliation;
-
-pub mod update_reconciliation;
-
-pub mod delete_reconciliation;
-
-pub mod list_reports;
-
-pub mod create_report;
-
-pub mod get_report;
-
-pub mod update_report;
-
-pub mod delete_report;
+pub mod cash_flow_forecast;
 
 pub mod list_vendor_invoices;
 
@@ -232,3 +38,607 @@ pub mod get_vendor_invoice;
 pub mod update_vendor_invoice;
 
 pub mod delete_vendor_invoice;
+
+pub mod register_vendor_invoice_payment;
+
+pub mod perform_vendor_invoice_three_way_match;
+
+pub mod list_ar_agings;
+
+pub mod create_ar_aging;
+
+pub mod get_ar_aging;
+
+pub mod list_collection_cases;
+
+pub mod create_collection_case;
+
+pub mod list_collection_activities;
+
+pub mod create_collection_activity;
+
+pub mod list_credit_memos;
+
+pub mod create_credit_memo;
+
+pub mod list_customer_invoices;
+
+pub mod create_customer_invoice;
+
+pub mod get_customer_invoice;
+
+pub mod update_customer_invoice;
+
+pub mod delete_customer_invoice;
+
+pub mod send_customer_statements;
+
+pub mod list_follow_up_levels;
+
+pub mod create_follow_up_level;
+
+pub mod create_follow_up_run;
+
+pub mod create_payment_promise;
+
+pub mod list_payments_1;
+
+pub mod create_payment_1;
+
+pub mod create_payment_application;
+
+pub mod get_payment_1;
+
+pub mod update_payment_1;
+
+pub mod delete_payment_1;
+
+pub mod list_payment_applications;
+
+pub mod auto_apply_payment;
+
+pub mod aging_summary;
+
+pub mod collections_summary;
+
+pub mod list_asset_models;
+
+pub mod create_asset_model;
+
+pub mod list_assets;
+
+pub mod create_asset;
+
+pub mod bulk_depreciate;
+
+pub mod get_asset;
+
+pub mod update_asset;
+
+pub mod delete_asset;
+
+pub mod run_depreciation;
+
+pub mod list_depreciation_entries;
+
+pub mod modify_asset;
+
+pub mod pause_asset_depreciation;
+
+pub mod resume_asset_depreciation;
+
+pub mod validate_asset;
+
+pub mod list_asset_categories;
+
+pub mod create_asset_category;
+
+pub mod list_disposals;
+
+pub mod create_disposal;
+
+pub mod asset_summary;
+
+pub mod list_revaluations;
+
+pub mod create_revaluation;
+
+pub mod list_approval_policies;
+
+pub mod create_approval_policy;
+
+pub mod list_audit_events;
+
+pub mod list_control_exceptions;
+
+pub mod create_control_exception;
+
+pub mod list_segregation_rules;
+
+pub mod create_segregation_rule;
+
+pub mod list_signature_requests;
+
+pub mod create_signature_request;
+
+pub mod sign_signature_request;
+
+pub mod list_bank_accounts;
+
+pub mod create_bank_account;
+
+pub mod get_bank_account;
+
+pub mod update_bank_account;
+
+pub mod delete_bank_account;
+
+pub mod list_reconciliation_models;
+
+pub mod create_reconciliation_model;
+
+pub mod list_reconciliations;
+
+pub mod create_reconciliation;
+
+pub mod complete_reconciliation;
+
+pub mod cash_position;
+
+pub mod reconciliation_report;
+
+pub mod list_bank_statements;
+
+pub mod create_bank_statement;
+
+pub mod get_bank_statement;
+
+pub mod trigger_statement_sync;
+
+pub mod list_bank_transactions;
+
+pub mod auto_match_transactions;
+
+pub mod create_transaction_exchange_difference;
+
+pub mod match_transaction;
+
+pub mod reconcile_transaction;
+
+pub mod get_transaction_reconciliation_suggestions;
+
+pub mod unreconcile_transaction;
+
+pub mod create_transaction_write_off;
+
+pub mod list_budget_revisions;
+
+pub mod create_budget_revision;
+
+pub mod list_budgets;
+
+pub mod create_budget;
+
+pub mod get_budget;
+
+pub mod update_budget;
+
+pub mod delete_budget;
+
+pub mod cancel_budget;
+
+pub mod complete_budget;
+
+pub mod confirm_budget;
+
+pub mod list_budget_lines;
+
+pub mod create_budget_line;
+
+pub mod reopen_budget;
+
+pub mod submit_budget;
+
+pub mod list_forecasts;
+
+pub mod create_forecast;
+
+pub mod variance_report;
+
+pub mod list_consolidation_groups;
+
+pub mod create_consolidation_group;
+
+pub mod list_consolidation_runs;
+
+pub mod create_consolidation_run;
+
+pub mod execute_consolidation_run;
+
+pub mod list_elimination_entries;
+
+pub mod list_elimination_rules;
+
+pub mod create_elimination_rule;
+
+pub mod list_group_reporting_packs;
+
+pub mod create_group_reporting_pack;
+
+pub mod list_accounting_documents;
+
+pub mod create_accounting_document;
+
+pub mod classify_accounting_document;
+
+pub mod approve_document_extraction;
+
+pub mod link_document_to_bank_statement;
+
+pub mod link_document_to_invoice;
+
+pub mod list_extraction_jobs;
+
+pub mod create_extraction_job;
+
+pub mod list_extraction_results;
+
+pub mod list_edi_acknowledgments;
+
+pub mod list_edi_documents;
+
+pub mod create_edi_document;
+
+pub mod get_edi_document;
+
+pub mod update_edi_document;
+
+pub mod delete_edi_document;
+
+pub mod list_edi_errors;
+
+pub mod list_edi_mappings;
+
+pub mod create_edi_mapping;
+
+pub mod get_edi_mapping;
+
+pub mod update_edi_mapping;
+
+pub mod delete_edi_mapping;
+
+pub mod list_edi_profiles;
+
+pub mod create_edi_profile;
+
+pub mod list_edi_submissions;
+
+pub mod create_edi_submission;
+
+pub mod retry_edi_submission;
+
+pub mod get_edi_submission_status;
+
+pub mod submit_edi_submission;
+
+pub mod list_edi_validation_profiles;
+
+pub mod create_edi_validation_profile;
+
+pub mod list_custom_reports;
+
+pub mod create_custom_report;
+
+pub mod get_custom_report;
+
+pub mod update_custom_report;
+
+pub mod delete_custom_report;
+
+pub mod execute_custom_report;
+
+pub mod drill_down_report_cell;
+
+pub mod list_report_definitions;
+
+pub mod create_report_definition;
+
+pub mod list_report_definition_lines;
+
+pub mod list_report_executions;
+
+pub mod create_report_export;
+
+pub mod generate_balance_sheet;
+
+pub mod generate_cash_flow;
+
+pub mod generate_general_ledger;
+
+pub mod generate_income_statement;
+
+pub mod generate_trial_balance;
+
+pub mod list_statutory_report_packs;
+
+pub mod list_accounts;
+
+pub mod create_account;
+
+pub mod get_account;
+
+pub mod update_account;
+
+pub mod delete_account;
+
+pub mod get_account_balance;
+
+pub mod list_chart_of_accounts;
+
+pub mod create_chart_of_account;
+
+pub mod get_chart_of_account;
+
+pub mod update_chart_of_account;
+
+pub mod delete_chart_of_account;
+
+pub mod list_chart_templates;
+
+pub mod create_chart_template;
+
+pub mod get_chart_template;
+
+pub mod update_chart_template;
+
+pub mod delete_chart_template;
+
+pub mod deploy_chart_template;
+
+pub mod create_currency_revaluation;
+
+pub mod list_fiscal_periods;
+
+pub mod create_fiscal_period;
+
+pub mod get_fiscal_period;
+
+pub mod update_fiscal_period;
+
+pub mod delete_fiscal_period;
+
+pub mod list_fiscal_positions;
+
+pub mod create_fiscal_position;
+
+pub mod get_fiscal_position;
+
+pub mod update_fiscal_position;
+
+pub mod delete_fiscal_position;
+
+pub mod list_fiscal_years;
+
+pub mod create_fiscal_year;
+
+pub mod get_fiscal_year;
+
+pub mod update_fiscal_year;
+
+pub mod delete_fiscal_year;
+
+pub mod close_fiscal_year;
+
+pub mod reopen_fiscal_year;
+
+pub mod list_fiscal_year_periods;
+
+pub mod generate_fiscal_year_periods;
+
+pub mod list_journal_entries;
+
+pub mod create_journal_entry;
+
+pub mod bulk_approve_journal_entries;
+
+pub mod bulk_post_journal_entries;
+
+pub mod get_journal_entry;
+
+pub mod update_journal_entry;
+
+pub mod delete_journal_entry;
+
+pub mod approve_journal_entry;
+
+pub mod list_journal_entry_lines;
+
+pub mod post_journal_entry;
+
+pub mod reverse_journal_entry;
+
+pub mod list_journal_items;
+
+pub mod reconcile_journal_items;
+
+pub mod unreconcile_journal_items;
+
+pub mod list_journals;
+
+pub mod create_journal;
+
+pub mod get_journal;
+
+pub mod update_journal;
+
+pub mod delete_journal;
+
+pub mod list_journal_entries_by_journal;
+
+pub mod list_lock_dates;
+
+pub mod create_lock_date;
+
+pub mod list_payment_methods;
+
+pub mod create_payment_method;
+
+pub mod get_payment_method;
+
+pub mod update_payment_method;
+
+pub mod delete_payment_method;
+
+pub mod list_payment_method_journal_mappings;
+
+pub mod list_payment_terms;
+
+pub mod create_payment_term;
+
+pub mod get_payment_term;
+
+pub mod update_payment_term;
+
+pub mod delete_payment_term;
+
+pub mod account_balances_report;
+
+pub mod ledger_report;
+
+pub mod trial_balance;
+
+pub mod list_tax_repartition_lines;
+
+pub mod create_tax_repartition_line;
+
+pub mod get_tax_repartition_line;
+
+pub mod update_tax_repartition_line;
+
+pub mod delete_tax_repartition_line;
+
+pub mod list_invoices;
+
+pub mod create_invoice;
+
+pub mod get_invoice;
+
+pub mod update_invoice;
+
+pub mod delete_invoice;
+
+pub mod approve_invoice;
+
+pub mod cancel_invoice;
+
+pub mod create_invoice_credit_note;
+
+pub mod handoff_invoice_to_deferral;
+
+pub mod handoff_invoice_to_einvoice;
+
+pub mod list_invoice_line_items;
+
+pub mod create_line_item;
+
+pub mod update_line_item;
+
+pub mod delete_line_item;
+
+pub mod list_invoice_payment_matches;
+
+pub mod post_invoice;
+
+pub mod register_invoice_payment;
+
+pub mod void_invoice;
+
+pub mod get_invoice_workflow_history;
+
+pub mod invoice_summary;
+
+pub mod calculate_tax;
+
+pub mod list_tax_rates;
+
+pub mod list_lease_liabilities;
+
+pub mod list_lease_modifications;
+
+pub mod create_lease_modification;
+
+pub mod approve_lease_modification;
+
+pub mod list_lease_payment_schedules;
+
+pub mod create_lease_payment_schedule;
+
+pub mod list_leases;
+
+pub mod create_lease;
+
+pub mod list_right_of_use_assets;
+
+pub mod list_deferred_expenses;
+
+pub mod create_deferred_expense;
+
+pub mod list_deferred_revenues;
+
+pub mod create_deferred_revenue;
+
+pub mod list_recognition_rules;
+
+pub mod create_recognition_rule;
+
+pub mod list_recognition_runs;
+
+pub mod create_recognition_run;
+
+pub mod post_recognition_run;
+
+pub mod list_recognition_schedules;
+
+pub mod create_recognition_schedule;
+
+pub mod list_tax_audit_packs;
+
+pub mod create_tax_audit_pack;
+
+pub mod list_tax_payments;
+
+pub mod create_tax_payment;
+
+pub mod list_tax_periods;
+
+pub mod create_tax_period;
+
+pub mod list_tax_returns;
+
+pub mod create_tax_return;
+
+pub mod submit_tax_return;
+
+pub mod validate_tax_return;
+
+pub mod list_tax_rules;
+
+pub mod create_tax_rule;
+
+pub mod list_bank_relationships;
+
+pub mod create_bank_relationship;
+
+pub mod list_cash_forecasts;
+
+pub mod create_cash_forecast;
+
+pub mod list_cash_positions;
+
+pub mod list_cash_transfers;
+
+pub mod create_cash_transfer;
+
+pub mod list_liquidity_plans;
+
+pub mod create_liquidity_plan;

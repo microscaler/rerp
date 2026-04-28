@@ -22,27 +22,27 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         aging_date: "2024-01-31".to_string(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
-        current: None, // TODO: Set from your business logic
+        current: String::new(), // TODO: Set from your business logic
 
-        days_31_60: None, // TODO: Set from your business logic
+        days_31_60: String::new(), // TODO: Set from your business logic
 
-        days_61_90: None, // TODO: Set from your business logic
+        days_61_90: String::new(), // TODO: Set from your business logic
 
-        days_91_120: None, // TODO: Set from your business logic
+        days_91_120: String::new(), // TODO: Set from your business logic
 
         id: "a00b0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        over_120: None, // TODO: Set from your business logic
+        over_120: String::new(), // TODO: Set from your business logic
 
-        total_outstanding: None, // TODO: Set from your business logic
+        total_outstanding: 0, // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
         vendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
     }

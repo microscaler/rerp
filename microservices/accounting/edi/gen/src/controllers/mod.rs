@@ -3,6 +3,8 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
+pub mod list_edi_acknowledgments;
+
 pub mod list_edi_documents;
 
 pub mod create_edi_document;
@@ -13,6 +15,8 @@ pub mod update_edi_document;
 
 pub mod delete_edi_document;
 
+pub mod list_edi_errors;
+
 pub mod list_edi_mappings;
 
 pub mod create_edi_mapping;
@@ -22,3 +26,21 @@ pub mod get_edi_mapping;
 pub mod update_edi_mapping;
 
 pub mod delete_edi_mapping;
+
+pub mod list_edi_profiles;
+
+pub mod create_edi_profile;
+
+pub mod list_edi_submissions;
+
+pub mod create_edi_submission;
+
+pub mod retry_edi_submission;
+
+pub mod get_edi_submission_status;
+
+pub mod submit_edi_submission;
+
+pub mod list_edi_validation_profiles;
+
+pub mod create_edi_validation_profile;

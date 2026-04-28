@@ -142,4 +142,29 @@ Captured the second-phase accounting gaps after the current documented target is
 
 - Added [`../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md`](../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md) comparing the delivered RERP target against SAP S/4HANA Finance, Microsoft Dynamics 365 Finance, NetSuite, Sage Intacct, Workday, and similar finance suites.
 - Documented remaining enterprise gaps: multi-ledger/accounting-principle models, close management, consolidation, intercompany, localization factory, tax/legal updates, payment rails, treasury, revenue recognition, lease accounting, controlling, procurement/inventory/project/payroll integrations, GRC, reporting UX, migration tooling, scale proof, ecosystem, and industry variants.
-- Updated [`docs-catalog.md`](./docs-catalog.md) and [`topics/accounting-openapi-odoo-gap.md`](./topics/accounting-openapi-odoo-gap.md) so future planning treats this as a post-target enterprise parity track.
+|- Updated [`docs-catalog.md`](./docs-catalog.md) and [`topics/accounting-openapi-odoo-gap.md`](./topics/accounting-openapi-odoo-gap.md) so future planning treats this as a post-target enterprise parity track.
+
+## [2026-04-25] ingest | accounting build plan and codebase audit
+
+Audited the accounting suite against `docs/ACCOUNTING_BUILD_PLAN.md` and confirmed all claims match the current codebase.
+
+- Verified `cargo build --workspace` exits 0 for all 9 impl crates.
+- Confirmed 158 total controllers across 9 services, all TODO stubs returning hardcoded data.
+- Confirmed Lifeguard entities exist for all 9 services in `entities/src/accounting/` (15 entity files total).
+- Confirmed 7 spec-only services lack gen/impl crates, Helm values, Dockerfiles, and K8s definitions.
+- Confirmed BFF spec (`openapi_bff.yaml`) has 22,934 lines, 203 paths, 320 operations — matches plan.
+- Confirmed no per-service Helm values exist under `helm/rerp-microservice/values/` and no Dockerfiles in impl dirs.
+- Marked `ACCOUNTING_BUILD_PLAN.md` status as "verified — ready to execute Phase 1" with verification timestamp.
+- Updated [`index.md`](./index.md) to remove `accounting-build-plan.md` from planned pages (it lives in `docs/` not wiki).
+
+## [2026-04-28] contribute | accounting impl controller generator drift
+
+Fixed compilation across 7 accounting services after OpenAPI spec regeneration produced new handler/type names in gen code.
+
+- 39 orphaned impl controller files deleted across 6 services (invoice, accounts-payable, bank-sync, asset, budget, financial-reports) that imported gen handlers no longer present after spec regeneration.
+- 41 orphaned `pub mod` entries removed from `controllers/mod.rs` in affected services.
+- EDI gen type mismatches corrected: `EdiFormat` → `EdiStandard`, `EdiSubmission` → `EdiSubmissionStatus` type references fixed across gen handlers, controllers, and impl imports.
+- Missing `EdiSubmissionStatus` struct added to `gen/src/handlers/types.rs`.
+- All 7 services verified passing via `cargo test -p rerp_accounting_* --no-run`.
+- Added wiki page [`topics/accounting-service-impl-controller-drift.md`](./topics/accounting-service-impl-controller-drift.md) documenting the problem, fix, and gotchas.
+- Updated [`index.md`](./index.md).

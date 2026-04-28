@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger::handlers::delete_account::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::delete_account::{Request, Response};
 
 #[handler(DeleteAccountController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

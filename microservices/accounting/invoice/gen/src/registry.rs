@@ -12,39 +12,9 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_invoice_lines",
-        crate::controllers::list_invoice_lines::ListInvoiceLinesController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_invoice_line",
-        crate::controllers::create_invoice_line::CreateInvoiceLineController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "get_invoice_line",
-        crate::controllers::get_invoice_line::GetInvoiceLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_invoice_line",
-        crate::controllers::update_invoice_line::UpdateInvoiceLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_invoice_line",
-        crate::controllers::delete_invoice_line::DeleteInvoiceLineController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "list_invoices",
         crate::controllers::list_invoices::ListInvoicesController,
-        20480,
+        28672,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -70,6 +40,108 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::delete_invoice::DeleteInvoiceController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "approve_invoice",
+        crate::controllers::approve_invoice::ApproveInvoiceController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "cancel_invoice",
+        crate::controllers::cancel_invoice::CancelInvoiceController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_invoice_credit_note",
+        crate::controllers::create_invoice_credit_note::CreateInvoiceCreditNoteController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "handoff_invoice_to_deferral",
+        crate::controllers::handoff_invoice_to_deferral::HandoffInvoiceToDeferralController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "handoff_invoice_to_einvoice",
+        crate::controllers::handoff_invoice_to_einvoice::HandoffInvoiceToEinvoiceController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_invoice_line_items",
+        crate::controllers::list_invoice_line_items::ListInvoiceLineItemsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_line_item",
+        crate::controllers::create_line_item::CreateLineItemController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_line_item",
+        crate::controllers::update_line_item::UpdateLineItemController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_line_item",
+        crate::controllers::delete_line_item::DeleteLineItemController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_invoice_payment_matches",
+        crate::controllers::list_invoice_payment_matches::ListInvoicePaymentMatchesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "post_invoice",
+        crate::controllers::post_invoice::PostInvoiceController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "register_invoice_payment",
+        crate::controllers::register_invoice_payment::RegisterInvoicePaymentController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "void_invoice",
+        crate::controllers::void_invoice::VoidInvoiceController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_invoice_workflow_history",
+        crate::controllers::get_invoice_workflow_history::GetInvoiceWorkflowHistoryController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "invoice_summary",
+        crate::controllers::invoice_summary::InvoiceSummaryController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "calculate_tax",
+        crate::controllers::calculate_tax::CalculateTaxController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_tax_rates",
+        crate::controllers::list_tax_rates::ListTaxRatesController,
+        24576,
+    );
 }
 
 /// Dynamically register handlers for the provided routes using their handler names.
@@ -89,50 +161,10 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
-            "list_invoice_lines" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_invoice_lines::ListInvoiceLinesController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_invoice_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_invoice_line::CreateInvoiceLineController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_invoice_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_invoice_line::GetInvoiceLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_invoice_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_invoice_line::UpdateInvoiceLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_invoice_line" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_invoice_line::DeleteInvoiceLineController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_invoices" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_invoices::ListInvoicesController,
-                    20480,
+                    28672,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -165,6 +197,142 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::delete_invoice::DeleteInvoiceController,
                     20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "approve_invoice" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::approve_invoice::ApproveInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "cancel_invoice" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::cancel_invoice::CancelInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_invoice_credit_note" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_invoice_credit_note::CreateInvoiceCreditNoteController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "handoff_invoice_to_deferral" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::handoff_invoice_to_deferral::HandoffInvoiceToDeferralController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "handoff_invoice_to_einvoice" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::handoff_invoice_to_einvoice::HandoffInvoiceToEinvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_invoice_line_items" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_invoice_line_items::ListInvoiceLineItemsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_line_item" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_line_item::CreateLineItemController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_line_item" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_line_item::UpdateLineItemController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_line_item" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_line_item::DeleteLineItemController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_invoice_payment_matches" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_invoice_payment_matches::ListInvoicePaymentMatchesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "post_invoice" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::post_invoice::PostInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "register_invoice_payment" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::register_invoice_payment::RegisterInvoicePaymentController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "void_invoice" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::void_invoice::VoidInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_invoice_workflow_history" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_invoice_workflow_history::GetInvoiceWorkflowHistoryController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "invoice_summary" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::invoice_summary::InvoiceSummaryController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "calculate_tax" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::calculate_tax::CalculateTaxController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_tax_rates" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_tax_rates::ListTaxRatesController,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

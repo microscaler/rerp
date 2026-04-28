@@ -2,33 +2,57 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::Account;
+use crate::handlers::types::GeneralLedgerAccount;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Request {}
-
-#[derive(Debug, Serialize)]
-
-pub struct Response {
+pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "items")]
-    pub items: Option<Vec<Account>>,
+    #[serde(rename = "page")]
+    pub page: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
     pub limit: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "page")]
-    pub page: Option<i32>,
+    #[serde(rename = "search")]
+    pub search: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_type")]
+    pub account_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "parent_id")]
+    pub parent_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "active")]
+    pub active: Option<bool>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+
+pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "has_more")]
+    pub has_more: Option<bool>,
+
+    #[serde(rename = "items")]
+    pub items: Vec<GeneralLedgerAccount>,
+
+    #[serde(rename = "limit")]
+    pub limit: i32,
+
+    #[serde(rename = "page")]
+    pub page: i32,
+
     #[serde(rename = "total")]
-    pub total: Option<i32>,
+    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -38,6 +62,90 @@ impl TryFrom<HandlerRequest> for Request {
         use serde_json::{Map, Value};
 
         let mut data_map = Map::new();
+
+        if let Some(v) = req.get_query_param("page") {
+            data_map.insert(
+                "page".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("limit") {
+            data_map.insert(
+                "limit".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("search") {
+            data_map.insert(
+                "search".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("account_type") {
+            data_map.insert(
+                "account_type".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"enum":["ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE"],"type":"string"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("parent_id") {
+            data_map.insert(
+                "parent_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("active") {
+            data_map.insert(
+                "active".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"type":"boolean"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
 
         if let Some(body) = req.body {
             match body {
@@ -54,9 +162,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::list_accounts::handle(req)
 }

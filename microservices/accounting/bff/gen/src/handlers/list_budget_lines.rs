@@ -2,33 +2,52 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::BudgetLine;
+use crate::handlers::types::BudgetBudgetLine;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Request {}
+pub struct Request {
+    #[serde(rename = "id")]
+    pub id: String,
 
-#[derive(Debug, Serialize)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_account_id")]
+    pub gl_account_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_from")]
+    pub period_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "period_to")]
+    pub period_to: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "has_more")]
+    pub has_more: Option<bool>,
+
     #[serde(rename = "items")]
-    pub items: Option<Vec<BudgetLine>>,
+    pub items: Vec<BudgetBudgetLine>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    pub limit: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "page")]
-    pub page: Option<i32>,
+    pub page: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total")]
-    pub total: Option<i32>,
+    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -38,6 +57,80 @@ impl TryFrom<HandlerRequest> for Request {
         use serde_json::{Map, Value};
 
         let mut data_map = Map::new();
+
+        if let Some(v) = req.get_path_param("id") {
+            data_map.insert(
+                "id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+            return Err(anyhow::anyhow!("Missing required parameter 'id'"));
+        }
+
+        if let Some(v) = req.get_query_param("gl_account_id") {
+            data_map.insert(
+                "gl_account_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("period_from") {
+            data_map.insert(
+                "period_from".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("period_to") {
+            data_map.insert(
+                "period_to".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("department_id") {
+            data_map.insert(
+                "department_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
 
         if let Some(body) = req.body {
             match body {
@@ -54,9 +147,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::list_budget_lines::handle(req)
 }

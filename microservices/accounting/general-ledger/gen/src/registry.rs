@@ -114,6 +114,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "create_currency_revaluation",
+        crate::controllers::create_currency_revaluation::CreateCurrencyRevaluationController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_fiscal_periods",
         crate::controllers::list_fiscal_periods::ListFiscalPeriodsController,
         20480,
@@ -294,6 +300,24 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "list_journal_items",
+        crate::controllers::list_journal_items::ListJournalItemsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "reconcile_journal_items",
+        crate::controllers::reconcile_journal_items::ReconcileJournalItemsController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "unreconcile_journal_items",
+        crate::controllers::unreconcile_journal_items::UnreconcileJournalItemsController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_journals",
         crate::controllers::list_journals::ListJournalsController,
         20480,
@@ -327,6 +351,18 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         "list_journal_entries_by_journal",
         crate::controllers::list_journal_entries_by_journal::ListJournalEntriesByJournalController,
         24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_lock_dates",
+        crate::controllers::list_lock_dates::ListLockDatesController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_lock_date",
+        crate::controllers::create_lock_date::CreateLockDateController,
+        16384,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -597,6 +633,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "create_currency_revaluation" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_currency_revaluation::CreateCurrencyRevaluationController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_fiscal_periods" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_fiscal_periods::ListFiscalPeriodsController,
@@ -837,6 +881,30 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "list_journal_items" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_journal_items::ListJournalItemsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "reconcile_journal_items" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reconcile_journal_items::ReconcileJournalItemsController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "unreconcile_journal_items" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::unreconcile_journal_items::UnreconcileJournalItemsController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_journals" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_journals::ListJournalsController,
@@ -881,6 +949,22 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_journal_entries_by_journal::ListJournalEntriesByJournalController,
                     24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_lock_dates" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_lock_dates::ListLockDatesController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_lock_date" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_lock_date::CreateLockDateController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

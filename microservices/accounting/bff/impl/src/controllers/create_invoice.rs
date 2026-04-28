@@ -20,25 +20,25 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        cancelled_at: None, // TODO: Set from your business logic
+        cancelled_at: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
-        customer_id: None, // TODO: Set from your business logic
+        customer_id: String::new(), // TODO: Set from your business logic
 
-        discount_amount: None, // TODO: Set from your business logic
+        discount_amount: String::new(), // TODO: Set from your business logic
 
-        due_date: None, // TODO: Set from your business logic
+        due_date: String::new(), // TODO: Set from your business logic
 
-        exchange_rate: None, // TODO: Set from your business logic
+        exchange_rate: String::new(), // TODO: Set from your business logic
 
         id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        internal_notes: None, // TODO: Set from your business logic
+        internal_notes: String::new(), // TODO: Set from your business logic
 
         invoice_date: "2024-01-15".to_string(), // TODO: Set from your business logic
 
@@ -46,36 +46,36 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         invoice_type: "CUSTOMER_INVOICE".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        notes: None, // TODO: Set from your business logic
+        notes: String::new(), // TODO: Set from your business logic
 
-        outstanding_amount: None, // TODO: Set from your business logic
+        outstanding_amount: String::new(), // TODO: Set from your business logic
 
-        paid_amount: None, // TODO: Set from your business logic
+        paid_amount: String::new(), // TODO: Set from your business logic
 
-        paid_at: None, // TODO: Set from your business logic
+        paid_at: String::new(), // TODO: Set from your business logic
 
         payment_state: "NOT_PAID".to_string(), // TODO: Set from your business logic
 
-        payment_term_id: None, // TODO: Set from your business logic
+        payment_term_id: String::new(), // TODO: Set from your business logic
 
-        posted_at: None, // TODO: Set from your business logic
+        posted_at: String::new(), // TODO: Set from your business logic
 
-        reference_number: None, // TODO: Set from your business logic
+        reference_number: String::new(), // TODO: Set from your business logic
 
         status: "DRAFT".to_string(), // TODO: Set from your business logic
 
-        subtotal: None, // TODO: Set from your business logic
+        subtotal: 0, // TODO: Set from your business logic
 
-        tax_amount: None, // TODO: Set from your business logic
+        tax_amount: String::new(), // TODO: Set from your business logic
 
-        total_amount: None, // TODO: Set from your business logic
+        total_amount: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        vendor_id: None, // TODO: Set from your business logic
+        vendor_id: String::new(), // TODO: Set from your business logic
 
-        vendor_reference: None, // TODO: Set from your business logic
+        vendor_reference: String::new(), // TODO: Set from your business logic
     }
 }

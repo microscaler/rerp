@@ -13,11 +13,8 @@ pub struct Request {
     pub bank_account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    #[serde(rename = "book_balance")]
+    pub book_balance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
@@ -33,62 +30,35 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "adjusted_balance")]
+    pub adjusted_balance: Option<f64>,
+
     #[serde(rename = "bank_account_id")]
     pub bank_account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "bank_balance")]
-    pub bank_balance: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "book_balance")]
-    pub book_balance: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub book_balance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "difference")]
-    pub difference: Option<rust_decimal::Decimal>,
+    pub difference: Option<f64>,
 
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
+    #[serde(rename = "matched_transactions")]
+    pub matched_transactions: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
     pub notes: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_deposits_amount")]
-    pub outstanding_deposits_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_deposits_count")]
-    pub outstanding_deposits_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_withdrawals_amount")]
-    pub outstanding_withdrawals_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_withdrawals_count")]
-    pub outstanding_withdrawals_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reconciled_at")]
@@ -101,19 +71,32 @@ pub struct Response {
     #[serde(rename = "reconciliation_date")]
     pub reconciliation_date: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "statement_balance")]
+    pub statement_balance: Option<f64>,
+
     #[serde(rename = "statement_id")]
     pub statement_id: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
-    pub status: String,
+    pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_matched")]
+    pub total_matched: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_unmatched")]
+    pub total_unmatched: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "unmatched_transactions")]
+    pub unmatched_transactions: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

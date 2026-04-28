@@ -13,7 +13,7 @@ jemalloc = ["tikv-jemallocator"]
 
 [dependencies]
 # Generated crate
-financial_reports_service_api = { path = "../gen" }
+rerp_accounting_financial_reports_gen = { path = "../gen" }
 
 # BRRTRouter (re-exported from gen crate, but may need direct access)
 brrtrouter = { workspace = true }

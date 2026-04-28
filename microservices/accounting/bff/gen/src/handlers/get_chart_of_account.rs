@@ -13,7 +13,7 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(rename = "account_type")]
@@ -88,9 +88,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_chart_of_account::handle(req)
 }

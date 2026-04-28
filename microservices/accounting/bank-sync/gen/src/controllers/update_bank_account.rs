@@ -6,62 +6,25 @@ use brrtrouter_macros::handler;
 
 #[handler(UpdateBankAccountController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "account_name": "Operating Account (Updated)",
-    //   "account_number": "CHASE-001",
-    //   "account_type": "CHECKING",
-    //   "balance": 55000.0,
-    //   "bank_name": "Chase Bank",
-    //   "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //   "created_at": "2024-01-15T10:00:00Z",
-    //   "currency_code": "USD",
-    //   "id": "a00d0e8400-e29b-41d4-a716-446655440000",
-    //   "is_active": true,
-    //   "updated_at": "2024-01-15T11:00:00Z"
-    // }
-    match serde_json::from_str::<Response>(
-        r###"{
-  "account_name": "Operating Account (Updated)",
-  "account_number": "CHASE-001",
-  "account_type": "CHECKING",
-  "balance": 55000.0,
-  "bank_name": "Chase Bank",
-  "company_id": "550e8400-e29b-41d4-a716-446655440000",
-  "created_at": "2024-01-15T10:00:00Z",
-  "currency_code": "USD",
-  "id": "a00d0e8400-e29b-41d4-a716-446655440000",
-  "is_active": true,
-  "updated_at": "2024-01-15T11:00:00Z"
-}"###,
-    ) {
-        Ok(parsed) => return parsed,
-        Err(e) => {
-            eprintln!("Failed to parse mock example JSON into Response: {}", e);
-            // Fallback to empty default structs below
-        }
-    }
-
     Response {
-        account_name: "Operating Account (Updated)".to_string(),
-        account_number: "CHASE-001".to_string(),
-        account_type: "CHECKING".to_string(),
-        bank_code: Some("example".to_string()),
-        bank_name: Some("Chase Bank".to_string()),
-        company_id: Some("550e8400-e29b-41d4-a716-446655440000".to_string()),
-        created_at: Some("2024-01-15T10:00:00Z".to_string()),
-        created_by: Some("example".to_string()),
-        currency_code: "USD".to_string(),
-        current_balance: Some(rust_decimal::Decimal::new(12345, 2)),
-        id: "a00d0e8400-e29b-41d4-a716-446655440000".to_string(),
-        is_active: true,
-        last_reconciled_at: Some("example".to_string()),
-        last_synced_at: Some("example".to_string()),
-        metadata: Some(Default::default()),
-        reconciled_balance: Some(rust_decimal::Decimal::new(12345, 2)),
-        sync_credentials: Some("example".to_string()),
-        sync_provider: Some("example".to_string()),
-        updated_at: Some("2024-01-15T11:00:00Z".to_string()),
-        updated_by: Some("example".to_string()),
+        account_number: "example".to_string(),
+        account_type: Some("example".to_string()),
+        bank_id: Some("example".to_string()),
+        bank_name: Some("example".to_string()),
+        company_id: "example".to_string(),
+        created_at: Some("example".to_string()),
+        currency_code: "example".to_string(),
+        gl_account_id: Some("example".to_string()),
+        id: "example".to_string(),
+        last_sync_date: Some("example".to_string()),
+        name: "example".to_string(),
+        notes: Some("example".to_string()),
+        opening_balance: Some(3.14),
+        opening_balance_date: Some("example".to_string()),
+        routing_number: Some("example".to_string()),
+        status: "example".to_string(),
+        sync_enabled: Some(true),
+        sync_frequency: Some("example".to_string()),
+        updated_at: Some("example".to_string()),
     }
 }

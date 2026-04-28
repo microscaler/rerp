@@ -10,12 +10,16 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
+    #[serde(rename = "custodian_id")]
+    pub custodian_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "disposal_date")]
-    pub disposal_date: Option<String>,
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "description")]
+    pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "location")]
@@ -24,6 +28,10 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "name")]
     pub name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
@@ -38,15 +46,18 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "accumulated_depreciation")]
-    pub accumulated_depreciation: Option<rust_decimal::Decimal>,
+    pub accumulated_depreciation: Option<f64>,
+
+    #[serde(rename = "acquisition_cost")]
+    pub acquisition_cost: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "accumulated_depreciation_account_id")]
-    pub accumulated_depreciation_account_id: Option<String>,
+    #[serde(rename = "acquisition_date")]
+    pub acquisition_date: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "asset_account_id")]
-    pub asset_account_id: Option<String>,
+    #[serde(rename = "acquisition_gl_entry_id")]
+    pub acquisition_gl_entry_id: Option<String>,
 
     #[serde(rename = "asset_number")]
     pub asset_number: String,
@@ -54,88 +65,73 @@ pub struct Response {
     #[serde(rename = "category_id")]
     pub category_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
     #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    pub currency_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "current_value")]
-    pub current_value: Option<rust_decimal::Decimal>,
+    #[serde(rename = "custodian_id")]
+    pub custodian_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_expense_account_id")]
-    pub depreciation_expense_account_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_method")]
-    pub depreciation_method: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_rate")]
-    pub depreciation_rate: Option<rust_decimal::Decimal>,
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
     pub description: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "disposal_date")]
-    pub disposal_date: Option<String>,
-
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "in_service_date")]
-    pub in_service_date: Option<String>,
+    #[serde(rename = "insurance_policy")]
+    pub insurance_policy: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "location")]
     pub location: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
     #[serde(rename = "name")]
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "purchase_cost")]
-    pub purchase_cost: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "purchase_date")]
-    pub purchase_date: String,
+    #[serde(rename = "net_book_value")]
+    pub net_book_value: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "salvage_value")]
-    pub salvage_value: Option<rust_decimal::Decimal>,
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "serial_number")]
+    pub serial_number: Option<String>,
 
     #[serde(rename = "status")]
     pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "supplier_id")]
+    pub supplier_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "useful_life_months")]
     pub useful_life_months: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "warranty_expiry")]
+    pub warranty_expiry: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

@@ -20,11 +20,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
@@ -34,23 +34,23 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         entry_number: "JE-2024-001".to_string(), // TODO: Set from your business logic
 
-        exchange_rate: None, // TODO: Set from your business logic
+        exchange_rate: String::new(), // TODO: Set from your business logic
 
-        fiscal_period_id: None, // TODO: Set from your business logic
+        fiscal_period_id: String::new(), // TODO: Set from your business logic
 
         id: "a0080e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        posted_at: None, // TODO: Set from your business logic
+        posted_at: String::new(), // TODO: Set from your business logic
 
-        posted_by: None, // TODO: Set from your business logic
+        posted_by: String::new(), // TODO: Set from your business logic
 
-        reference_number: None, // TODO: Set from your business logic
+        reference_number: String::new(), // TODO: Set from your business logic
 
-        source_id: None, // TODO: Set from your business logic
+        source_id: String::new(), // TODO: Set from your business logic
 
-        source_type: None, // TODO: Set from your business logic
+        source_type: String::new(), // TODO: Set from your business logic
 
         status: "DRAFT".to_string(), // TODO: Set from your business logic
 
@@ -58,8 +58,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         total_debit: rust_decimal::Decimal::new(0, 1), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
     }
 }

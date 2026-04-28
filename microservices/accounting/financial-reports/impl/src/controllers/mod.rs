@@ -3,22 +3,24 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_financial_statements;
 
-pub mod create_financial_statement;
 
-pub mod get_financial_statement;
 
-pub mod update_financial_statement;
-
-pub mod delete_financial_statement;
-
-pub mod list_reports;
-
-pub mod create_report;
-
-pub mod get_report;
-
-pub mod update_report;
-
-pub mod delete_report;
+pub mod create_custom_report;
+pub mod create_report_definition;
+pub mod create_report_export;
+pub mod delete_custom_report;
+pub mod drill_down_report_cell;
+pub mod execute_custom_report;
+pub mod generate_balance_sheet;
+pub mod generate_cash_flow;
+pub mod generate_general_ledger;
+pub mod generate_income_statement;
+pub mod generate_trial_balance;
+pub mod get_custom_report;
+pub mod list_custom_reports;
+pub mod list_report_definition_lines;
+pub mod list_report_definitions;
+pub mod list_report_executions;
+pub mod list_statutory_report_packs;
+pub mod update_custom_report;

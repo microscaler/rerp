@@ -2592,6 +2592,105 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /lock-dates:
+    get:
+      operationId: list_lock_dates
+      summary: List accounting lock dates
+      responses:
+        '200':
+          description: Lock dates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLockDates'
+    post:
+      operationId: create_lock_date
+      summary: Create accounting lock date
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLockDateRequest'
+      responses:
+        '201':
+          description: Lock date created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockDate'
+  /journal-items:
+    get:
+      operationId: list_journal_items
+      summary: List journal items
+      parameters:
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: reconciled
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Journal items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJournalItems'
+  /journal-items/reconcile:
+    post:
+      operationId: reconcile_journal_items
+      summary: Reconcile journal items
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconcileJournalItemsRequest'
+      responses:
+        '200':
+          description: Journal items reconciled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalItemReconciliation'
+  /journal-items/unreconcile:
+    post:
+      operationId: unreconcile_journal_items
+      summary: Unreconcile journal items
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnreconcileJournalItemsRequest'
+      responses:
+        '200':
+          description: Journal items unreconciled
+  /currency-revaluations:
+    post:
+      operationId: create_currency_revaluation
+      summary: Create currency revaluation
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCurrencyRevaluationRequest'
+      responses:
+        '201':
+          description: Currency revaluation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyRevaluation'
 components:
   securitySchemes:
     bearerAuth:
@@ -3644,6 +3743,163 @@ components:
         reference:
           type: string
           maxLength: 100
+    LockDate:
+      type: object
+      required: [id, company_id, lock_type, locked_through_date]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        lock_type:
+          type: string
+          enum: [FISCAL, TAX, ALL_USERS, NON_ADVISER_USERS]
+        locked_through_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          nullable: true
+    CreateLockDateRequest:
+      type: object
+      required: [company_id, lock_type, locked_through_date]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        lock_type:
+          type: string
+          enum: [FISCAL, TAX, ALL_USERS, NON_ADVISER_USERS]
+        locked_through_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          nullable: true
+    JournalItem:
+      type: object
+      required: [id, journal_entry_id, account_id, debit, credit]
+      properties:
+        id:
+          type: string
+          format: uuid
+        journal_entry_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        debit:
+          type: number
+          format: double
+        credit:
+          type: number
+          format: double
+        reconciled:
+          type: boolean
+        reconciliation_id:
+          type: string
+          format: uuid
+          nullable: true
+    ReconcileJournalItemsRequest:
+      type: object
+      required: [journal_item_ids]
+      properties:
+        journal_item_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        notes:
+          type: string
+          nullable: true
+    UnreconcileJournalItemsRequest:
+      type: object
+      required: [reconciliation_id]
+      properties:
+        reconciliation_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          nullable: true
+    JournalItemReconciliation:
+      type: object
+      required: [id, journal_item_ids, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        journal_item_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum: [RECONCILED, UNRECONCILED]
+    CreateCurrencyRevaluationRequest:
+      type: object
+      required: [company_id, currency_code, revaluation_date]
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        revaluation_date:
+          type: string
+          format: date
+        account_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    CurrencyRevaluation:
+      type: object
+      required: [id, company_id, currency_code, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        status:
+          type: string
+          enum: [DRAFT, POSTED, REVERSED]
+        journal_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+    PaginatedLockDates:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LockDate'
+        total:
+          type: integer
+    PaginatedJournalItems:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalItem'
+        total:
+          type: integer
     PaginatedAccounts:
       type: object
       required:

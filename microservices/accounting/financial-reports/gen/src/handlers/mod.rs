@@ -5,22 +5,38 @@
 
 pub mod types;
 
-pub mod list_financial_statements;
+pub mod list_custom_reports;
 
-pub mod create_financial_statement;
+pub mod create_custom_report;
 
-pub mod get_financial_statement;
+pub mod get_custom_report;
 
-pub mod update_financial_statement;
+pub mod update_custom_report;
 
-pub mod delete_financial_statement;
+pub mod delete_custom_report;
 
-pub mod list_reports;
+pub mod execute_custom_report;
 
-pub mod create_report;
+pub mod drill_down_report_cell;
 
-pub mod get_report;
+pub mod list_report_definitions;
 
-pub mod update_report;
+pub mod create_report_definition;
 
-pub mod delete_report;
+pub mod list_report_definition_lines;
+
+pub mod list_report_executions;
+
+pub mod create_report_export;
+
+pub mod generate_balance_sheet;
+
+pub mod generate_cash_flow;
+
+pub mod generate_general_ledger;
+
+pub mod generate_income_statement;
+
+pub mod generate_trial_balance;
+
+pub mod list_statutory_report_packs;

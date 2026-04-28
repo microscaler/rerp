@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::GeneralLedgerLineItemRequest;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
@@ -14,22 +15,22 @@ pub struct Request {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "posted_at")]
-    pub posted_at: Option<String>,
+    #[serde(rename = "entry_date")]
+    pub entry_date: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "lines")]
+    pub lines: Option<Vec<GeneralLedgerLineItemRequest>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reference_number")]
     pub reference_number: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "status")]
-    pub status: Option<String>,
-
     #[serde(rename = "id")]
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,7 +59,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exchange_rate")]
-    pub exchange_rate: Option<rust_decimal::Decimal>,
+    pub exchange_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "fiscal_period_id")]
@@ -68,8 +69,8 @@ pub struct Response {
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
+    #[serde(rename = "journal_id")]
+    pub journal_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_at")]
@@ -84,21 +85,21 @@ pub struct Response {
     pub reference_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "source_id")]
-    pub source_id: Option<String>,
+    #[serde(rename = "reversed_at")]
+    pub reversed_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "source_type")]
-    pub source_type: Option<String>,
+    #[serde(rename = "reversed_by")]
+    pub reversed_by: Option<String>,
 
     #[serde(rename = "status")]
     pub status: String,
 
     #[serde(rename = "total_credit")]
-    pub total_credit: rust_decimal::Decimal,
+    pub total_credit: f64,
 
     #[serde(rename = "total_debit")]
-    pub total_debit: rust_decimal::Decimal,
+    pub total_debit: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
@@ -146,9 +147,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::update_journal_entry::handle(req)
 }

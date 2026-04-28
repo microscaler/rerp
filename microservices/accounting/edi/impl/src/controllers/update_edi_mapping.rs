@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use edi_service_api::handlers::update_edi_mapping::{Request, Response};
+use rerp_accounting_edi_gen::handlers::update_edi_mapping::{Request, Response};
 
 #[handler(UpdateEdiMappingController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

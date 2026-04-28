@@ -13,9 +13,19 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(rename = "code")]
+    pub code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "details")]
+    pub details: Option<serde_json::Value>,
+
+    #[serde(rename = "message")]
+    pub message: String,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -54,9 +64,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::delete_invoice::handle(req)
 }

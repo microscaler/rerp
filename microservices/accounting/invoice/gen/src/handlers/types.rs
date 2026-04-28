@@ -5,394 +5,385 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateInvoiceLineRequest {
-    pub account_id: String,
+pub struct ApproveInvoiceResponse {
+    pub billing_address_id: String,
 
-    pub discount_amount: rust_decimal::Decimal,
+    pub billing_entity_id: String,
 
-    pub discount_percent: rust_decimal::Decimal,
+    pub company_currency_code: String,
 
-    pub invoice_id: String,
+    pub company_id: String,
 
-    pub line_number: i32,
-
-    pub product_code: String,
-
-    pub product_description: String,
-
-    pub product_id: String,
-
-    pub product_name: String,
-
-    pub quantity: rust_decimal::Decimal,
-
-    pub tax_id: String,
-
-    pub tax_rate: rust_decimal::Decimal,
-
-    pub unit_of_measure: String,
-
-    pub unit_price: rust_decimal::Decimal,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateInvoiceLineResponse {
-    pub account_id: String,
+    pub company_total_amount: f64,
 
     pub created_at: String,
 
+    pub created_by: String,
+
     pub currency_code: String,
 
-    pub discount_amount: rust_decimal::Decimal,
+    pub due_date: String,
 
-    pub discount_percent: rust_decimal::Decimal,
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
 
     pub id: String,
 
-    pub invoice_id: String,
+    pub internal_notes: String,
 
-    pub line_number: i32,
+    pub invoice_number: String,
 
-    pub line_subtotal: rust_decimal::Decimal,
+    pub invoice_type: String,
 
-    pub line_total: rust_decimal::Decimal,
+    pub issued_date: String,
 
-    pub metadata: serde_json::Value,
+    pub notes: String,
 
-    pub product_code: String,
+    pub posted_at: String,
 
-    pub product_description: String,
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CalculateTaxResponse {
+    pub breakdown: Vec<TaxBreakdown>,
+
+    pub subtotal: f64,
+
+    pub total: f64,
+
+    pub total_tax: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CancelInvoiceResponse {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
+
+    pub company_id: String,
+
+    pub company_total_amount: f64,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
+
+    pub id: String,
+
+    pub internal_notes: String,
+
+    pub invoice_number: String,
+
+    pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub notes: String,
+
+    pub posted_at: String,
+
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateInvoiceCreditNoteRequest {
+    pub amount: f64,
+
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateInvoiceCreditNoteResponse {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
+
+    pub company_id: String,
+
+    pub company_total_amount: f64,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
+
+    pub id: String,
+
+    pub internal_notes: String,
+
+    pub invoice_number: String,
+
+    pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub notes: String,
+
+    pub posted_at: String,
+
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateInvoiceLineItemRequest {
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
 
     pub product_id: String,
 
-    pub product_name: String,
+    pub quantity: f64,
 
-    pub quantity: rust_decimal::Decimal,
+    pub tax_code: String,
 
-    pub tax_amount: rust_decimal::Decimal,
-
-    pub tax_id: String,
-
-    pub tax_rate: rust_decimal::Decimal,
-
-    pub unit_of_measure: String,
-
-    pub unit_price: rust_decimal::Decimal,
-
-    pub updated_at: String,
+    pub unit_price: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateInvoiceRequest {
+    pub auto_confirm: bool,
+
+    pub billing_address_id: String,
+
     pub company_id: String,
 
     pub currency_code: String,
 
-    pub customer_id: String,
-
     pub due_date: String,
 
-    pub exchange_rate: rust_decimal::Decimal,
+    pub entity_id: String,
+
+    pub exchange_rate: f64,
 
     pub internal_notes: String,
 
-    pub invoice_date: String,
-
-    pub invoice_number: String,
-
     pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub line_items: Vec<CreateInvoiceLineItemRequest>,
 
     pub notes: String,
 
-    pub payment_term_id: String,
-
-    pub reference_number: String,
-
-    pub vendor_id: String,
-
-    pub vendor_reference: String,
+    pub shipping_address_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateInvoiceResponse {
-    pub cancelled_at: String,
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
 
     pub company_id: String,
 
+    pub company_total_amount: f64,
+
     pub created_at: String,
+
+    pub created_by: String,
 
     pub currency_code: String,
 
-    pub customer_id: String,
-
-    pub discount_amount: rust_decimal::Decimal,
-
     pub due_date: String,
 
-    pub exchange_rate: rust_decimal::Decimal,
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
 
     pub id: String,
 
     pub internal_notes: String,
 
-    pub invoice_date: String,
-
     pub invoice_number: String,
 
     pub invoice_type: String,
 
-    pub metadata: serde_json::Value,
+    pub issued_date: String,
 
     pub notes: String,
 
-    pub outstanding_amount: rust_decimal::Decimal,
-
-    pub paid_amount: rust_decimal::Decimal,
-
-    pub paid_at: String,
-
-    pub payment_state: String,
-
-    pub payment_term_id: String,
-
     pub posted_at: String,
 
-    pub reference_number: String,
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
 
     pub status: String,
 
-    pub subtotal: rust_decimal::Decimal,
+    pub subtotal_amount: f64,
 
-    pub tax_amount: rust_decimal::Decimal,
+    pub tax_amount: f64,
 
-    pub total_amount: rust_decimal::Decimal,
+    pub total_amount: f64,
 
     pub updated_at: String,
-
-    pub vendor_id: String,
-
-    pub vendor_reference: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetInvoiceLineResponse {
-    pub account_id: String,
+pub struct CreateLineItemRequest {
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub product_id: String,
+
+    pub quantity: f64,
+
+    pub tax_code: String,
+
+    pub unit_price: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateLineItemResponse {
+    pub amount: f64,
 
     pub created_at: String,
 
-    pub currency_code: String,
+    pub description: String,
 
-    pub discount_amount: rust_decimal::Decimal,
+    pub discount_amount: f64,
 
-    pub discount_percent: rust_decimal::Decimal,
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
 
     pub id: String,
 
     pub invoice_id: String,
 
-    pub line_number: i32,
-
-    pub line_subtotal: rust_decimal::Decimal,
-
-    pub line_total: rust_decimal::Decimal,
-
-    pub metadata: serde_json::Value,
-
     pub product_code: String,
-
-    pub product_description: String,
 
     pub product_id: String,
 
     pub product_name: String,
 
-    pub quantity: rust_decimal::Decimal,
+    pub quantity: f64,
 
-    pub tax_amount: rust_decimal::Decimal,
+    pub tax_amount: f64,
 
-    pub tax_id: String,
+    pub tax_code: String,
 
-    pub tax_rate: rust_decimal::Decimal,
+    pub tax_rate: f64,
 
-    pub unit_of_measure: String,
-
-    pub unit_price: rust_decimal::Decimal,
+    pub unit_price: f64,
 
     pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetInvoiceResponse {
-    pub cancelled_at: String,
+pub struct DeleteInvoiceResponse {
+    pub code: String,
 
-    pub company_id: String,
+    pub details: serde_json::Value,
 
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub customer_id: String,
-
-    pub discount_amount: rust_decimal::Decimal,
-
-    pub due_date: String,
-
-    pub exchange_rate: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub internal_notes: String,
-
-    pub invoice_date: String,
-
-    pub invoice_number: String,
-
-    pub invoice_type: String,
-
-    pub metadata: serde_json::Value,
-
-    pub notes: String,
-
-    pub outstanding_amount: rust_decimal::Decimal,
-
-    pub paid_amount: rust_decimal::Decimal,
-
-    pub paid_at: String,
-
-    pub payment_state: String,
-
-    pub payment_term_id: String,
-
-    pub posted_at: String,
-
-    pub reference_number: String,
-
-    pub status: String,
-
-    pub subtotal: rust_decimal::Decimal,
-
-    pub tax_amount: rust_decimal::Decimal,
-
-    pub total_amount: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub vendor_id: String,
-
-    pub vendor_reference: String,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct Invoice {
-    pub cancelled_at: String,
+pub struct DeleteLineItemResponse {
+    pub code: String,
 
-    pub company_id: String,
+    pub details: serde_json::Value,
 
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub customer_id: String,
-
-    pub discount_amount: rust_decimal::Decimal,
-
-    pub due_date: String,
-
-    pub exchange_rate: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub internal_notes: String,
-
-    pub invoice_date: String,
-
-    pub invoice_number: String,
-
-    pub invoice_type: String,
-
-    pub metadata: serde_json::Value,
-
-    pub notes: String,
-
-    pub outstanding_amount: rust_decimal::Decimal,
-
-    pub paid_amount: rust_decimal::Decimal,
-
-    pub paid_at: String,
-
-    pub payment_state: String,
-
-    pub payment_term_id: String,
-
-    pub posted_at: String,
-
-    pub reference_number: String,
-
-    pub status: String,
-
-    pub subtotal: rust_decimal::Decimal,
-
-    pub tax_amount: rust_decimal::Decimal,
-
-    pub total_amount: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub vendor_id: String,
-
-    pub vendor_reference: String,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct InvoiceLine {
-    pub account_id: String,
+pub struct ErrorResponse {
+    pub code: String,
 
-    pub created_at: String,
+    pub details: serde_json::Value,
 
-    pub currency_code: String,
-
-    pub discount_amount: rust_decimal::Decimal,
-
-    pub discount_percent: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub invoice_id: String,
-
-    pub line_number: i32,
-
-    pub line_subtotal: rust_decimal::Decimal,
-
-    pub line_total: rust_decimal::Decimal,
-
-    pub metadata: serde_json::Value,
-
-    pub product_code: String,
-
-    pub product_description: String,
-
-    pub product_id: String,
-
-    pub product_name: String,
-
-    pub quantity: rust_decimal::Decimal,
-
-    pub tax_amount: rust_decimal::Decimal,
-
-    pub tax_id: String,
-
-    pub tax_rate: rust_decimal::Decimal,
-
-    pub unit_of_measure: String,
-
-    pub unit_price: rust_decimal::Decimal,
-
-    pub updated_at: String,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListInvoiceLinesResponse {
-    pub items: Vec<InvoiceLine>,
+pub struct GetInvoiceWorkflowHistoryResponse {
+    pub has_more: bool,
+
+    pub items: Vec<InvoiceApprovalAction>,
 
     pub limit: i32,
 
@@ -402,7 +393,247 @@ pub struct ListInvoiceLinesResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct HandoffInvoiceToDeferralResponse {
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub status: String,
+
+    pub target_service: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct HandoffInvoiceToEinvoiceResponse {
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub status: String,
+
+    pub target_service: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Invoice {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
+
+    pub company_id: String,
+
+    pub company_total_amount: f64,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
+
+    pub id: String,
+
+    pub internal_notes: String,
+
+    pub invoice_number: String,
+
+    pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub notes: String,
+
+    pub posted_at: String,
+
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceApprovalAction {
+    pub action: String,
+
+    pub by_user: String,
+
+    pub date: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub notes: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceHandoff {
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub status: String,
+
+    pub target_service: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceLineItem {
+    pub amount: f64,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub product_code: String,
+
+    pub product_id: String,
+
+    pub product_name: String,
+
+    pub quantity: f64,
+
+    pub tax_amount: f64,
+
+    pub tax_code: String,
+
+    pub tax_rate: f64,
+
+    pub unit_price: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoicePayment {
+    pub amount: f64,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoicePaymentMatch {
+    pub amount: f64,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub payment_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceSummary {
+    pub average_invoice_amount: f64,
+
+    pub by_status: serde_json::Value,
+
+    pub by_type: serde_json::Value,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub tax_collected: f64,
+
+    pub total_amount: f64,
+
+    pub total_invoices: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceSummaryResponse {
+    pub average_invoice_amount: f64,
+
+    pub by_status: serde_json::Value,
+
+    pub by_type: serde_json::Value,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub tax_collected: f64,
+
+    pub total_amount: f64,
+
+    pub total_invoices: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListInvoiceLineItemsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<InvoiceLineItem>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListInvoicePaymentMatchesResponse {
+    pub items: Vec<InvoicePaymentMatch>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListInvoicesResponse {
+    pub has_more: bool,
+
     pub items: Vec<Invoice>,
 
     pub limit: i32,
@@ -413,143 +644,402 @@ pub struct ListInvoicesResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateInvoiceLineRequest {
-    pub discount_amount: rust_decimal::Decimal,
+pub struct ListTaxRatesResponse {
+    pub has_more: bool,
 
-    pub discount_percent: rust_decimal::Decimal,
+    pub items: Vec<TaxRate>,
 
-    pub product_name: String,
+    pub limit: i32,
 
-    pub quantity: rust_decimal::Decimal,
+    pub page: i32,
 
-    pub tax_id: String,
-
-    pub tax_rate: rust_decimal::Decimal,
-
-    pub unit_price: rust_decimal::Decimal,
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateInvoiceLineResponse {
-    pub account_id: String,
+pub struct PaginatedApprovals {
+    pub has_more: bool,
 
-    pub created_at: String,
+    pub items: Vec<InvoiceApprovalAction>,
 
-    pub currency_code: String,
+    pub limit: i32,
 
-    pub discount_amount: rust_decimal::Decimal,
+    pub page: i32,
 
-    pub discount_percent: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub invoice_id: String,
-
-    pub line_number: i32,
-
-    pub line_subtotal: rust_decimal::Decimal,
-
-    pub line_total: rust_decimal::Decimal,
-
-    pub metadata: serde_json::Value,
-
-    pub product_code: String,
-
-    pub product_description: String,
-
-    pub product_id: String,
-
-    pub product_name: String,
-
-    pub quantity: rust_decimal::Decimal,
-
-    pub tax_amount: rust_decimal::Decimal,
-
-    pub tax_id: String,
-
-    pub tax_rate: rust_decimal::Decimal,
-
-    pub unit_of_measure: String,
-
-    pub unit_price: rust_decimal::Decimal,
-
-    pub updated_at: String,
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateInvoiceRequest {
-    pub due_date: String,
+pub struct PaginatedInvoicePaymentMatches {
+    pub items: Vec<InvoicePaymentMatch>,
 
-    pub internal_notes: String,
-
-    pub invoice_date: String,
-
-    pub metadata: serde_json::Value,
-
-    pub notes: String,
-
-    pub payment_state: String,
-
-    pub status: String,
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateInvoiceResponse {
-    pub cancelled_at: String,
+pub struct PaginatedInvoices {
+    pub has_more: bool,
+
+    pub items: Vec<Invoice>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLineItems {
+    pub has_more: bool,
+
+    pub items: Vec<InvoiceLineItem>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxRates {
+    pub has_more: bool,
+
+    pub items: Vec<TaxRate>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PostInvoiceResponse {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
 
     pub company_id: String,
 
+    pub company_total_amount: f64,
+
     pub created_at: String,
+
+    pub created_by: String,
 
     pub currency_code: String,
 
-    pub customer_id: String,
-
-    pub discount_amount: rust_decimal::Decimal,
-
     pub due_date: String,
 
-    pub exchange_rate: rust_decimal::Decimal,
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
 
     pub id: String,
 
     pub internal_notes: String,
-
-    pub invoice_date: String,
 
     pub invoice_number: String,
 
     pub invoice_type: String,
 
-    pub metadata: serde_json::Value,
+    pub issued_date: String,
 
     pub notes: String,
 
-    pub outstanding_amount: rust_decimal::Decimal,
-
-    pub paid_amount: rust_decimal::Decimal,
-
-    pub paid_at: String,
-
-    pub payment_state: String,
-
-    pub payment_term_id: String,
-
     pub posted_at: String,
 
-    pub reference_number: String,
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
 
     pub status: String,
 
-    pub subtotal: rust_decimal::Decimal,
+    pub subtotal_amount: f64,
 
-    pub tax_amount: rust_decimal::Decimal,
+    pub tax_amount: f64,
 
-    pub total_amount: rust_decimal::Decimal,
+    pub total_amount: f64,
 
     pub updated_at: String,
+}
 
-    pub vendor_id: String,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RegisterInvoicePaymentRequest {
+    pub amount: f64,
 
-    pub vendor_reference: String,
+    pub currency_code: String,
+
+    pub external_reference: String,
+
+    pub payment_date: String,
+
+    pub payment_method: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RegisterInvoicePaymentResponse {
+    pub amount: f64,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TaxBreakdown {
+    pub rate: f64,
+
+    pub tax_amount: f64,
+
+    pub tax_code: String,
+
+    pub taxable_amount: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TaxRate {
+    pub code: String,
+
+    pub country_code: String,
+
+    pub description: String,
+
+    pub effective_date: String,
+
+    pub expiry_date: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub rate: f64,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateInvoiceLineItemRequest {
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub quantity: f64,
+
+    pub tax_code: String,
+
+    pub unit_price: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateInvoiceRequest {
+    pub billing_address_id: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub internal_notes: String,
+
+    pub issued_date: String,
+
+    pub line_items: Vec<CreateInvoiceLineItemRequest>,
+
+    pub notes: String,
+
+    pub shipping_address_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateInvoiceResponse {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
+
+    pub company_id: String,
+
+    pub company_total_amount: f64,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
+
+    pub id: String,
+
+    pub internal_notes: String,
+
+    pub invoice_number: String,
+
+    pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub notes: String,
+
+    pub posted_at: String,
+
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateLineItemRequest {
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub quantity: f64,
+
+    pub tax_code: String,
+
+    pub unit_price: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateLineItemResponse {
+    pub amount: f64,
+
+    pub created_at: String,
+
+    pub description: String,
+
+    pub discount_amount: f64,
+
+    pub discount_percent: f64,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub product_code: String,
+
+    pub product_id: String,
+
+    pub product_name: String,
+
+    pub quantity: f64,
+
+    pub tax_amount: f64,
+
+    pub tax_code: String,
+
+    pub tax_rate: f64,
+
+    pub unit_price: f64,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ValidationError {
+    pub code: String,
+
+    pub errors: Vec<serde_json::Value>,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct VoidInvoiceResponse {
+    pub billing_address_id: String,
+
+    pub billing_entity_id: String,
+
+    pub company_currency_code: String,
+
+    pub company_id: String,
+
+    pub company_total_amount: f64,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub currency_code: String,
+
+    pub due_date: String,
+
+    pub entity_id: String,
+
+    pub entity_name: String,
+
+    pub exchange_rate: f64,
+
+    pub id: String,
+
+    pub internal_notes: String,
+
+    pub invoice_number: String,
+
+    pub invoice_type: String,
+
+    pub issued_date: String,
+
+    pub notes: String,
+
+    pub posted_at: String,
+
+    pub posted_by: String,
+
+    pub shipping_address_id: String,
+
+    pub status: String,
+
+    pub subtotal_amount: f64,
+
+    pub tax_amount: f64,
+
+    pub total_amount: f64,
+
+    pub updated_at: String,
 }

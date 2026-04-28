@@ -139,6 +139,76 @@ pub struct CreateEdiMappingResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiProfileRequest {
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub standard: EdiStandard,
+
+    pub trading_partner_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiProfileResponse {
+    pub active: bool,
+
+    pub id: String,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub standard: EdiStandard,
+
+    pub trading_partner_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiSubmissionRequest {
+    pub document_id: String,
+
+    pub profile_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiSubmissionResponse {
+    pub document_id: String,
+
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub profile_id: String,
+
+    pub status: EdiSubmissionStatus,
+
+    pub submitted_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiValidationProfileRequest {
+    pub name: String,
+
+    pub profile_id: String,
+
+    pub rules: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateEdiValidationProfileResponse {
+    pub active: bool,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub profile_id: String,
+
+    pub rules: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiAcknowledgment {
     pub acknowledgment_content: String,
 
@@ -229,7 +299,20 @@ pub struct EdiDocument {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct EdiFormat {
+pub struct EdiError {
+    pub code: String,
+
+    pub field_path: String,
+
+    pub id: String,
+
+    pub message: String,
+
+    pub submission_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct EdiStandard {
     pub code: String,
 
     pub created_at: String,
@@ -249,6 +332,13 @@ pub struct EdiFormat {
     pub updated_at: String,
 
     pub version: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct EdiSubmissionStatus {
+    pub code: String,
+
+    pub description: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -280,6 +370,49 @@ pub struct EdiMapping {
     pub updated_by: String,
 
     pub validation_rules: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct EdiProfile {
+    pub active: bool,
+
+    pub id: String,
+
+    pub jurisdiction_code: String,
+
+    pub name: String,
+
+    pub standard: EdiStandard,
+
+    pub trading_partner_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct EdiSubmission {
+    pub document_id: String,
+
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub profile_id: String,
+
+    pub status: EdiSubmissionStatus,
+
+    pub submitted_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct EdiValidationProfile {
+    pub active: bool,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub profile_id: String,
+
+    pub rules: serde_json::Value,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -375,6 +508,21 @@ pub struct GetEdiMappingResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetEdiSubmissionResponse {
+    pub document_id: String,
+
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub profile_id: String,
+
+    pub status: EdiSubmissionStatus,
+
+    pub submitted_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListEdiDocumentsResponse {
     pub items: Vec<EdiDocument>,
 
@@ -394,6 +542,45 @@ pub struct ListEdiMappingsResponse {
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedResponse {
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RetryEdiSubmissionResponse {
+    pub document_id: String,
+
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub profile_id: String,
+
+    pub status: EdiSubmissionStatus,
+
+    pub submitted_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SubmitEdiSubmissionResponse {
+    pub document_id: String,
+
+    pub external_reference: String,
+
+    pub id: String,
+
+    pub profile_id: String,
+
+    pub status: EdiSubmissionStatus,
+
+    pub submitted_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

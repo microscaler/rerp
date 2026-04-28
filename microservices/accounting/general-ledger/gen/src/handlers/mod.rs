@@ -39,6 +39,8 @@ pub mod delete_chart_template;
 
 pub mod deploy_chart_template;
 
+pub mod create_currency_revaluation;
+
 pub mod list_fiscal_periods;
 
 pub mod create_fiscal_period;
@@ -99,6 +101,12 @@ pub mod post_journal_entry;
 
 pub mod reverse_journal_entry;
 
+pub mod list_journal_items;
+
+pub mod reconcile_journal_items;
+
+pub mod unreconcile_journal_items;
+
 pub mod list_journals;
 
 pub mod create_journal;
@@ -110,6 +118,10 @@ pub mod update_journal;
 pub mod delete_journal;
 
 pub mod list_journal_entries_by_journal;
+
+pub mod list_lock_dates;
+
+pub mod create_lock_date;
 
 pub mod list_payment_methods;
 

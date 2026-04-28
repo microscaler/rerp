@@ -13,74 +13,9 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "aging_bucket")]
-    pub aging_bucket: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "collection_status")]
-    pub collection_status: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "credit_limit")]
-    pub credit_limit: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "credit_used")]
-    pub credit_used: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "customer_id")]
-    pub customer_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_overdue")]
-    pub days_overdue: Option<i32>,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(rename = "invoice_id")]
-    pub invoice_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "last_payment_amount")]
-    pub last_payment_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "last_payment_date")]
-    pub last_payment_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "write_off_amount")]
-    pub write_off_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "write_off_date")]
-    pub write_off_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "write_off_reason")]
-    pub write_off_reason: Option<String>,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -119,9 +54,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_customer_invoice::handle(req)
 }

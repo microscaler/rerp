@@ -26,7 +26,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         created_at: None, // TODO: Set from your business logic
 
-        description: None, // TODO: Set from your business logic
+        description: String::new(), // TODO: Set from your business logic
 
         id: "a00c0e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
@@ -36,8 +36,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         name: "Assets (Updated)".to_string(), // TODO: Set from your business logic
 
-        parent_id: None, // TODO: Set from your business logic
+        parent_id: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
     }
 }

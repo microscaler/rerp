@@ -2,21 +2,33 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::EdiDocument;
+use crate::handlers::types::EdiEdiDocument;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Request {}
+pub struct Request {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "page")]
+    pub page: Option<i32>,
 
-#[derive(Debug, Serialize)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "limit")]
+    pub limit: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "search")]
+    pub search: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "items")]
-    pub items: Option<Vec<EdiDocument>>,
+    pub items: Option<Vec<EdiEdiDocument>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
@@ -39,6 +51,48 @@ impl TryFrom<HandlerRequest> for Request {
 
         let mut data_map = Map::new();
 
+        if let Some(v) = req.get_query_param("page") {
+            data_map.insert(
+                "page".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("limit") {
+            data_map.insert(
+                "limit".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("search") {
+            data_map.insert(
+                "search".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
         if let Some(body) = req.body {
             match body {
                 Value::Object(map) => {
@@ -54,9 +108,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::list_edi_documents::handle(req)
 }

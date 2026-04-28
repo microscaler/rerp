@@ -43,7 +43,7 @@ pub struct Request {
     pub sender_id: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(rename = "acknowledgment_sent")]
@@ -178,9 +178,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::create_edi_document::handle(req)
 }

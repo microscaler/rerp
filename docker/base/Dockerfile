@@ -27,7 +27,7 @@ ENV RUST_BACKTRACE=1
 ENV RUST_LOG=info
 
 # Add dev synchronization script
-COPY dev-entrypoint.sh /dev-entrypoint.sh
+COPY docker/base/dev-entrypoint.sh /dev-entrypoint.sh
 RUN chmod +x /dev-entrypoint.sh
 
 # Labels for identification

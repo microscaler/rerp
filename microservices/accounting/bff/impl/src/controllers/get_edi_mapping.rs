@@ -22,11 +22,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
-        default_values: None, // TODO: Set from your business logic
+        default_values: String::new(), // TODO: Set from your business logic
 
-        description: None, // TODO: Set from your business logic
+        description: String::new(), // TODO: Set from your business logic
 
         document_type: "example".to_string(), // TODO: Set from your business logic
 
@@ -40,12 +40,12 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         mapping_name: "example".to_string(), // TODO: Set from your business logic
 
-        transformation_rules: None, // TODO: Set from your business logic
+        transformation_rules: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
 
-        validation_rules: None, // TODO: Set from your business logic
+        validation_rules: String::new(), // TODO: Set from your business logic
     }
 }

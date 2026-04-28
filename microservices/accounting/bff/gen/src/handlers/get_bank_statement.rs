@@ -13,7 +13,7 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(rename = "bank_account_id")]
@@ -21,33 +21,21 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closing_balance")]
-    pub closing_balance: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub closing_balance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "file_reference")]
+    pub file_reference: Option<String>,
+
     #[serde(rename = "id")]
     pub id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "import_format")]
-    pub import_format: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "import_source")]
-    pub import_source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "imported_at")]
@@ -58,28 +46,16 @@ pub struct Response {
     pub imported_by: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
+    #[serde(rename = "matched_count")]
+    pub matched_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opening_balance")]
-    pub opening_balance: Option<rust_decimal::Decimal>,
+    pub opening_balance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "period_end")]
-    pub period_end: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "period_start")]
-    pub period_start: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "reconciled_at")]
-    pub reconciled_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "reconciled_by")]
-    pub reconciled_by: Option<String>,
+    #[serde(rename = "start_date")]
+    pub start_date: Option<String>,
 
     #[serde(rename = "statement_date")]
     pub statement_date: String,
@@ -88,28 +64,21 @@ pub struct Response {
     #[serde(rename = "statement_number")]
     pub statement_number: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
-    pub status: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_credits")]
-    pub total_credits: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_debits")]
-    pub total_debits: Option<rust_decimal::Decimal>,
+    pub status: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "transaction_count")]
     pub transaction_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
+    #[serde(rename = "unmatched_count")]
+    pub unmatched_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -149,9 +118,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_bank_statement::handle(req)
 }

@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use edi_service_api::handlers::list_edi_documents::{Request, Response};
+use rerp_accounting_edi_gen::handlers::list_edi_documents::{Request, Response};
 
 #[allow(unused_imports)]
-use edi_service_api::handlers::types::EdiDocument;
+use rerp_accounting_edi_gen::handlers::types::EdiDocument;
 
 #[handler(ListEdiDocumentsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

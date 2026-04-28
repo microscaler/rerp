@@ -24,6 +24,20 @@ members = [
     "accounting/financial-reports/impl",
     "accounting/bff/gen",
     "accounting/bff/impl",
+    "accounting/tax-compliance/gen",
+    "accounting/tax-compliance/impl",
+    "accounting/documents-extraction/gen",
+    "accounting/documents-extraction/impl",
+    "accounting/treasury/gen",
+    "accounting/treasury/impl",
+    "accounting/consolidation/gen",
+    "accounting/consolidation/impl",
+    "accounting/revenue-recognition/gen",
+    "accounting/revenue-recognition/impl",
+    "accounting/lease-accounting/gen",
+    "accounting/lease-accounting/impl",
+    "accounting/audit-controls/gen",
+    "accounting/audit-controls/impl",
 ]
 resolver = "2"
 

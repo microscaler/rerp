@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use edi_service_api::handlers::create_edi_document::{Request, Response};
+use rerp_accounting_edi_gen::handlers::create_edi_document::{Request, Response};
 
 #[handler(CreateEdiDocumentController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

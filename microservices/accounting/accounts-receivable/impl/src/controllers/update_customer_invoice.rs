@@ -3,9 +3,11 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path update_customer_invoice --force
 
-use rerp_accounting_accounts_receivable::handlers::update_customer_invoice::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::update_customer_invoice::{
+    Request, Response,
+};
 
 #[handler(UpdateCustomerInvoiceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

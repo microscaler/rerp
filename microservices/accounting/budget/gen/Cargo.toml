@@ -1,5 +1,5 @@
 [package]
-name = "budget_service_api"
+name = "rerp_accounting_budget_gen"
 version = "0.1.0"
 edition = "2021"
 
@@ -41,5 +41,4 @@ anyhow = { workspace = true }
 # Consumer `Cargo.toml` [workspace.dependencies] must include: arc-swap = "1.7" (or matching pin).
 arc-swap = { workspace = true }
 clap = { workspace = true }
-tikv-jemallocator = { workspace = true, optional = true }# From brrtrouter-dependencies.toml [conditional] section (type detected)
-rust_decimal = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }

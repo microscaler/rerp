@@ -6,11 +6,13 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Asset {
-    pub accumulated_depreciation: rust_decimal::Decimal,
+    pub accumulated_depreciation: f64,
 
-    pub accumulated_depreciation_account_id: String,
+    pub acquisition_cost: f64,
 
-    pub asset_account_id: String,
+    pub acquisition_date: String,
+
+    pub acquisition_gl_entry_id: String,
 
     pub asset_number: String,
 
@@ -20,52 +22,154 @@ pub struct Asset {
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub current_value: rust_decimal::Decimal,
+    pub custodian_id: String,
 
-    pub depreciation_expense_account_id: String,
-
-    pub depreciation_method: String,
-
-    pub depreciation_rate: rust_decimal::Decimal,
+    pub department_id: String,
 
     pub description: String,
 
-    pub disposal_date: String,
-
     pub id: String,
 
-    pub in_service_date: String,
+    pub insurance_policy: String,
 
     pub location: String,
 
-    pub metadata: serde_json::Value,
-
     pub name: String,
 
-    pub purchase_cost: rust_decimal::Decimal,
+    pub net_book_value: f64,
 
-    pub purchase_date: String,
+    pub notes: String,
 
-    pub salvage_value: rust_decimal::Decimal,
+    pub serial_number: String,
 
     pub status: String,
 
+    pub supplier_id: String,
+
     pub updated_at: String,
 
-    pub updated_by: String,
+    pub useful_life_months: i32,
+
+    pub warranty_expiry: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AssetCategory {
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub default_depreciation_method: String,
+
+    pub default_useful_life_months: i32,
+
+    pub description: String,
+
+    pub gl_account_credit: String,
+
+    pub gl_account_debit: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub parent_category_id: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AssetModel {
+    pub asset_account_id: String,
+
+    pub depreciation_account_id: String,
+
+    pub depreciation_method: String,
+
+    pub expense_account_id: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub residual_value_percent: f64,
 
     pub useful_life_months: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct AssetRegister {
-    pub code: String,
+pub struct AssetSummary {
+    pub as_of_date: String,
 
-    pub created_at: String,
+    pub by_category: Vec<serde_json::Value>,
+
+    pub by_status: serde_json::Value,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub depreciation_expense_current_year: f64,
+
+    pub disposals_current_year: i32,
+
+    pub total_accumulated_depreciation: f64,
+
+    pub total_acquisition_cost: f64,
+
+    pub total_assets: i32,
+
+    pub total_net_book_value: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AssetSummaryResponse {
+    pub as_of_date: String,
+
+    pub by_category: Vec<serde_json::Value>,
+
+    pub by_status: serde_json::Value,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub depreciation_expense_current_year: f64,
+
+    pub disposals_current_year: i32,
+
+    pub total_accumulated_depreciation: f64,
+
+    pub total_acquisition_cost: f64,
+
+    pub total_assets: i32,
+
+    pub total_net_book_value: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BulkDepreciateRequest {
+    pub period: String,
+
+    pub post_to_gl: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BulkDepreciateResponse {
+    pub assets_processed: i32,
+
+    pub errors: Vec<String>,
+
+    pub total_depreciation: f64,
+
+    pub total_entries: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateAssetCategoryRequest {
+    pub company_id: String,
 
     pub default_depreciation_method: String,
 
@@ -73,150 +177,155 @@ pub struct AssetRegister {
 
     pub description: String,
 
-    pub id: String,
+    pub gl_account_credit: String,
 
-    pub is_active: bool,
+    pub gl_account_debit: String,
 
     pub name: String,
 
-    pub parent_id: String,
-
-    pub updated_at: String,
+    pub parent_category_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct AssetTransaction {
-    pub asset_id: String,
-
+pub struct CreateAssetCategoryResponse {
     pub company_id: String,
 
     pub created_at: String,
 
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub gain_loss: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub impairment_amount: rust_decimal::Decimal,
-
-    pub impairment_reason: String,
-
-    pub journal_entry_id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub notes: String,
-
-    pub reference_number: String,
-
-    pub sale_proceeds: rust_decimal::Decimal,
-
-    pub transaction_amount: rust_decimal::Decimal,
-
-    pub transaction_date: String,
-
-    pub transaction_type: String,
-
-    pub transfer_to_company_id: String,
-
-    pub transfer_to_location: String,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateAssetRegisterRequest {
-    pub code: String,
-
     pub default_depreciation_method: String,
 
     pub default_useful_life_months: i32,
 
     pub description: String,
 
-    pub is_active: bool,
+    pub gl_account_credit: String,
 
-    pub name: String,
-
-    pub parent_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateAssetRegisterResponse {
-    pub code: String,
-
-    pub created_at: String,
-
-    pub default_depreciation_method: String,
-
-    pub default_useful_life_months: i32,
-
-    pub description: String,
+    pub gl_account_debit: String,
 
     pub id: String,
 
-    pub is_active: bool,
+    pub name: String,
+
+    pub parent_category_id: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateAssetModelRequest {
+    pub depreciation_method: String,
 
     pub name: String,
 
-    pub parent_id: String,
+    pub residual_value_percent: f64,
 
-    pub updated_at: String,
+    pub useful_life_months: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateAssetModelResponse {
+    pub asset_account_id: String,
+
+    pub depreciation_account_id: String,
+
+    pub depreciation_method: String,
+
+    pub expense_account_id: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub residual_value_percent: f64,
+
+    pub useful_life_months: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAssetRequest {
-    pub accumulated_depreciation_account_id: String,
+    pub acquisition_cost: f64,
 
-    pub asset_account_id: String,
+    pub acquisition_date: String,
+
+    pub acquisition_gl_entry_id: String,
 
     pub asset_number: String,
 
-    pub category_id: String,
+    pub auto_depreciate: bool,
 
     pub company_id: String,
 
     pub currency_code: String,
 
-    pub depreciation_expense_account_id: String,
+    pub custodian_id: String,
+
+    pub department_id: String,
 
     pub depreciation_method: String,
 
     pub description: String,
 
-    pub in_service_date: String,
-
     pub location: String,
 
     pub name: String,
 
-    pub purchase_cost: rust_decimal::Decimal,
+    pub notes: String,
 
-    pub purchase_date: String,
+    pub serial_number: String,
 
-    pub salvage_value: rust_decimal::Decimal,
+    pub supplier_id: String,
+
+    pub useful_life_months: i32,
+
+    pub warranty_expiry: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDepreciationEntryRequest {
+    pub depreciation_amount: f64,
+
+    pub period: String,
+
+    pub post_to_gl: bool,
+
+    pub schedule_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDepreciationScheduleRequest {
+    pub asset_id: String,
+
+    pub method: String,
+
+    pub monthly_rate: f64,
+
+    pub salvage_value: f64,
+
+    pub start_date: String,
 
     pub useful_life_months: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateAssetResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
+pub struct CreateDisposalRequest {
+    pub asset_id: String,
 
-    pub accumulated_depreciation_account_id: String,
+    pub currency_code: String,
 
-    pub asset_account_id: String,
+    pub description: String,
 
-    pub asset_number: String,
+    pub disposal_date: String,
 
-    pub category_id: String,
+    pub disposal_type: String,
 
-    pub company_id: String,
+    pub proceeds: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDisposalResponse {
+    pub approved_by: String,
+
+    pub asset_id: String,
 
     pub created_at: String,
 
@@ -224,154 +333,125 @@ pub struct CreateAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: rust_decimal::Decimal,
-
-    pub depreciation_expense_account_id: String,
-
-    pub depreciation_method: String,
-
-    pub depreciation_rate: rust_decimal::Decimal,
-
     pub description: String,
 
     pub disposal_date: String,
 
+    pub disposal_type: String,
+
+    pub gain_loss: f64,
+
+    pub gl_entry_id: String,
+
     pub id: String,
 
-    pub in_service_date: String,
+    pub net_book_value: f64,
 
-    pub location: String,
-
-    pub metadata: serde_json::Value,
-
-    pub name: String,
-
-    pub purchase_cost: rust_decimal::Decimal,
-
-    pub purchase_date: String,
-
-    pub salvage_value: rust_decimal::Decimal,
-
-    pub status: String,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-
-    pub useful_life_months: i32,
+    pub proceeds: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateDepreciationRequest {
+pub struct CreateRevaluationRequest {
     pub asset_id: String,
 
-    pub currency_code: String,
+    pub new_value: f64,
 
-    pub depreciation_amount: rust_decimal::Decimal,
+    pub post_to_gl: bool,
 
-    pub period_end: String,
+    pub reason: String,
 
-    pub period_start: String,
+    pub revaluation_date: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateDepreciationResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
-
+pub struct CreateRevaluationResponse {
     pub asset_id: String,
-
-    pub book_value: rust_decimal::Decimal,
 
     pub created_at: String,
 
-    pub currency_code: String,
+    pub created_by: String,
 
-    pub depreciation_amount: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub journal_entry_id: String,
-
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub posted_at: String,
-
-    pub posted_by: String,
-
-    pub status: String,
-
-    pub updated_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct Depreciation {
-    pub accumulated_depreciation: rust_decimal::Decimal,
-
-    pub asset_id: String,
-
-    pub book_value: rust_decimal::Decimal,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub depreciation_amount: rust_decimal::Decimal,
+    pub gl_entry_id: String,
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    pub new_value: f64,
 
-    pub period_end: String,
+    pub previous_value: f64,
 
-    pub period_start: String,
+    pub reason: String,
 
-    pub posted_at: String,
-
-    pub posted_by: String,
-
-    pub status: String,
-
-    pub updated_at: String,
+    pub revaluation_date: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetAssetRegisterResponse {
+pub struct DeleteAssetResponse {
     pub code: String,
 
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DepreciationEntry {
+    pub accumulated_depreciation: f64,
+
+    pub asset_id: String,
+
     pub created_at: String,
 
-    pub default_depreciation_method: String,
+    pub depreciation_amount: f64,
 
-    pub default_useful_life_months: i32,
-
-    pub description: String,
+    pub gl_entry_id: String,
 
     pub id: String,
 
-    pub is_active: bool,
+    pub net_book_value: f64,
 
-    pub name: String,
+    pub period: String,
 
-    pub parent_id: String,
+    pub posted_to_gl: bool,
+
+    pub schedule_id: String,
 
     pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetAssetResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
+pub struct DepreciationSchedule {
+    pub acquisition_cost: f64,
 
-    pub accumulated_depreciation_account_id: String,
+    pub asset_id: String,
 
-    pub asset_account_id: String,
+    pub created_at: String,
 
-    pub asset_number: String,
+    pub end_date: String,
 
-    pub category_id: String,
+    pub entries: Vec<DepreciationEntry>,
 
-    pub company_id: String,
+    pub id: String,
+
+    pub method: String,
+
+    pub monthly_rate: f64,
+
+    pub salvage_value: f64,
+
+    pub start_date: String,
+
+    pub total_depreciation: f64,
+
+    pub updated_at: String,
+
+    pub useful_life_months: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DisposalRecord {
+    pub approved_by: String,
+
+    pub asset_id: String,
 
     pub created_at: String,
 
@@ -379,77 +459,37 @@ pub struct GetAssetResponse {
 
     pub currency_code: String,
 
-    pub current_value: rust_decimal::Decimal,
-
-    pub depreciation_expense_account_id: String,
-
-    pub depreciation_method: String,
-
-    pub depreciation_rate: rust_decimal::Decimal,
-
     pub description: String,
 
     pub disposal_date: String,
 
-    pub id: String,
+    pub disposal_type: String,
 
-    pub in_service_date: String,
+    pub gain_loss: f64,
 
-    pub location: String,
-
-    pub metadata: serde_json::Value,
-
-    pub name: String,
-
-    pub purchase_cost: rust_decimal::Decimal,
-
-    pub purchase_date: String,
-
-    pub salvage_value: rust_decimal::Decimal,
-
-    pub status: String,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-
-    pub useful_life_months: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetDepreciationResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
-
-    pub asset_id: String,
-
-    pub book_value: rust_decimal::Decimal,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub depreciation_amount: rust_decimal::Decimal,
+    pub gl_entry_id: String,
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    pub net_book_value: f64,
 
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub posted_at: String,
-
-    pub posted_by: String,
-
-    pub status: String,
-
-    pub updated_at: String,
+    pub proceeds: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListAssetRegistersResponse {
-    pub items: Vec<AssetRegister>,
+pub struct ErrorResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListAssetCategoriesResponse {
+    pub has_more: bool,
+
+    pub items: Vec<AssetCategory>,
 
     pub limit: i32,
 
@@ -459,7 +499,16 @@ pub struct ListAssetRegistersResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListAssetModelsResponse {
+    pub items: Vec<AssetModel>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListAssetsResponse {
+    pub has_more: bool,
+
     pub items: Vec<Asset>,
 
     pub limit: i32,
@@ -470,8 +519,10 @@ pub struct ListAssetsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListDepreciationsResponse {
-    pub items: Vec<Depreciation>,
+pub struct ListDepreciationEntriesResponse {
+    pub has_more: bool,
+
+    pub items: Vec<DepreciationEntry>,
 
     pub limit: i32,
 
@@ -481,61 +532,53 @@ pub struct ListDepreciationsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateAssetRegisterRequest {
-    pub default_depreciation_method: String,
+pub struct ListDisposalsResponse {
+    pub has_more: bool,
 
-    pub default_useful_life_months: i32,
+    pub items: Vec<DisposalRecord>,
 
-    pub description: String,
+    pub limit: i32,
 
-    pub is_active: bool,
+    pub page: i32,
 
-    pub name: String,
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateAssetRegisterResponse {
-    pub code: String,
+pub struct ListRevaluationsResponse {
+    pub has_more: bool,
 
-    pub created_at: String,
+    pub items: Vec<RevaluationRecord>,
 
-    pub default_depreciation_method: String,
+    pub limit: i32,
 
-    pub default_useful_life_months: i32,
+    pub page: i32,
 
-    pub description: String,
-
-    pub id: String,
-
-    pub is_active: bool,
-
-    pub name: String,
-
-    pub parent_id: String,
-
-    pub updated_at: String,
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateAssetRequest {
-    pub description: String,
+pub struct ModifyAssetRequest {
+    pub effective_date: String,
 
-    pub disposal_date: String,
+    pub new_residual_value: f64,
 
-    pub location: String,
+    pub new_useful_life_months: i32,
 
-    pub name: String,
+    pub reason: String,
 
-    pub status: String,
+    pub value_adjustment: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateAssetResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
+pub struct ModifyAssetResponse {
+    pub accumulated_depreciation: f64,
 
-    pub accumulated_depreciation_account_id: String,
+    pub acquisition_cost: f64,
 
-    pub asset_account_id: String,
+    pub acquisition_date: String,
+
+    pub acquisition_gl_entry_id: String,
 
     pub asset_number: String,
 
@@ -545,83 +588,241 @@ pub struct UpdateAssetResponse {
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub current_value: rust_decimal::Decimal,
+    pub custodian_id: String,
 
-    pub depreciation_expense_account_id: String,
-
-    pub depreciation_method: String,
-
-    pub depreciation_rate: rust_decimal::Decimal,
+    pub department_id: String,
 
     pub description: String,
 
-    pub disposal_date: String,
-
     pub id: String,
 
-    pub in_service_date: String,
+    pub insurance_policy: String,
 
     pub location: String,
 
-    pub metadata: serde_json::Value,
-
     pub name: String,
 
-    pub purchase_cost: rust_decimal::Decimal,
+    pub net_book_value: f64,
 
-    pub purchase_date: String,
+    pub notes: String,
 
-    pub salvage_value: rust_decimal::Decimal,
+    pub serial_number: String,
 
     pub status: String,
+
+    pub supplier_id: String,
 
     pub updated_at: String,
 
-    pub updated_by: String,
-
     pub useful_life_months: i32,
+
+    pub warranty_expiry: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateDepreciationRequest {
-    pub depreciation_amount: rust_decimal::Decimal,
+pub struct PaginatedAssetCategories {
+    pub has_more: bool,
 
-    pub journal_entry_id: String,
+    pub items: Vec<AssetCategory>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAssetModels {
+    pub items: Vec<AssetModel>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAssets {
+    pub has_more: bool,
+
+    pub items: Vec<Asset>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDepreciationEntries {
+    pub has_more: bool,
+
+    pub items: Vec<DepreciationEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDisposals {
+    pub has_more: bool,
+
+    pub items: Vec<DisposalRecord>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRevaluations {
+    pub has_more: bool,
+
+    pub items: Vec<RevaluationRecord>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RevaluationRecord {
+    pub asset_id: String,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub gl_entry_id: String,
+
+    pub id: String,
+
+    pub new_value: f64,
+
+    pub previous_value: f64,
+
+    pub reason: String,
+
+    pub revaluation_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RunDepreciationRequest {
+    pub depreciation_amount: f64,
+
+    pub period: String,
+
+    pub post_to_gl: bool,
+
+    pub schedule_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RunDepreciationResponse {
+    pub accumulated_depreciation: f64,
+
+    pub asset_id: String,
+
+    pub created_at: String,
+
+    pub depreciation_amount: f64,
+
+    pub gl_entry_id: String,
+
+    pub id: String,
+
+    pub net_book_value: f64,
+
+    pub period: String,
+
+    pub posted_to_gl: bool,
+
+    pub schedule_id: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateAssetRequest {
+    pub custodian_id: String,
+
+    pub department_id: String,
+
+    pub description: String,
+
+    pub location: String,
+
+    pub name: String,
+
+    pub notes: String,
 
     pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateDepreciationResponse {
-    pub accumulated_depreciation: rust_decimal::Decimal,
+pub struct UpdateAssetResponse {
+    pub accumulated_depreciation: f64,
 
-    pub asset_id: String,
+    pub acquisition_cost: f64,
 
-    pub book_value: rust_decimal::Decimal,
+    pub acquisition_date: String,
+
+    pub acquisition_gl_entry_id: String,
+
+    pub asset_number: String,
+
+    pub category_id: String,
+
+    pub company_id: String,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub depreciation_amount: rust_decimal::Decimal,
+    pub custodian_id: String,
+
+    pub department_id: String,
+
+    pub description: String,
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    pub insurance_policy: String,
 
-    pub period_end: String,
+    pub location: String,
 
-    pub period_start: String,
+    pub name: String,
 
-    pub posted_at: String,
+    pub net_book_value: f64,
 
-    pub posted_by: String,
+    pub notes: String,
+
+    pub serial_number: String,
 
     pub status: String,
 
+    pub supplier_id: String,
+
     pub updated_at: String,
+
+    pub useful_life_months: i32,
+
+    pub warranty_expiry: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ValidationError {
+    pub code: String,
+
+    pub errors: Vec<serde_json::Value>,
+
+    pub message: String,
 }

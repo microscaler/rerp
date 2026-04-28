@@ -12,44 +12,32 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_asset_registers",
-        crate::controllers::list_asset_registers::ListAssetRegistersController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_asset_register",
-        crate::controllers::create_asset_register::CreateAssetRegisterController,
+        "list_asset_models",
+        crate::controllers::list_asset_models::ListAssetModelsController,
         16384,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "get_asset_register",
-        crate::controllers::get_asset_register::GetAssetRegisterController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_asset_register",
-        crate::controllers::update_asset_register::UpdateAssetRegisterController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_asset_register",
-        crate::controllers::delete_asset_register::DeleteAssetRegisterController,
-        20480,
+        "create_asset_model",
+        crate::controllers::create_asset_model::CreateAssetModelController,
+        16384,
     );
 
     dispatcher.register_typed_with_stack_size(
         "list_assets",
         crate::controllers::list_assets::ListAssetsController,
-        20480,
+        28672,
     );
 
     dispatcher.register_typed_with_stack_size(
         "create_asset",
         crate::controllers::create_asset::CreateAssetController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "bulk_depreciate",
+        crate::controllers::bulk_depreciate::BulkDepreciateController,
         16384,
     );
 
@@ -72,33 +60,81 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "list_depreciations",
-        crate::controllers::list_depreciations::ListDepreciationsController,
+        "run_depreciation",
+        crate::controllers::run_depreciation::RunDepreciationController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "create_depreciation",
-        crate::controllers::create_depreciation::CreateDepreciationController,
+        "list_depreciation_entries",
+        crate::controllers::list_depreciation_entries::ListDepreciationEntriesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "modify_asset",
+        crate::controllers::modify_asset::ModifyAssetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "pause_asset_depreciation",
+        crate::controllers::pause_asset_depreciation::PauseAssetDepreciationController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "resume_asset_depreciation",
+        crate::controllers::resume_asset_depreciation::ResumeAssetDepreciationController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "validate_asset",
+        crate::controllers::validate_asset::ValidateAssetController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_asset_categories",
+        crate::controllers::list_asset_categories::ListAssetCategoriesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_asset_category",
+        crate::controllers::create_asset_category::CreateAssetCategoryController,
         16384,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "get_depreciation",
-        crate::controllers::get_depreciation::GetDepreciationController,
+        "list_disposals",
+        crate::controllers::list_disposals::ListDisposalsController,
+        24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_disposal",
+        crate::controllers::create_disposal::CreateDisposalController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "asset_summary",
+        crate::controllers::asset_summary::AssetSummaryController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "update_depreciation",
-        crate::controllers::update_depreciation::UpdateDepreciationController,
+        "list_revaluations",
+        crate::controllers::list_revaluations::ListRevaluationsController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "delete_depreciation",
-        crate::controllers::delete_depreciation::DeleteDepreciationController,
-        20480,
+        "create_revaluation",
+        crate::controllers::create_revaluation::CreateRevaluationController,
+        16384,
     );
 }
 
@@ -119,42 +155,18 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
     for route in routes {
         // JSF P0-2: Use as_ref() for Arc<str> -> &str conversion
         match route.handler_name.as_ref() {
-            "list_asset_registers" => {
+            "list_asset_models" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_asset_registers::ListAssetRegistersController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_asset_register" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_asset_register::CreateAssetRegisterController,
+                    crate::controllers::list_asset_models::ListAssetModelsController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_asset_register" => {
+            "create_asset_model" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_asset_register::GetAssetRegisterController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_asset_register" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_asset_register::UpdateAssetRegisterController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_asset_register" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_asset_register::DeleteAssetRegisterController,
-                    20480,
+                    crate::controllers::create_asset_model::CreateAssetModelController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -162,7 +174,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_assets" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_assets::ListAssetsController,
-                    20480,
+                    28672,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -170,6 +182,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "create_asset" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_asset::CreateAssetController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "bulk_depreciate" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::bulk_depreciate::BulkDepreciateController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
@@ -199,42 +219,106 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "list_depreciations" => {
+            "run_depreciation" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_depreciations::ListDepreciationsController,
+                    crate::controllers::run_depreciation::RunDepreciationController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "create_depreciation" => {
+            "list_depreciation_entries" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_depreciation::CreateDepreciationController,
+                    crate::controllers::list_depreciation_entries::ListDepreciationEntriesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "modify_asset" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::modify_asset::ModifyAssetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "pause_asset_depreciation" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::pause_asset_depreciation::PauseAssetDepreciationController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "resume_asset_depreciation" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::resume_asset_depreciation::ResumeAssetDepreciationController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "validate_asset" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::validate_asset::ValidateAssetController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_asset_categories" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_asset_categories::ListAssetCategoriesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_asset_category" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_asset_category::CreateAssetCategoryController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_depreciation" => {
+            "list_disposals" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_depreciation::GetDepreciationController,
+                    crate::controllers::list_disposals::ListDisposalsController,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_disposal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_disposal::CreateDisposalController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "asset_summary" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::asset_summary::AssetSummaryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_depreciation" => {
+            "list_revaluations" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_depreciation::UpdateDepreciationController,
+                    crate::controllers::list_revaluations::ListRevaluationsController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "delete_depreciation" => {
+            "create_revaluation" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_depreciation::DeleteDepreciationController,
-                    20480,
+                    crate::controllers::create_revaluation::CreateRevaluationController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

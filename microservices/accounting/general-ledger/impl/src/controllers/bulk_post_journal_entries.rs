@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger::handlers::bulk_post_journal_entries::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::bulk_post_journal_entries::{Request, Response};
 
 #[handler(BulkPostJournalEntriesController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

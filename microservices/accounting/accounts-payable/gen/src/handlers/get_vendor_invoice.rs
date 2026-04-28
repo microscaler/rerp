@@ -15,68 +15,7 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "aging_bucket")]
-    pub aging_bucket: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approval_status")]
-    pub approval_status: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approved_at")]
-    pub approved_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approved_by")]
-    pub approved_by: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_until_due")]
-    pub days_until_due: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "early_payment_discount_date")]
-    pub early_payment_discount_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "early_payment_discount_percent")]
-    pub early_payment_discount_percent: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(rename = "invoice_id")]
-    pub invoice_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "matching_status")]
-    pub matching_status: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "purchase_order_id")]
-    pub purchase_order_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
-
-    #[serde(rename = "vendor_id")]
-    pub vendor_id: String,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;

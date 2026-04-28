@@ -3,12 +3,12 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_ar_agings --force
 
-use rerp_accounting_accounts_receivable::handlers::list_ar_agings::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::list_ar_agings::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_accounts_receivable::handlers::types::ArAging;
+use rerp_accounting_accounts_receivable_gen::handlers::types::ArAging;
 
 #[handler(ListArAgingsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -21,4 +21,15 @@ pub mod get_edi_mapping;
 
 pub mod update_edi_mapping;
 
+pub mod create_edi_profile;
+pub mod create_edi_submission;
+pub mod create_edi_validation_profile;
 pub mod delete_edi_mapping;
+pub mod get_edi_submission_status;
+pub mod list_edi_acknowledgments;
+pub mod list_edi_errors;
+pub mod list_edi_profiles;
+pub mod list_edi_submissions;
+pub mod list_edi_validation_profiles;
+pub mod retry_edi_submission;
+pub mod submit_edi_submission;

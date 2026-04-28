@@ -13,56 +13,51 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "aging_date")]
-    pub aging_date: String,
+    #[serde(rename = "as_of_date")]
+    pub as_of_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "bucket_1_30")]
+    pub bucket_1_30: f64,
+
+    #[serde(rename = "bucket_31_60")]
+    pub bucket_31_60: f64,
+
+    #[serde(rename = "bucket_61_90")]
+    pub bucket_61_90: f64,
+
+    #[serde(rename = "bucket_90_plus")]
+    pub bucket_90_plus: f64,
+
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "currency_code")]
+    pub currency_code: Option<String>,
+
     #[serde(rename = "current")]
-    pub current: Option<rust_decimal::Decimal>,
+    pub current: f64,
 
     #[serde(rename = "customer_id")]
     pub customer_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_31_60")]
-    pub days_31_60: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_61_90")]
-    pub days_61_90: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_91_120")]
-    pub days_91_120: Option<rust_decimal::Decimal>,
 
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "over_120")]
-    pub over_120: Option<rust_decimal::Decimal>,
+    #[serde(rename = "invoice_count")]
+    pub invoice_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_outstanding")]
-    pub total_outstanding: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
+    pub total_outstanding: Option<f64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -102,9 +97,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_ar_aging::handle(req)
 }

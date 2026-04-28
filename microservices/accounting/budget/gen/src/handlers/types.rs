@@ -8,13 +8,15 @@ use serde::{Deserialize, Serialize};
 pub struct Budget {
     pub approval_status: String,
 
+    pub approved_amount: f64,
+
     pub approved_at: String,
 
     pub approved_by: String,
 
-    pub budget_number: String,
-
     pub company_id: String,
+
+    pub cost_center_id: String,
 
     pub created_at: String,
 
@@ -22,7 +24,7 @@ pub struct Budget {
 
     pub currency_code: String,
 
-    pub current_version_id: String,
+    pub department_id: String,
 
     pub description: String,
 
@@ -30,144 +32,193 @@ pub struct Budget {
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
-
     pub name: String,
 
-    pub period_end: String,
+    pub notes: String,
 
-    pub period_start: String,
+    pub period_type: String,
 
     pub status: String,
 
-    pub total_actual_amount: rust_decimal::Decimal,
+    pub submitted_at: String,
 
-    pub total_budget_amount: rust_decimal::Decimal,
-
-    pub total_variance: rust_decimal::Decimal,
+    pub total_amount: f64,
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    pub version: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BudgetLine {
-    pub account_id: String,
+    pub actual_amount: f64,
 
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
+    pub amount: f64,
 
     pub budget_id: String,
+
+    pub cost_center_id: String,
 
     pub created_at: String,
 
     pub currency_code: String,
+
+    pub department_id: String,
+
+    pub gl_account_code: String,
+
+    pub gl_account_id: String,
+
+    pub gl_account_name: String,
 
     pub id: String,
 
     pub notes: String,
 
-    pub period_id: String,
+    pub period: String,
+
+    pub period_name: String,
 
     pub updated_at: String,
 
-    pub variance: rust_decimal::Decimal,
+    pub variance: f64,
 
-    pub variance_percent: rust_decimal::Decimal,
-
-    pub version_id: String,
+    pub variance_percent: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct BudgetVariance {
-    pub account_id: String,
-
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
-
+pub struct BudgetRevision {
     pub budget_id: String,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub exceeds_threshold: bool,
 
     pub id: String,
 
-    pub is_favorable: bool,
+    pub reason: String,
 
-    pub last_calculated_at: String,
+    pub requested_by: String,
 
-    pub period_id: String,
+    pub revision_number: i32,
 
-    pub updated_at: String,
-
-    pub variance: rust_decimal::Decimal,
-
-    pub variance_percent: rust_decimal::Decimal,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBudgetLineRequest {
-    pub account_id: String,
+    pub amount: f64,
 
-    pub budget_amount: rust_decimal::Decimal,
-
-    pub budget_id: String,
+    pub cost_center_id: String,
 
     pub currency_code: String,
 
+    pub department_id: String,
+
+    pub gl_account_code: String,
+
+    pub gl_account_id: String,
+
     pub notes: String,
 
-    pub period_id: String,
+    pub period: String,
 
-    pub version_id: String,
+    pub period_name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBudgetLineResponse {
-    pub account_id: String,
+    pub actual_amount: f64,
 
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
+    pub amount: f64,
 
     pub budget_id: String,
+
+    pub cost_center_id: String,
 
     pub created_at: String,
 
     pub currency_code: String,
 
+    pub department_id: String,
+
+    pub gl_account_code: String,
+
+    pub gl_account_id: String,
+
+    pub gl_account_name: String,
+
     pub id: String,
 
     pub notes: String,
 
-    pub period_id: String,
+    pub period: String,
+
+    pub period_name: String,
 
     pub updated_at: String,
 
-    pub variance: rust_decimal::Decimal,
+    pub variance: f64,
 
-    pub variance_percent: rust_decimal::Decimal,
-
-    pub version_id: String,
+    pub variance_percent: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBudgetRequest {
-    pub budget_number: String,
+    pub budget_lines: Vec<CreateBudgetLineRequest>,
 
     pub company_id: String,
+
+    pub cost_center_id: String,
+
+    pub currency_code: String,
+
+    pub department_id: String,
+
+    pub description: String,
+
+    pub fiscal_year: i32,
+
+    pub name: String,
+
+    pub notes: String,
+
+    pub period_type: String,
+
+    pub version: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateBudgetRevisionRequest {
+    pub budget_id: String,
+
+    pub line_adjustments: Vec<serde_json::Value>,
+
+    pub reason: String,
+
+    pub requested_by: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateBudgetRevisionResponse {
+    pub budget_id: String,
+
+    pub id: String,
+
+    pub reason: String,
+
+    pub requested_by: String,
+
+    pub revision_number: i32,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateForecastRequest {
+    pub budget_id: String,
 
     pub currency_code: String,
 
     pub description: String,
 
-    pub fiscal_year: i32,
+    pub forecast_type: String,
 
     pub name: String,
 
@@ -177,16 +228,10 @@ pub struct CreateBudgetRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateBudgetResponse {
-    pub approval_status: String,
+pub struct CreateForecastResponse {
+    pub as_of_date: String,
 
-    pub approved_at: String,
-
-    pub approved_by: String,
-
-    pub budget_number: String,
-
-    pub company_id: String,
+    pub budget_id: String,
 
     pub created_at: String,
 
@@ -194,15 +239,11 @@ pub struct CreateBudgetResponse {
 
     pub currency_code: String,
 
-    pub current_version_id: String,
-
     pub description: String,
 
-    pub fiscal_year: i32,
+    pub forecast_type: String,
 
     pub id: String,
-
-    pub metadata: serde_json::Value,
 
     pub name: String,
 
@@ -212,168 +253,83 @@ pub struct CreateBudgetResponse {
 
     pub status: String,
 
-    pub total_actual_amount: rust_decimal::Decimal,
-
-    pub total_budget_amount: rust_decimal::Decimal,
-
-    pub total_variance: rust_decimal::Decimal,
+    pub total_forecasted: f64,
 
     pub updated_at: String,
-
-    pub updated_by: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateBudgetVarianceRequest {
-    pub account_id: String,
+pub struct DeleteBudgetResponse {
+    pub code: String,
 
-    pub budget_id: String,
+    pub details: serde_json::Value,
 
-    pub currency_code: String,
-
-    pub period_id: String,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateBudgetVarianceResponse {
-    pub account_id: String,
+pub struct ErrorResponse {
+    pub code: String,
 
-    pub actual_amount: rust_decimal::Decimal,
+    pub details: serde_json::Value,
 
-    pub budget_amount: rust_decimal::Decimal,
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Forecast {
+    pub as_of_date: String,
 
     pub budget_id: String,
 
     pub created_at: String,
 
+    pub created_by: String,
+
     pub currency_code: String,
 
-    pub exceeds_threshold: bool,
+    pub description: String,
+
+    pub forecast_type: String,
 
     pub id: String,
 
-    pub is_favorable: bool,
+    pub name: String,
 
-    pub last_calculated_at: String,
+    pub period_end: String,
 
-    pub period_id: String,
+    pub period_start: String,
+
+    pub status: String,
+
+    pub total_forecasted: f64,
 
     pub updated_at: String,
-
-    pub variance: rust_decimal::Decimal,
-
-    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetBudgetLineResponse {
-    pub account_id: String,
-
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
-
-    pub budget_id: String,
+pub struct ForecastLine {
+    pub amount: f64,
 
     pub created_at: String,
 
-    pub currency_code: String,
+    pub forecast_id: String,
+
+    pub gl_account_id: String,
 
     pub id: String,
 
     pub notes: String,
 
-    pub period_id: String,
+    pub period: String,
 
     pub updated_at: String,
-
-    pub variance: rust_decimal::Decimal,
-
-    pub variance_percent: rust_decimal::Decimal,
-
-    pub version_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetBudgetResponse {
-    pub approval_status: String,
-
-    pub approved_at: String,
-
-    pub approved_by: String,
-
-    pub budget_number: String,
-
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub current_version_id: String,
-
-    pub description: String,
-
-    pub fiscal_year: i32,
-
-    pub id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub name: String,
-
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub status: String,
-
-    pub total_actual_amount: rust_decimal::Decimal,
-
-    pub total_budget_amount: rust_decimal::Decimal,
-
-    pub total_variance: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetBudgetVarianceResponse {
-    pub account_id: String,
-
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
-
-    pub budget_id: String,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub exceeds_threshold: bool,
-
-    pub id: String,
-
-    pub is_favorable: bool,
-
-    pub last_calculated_at: String,
-
-    pub period_id: String,
-
-    pub updated_at: String,
-
-    pub variance: rust_decimal::Decimal,
-
-    pub variance_percent: rust_decimal::Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBudgetLinesResponse {
+    pub has_more: bool,
+
     pub items: Vec<BudgetLine>,
 
     pub limit: i32,
@@ -384,18 +340,16 @@ pub struct ListBudgetLinesResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListBudgetVariancesResponse {
-    pub items: Vec<BudgetVariance>,
-
-    pub limit: i32,
-
-    pub page: i32,
+pub struct ListBudgetRevisionsResponse {
+    pub items: Vec<BudgetRevision>,
 
     pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBudgetsResponse {
+    pub has_more: bool,
+
     pub items: Vec<Budget>,
 
     pub limit: i32,
@@ -406,50 +360,118 @@ pub struct ListBudgetsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBudgetLineRequest {
-    pub actual_amount: rust_decimal::Decimal,
+pub struct ListForecastsResponse {
+    pub has_more: bool,
 
-    pub budget_amount: rust_decimal::Decimal,
+    pub items: Vec<Forecast>,
 
-    pub notes: String,
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBudgetLineResponse {
-    pub account_id: String,
+pub struct PaginatedBudgetLines {
+    pub has_more: bool,
 
-    pub actual_amount: rust_decimal::Decimal,
+    pub items: Vec<BudgetLine>,
 
-    pub budget_amount: rust_decimal::Decimal,
+    pub limit: i32,
 
-    pub budget_id: String,
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedBudgetRevisions {
+    pub items: Vec<BudgetRevision>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedBudgets {
+    pub has_more: bool,
+
+    pub items: Vec<Budget>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedForecasts {
+    pub has_more: bool,
+
+    pub items: Vec<Forecast>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SubmitBudgetResponse {
+    pub approval_status: String,
+
+    pub approved_amount: f64,
+
+    pub approved_at: String,
+
+    pub approved_by: String,
+
+    pub company_id: String,
+
+    pub cost_center_id: String,
 
     pub created_at: String,
 
+    pub created_by: String,
+
     pub currency_code: String,
+
+    pub department_id: String,
+
+    pub description: String,
+
+    pub fiscal_year: i32,
 
     pub id: String,
 
+    pub name: String,
+
     pub notes: String,
 
-    pub period_id: String,
+    pub period_type: String,
+
+    pub status: String,
+
+    pub submitted_at: String,
+
+    pub total_amount: f64,
 
     pub updated_at: String,
 
-    pub variance: rust_decimal::Decimal,
-
-    pub variance_percent: rust_decimal::Decimal,
-
-    pub version_id: String,
+    pub version: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBudgetRequest {
-    pub approval_status: String,
+    pub budget_lines: Vec<CreateBudgetLineRequest>,
 
     pub description: String,
 
     pub name: String,
+
+    pub notes: String,
 
     pub status: String,
 }
@@ -458,13 +480,15 @@ pub struct UpdateBudgetRequest {
 pub struct UpdateBudgetResponse {
     pub approval_status: String,
 
+    pub approved_amount: f64,
+
     pub approved_at: String,
 
     pub approved_by: String,
 
-    pub budget_number: String,
-
     pub company_id: String,
+
+    pub cost_center_id: String,
 
     pub created_at: String,
 
@@ -472,7 +496,7 @@ pub struct UpdateBudgetResponse {
 
     pub currency_code: String,
 
-    pub current_version_id: String,
+    pub department_id: String,
 
     pub description: String,
 
@@ -480,67 +504,94 @@ pub struct UpdateBudgetResponse {
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
-
     pub name: String,
 
-    pub period_end: String,
+    pub notes: String,
 
-    pub period_start: String,
+    pub period_type: String,
 
     pub status: String,
 
-    pub total_actual_amount: rust_decimal::Decimal,
+    pub submitted_at: String,
 
-    pub total_budget_amount: rust_decimal::Decimal,
-
-    pub total_variance: rust_decimal::Decimal,
+    pub total_amount: f64,
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    pub version: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBudgetVarianceRequest {
-    pub actual_amount: rust_decimal::Decimal,
+pub struct ValidationError {
+    pub code: String,
 
-    pub budget_amount: rust_decimal::Decimal,
+    pub errors: Vec<serde_json::Value>,
 
-    pub exceeds_threshold: bool,
-
-    pub is_favorable: bool,
-
-    pub variance: rust_decimal::Decimal,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBudgetVarianceResponse {
-    pub account_id: String,
-
-    pub actual_amount: rust_decimal::Decimal,
-
-    pub budget_amount: rust_decimal::Decimal,
+pub struct VarianceReport {
+    pub breach_threshold: f64,
 
     pub budget_id: String,
+
+    pub budget_name: String,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub exceeds_threshold: bool,
+    pub fiscal_year: i32,
 
     pub id: String,
 
-    pub is_favorable: bool,
+    pub lines: Vec<serde_json::Value>,
 
-    pub last_calculated_at: String,
+    pub period_end: String,
 
-    pub period_id: String,
+    pub period_start: String,
 
-    pub updated_at: String,
+    pub total_actual: f64,
 
-    pub variance: rust_decimal::Decimal,
+    pub total_budgeted: f64,
 
-    pub variance_percent: rust_decimal::Decimal,
+    pub total_variance: f64,
+
+    pub total_variance_percent: f64,
+
+    pub warning_threshold: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct VarianceReportResponse {
+    pub breach_threshold: f64,
+
+    pub budget_id: String,
+
+    pub budget_name: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub fiscal_year: i32,
+
+    pub id: String,
+
+    pub lines: Vec<serde_json::Value>,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub total_actual: f64,
+
+    pub total_budgeted: f64,
+
+    pub total_variance: f64,
+
+    pub total_variance_percent: f64,
+
+    pub warning_threshold: f64,
 }

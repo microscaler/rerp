@@ -3,12 +3,12 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_payments --force
 
-use rerp_accounting_accounts_receivable::handlers::list_payments::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::list_payments::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_accounts_receivable::handlers::types::Payment;
+use rerp_accounting_accounts_receivable_gen::handlers::types::Payment;
 
 #[handler(ListPaymentsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

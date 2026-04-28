@@ -20,52 +20,52 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        approved_at: None, // TODO: Set from your business logic
+        approved_at: String::new(), // TODO: Set from your business logic
 
-        approved_by: None, // TODO: Set from your business logic
+        approved_by: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
         currency_code: "example".to_string(), // TODO: Set from your business logic
 
-        description: None, // TODO: Set from your business logic
+        description: String::new(), // TODO: Set from your business logic
 
-        generated_at: None, // TODO: Set from your business logic
+        generated_at: String::new(), // TODO: Set from your business logic
 
-        generated_by: None, // TODO: Set from your business logic
+        generated_by: String::new(), // TODO: Set from your business logic
 
         id: "example".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
         name: "example".to_string(), // TODO: Set from your business logic
 
-        parameters: None, // TODO: Set from your business logic
+        parameters: String::new(), // TODO: Set from your business logic
 
-        period_end: None, // TODO: Set from your business logic
+        period_end: String::new(), // TODO: Set from your business logic
 
-        period_start: None, // TODO: Set from your business logic
+        period_start: String::new(), // TODO: Set from your business logic
 
         report_code: "example".to_string(), // TODO: Set from your business logic
 
-        report_data: None, // TODO: Set from your business logic
+        report_data: String::new(), // TODO: Set from your business logic
 
-        report_date: None, // TODO: Set from your business logic
+        report_date: String::new(), // TODO: Set from your business logic
 
         report_type: "example".to_string(), // TODO: Set from your business logic
 
         status: "example".to_string(), // TODO: Set from your business logic
 
-        template_id: None, // TODO: Set from your business logic
+        template_id: String::new(), // TODO: Set from your business logic
 
-        total_amount: None, // TODO: Set from your business logic
+        total_amount: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
     }
 }

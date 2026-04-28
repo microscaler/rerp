@@ -1,0 +1,409 @@
+openapi: 3.1.0
+info:
+  title: Appointments API Gateway
+  description: 'Appointment scheduling and calendar integration.. This aggregates and proxies requests to Appointments microservices.
+    This is the single entry point for the Appointments system.
+
+
+    All requests are proxied to the appropriate sub-service:
+
+    - `/api/v1/appointments/core/*` → Core Service
+
+
+    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
+    on next generation.
+
+
+    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
+    output.
+
+
+    **Service Discovery**: Sub-services are discovered from openapi/appointments/ directory.'
+  version: 1.0.0
+servers:
+- url: /api/v1/appointments
+  description: Appointments API Gateway
+tags: []
+paths:
+  /appointments:
+    get:
+      operationId: list_appointments
+      summary: List appointments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Appointment'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    post:
+      operationId: create_appointment
+      summary: Create appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+  /appointments/{id}:
+    get:
+      operationId: get_appointment
+      summary: Get appointment by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Appointment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    put:
+      operationId: update_appointment
+      summary: Update appointment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppointmentRequest'
+      responses:
+        '200':
+          description: Appointment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    delete:
+      operationId: delete_appointment
+      summary: Delete appointment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Appointment deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+  /availabilitys:
+    get:
+      operationId: list_availabilitys
+      summary: List availabilitys
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of availabilitys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Availability'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    post:
+      operationId: create_availability
+      summary: Create availability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAvailabilityRequest'
+      responses:
+        '201':
+          description: Availability created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+  /availabilitys/{id}:
+    get:
+      operationId: get_availability
+      summary: Get availability by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Availability details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    put:
+      operationId: update_availability
+      summary: Update availability
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAvailabilityRequest'
+      responses:
+        '200':
+          description: Availability updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Availability'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    delete:
+      operationId: delete_availability
+      summary: Delete availability
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Availability deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+  /calendars:
+    get:
+      operationId: list_calendars
+      summary: List calendars
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of calendars
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Calendar'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    post:
+      operationId: create_calendar
+      summary: Create calendar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCalendarRequest'
+      responses:
+        '201':
+          description: Calendar created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+        '400':
+          description: Invalid request
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+  /calendars/{id}:
+    get:
+      operationId: get_calendar
+      summary: Get calendar by id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Calendar details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    put:
+      operationId: update_calendar
+      summary: Update calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCalendarRequest'
+      responses:
+        '200':
+          description: Calendar updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+    delete:
+      operationId: delete_calendar
+      summary: Delete calendar
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Calendar deleted
+        '404':
+          description: Not found
+      x-service: core
+      x-service-base-path: /api/v1/appointments/core
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

@@ -21,26 +21,42 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "search")]
     pub search: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fiscal_year")]
+    pub fiscal_year: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "status")]
+    pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "company_id")]
+    pub company_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "has_more")]
+    pub has_more: Option<bool>,
+
     #[serde(rename = "items")]
-    pub items: Option<Vec<Budget>>,
+    pub items: Vec<Budget>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    pub limit: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "page")]
-    pub page: Option<i32>,
+    pub page: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total")]
-    pub total: Option<i32>,
+    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -84,6 +100,63 @@ impl TryFrom<HandlerRequest> for Request {
                 brrtrouter::server::request::decode_param_value(
                     v,
                     Some(&serde_json::json!({"type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("fiscal_year") {
+            data_map.insert(
+                "fiscal_year".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"type":"integer"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("status") {
+            data_map.insert(
+                "status".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"enum":["DRAFT","SUBMITTED","APPROVED","ACTIVE","ARCHIVED","REJECTED"],"type":"string"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("department_id") {
+            data_map.insert(
+                "department_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("company_id") {
+            data_map.insert(
+                "company_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
                     None,
                     None,
                 ),

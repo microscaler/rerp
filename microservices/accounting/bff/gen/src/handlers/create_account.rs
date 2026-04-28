@@ -36,7 +36,7 @@ pub struct Request {
     pub normal_balance: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(rename = "account_type")]
@@ -51,6 +51,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "created_by")]
+    pub created_by: Option<String>,
 
     #[serde(rename = "currency_code")]
     pub currency_code: String,
@@ -81,6 +85,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_by")]
+    pub updated_by: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -106,9 +114,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::create_account::handle(req)
 }

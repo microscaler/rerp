@@ -3,9 +3,11 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_collection_activity --force
 
-use rerp_accounting_accounts_receivable::handlers::create_collection_activity::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::create_collection_activity::{
+    Request, Response,
+};
 
 #[handler(CreateCollectionActivityController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

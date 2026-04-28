@@ -1,5 +1,5 @@
 [package]
-name = "rerp_accounting_accounts_receivable"
+name = "rerp_accounting_accounts_receivable_gen"
 version = "0.1.0"
 edition = "2021"
 

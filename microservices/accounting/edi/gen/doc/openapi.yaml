@@ -8,7 +8,17 @@ servers:
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/edi
   description: EDI & Compliance API
-tags: []
+tags:
+- name: edi-documents
+  description: EDI documents and accounting document exchange
+- name: edi-mappings
+  description: Mapping rules for inbound and outbound EDI documents
+- name: edi-profiles
+  description: Trading partner, jurisdiction, and standard profiles
+- name: edi-submissions
+  description: Submission lifecycle, polling, retry, and acknowledgments
+- name: validation
+  description: EDI validation profiles and errors
 paths:
   /edi-documents:
     get:
@@ -218,7 +228,194 @@ paths:
           description: EdiMapping deleted
         '404':
           description: Not found
+  /edi-profiles:
+    get:
+      operationId: list_edi_profiles
+      summary: List EDI profiles
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of EDI profiles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEdiProfiles'
+    post:
+      operationId: create_edi_profile
+      summary: Create EDI profile
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiProfileRequest'
+      responses:
+        '201':
+          description: EDI profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiProfile'
+  /edi-validation-profiles:
+    get:
+      operationId: list_edi_validation_profiles
+      summary: List EDI validation profiles
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of EDI validation profiles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEdiValidationProfiles'
+    post:
+      operationId: create_edi_validation_profile
+      summary: Create EDI validation profile
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiValidationProfileRequest'
+      responses:
+        '201':
+          description: EDI validation profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiValidationProfile'
+  /edi-submissions:
+    get:
+      operationId: list_edi_submissions
+      summary: List EDI submissions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/EdiSubmissionStatus'
+      responses:
+        '200':
+          description: List of EDI submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEdiSubmissions'
+    post:
+      operationId: create_edi_submission
+      summary: Create EDI submission
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEdiSubmissionRequest'
+      responses:
+        '201':
+          description: EDI submission created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiSubmission'
+  /edi-submissions/{id}/submit:
+    post:
+      operationId: submit_edi_submission
+      summary: Submit EDI submission
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: EDI submission accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiSubmission'
+  /edi-submissions/{id}/status:
+    get:
+      operationId: get_edi_submission_status
+      summary: Get EDI submission status
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: EDI submission status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiSubmission'
+  /edi-submissions/{id}/retry:
+    post:
+      operationId: retry_edi_submission
+      summary: Retry EDI submission
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: EDI submission retry accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdiSubmission'
+  /edi-acknowledgments:
+    get:
+      operationId: list_edi_acknowledgments
+      summary: List EDI acknowledgments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of EDI acknowledgments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEdiAcknowledgments'
+  /edi-errors:
+    get:
+      operationId: list_edi_errors
+      summary: List EDI errors
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of EDI errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEdiErrors'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   parameters:
     Page:
       name: page
@@ -241,6 +438,152 @@ components:
       schema:
         type: string
   schemas:
+    EdiStandard:
+      type: string
+      enum:
+      - UBL
+      - PEPPOL
+      - FACTUR_X
+      - SAF_T
+      - INTRASTAT
+      - ISO20022
+      - CUSTOM
+    EdiSubmissionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - VALIDATING
+      - READY
+      - SUBMITTED
+      - ACCEPTED
+      - REJECTED
+      - RETRY_REQUIRED
+      - CANCELLED
+    EdiProfile:
+      type: object
+      required:
+      - id
+      - name
+      - standard
+      - active
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        standard:
+          $ref: '#/components/schemas/EdiStandard'
+        jurisdiction_code:
+          type: string
+        trading_partner_id:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+    CreateEdiProfileRequest:
+      type: object
+      required:
+      - name
+      - standard
+      properties:
+        name:
+          type: string
+        standard:
+          $ref: '#/components/schemas/EdiStandard'
+        jurisdiction_code:
+          type: string
+        trading_partner_id:
+          type: string
+          format: uuid
+    EdiValidationProfile:
+      type: object
+      required:
+      - id
+      - profile_id
+      - name
+      - active
+      properties:
+        id:
+          type: string
+          format: uuid
+        profile_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        rules:
+          type: object
+        active:
+          type: boolean
+    CreateEdiValidationProfileRequest:
+      type: object
+      required:
+      - profile_id
+      - name
+      properties:
+        profile_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        rules:
+          type: object
+    EdiSubmission:
+      type: object
+      required:
+      - id
+      - document_id
+      - profile_id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        profile_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/EdiSubmissionStatus'
+        external_reference:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+    CreateEdiSubmissionRequest:
+      type: object
+      required:
+      - document_id
+      - profile_id
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        profile_id:
+          type: string
+          format: uuid
+    EdiError:
+      type: object
+      required:
+      - id
+      - submission_id
+      - message
+      properties:
+        id:
+          type: string
+          format: uuid
+        submission_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        message:
+          type: string
+        field_path:
+          type: string
     EdiDocument:
       type: object
       required:
@@ -644,3 +987,63 @@ components:
           type: boolean
         description:
           type: string
+    PaginatedEdiProfiles:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiProfile'
+    PaginatedEdiValidationProfiles:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiValidationProfile'
+    PaginatedEdiSubmissions:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiSubmission'
+    PaginatedEdiAcknowledgments:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiAcknowledgment'
+    PaginatedEdiErrors:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiError'
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+security:
+- bearerAuth: []

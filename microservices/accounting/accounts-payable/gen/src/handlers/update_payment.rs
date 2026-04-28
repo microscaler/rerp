@@ -10,12 +10,12 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "notes")]
-    pub notes: Option<String>,
+    #[serde(rename = "amount")]
+    pub amount: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "payment_amount")]
-    pub payment_amount: Option<rust_decimal::Decimal>,
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "payment_date")]
@@ -37,12 +37,11 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "applied_amount")]
-    pub applied_amount: Option<rust_decimal::Decimal>,
+    #[serde(rename = "actual_payment_date")]
+    pub actual_payment_date: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "bank_account_id")]
-    pub bank_account_id: Option<String>,
+    #[serde(rename = "amount")]
+    pub amount: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
@@ -52,26 +51,19 @@ pub struct Response {
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
     #[serde(rename = "currency_code")]
     pub currency_code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "gl_entry_id")]
+    pub gl_entry_id: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
     pub notes: Option<String>,
-
-    #[serde(rename = "payment_amount")]
-    pub payment_amount: rust_decimal::Decimal,
 
     #[serde(rename = "payment_date")]
     pub payment_date: String,
@@ -79,12 +71,13 @@ pub struct Response {
     #[serde(rename = "payment_method")]
     pub payment_method: String,
 
-    #[serde(rename = "payment_number")]
-    pub payment_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "posted_to_gl")]
+    pub posted_to_gl: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "payment_reference")]
-    pub payment_reference: Option<String>,
+    #[serde(rename = "reference_number")]
+    pub reference_number: Option<String>,
 
     #[serde(rename = "status")]
     pub status: String,
@@ -94,11 +87,8 @@ pub struct Response {
     pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
-
     #[serde(rename = "vendor_id")]
-    pub vendor_id: String,
+    pub vendor_id: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

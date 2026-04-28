@@ -20,7 +20,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
@@ -30,26 +30,26 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         data_version: 42, // TODO: Set from your business logic
 
-        generated_at: None, // TODO: Set from your business logic
+        generated_at: String::new(), // TODO: Set from your business logic
 
-        generated_by: None, // TODO: Set from your business logic
+        generated_by: String::new(), // TODO: Set from your business logic
 
         id: "example".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        net_income: None, // TODO: Set from your business logic
+        net_income: String::new(), // TODO: Set from your business logic
 
         report_date: "example".to_string(), // TODO: Set from your business logic
 
         report_id: "example".to_string(), // TODO: Set from your business logic
 
-        summary: None, // TODO: Set from your business logic
+        summary: String::new(), // TODO: Set from your business logic
 
-        total_assets: None, // TODO: Set from your business logic
+        total_assets: String::new(), // TODO: Set from your business logic
 
-        total_liabilities: None, // TODO: Set from your business logic
+        total_liabilities: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
     }
 }

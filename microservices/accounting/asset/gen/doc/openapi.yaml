@@ -2,215 +2,149 @@ openapi: 3.1.0
 info:
   title: Asset Management
   version: 1.0.0
-  description: Fixed asset management service tracking asset acquisition and depreciation.
+  description: Fixed asset management service handling asset lifecycle from acquisition to disposal. Supports depreciation scheduling, asset tracking, revaluation, and integration with general ledger for asset accounts. Compliant with common depreciation methods and tax regulations.
+  contact:
+    name: RERP Accounting API Support
+    email: accounting-api@rerp.ai
 servers:
-- url: http://localhost:8006/api/v1/accounting/asset
+- url: http://localhost:8007/api/v1/accounting/asset
   description: Local development (direct to service, port from port-registry)
 - url: /api/v1/accounting/asset
   description: Asset Management API
-tags: []
+tags:
+- name: assets
+  description: Fixed asset lifecycle and tracking
+- name: depreciation
+  description: Depreciation schedules and calculations
+- name: revaluation
+  description: Asset revaluation and impairment
+- name: disposal
+  description: Asset disposal, sale, and write-offs
+- name: reports
+  description: Asset reporting and analysis
 paths:
   /assets:
     get:
       operationId: list_assets
       summary: List assets
+      description: Paginated list of all fixed assets with filtering by category, status, location, department, and useful life range.
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Search by asset number, name, or serial number
+      - name: category_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - DEPRECIATING
+          - FULLY_DEPRECIATED
+          - DISPOSED
+          - SCRAPPED
+          - IN_REPAIR
+          - TRANSIT
+      - name: department_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: custodian_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: location
+        in: query
+        schema:
+          type: string
+        description: Filter by location name
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: nbv_min
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Minimum net book value
+      - name: nbv_max
+        in: query
+        schema:
+          type: number
+          format: double
+        description: Maximum net book value
       responses:
         '200':
-          description: List of assets
+          description: Paginated list of assets
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Asset'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Fixed assets
-                  value:
-                    items:
-                    - id: a0100e8400-e29b-41d4-a716-446655440000
-                      asset_number: AST-2024-001
-                      name: Office Building - Main Campus
-                      category_id: a0110e8400-e29b-41d4-a716-446655440000
-                      purchase_date: '2020-01-15'
-                      purchase_cost: 5000000.0
-                      current_value: 5500000.0
-                      depreciation_method: STRAIGHT_LINE
-                      useful_life_months: 360
-                      currency_code: USD
-                      status: ACTIVE
-                      company_id: 550e8400-e29b-41d4-a716-446655440000
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Fixed assets
-                  value:
-                    items:
-                    - id: b0100e8400-e29b-41d4-a716-446655440000
-                      asset_number: AST-2024-100
-                      name: Laptop Computer
-                      category_id: b0110e8400-e29b-41d4-a716-446655440000
-                      purchase_date: '2024-01-10'
-                      purchase_cost: 1500.0
-                      current_value: 1200.0
-                      depreciation_method: STRAIGHT_LINE
-                      useful_life_months: 36
-                      currency_code: USD
-                      status: ACTIVE
-                      company_id: 660e8400-e29b-41d4-a716-446655440001
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Multi-currency assets
-                  value:
-                    items:
-                    - id: c0100e8400-e29b-41d4-a716-446655440000
-                      asset_number: AST-2024-200
-                      name: Manufacturing Equipment
-                      category_id: c0110e8400-e29b-41d4-a716-446655440000
-                      purchase_date: '2023-06-01'
-                      purchase_cost: 500000.0
-                      current_value: 450000.0
-                      depreciation_method: DECLINING_BALANCE
-                      useful_life_months: 120
-                      currency_code: EUR
-                      status: ACTIVE
-                      company_id: 770e8400-e29b-41d4-a716-446655440002
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedAssets'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: create_asset
       summary: Create asset
+      description: Create a new fixed asset with automatic depreciation schedule generation.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create asset for Acme Corporation
-                value:
-                  asset_number: AST-2024-001
-                  name: Office Building - Main Campus
-                  category_id: a0110e8400-e29b-41d4-a716-446655440000
-                  purchase_date: '2020-01-15'
-                  purchase_cost: 5000000.0
-                  depreciation_method: STRAIGHT_LINE
-                  useful_life_months: 360
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create asset for TechStart Inc
-                value:
-                  asset_number: AST-2024-100
-                  name: Laptop Computer
-                  category_id: b0110e8400-e29b-41d4-a716-446655440000
-                  purchase_date: '2024-01-10'
-                  purchase_cost: 1500.0
-                  depreciation_method: STRAIGHT_LINE
-                  useful_life_months: 36
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency asset
-                value:
-                  asset_number: AST-2024-200
-                  name: Manufacturing Equipment
-                  category_id: c0110e8400-e29b-41d4-a716-446655440000
-                  purchase_date: '2023-06-01'
-                  purchase_cost: 500000.0
-                  depreciation_method: DECLINING_BALANCE
-                  useful_life_months: 120
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
       responses:
         '201':
-          description: Asset created
+          description: Asset created with depreciation schedule
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Asset'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation asset created
-                  value:
-                    id: a0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-001
-                    name: Office Building - Main Campus
-                    category_id: a0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2020-01-15'
-                    purchase_cost: 5000000.0
-                    current_value: 5000000.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 360
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart asset created
-                  value:
-                    id: b0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-100
-                    name: Laptop Computer
-                    category_id: b0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2024-01-10'
-                    purchase_cost: 1500.0
-                    current_value: 1500.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 36
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing asset created
-                  value:
-                    id: c0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-200
-                    name: Manufacturing Equipment
-                    category_id: c0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2023-06-01'
-                    purchase_cost: 500000.0
-                    current_value: 500000.0
-                    depreciation_method: DECLINING_BALANCE
-                    useful_life_months: 120
-                    currency_code: EUR
-                    status: ACTIVE
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/AssetWithDetails'
         '400':
-          description: Invalid request
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
   /assets/{id}:
     get:
       operationId: get_asset
       summary: Get asset by id
+      description: Retrieve a single asset with full details including depreciation schedule and revaluation history.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -220,68 +154,22 @@ paths:
           format: uuid
       responses:
         '200':
-          description: Asset details
+          description: Asset details with depreciation schedule
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Asset'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation asset
-                  value:
-                    id: a0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-001
-                    name: Office Building - Main Campus
-                    category_id: a0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2020-01-15'
-                    purchase_cost: 5000000.0
-                    current_value: 5500000.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 360
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart asset
-                  value:
-                    id: b0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-100
-                    name: Laptop Computer
-                    category_id: b0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2024-01-10'
-                    purchase_cost: 1500.0
-                    current_value: 1200.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 36
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing asset
-                  value:
-                    id: c0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-200
-                    name: Manufacturing Equipment
-                    category_id: c0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2023-06-01'
-                    purchase_cost: 500000.0
-                    current_value: 450000.0
-                    depreciation_method: DECLINING_BALANCE
-                    useful_life_months: 120
-                    currency_code: EUR
-                    status: ACTIVE
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/AssetWithDetails'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: update_asset
       summary: Update asset
+      description: Update an asset's details. Does not allow modification of acquisition cost or date after depreciation starts.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -295,22 +183,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAssetRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation asset
-                value:
-                  name: Office Building - Main Campus (Updated)
-                  current_value: 5600000.0
-              techStartUpdate:
-                summary: Update TechStart asset
-                value:
-                  name: Laptop Computer (Updated)
-                  current_value: 1100.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing asset
-                value:
-                  name: Manufacturing Equipment (Updated)
-                  current_value: 440000.0
       responses:
         '200':
           description: Asset updated
@@ -318,63 +190,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation asset updated
-                  value:
-                    id: a0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-001
-                    name: Office Building - Main Campus (Updated)
-                    category_id: a0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2020-01-15'
-                    purchase_cost: 5000000.0
-                    current_value: 5600000.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 360
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart asset updated
-                  value:
-                    id: b0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-100
-                    name: Laptop Computer (Updated)
-                    category_id: b0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2024-01-10'
-                    purchase_cost: 1500.0
-                    current_value: 1100.0
-                    depreciation_method: STRAIGHT_LINE
-                    useful_life_months: 36
-                    currency_code: USD
-                    status: ACTIVE
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing asset updated
-                  value:
-                    id: c0100e8400-e29b-41d4-a716-446655440000
-                    asset_number: AST-2024-200
-                    name: Manufacturing Equipment (Updated)
-                    category_id: c0110e8400-e29b-41d4-a716-446655440000
-                    purchase_date: '2023-06-01'
-                    purchase_cost: 500000.0
-                    current_value: 440000.0
-                    depreciation_method: DECLINING_BALANCE
-                    useful_life_months: 120
-                    currency_code: EUR
-                    status: ACTIVE
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot update depreciation-related fields after depreciation starts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_asset
       summary: Delete asset
+      description: Delete an asset. Only allowed for assets in ACTIVE status with no depreciation entries.
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -387,427 +219,461 @@ paths:
           description: Asset deleted
         '404':
           description: Not found
-  /depreciations:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cannot delete asset with depreciation entries or non-active status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /assets/{id}/depreciation:
     get:
-      operationId: list_depreciations
-      summary: List depreciations
+      operationId: list_depreciation_entries
+      summary: List depreciation entries
+      description: Get all depreciation entries for an asset.
+      x-brrtrouter-impl: true
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
-          description: List of depreciations
+          description: List of depreciation entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDepreciationEntries'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /assets/{id}/depreciate:
+    post:
+      operationId: run_depreciation
+      summary: Run depreciation for asset
+      description: Run depreciation calculation for an asset for a specific period.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepreciationEntryRequest'
+      responses:
+        '201':
+          description: Depreciation entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepreciationEntry'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Asset is not in an active depreciation state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /assets/bulk-depreciate:
+    post:
+      operationId: bulk_depreciate
+      summary: Run depreciation for all assets
+      description: Run depreciation for all active assets for a given period. Used for month-end/year-end close.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - period
+              properties:
+                period:
+                  type: string
+                  format: date
+                post_to_gl:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Bulk depreciation results with count of entries created
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  items:
+                  total_entries:
+                    type: integer
+                  total_depreciation:
+                    type: number
+                  assets_processed:
+                    type: integer
+                  errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Depreciation'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                      type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /revaluations:
+    get:
+      operationId: list_revaluations
+      summary: List revaluations
+      description: List all asset revaluations with filtering by asset and date range.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: asset_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated list of revaluations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRevaluations'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_depreciation
-      summary: Create depreciation
+      operationId: create_revaluation
+      summary: Create revaluation
+      description: Revalue an asset to a new value, recording the change.
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDepreciationRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create depreciation for Acme Corporation asset
-                value:
-                  asset_id: a0100e8400-e29b-41d4-a716-446655440000
-                  period_start: '2024-01-01'
-                  period_end: '2024-01-31'
-                  depreciation_amount: 13888.89
-                  currency_code: USD
-                  company_id: 550e8400-e29b-41d4-a716-446655440000
-              techStartRequest:
-                summary: Create depreciation for TechStart asset
-                value:
-                  asset_id: b0100e8400-e29b-41d4-a716-446655440000
-                  period_start: '2024-01-01'
-                  period_end: '2024-01-31'
-                  depreciation_amount: 41.67
-                  currency_code: USD
-                  company_id: 660e8400-e29b-41d4-a716-446655440001
-              globalManufacturingRequest:
-                summary: Create multi-currency depreciation
-                value:
-                  asset_id: c0100e8400-e29b-41d4-a716-446655440000
-                  period_start: '2024-01-01'
-                  period_end: '2024-01-31'
-                  depreciation_amount: 4166.67
-                  currency_code: EUR
-                  company_id: 770e8400-e29b-41d4-a716-446655440002
+              $ref: '#/components/schemas/CreateRevaluationRequest'
       responses:
         '201':
-          description: Depreciation created
+          description: Revaluation created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Depreciation'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation depreciation created
-                  value:
-                    id: a0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: a0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 13888.89
-                    accumulated_depreciation: 0.0
-                    book_value: 0.0
-                    currency_code: USD
-                    status: SCHEDULED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart depreciation created
-                  value:
-                    id: b0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: b0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 41.67
-                    accumulated_depreciation: 0.0
-                    book_value: 0.0
-                    currency_code: USD
-                    status: SCHEDULED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing depreciation created
-                  value:
-                    id: c0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: c0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 4166.67
-                    accumulated_depreciation: 0.0
-                    book_value: 0.0
-                    currency_code: EUR
-                    status: SCHEDULED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
+                $ref: '#/components/schemas/RevaluationRecord'
         '400':
-          description: Invalid request
-  /depreciations/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Asset is not in an active state for revaluation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /disposals:
     get:
-      operationId: get_depreciation
-      summary: Get depreciation by id
+      operationId: list_disposals
+      summary: List disposals
+      description: List all asset disposals with filtering by type, date range, and asset.
+      x-brrtrouter-impl: true
       parameters:
-      - name: id
-        in: path
-        required: true
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: asset_id
+        in: query
         schema:
           type: string
           format: uuid
-      responses:
-        '200':
-          description: Depreciation details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Depreciation'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation depreciation
-                  value:
-                    id: a0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: a0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 13888.89
-                    accumulated_depreciation: 555555.56
-                    book_value: 4444444.44
-                    currency_code: USD
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                techStartExample:
-                  summary: TechStart depreciation
-                  value:
-                    id: b0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: b0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 41.67
-                    accumulated_depreciation: 41.67
-                    book_value: 1458.33
-                    currency_code: USD
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing depreciation
-                  value:
-                    id: c0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: c0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 4166.67
-                    accumulated_depreciation: 29166.67
-                    book_value: 470833.33
-                    currency_code: EUR
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_depreciation
-      summary: Update depreciation
-      parameters:
-      - name: id
-        in: path
-        required: true
+      - name: disposal_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - SALE
+          - SCRAP
+          - DONATION
+          - TRANSFER
+          - WRITE_OFF
+          - THEFT
+      - name: company_id
+        in: query
         schema:
           type: string
           format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateDepreciationRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation depreciation
-                value:
-                  status: POSTED
-                  depreciation_amount: 14000.0
-              techStartUpdate:
-                summary: Update TechStart depreciation
-                value:
-                  status: POSTED
-                  depreciation_amount: 42.0
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing depreciation
-                value:
-                  status: POSTED
-                  depreciation_amount: 4200.0
-      responses:
-        '200':
-          description: Depreciation updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Depreciation'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation depreciation updated
-                  value:
-                    id: a0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: a0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 14000.0
-                    accumulated_depreciation: 555555.56
-                    book_value: 4444444.44
-                    currency_code: USD
-                    status: POSTED
-                    company_id: 550e8400-e29b-41d4-a716-446655440000
-                    created_at: '2024-01-31T10:00:00Z'
-                    updated_at: '2024-01-31T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart depreciation updated
-                  value:
-                    id: b0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: b0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 42.0
-                    accumulated_depreciation: 41.67
-                    book_value: 1458.33
-                    currency_code: USD
-                    status: POSTED
-                    company_id: 660e8400-e29b-41d4-a716-446655440001
-                    created_at: '2024-01-31T09:00:00Z'
-                    updated_at: '2024-01-31T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing depreciation updated
-                  value:
-                    id: c0120e8400-e29b-41d4-a716-446655440000
-                    asset_id: c0100e8400-e29b-41d4-a716-446655440000
-                    period_start: '2024-01-01'
-                    period_end: '2024-01-31'
-                    depreciation_amount: 4200.0
-                    accumulated_depreciation: 29166.67
-                    book_value: 470833.33
-                    currency_code: EUR
-                    status: POSTED
-                    company_id: 770e8400-e29b-41d4-a716-446655440002
-                    created_at: '2024-01-31T08:00:00Z'
-                    updated_at: '2024-01-31T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_depreciation
-      summary: Delete depreciation
-      parameters:
-      - name: id
-        in: path
-        required: true
+      - name: date_from
+        in: query
         schema:
           type: string
-          format: uuid
-      responses:
-        '204':
-          description: Depreciation deleted
-        '404':
-          description: Not found
-  /asset-registers:
-    get:
-      operationId: list_asset_registers
-      summary: List asset-registers
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+          format: date
+        description: Disposal date from
+      - name: date_to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Disposal date to
       responses:
         '200':
-          description: List of asset-registers
+          description: Paginated list of disposals
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AssetRegister'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation - Asset registers
-                  value:
-                    items:
-                    - id: a0130e8400-e29b-41d4-a716-446655440000
-                      code: REAL_ESTATE
-                      name: Real Estate Register
-                      is_active: true
-                      created_at: '2024-01-15T10:00:00Z'
-                      updated_at: '2024-01-15T10:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                techStartExample:
-                  summary: TechStart Inc - Asset registers
-                  value:
-                    items:
-                    - id: b0130e8400-e29b-41d4-a716-446655440000
-                      code: EQUIPMENT
-                      name: Equipment Register
-                      is_active: true
-                      created_at: '2024-01-20T09:00:00Z'
-                      updated_at: '2024-01-20T09:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
-                globalManufacturingExample:
-                  summary: Global Manufacturing - Asset registers
-                  value:
-                    items:
-                    - id: c0130e8400-e29b-41d4-a716-446655440000
-                      code: MACHINERY
-                      name: Machinery Register
-                      is_active: true
-                      created_at: '2024-01-25T08:00:00Z'
-                      updated_at: '2024-01-25T08:00:00Z'
-                    total: 1
-                    page: 1
-                    limit: 20
+                $ref: '#/components/schemas/PaginatedDisposals'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_asset_register
-      summary: Create asset-register
+      operationId: create_disposal
+      summary: Create disposal
+      description: Record the disposal of an asset (sale, scrap, write-off, etc.).
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAssetRegisterRequest'
-            examples:
-              acmeCorporationRequest:
-                summary: Create asset register for Acme Corporation
-                value:
-                  code: REAL_ESTATE
-                  name: Real Estate Register
-                  is_active: true
-              techStartRequest:
-                summary: Create asset register for TechStart Inc
-                value:
-                  code: EQUIPMENT
-                  name: Equipment Register
-                  is_active: true
-              globalManufacturingRequest:
-                summary: Create asset register for Global Manufacturing
-                value:
-                  code: MACHINERY
-                  name: Machinery Register
-                  is_active: true
+              $ref: '#/components/schemas/CreateDisposalRequest'
       responses:
         '201':
-          description: AssetRegister created
+          description: Disposal created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetRegister'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation asset register created
-                  value:
-                    id: a0130e8400-e29b-41d4-a716-446655440000
-                    code: REAL_ESTATE
-                    name: Real Estate Register
-                    is_active: true
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartResponse:
-                  summary: TechStart asset register created
-                  value:
-                    id: b0130e8400-e29b-41d4-a716-446655440000
-                    code: EQUIPMENT
-                    name: Equipment Register
-                    is_active: true
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing asset register created
-                  value:
-                    id: c0130e8400-e29b-41d4-a716-446655440000
-                    code: MACHINERY
-                    name: Machinery Register
-                    is_active: true
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
+                $ref: '#/components/schemas/DisposalRecord'
         '400':
-          description: Invalid request
-  /asset-registers/{id}:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Asset is not in an active state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /categories:
     get:
-      operationId: get_asset_register
-      summary: Get asset-register by id
+      operationId: list_asset_categories
+      summary: List asset categories
+      description: List all asset categories with hierarchical support.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Paginated list of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssetCategories'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: create_asset_category
+      summary: Create asset category
+      description: Create a new asset category with default depreciation settings.
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetCategoryRequest'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetCategory'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /reports/asset-summary:
+    get:
+      operationId: asset_summary
+      summary: Asset summary report
+      description: Generate a company-wide asset summary with breakdown by category, status, and depreciation expenses.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by company
+      - name: as_of_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Date for asset valuation. Defaults to today.
+      - name: include_disposed
+        in: query
+        schema:
+          type: boolean
+        description: Include disposed assets in totals
+      responses:
+        '200':
+          description: Asset summary with breakdowns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /asset-models:
+    get:
+      operationId: list_asset_models
+      summary: List asset models
+      responses:
+        '200':
+          description: Asset models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssetModels'
+    post:
+      operationId: create_asset_model
+      summary: Create asset model
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetModelRequest'
+      responses:
+        '201':
+          description: Asset model created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetModel'
+  /assets/{id}/validate:
+    post:
+      operationId: validate_asset
+      summary: Validate asset
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -817,44 +683,42 @@ paths:
           format: uuid
       responses:
         '200':
-          description: AssetRegister details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AssetRegister'
-              examples:
-                acmeCorporationExample:
-                  summary: Acme Corporation asset register
-                  value:
-                    id: a0130e8400-e29b-41d4-a716-446655440000
-                    code: REAL_ESTATE
-                    name: Real Estate Register
-                    is_active: true
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T10:00:00Z'
-                techStartExample:
-                  summary: TechStart asset register
-                  value:
-                    id: b0130e8400-e29b-41d4-a716-446655440000
-                    code: EQUIPMENT
-                    name: Equipment Register
-                    is_active: true
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T09:00:00Z'
-                globalManufacturingExample:
-                  summary: Global Manufacturing asset register
-                  value:
-                    id: c0130e8400-e29b-41d4-a716-446655440000
-                    code: MACHINERY
-                    name: Machinery Register
-                    is_active: true
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T08:00:00Z'
-        '404':
-          description: Not found
-    put:
-      operationId: update_asset_register
-      summary: Update asset-register
+          description: Asset validated
+  /assets/{id}/pause-depreciation:
+    post:
+      operationId: pause_asset_depreciation
+      summary: Pause asset depreciation
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset depreciation paused
+  /assets/{id}/resume-depreciation:
+    post:
+      operationId: resume_asset_depreciation
+      summary: Resume asset depreciation
+      x-brrtrouter-impl: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Asset depreciation resumed
+  /assets/{id}/modify:
+    post:
+      operationId: modify_asset
+      summary: Modify asset accounting values
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -867,97 +731,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateAssetRegisterRequest'
-            examples:
-              acmeCorporationUpdate:
-                summary: Update Acme Corporation asset register
-                value:
-                  name: Real Estate Register (Updated)
-                  is_active: true
-              techStartUpdate:
-                summary: Update TechStart asset register
-                value:
-                  name: Equipment Register (Updated)
-                  is_active: true
-              globalManufacturingUpdate:
-                summary: Update Global Manufacturing asset register
-                value:
-                  name: Machinery Register (Updated)
-                  is_active: true
+              $ref: '#/components/schemas/ModifyAssetRequest'
       responses:
         '200':
-          description: AssetRegister updated
+          description: Asset modified
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetRegister'
-              examples:
-                acmeCorporationResponse:
-                  summary: Acme Corporation asset register updated
-                  value:
-                    id: a0130e8400-e29b-41d4-a716-446655440000
-                    code: REAL_ESTATE
-                    name: Real Estate Register (Updated)
-                    is_active: true
-                    created_at: '2024-01-15T10:00:00Z'
-                    updated_at: '2024-01-15T11:00:00Z'
-                techStartResponse:
-                  summary: TechStart asset register updated
-                  value:
-                    id: b0130e8400-e29b-41d4-a716-446655440000
-                    code: EQUIPMENT
-                    name: Equipment Register (Updated)
-                    is_active: true
-                    created_at: '2024-01-20T09:00:00Z'
-                    updated_at: '2024-01-20T10:00:00Z'
-                globalManufacturingResponse:
-                  summary: Global Manufacturing asset register updated
-                  value:
-                    id: c0130e8400-e29b-41d4-a716-446655440000
-                    code: MACHINERY
-                    name: Machinery Register (Updated)
-                    is_active: true
-                    created_at: '2024-01-25T08:00:00Z'
-                    updated_at: '2024-01-25T09:00:00Z'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_asset_register
-      summary: Delete asset-register
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: AssetRegister deleted
-        '404':
-          description: Not found
+                $ref: '#/components/schemas/Asset'
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     Asset:
       type: object
@@ -965,62 +753,61 @@ components:
       - id
       - asset_number
       - name
+      - acquisition_cost
       - category_id
-      - purchase_date
       - status
-      - currency_code
+      - company_id
       properties:
         id:
           type: string
           format: uuid
+          description: Unique identifier for this asset
         asset_number:
           type: string
           maxLength: 100
+          description: Unique asset tag/number
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
+          description: Asset name/description
         description:
           type: string
+          maxLength: 2000
           nullable: true
+          description: Detailed description
         category_id:
           type: string
           format: uuid
-        purchase_cost:
+          description: Asset category
+        acquisition_cost:
           type: number
-          format: decimal
-        current_value:
-          type: number
-          format: decimal
-        accumulated_depreciation:
-          type: number
-          format: decimal
-        salvage_value:
-          type: number
-          format: decimal
-        purchase_date:
+          format: double
+          minimum: 0
+          description: Original acquisition cost
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Currency of the acquisition cost
+        acquisition_date:
           type: string
           format: date
-        in_service_date:
+          description: Date the asset was acquired
+        location:
           type: string
-          format: date
+          maxLength: 500
           nullable: true
-        disposal_date:
+          description: Current location of the asset
+        department_id:
           type: string
-          format: date
+          format: uuid
           nullable: true
-        depreciation_method:
+          description: Department responsible for the asset
+        custodian_id:
           type: string
-          enum:
-          - STRAIGHT_LINE
-          - DECLINING_BALANCE
-          - UNITS_OF_PRODUCTION
-          - SUM_OF_YEARS
+          format: uuid
           nullable: true
-        useful_life_months:
-          type: integer
-        depreciation_rate:
-          type: number
-          format: decimal
+          description: Person responsible for the asset
         status:
           type: string
           enum:
@@ -1028,225 +815,54 @@ components:
           - DEPRECIATING
           - FULLY_DEPRECIATED
           - DISPOSED
-          - IMPAIRED
-        location:
-          type: string
-          maxLength: 255
-          nullable: true
-        asset_account_id:
-          type: string
-          format: uuid
-          nullable: true
-        depreciation_expense_account_id:
+          - SCRAPPED
+          - IN_REPAIR
+          - TRANSIT
+          description: Asset lifecycle status
+        acquisition_gl_entry_id:
           type: string
           format: uuid
           nullable: true
-        accumulated_depreciation_account_id:
-          type: string
-          format: uuid
-          nullable: true
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
-    Depreciation:
-      type: object
-      required:
-      - id
-      - asset_id
-      - period_start
-      - period_end
-      - depreciation_amount
-      - status
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        asset_id:
-          type: string
-          format: uuid
-        period_start:
-          type: string
-          format: date
-        period_end:
-          type: string
-          format: date
-        depreciation_amount:
+          description: GL journal entry created during acquisition
+        net_book_value:
           type: number
-          format: decimal
+          format: double
+          description: Current net book value (cost - accumulated depreciation)
         accumulated_depreciation:
           type: number
-          format: decimal
-        book_value:
-          type: number
-          format: decimal
-        journal_entry_id:
-          type: string
-          format: uuid
-          nullable: true
-        status:
-          type: string
-          enum:
-          - SCHEDULED
-          - POSTED
-          - SKIPPED
-        posted_at:
-          type: string
-          format: date-time
-          nullable: true
-        posted_by:
-          type: string
-          format: uuid
-          nullable: true
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    AssetRegister:
-      type: object
-      required:
-      - id
-      - code
-      - name
-      - is_active
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-          maxLength: 50
-        name:
-          type: string
-          maxLength: 255
-        parent_id:
-          type: string
-          format: uuid
-          nullable: true
-        description:
-          type: string
-          nullable: true
-        default_depreciation_method:
-          type: string
-          enum:
-          - STRAIGHT_LINE
-          - DECLINING_BALANCE
-          - UNITS_OF_PRODUCTION
-          - SUM_OF_YEARS
-          nullable: true
-        default_useful_life_months:
+          format: double
+          description: Total depreciation to date
+        useful_life_months:
           type: integer
-          nullable: true
-        is_active:
-          type: boolean
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    AssetTransaction:
-      type: object
-      required:
-      - id
-      - asset_id
-      - transaction_date
-      - transaction_type
-      - transaction_amount
-      - currency_code
-      properties:
-        id:
-          type: string
-          format: uuid
-        asset_id:
-          type: string
-          format: uuid
-        transaction_date:
-          type: string
-          format: date
-        transaction_type:
-          type: string
-          enum:
-          - PURCHASE
-          - SALE
-          - DISPOSAL
-          - TRANSFER
-          - IMPAIRMENT
-          - ADJUSTMENT
-        transaction_amount:
-          type: number
-          format: decimal
-        sale_proceeds:
-          type: number
-          format: decimal
-          nullable: true
-        gain_loss:
-          type: number
-          format: decimal
-          nullable: true
-        transfer_to_location:
-          type: string
-          nullable: true
-        transfer_to_company_id:
-          type: string
-          format: uuid
-          nullable: true
-        impairment_amount:
-          type: number
-          format: decimal
-          nullable: true
-        impairment_reason:
-          type: string
-          nullable: true
-        journal_entry_id:
-          type: string
-          format: uuid
-          nullable: true
-        reference_number:
-          type: string
-          maxLength: 100
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
+          minimum: 1
+          description: Useful life in months
         company_id:
           type: string
           format: uuid
+          description: Company this asset belongs to
+        supplier_id:
+          type: string
+          format: uuid
           nullable: true
-        metadata:
-          type: object
+          description: Original supplier/vendor
+        serial_number:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: Manufacturer serial number
+        warranty_expiry:
+          type: string
+          format: date
+          nullable: true
+          description: Warranty expiration date
+        insurance_policy:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: Insurance policy reference
+        notes:
+          type: string
+          maxLength: 2000
           nullable: true
         created_at:
           type: string
@@ -1254,82 +870,132 @@ components:
         updated_at:
           type: string
           format: date-time
-        created_by:
-          type: string
-          format: uuid
-          nullable: true
-        updated_by:
-          type: string
-          format: uuid
-          nullable: true
+    AssetWithDetails:
+      allOf:
+      - $ref: '#/components/schemas/Asset'
+      - type: object
+        properties:
+          depreciation_schedule:
+            type: array
+            items:
+              $ref: '#/components/schemas/DepreciationEntry'
+            description: Depreciation schedule for this asset
+          disposal_record:
+            type: object
+            nullable: true
+            description: Disposal record if disposed
+          revaluation_history:
+            type: array
+            items:
+              $ref: '#/components/schemas/RevaluationRecord'
+            description: Revaluation history
     CreateAssetRequest:
       type: object
       required:
       - asset_number
       - name
+      - acquisition_cost
       - category_id
-      - purchase_date
-      - currency_code
+      - acquisition_date
+      - useful_life_months
+      - company_id
       properties:
         asset_number:
           type: string
           maxLength: 100
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
         description:
           type: string
-        category_id:
+          maxLength: 2000
+          nullable: true
+        acquisition_cost:
+          type: number
+          format: double
+          minimum: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: Defaults to company currency
+        acquisition_date:
+          type: string
+          format: date
+        location:
+          type: string
+          maxLength: 500
+          nullable: true
+        department_id:
           type: string
           format: uuid
-        purchase_cost:
-          type: number
-          format: decimal
-        salvage_value:
-          type: number
-          format: decimal
-        purchase_date:
+          nullable: true
+        custodian_id:
           type: string
-          format: date
-        in_service_date:
-          type: string
-          format: date
+          format: uuid
+          nullable: true
+        useful_life_months:
+          type: integer
+          minimum: 1
         depreciation_method:
           type: string
           enum:
           - STRAIGHT_LINE
           - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
-          - SUM_OF_YEARS
-        useful_life_months:
-          type: integer
-        location:
-          type: string
-          maxLength: 255
-        asset_account_id:
-          type: string
-          format: uuid
-        depreciation_expense_account_id:
-          type: string
-          format: uuid
-        accumulated_depreciation_account_id:
-          type: string
-          format: uuid
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
+          - FOREIGN_EXCHANGE_ADJUSTMENT
+          description: Depreciation method. Defaults to STRAIGHT_LINE.
         company_id:
           type: string
           format: uuid
+        supplier_id:
+          type: string
+          format: uuid
+          nullable: true
+        serial_number:
+          type: string
+          maxLength: 200
+          nullable: true
+        warranty_expiry:
+          type: string
+          format: date
+          nullable: true
+        acquisition_gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL entry from acquisition invoice
+        notes:
+          type: string
+          maxLength: 2000
+          nullable: true
+        auto_depreciate:
+          type: boolean
+          default: true
+          description: Automatically create depreciation schedule on creation
     UpdateAssetRequest:
       type: object
       properties:
         name:
           type: string
-          maxLength: 255
+          maxLength: 200
         description:
           type: string
+          maxLength: 2000
+          nullable: true
+        location:
+          type: string
+          maxLength: 500
+          nullable: true
+        department_id:
+          type: string
+          format: uuid
+          nullable: true
+        custodian_id:
+          type: string
+          format: uuid
+          nullable: true
         status:
           type: string
           enum:
@@ -1337,97 +1003,747 @@ components:
           - DEPRECIATING
           - FULLY_DEPRECIATED
           - DISPOSED
-          - IMPAIRED
-        location:
+          - SCRAPPED
+          - IN_REPAIR
+          - TRANSIT
+        notes:
           type: string
-          maxLength: 255
-        disposal_date:
+          maxLength: 2000
+          nullable: true
+    DepreciationSchedule:
+      type: object
+      required:
+      - id
+      - asset_id
+      - method
+      - useful_life_months
+      - monthly_rate
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the schedule
+        asset_id:
+          type: string
+          format: uuid
+          description: Asset this schedule belongs to
+        method:
+          type: string
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
+          - FOREIGN_EXCHANGE_ADJUSTMENT
+        acquisition_cost:
+          type: number
+          format: double
+          description: Cost basis for calculation
+        salvage_value:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+          description: Estimated salvage/scrap value
+        useful_life_months:
+          type: integer
+          minimum: 1
+        monthly_rate:
+          type: number
+          format: double
+          description: Monthly depreciation rate
+        start_date:
           type: string
           format: date
-    CreateDepreciationRequest:
+          description: Depreciation start date
+        end_date:
+          type: string
+          format: date
+          description: Depreciation end date
+        total_depreciation:
+          type: number
+          format: double
+          description: Total depreciation over life
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationEntry'
+          description: Individual depreciation entries
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    DepreciationEntry:
+      type: object
+      required:
+      - id
+      - schedule_id
+      - period
+      - depreciation_amount
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this entry
+        schedule_id:
+          type: string
+          format: uuid
+          description: Depreciation schedule this entry belongs to
+        asset_id:
+          type: string
+          format: uuid
+          description: Asset this entry relates to
+        period:
+          type: string
+          format: date
+          description: Period end date for this entry
+        depreciation_amount:
+          type: number
+          format: double
+          description: Depreciation amount for this period
+        accumulated_depreciation:
+          type: number
+          format: double
+          description: Total accumulated depreciation at this period
+        net_book_value:
+          type: number
+          format: double
+          description: Net book value at this period
+        gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL journal entry created for this depreciation
+        posted_to_gl:
+          type: boolean
+          default: false
+          description: Whether posted to GL
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateDepreciationScheduleRequest:
       type: object
       required:
       - asset_id
-      - period_start
-      - period_end
-      - depreciation_amount
-      - currency_code
+      - method
+      - useful_life_months
+      - start_date
       properties:
         asset_id:
           type: string
           format: uuid
-        period_start:
+        method:
+          type: string
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
+          - FOREIGN_EXCHANGE_ADJUSTMENT
+        salvage_value:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+        useful_life_months:
+          type: integer
+          minimum: 1
+        start_date:
           type: string
           format: date
-        period_end:
+        monthly_rate:
+          type: number
+          format: double
+          nullable: true
+          description: Custom monthly rate. Auto-calculated from method if not provided.
+    CreateDepreciationEntryRequest:
+      type: object
+      required:
+      - schedule_id
+      - period
+      - depreciation_amount
+      properties:
+        schedule_id:
+          type: string
+          format: uuid
+        period:
           type: string
           format: date
         depreciation_amount:
           type: number
-          format: decimal
+          format: double
+          minimum: 0
+        post_to_gl:
+          type: boolean
+          default: true
+          description: Create GL entry for this depreciation
+    RevaluationRecord:
+      type: object
+      required:
+      - id
+      - asset_id
+      - previous_value
+      - new_value
+      - revaluation_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+          description: Asset being revalued
+        previous_value:
+          type: number
+          format: double
+          description: Net book value before revaluation
+        new_value:
+          type: number
+          format: double
+          description: New net book value after revaluation
+        revaluation_date:
+          type: string
+          format: date
+          description: Date of revaluation
+        reason:
+          type: string
+          maxLength: 1000
+          description: Reason for revaluation
+        gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL journal entry for revaluation
+        created_by:
+          type: string
+          format: uuid
+          description: User who performed revaluation
+        created_at:
+          type: string
+          format: date-time
+    CreateRevaluationRequest:
+      type: object
+      required:
+      - asset_id
+      - new_value
+      - revaluation_date
+      - reason
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        new_value:
+          type: number
+          format: double
+          minimum: 0
+        revaluation_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 1000
+        post_to_gl:
+          type: boolean
+          default: true
+          description: Create GL entry for revaluation
+    DisposalRecord:
+      type: object
+      required:
+      - id
+      - asset_id
+      - disposal_date
+      - disposal_type
+      - net_book_value
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+          description: Asset being disposed
+        disposal_date:
+          type: string
+          format: date
+          description: Date of disposal
+        disposal_type:
+          type: string
+          enum:
+          - SALE
+          - SCRAP
+          - DONATION
+          - TRANSFER
+          - WRITE_OFF
+          - THEFT
+        net_book_value:
+          type: number
+          format: double
+          description: Net book value at disposal
+        proceeds:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+          description: Sale proceeds (0 for scrap/write-off)
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
-    UpdateDepreciationRequest:
-      type: object
-      properties:
-        depreciation_amount:
+          description: Currency of proceeds
+        gain_loss:
           type: number
-          format: decimal
-        status:
+          format: double
+          description: Gain (positive) or loss (negative) on disposal
+        description:
           type: string
-          enum:
-          - SCHEDULED
-          - POSTED
-          - SKIPPED
-        journal_entry_id:
+          maxLength: 2000
+          nullable: true
+          description: Disposal details
+        approved_by:
           type: string
           format: uuid
-    CreateAssetRegisterRequest:
+          nullable: true
+          description: User who approved the disposal
+        gl_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: GL journal entry for disposal
+        created_by:
+          type: string
+          format: uuid
+          description: User who recorded the disposal
+        created_at:
+          type: string
+          format: date-time
+    CreateDisposalRequest:
+      type: object
+      required:
+      - asset_id
+      - disposal_date
+      - disposal_type
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        disposal_date:
+          type: string
+          format: date
+        disposal_type:
+          type: string
+          enum:
+          - SALE
+          - SCRAP
+          - DONATION
+          - TRANSFER
+          - WRITE_OFF
+          - THEFT
+        proceeds:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+    AssetCategory:
+      type: object
+      required:
+      - id
+      - name
+      - company_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+          description: Category name
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Category description
+        default_depreciation_method:
+          type: string
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
+          - FOREIGN_EXCHANGE_ADJUSTMENT
+          description: Default depreciation method for assets in this category
+        default_useful_life_months:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Default useful life in months
+        gl_account_debit:
+          type: string
+          format: uuid
+          nullable: true
+          description: Default debit GL account for acquisitions
+        gl_account_credit:
+          type: string
+          format: uuid
+          nullable: true
+          description: Default credit GL account for depreciation
+        parent_category_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent category for hierarchical categories
+        company_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CreateAssetCategoryRequest:
+      type: object
+      required:
+      - name
+      - company_id
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        default_depreciation_method:
+          type: string
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
+          - FOREIGN_EXCHANGE_ADJUSTMENT
+        default_useful_life_months:
+          type: integer
+          minimum: 1
+          nullable: true
+        gl_account_debit:
+          type: string
+          format: uuid
+          nullable: true
+        gl_account_credit:
+          type: string
+          format: uuid
+          nullable: true
+        parent_category_id:
+          type: string
+          format: uuid
+          nullable: true
+        company_id:
+          type: string
+          format: uuid
+    AssetModel:
+      type: object
+      required: [id, name, depreciation_method, useful_life_months]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+        useful_life_months:
+          type: integer
+          minimum: 1
+        residual_value_percent:
+          type: number
+          format: double
+          nullable: true
+        asset_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        depreciation_account_id:
+          type: string
+          format: uuid
+          nullable: true
+        expense_account_id:
+          type: string
+          format: uuid
+          nullable: true
+    CreateAssetModelRequest:
+      type: object
+      required: [name, depreciation_method, useful_life_months]
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        depreciation_method:
+          type: string
+          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+        useful_life_months:
+          type: integer
+          minimum: 1
+        residual_value_percent:
+          type: number
+          format: double
+          nullable: true
+    ModifyAssetRequest:
+      type: object
+      required: [effective_date, reason]
+      properties:
+        effective_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        new_useful_life_months:
+          type: integer
+          nullable: true
+        new_residual_value:
+          type: number
+          format: double
+          nullable: true
+        value_adjustment:
+          type: number
+          format: double
+          nullable: true
+    PaginatedAssetModels:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetModel'
+        total:
+          type: integer
+    PaginatedAssets:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedDepreciationEntries:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepreciationEntry'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedRevaluations:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevaluationRecord'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedDisposals:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisposalRecord'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    PaginatedAssetCategories:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetCategory'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+    AssetSummary:
+      type: object
+      required:
+      - company_id
+      - total_acquisition_cost
+      - total_accumulated_depreciation
+      - total_net_book_value
+      properties:
+        company_id:
+          type: string
+          format: uuid
+        as_of_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          minLength: 3
+          maxLength: 3
+        total_assets:
+          type: integer
+          description: Count of active assets
+        total_acquisition_cost:
+          type: number
+          format: double
+          description: Total acquisition cost
+        total_accumulated_depreciation:
+          type: number
+          format: double
+          description: Total accumulated depreciation
+        total_net_book_value:
+          type: number
+          format: double
+          description: Total net book value
+        by_category:
+          type: array
+          items:
+            type: object
+            properties:
+              category_id:
+                type: string
+                format: uuid
+              category_name:
+                type: string
+              count:
+                type: integer
+              acquisition_cost:
+                type: number
+                format: double
+              net_book_value:
+                type: number
+                format: double
+          description: Breakdown by category
+        by_status:
+          type: object
+          description: Count by status
+        depreciation_expense_current_year:
+          type: number
+          format: double
+          description: Total depreciation expense in current fiscal year
+        disposals_current_year:
+          type: integer
+          description: Number of assets disposed this year
+    ErrorResponse:
       type: object
       required:
       - code
-      - name
+      - message
       properties:
         code:
           type: string
-          maxLength: 50
-        name:
-          type: string
-          maxLength: 255
-        parent_id:
-          type: string
-          format: uuid
-        description:
-          type: string
-        default_depreciation_method:
-          type: string
           enum:
-          - STRAIGHT_LINE
-          - DECLINING_BALANCE
-          - UNITS_OF_PRODUCTION
-          - SUM_OF_YEARS
-        default_useful_life_months:
-          type: integer
-        is_active:
-          type: boolean
-    UpdateAssetRegisterRequest:
+          - NOT_FOUND
+          - UNAUTHORIZED
+          - FORBIDDEN
+          - CONFLICT
+          - SERVER_ERROR
+          - UNKNOWN
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Asset not found
+        details:
+          type: object
+          nullable: true
+    ValidationError:
       type: object
+      required:
+      - code
+      - message
+      - errors
       properties:
-        name:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-        default_depreciation_method:
+        code:
           type: string
           enum:
-          - STRAIGHT_LINE
-          - DECLINING_BALANCE
-          - UNITS_OF_PRODUCTION
-          - SUM_OF_YEARS
-        default_useful_life_months:
-          type: integer
-        is_active:
-          type: boolean
+          - VALIDATION_ERROR
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Disposal proceeds exceed net book value
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+                example: proceeds
+              message:
+                type: string
+                example: Disposal proceeds cannot exceed net book value without proper documentation
+security:
+- bearerAuth: []

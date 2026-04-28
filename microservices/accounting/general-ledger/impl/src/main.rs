@@ -1,4 +1,4 @@
-// This file uses generated code from the rerp_accounting_general_ledger crate
+// This file uses generated code from the rerp_accounting_general_ledger_gen crate
 // Business logic controllers are in impl/src/controllers/
 // This file is based on gen/src/main.rs but uses impl controllers
 
@@ -17,9 +17,9 @@ use brrtrouter::spec::SecurityScheme;
 use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
 use clap::Parser;
 // Use generated code from gen crate
-use rerp_accounting_general_ledger::handlers::*;
-use rerp_accounting_general_ledger::registry;
-use rerp_accounting_general_ledger::*;
+use rerp_accounting_general_ledger_gen::handlers::*;
+use rerp_accounting_general_ledger_gen::registry;
+use rerp_accounting_general_ledger_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;

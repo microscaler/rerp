@@ -3,49 +3,21 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_asset --force
 
-use asset_service_api::handlers::create_asset::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_asset_gen::handlers::create_asset::{Request, Response};
 
 #[handler(CreateAssetController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
-    // let accumulated_depreciation_account_id = req.inner.accumulated_depreciation_account_id;// let asset_account_id = req.inner.asset_account_id;// let asset_number = req.inner.asset_number;// let category_id = req.inner.category_id;// let company_id = req.inner.company_id;// let currency_code = req.inner.currency_code;// let depreciation_expense_account_id = req.inner.depreciation_expense_account_id;// let depreciation_method = req.inner.depreciation_method;// let description = req.inner.description;// let in_service_date = req.inner.in_service_date;// let location = req.inner.location;// let name = req.inner.name;// let purchase_cost = req.inner.purchase_cost;// let purchase_date = req.inner.purchase_date;// let salvage_value = req.inner.salvage_value;// let useful_life_months = req.inner.useful_life_months;
+    // let acquisition_cost = req.inner.acquisition_cost;// let acquisition_date = req.inner.acquisition_date;// let acquisition_gl_entry_id = req.inner.acquisition_gl_entry_id;// let asset_number = req.inner.asset_number;// let auto_depreciate = req.inner.auto_depreciate;// let company_id = req.inner.company_id;// let currency_code = req.inner.currency_code;// let custodian_id = req.inner.custodian_id;// let department_id = req.inner.department_id;// let depreciation_method = req.inner.depreciation_method;// let description = req.inner.description;// let location = req.inner.location;// let name = req.inner.name;// let notes = req.inner.notes;// let serial_number = req.inner.serial_number;// let supplier_id = req.inner.supplier_id;// let useful_life_months = req.inner.useful_life_months;// let warranty_expiry = req.inner.warranty_expiry;
     //
     // Example: Database query, validation, etc.
     // let result = your_service.process(&req.inner)?;
     //
     // Example: Return response
 
-    Response {
-        accumulated_depreciation: None, // TODO: Set from your business logic
-        accumulated_depreciation_account_id: None, // TODO: Set from your business logic
-        asset_account_id: None,         // TODO: Set from your business logic
-        asset_number: "AST-2024-001".to_string(), // TODO: Set from your business logic
-        category_id: "a0110e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-        company_id: None,                      // TODO: Set from your business logic
-        created_at: None,                      // TODO: Set from your business logic
-        created_by: None,                      // TODO: Set from your business logic
-        currency_code: "USD".to_string(),      // TODO: Set from your business logic
-        current_value: None,                   // TODO: Set from your business logic
-        depreciation_expense_account_id: None, // TODO: Set from your business logic
-        depreciation_method: None,             // TODO: Set from your business logic
-        depreciation_rate: None,               // TODO: Set from your business logic
-        description: None,                     // TODO: Set from your business logic
-        disposal_date: None,                   // TODO: Set from your business logic
-        id: "a0100e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-        in_service_date: None, // TODO: Set from your business logic
-        location: None,        // TODO: Set from your business logic
-        metadata: None,        // TODO: Set from your business logic
-        name: "Office Building - Main Campus".to_string(), // TODO: Set from your business logic
-        purchase_cost: None,   // TODO: Set from your business logic
-        purchase_date: "2020-01-15".to_string(), // TODO: Set from your business logic
-        salvage_value: None,   // TODO: Set from your business logic
-        status: "ACTIVE".to_string(), // TODO: Set from your business logic
-        updated_at: None,      // TODO: Set from your business logic
-        updated_by: None,      // TODO: Set from your business logic
-        useful_life_months: None, // TODO: Set from your business logic
-    }
+    Response {}
 }

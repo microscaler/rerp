@@ -5,10 +5,10 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger::handlers::list_journal_entries::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::list_journal_entries::{Request, Response};
 
 #[allow(unused_imports)]
-use rerp_accounting_general_ledger::handlers::types::JournalEntry;
+use rerp_accounting_general_ledger_gen::handlers::types::JournalEntry;
 
 #[handler(ListJournalEntriesController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

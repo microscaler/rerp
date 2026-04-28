@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path aging_summary --force
 
-use rerp_accounting_accounts_receivable::handlers::aging_summary::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::aging_summary::{Request, Response};
 
 #[handler(AgingSummaryController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

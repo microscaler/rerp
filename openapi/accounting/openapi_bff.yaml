@@ -2824,7 +2824,12 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/ExceptionStatus'
+          enum:
+          - OPEN
+          - WAIVED
+          - REMEDIATED
+          - REJECTED
+          - CLOSED
       responses:
         '200':
           description: Paginated control exceptions
@@ -2902,7 +2907,12 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/SignatureStatus'
+          enum:
+          - REQUESTED
+          - SIGNED
+          - REJECTED
+          - EXPIRED
+          - CANCELLED
       responses:
         '200':
           description: Paginated signature requests
@@ -4689,11 +4699,26 @@ paths:
       - name: document_type
         in: query
         schema:
-          $ref: '#/components/schemas/DocumentType'
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_MEMO
+          - BANK_STATEMENT
+          - EDI_DOCUMENT
+          - TAX_DOCUMENT
+          - OTHER
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/DocumentStatus'
+          enum:
+          - UPLOADED
+          - CLASSIFIED
+          - EXTRACTING
+          - REVIEW_REQUIRED
+          - APPROVED
+          - LINKED
+          - REJECTED
+          - ARCHIVED
       responses:
         '200':
           description: Paginated accounting documents
@@ -9847,7 +9872,12 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/LeaseStatus'
+          enum:
+          - DRAFT
+          - ACTIVE
+          - MODIFIED
+          - TERMINATED
+          - EXPIRED
       responses:
         '200':
           description: Paginated leases
@@ -10016,7 +10046,12 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/RecognitionRunStatus'
+          enum:
+          - DRAFT
+          - READY
+          - POSTED
+          - REVERSED
+          - FAILED
       responses:
         '200':
           description: Paginated recognition runs
@@ -10249,7 +10284,15 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/TaxReturnStatus'
+          enum:
+          - DRAFT
+          - READY_FOR_VALIDATION
+          - VALIDATED
+          - SUBMITTED
+          - ACCEPTED
+          - REJECTED
+          - PAID
+          - ARCHIVED
       - name: period_id
         in: query
         schema:
@@ -10345,7 +10388,14 @@ paths:
       - name: tax_type
         in: query
         schema:
-          $ref: '#/components/schemas/TaxType'
+          enum:
+          - VAT
+          - GST
+          - SALES_TAX
+          - WITHHOLDING
+          - PAYROLL
+          - CORPORATE_INCOME
+          - OTHER
       responses:
         '200':
           description: Paginated tax rules
@@ -10425,7 +10475,11 @@ paths:
       - name: horizon
         in: query
         schema:
-          $ref: '#/components/schemas/ForecastHorizon'
+          enum:
+          - DAILY_13_WEEK
+          - MONTHLY_12_MONTH
+          - QUARTERLY_8_QUARTER
+          - CUSTOM
       responses:
         '200':
           description: Paginated cash forecasts
@@ -10491,7 +10545,13 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/TransferStatus'
+          enum:
+          - PLANNED
+          - APPROVED
+          - SENT
+          - SETTLED
+          - CANCELLED
+          - FAILED
       responses:
         '200':
           description: Paginated cash transfers
@@ -10532,7 +10592,12 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/PlanStatus'
+          enum:
+          - DRAFT
+          - APPROVED
+          - ACTIVE
+          - COMPLETED
+          - CANCELLED
       responses:
         '200':
           description: Paginated liquidity plans
@@ -13883,7 +13948,12 @@ components:
           type: string
           format: uuid
         status:
-          $ref: '#/components/schemas/AuditControlsExceptionStatus'
+          enum:
+          - OPEN
+          - WAIVED
+          - REMEDIATED
+          - REJECTED
+          - CLOSED
         reason:
           type: string
     AuditControlsCreateApprovalPolicyRequest:
@@ -13950,14 +14020,6 @@ components:
           type: string
         message:
           type: string
-    AuditControlsExceptionStatus:
-      type: string
-      enum:
-      - OPEN
-      - WAIVED
-      - REMEDIATED
-      - REJECTED
-      - CLOSED
     AuditControlsPaginatedApprovalPolicies:
       allOf:
       - $ref: '#/components/schemas/AuditControlsPaginatedResponse'
@@ -14068,15 +14130,12 @@ components:
           type: string
           format: uuid
         status:
-          $ref: '#/components/schemas/AuditControlsSignatureStatus'
-    AuditControlsSignatureStatus:
-      type: string
-      enum:
-      - REQUESTED
-      - SIGNED
-      - REJECTED
-      - EXPIRED
-      - CANCELLED
+          enum:
+          - REQUESTED
+          - SIGNED
+          - REJECTED
+          - EXPIRED
+          - CANCELLED
     BankSyncBankAccount:
       type: object
       required:
@@ -15945,20 +16004,17 @@ components:
           type: string
           format: uuid
         status:
-          $ref: '#/components/schemas/ConsolidationConsolidationRunStatus'
+          enum:
+          - DRAFT
+          - READY
+          - RUNNING
+          - COMPLETED
+          - FAILED
+          - APPROVED
+          - ARCHIVED
         executed_at:
           type: string
           format: date-time
-    ConsolidationConsolidationRunStatus:
-      type: string
-      enum:
-      - DRAFT
-      - READY
-      - RUNNING
-      - COMPLETED
-      - FAILED
-      - APPROVED
-      - ARCHIVED
     ConsolidationCreateConsolidationGroupRequest:
       type: object
       required:
@@ -16167,9 +16223,24 @@ components:
           type: string
           format: uuid
         document_type:
-          $ref: '#/components/schemas/DocumentsExtractionDocumentType'
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_MEMO
+          - BANK_STATEMENT
+          - EDI_DOCUMENT
+          - TAX_DOCUMENT
+          - OTHER
         status:
-          $ref: '#/components/schemas/DocumentsExtractionDocumentStatus'
+          enum:
+          - UPLOADED
+          - CLASSIFIED
+          - EXTRACTING
+          - REVIEW_REQUIRED
+          - APPROVED
+          - LINKED
+          - REJECTED
+          - ARCHIVED
         file_name:
           type: string
         content_type:
@@ -16206,7 +16277,14 @@ components:
           type: string
           format: uuid
         document_type:
-          $ref: '#/components/schemas/DocumentsExtractionDocumentType'
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_MEMO
+          - BANK_STATEMENT
+          - EDI_DOCUMENT
+          - TAX_DOCUMENT
+          - OTHER
         file_name:
           type: string
         content_type:
@@ -16234,7 +16312,14 @@ components:
           type: string
           format: uuid
         document_type:
-          $ref: '#/components/schemas/DocumentsExtractionDocumentType'
+          enum:
+          - CUSTOMER_INVOICE
+          - VENDOR_BILL
+          - CREDIT_MEMO
+          - BANK_STATEMENT
+          - EDI_DOCUMENT
+          - TAX_DOCUMENT
+          - OTHER
         confidence:
           type: number
           format: double
@@ -16261,27 +16346,6 @@ components:
           format: uuid
         target_type:
           type: string
-    DocumentsExtractionDocumentStatus:
-      type: string
-      enum:
-      - UPLOADED
-      - CLASSIFIED
-      - EXTRACTING
-      - REVIEW_REQUIRED
-      - APPROVED
-      - LINKED
-      - REJECTED
-      - ARCHIVED
-    DocumentsExtractionDocumentType:
-      type: string
-      enum:
-      - CUSTOMER_INVOICE
-      - VENDOR_BILL
-      - CREDIT_MEMO
-      - BANK_STATEMENT
-      - EDI_DOCUMENT
-      - TAX_DOCUMENT
-      - OTHER
     DocumentsExtractionErrorResponse:
       type: object
       required:
@@ -16325,7 +16389,12 @@ components:
         profile:
           type: string
         status:
-          $ref: '#/components/schemas/DocumentsExtractionExtractionStatus'
+          enum:
+          - PENDING
+          - RUNNING
+          - COMPLETED
+          - FAILED
+          - CANCELLED
         created_at:
           type: string
           format: date-time
@@ -16355,14 +16424,6 @@ components:
         confidence:
           type: number
           format: double
-    DocumentsExtractionExtractionStatus:
-      type: string
-      enum:
-      - PENDING
-      - RUNNING
-      - COMPLETED
-      - FAILED
-      - CANCELLED
     DocumentsExtractionLinkDocumentRequest:
       type: object
       required:
@@ -21835,7 +21896,11 @@ components:
         lease_number:
           type: string
         classification:
-          $ref: '#/components/schemas/LeaseAccountingLeaseClassification'
+          enum:
+          - OPERATING
+          - FINANCE
+          - SHORT_TERM
+          - LOW_VALUE
         commencement_date:
           type: string
           format: date
@@ -21867,9 +21932,18 @@ components:
         lease_number:
           type: string
         classification:
-          $ref: '#/components/schemas/LeaseAccountingLeaseClassification'
+          enum:
+          - OPERATING
+          - FINANCE
+          - SHORT_TERM
+          - LOW_VALUE
         status:
-          $ref: '#/components/schemas/LeaseAccountingLeaseStatus'
+          enum:
+          - DRAFT
+          - ACTIVE
+          - MODIFIED
+          - TERMINATED
+          - EXPIRED
         commencement_date:
           type: string
           format: date
@@ -21879,13 +21953,6 @@ components:
         discount_rate:
           type: number
           format: double
-    LeaseAccountingLeaseClassification:
-      type: string
-      enum:
-      - OPERATING
-      - FINANCE
-      - SHORT_TERM
-      - LOW_VALUE
     LeaseAccountingLeaseLiability:
       type: object
       required:
@@ -21956,14 +22023,6 @@ components:
           type: string
           minLength: 3
           maxLength: 3
-    LeaseAccountingLeaseStatus:
-      type: string
-      enum:
-      - DRAFT
-      - ACTIVE
-      - MODIFIED
-      - TERMINATED
-      - EXPIRED
     LeaseAccountingPaginatedLeaseLiabilities:
       allOf:
       - $ref: '#/components/schemas/LeaseAccountingPaginatedResponse'
@@ -22063,7 +22122,12 @@ components:
         name:
           type: string
         method:
-          $ref: '#/components/schemas/RevenueRecognitionRecognitionMethod'
+          enum:
+          - STRAIGHT_LINE
+          - MILESTONE
+          - USAGE_BASED
+          - PERCENT_COMPLETE
+          - MANUAL
     RevenueRecognitionCreateRecognitionRunRequest:
       type: object
       required:
@@ -22183,14 +22247,6 @@ components:
           type: integer
         limit:
           type: integer
-    RevenueRecognitionRecognitionMethod:
-      type: string
-      enum:
-      - STRAIGHT_LINE
-      - MILESTONE
-      - USAGE_BASED
-      - PERCENT_COMPLETE
-      - MANUAL
     RevenueRecognitionRecognitionRule:
       type: object
       required:
@@ -22205,7 +22261,12 @@ components:
         name:
           type: string
         method:
-          $ref: '#/components/schemas/RevenueRecognitionRecognitionMethod'
+          enum:
+          - STRAIGHT_LINE
+          - MILESTONE
+          - USAGE_BASED
+          - PERCENT_COMPLETE
+          - MANUAL
         active:
           type: boolean
     RevenueRecognitionRecognitionRun:
@@ -22222,18 +22283,15 @@ components:
           type: string
           format: uuid
         status:
-          $ref: '#/components/schemas/RevenueRecognitionRecognitionRunStatus'
+          enum:
+          - DRAFT
+          - READY
+          - POSTED
+          - REVERSED
+          - FAILED
         posted_journal_entry_id:
           type: string
           format: uuid
-    RevenueRecognitionRecognitionRunStatus:
-      type: string
-      enum:
-      - DRAFT
-      - READY
-      - POSTED
-      - REVERSED
-      - FAILED
     RevenueRecognitionRecognitionSchedule:
       type: object
       required:
@@ -22297,7 +22355,14 @@ components:
         jurisdiction_code:
           type: string
         tax_type:
-          $ref: '#/components/schemas/TaxComplianceTaxType'
+          enum:
+          - VAT
+          - GST
+          - SALES_TAX
+          - WITHHOLDING
+          - PAYROLL
+          - CORPORATE_INCOME
+          - OTHER
         start_date:
           type: string
           format: date
@@ -22333,7 +22398,14 @@ components:
         jurisdiction_code:
           type: string
         tax_type:
-          $ref: '#/components/schemas/TaxComplianceTaxType'
+          enum:
+          - VAT
+          - GST
+          - SALES_TAX
+          - WITHHOLDING
+          - PAYROLL
+          - CORPORATE_INCOME
+          - OTHER
         name:
           type: string
         rate:
@@ -22413,14 +22485,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/TaxComplianceTaxRule'
-    TaxCompliancePaymentStatus:
-      type: string
-      enum:
-      - SCHEDULED
-      - SENT
-      - SETTLED
-      - FAILED
-      - CANCELLED
     TaxComplianceSubmitTaxReturnRequest:
       type: object
       required:
@@ -22473,7 +22537,12 @@ components:
           type: number
           format: double
         status:
-          $ref: '#/components/schemas/TaxCompliancePaymentStatus'
+          enum:
+          - SCHEDULED
+          - SENT
+          - SETTLED
+          - FAILED
+          - CANCELLED
         paid_at:
           type: string
           format: date-time
@@ -22497,7 +22566,14 @@ components:
         jurisdiction_code:
           type: string
         tax_type:
-          $ref: '#/components/schemas/TaxComplianceTaxType'
+          enum:
+          - VAT
+          - GST
+          - SALES_TAX
+          - WITHHOLDING
+          - PAYROLL
+          - CORPORATE_INCOME
+          - OTHER
         start_date:
           type: string
           format: date
@@ -22508,14 +22584,11 @@ components:
           type: string
           format: date
         status:
-          $ref: '#/components/schemas/TaxComplianceTaxPeriodStatus'
-    TaxComplianceTaxPeriodStatus:
-      type: string
-      enum:
-      - OPEN
-      - LOCKED
-      - FILED
-      - CLOSED
+          enum:
+          - OPEN
+          - LOCKED
+          - FILED
+          - CLOSED
     TaxComplianceTaxReturn:
       type: object
       required:
@@ -22538,7 +22611,15 @@ components:
         return_type:
           type: string
         status:
-          $ref: '#/components/schemas/TaxComplianceTaxReturnStatus'
+          enum:
+          - DRAFT
+          - READY_FOR_VALIDATION
+          - VALIDATED
+          - SUBMITTED
+          - ACCEPTED
+          - REJECTED
+          - PAID
+          - ARCHIVED
         total_due:
           type: number
           format: double
@@ -22549,17 +22630,6 @@ components:
         submitted_at:
           type: string
           format: date-time
-    TaxComplianceTaxReturnStatus:
-      type: string
-      enum:
-      - DRAFT
-      - READY_FOR_VALIDATION
-      - VALIDATED
-      - SUBMITTED
-      - ACCEPTED
-      - REJECTED
-      - PAID
-      - ARCHIVED
     TaxComplianceTaxReturnSubmission:
       type: object
       required:
@@ -22609,7 +22679,14 @@ components:
         jurisdiction_code:
           type: string
         tax_type:
-          $ref: '#/components/schemas/TaxComplianceTaxType'
+          enum:
+          - VAT
+          - GST
+          - SALES_TAX
+          - WITHHOLDING
+          - PAYROLL
+          - CORPORATE_INCOME
+          - OTHER
         name:
           type: string
         rate:
@@ -22623,16 +22700,6 @@ components:
           format: date
         active:
           type: boolean
-    TaxComplianceTaxType:
-      type: string
-      enum:
-      - VAT
-      - GST
-      - SALES_TAX
-      - WITHHOLDING
-      - PAYROLL
-      - CORPORATE_INCOME
-      - OTHER
     TaxComplianceValidationError:
       type: object
       required:
@@ -22686,7 +22753,11 @@ components:
           type: string
           format: uuid
         horizon:
-          $ref: '#/components/schemas/TreasuryForecastHorizon'
+          enum:
+          - DAILY_13_WEEK
+          - MONTHLY_12_MONTH
+          - QUARTERLY_8_QUARTER
+          - CUSTOM
         status:
           type: string
         start_date:
@@ -22752,7 +22823,13 @@ components:
           minLength: 3
           maxLength: 3
         status:
-          $ref: '#/components/schemas/TreasuryTransferStatus'
+          enum:
+          - PLANNED
+          - APPROVED
+          - SENT
+          - SETTLED
+          - CANCELLED
+          - FAILED
     TreasuryCreateBankRelationshipRequest:
       type: object
       required:
@@ -22775,7 +22852,11 @@ components:
           type: string
           format: uuid
         horizon:
-          $ref: '#/components/schemas/TreasuryForecastHorizon'
+          enum:
+          - DAILY_13_WEEK
+          - MONTHLY_12_MONTH
+          - QUARTERLY_8_QUARTER
+          - CUSTOM
         start_date:
           type: string
           format: date
@@ -22828,13 +22909,6 @@ components:
           type: string
         message:
           type: string
-    TreasuryForecastHorizon:
-      type: string
-      enum:
-      - DAILY_13_WEEK
-      - MONTHLY_12_MONTH
-      - QUARTERLY_8_QUARTER
-      - CUSTOM
     TreasuryLiquidityPlan:
       type: object
       required:
@@ -22850,7 +22924,12 @@ components:
           type: string
           format: uuid
         status:
-          $ref: '#/components/schemas/TreasuryPlanStatus'
+          enum:
+          - DRAFT
+          - APPROVED
+          - ACTIVE
+          - COMPLETED
+          - CANCELLED
         plan_date:
           type: string
           format: date
@@ -22915,20 +22994,3 @@ components:
           type: integer
         limit:
           type: integer
-    TreasuryPlanStatus:
-      type: string
-      enum:
-      - DRAFT
-      - APPROVED
-      - ACTIVE
-      - COMPLETED
-      - CANCELLED
-    TreasuryTransferStatus:
-      type: string
-      enum:
-      - PLANNED
-      - APPROVED
-      - SENT
-      - SETTLED
-      - CANCELLED
-      - FAILED

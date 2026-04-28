@@ -20,38 +20,38 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        aging_bucket: None, // TODO: Set from your business logic
+        aging_bucket: String::new(), // TODO: Set from your business logic
 
-        collection_status: None, // TODO: Set from your business logic
+        collection_status: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        credit_limit: None, // TODO: Set from your business logic
+        credit_limit: 0, // TODO: Set from your business logic
 
-        credit_used: None, // TODO: Set from your business logic
+        credit_used: String::new(), // TODO: Set from your business logic
 
         customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
 
-        days_overdue: None, // TODO: Set from your business logic
+        days_overdue: String::new(), // TODO: Set from your business logic
 
         id: "a0030e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
         invoice_id: "a0010e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        last_payment_amount: None, // TODO: Set from your business logic
+        last_payment_amount: String::new(), // TODO: Set from your business logic
 
-        last_payment_date: None, // TODO: Set from your business logic
+        last_payment_date: String::new(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        outstanding_amount: None, // TODO: Set from your business logic
+        outstanding_amount: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        write_off_amount: None, // TODO: Set from your business logic
+        write_off_amount: String::new(), // TODO: Set from your business logic
 
-        write_off_date: None, // TODO: Set from your business logic
+        write_off_date: String::new(), // TODO: Set from your business logic
 
-        write_off_reason: None, // TODO: Set from your business logic
+        write_off_reason: String::new(), // TODO: Set from your business logic
     }
 }

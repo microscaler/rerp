@@ -13,52 +13,9 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(rename = "account_type")]
-    pub account_type: String,
-
-    #[serde(rename = "chart_of_account_id")]
-    pub chart_of_account_id: String,
-
-    #[serde(rename = "code")]
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(rename = "is_active")]
-    pub is_active: bool,
-
-    #[serde(rename = "is_system_account")]
-    pub is_system_account: bool,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(rename = "name")]
-    pub name: String,
-
-    #[serde(rename = "normal_balance")]
-    pub normal_balance: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -97,9 +54,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_account::handle(req)
 }

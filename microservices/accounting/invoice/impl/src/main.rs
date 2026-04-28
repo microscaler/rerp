@@ -1,4 +1,4 @@
-// This file uses generated code from the invoice_service_api crate
+// This file uses generated code from the rerp_accounting_invoice_gen crate
 // Business logic controllers are in impl/src/controllers/
 // This file is based on gen/src/main.rs but uses impl controllers
 
@@ -8,9 +8,9 @@
 #![allow(clippy::uninlined_format_args)]
 #![allow(unused_imports)]
 // Use generated code from gen crate
-use invoice_service_api::handlers::*;
-use invoice_service_api::registry::*;
-use invoice_service_api::*;
+use rerp_accounting_invoice_gen::handlers::*;
+use rerp_accounting_invoice_gen::registry::*;
+use rerp_accounting_invoice_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;

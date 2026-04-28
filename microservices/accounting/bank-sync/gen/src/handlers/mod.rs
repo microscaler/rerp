@@ -15,22 +15,40 @@ pub mod update_bank_account;
 
 pub mod delete_bank_account;
 
+pub mod list_reconciliation_models;
+
+pub mod create_reconciliation_model;
+
+pub mod list_reconciliations;
+
+pub mod create_reconciliation;
+
+pub mod complete_reconciliation;
+
+pub mod cash_position;
+
+pub mod reconciliation_report;
+
 pub mod list_bank_statements;
 
 pub mod create_bank_statement;
 
 pub mod get_bank_statement;
 
-pub mod update_bank_statement;
+pub mod trigger_statement_sync;
 
-pub mod delete_bank_statement;
+pub mod list_bank_transactions;
 
-pub mod list_reconciliations;
+pub mod auto_match_transactions;
 
-pub mod create_reconciliation;
+pub mod create_transaction_exchange_difference;
 
-pub mod get_reconciliation;
+pub mod match_transaction;
 
-pub mod update_reconciliation;
+pub mod reconcile_transaction;
 
-pub mod delete_reconciliation;
+pub mod get_transaction_reconciliation_suggestions;
+
+pub mod unreconcile_transaction;
+
+pub mod create_transaction_write_off;

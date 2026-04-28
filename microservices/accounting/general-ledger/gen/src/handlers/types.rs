@@ -499,6 +499,30 @@ pub struct CreateChartTemplateResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateCurrencyRevaluationRequest {
+    pub account_ids: Vec<String>,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub revaluation_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateCurrencyRevaluationResponse {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPeriodRequest {
     pub company_id: String,
 
@@ -755,6 +779,30 @@ pub struct CreateJournalResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateLockDateRequest {
+    pub company_id: String,
+
+    pub lock_type: String,
+
+    pub locked_through_date: String,
+
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateLockDateResponse {
+    pub company_id: String,
+
+    pub id: String,
+
+    pub lock_type: String,
+
+    pub locked_through_date: String,
+
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreatePaymentMethodRequest {
     pub code: String,
 
@@ -882,6 +930,19 @@ pub struct CreateTaxRepartitionLineResponse {
     pub tax_name: String,
 
     pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CurrencyRevaluation {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1439,6 +1500,32 @@ pub struct JournalEntryLine {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JournalItem {
+    pub account_id: String,
+
+    pub credit: f64,
+
+    pub debit: f64,
+
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub reconciled: bool,
+
+    pub reconciliation_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JournalItemReconciliation {
+    pub id: String,
+
+    pub journal_item_ids: Vec<String>,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LedgerReport {
     pub company_id: String,
 
@@ -1660,6 +1747,13 @@ pub struct ListJournalEntryLinesResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListJournalItemsResponse {
+    pub items: Vec<JournalItem>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListJournalsResponse {
     pub has_more: bool,
 
@@ -1668,6 +1762,13 @@ pub struct ListJournalsResponse {
     pub limit: i32,
 
     pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLockDatesResponse {
+    pub items: Vec<LockDate>,
 
     pub total: i32,
 }
@@ -1714,6 +1815,19 @@ pub struct ListTaxRepartitionLinesResponse {
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LockDate {
+    pub company_id: String,
+
+    pub id: String,
+
+    pub lock_type: String,
+
+    pub locked_through_date: String,
+
+    pub reason: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1821,6 +1935,13 @@ pub struct PaginatedJournalEntries {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedJournalItems {
+    pub items: Vec<JournalItem>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedJournals {
     pub has_more: bool,
 
@@ -1829,6 +1950,13 @@ pub struct PaginatedJournals {
     pub limit: i32,
 
     pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLockDates {
+    pub items: Vec<LockDate>,
 
     pub total: i32,
 }
@@ -2035,6 +2163,22 @@ pub struct PostJournalEntryResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconcileJournalItemsRequest {
+    pub journal_item_ids: Vec<String>,
+
+    pub notes: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconcileJournalItemsResponse {
+    pub id: String,
+
+    pub journal_item_ids: Vec<String>,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReopenFiscalYearResponse {
     pub closed_at: String,
 
@@ -2201,6 +2345,13 @@ pub struct TrialBalanceResponse {
     pub total_credits: f64,
 
     pub total_debits: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UnreconcileJournalItemsRequest {
+    pub reason: String,
+
+    pub reconciliation_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

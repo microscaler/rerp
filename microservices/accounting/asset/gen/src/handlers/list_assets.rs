@@ -21,26 +21,58 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "search")]
     pub search: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "category_id")]
+    pub category_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "status")]
+    pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "custodian_id")]
+    pub custodian_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "location")]
+    pub location: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "company_id")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "nbv_min")]
+    pub nbv_min: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "nbv_max")]
+    pub nbv_max: Option<f64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "has_more")]
+    pub has_more: Option<bool>,
+
     #[serde(rename = "items")]
-    pub items: Option<Vec<Asset>>,
+    pub items: Vec<Asset>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    pub limit: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "page")]
-    pub page: Option<i32>,
+    pub page: i32,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total")]
-    pub total: Option<i32>,
+    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -84,6 +116,123 @@ impl TryFrom<HandlerRequest> for Request {
                 brrtrouter::server::request::decode_param_value(
                     v,
                     Some(&serde_json::json!({"type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("category_id") {
+            data_map.insert(
+                "category_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("status") {
+            data_map.insert(
+                "status".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"enum":["ACTIVE","DEPRECIATING","FULLY_DEPRECIATED","DISPOSED","SCRAPPED","IN_REPAIR","TRANSIT"],"type":"string"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("department_id") {
+            data_map.insert(
+                "department_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("custodian_id") {
+            data_map.insert(
+                "custodian_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("location") {
+            data_map.insert(
+                "location".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("company_id") {
+            data_map.insert(
+                "company_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("nbv_min") {
+            data_map.insert(
+                "nbv_min".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"double","type":"number"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("nbv_max") {
+            data_map.insert(
+                "nbv_max".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"double","type":"number"})),
                     None,
                     None,
                 ),

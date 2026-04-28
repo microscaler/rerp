@@ -1,37 +1,35 @@
-# RERP LLM Wiki — Index
+# LLM Wiki Index
 
-Content catalog for RERP's llm-wiki. Read this first when starting a documentation, tooling, or architecture task.
+> Content catalog. Every wiki page listed under its type.
+> Last updated: 2026-04-28 | Total pages: 9
 
-## Core Operational
+---
 
-- [`SCHEMA.md`](./SCHEMA.md) — Wiki purpose, source-of-truth order, page conventions, and ingest/query/session workflow.
-- [`log.md`](./log.md) — Chronological append-only activity log.
-- [`docs-catalog.md`](./docs-catalog.md) — Inventory of source docs and sibling references the wiki synthesizes.
+## Topics (5 pages)
 
-## Topics
+### Accounting
+- [[accounting-openapi-odoo-gap.md]] — RERP accounting maturity target vs Odoo Enterprise benchmark, generator coverage, remaining gaps, service boundary guidance
+- [[accounting-service-impl-controller-drift.md]] — Generator name drift between OpenAPI specs and impl controller stubs, orphaned file cleanup process
+- [[suite-aware-brrtrouter-wrapper.md]] — RERP wrapper contract for BRRTRouter, suite-nested layout, naming conventions, BFF path namespacing
+- [[hauliage-reference-operating-model.md]] — Hauliage patterns translated to RERP's nested suites, build/deploy loop, database model lessons
+- [[service-implementation-and-database-layout.md]] — RERP service/entity/database responsibilities, gen/impl split, Lifeguard migration workflow
 
-- [`topics/suite-aware-brrtrouter-wrapper.md`](./topics/suite-aware-brrtrouter-wrapper.md) — RERP's suite-nested BRRTRouter wrapper contract: keep nested layout, use Hauliage naming semantics, build impl crates, write suite-local BFF specs.
-- [`topics/hauliage-reference-operating-model.md`](./topics/hauliage-reference-operating-model.md) — What RERP should borrow from Hauliage: two-crate service loop, build/deploy stages, database lessons, and what not to copy.
-- [`topics/service-implementation-and-database-layout.md`](./topics/service-implementation-and-database-layout.md) — RERP-specific responsibilities for `openapi/`, `gen/`, `impl/`, shared `entities/`, Lifeguard migrations, and database config.
-- [`topics/accounting-openapi-odoo-gap.md`](./topics/accounting-openapi-odoo-gap.md) — Accounting OpenAPI maturity target versus Odoo Enterprise: generated BFF coverage, new accounting service contracts, enrichment targets, accounting engines, BDD backlog, reconciliation, reporting, payments, documents, and localization.
+### Other
+- [[hauliage-reference-operating-model.md]] — Hauliage reference patterns adapted for RERP
 
-## Entities
+## Reference (0 pages)
 
-*(No entity pages yet.)*
+## Reconciliation (1 page)
 
-## Reconciliation
+- [[legacy-root-llmwiki-location.md]] — Notes on historical llmwiki location migration
 
-- [`reconciliation/legacy-root-llmwiki-location.md`](./reconciliation/legacy-root-llmwiki-location.md) — Root `llmwiki/` is historical source material; `docs/llmwiki/` is canonical per `AGENTS.md`.
+---
 
-## Planned Gaps
+## Upcoming Pages (Planned)
 
-- [ ] Reconcile older BFF automation docs that mention deleted `scripts/generate_system_bff.py` with current `tooling/`-only policy.
-- [ ] Add a topic for RERP suite/BFF expansion once non-accounting suites gain `bff-suite-config.yaml`.
+These wiki pages should be created as work progresses:
 
-## Cross-References
-
-- [`../../AGENTS.md`](../../AGENTS.md) — Agent rules for RERP.
-- [`../TOOLS_ALIGNMENT_FINDINGS.md`](../TOOLS_ALIGNMENT_FINDINGS.md) — RERP vs Hauliage tooling/layout analysis.
-- [`../TOOLING_MIGRATION_PLAN.md`](../TOOLING_MIGRATION_PLAN.md) — Migration from scripts into the `rerp` CLI.
-- BRRTRouter sibling repo: [`../../../BRRTRouter`](../../../BRRTRouter).
-- Hauliage sibling repo: [`../../../hauliage`](../../../hauliage).
+- `topics/reconciliation-rules-engine.md` — First rules engine dossier implementation status
+- `topics/report-expression-engine.md` — Second rules engine dossier implementation status
+- `topics/bank-sync-reconciliation-slice.md` — Slice 1A/B reconciliation implementation
+- `topics/financial-reports-slice.md` — Slice 1C report definitions implementation

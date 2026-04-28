@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_payment --force
 
-use rerp_accounting_accounts_receivable::handlers::get_payment::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::get_payment::{Request, Response};
 
 #[handler(GetPaymentController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -3,15 +3,19 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_ap_agings;
+pub mod list_approvals;
 
-pub mod create_ap_aging;
+pub mod create_approval;
 
-pub mod get_ap_aging;
+pub mod list_payment_commitments;
 
-pub mod update_ap_aging;
+pub mod list_payment_batches;
 
-pub mod delete_ap_aging;
+pub mod create_payment_batch;
+
+pub mod approve_payment_batch;
+
+pub mod export_payment_batch_file;
 
 pub mod list_payments;
 
@@ -23,6 +27,8 @@ pub mod update_payment;
 
 pub mod delete_payment;
 
+pub mod cash_flow_forecast;
+
 pub mod list_vendor_invoices;
 
 pub mod create_vendor_invoice;
@@ -32,3 +38,7 @@ pub mod get_vendor_invoice;
 pub mod update_vendor_invoice;
 
 pub mod delete_vendor_invoice;
+
+pub mod register_vendor_invoice_payment;
+
+pub mod perform_vendor_invoice_three_way_match;

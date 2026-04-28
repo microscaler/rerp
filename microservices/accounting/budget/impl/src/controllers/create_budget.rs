@@ -5,42 +5,22 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use budget_service_api::handlers::create_budget::{Request, Response};
+use rerp_accounting_budget_gen::handlers::create_budget::{Request, Response};
+
+#[allow(unused_imports)]
+use rerp_accounting_budget_gen::handlers::types::CreateBudgetLineRequest;
 
 #[handler(CreateBudgetController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
-    // let budget_number = req.inner.budget_number;// let company_id = req.inner.company_id;// let currency_code = req.inner.currency_code;// let description = req.inner.description;// let fiscal_year = req.inner.fiscal_year;// let name = req.inner.name;// let period_end = req.inner.period_end;// let period_start = req.inner.period_start;
+    // let budget_lines = req.inner.budget_lines;// let company_id = req.inner.company_id;// let cost_center_id = req.inner.cost_center_id;// let currency_code = req.inner.currency_code;// let department_id = req.inner.department_id;// let description = req.inner.description;// let fiscal_year = req.inner.fiscal_year;// let name = req.inner.name;// let notes = req.inner.notes;// let period_type = req.inner.period_type;// let version = req.inner.version;
     //
     // Example: Database query, validation, etc.
     // let result = your_service.process(&req.inner)?;
     //
     // Example: Return response
 
-    Response {
-        approval_status: None,                // TODO: Set from your business logic
-        approved_at: None,                    // TODO: Set from your business logic
-        approved_by: None,                    // TODO: Set from your business logic
-        budget_number: "example".to_string(), // TODO: Set from your business logic
-        company_id: None,                     // TODO: Set from your business logic
-        created_at: None,                     // TODO: Set from your business logic
-        created_by: None,                     // TODO: Set from your business logic
-        currency_code: "USD".to_string(),     // TODO: Set from your business logic
-        current_version_id: None,             // TODO: Set from your business logic
-        description: None,                    // TODO: Set from your business logic
-        fiscal_year: 2024,                    // TODO: Set from your business logic
-        id: "a0140e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-        metadata: None,                      // TODO: Set from your business logic
-        name: "example".to_string(),         // TODO: Set from your business logic
-        period_end: "example".to_string(),   // TODO: Set from your business logic
-        period_start: "example".to_string(), // TODO: Set from your business logic
-        status: "DRAFT".to_string(),         // TODO: Set from your business logic
-        total_actual_amount: None,           // TODO: Set from your business logic
-        total_budget_amount: None,           // TODO: Set from your business logic
-        total_variance: None,                // TODO: Set from your business logic
-        updated_at: None,                    // TODO: Set from your business logic
-        updated_by: None,                    // TODO: Set from your business logic
-    }
+    Response {}
 }

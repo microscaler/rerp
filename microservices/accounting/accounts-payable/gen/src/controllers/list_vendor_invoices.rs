@@ -9,57 +9,11 @@ use crate::handlers::types::VendorInvoice;
 
 #[handler(ListVendorInvoicesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    // Example response:
-    // {
-    //   "items": [
-    //     {
-    //       "aging_bucket": "CURRENT",
-    //       "company_id": "550e8400-e29b-41d4-a716-446655440000",
-    //       "created_at": "2024-01-15T09:00:00Z",
-    //       "currency_code": "USD",
-    //       "id": "a0050e8400-e29b-41d4-a716-446655440000",
-    //       "invoice_id": "a0011e8400-e29b-41d4-a716-446655440001",
-    //       "original_amount": 15000.0,
-    //       "outstanding_amount": 15000.0,
-    //       "status": "OUTSTANDING",
-    //       "updated_at": "2024-01-15T09:00:00Z",
-    //       "vendor_id": "411e8400-e29b-41d4-a716-446655440001"
-    //     }
-    //   ],
-    //   "limit": 20,
-    //   "page": 1,
-    //   "total": 1
-    // }
-    match serde_json::from_str::<Response>(
-        r###"{
-  "items": [
-    {
-      "aging_bucket": "CURRENT",
-      "company_id": "550e8400-e29b-41d4-a716-446655440000",
-      "created_at": "2024-01-15T09:00:00Z",
-      "currency_code": "USD",
-      "id": "a0050e8400-e29b-41d4-a716-446655440000",
-      "invoice_id": "a0011e8400-e29b-41d4-a716-446655440001",
-      "original_amount": 15000.0,
-      "outstanding_amount": 15000.0,
-      "status": "OUTSTANDING",
-      "updated_at": "2024-01-15T09:00:00Z",
-      "vendor_id": "411e8400-e29b-41d4-a716-446655440001"
-    }
-  ],
-  "limit": 20,
-  "page": 1,
-  "total": 1
-}"###,
-    ) {
-        Ok(parsed) => return parsed,
-        Err(e) => {
-            eprintln!("Failed to parse mock example JSON into Response: {}", e);
-            // Fallback to empty default structs below
-        }
-    }
-
     Response {
-        items: Some(vec![serde_json::from_value::<VendorInvoice>(serde_json::json!({"aging_bucket":"CURRENT","company_id":"550e8400-e29b-41d4-a716-446655440000","created_at":"2024-01-15T09:00:00Z","currency_code":"USD","id":"a0050e8400-e29b-41d4-a716-446655440000","invoice_id":"a0011e8400-e29b-41d4-a716-446655440001","original_amount":15000.0,"outstanding_amount":15000.0,"status":"OUTSTANDING","updated_at":"2024-01-15T09:00:00Z","vendor_id":"411e8400-e29b-41d4-a716-446655440001"})).unwrap_or_default()]),limit: Some(20),page: Some(1),total: Some(1),
+        has_more: Some(true),
+        items: vec![],
+        limit: 42,
+        page: 42,
+        total: 42,
     }
 }

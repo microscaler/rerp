@@ -145,6 +145,7 @@ fn main() -> io::Result<()> {
     // configure coroutine stack size
     let config = RuntimeConfig::from_env();
     may::config().set_stack_size(config.stack_size);
+    may::config().set_workers(config.may_workers);
     // Load OpenAPI spec and create router
     // Resolve relative specs against the crate directory so launches from other CWDs work
     let spec_path = if args.spec.is_relative() {
@@ -195,8 +196,14 @@ fn main() -> io::Result<()> {
         }
     };
 
-    let (routes, schemes, _slug) = brrtrouter::spec::load_spec_full(spec_path.to_str().unwrap())
-        .expect("failed to load OpenAPI spec");
+    let spec_str = spec_path.to_str().unwrap_or_else(|| {
+        eprintln!("[startup][error] OpenAPI spec path contains invalid UTF-8");
+        std::process::exit(1);
+    });
+    let (routes, schemes, _slug) = brrtrouter::spec::load_spec_full(spec_str).unwrap_or_else(|e| {
+        eprintln!("[startup][error] failed to load OpenAPI spec: {}", e);
+        std::process::exit(1);
+    });
     let _router = Router::new(routes.clone());
     // Create router and dispatcher
     let mut dispatcher = Dispatcher::new();
@@ -283,12 +290,14 @@ fn main() -> io::Result<()> {
                     };
                     merged_policies.insert(handler_name, merged_policy);
                 }
-                // Create CORS middleware with all policies pre-processed at startup
+                // Create CORS middleware with all policies pre-processed at startup; link metrics
+                // so /metrics exposes brrtrouter_cors_* counters (same Arc as dispatcher).
                 Some(std::sync::Arc::new(
                     brrtrouter::middleware::CorsMiddleware::with_route_policies(
                         global_cors,
                         merged_policies,
-                    ),
+                    )
+                    .with_metrics_sink(metrics.clone()),
                 ))
             }
             Err(e) => {
@@ -306,9 +315,9 @@ fn main() -> io::Result<()> {
         registry::register_from_spec(&mut dispatcher, &routes);
     }
 
-    // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
-    // set for local testing.
-    // This returns a coroutine JoinHandle; we join on it to keep the server running
+    // Start the HTTP server on port 8081 (avoids the very common 8080 conflict
+    // with local dev tooling), binding to 127.0.0.1 if BRRTR_LOCAL is set.
+    // `ServerHandle::run_until_shutdown` waits for SIGTERM/SIGINT (k8s scale-down), stops the server, flushes OTLP
     let router = std::sync::Arc::new(arc_swap::ArcSwap::from_pointee(Router::new(routes.clone())));
     // Dump initial route table — ArcSwap load is infallible.
     router.load().dump_routes();
@@ -338,6 +347,7 @@ fn main() -> io::Result<()> {
     let spec_display = spec_path.display();
     let doc_display = args.doc_dir.display();
     let stack_size = config.stack_size;
+    let may_workers = config.may_workers;
     let routes_count = routes.len();
     let hot_reload = args.hot_reload;
     println!("[startup] spec_path={spec_display}");
@@ -346,9 +356,7 @@ fn main() -> io::Result<()> {
         println!("[startup] static_dir={sd_display}");
     }
     println!("[startup] doc_dir={doc_display}");
-    println!(
-        "[startup] stack_size={stack_size} routes_count={routes_count} hot_reload={hot_reload}"
-    );
+    println!("[startup] stack_size={stack_size} may_workers={may_workers} routes_count={routes_count} hot_reload={hot_reload}");
 
     match serde_yaml::to_string(&app_config) {
         Ok(y) => println!("[config]\n{y}"),
@@ -589,8 +597,8 @@ fn main() -> io::Result<()> {
             }
         }
     }
-    // Port selection priority: config.yaml > PORT environment variable > default 8080
-    // This allows Kubernetes ConfigMaps to set the port, with env var as fallback
+    // Port selection priority: config.yaml > PORT environment variable > default 8081
+    // (local-dev default; k8s deployments continue to set PORT=8080 explicitly)
     let port = app_config
         .port
         .or_else(|| {
@@ -598,7 +606,7 @@ fn main() -> io::Result<()> {
                 .ok()
                 .and_then(|p| p.parse::<u16>().ok())
         })
-        .unwrap_or(8080);
+        .unwrap_or(8081);
     let addr = if std::env::var("BRRTR_LOCAL").is_ok() {
         format!("127.0.0.1:{port}")
     } else {
@@ -609,7 +617,7 @@ fn main() -> io::Result<()> {
     println!("Server started successfully on {addr}");
 
     server
-        .join()
+        .run_until_shutdown()
         .map_err(|e| io::Error::other(format!("Server encountered an error: {e:?}")))?;
     Ok(())
 }

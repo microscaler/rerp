@@ -1,5 +1,5 @@
 [package]
-name = "edi_service_api"
+name = "rerp_accounting_edi_gen"
 version = "0.1.0"
 edition = "2021"
 

@@ -7,4 +7,5 @@ def main() -> None:
 
     run_main()
 
+
 __all__ = ["main"]

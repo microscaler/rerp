@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_credit_memo --force
 
-use rerp_accounting_accounts_receivable::handlers::create_credit_memo::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::create_credit_memo::{Request, Response};
 
 #[handler(CreateCreditMemoController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

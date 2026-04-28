@@ -6,5 +6,9 @@ use brrtrouter_macros::handler;
 
 #[handler(DeleteAssetController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {}
+    Response {
+        code: "example".to_string(),
+        details: Some(Default::default()),
+        message: "example".to_string(),
+    }
 }

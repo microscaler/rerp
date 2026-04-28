@@ -3,9 +3,9 @@
 // You can modify this file freely - it will NOT be auto-regenerated.
 // To regenerate this stub, use: brrtrouter-gen generate-stubs --path get_payment --force
 
-use accounts_payable_service_api::handlers::get_payment::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
+use rerp_accounting_accounts_payable_gen::handlers::get_payment::{Request, Response};
 
 #[handler(GetPaymentController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
@@ -20,23 +20,20 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        applied_amount: None,             // TODO: Set from your business logic
-        bank_account_id: None,            // TODO: Set from your business logic
-        company_id: None,                 // TODO: Set from your business logic
-        created_at: None,                 // TODO: Set from your business logic
-        created_by: None,                 // TODO: Set from your business logic
-        currency_code: "USD".to_string(), // TODO: Set from your business logic
-        id: "a0060e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
-        metadata: None, // TODO: Set from your business logic
-        notes: None,    // TODO: Set from your business logic
-        payment_amount: rust_decimal::Decimal::new(75000, 1), // TODO: Set from your business logic
-        payment_date: "2024-01-20".to_string(), // TODO: Set from your business logic
-        payment_method: "WIRE".to_string(), // TODO: Set from your business logic
-        payment_number: "AP-PAY-2024-001".to_string(), // TODO: Set from your business logic
-        payment_reference: None, // TODO: Set from your business logic
-        status: "POSTED".to_string(), // TODO: Set from your business logic
-        updated_at: None, // TODO: Set from your business logic
-        updated_by: None, // TODO: Set from your business logic
-        vendor_id: "411e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
+        actual_payment_date: None,             // TODO: Set from your business logic
+        amount: 3.14,                          // TODO: Set from your business logic
+        company_id: None,                      // TODO: Set from your business logic
+        created_at: None,                      // TODO: Set from your business logic
+        currency_code: "example".to_string(),  // TODO: Set from your business logic
+        gl_entry_id: None,                     // TODO: Set from your business logic
+        id: "example".to_string(),             // TODO: Set from your business logic
+        notes: None,                           // TODO: Set from your business logic
+        payment_date: "example".to_string(),   // TODO: Set from your business logic
+        payment_method: "example".to_string(), // TODO: Set from your business logic
+        posted_to_gl: None,                    // TODO: Set from your business logic
+        reference_number: None,                // TODO: Set from your business logic
+        status: "example".to_string(),         // TODO: Set from your business logic
+        updated_at: None,                      // TODO: Set from your business logic
+        vendor_id: None,                       // TODO: Set from your business logic
     }
 }

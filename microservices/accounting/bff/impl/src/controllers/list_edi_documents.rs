@@ -23,12 +23,12 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        items: None, // TODO: Set from your business logic
+        items: vec![], // TODO: Set from your business logic
 
-        limit: None, // TODO: Set from your business logic
+        limit: 0, // TODO: Set from your business logic
 
-        page: None, // TODO: Set from your business logic
+        page: 0, // TODO: Set from your business logic
 
-        total: None, // TODO: Set from your business logic
+        total: 0, // TODO: Set from your business logic
     }
 }

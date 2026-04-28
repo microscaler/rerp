@@ -389,18 +389,6 @@ status:
     echo "Ingress:"
     kubectl get ingress -n rerp 2>/dev/null || echo "No ingress found"
 
-# Port forwarding for direct access
-port-forward:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "Setting up port forwards..."
-    kubectl port-forward -n rerp svc/postgresql 5432:5432 &
-    kubectl port-forward -n rerp svc/redis-master 6379:6379 &
-    kubectl port-forward -n rerp svc/prometheus-server 9091:80 &
-    kubectl port-forward -n rerp svc/grafana 3002:80 &
-    echo "Port forwards established. Press Ctrl+C to stop."
-    wait
-
 # Database migrations
 # Usage: just migrate [service]
 # Example: just migrate general-ledger

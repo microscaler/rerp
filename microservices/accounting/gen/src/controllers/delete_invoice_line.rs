@@ -1,0 +1,20 @@
+
+// User-owned controller for handler 'delete_invoice_line'.
+
+use brrtrouter_macros::handler;
+use brrtrouter::typed::TypedHandlerRequest;
+use crate::handlers::delete_invoice_line::{ Request, Response };
+
+
+
+#[handler(DeleteInvoiceLineController)]
+pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+    
+    
+    
+    Response {
+        
+    }
+    
+    
+}

@@ -5,14 +5,34 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct BankAccount {
-    pub account_name: String,
+pub struct AutoMatchTransactionsRequest {
+    pub bank_account_id: String,
 
+    pub date_range_from: String,
+
+    pub date_range_to: String,
+
+    pub description_similarity_threshold: f64,
+
+    pub match_tolerance: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AutoMatchTransactionsResponse {
+    pub matched_count: i32,
+
+    pub matches: Vec<serde_json::Value>,
+
+    pub remaining_unmatched: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BankAccount {
     pub account_number: String,
 
     pub account_type: String,
 
-    pub bank_code: String,
+    pub bank_id: String,
 
     pub bank_name: String,
 
@@ -20,68 +40,126 @@ pub struct BankAccount {
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub current_balance: rust_decimal::Decimal,
+    pub gl_account_id: String,
 
     pub id: String,
 
-    pub is_active: bool,
+    pub last_sync_date: String,
 
-    pub last_reconciled_at: String,
+    pub name: String,
 
-    pub last_synced_at: String,
+    pub notes: String,
 
-    pub metadata: serde_json::Value,
+    pub opening_balance: f64,
 
-    pub reconciled_balance: rust_decimal::Decimal,
+    pub opening_balance_date: String,
 
-    pub sync_credentials: String,
+    pub routing_number: String,
 
-    pub sync_provider: String,
+    pub status: String,
+
+    pub sync_enabled: bool,
+
+    pub sync_frequency: String,
 
     pub updated_at: String,
+}
 
-    pub updated_by: String,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BankReconciliation {
+    pub adjusted_balance: f64,
+
+    pub bank_account_id: String,
+
+    pub book_balance: f64,
+
+    pub created_at: String,
+
+    pub difference: f64,
+
+    pub id: String,
+
+    pub matched_transactions: i32,
+
+    pub notes: String,
+
+    pub reconciled_at: String,
+
+    pub reconciled_by: String,
+
+    pub reconciliation_date: String,
+
+    pub statement_balance: f64,
+
+    pub statement_id: String,
+
+    pub status: String,
+
+    pub total_matched: f64,
+
+    pub total_unmatched: f64,
+
+    pub unmatched_transactions: i32,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BankReconciliationReport {
+    pub bank_account_id: String,
+
+    pub bank_account_name: String,
+
+    pub closing_balance: f64,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub opening_balance: f64,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub reconciled_amount: f64,
+
+    pub reconciliation_percentage: f64,
+
+    pub total_deposits: f64,
+
+    pub total_withdrawals: f64,
+
+    pub unreconciled_amount: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankStatement {
     pub bank_account_id: String,
 
-    pub closing_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
+    pub closing_balance: f64,
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
+    pub file_reference: String,
+
     pub id: String,
-
-    pub import_format: String,
-
-    pub import_source: String,
 
     pub imported_at: String,
 
     pub imported_by: String,
 
-    pub metadata: serde_json::Value,
+    pub matched_count: i32,
 
-    pub opening_balance: rust_decimal::Decimal,
+    pub opening_balance: f64,
 
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub reconciled_at: String,
-
-    pub reconciled_by: String,
+    pub start_date: String,
 
     pub statement_date: String,
 
@@ -89,24 +167,22 @@ pub struct BankStatement {
 
     pub status: String,
 
-    pub total_credits: rust_decimal::Decimal,
-
-    pub total_debits: rust_decimal::Decimal,
-
     pub transaction_count: i32,
 
-    pub updated_at: String,
+    pub unmatched_count: i32,
 
-    pub updated_by: String,
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankTransaction {
-    pub amount: rust_decimal::Decimal,
-
-    pub balance_after: rust_decimal::Decimal,
+    pub amount: f64,
 
     pub bank_account_id: String,
+
+    pub counterparty_account: String,
+
+    pub counterparty_name: String,
 
     pub created_at: String,
 
@@ -114,40 +190,111 @@ pub struct BankTransaction {
 
     pub description: String,
 
+    pub dispute_reason: String,
+
     pub id: String,
 
-    pub matched_at: String,
+    pub matched_by: String,
 
-    pub matched_payment_id: String,
+    pub matched_date: String,
 
-    pub metadata: serde_json::Value,
+    pub matched_entry_id: String,
 
-    pub reconciled_statement_id: String,
+    pub matched_entry_type: String,
+
+    pub notes: String,
 
     pub reference: String,
 
     pub statement_id: String,
 
-    pub statement_line_number: i32,
-
     pub status: String,
 
     pub transaction_date: String,
 
-    pub transaction_type: String,
+    pub updated_at: String,
+
+    pub value_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CashPosition {
+    pub as_of_date: String,
+
+    pub available_balance: f64,
+
+    pub by_account: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub pending_transactions: f64,
+
+    pub total_cash: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CashPositionResponse {
+    pub as_of_date: String,
+
+    pub available_balance: f64,
+
+    pub by_account: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub pending_transactions: f64,
+
+    pub total_cash: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CompleteReconciliationResponse {
+    pub adjusted_balance: f64,
+
+    pub bank_account_id: String,
+
+    pub book_balance: f64,
+
+    pub created_at: String,
+
+    pub difference: f64,
+
+    pub id: String,
+
+    pub matched_transactions: i32,
+
+    pub notes: String,
+
+    pub reconciled_at: String,
+
+    pub reconciled_by: String,
+
+    pub reconciliation_date: String,
+
+    pub statement_balance: f64,
+
+    pub statement_id: String,
+
+    pub status: String,
+
+    pub total_matched: f64,
+
+    pub total_unmatched: f64,
+
+    pub unmatched_transactions: i32,
 
     pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankAccountRequest {
-    pub account_name: String,
-
     pub account_number: String,
 
     pub account_type: String,
-
-    pub bank_code: String,
 
     pub bank_name: String,
 
@@ -155,20 +302,26 @@ pub struct CreateBankAccountRequest {
 
     pub currency_code: String,
 
-    pub is_active: bool,
+    pub gl_account_id: String,
 
-    pub sync_provider: String,
+    pub name: String,
+
+    pub notes: String,
+
+    pub opening_balance: f64,
+
+    pub opening_balance_date: String,
+
+    pub routing_number: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankAccountResponse {
-    pub account_name: String,
-
     pub account_number: String,
 
     pub account_type: String,
 
-    pub bank_code: String,
+    pub bank_id: String,
 
     pub bank_name: String,
 
@@ -176,93 +329,90 @@ pub struct CreateBankAccountResponse {
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub current_balance: rust_decimal::Decimal,
+    pub gl_account_id: String,
 
     pub id: String,
 
-    pub is_active: bool,
+    pub last_sync_date: String,
 
-    pub last_reconciled_at: String,
+    pub name: String,
 
-    pub last_synced_at: String,
+    pub notes: String,
 
-    pub metadata: serde_json::Value,
+    pub opening_balance: f64,
 
-    pub reconciled_balance: rust_decimal::Decimal,
+    pub opening_balance_date: String,
 
-    pub sync_credentials: String,
+    pub routing_number: String,
 
-    pub sync_provider: String,
+    pub status: String,
+
+    pub sync_enabled: bool,
+
+    pub sync_frequency: String,
 
     pub updated_at: String,
+}
 
-    pub updated_by: String,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateBankReconciliationRequest {
+    pub bank_account_id: String,
+
+    pub book_balance: f64,
+
+    pub notes: String,
+
+    pub reconciliation_date: String,
+
+    pub statement_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankStatementRequest {
     pub bank_account_id: String,
 
-    pub closing_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
+    pub closing_balance: f64,
 
     pub currency_code: String,
 
-    pub import_format: String,
+    pub file_reference: String,
 
-    pub import_source: String,
+    pub opening_balance: f64,
 
-    pub opening_balance: rust_decimal::Decimal,
-
-    pub period_end: String,
-
-    pub period_start: String,
+    pub start_date: String,
 
     pub statement_date: String,
 
     pub statement_number: String,
+
+    pub transactions: Vec<CreateBankTransactionRequest>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
+    pub closing_balance: f64,
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
+    pub file_reference: String,
+
     pub id: String,
-
-    pub import_format: String,
-
-    pub import_source: String,
 
     pub imported_at: String,
 
     pub imported_by: String,
 
-    pub metadata: serde_json::Value,
+    pub matched_count: i32,
 
-    pub opening_balance: rust_decimal::Decimal,
+    pub opening_balance: f64,
 
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub reconciled_at: String,
-
-    pub reconciled_by: String,
+    pub start_date: String,
 
     pub statement_date: String,
 
@@ -270,43 +420,97 @@ pub struct CreateBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: rust_decimal::Decimal,
-
-    pub total_debits: rust_decimal::Decimal,
-
     pub transaction_count: i32,
 
-    pub updated_at: String,
+    pub unmatched_count: i32,
 
-    pub updated_by: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateBankTransactionMatchingRequest {
+    pub matched_entry_id: String,
+
+    pub matched_entry_type: String,
+
+    pub notes: String,
+
+    pub transaction_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankTransactionRequest {
-    pub amount: rust_decimal::Decimal,
+    pub amount: f64,
 
-    pub bank_account_id: String,
+    pub counterparty_account: String,
+
+    pub counterparty_name: String,
 
     pub currency_code: String,
 
     pub description: String,
 
-    pub reference: String,
+    pub notes: String,
 
-    pub statement_id: String,
+    pub reference: String,
 
     pub transaction_date: String,
 
-    pub transaction_type: String,
+    pub value_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateExchangeDifferenceRequest {
+    pub account_id: String,
+
+    pub amount: f64,
+
+    pub currency_code: String,
+
+    pub exchange_rate_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReconciliationModelRequest {
+    pub active: bool,
+
+    pub match_tolerance_amount: f64,
+
+    pub match_tolerance_days: i32,
+
+    pub name: String,
+
+    pub rule_type: String,
+
+    pub sequence: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReconciliationModelResponse {
+    pub active: bool,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    pub match_tolerance_amount: f64,
+
+    pub match_tolerance_days: i32,
+
+    pub name: String,
+
+    pub rule_type: String,
+
+    pub sequence: i32,
+
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationRequest {
     pub bank_account_id: String,
 
-    pub company_id: String,
-
-    pub currency_code: String,
+    pub book_balance: f64,
 
     pub notes: String,
 
@@ -317,35 +521,21 @@ pub struct CreateReconciliationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationResponse {
+    pub adjusted_balance: f64,
+
     pub bank_account_id: String,
 
-    pub bank_balance: rust_decimal::Decimal,
-
-    pub book_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
+    pub book_balance: f64,
 
     pub created_at: String,
 
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub difference: rust_decimal::Decimal,
+    pub difference: f64,
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    pub matched_transactions: i32,
 
     pub notes: String,
-
-    pub outstanding_deposits_amount: rust_decimal::Decimal,
-
-    pub outstanding_deposits_count: i32,
-
-    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
-
-    pub outstanding_withdrawals_count: i32,
 
     pub reconciled_at: String,
 
@@ -353,24 +543,94 @@ pub struct CreateReconciliationResponse {
 
     pub reconciliation_date: String,
 
+    pub statement_balance: f64,
+
     pub statement_id: String,
 
     pub status: String,
 
-    pub updated_at: String,
+    pub total_matched: f64,
 
-    pub updated_by: String,
+    pub total_unmatched: f64,
+
+    pub unmatched_transactions: i32,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTransactionExchangeDifferenceRequest {
+    pub account_id: String,
+
+    pub amount: f64,
+
+    pub currency_code: String,
+
+    pub exchange_rate_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTransactionExchangeDifferenceResponse {
+    pub adjustment_type: String,
+
+    pub amount: f64,
+
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub transaction_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTransactionWriteOffRequest {
+    pub account_id: String,
+
+    pub amount: f64,
+
+    pub reason: String,
+
+    pub tax_code: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateTransactionWriteOffResponse {
+    pub adjustment_type: String,
+
+    pub amount: f64,
+
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub transaction_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteBankAccountResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ErrorResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetBankAccountResponse {
-    pub account_name: String,
-
     pub account_number: String,
 
     pub account_type: String,
 
-    pub bank_code: String,
+    pub bank_id: String,
 
     pub bank_name: String,
 
@@ -378,68 +638,56 @@ pub struct GetBankAccountResponse {
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub current_balance: rust_decimal::Decimal,
+    pub gl_account_id: String,
 
     pub id: String,
 
-    pub is_active: bool,
+    pub last_sync_date: String,
 
-    pub last_reconciled_at: String,
+    pub name: String,
 
-    pub last_synced_at: String,
+    pub notes: String,
 
-    pub metadata: serde_json::Value,
+    pub opening_balance: f64,
 
-    pub reconciled_balance: rust_decimal::Decimal,
+    pub opening_balance_date: String,
 
-    pub sync_credentials: String,
+    pub routing_number: String,
 
-    pub sync_provider: String,
+    pub status: String,
+
+    pub sync_enabled: bool,
+
+    pub sync_frequency: String,
 
     pub updated_at: String,
-
-    pub updated_by: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetBankStatementResponse {
     pub bank_account_id: String,
 
-    pub closing_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
+    pub closing_balance: f64,
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
+    pub file_reference: String,
+
     pub id: String,
-
-    pub import_format: String,
-
-    pub import_source: String,
 
     pub imported_at: String,
 
     pub imported_by: String,
 
-    pub metadata: serde_json::Value,
+    pub matched_count: i32,
 
-    pub opening_balance: rust_decimal::Decimal,
+    pub opening_balance: f64,
 
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub reconciled_at: String,
-
-    pub reconciled_by: String,
+    pub start_date: String,
 
     pub statement_date: String,
 
@@ -447,66 +695,24 @@ pub struct GetBankStatementResponse {
 
     pub status: String,
 
-    pub total_credits: rust_decimal::Decimal,
-
-    pub total_debits: rust_decimal::Decimal,
-
     pub transaction_count: i32,
 
-    pub updated_at: String,
+    pub unmatched_count: i32,
 
-    pub updated_by: String,
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetReconciliationResponse {
-    pub bank_account_id: String,
+pub struct GetTransactionReconciliationSuggestionsResponse {
+    pub suggestions: Vec<ReconciliationSuggestion>,
 
-    pub bank_balance: rust_decimal::Decimal,
-
-    pub book_balance: rust_decimal::Decimal,
-
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub difference: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub notes: String,
-
-    pub outstanding_deposits_amount: rust_decimal::Decimal,
-
-    pub outstanding_deposits_count: i32,
-
-    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
-
-    pub outstanding_withdrawals_count: i32,
-
-    pub reconciled_at: String,
-
-    pub reconciled_by: String,
-
-    pub reconciliation_date: String,
-
-    pub statement_id: String,
-
-    pub status: String,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
+    pub transaction_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBankAccountsResponse {
+    pub has_more: bool,
+
     pub items: Vec<BankAccount>,
 
     pub limit: i32,
@@ -518,6 +724,8 @@ pub struct ListBankAccountsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBankStatementsResponse {
+    pub has_more: bool,
+
     pub items: Vec<BankStatement>,
 
     pub limit: i32,
@@ -528,8 +736,10 @@ pub struct ListBankStatementsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListReconciliationsResponse {
-    pub items: Vec<Reconciliation>,
+pub struct ListBankTransactionsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<BankTransaction>,
 
     pub limit: i32,
 
@@ -539,237 +749,332 @@ pub struct ListReconciliationsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct Reconciliation {
-    pub bank_account_id: String,
+pub struct ListReconciliationModelsResponse {
+    pub items: Vec<ReconciliationModel>,
 
-    pub bank_balance: rust_decimal::Decimal,
+    pub total: i32,
+}
 
-    pub book_balance: rust_decimal::Decimal,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListReconciliationsResponse {
+    pub has_more: bool,
 
-    pub company_id: String,
+    pub items: Vec<BankReconciliation>,
 
-    pub created_at: String,
+    pub limit: i32,
 
-    pub created_by: String,
+    pub page: i32,
 
-    pub currency_code: String,
+    pub total: i32,
+}
 
-    pub difference: rust_decimal::Decimal,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct MatchTransactionRequest {
+    pub matched_entry_id: String,
 
-    pub id: String,
-
-    pub metadata: serde_json::Value,
+    pub matched_entry_type: String,
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: rust_decimal::Decimal,
+    pub transaction_id: String,
+}
 
-    pub outstanding_deposits_count: i32,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct MatchTransactionResponse {
+    pub amount: f64,
 
-    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
+    pub bank_account_id: String,
 
-    pub outstanding_withdrawals_count: i32,
+    pub counterparty_account: String,
 
-    pub reconciled_at: String,
+    pub counterparty_name: String,
 
-    pub reconciled_by: String,
+    pub created_at: String,
 
-    pub reconciliation_date: String,
+    pub currency_code: String,
+
+    pub description: String,
+
+    pub dispute_reason: String,
+
+    pub id: String,
+
+    pub matched_by: String,
+
+    pub matched_date: String,
+
+    pub matched_entry_id: String,
+
+    pub matched_entry_type: String,
+
+    pub notes: String,
+
+    pub reference: String,
 
     pub statement_id: String,
 
     pub status: String,
 
-    pub updated_at: String,
-
-    pub updated_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBankAccountRequest {
-    pub account_name: String,
-
-    pub account_type: String,
-
-    pub bank_code: String,
-
-    pub bank_name: String,
-
-    pub is_active: bool,
-
-    pub sync_provider: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBankAccountResponse {
-    pub account_name: String,
-
-    pub account_number: String,
-
-    pub account_type: String,
-
-    pub bank_code: String,
-
-    pub bank_name: String,
-
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub current_balance: rust_decimal::Decimal,
-
-    pub id: String,
-
-    pub is_active: bool,
-
-    pub last_reconciled_at: String,
-
-    pub last_synced_at: String,
-
-    pub metadata: serde_json::Value,
-
-    pub reconciled_balance: rust_decimal::Decimal,
-
-    pub sync_credentials: String,
-
-    pub sync_provider: String,
+    pub transaction_date: String,
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    pub value_date: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBankStatementRequest {
-    pub reconciled_at: String,
+pub struct PaginatedBankAccounts {
+    pub has_more: bool,
 
-    pub reconciled_by: String,
+    pub items: Vec<BankAccount>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedBankStatements {
+    pub has_more: bool,
+
+    pub items: Vec<BankStatement>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedBankTransactions {
+    pub has_more: bool,
+
+    pub items: Vec<BankTransaction>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedReconciliationModels {
+    pub items: Vec<ReconciliationModel>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedReconciliations {
+    pub has_more: bool,
+
+    pub items: Vec<BankReconciliation>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconcileTransactionRequest {
+    pub matched_entry_id: String,
+
+    pub matched_entry_type: String,
+
+    pub notes: String,
+
+    pub write_off_amount: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconcileTransactionResponse {
+    pub journal_entry_id: String,
+
+    pub reconciliation_id: String,
 
     pub status: String,
+
+    pub transaction_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBankStatementResponse {
-    pub bank_account_id: String,
+pub struct ReconciliationAdjustment {
+    pub adjustment_type: String,
 
-    pub closing_balance: rust_decimal::Decimal,
+    pub amount: f64,
 
-    pub company_id: String,
+    pub id: String,
+
+    pub journal_entry_id: String,
+
+    pub transaction_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconciliationModel {
+    pub active: bool,
 
     pub created_at: String,
 
-    pub created_by: String,
+    pub id: String,
+
+    pub match_tolerance_amount: f64,
+
+    pub match_tolerance_days: i32,
+
+    pub name: String,
+
+    pub rule_type: String,
+
+    pub sequence: i32,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconciliationReportResponse {
+    pub bank_account_id: String,
+
+    pub bank_account_name: String,
+
+    pub closing_balance: f64,
+
+    pub created_at: String,
 
     pub currency_code: String,
 
     pub id: String,
 
-    pub import_format: String,
-
-    pub import_source: String,
-
-    pub imported_at: String,
-
-    pub imported_by: String,
-
-    pub metadata: serde_json::Value,
-
-    pub opening_balance: rust_decimal::Decimal,
+    pub opening_balance: f64,
 
     pub period_end: String,
 
     pub period_start: String,
 
-    pub reconciled_at: String,
+    pub reconciled_amount: f64,
 
-    pub reconciled_by: String,
+    pub reconciliation_percentage: f64,
 
-    pub statement_date: String,
+    pub total_deposits: f64,
 
-    pub statement_number: String,
+    pub total_withdrawals: f64,
 
-    pub status: String,
-
-    pub total_credits: rust_decimal::Decimal,
-
-    pub total_debits: rust_decimal::Decimal,
-
-    pub transaction_count: i32,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
+    pub unreconciled_amount: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateBankTransactionRequest {
-    pub description: String,
+pub struct ReconciliationResult {
+    pub journal_entry_id: String,
 
-    pub matched_payment_id: String,
+    pub reconciliation_id: String,
 
     pub status: String,
 
-    pub transaction_type: String,
+    pub transaction_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateReconciliationRequest {
-    pub bank_balance: rust_decimal::Decimal,
+pub struct ReconciliationSuggestion {
+    pub candidate_id: String,
 
-    pub book_balance: rust_decimal::Decimal,
+    pub candidate_type: String,
+
+    pub confidence: f64,
+
+    pub model_id: String,
+
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReconciliationSuggestions {
+    pub suggestions: Vec<ReconciliationSuggestion>,
+
+    pub transaction_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TriggerStatementSyncResponse {
+    pub statements_found: i32,
+
+    pub sync_status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateBankAccountRequest {
+    pub account_number: String,
+
+    pub account_type: String,
+
+    pub bank_name: String,
+
+    pub gl_account_id: String,
+
+    pub name: String,
 
     pub notes: String,
 
+    pub routing_number: String,
+
     pub status: String,
+
+    pub sync_enabled: bool,
+
+    pub sync_frequency: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateReconciliationResponse {
-    pub bank_account_id: String,
+pub struct UpdateBankAccountResponse {
+    pub account_number: String,
 
-    pub bank_balance: rust_decimal::Decimal,
+    pub account_type: String,
 
-    pub book_balance: rust_decimal::Decimal,
+    pub bank_id: String,
+
+    pub bank_name: String,
 
     pub company_id: String,
 
     pub created_at: String,
 
-    pub created_by: String,
-
     pub currency_code: String,
 
-    pub difference: rust_decimal::Decimal,
+    pub gl_account_id: String,
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    pub last_sync_date: String,
+
+    pub name: String,
 
     pub notes: String,
 
-    pub outstanding_deposits_amount: rust_decimal::Decimal,
+    pub opening_balance: f64,
 
-    pub outstanding_deposits_count: i32,
+    pub opening_balance_date: String,
 
-    pub outstanding_withdrawals_amount: rust_decimal::Decimal,
-
-    pub outstanding_withdrawals_count: i32,
-
-    pub reconciled_at: String,
-
-    pub reconciled_by: String,
-
-    pub reconciliation_date: String,
-
-    pub statement_id: String,
+    pub routing_number: String,
 
     pub status: String,
 
-    pub updated_at: String,
+    pub sync_enabled: bool,
 
-    pub updated_by: String,
+    pub sync_frequency: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ValidationError {
+    pub code: String,
+
+    pub errors: Vec<serde_json::Value>,
+
+    pub message: String,
 }

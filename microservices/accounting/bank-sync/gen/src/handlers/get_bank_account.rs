@@ -16,79 +16,75 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "account_name")]
-    pub account_name: String,
-
     #[serde(rename = "account_number")]
     pub account_number: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "account_type")]
-    pub account_type: String,
+    pub account_type: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "bank_code")]
-    pub bank_code: Option<String>,
+    #[serde(rename = "bank_id")]
+    pub bank_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "bank_name")]
     pub bank_name: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "current_balance")]
-    pub current_balance: Option<rust_decimal::Decimal>,
+    #[serde(rename = "gl_account_id")]
+    pub gl_account_id: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(rename = "is_active")]
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "last_sync_date")]
+    pub last_sync_date: Option<String>,
+
+    #[serde(rename = "name")]
+    pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "last_reconciled_at")]
-    pub last_reconciled_at: Option<String>,
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "last_synced_at")]
-    pub last_synced_at: Option<String>,
+    #[serde(rename = "opening_balance")]
+    pub opening_balance: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
+    #[serde(rename = "opening_balance_date")]
+    pub opening_balance_date: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "reconciled_balance")]
-    pub reconciled_balance: Option<rust_decimal::Decimal>,
+    #[serde(rename = "routing_number")]
+    pub routing_number: Option<String>,
+
+    #[serde(rename = "status")]
+    pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "sync_credentials")]
-    pub sync_credentials: Option<String>,
+    #[serde(rename = "sync_enabled")]
+    pub sync_enabled: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "sync_provider")]
-    pub sync_provider: Option<String>,
+    #[serde(rename = "sync_frequency")]
+    pub sync_frequency: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

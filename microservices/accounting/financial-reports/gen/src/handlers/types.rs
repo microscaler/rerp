@@ -5,255 +5,572 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateFinancialStatementRequest {
-    pub company_id: String,
+pub struct BalanceSheet {
+    pub account_details: Vec<serde_json::Value>,
 
-    pub currency_code: String,
+    pub assets: serde_json::Value,
 
-    pub data: serde_json::Value,
-
-    pub report_date: String,
-
-    pub report_id: String,
-
-    pub summary: serde_json::Value,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateFinancialStatementResponse {
     pub company_id: String,
 
     pub created_at: String,
 
     pub currency_code: String,
 
-    pub data: serde_json::Value,
-
-    pub data_version: i32,
-
-    pub generated_at: String,
-
-    pub generated_by: String,
+    pub equity: serde_json::Value,
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
-
-    pub net_income: rust_decimal::Decimal,
-
-    pub report_date: String,
-
-    pub report_id: String,
-
-    pub summary: serde_json::Value,
-
-    pub total_assets: rust_decimal::Decimal,
-
-    pub total_liabilities: rust_decimal::Decimal,
-
-    pub updated_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateReportRequest {
-    pub company_id: String,
-
-    pub currency_code: String,
-
-    pub description: String,
-
-    pub name: String,
-
-    pub parameters: serde_json::Value,
+    pub liabilities: serde_json::Value,
 
     pub period_end: String,
 
     pub period_start: String,
-
-    pub report_code: String,
-
-    pub report_date: String,
-
-    pub report_type: String,
-
-    pub template_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateReportResponse {
-    pub approved_at: String,
+pub struct CashFlowStatement {
+    pub account_details: Vec<serde_json::Value>,
 
-    pub approved_by: String,
+    pub beginning_cash: f64,
 
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub ending_cash: f64,
+
+    pub financing_activities: f64,
+
+    pub id: String,
+
+    pub investing_activities: f64,
+
+    pub net_cash_flow: f64,
+
+    pub operating_activities: f64,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateBalanceSheetRequest {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub include_detail: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateCashFlowStatementRequest {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateCustomReportRequest {
+    pub company_id: String,
+
+    pub definition: serde_json::Value,
+
+    pub description: String,
+
+    pub is_shared: bool,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateCustomReportResponse {
     pub company_id: String,
 
     pub created_at: String,
 
     pub created_by: String,
 
-    pub currency_code: String,
+    pub definition: serde_json::Value,
 
     pub description: String,
 
-    pub generated_at: String,
-
-    pub generated_by: String,
-
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    pub is_shared: bool,
 
     pub name: String,
 
-    pub parameters: serde_json::Value,
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateGeneralLedgerReportRequest {
+    pub account_id: String,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub group_by_account: bool,
+
+    pub include_empty_accounts: bool,
 
     pub period_end: String,
 
     pub period_start: String,
+}
 
-    pub report_code: String,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateIncomeStatementRequest {
+    pub company_id: String,
 
-    pub report_data: serde_json::Value,
+    pub compare_previous_period: bool,
 
-    pub report_date: String,
+    pub currency_code: String,
+
+    pub include_detail: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReportDefinitionRequest {
+    pub active: bool,
+
+    pub company_id: String,
+
+    pub name: String,
 
     pub report_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReportDefinitionResponse {
+    pub active: bool,
+
+    pub company_id: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub report_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReportExportRequest {
+    pub format: String,
+
+    pub report_execution_id: String,
+
+    pub requested_by: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateReportExportResponse {
+    pub artifact_uri: String,
+
+    pub id: String,
+
+    pub report_execution_id: String,
 
     pub status: String,
-
-    pub template_id: String,
-
-    pub total_amount: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct FinancialStatement {
+pub struct CreateTrialBalanceRequest {
     pub company_id: String,
-
-    pub created_at: String,
 
     pub currency_code: String,
 
-    pub data: serde_json::Value,
-
-    pub data_version: i32,
-
-    pub generated_at: String,
-
-    pub generated_by: String,
-
-    pub id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub net_income: rust_decimal::Decimal,
-
-    pub report_date: String,
-
-    pub report_id: String,
-
-    pub summary: serde_json::Value,
-
-    pub total_assets: rust_decimal::Decimal,
-
-    pub total_liabilities: rust_decimal::Decimal,
-
-    pub updated_at: String,
+    pub period_end: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetFinancialStatementResponse {
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub data: serde_json::Value,
-
-    pub data_version: i32,
-
-    pub generated_at: String,
-
-    pub generated_by: String,
-
-    pub id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub net_income: rust_decimal::Decimal,
-
-    pub report_date: String,
-
-    pub report_id: String,
-
-    pub summary: serde_json::Value,
-
-    pub total_assets: rust_decimal::Decimal,
-
-    pub total_liabilities: rust_decimal::Decimal,
-
-    pub updated_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetReportResponse {
-    pub approved_at: String,
-
-    pub approved_by: String,
-
+pub struct CustomReport {
     pub company_id: String,
 
     pub created_at: String,
 
     pub created_by: String,
 
-    pub currency_code: String,
+    pub definition: serde_json::Value,
 
     pub description: String,
 
-    pub generated_at: String,
-
-    pub generated_by: String,
-
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    pub is_shared: bool,
 
     pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DeleteCustomReportResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DrillDownReportCellResponse {
+    pub cell_id: String,
+
+    pub source_lines: Vec<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ErrorResponse {
+    pub code: String,
+
+    pub details: serde_json::Value,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ExecuteCustomReportRequest {
+    pub currency_code: String,
 
     pub parameters: serde_json::Value,
 
     pub period_end: String,
 
     pub period_start: String,
-
-    pub report_code: String,
-
-    pub report_data: serde_json::Value,
-
-    pub report_date: String,
-
-    pub report_type: String,
-
-    pub status: String,
-
-    pub template_id: String,
-
-    pub total_amount: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListFinancialStatementsResponse {
-    pub items: Vec<FinancialStatement>,
+pub struct ExecuteCustomReportResponse {
+    pub completed_at: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub data: serde_json::Value,
+
+    pub error_message: String,
+
+    pub id: String,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub report_id: String,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GeneralLedgerReport {
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub entries: Vec<serde_json::Value>,
+
+    pub id: String,
+
+    pub is_balanced: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub total_credits: f64,
+
+    pub total_debits: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateBalanceSheetRequest {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub include_detail: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateBalanceSheetResponse {
+    pub account_details: Vec<serde_json::Value>,
+
+    pub assets: serde_json::Value,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub equity: serde_json::Value,
+
+    pub id: String,
+
+    pub liabilities: serde_json::Value,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateCashFlowRequest {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateCashFlowResponse {
+    pub account_details: Vec<serde_json::Value>,
+
+    pub beginning_cash: f64,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub ending_cash: f64,
+
+    pub financing_activities: f64,
+
+    pub id: String,
+
+    pub investing_activities: f64,
+
+    pub net_cash_flow: f64,
+
+    pub operating_activities: f64,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateGeneralLedgerRequest {
+    pub account_id: String,
+
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub group_by_account: bool,
+
+    pub include_empty_accounts: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateGeneralLedgerResponse {
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub entries: Vec<serde_json::Value>,
+
+    pub id: String,
+
+    pub is_balanced: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub total_credits: f64,
+
+    pub total_debits: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateIncomeStatementRequest {
+    pub company_id: String,
+
+    pub compare_previous_period: bool,
+
+    pub currency_code: String,
+
+    pub include_detail: bool,
+
+    pub period_end: String,
+
+    pub period_start: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateIncomeStatementResponse {
+    pub account_details: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub cost_of_goods_sold: f64,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub gross_profit: f64,
+
+    pub id: String,
+
+    pub net_income: f64,
+
+    pub net_margin: f64,
+
+    pub operating_expenses: serde_json::Value,
+
+    pub operating_income: f64,
+
+    pub other_income_expense: f64,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub revenue: serde_json::Value,
+
+    pub tax_expense: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateTrialBalanceRequest {
+    pub company_id: String,
+
+    pub currency_code: String,
+
+    pub period_end: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GenerateTrialBalanceResponse {
+    pub accounts: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub is_balanced: bool,
+
+    pub period_end: String,
+
+    pub total_credits: f64,
+
+    pub total_debits: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetCustomReportResponse {
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub created_by: String,
+
+    pub definition: serde_json::Value,
+
+    pub description: String,
+
+    pub id: String,
+
+    pub is_shared: bool,
+
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub r#type: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct IncomeStatement {
+    pub account_details: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub cost_of_goods_sold: f64,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub gross_profit: f64,
+
+    pub id: String,
+
+    pub net_income: f64,
+
+    pub net_margin: f64,
+
+    pub operating_expenses: serde_json::Value,
+
+    pub operating_income: f64,
+
+    pub other_income_expense: f64,
+
+    pub period_end: String,
+
+    pub period_start: String,
+
+    pub revenue: serde_json::Value,
+
+    pub tax_expense: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListCustomReportsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<CustomReport>,
 
     pub limit: i32,
 
@@ -263,8 +580,24 @@ pub struct ListFinancialStatementsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListReportsResponse {
-    pub items: Vec<Report>,
+pub struct ListReportDefinitionLinesResponse {
+    pub items: Vec<ReportDefinitionLine>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListReportDefinitionsResponse {
+    pub items: Vec<ReportDefinition>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListReportExecutionsResponse {
+    pub has_more: bool,
+
+    pub items: Vec<ReportExecution>,
 
     pub limit: i32,
 
@@ -274,236 +607,200 @@ pub struct ListReportsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct Report {
-    pub approved_at: String,
+pub struct ListStatutoryReportPacksResponse {
+    pub items: Vec<StatutoryReportPack>,
 
-    pub approved_by: String,
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedCustomReports {
+    pub has_more: bool,
+
+    pub items: Vec<CustomReport>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedReportDefinitionLines {
+    pub items: Vec<ReportDefinitionLine>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedReportDefinitions {
+    pub items: Vec<ReportDefinition>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedReportExecutions {
+    pub has_more: bool,
+
+    pub items: Vec<ReportExecution>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedStatutoryReportPacks {
+    pub items: Vec<StatutoryReportPack>,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReportCellDrillDown {
+    pub cell_id: String,
+
+    pub source_lines: Vec<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReportDefinition {
+    pub active: bool,
 
     pub company_id: String,
 
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub currency_code: String,
-
-    pub description: String,
-
-    pub generated_at: String,
-
-    pub generated_by: String,
-
     pub id: String,
-
-    pub metadata: serde_json::Value,
 
     pub name: String,
 
-    pub parameters: serde_json::Value,
+    pub report_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReportDefinitionLine {
+    pub definition_id: String,
+
+    pub expression: String,
+
+    pub id: String,
+
+    pub label: String,
+
+    pub parent_line_id: String,
+
+    pub sequence: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReportExecution {
+    pub completed_at: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub data: serde_json::Value,
+
+    pub error_message: String,
+
+    pub id: String,
 
     pub period_end: String,
 
     pub period_start: String,
-
-    pub report_code: String,
-
-    pub report_data: serde_json::Value,
-
-    pub report_date: String,
-
-    pub report_type: String,
-
-    pub status: String,
-
-    pub template_id: String,
-
-    pub total_amount: rust_decimal::Decimal,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ReportSchedule {
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub default_parameters: serde_json::Value,
-
-    pub description: String,
-
-    pub frequency: String,
-
-    pub id: String,
-
-    pub last_run_at: String,
-
-    pub metadata: serde_json::Value,
-
-    pub name: String,
-
-    pub next_run_at: String,
-
-    pub output_format: String,
-
-    pub recipients: serde_json::Value,
-
-    pub run_count: i32,
-
-    pub schedule_config: serde_json::Value,
-
-    pub status: String,
-
-    pub template_id: String,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ReportTemplate {
-    pub account_mappings: serde_json::Value,
-
-    pub created_at: String,
-
-    pub created_by: String,
-
-    pub description: String,
-
-    pub formatting: serde_json::Value,
-
-    pub formulas: serde_json::Value,
-
-    pub id: String,
-
-    pub is_active: bool,
-
-    pub is_system_template: bool,
-
-    pub name: String,
-
-    pub report_type: String,
-
-    pub template_code: String,
-
-    pub template_structure: serde_json::Value,
-
-    pub updated_at: String,
-
-    pub updated_by: String,
-
-    pub version: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateFinancialStatementRequest {
-    pub data: serde_json::Value,
-
-    pub data_version: i32,
-
-    pub summary: serde_json::Value,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateFinancialStatementResponse {
-    pub company_id: String,
-
-    pub created_at: String,
-
-    pub currency_code: String,
-
-    pub data: serde_json::Value,
-
-    pub data_version: i32,
-
-    pub generated_at: String,
-
-    pub generated_by: String,
-
-    pub id: String,
-
-    pub metadata: serde_json::Value,
-
-    pub net_income: rust_decimal::Decimal,
-
-    pub report_date: String,
 
     pub report_id: String,
 
-    pub summary: serde_json::Value,
-
-    pub total_assets: rust_decimal::Decimal,
-
-    pub total_liabilities: rust_decimal::Decimal,
-
-    pub updated_at: String,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateReportRequest {
-    pub description: String,
+pub struct ReportExport {
+    pub artifact_uri: String,
 
-    pub name: String,
+    pub id: String,
 
-    pub parameters: serde_json::Value,
-
-    pub report_data: serde_json::Value,
+    pub report_execution_id: String,
 
     pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateReportResponse {
-    pub approved_at: String,
+pub struct StatutoryReportPack {
+    pub id: String,
 
-    pub approved_by: String,
+    pub jurisdiction_code: String,
 
+    pub report_type: String,
+
+    pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TrialBalance {
+    pub accounts: Vec<serde_json::Value>,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub is_balanced: bool,
+
+    pub period_end: String,
+
+    pub total_credits: f64,
+
+    pub total_debits: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateCustomReportRequest {
+    pub definition: serde_json::Value,
+
+    pub description: String,
+
+    pub is_shared: bool,
+
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateCustomReportResponse {
     pub company_id: String,
 
     pub created_at: String,
 
     pub created_by: String,
 
-    pub currency_code: String,
+    pub definition: serde_json::Value,
 
     pub description: String,
 
-    pub generated_at: String,
-
-    pub generated_by: String,
-
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    pub is_shared: bool,
 
     pub name: String,
 
-    pub parameters: serde_json::Value,
-
-    pub period_end: String,
-
-    pub period_start: String,
-
-    pub report_code: String,
-
-    pub report_data: serde_json::Value,
-
-    pub report_date: String,
-
-    pub report_type: String,
-
-    pub status: String,
-
-    pub template_id: String,
-
-    pub total_amount: rust_decimal::Decimal,
+    #[serde(rename = "type")]
+    pub r#type: String,
 
     pub updated_at: String,
+}
 
-    pub updated_by: String,
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ValidationError {
+    pub code: String,
+
+    pub errors: Vec<serde_json::Value>,
+
+    pub message: String,
 }

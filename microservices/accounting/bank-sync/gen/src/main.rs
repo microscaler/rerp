@@ -612,7 +612,7 @@ fn main() -> io::Result<()> {
     } else {
         format!("0.0.0.0:{port}")
     };
-    println!("🚀 bank_synchronization example server listening on {addr}");
+    println!("🚀 bank_sync example server listening on {addr}");
     let server = HttpServer(service).start(&addr).map_err(io::Error::other)?;
     println!("Server started successfully on {addr}");
 

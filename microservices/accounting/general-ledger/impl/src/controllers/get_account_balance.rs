@@ -5,7 +5,7 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_general_ledger::handlers::get_account_balance::{Request, Response};
+use rerp_accounting_general_ledger_gen::handlers::get_account_balance::{Request, Response};
 
 #[handler(GetAccountBalanceController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

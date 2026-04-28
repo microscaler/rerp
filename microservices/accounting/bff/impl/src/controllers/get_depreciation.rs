@@ -20,11 +20,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        accumulated_depreciation: None, // TODO: Set from your business logic
+        accumulated_depreciation: String::new(), // TODO: Set from your business logic
 
         asset_id: "a0100e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        book_value: None, // TODO: Set from your business logic
+        book_value: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
@@ -34,18 +34,18 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         id: "a0120e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        journal_entry_id: None, // TODO: Set from your business logic
+        journal_entry_id: String::new(), // TODO: Set from your business logic
 
         period_end: "2024-01-31".to_string(), // TODO: Set from your business logic
 
         period_start: "2024-01-01".to_string(), // TODO: Set from your business logic
 
-        posted_at: None, // TODO: Set from your business logic
+        posted_at: String::new(), // TODO: Set from your business logic
 
-        posted_by: None, // TODO: Set from your business logic
+        posted_by: String::new(), // TODO: Set from your business logic
 
         status: "POSTED".to_string(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
     }
 }

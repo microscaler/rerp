@@ -22,60 +22,60 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         acknowledgment_sent: true, // TODO: Set from your business logic
 
-        acknowledgment_sent_at: None, // TODO: Set from your business logic
+        acknowledgment_sent_at: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
-        currency_code: None, // TODO: Set from your business logic
+        currency_code: String::new(), // TODO: Set from your business logic
 
         document_number: "example".to_string(), // TODO: Set from your business logic
 
-        document_total_amount: None, // TODO: Set from your business logic
+        document_total_amount: String::new(), // TODO: Set from your business logic
 
         document_type: "example".to_string(), // TODO: Set from your business logic
 
-        error_details: None, // TODO: Set from your business logic
+        error_details: String::new(), // TODO: Set from your business logic
 
-        error_message: None, // TODO: Set from your business logic
+        error_message: String::new(), // TODO: Set from your business logic
 
         format_id: "example".to_string(), // TODO: Set from your business logic
 
         id: "example".to_string(), // TODO: Set from your business logic
 
-        last_retry_at: None, // TODO: Set from your business logic
+        last_retry_at: String::new(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        parsed_at: None, // TODO: Set from your business logic
+        parsed_at: String::new(), // TODO: Set from your business logic
 
-        parsed_data: None, // TODO: Set from your business logic
+        parsed_data: String::new(), // TODO: Set from your business logic
 
-        processed_at: None, // TODO: Set from your business logic
+        processed_at: String::new(), // TODO: Set from your business logic
 
-        raw_content: None, // TODO: Set from your business logic
+        raw_content: String::new(), // TODO: Set from your business logic
 
         received_at: "example".to_string(), // TODO: Set from your business logic
 
-        receiver_id: None, // TODO: Set from your business logic
+        receiver_id: String::new(), // TODO: Set from your business logic
 
-        related_invoice_id: None, // TODO: Set from your business logic
+        related_invoice_id: String::new(), // TODO: Set from your business logic
 
-        related_purchase_order_id: None, // TODO: Set from your business logic
+        related_purchase_order_id: String::new(), // TODO: Set from your business logic
 
         retry_count: 42, // TODO: Set from your business logic
 
-        sender_id: None, // TODO: Set from your business logic
+        sender_id: String::new(), // TODO: Set from your business logic
 
         status: "example".to_string(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
 
-        validated_at: None, // TODO: Set from your business logic
+        validated_at: String::new(), // TODO: Set from your business logic
     }
 }

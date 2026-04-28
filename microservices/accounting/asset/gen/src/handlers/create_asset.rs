@@ -9,30 +9,37 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "accumulated_depreciation_account_id")]
-    pub accumulated_depreciation_account_id: Option<String>,
+    #[serde(rename = "acquisition_cost")]
+    pub acquisition_cost: f64,
+
+    #[serde(rename = "acquisition_date")]
+    pub acquisition_date: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "asset_account_id")]
-    pub asset_account_id: Option<String>,
+    #[serde(rename = "acquisition_gl_entry_id")]
+    pub acquisition_gl_entry_id: Option<String>,
 
     #[serde(rename = "asset_number")]
     pub asset_number: String,
 
-    #[serde(rename = "category_id")]
-    pub category_id: String,
-
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "auto_depreciate")]
+    pub auto_depreciate: Option<bool>,
+
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_expense_account_id")]
-    pub depreciation_expense_account_id: Option<String>,
+    #[serde(rename = "currency_code")]
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "custodian_id")]
+    pub custodian_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "depreciation_method")]
@@ -43,10 +50,6 @@ pub struct Request {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "in_service_date")]
-    pub in_service_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "location")]
     pub location: Option<String>,
 
@@ -54,125 +57,28 @@ pub struct Request {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "purchase_cost")]
-    pub purchase_cost: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "purchase_date")]
-    pub purchase_date: String,
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "salvage_value")]
-    pub salvage_value: Option<rust_decimal::Decimal>,
+    #[serde(rename = "serial_number")]
+    pub serial_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "supplier_id")]
+    pub supplier_id: Option<String>,
+
     #[serde(rename = "useful_life_months")]
-    pub useful_life_months: Option<i32>,
+    pub useful_life_months: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "warranty_expiry")]
+    pub warranty_expiry: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "accumulated_depreciation")]
-    pub accumulated_depreciation: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "accumulated_depreciation_account_id")]
-    pub accumulated_depreciation_account_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "asset_account_id")]
-    pub asset_account_id: Option<String>,
-
-    #[serde(rename = "asset_number")]
-    pub asset_number: String,
-
-    #[serde(rename = "category_id")]
-    pub category_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "current_value")]
-    pub current_value: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_expense_account_id")]
-    pub depreciation_expense_account_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_method")]
-    pub depreciation_method: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "depreciation_rate")]
-    pub depreciation_rate: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "disposal_date")]
-    pub disposal_date: Option<String>,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "in_service_date")]
-    pub in_service_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "location")]
-    pub location: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(rename = "name")]
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "purchase_cost")]
-    pub purchase_cost: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "purchase_date")]
-    pub purchase_date: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "salvage_value")]
-    pub salvage_value: Option<rust_decimal::Decimal>,
-
-    #[serde(rename = "status")]
-    pub status: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "useful_life_months")]
-    pub useful_life_months: Option<i32>,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;

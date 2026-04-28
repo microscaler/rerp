@@ -391,7 +391,7 @@ def get_binary_name(name):
 def create_microservice_stubs_resource(name, spec_file):
     local_resource(
         'stubs-%s' % name,
-        '%s gen stubs %s %s --force' % (rerp_bin, RERP_SUITE, name),
+        '%s gen suite %s --service %s' % (rerp_bin, RERP_SUITE, name),
         deps=[
             './openapi/%s' % spec_file,
             './microservices/%s/%s/gen' % (RERP_SUITE, name),
@@ -697,7 +697,7 @@ custom_build(
 k8s_yaml('k8s/website.yaml')
 k8s_resource(
     'website',
-    port_forwards=['3000:8080'],
+    port_forwards=['3001:8080'],
     labels=['rerp_ui'],
 )
 

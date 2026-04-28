@@ -3,19 +3,15 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_asset_registers;
+pub mod list_asset_models;
 
-pub mod create_asset_register;
-
-pub mod get_asset_register;
-
-pub mod update_asset_register;
-
-pub mod delete_asset_register;
+pub mod create_asset_model;
 
 pub mod list_assets;
 
 pub mod create_asset;
+
+pub mod bulk_depreciate;
 
 pub mod get_asset;
 
@@ -23,12 +19,28 @@ pub mod update_asset;
 
 pub mod delete_asset;
 
-pub mod list_depreciations;
+pub mod run_depreciation;
 
-pub mod create_depreciation;
+pub mod list_depreciation_entries;
 
-pub mod get_depreciation;
+pub mod modify_asset;
 
-pub mod update_depreciation;
+pub mod pause_asset_depreciation;
 
-pub mod delete_depreciation;
+pub mod resume_asset_depreciation;
+
+pub mod validate_asset;
+
+pub mod list_asset_categories;
+
+pub mod create_asset_category;
+
+pub mod list_disposals;
+
+pub mod create_disposal;
+
+pub mod asset_summary;
+
+pub mod list_revaluations;
+
+pub mod create_revaluation;

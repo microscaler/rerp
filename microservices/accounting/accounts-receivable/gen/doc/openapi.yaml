@@ -897,6 +897,116 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /follow-up-levels:
+    get:
+      operationId: list_follow_up_levels
+      summary: List customer follow-up levels
+      responses:
+        '200':
+          description: Follow-up levels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFollowUpLevels'
+    post:
+      operationId: create_follow_up_level
+      summary: Create customer follow-up level
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFollowUpLevelRequest'
+      responses:
+        '201':
+          description: Follow-up level created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUpLevel'
+  /follow-up-runs:
+    post:
+      operationId: create_follow_up_run
+      summary: Create customer follow-up run
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFollowUpRunRequest'
+      responses:
+        '202':
+          description: Follow-up run accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUpRun'
+  /collection-cases:
+    get:
+      operationId: list_collection_cases
+      summary: List collection cases
+      responses:
+        '200':
+          description: Collection cases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCollectionCases'
+    post:
+      operationId: create_collection_case
+      summary: Create collection case
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCollectionCaseRequest'
+      responses:
+        '201':
+          description: Collection case created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionCase'
+  /payment-promises:
+    post:
+      operationId: create_payment_promise
+      summary: Create promise to pay
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentPromiseRequest'
+      responses:
+        '201':
+          description: Payment promise created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPromise'
+  /customer-statements/send:
+    post:
+      operationId: send_customer_statements
+      summary: Send customer statements
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendCustomerStatementsRequest'
+      responses:
+        '202':
+          description: Customer statement job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementSendJob'
 components:
   securitySchemes:
     bearerAuth:
@@ -1626,6 +1736,247 @@ components:
         updated_at:
           type: string
           format: date-time
+    FollowUpLevel:
+      type: object
+      required:
+      - id
+      - name
+      - sequence
+      - days_overdue
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sequence:
+          type: integer
+        days_overdue:
+          type: integer
+        action_type:
+          type: string
+          enum:
+          - EMAIL
+          - SMS
+          - LETTER
+          - ACTIVITY
+          - HOLD
+        active:
+          type: boolean
+    CreateFollowUpLevelRequest:
+      type: object
+      required:
+      - name
+      - sequence
+      - days_overdue
+      properties:
+        name:
+          type: string
+        sequence:
+          type: integer
+        days_overdue:
+          type: integer
+        action_type:
+          type: string
+          enum:
+          - EMAIL
+          - SMS
+          - LETTER
+          - ACTIVITY
+          - HOLD
+        active:
+          type: boolean
+          default: true
+    FollowUpRun:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        customer_count:
+          type: integer
+    CreateFollowUpRunRequest:
+      type: object
+      properties:
+        company_id:
+          type: string
+          format: uuid
+          nullable: true
+        as_of_date:
+          type: string
+          format: date
+        dry_run:
+          type: boolean
+          default: false
+    CollectionCase:
+      type: object
+      required:
+      - id
+      - customer_id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - OPEN
+          - PAUSED
+          - PROMISED
+          - ESCALATED
+          - CLOSED
+        assigned_to:
+          type: string
+          format: uuid
+          nullable: true
+        total_due:
+          type: number
+          format: double
+    CreateCollectionCaseRequest:
+      type: object
+      required:
+      - customer_id
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        invoice_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        assigned_to:
+          type: string
+          format: uuid
+          nullable: true
+    PaymentPromise:
+      type: object
+      required:
+      - id
+      - customer_id
+      - promised_amount
+      - promised_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        promised_amount:
+          type: number
+          format: double
+        promised_date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - OPEN
+          - KEPT
+          - BROKEN
+          - CANCELLED
+    CreatePaymentPromiseRequest:
+      type: object
+      required:
+      - customer_id
+      - promised_amount
+      - promised_date
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        invoice_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        promised_amount:
+          type: number
+          format: double
+        promised_date:
+          type: string
+          format: date
+    SendCustomerStatementsRequest:
+      type: object
+      required:
+      - customer_ids
+      - statement_date
+      properties:
+        customer_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        statement_date:
+          type: string
+          format: date
+        delivery_method:
+          type: string
+          enum:
+          - EMAIL
+          - LETTER
+          - PORTAL
+    StatementSendJob:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - SENDING
+          - COMPLETED
+          - FAILED
+        statement_count:
+          type: integer
+    PaginatedFollowUpLevels:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowUpLevel'
+        total:
+          type: integer
+    PaginatedCollectionCases:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollectionCase'
+        total:
+          type: integer
     PaginatedCustomerInvoices:
       type: object
       required:

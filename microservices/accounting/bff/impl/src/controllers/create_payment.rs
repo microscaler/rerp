@@ -20,27 +20,27 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     // Example: Return response
 
     Response {
-        applied_amount: None, // TODO: Set from your business logic
+        applied_amount: String::new(), // TODO: Set from your business logic
 
-        bank_account_id: None, // TODO: Set from your business logic
+        bank_account_id: String::new(), // TODO: Set from your business logic
 
-        company_id: None, // TODO: Set from your business logic
+        company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: None, // TODO: Set from your business logic
+        created_by: String::new(), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
         customer_id: "111e8400-e29b-41d4-a716-446655440001".to_string(), // TODO: Set from your business logic
 
-        exchange_rate: None, // TODO: Set from your business logic
+        exchange_rate: String::new(), // TODO: Set from your business logic
 
         id: "a0040e8400-e29b-41d4-a716-446655440000".to_string(), // TODO: Set from your business logic
 
-        metadata: None, // TODO: Set from your business logic
+        metadata: String::new(), // TODO: Set from your business logic
 
-        notes: None, // TODO: Set from your business logic
+        notes: String::new(), // TODO: Set from your business logic
 
         payment_amount: rust_decimal::Decimal::new(55000, 1), // TODO: Set from your business logic
 
@@ -50,18 +50,18 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         payment_number: "AR-PAY-2024-001".to_string(), // TODO: Set from your business logic
 
-        payment_reference: None, // TODO: Set from your business logic
+        payment_reference: String::new(), // TODO: Set from your business logic
 
-        reconciled_at: None, // TODO: Set from your business logic
+        reconciled_at: String::new(), // TODO: Set from your business logic
 
-        reconciled_by: None, // TODO: Set from your business logic
+        reconciled_by: String::new(), // TODO: Set from your business logic
 
         status: "DRAFT".to_string(), // TODO: Set from your business logic
 
-        unapplied_amount: None, // TODO: Set from your business logic
+        unapplied_amount: String::new(), // TODO: Set from your business logic
 
-        updated_at: None, // TODO: Set from your business logic
+        updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: None, // TODO: Set from your business logic
+        updated_by: String::new(), // TODO: Set from your business logic
     }
 }

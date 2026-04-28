@@ -13,89 +13,9 @@ pub struct Request {
     pub id: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approval_status")]
-    pub approval_status: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approved_at")]
-    pub approved_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "approved_by")]
-    pub approved_by: Option<String>,
-
-    #[serde(rename = "budget_number")]
-    pub budget_number: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "current_version_id")]
-    pub current_version_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(rename = "fiscal_year")]
-    pub fiscal_year: i32,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
-
-    #[serde(rename = "name")]
-    pub name: String,
-
-    #[serde(rename = "period_end")]
-    pub period_end: String,
-
-    #[serde(rename = "period_start")]
-    pub period_start: String,
-
-    #[serde(rename = "status")]
-    pub status: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_actual_amount")]
-    pub total_actual_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_budget_amount")]
-    pub total_budget_amount: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_variance")]
-    pub total_variance: Option<rust_decimal::Decimal>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "updated_by")]
-    pub updated_by: Option<String>,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -134,9 +54,4 @@ impl TryFrom<HandlerRequest> for Request {
 
         Ok(serde_json::from_value(Value::Object(data_map))?)
     }
-}
-
-#[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::get_budget::handle(req)
 }

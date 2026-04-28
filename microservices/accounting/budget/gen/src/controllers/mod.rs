@@ -3,25 +3,9 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_budget_lines;
+pub mod list_budget_revisions;
 
-pub mod create_budget_line;
-
-pub mod get_budget_line;
-
-pub mod update_budget_line;
-
-pub mod delete_budget_line;
-
-pub mod list_budget_variances;
-
-pub mod create_budget_variance;
-
-pub mod get_budget_variance;
-
-pub mod update_budget_variance;
-
-pub mod delete_budget_variance;
+pub mod create_budget_revision;
 
 pub mod list_budgets;
 
@@ -32,3 +16,23 @@ pub mod get_budget;
 pub mod update_budget;
 
 pub mod delete_budget;
+
+pub mod cancel_budget;
+
+pub mod complete_budget;
+
+pub mod confirm_budget;
+
+pub mod list_budget_lines;
+
+pub mod create_budget_line;
+
+pub mod reopen_budget;
+
+pub mod submit_budget;
+
+pub mod list_forecasts;
+
+pub mod create_forecast;
+
+pub mod variance_report;

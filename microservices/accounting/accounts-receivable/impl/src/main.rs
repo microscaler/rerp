@@ -7,9 +7,9 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
 // Use generated code from gen crate
-use rerp_accounting_accounts_receivable::handlers::*;
-use rerp_accounting_accounts_receivable::registry::*;
-use rerp_accounting_accounts_receivable::*;
+use rerp_accounting_accounts_receivable_gen::handlers::*;
+use rerp_accounting_accounts_receivable_gen::registry::*;
+use rerp_accounting_accounts_receivable_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
