@@ -54,13 +54,13 @@ paths:
         '401':
           description: Unauthorized
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -81,13 +81,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/WeightedPipeline'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -129,13 +129,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedConversionrate'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -176,13 +176,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/FunnelData'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -203,13 +203,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadSourceReport'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -255,13 +255,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -297,13 +297,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/TeamPerformance'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -348,13 +348,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedLeaderboardEntry'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -395,13 +395,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/WinLossAnalysis'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -422,13 +422,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/TimeToCloseAnalysis'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -455,13 +455,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -482,13 +482,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -518,13 +518,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -565,11 +565,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -596,13 +606,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -644,7 +654,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
@@ -690,11 +700,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch"
+          description: Conflict — resource version mismatch
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

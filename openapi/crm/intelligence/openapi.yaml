@@ -52,6 +52,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -112,6 +122,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -244,13 +264,13 @@ paths:
         '400':
           description: Invalid request
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -261,6 +281,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -363,6 +385,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -391,6 +423,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -430,6 +472,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -466,6 +518,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -526,6 +588,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -573,6 +645,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -606,6 +688,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -641,6 +733,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -676,6 +778,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

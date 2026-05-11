@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Live Chat
   version: 1.0.0
-  description: Real-time live chat service with visitor tracking, agent management, and chat-to-lead conversion.
+  description: Real-time live chat service with visitor tracking, agent management,
+    and chat-to-lead conversion.
 servers:
 - url: http://localhost:10352/api/v1/crm/livechat
   description: Local development (direct to service, port from port-registry)
@@ -150,7 +151,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -286,6 +287,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -451,13 +462,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -468,6 +479,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -489,7 +502,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -531,13 +544,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -548,6 +561,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

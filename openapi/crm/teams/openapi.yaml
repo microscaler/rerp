@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Teams
   version: 1.0.0
-  description: "Sales team management \u2014 teams, members, auto-assignment, unassigned queue."
+  description: Sales team management — teams, members, auto-assignment, unassigned
+    queue.
 servers:
 - url: http://localhost:10352/api/v1/crm/teams
   description: Local development (direct to service, port from port-registry)
@@ -138,13 +139,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -155,6 +156,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -176,7 +179,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -289,7 +292,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:

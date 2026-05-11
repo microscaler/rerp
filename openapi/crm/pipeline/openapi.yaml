@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Pipeline
   version: 1.0.0
-  description: "Pipeline service \u2014 leads, opportunities, stages, lead conversion, pipeline summary."
+  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline
+    summary.
 servers:
 - url: http://localhost:10352/api/v1/crm/pipeline
   description: Local development (direct to service, port from port-registry)
@@ -177,13 +178,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -194,6 +195,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -215,7 +218,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -259,13 +262,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -276,6 +279,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -312,6 +317,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -342,6 +357,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -379,6 +404,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -526,13 +561,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -543,6 +578,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -566,7 +603,7 @@ paths:
         '409':
           description: Stage is in use
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:

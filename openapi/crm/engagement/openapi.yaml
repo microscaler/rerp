@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: CRM Engagement
   version: 1.0.0
-  description: Customer engagement service for subscriptions, renewals, gamification, and health scoring.
+  description: Customer engagement service for subscriptions, renewals, gamification,
+    and health scoring.
 servers:
 - url: http://localhost:10352/api/v1/crm/engagement
   description: Local development (direct to service, port from port-registry)
@@ -138,13 +139,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -155,6 +156,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -176,7 +179,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -229,6 +232,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -417,13 +430,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -434,6 +447,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -473,13 +488,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: "Conflict \u2014 resource version mismatch or duplicate"
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -490,6 +505,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
