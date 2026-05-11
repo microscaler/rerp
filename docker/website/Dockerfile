@@ -1,6 +1,6 @@
 # Multi-stage build for RERP website
 # Stage 1: Build the SolidJS application
-FROM --platform=linux/amd64 node:25-alpine AS builder
+FROM --platform=linux/amd64 node:26-alpine AS builder
 
 # Install Yarn via Alpine package manager
 # Yarn v1.22.22 is available in Alpine repositories
