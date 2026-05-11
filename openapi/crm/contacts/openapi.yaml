@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: Contacts
-  version: 1.0.0
+  version: v1.0.0
   description: Contact management service — contacts, org hierarchy, addresses.
+  x-api-version: CRM Contacts API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/contacts
   description: Local development (direct to service, port from port-registry)
@@ -561,6 +564,7 @@ components:
         opportunity_count:
           type: integer
           readOnly: true
+      description: An individual person associated with an account or lead
     CreateContactRequest:
       type: object
       required:
@@ -723,6 +727,7 @@ components:
       - removed_id
       - merged_lead_count
       - merged_account_count
+      description: Result of merging multiple records together
     ErrorResponse:
       type: object
       required:
@@ -738,6 +743,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedResponse:
       type: object
       required:
@@ -751,6 +757,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     PaginatedContact:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

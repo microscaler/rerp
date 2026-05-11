@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: CRM Platform & Extensibility
-  version: 1.0.0
+  version: v1.0.0
   description: Custom fields, webhooks, audit logging, API keys, and integrations.
+  x-api-version: CRM Platform API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/platform
   description: Local development (direct to service, port from port-registry)
@@ -1081,6 +1084,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A custom field definition for extending entity schemas
     CreateCustomFieldRequest:
       type: object
       required:
@@ -1184,6 +1188,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A webhook endpoint for receiving event notifications
     CreateWebhookRequest:
       type: object
       required:
@@ -1261,6 +1266,7 @@ components:
       - response_body
       - delivered_at
       - retry_count
+      description: A log entry for webhook delivery attempts
     AuditLogEntry:
       type: object
       required:
@@ -1295,6 +1301,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: An audit log entry recording a system action
     ApiKey:
       type: object
       required:
@@ -1331,6 +1338,7 @@ components:
         expires_at:
           type: string
           format: date-time
+      description: An API key used for authentication and authorization
     CreateApiKeyRequest:
       type: object
       required:
@@ -1383,6 +1391,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A third-party integration configuration
     CreateIntegrationRequest:
       type: object
       required:
@@ -1473,6 +1482,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     ErrorResponse:
       type: object
       required:
@@ -1488,6 +1499,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedWebhook:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

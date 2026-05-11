@@ -1,9 +1,12 @@
 openapi: 3.1.0
 info:
   title: CRM Engagement
-  version: 1.0.0
+  version: v1.0.0
   description: Customer engagement service for subscriptions, renewals, gamification,
     and health scoring.
+  x-api-version: CRM Engagement API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/engagement
   description: Local development (direct to service, port from port-registry)
@@ -915,6 +918,7 @@ components:
           type: number
           format: float
           description: Churn probability (0-100)
+      description: A customer subscription to a product or service plan
     CreateSubscriptionRequest:
       type: object
       required:
@@ -1069,6 +1073,7 @@ components:
           type: number
           format: float
           readOnly: true
+      description: A target metric for sales teams or individuals to achieve
     CreateGoalRequest:
       type: object
       required:
@@ -1253,6 +1258,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedResponse:
       type: object
       required:
@@ -1266,6 +1272,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     PaginatedSubscription:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

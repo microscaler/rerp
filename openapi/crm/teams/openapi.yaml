@@ -1,9 +1,12 @@
 openapi: 3.1.0
 info:
   title: Teams
-  version: 1.0.0
+  version: v1.0.0
   description: Sales team management — teams, members, auto-assignment, unassigned
     queue.
+  x-api-version: CRM Teams API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/teams
   description: Local development (direct to service, port from port-registry)
@@ -559,6 +562,8 @@ components:
           type: number
           format: double
           readOnly: true
+      description: A group of sales representatives organized by region or product
+        line
     CreateTeamRequest:
       type: object
       required:
@@ -675,6 +680,7 @@ components:
         user_name:
           type: string
           readOnly: true
+      description: A team member with their role and details
     AddTeamMemberRequest:
       type: object
       required:
@@ -727,6 +733,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     TeamMembers:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -751,6 +759,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedTeam:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

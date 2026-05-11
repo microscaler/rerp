@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: CRM Marketing Integration
-  version: 1.0.0
+  version: v1.0.0
   description: Campaign tracking, web forms, visitor analytics, events, and surveys.
+  x-api-version: CRM Marketing API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/marketing
   description: Local development (direct to service, port from port-registry)
@@ -1047,6 +1050,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A marketing form definition with its fields
     FormSubmissionRequest:
       type: object
       required:
@@ -1080,6 +1084,7 @@ components:
       - contact_id
       - form_id
       - redirect_url
+      description: Result of a marketing form submission
     VisitorTracking:
       type: object
       required:
@@ -1115,6 +1120,7 @@ components:
         lead_id:
           type: string
           format: uuid
+      description: A visitor tracking record with page and session data
     TrackPageViewRequest:
       type: object
       required:
@@ -1203,6 +1209,7 @@ components:
         registration_date:
           type: string
           format: date-time
+      description: An event registration record
     SurveyResponseRequest:
       type: object
       required:
@@ -1243,6 +1250,7 @@ components:
         response_date:
           type: string
           format: date-time
+      description: A survey response with answers and feedback
     PaginatedResponse:
       type: object
       required:
@@ -1256,6 +1264,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     ErrorResponse:
       type: object
       required:
@@ -1271,6 +1281,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedEventRegistration:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1331,6 +1342,7 @@ components:
         created_at:
           type: string
           format: date-time
+      description: A lead result attributed to a campaign
     PaginatedCampaignLeadResult:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: Accounts
-  version: 1.0.0
+  version: v1.0.0
   description: Account/company management — companies, industry, size, hierarchy.
+  x-api-version: CRM Accounts API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/accounts
   description: Local development (direct to service, port from port-registry)
@@ -501,6 +504,7 @@ components:
           type: number
           format: double
           readOnly: true
+      description: A company or organization that is a customer or prospect
     CreateAccountRequest:
       type: object
       required:
@@ -716,6 +720,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedResponse:
       type: object
       required:
@@ -729,6 +734,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     PaginatedAccount:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

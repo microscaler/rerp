@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: CRM Intelligence
-  version: 1.0.0
+  version: v1.0.0
   description: Predictive analytics, lead scoring, enrichment, and data verification.
+  x-api-version: CRM Intelligence API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/intelligence
   description: Local development (direct to service, port from port-registry)
@@ -1166,6 +1169,7 @@ components:
         total_records:
           type: integer
           readOnly: true
+      description: A lead score with its calculated value and level
     ScoreExplanation:
       type: object
       properties:
@@ -1200,6 +1204,7 @@ components:
       - probability
       - contributing_factors
       - total_records
+      description: A detailed explanation of how a lead score was calculated
     ScoringFrequency:
       type: object
       required:
@@ -1227,6 +1232,7 @@ components:
         total:
           type: integer
           readOnly: true
+      description: Configuration for how often lead scores should be recalculated
     ScoringThresholds:
       type: object
       required:
@@ -1400,6 +1406,7 @@ components:
       required:
       - enrichment_request_id
       - completed_at
+      description: Enriched data obtained from external sources for a lead
     EmailVerificationResult:
       type: object
       properties:
@@ -1560,6 +1567,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     ErrorResponse:
       type: object
       required:
@@ -1575,6 +1584,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedScoringFrequency:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1599,6 +1609,7 @@ components:
         score:
           type: number
           format: float
+      description: Aggregated lead score distribution across hot/warm/cold levels
     LeadScoreRanked:
       type: object
       required:
@@ -1617,6 +1628,7 @@ components:
         score:
           type: number
           format: float
+      description: A ranked lead with its score and position in the ranking
     PaginatedLeadScoreSummary:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

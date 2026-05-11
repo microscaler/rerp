@@ -1,9 +1,12 @@
 openapi: 3.1.0
 info:
   title: CRM Automation
-  version: 1.0.0
+  version: v1.0.0
   description: Workflow automation service for CRM pipelines with triggers, rules,
     and scheduled actions.
+  x-api-version: CRM Automation API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/automation
   description: Local development (direct to service, port from port-registry)
@@ -1120,6 +1123,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: An automation workflow that defines business logic for lead processing
     CreateWorkflowRequest:
       type: object
       required:
@@ -1213,6 +1217,8 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A conditional rule that triggers actions when certain criteria
+        are met
     CreateRuleRequest:
       type: object
       required:
@@ -1304,6 +1310,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: An event-based trigger that initiates workflow execution
     CreateTriggerRequest:
       type: object
       required:
@@ -1391,6 +1398,7 @@ components:
       - executed
       - actions_ran
       - errors
+      description: Result of executing a workflow including triggered rules
     RuleTestResult:
       type: object
       properties:
@@ -1412,6 +1420,7 @@ components:
       - condition_met
       - matching_conditions
       - actions_to_fire
+      description: Result of testing a rule configuration
     ScheduledAction:
       type: object
       required:
@@ -1440,6 +1449,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A scheduled action with its execution parameters
     ScheduleActionRequest:
       type: object
       required:
@@ -1553,6 +1563,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedResponse:
       type: object
       required:
@@ -1566,6 +1577,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     PaginatedWorkflow:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

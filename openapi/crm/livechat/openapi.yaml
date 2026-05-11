@@ -1,9 +1,12 @@
 openapi: 3.1.0
 info:
   title: Live Chat
-  version: 1.0.0
+  version: v1.0.0
   description: Real-time live chat service with visitor tracking, agent management,
     and chat-to-lead conversion.
+  x-api-version: CRM LiveChat API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/livechat
   description: Local development (direct to service, port from port-registry)
@@ -984,6 +987,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A live chat session between a visitor and an agent
     CreateChatRequest:
       type: object
       required:
@@ -1117,6 +1121,7 @@ components:
         read_at:
           type: string
           format: date-time
+      description: A single message within a chat session
     SendMessageRequest:
       type: object
       required:
@@ -1175,6 +1180,7 @@ components:
           type: string
           format: date-time
           readOnly: true
+      description: A customer support agent who handles live chat sessions
     CreateAgentRequest:
       type: object
       required:
@@ -1241,6 +1247,7 @@ components:
       - satisfaction_avg
       - chats_today
       - chats_this_week
+      description: Agent performance metrics including response times and satisfaction
     ChatStatus:
       type: string
       enum:
@@ -1267,6 +1274,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     ErrorResponse:
       type: object
       required:
@@ -1282,6 +1291,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedAgent:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1339,6 +1349,7 @@ components:
         waiting_since:
           type: string
           format: date-time
+      description: A visitor waiting in the agent queue
     PaginatedAgentQueueItem:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

@@ -1,9 +1,12 @@
 openapi: 3.1.0
 info:
   title: Pipeline
-  version: 1.0.0
+  version: v1.0.0
   description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline
     summary.
+  x-api-version: CRM Pipeline API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
 servers:
 - url: http://localhost:10352/api/v1/crm/pipeline
   description: Local development (direct to service, port from port-registry)
@@ -1029,6 +1032,8 @@ components:
         is_rotting:
           type: boolean
           readOnly: true
+      description: A potential customer who has shown interest in our products or
+        services
     CreateLeadRequest:
       type: object
       required:
@@ -1295,6 +1300,7 @@ components:
         lead_count:
           type: integer
           readOnly: true
+      description: A pipeline stage representing a step in the sales process
     CreateStageRequest:
       type: object
       required:
@@ -1429,6 +1435,7 @@ components:
       - lead_id
       - contact_id
       - account_id
+      description: Result of converting a lead to a contact or account
     DuplicateDetectionRequest:
       type: object
       properties:
@@ -1453,6 +1460,7 @@ components:
             format: uuid
       required:
       - duplicates
+      description: Result of duplicate detection with matched records
     MergeLeadsRequest:
       type: object
       required:
@@ -1483,6 +1491,7 @@ components:
       - merged_id
       - merged_tag_count
       - merged_description_additions
+      description: Result of merging multiple records together
     PaginatedResponse:
       type: object
       required:
@@ -1496,6 +1505,8 @@ components:
           type: integer
         limit:
           type: integer
+      description: A generic paginated response wrapper with items and pagination
+        metadata
     ErrorResponse:
       type: object
       required:
@@ -1511,6 +1522,7 @@ components:
         details:
           type: string
           description: Additional error details
+      description: An error response with code, message, and optional details
     PaginatedLead:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
