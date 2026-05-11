@@ -71,6 +71,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all contacts
+      x-operation-id: get_contacts_list
+      x-controller: rerp_crm::contacts::controller::contacts
+      x-handler-name: contacts
     post:
       operationId: create_contact
       summary: Create a new contact
@@ -89,6 +92,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Contact'
+              examples:
+                default: &id001
+                  id: 00000000-0000-0000-0000-000000000002
+                  first_name: Jane
+                  last_name: Smith
+                  email: jane@example.com
+                  phone: +1-555-0124
+                  title: Marketing Director
+                  account_id: 00000000-0000-0000-0000-000000000003
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '401':
@@ -103,6 +117,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new contacts
+      x-operation-id: post_contacts_list
+      x-controller: rerp_crm::contacts::controller::contacts
+      x-handler-name: contacts
   /contacts/search-by-email:
     get:
       operationId: search_contacts_by_email
@@ -130,6 +147,9 @@ paths:
       security:
       - bearerAuth: []
       description: Search contacts by email address
+      x-operation-id: get_search-by-email
+      x-controller: rerp_crm::contacts::controller::contacts::search-by-email
+      x-handler-name: contacts_search-by-email
   /contacts/{id}:
     get:
       operationId: get_contact
@@ -150,6 +170,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Contact'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -157,6 +179,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get contacts by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id
+      x-handler-name: contacts_id
     put:
       operationId: update_contact
       summary: Update contact fields
@@ -182,6 +207,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Contact'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -212,6 +239,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update contacts by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id
+      x-handler-name: contacts_id
     delete:
       operationId: delete_contact
       summary: Soft-delete contact
@@ -246,6 +276,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete contacts by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id
+      x-handler-name: contacts_id
   /contacts/{id}/tree:
     get:
       operationId: get_contact_hierarchy
@@ -273,6 +306,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get hierarchical tree structure
+      x-operation-id: get_tree_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id::tree
+      x-handler-name: contacts_id_tree
   /contacts/{id}/leads:
     get:
       operationId: get_contact_related_leads
@@ -313,6 +349,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
+      x-operation-id: get_leads_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id::leads
+      x-handler-name: contacts_id_leads
   /contacts/{id}/accounts:
     get:
       operationId: get_contact_accounts
@@ -340,6 +379,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get contacts by ID
+      x-operation-id: get_accounts_by_id
+      x-controller: rerp_crm::contacts::controller::contacts::id::accounts
+      x-handler-name: contacts_id_accounts
   /contacts/merge:
     post:
       operationId: merge_contacts
@@ -359,6 +401,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MergeResult'
+              examples:
+                default:
+                  primary_id: 00000000-0000-0000-0000-000000000002
+                  merged_from:
+                  - 00000000-0000-0000-0000-000000000032
+                  - 00000000-0000-0000-0000-000000000033
+                  fields_merged:
+                  - email
+                  - phone
+                  - company
         '400':
           description: Invalid request
         '404':
@@ -385,6 +437,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new contacts
+      x-operation-id: post_merge
+      x-controller: rerp_crm::contacts::controller::contacts::merge
+      x-handler-name: contacts_merge
 components:
   schemas:
     Contact:

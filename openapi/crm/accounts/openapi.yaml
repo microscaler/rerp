@@ -66,6 +66,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all accounts
+      x-operation-id: get_accounts_list
+      x-controller: rerp_crm::accounts::controller::accounts
+      x-handler-name: accounts
     post:
       operationId: create_account
       summary: Create a new account/company
@@ -84,6 +87,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+              examples:
+                default: &id001
+                  id: 00000000-0000-0000-0000-000000000003
+                  name: Acme Corp
+                  website: https://acme.com
+                  industry: Technology
+                  size: medium
+                  owner_id: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '401':
@@ -98,6 +111,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new accounts
+      x-operation-id: post_accounts_list
+      x-controller: rerp_crm::accounts::controller::accounts
+      x-handler-name: accounts
   /accounts/{id}:
     get:
       operationId: get_account
@@ -118,6 +134,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -125,6 +143,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get accounts by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id
+      x-handler-name: accounts_id
     put:
       operationId: update_account
       summary: Update account fields
@@ -150,6 +171,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -180,6 +203,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update accounts by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id
+      x-handler-name: accounts_id
     delete:
       operationId: delete_account
       summary: Soft-delete account
@@ -214,6 +240,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete accounts by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id
+      x-handler-name: accounts_id
   /accounts/{id}/tree:
     get:
       operationId: get_account_hierarchy
@@ -241,6 +270,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get hierarchical tree structure
+      x-operation-id: get_tree_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id::tree
+      x-handler-name: accounts_id_tree
   /accounts/{id}/contacts:
     get:
       operationId: get_account_contacts
@@ -281,6 +313,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get accounts by ID
+      x-operation-id: get_contacts_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id::contacts
+      x-handler-name: accounts_id_contacts
   /accounts/{id}/leads:
     get:
       operationId: get_account_leads
@@ -321,6 +356,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
+      x-operation-id: get_leads_by_id
+      x-controller: rerp_crm::accounts::controller::accounts::id::leads
+      x-handler-name: accounts_id_leads
   /accounts/reports/summary:
     get:
       operationId: get_accounts_report
@@ -341,6 +379,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all accounts
+      x-operation-id: get_summary
+      x-controller: rerp_crm::accounts::controller::accounts::reports::summary
+      x-handler-name: accounts_reports_summary
 components:
   schemas:
     Account:

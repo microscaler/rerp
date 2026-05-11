@@ -57,6 +57,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all workflows
+      x-operation-id: get_workflows_list
+      x-controller: rerp_crm::automation::controller::workflows
+      x-handler-name: workflows
     post:
       operationId: create_workflow
       summary: Create a new workflow
@@ -75,6 +78,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              examples:
+                default: &id001
+                  id: 00000000-0000-0000-0000-000000000007
+                  name: Lead Assignment
+                  description: Auto-assign leads based on region
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -89,6 +100,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new workflows
+      x-operation-id: post_workflows_list
+      x-controller: rerp_crm::automation::controller::workflows
+      x-handler-name: workflows
   /workflows/{id}:
     get:
       operationId: get_workflow
@@ -109,6 +123,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -116,6 +132,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflows by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id
+      x-handler-name: workflows_id
     put:
       operationId: update_workflow
       summary: Update workflow
@@ -141,6 +160,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -171,6 +192,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update workflows by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id
+      x-handler-name: workflows_id
     delete:
       operationId: delete_workflow
       summary: Delete workflow
@@ -205,6 +229,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete workflows by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id
+      x-handler-name: workflows_id
   /workflows/{id}/rules:
     get:
       operationId: list_workflow_rules
@@ -234,6 +261,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflow rules
+      x-operation-id: get_rules_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id::rules
+      x-handler-name: workflows_id_rules
     post:
       operationId: create_workflow_rule
       summary: Add a rule to a workflow
@@ -259,6 +289,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
+              examples:
+                default: &id002
+                  id: 00000000-0000-0000-0000-000000000008
+                  name: Assign to region A
+                  condition:
+                    field: region
+                    operator: equals
+                    value: A
+                  action:
+                    type: assign
+                    value: team-001
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '404':
@@ -275,6 +318,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Get workflow rules
+      x-operation-id: post_rules_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id::rules
+      x-handler-name: workflows_id_rules
   /workflows/{id}/run:
     post:
       operationId: run_workflow
@@ -295,6 +341,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowExecutionResult'
+              examples:
+                default:
+                  workflow_id: 00000000-0000-0000-0000-000000000007
+                  status: completed
+                  started_at: '2024-01-15T10:30:00Z'
+                  completed_at: '2024-01-15T10:30:05Z'
+                  rules_triggered: 3
         '404':
           description: Not found
         '500':
@@ -311,6 +364,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Run a workflow manually
+      x-operation-id: post_workflows_run
+      x-controller: rerp_crm::automation::controller::workflows::id::run
+      x-handler-name: workflows_id_run
   /workflows/{id}/run-history:
     get:
       operationId: list_workflow_run_history
@@ -340,6 +396,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflow execution history
+      x-operation-id: get_run-history_by_id
+      x-controller: rerp_crm::automation::controller::workflows::id::run-history
+      x-handler-name: workflows_id_run-history
   /rules:
     get:
       operationId: list_rules
@@ -368,6 +427,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflow rules
+      x-operation-id: get_rules_list
+      x-controller: rerp_crm::automation::controller::rules
+      x-handler-name: rules
     post:
       operationId: create_rule
       summary: Create a standalone rule (adds to a workflow)
@@ -386,6 +448,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
         '500':
@@ -400,6 +464,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Get workflow rules
+      x-operation-id: post_rules_list
+      x-controller: rerp_crm::automation::controller::rules
+      x-handler-name: rules
   /rules/{id}:
     get:
       operationId: get_rule
@@ -420,6 +487,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
+              examples:
+                default: *id002
         '404':
           description: Not found
         '401':
@@ -427,6 +496,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflow rules
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::automation::controller::rules::id
+      x-handler-name: rules_id
     put:
       operationId: update_rule
       summary: Update rule
@@ -452,6 +524,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
         '404':
@@ -482,6 +556,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Get workflow rules
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::automation::controller::rules::id
+      x-handler-name: rules_id
     delete:
       operationId: delete_rule
       summary: Delete rule
@@ -516,6 +593,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get workflow rules
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::automation::controller::rules::id
+      x-handler-name: rules_id
   /rules/test:
     post:
       operationId: test_rule
@@ -542,6 +622,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleTestResult'
+              examples:
+                default:
+                  rule_id: 00000000-0000-0000-0000-000000000008
+                  test_passed: true
+                  matched: true
+                  evaluation_time_ms: 12
         '500':
           description: Internal server error
           content:
@@ -556,6 +642,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Get workflow rules
+      x-operation-id: post_test
+      x-controller: rerp_crm::automation::controller::rules::test
+      x-handler-name: rules_test
   /triggers:
     get:
       operationId: list_triggers
@@ -595,6 +684,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all triggers
+      x-operation-id: get_triggers_list
+      x-controller: rerp_crm::automation::controller::triggers
+      x-handler-name: triggers
     post:
       operationId: create_trigger
       summary: Create a new trigger
@@ -613,6 +705,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
+              examples:
+                default: &id003
+                  id: 00000000-0000-0000-0000-000000000009
+                  name: On Lead Create
+                  event: lead.created
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -627,6 +727,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new triggers
+      x-operation-id: post_triggers_list
+      x-controller: rerp_crm::automation::controller::triggers
+      x-handler-name: triggers
   /triggers/{id}:
     get:
       operationId: get_trigger
@@ -647,6 +750,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
+              examples:
+                default: *id003
         '404':
           description: Not found
         '401':
@@ -654,6 +759,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get triggers by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::automation::controller::triggers::id
+      x-handler-name: triggers_id
     put:
       operationId: update_trigger
       summary: Update trigger (enable/disable, schedule)
@@ -679,6 +787,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
+              examples:
+                default: *id003
         '400':
           description: Invalid request
         '404':
@@ -709,6 +819,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update triggers by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::automation::controller::triggers::id
+      x-handler-name: triggers_id
     delete:
       operationId: delete_trigger
       summary: Delete trigger
@@ -743,6 +856,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete triggers by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::automation::controller::triggers::id
+      x-handler-name: triggers_id
   /triggers/{id}/fire:
     post:
       operationId: fire_trigger
@@ -782,6 +898,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Fire a trigger manually
+      x-operation-id: post_triggers_fire
+      x-controller: rerp_crm::automation::controller::triggers::id::fire
+      x-handler-name: triggers_id_fire
   /actions/schedule:
     post:
       operationId: schedule_action
@@ -801,6 +920,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
+              examples:
+                default: &id004
+                  id: 00000000-0000-0000-0000-000000000026
+                  type: email
+                  scheduled_at: '2024-01-16T10:00:00Z'
+                  status: pending
         '500':
           description: Internal server error
           content:
@@ -815,6 +940,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Schedule a report to run on a recurring basis
+      x-operation-id: post_schedule
+      x-controller: rerp_crm::automation::controller::actions::schedule
+      x-handler-name: actions_schedule
   /actions/recurring:
     post:
       operationId: schedule_recurring_action
@@ -834,6 +962,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
+              examples:
+                default: *id004
         '500':
           description: Internal server error
           content:
@@ -848,6 +978,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new actions
+      x-operation-id: post_recurring
+      x-controller: rerp_crm::automation::controller::actions::recurring
+      x-handler-name: actions_recurring
   /actions/upcoming:
     get:
       operationId: list_upcoming_actions
@@ -871,6 +1004,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all actions
+      x-operation-id: get_upcoming
+      x-controller: rerp_crm::automation::controller::actions::upcoming
+      x-handler-name: actions_upcoming
 components:
   parameters:
     Page:

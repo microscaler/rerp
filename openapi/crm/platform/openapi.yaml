@@ -40,6 +40,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCustomField'
+              examples:
+                default:
+                  items:
+                  - &id001
+                    id: 00000000-0000-0000-0000-000000000021
+                    entity: lead
+                    name: priority
+                    type: string
+                    required: false
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -47,6 +63,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all custom-fields
+      x-operation-id: get_custom-fields_list
+      x-controller: rerp_crm::platform::controller::custom-fields
+      x-handler-name: custom-fields
     post:
       operationId: create_custom_field
       summary: Create a custom field on any entity
@@ -65,6 +84,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '403':
@@ -81,6 +102,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new custom-fields
+      x-operation-id: post_custom-fields_list
+      x-controller: rerp_crm::platform::controller::custom-fields
+      x-handler-name: custom-fields
   /custom-fields/{id}:
     get:
       operationId: get_custom_field
@@ -101,6 +125,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -108,6 +134,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get custom-fields by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::platform::controller::custom-fields::id
+      x-handler-name: custom-fields_id
     put:
       operationId: update_custom_field
       summary: Update custom field
@@ -133,6 +162,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -163,6 +194,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update custom-fields by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::platform::controller::custom-fields::id
+      x-handler-name: custom-fields_id
     delete:
       operationId: delete_custom_field
       summary: Delete custom field
@@ -197,6 +231,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete custom-fields by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::platform::controller::custom-fields::id
+      x-handler-name: custom-fields_id
   /entities/{entity}/custom-fields:
     get:
       operationId: list_entity_custom_fields
@@ -225,6 +262,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCustomField'
+              examples:
+                default:
+                  items:
+                  - *id001
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '404':
           description: Entity not found
         '401':
@@ -232,6 +278,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get entities by ID
+      x-operation-id: get_custom-fields_by_id
+      x-controller: rerp_crm::platform::controller::entities::entity::custom-fields
+      x-handler-name: entities_entity_custom-fields
   /webhooks:
     get:
       operationId: list_webhooks
@@ -252,6 +301,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedWebhook'
+              examples:
+                default:
+                  items:
+                  - &id002
+                    id: 00000000-0000-0000-0000-000000000022
+                    url: https://example.com/webhook
+                    events:
+                    - lead.created
+                    - lead.updated
+                    enabled: true
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -259,6 +325,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all webhooks
+      x-operation-id: get_webhooks_list
+      x-controller: rerp_crm::platform::controller::webhooks
+      x-handler-name: webhooks
     post:
       operationId: create_webhook
       summary: Create a new webhook
@@ -277,6 +346,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
         '500':
@@ -291,6 +362,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new webhooks
+      x-operation-id: post_webhooks_list
+      x-controller: rerp_crm::platform::controller::webhooks
+      x-handler-name: webhooks
   /webhooks/{id}:
     get:
       operationId: get_webhook
@@ -311,6 +385,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
+              examples:
+                default: *id002
         '404':
           description: Not found
         '401':
@@ -318,6 +394,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get webhooks by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::platform::controller::webhooks::id
+      x-handler-name: webhooks_id
     put:
       operationId: update_webhook
       summary: Update webhook
@@ -343,6 +422,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
         '404':
@@ -373,6 +454,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update webhooks by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::platform::controller::webhooks::id
+      x-handler-name: webhooks_id
     delete:
       operationId: delete_webhook
       summary: Delete webhook
@@ -407,6 +491,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete webhooks by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::platform::controller::webhooks::id
+      x-handler-name: webhooks_id
   /webhooks/{id}/test:
     post:
       operationId: test_webhook
@@ -446,6 +533,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Test a rule configuration
+      x-operation-id: post_webhooks_test
+      x-controller: rerp_crm::platform::controller::webhooks::id::test
+      x-handler-name: webhooks_id_test
   /webhooks/{id}/logs:
     get:
       operationId: list_webhook_logs
@@ -468,6 +558,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedWebhookDeliveryLog'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000039
+                    event: lead.created
+                    status: success
+                    response_code: 200
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -475,6 +577,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get webhook delivery logs
+      x-operation-id: get_logs_by_id
+      x-controller: rerp_crm::platform::controller::webhooks::id::logs
+      x-handler-name: webhooks_id_logs
   /audit-log:
     get:
       operationId: list_audit_log
@@ -521,6 +626,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAuditLogEntry'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000038
+                    entity: lead
+                    entity_id: 00000000-0000-0000-0000-000000000001
+                    action: updated
+                    timestamp: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -528,6 +646,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all audit-log
+      x-operation-id: get_audit-log_list
+      x-controller: rerp_crm::platform::controller::audit-log
+      x-handler-name: audit-log
   /audit-log/{entity}/{entity_id}:
     get:
       operationId: get_entity_audit_log
@@ -568,6 +689,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get audit-log by ID
+      x-operation-id: get_entity_id_by_id
+      x-controller: rerp_crm::platform::controller::audit-log::entity::entity_id
+      x-handler-name: audit-log_entity_entity_id
   /api-keys:
     get:
       operationId: list_api_keys
@@ -581,6 +705,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedApiKey'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000023
+                    name: Production API
+                    key: sk_test_00000000000000000000
+                    enabled: true
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -588,6 +726,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all api-keys
+      x-operation-id: get_api-keys_list
+      x-controller: rerp_crm::platform::controller::api-keys
+      x-handler-name: api-keys
     post:
       operationId: create_api_key
       summary: Generate a new API key
@@ -617,6 +758,14 @@ paths:
                     description: This key will only be shown once — save it now.
                   key_hash:
                     type: string
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000004
+                  name: Discovery
+                  order: 1
+                  pipeline_id: 00000000-0000-0000-0000-000000000005
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -631,6 +780,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new api-keys
+      x-operation-id: post_api-keys_list
+      x-controller: rerp_crm::platform::controller::api-keys
+      x-handler-name: api-keys
   /auth/validate:
     post:
       operationId: validate_api_key
@@ -677,6 +829,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Validate an API key or token
+      x-operation-id: post_validate
+      x-controller: rerp_crm::platform::controller::auth::validate
+      x-handler-name: auth_validate
   /integrations:
     get:
       operationId: list_integrations
@@ -690,6 +845,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedIntegration'
+              examples:
+                default:
+                  items:
+                  - &id003
+                    id: 00000000-0000-0000-0000-000000000024
+                    name: Slack Integration
+                    type: messaging
+                    status: connected
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -697,6 +867,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all integrations
+      x-operation-id: get_integrations_list
+      x-controller: rerp_crm::platform::controller::integrations
+      x-handler-name: integrations
     post:
       operationId: create_integration
       summary: Configure a new integration
@@ -715,6 +888,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
+              examples:
+                default: *id003
         '400':
           description: Invalid request
         '500':
@@ -729,6 +904,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new integrations
+      x-operation-id: post_integrations_list
+      x-controller: rerp_crm::platform::controller::integrations
+      x-handler-name: integrations
   /integrations/{id}/sync:
     post:
       operationId: trigger_integration_sync
@@ -769,6 +947,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Sync integration data with external system
+      x-operation-id: post_integrations_sync
+      x-controller: rerp_crm::platform::controller::integrations::id::sync
+      x-handler-name: integrations_id_sync
   /integrations/{id}/status:
     get:
       operationId: get_integration_status
@@ -789,6 +970,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
+              examples:
+                default: *id003
         '404':
           description: Not found
         '401':
@@ -796,6 +979,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get or update agent status
+      x-operation-id: get_status_by_id
+      x-controller: rerp_crm::platform::controller::integrations::id::status
+      x-handler-name: integrations_id_status
 components:
   parameters:
     Page:

@@ -58,6 +58,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedChatSession'
+              examples:
+                default:
+                  items:
+                  - &id001
+                    id: 00000000-0000-0000-0000-000000000013
+                    visitor_id: 00000000-0000-0000-0000-000000000014
+                    agent_id: 00000000-0000-0000-0000-000000000015
+                    status: active
+                    started_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -65,6 +80,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all chats
+      x-operation-id: get_chats_list
+      x-controller: rerp_crm::livechat::controller::chats
+      x-handler-name: chats
     post:
       operationId: create_chat
       summary: Start a new chat session
@@ -83,6 +101,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatSession'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '500':
@@ -97,6 +117,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new chats
+      x-operation-id: post_chats_list
+      x-controller: rerp_crm::livechat::controller::chats
+      x-handler-name: chats
   /chats/active:
     get:
       operationId: list_active_chats
@@ -113,6 +136,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedChatSession'
+              examples:
+                default:
+                  items:
+                  - *id001
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -120,6 +152,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all chats
+      x-operation-id: get_active
+      x-controller: rerp_crm::livechat::controller::chats::active
+      x-handler-name: chats_active
   /chats/{id}:
     get:
       operationId: get_chat
@@ -140,6 +175,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatSession'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -147,6 +184,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get chats by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::livechat::controller::chats::id
+      x-handler-name: chats_id
     delete:
       operationId: delete_chat
       summary: Delete chat session transcript
@@ -181,6 +221,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete chats by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::livechat::controller::chats::id
+      x-handler-name: chats_id
   /chats/{id}/message:
     post:
       operationId: send_chat_message
@@ -207,6 +250,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatMessage'
+              examples:
+                default: &id002
+                  id: 00000000-0000-0000-0000-000000000016
+                  session_id: 00000000-0000-0000-0000-000000000013
+                  sender_id: 00000000-0000-0000-0000-000000000015
+                  content: Hello, how can I help you?
+                  created_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '404':
@@ -223,6 +273,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Perform an action on chats
+      x-operation-id: post_message_by_id
+      x-controller: rerp_crm::livechat::controller::chats::id::message
+      x-handler-name: chats_id_message
   /chats/{id}/close:
     post:
       operationId: close_chat
@@ -243,6 +296,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatSession'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '500':
@@ -259,6 +314,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Perform an action on chats
+      x-operation-id: post_chats_close
+      x-controller: rerp_crm::livechat::controller::chats::id::close
+      x-handler-name: chats_id_close
   /chats/{id}/transcript:
     get:
       operationId: get_chat_transcript
@@ -281,6 +339,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatTranscript'
+              examples:
+                default:
+                  session_id: 00000000-0000-0000-0000-000000000013
+                  messages:
+                  - sender: agent
+                    content: Hello, how can I help?
+                    timestamp: '2024-01-15T10:30:00Z'
+                  - sender: visitor
+                    content: I need pricing info
+                    timestamp: '2024-01-15T10:30:15Z'
+                  total_messages: 5
         '404':
           description: Not found
         '401':
@@ -288,6 +357,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get chat session transcript
+      x-operation-id: get_transcript_by_id
+      x-controller: rerp_crm::livechat::controller::chats::id::transcript
+      x-handler-name: chats_id_transcript
   /chats/convert:
     post:
       operationId: convert_chat_to_lead
@@ -307,6 +379,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatConversionResult'
+              examples:
+                default:
+                  session_id: 00000000-0000-0000-0000-000000000013
+                  converted_to_lead: true
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  converted_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -331,6 +409,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new chats
+      x-operation-id: post_convert
+      x-controller: rerp_crm::livechat::controller::chats::convert
+      x-handler-name: chats_convert
   /messages:
     get:
       operationId: list_messages
@@ -360,6 +441,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedChatMessage'
+              examples:
+                default:
+                  items:
+                  - *id002
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -367,6 +457,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all messages
+      x-operation-id: get_messages_list
+      x-controller: rerp_crm::livechat::controller::messages
+      x-handler-name: messages
   /messages/{id}:
     get:
       operationId: get_message
@@ -387,6 +480,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChatMessage'
+              examples:
+                default: *id002
         '404':
           description: Not found
         '401':
@@ -394,6 +489,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get messages by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::livechat::controller::messages::id
+      x-handler-name: messages_id
   /agents:
     get:
       operationId: list_agents
@@ -414,6 +512,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAgent'
+              examples:
+                default:
+                  items:
+                  - &id003
+                    id: 00000000-0000-0000-0000-000000000015
+                    name: Agent Smith
+                    email: agent@example.com
+                    status: available
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -421,6 +534,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all agents
+      x-operation-id: get_agents_list
+      x-controller: rerp_crm::livechat::controller::agents
+      x-handler-name: agents
     post:
       operationId: create_agent
       summary: Create a new chat agent
@@ -439,6 +555,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Agent'
+              examples:
+                default: *id003
         '400':
           description: Invalid request
         '500':
@@ -453,6 +571,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new agents
+      x-operation-id: post_agents_list
+      x-controller: rerp_crm::livechat::controller::agents
+      x-handler-name: agents
   /agents/{id}:
     get:
       operationId: get_agent
@@ -473,6 +594,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Agent'
+              examples:
+                default: *id003
         '404':
           description: Not found
         '401':
@@ -480,6 +603,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get agents by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::livechat::controller::agents::id
+      x-handler-name: agents_id
     put:
       operationId: update_agent
       summary: Update agent fields
@@ -505,6 +631,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Agent'
+              examples:
+                default: *id003
         '400':
           description: Invalid request
         '404':
@@ -535,6 +663,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update agents by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::livechat::controller::agents::id
+      x-handler-name: agents_id
     delete:
       operationId: delete_agent
       summary: Delete agent
@@ -569,6 +700,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete agents by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::livechat::controller::agents::id
+      x-handler-name: agents_id
   /agents/{id}/status:
     put:
       operationId: set_agent_status
@@ -595,6 +729,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Agent'
+              examples:
+                default: *id003
         '404':
           description: Not found
         '403':
@@ -625,6 +761,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Get or update agent status
+      x-operation-id: put_status_by_id
+      x-controller: rerp_crm::livechat::controller::agents::id::status
+      x-handler-name: agents_id_status
   /agents/status:
     get:
       operationId: get_all_agent_status
@@ -638,6 +777,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAgentStatus'
+              examples:
+                default:
+                  items:
+                  - agent_id: 00000000-0000-0000-0000-000000000015
+                    status: available
+                    current_chats: 2
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -645,6 +795,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get or update agent status
+      x-operation-id: get_status
+      x-controller: rerp_crm::livechat::controller::agents::status
+      x-handler-name: agents_status
   /agents/{id}/metrics:
     get:
       operationId: get_agent_metrics
@@ -665,6 +818,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AgentMetrics'
+              examples:
+                default:
+                  agent_id: 00000000-0000-0000-0000-000000000015
+                  total_chats: 45
+                  avg_response_time: 12
+                  satisfaction_score: 4.5
+                  period: weekly
         '404':
           description: Not found
         '401':
@@ -672,6 +832,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get agent performance metrics
+      x-operation-id: get_metrics_by_id
+      x-controller: rerp_crm::livechat::controller::agents::id::metrics
+      x-handler-name: agents_id_metrics
   /agents/queue:
     get:
       operationId: get_waiting_queue
@@ -699,6 +862,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAgentQueueItem'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000001
+                    name: John Doe
+                    source: website
+                    score: 45
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -706,6 +881,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all agents
+      x-operation-id: get_queue
+      x-controller: rerp_crm::livechat::controller::agents::queue
+      x-handler-name: agents_queue
 components:
   parameters:
     Page:

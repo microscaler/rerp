@@ -51,6 +51,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedPipelinesummary'
+              examples:
+                default:
+                  items:
+                  - total_leads: 150
+                    stage_breakdown:
+                      discovery: 45
+                      qualified: 35
+                    weighted_value: 375000
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '403':
@@ -70,6 +83,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get pipeline summary with stage breakdown
+      x-operation-id: get_pipeline-summary
+      x-controller: rerp_crm::reporting::controller::analytics::pipeline-summary
+      x-handler-name: analytics_pipeline-summary
   /analytics/pipeline-weighted:
     get:
       operationId: get_weighted_pipeline
@@ -83,6 +99,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeightedPipeline'
+              examples:
+                default:
+                  total_leads: 150
+                  stage_breakdown:
+                    discovery:
+                      count: 45
+                      value: 100000
+                      probability: 0.2
+                    qualified:
+                      count: 35
+                      value: 125000
+                      probability: 0.4
+                  weighted_value: 85000
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -102,6 +131,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get weighted pipeline revenue
+      x-operation-id: get_pipeline-weighted
+      x-controller: rerp_crm::reporting::controller::analytics::pipeline-weighted
+      x-handler-name: analytics_pipeline-weighted
   /analytics/conversion-rates:
     get:
       operationId: get_conversion_rates
@@ -136,6 +168,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedConversionrate'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    total_leads: 500
+                    converted: 62
+                    rate: 12.4
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -155,6 +199,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get conversion rate analytics
+      x-operation-id: get_conversion-rates
+      x-controller: rerp_crm::reporting::controller::analytics::conversion-rates
+      x-handler-name: analytics_conversion-rates
   /analytics/funnel:
     get:
       operationId: get_funnel
@@ -188,6 +235,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FunnelData'
+              examples:
+                default:
+                  stages:
+                  - name: visitor
+                    count: 10000
+                  - name: lead
+                    count: 1250
+                  - name: qualified
+                    count: 450
+                  - name: customer
+                    count: 62
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -207,6 +265,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all analytics
+      x-operation-id: get_funnel
+      x-controller: rerp_crm::reporting::controller::analytics::funnel
+      x-handler-name: analytics_funnel
   /analytics/lead-sources:
     get:
       operationId: get_lead_source_effectiveness
@@ -220,6 +281,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadSourceReport'
+              examples:
+                default:
+                  items:
+                  - total: 850
+                    by_source:
+                      website: 350
+                      referral: 200
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -239,6 +312,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get lead source analytics
+      x-operation-id: get_lead-sources
+      x-controller: rerp_crm::reporting::controller::analytics::lead-sources
+      x-handler-name: analytics_lead-sources
   /analytics/rep-performance:
     get:
       operationId: get_rep_performance
@@ -277,6 +353,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
+              examples:
+                default:
+                  rep_id: 00000000-0000-0000-0000-000000000010
+                  rep_name: Jane Smith
+                  deals_won: 12
+                  deals_lost: 5
+                  revenue: 125000
+                  conversion_rate: 24.0
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -296,6 +380,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get representative performance metrics
+      x-operation-id: get_rep-performance
+      x-controller: rerp_crm::reporting::controller::analytics::rep-performance
+      x-handler-name: analytics_rep-performance
   /analytics/team-performance:
     get:
       operationId: get_team_performance
@@ -324,6 +411,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamPerformance'
+              examples:
+                default:
+                  team_id: 00000000-0000-0000-0000-000000000006
+                  team_name: Sales Team Alpha
+                  total_deals: 24
+                  total_revenue: 250000
+                  avg_deal_size: 10416
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -343,6 +437,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get team performance metrics
+      x-operation-id: get_team-performance
+      x-controller: rerp_crm::reporting::controller::analytics::team-performance
+      x-handler-name: analytics_team-performance
   /analytics/leaderboard:
     get:
       operationId: get_leaderboard
@@ -380,6 +477,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeaderboardEntry'
+              examples:
+                default:
+                  items:
+                  - rep_id: 00000000-0000-0000-0000-000000000010
+                    rep_name: Jane Smith
+                    deals_won: 12
+                    rank: 1
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -399,6 +508,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get performance leaderboard
+      x-operation-id: get_leaderboard
+      x-controller: rerp_crm::reporting::controller::analytics::leaderboard
+      x-handler-name: analytics_leaderboard
   /analytics/win-loss:
     get:
       operationId: get_win_loss_analysis
@@ -432,6 +544,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WinLossAnalysis'
+              examples:
+                default:
+                  won: 45
+                  lost: 30
+                  win_rate: 60.0
+                  by_reason:
+                    price: 12
+                    feature_gap: 8
+                    competitor: 6
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -451,6 +572,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get win/loss analysis
+      x-operation-id: get_win-loss
+      x-controller: rerp_crm::reporting::controller::analytics::win-loss
+      x-handler-name: analytics_win-loss
   /analytics/time-to-close:
     get:
       operationId: get_time_to_close
@@ -464,6 +588,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimeToCloseAnalysis'
+              examples:
+                default:
+                  avg_days: 45
+                  median_days: 38
+                  by_stage:
+                    discovery: 10
+                    qualified: 15
+                    proposal: 12
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -483,6 +615,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get time-to-close analytics
+      x-operation-id: get_time-to-close
+      x-controller: rerp_crm::reporting::controller::analytics::time-to-close
+      x-handler-name: analytics_time-to-close
   /analytics/forecast/monthly:
     get:
       operationId: get_monthly_forecast
@@ -502,6 +637,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
+              examples:
+                default:
+                  items:
+                  - &id001
+                    period: monthly
+                    total_value: 420000
+                    confidence: 0.75
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -521,6 +668,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get monthly forecast
+      x-operation-id: get_monthly
+      x-controller: rerp_crm::reporting::controller::analytics::forecast::monthly
+      x-handler-name: analytics_forecast_monthly
   /analytics/forecast/quarterly:
     get:
       operationId: get_quarterly_forecast
@@ -534,6 +684,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
+              examples:
+                default:
+                  items:
+                  - *id001
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -553,6 +712,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get quarterly forecast
+      x-operation-id: get_quarterly
+      x-controller: rerp_crm::reporting::controller::analytics::forecast::quarterly
+      x-handler-name: analytics_forecast_quarterly
   /analytics/forecast/accuracy:
     get:
       operationId: get_forecast_accuracy
@@ -575,6 +737,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    forecasted: 420000
+                    actual: 405000
+                    accuracy: 96.4
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '403':
           description: Forbidden — insufficient permissions
           content:
@@ -594,6 +768,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get forecast accuracy metrics
+      x-operation-id: get_accuracy
+      x-controller: rerp_crm::reporting::controller::analytics::forecast::accuracy
+      x-handler-name: analytics_forecast_accuracy
   /reports/build:
     post:
       operationId: build_report
@@ -651,6 +828,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Build a custom report
+      x-operation-id: post_build
+      x-controller: rerp_crm::reporting::controller::reports::build
+      x-handler-name: reports_build
   /reports/{id}:
     get:
       operationId: get_saved_report
@@ -671,6 +851,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SavedReport'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000025
+                  name: Monthly Pipeline Report
+                  type: pipeline
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '403':
@@ -690,6 +877,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get reports by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::reporting::controller::reports::id
+      x-handler-name: reports_id
   /reports/{id}/schedule:
     post:
       operationId: schedule_report
@@ -716,6 +906,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000031
+                  report_id: 00000000-0000-0000-0000-000000000025
+                  frequency: monthly
+                  next_run: '2024-02-01T00:00:00Z'
+                  enabled: true
         '404':
           description: Not found
         '500':
@@ -738,6 +935,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Schedule a report to run on a recurring basis
+      x-operation-id: post_schedule_by_id
+      x-controller: rerp_crm::reporting::controller::reports::id::schedule
+      x-handler-name: reports_id_schedule
   /reports/export:
     post:
       operationId: export_report
@@ -799,6 +999,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Export report data to a file
+      x-operation-id: post_export
+      x-controller: rerp_crm::reporting::controller::reports::export
+      x-handler-name: reports_export
 components:
   parameters:
     Page:

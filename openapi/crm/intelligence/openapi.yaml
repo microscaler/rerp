@@ -70,6 +70,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Score a batch of leads asynchronously
+      x-operation-id: post_score-batch
+      x-controller: rerp_crm::intelligence::controller::leads::score-batch
+      x-handler-name: leads_score-batch
   /leads/score-bulk:
     post:
       operationId: score_leads_bulk
@@ -145,6 +148,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Score a batch of leads synchronously
+      x-operation-id: post_score-bulk
+      x-controller: rerp_crm::intelligence::controller::leads::score-bulk
+      x-handler-name: leads_score-bulk
   /leads/{id}/score:
     get:
       operationId: get_lead_score
@@ -165,6 +171,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeadScore'
+              examples:
+                default:
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  score: 85
+                  level: hot
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '401':
@@ -172,6 +184,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get leads by ID
+      x-operation-id: get_score_by_id
+      x-controller: rerp_crm::intelligence::controller::leads::id::score
+      x-handler-name: leads_id_score
   /leads/{id}/score/explain:
     get:
       operationId: explain_lead_score
@@ -192,6 +207,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoreExplanation'
+              examples:
+                default:
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  score: 85
+                  factors:
+                  - name: email_verified
+                    weight: 10
+                    applied: 10
+                  - name: company_size
+                    weight: 20
+                    applied: 20
+                  - name: industry_match
+                    weight: 30
+                    applied: 25
         '404':
           description: Not found
         '401':
@@ -199,6 +228,9 @@ paths:
       security:
       - bearerAuth: []
       description: Explain scoring factors for a lead
+      x-operation-id: get_explain_by_id
+      x-controller: rerp_crm::intelligence::controller::leads::id::score::explain
+      x-handler-name: leads_id_score_explain
   /scoring/frequencies:
     get:
       operationId: list_scoring_frequencies
@@ -219,6 +251,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedScoringFrequency'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000011
+                    name: Daily
+                    interval: daily
+                    enabled: true
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -226,6 +272,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all scoring
+      x-operation-id: get_frequencies
+      x-controller: rerp_crm::intelligence::controller::scoring::frequencies
+      x-handler-name: scoring_frequencies
   /scoring/frequencies/rebuild:
     post:
       operationId: rebuild_scoring_frequencies
@@ -258,6 +307,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Rebuild scoring frequencies from historical data
+      x-operation-id: post_rebuild
+      x-controller: rerp_crm::intelligence::controller::scoring::frequencies::rebuild
+      x-handler-name: scoring_frequencies_rebuild
   /scoring/thresholds:
     get:
       operationId: get_scoring_thresholds
@@ -271,6 +323,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoringThresholds'
+              examples:
+                default:
+                  hot_threshold: 80
+                  warm_threshold: 50
+                  cold_threshold: 0
+                  updated_at: '2024-01-15T10:30:00Z'
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -278,6 +336,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all scoring
+      x-operation-id: get_thresholds
+      x-controller: rerp_crm::intelligence::controller::scoring::thresholds
+      x-handler-name: scoring_thresholds
     put:
       operationId: update_scoring_thresholds
       summary: Update hot/warm/cold thresholds
@@ -322,6 +383,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update scoring by ID
+      x-operation-id: put_thresholds
+      x-controller: rerp_crm::intelligence::controller::scoring::thresholds
+      x-handler-name: scoring_thresholds
   /leads/hot:
     get:
       operationId: list_hot_leads
@@ -338,6 +402,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+              examples:
+                default:
+                  items:
+                  - &id001
+                    total_leads: 150
+                    hot: 45
+                    warm: 65
+                    cold: 40
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -345,6 +422,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all leads
+      x-operation-id: get_hot
+      x-controller: rerp_crm::intelligence::controller::leads::hot
+      x-handler-name: leads_hot
   /leads/warm:
     get:
       operationId: list_warm_leads
@@ -361,6 +441,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+              examples:
+                default:
+                  items:
+                  - *id001
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -368,6 +457,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all leads
+      x-operation-id: get_warm
+      x-controller: rerp_crm::intelligence::controller::leads::warm
+      x-handler-name: leads_warm
   /leads/cold:
     get:
       operationId: list_cold_leads
@@ -384,6 +476,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+              examples:
+                default:
+                  items:
+                  - *id001
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -391,6 +492,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all leads
+      x-operation-id: get_cold
+      x-controller: rerp_crm::intelligence::controller::leads::cold
+      x-handler-name: leads_cold
   /leads/ranked:
     get:
       operationId: list_ranked_leads
@@ -407,6 +511,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreRanked'
+              examples:
+                default:
+                  items:
+                  - lead_id: 00000000-0000-0000-0000-000000000001
+                    name: John Doe
+                    score: 92
+                    rank: 1
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -414,6 +530,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all leads
+      x-operation-id: get_ranked
+      x-controller: rerp_crm::intelligence::controller::leads::ranked
+      x-handler-name: leads_ranked
   /enrichment/lookup:
     post:
       operationId: lookup_enrichment
@@ -433,6 +552,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+              examples:
+                default: &id002
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  company: Acme Corp
+                  industry: Technology
+                  employees: 500
+                  found: true
         '400':
           description: Invalid request
         '500':
@@ -457,6 +583,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Enrich lead data from email address
+      x-operation-id: post_lookup
+      x-controller: rerp_crm::intelligence::controller::enrichment::lookup
+      x-handler-name: enrichment_lookup
   /enrichment/website:
     post:
       operationId: lookup_by_website
@@ -476,6 +605,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+              examples:
+                default: *id002
         '500':
           description: Internal server error
           content:
@@ -500,6 +631,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Enrich lead data from company website
+      x-operation-id: post_website
+      x-controller: rerp_crm::intelligence::controller::enrichment::website
+      x-handler-name: enrichment_website
   /enrichment/batch:
     post:
       operationId: batch_enrich
@@ -554,6 +688,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new enrichment
+      x-operation-id: post_batch
+      x-controller: rerp_crm::intelligence::controller::enrichment::batch
+      x-handler-name: enrichment_batch
   /enrichment/auto-fill:
     post:
       operationId: auto_fill
@@ -581,6 +718,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+              examples:
+                default: *id002
         '500':
           description: Internal server error
           content:
@@ -605,6 +744,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Auto-fill lead data from email domain
+      x-operation-id: post_auto-fill
+      x-controller: rerp_crm::intelligence::controller::enrichment::auto-fill
+      x-handler-name: enrichment_auto-fill
   /enrichment/{id}/result:
     get:
       operationId: get_enrichment_result
@@ -625,6 +767,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResult'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000012
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  company: Acme Corp
+                  industry: Technology
+                  employees: 500
+                  founded: 2010
         '404':
           description: Not found
         '401':
@@ -632,6 +782,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get enrichment by ID
+      x-operation-id: get_result_by_id
+      x-controller: rerp_crm::intelligence::controller::enrichment::id::result
+      x-handler-name: enrichment_id_result
   /verify/email:
     post:
       operationId: verify_email
@@ -657,6 +810,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmailVerificationResult'
+              examples:
+                default:
+                  email: john@example.com
+                  valid: true
+                  disposable: false
+                  role_account: false
+                  mx_records: true
         '400':
           description: Invalid request
         '500':
@@ -681,6 +841,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Verify email address validity
+      x-operation-id: post_email
+      x-controller: rerp_crm::intelligence::controller::verify::email
+      x-handler-name: verify_email
   /verify/batch:
     post:
       operationId: verify_batch
@@ -743,6 +906,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Verify email addresses in batch
+      x-operation-id: post_batch
+      x-controller: rerp_crm::intelligence::controller::verify::batch
+      x-handler-name: verify_batch
   /verify/phone:
     post:
       operationId: verify_phone
@@ -767,6 +933,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhoneVerificationResult'
+              examples:
+                default:
+                  phone: +1-555-0123
+                  valid: true
+                  line_type: mobile
+                  carrier: Verizon
         '500':
           description: Internal server error
           content:
@@ -791,6 +963,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Verify phone number validity
+      x-operation-id: post_phone
+      x-controller: rerp_crm::intelligence::controller::verify::phone
+      x-handler-name: verify_phone
   /mining/search:
     post:
       operationId: search_leads
@@ -841,6 +1016,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new mining
+      x-operation-id: post_search
+      x-controller: rerp_crm::intelligence::controller::mining::search
+      x-handler-name: mining_search
   /mining/icp-match:
     post:
       operationId: find_icp_matches
@@ -891,6 +1069,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Find leads matching ideal customer profile
+      x-operation-id: post_icp-match
+      x-controller: rerp_crm::intelligence::controller::mining::icp-match
+      x-handler-name: mining_icp-match
 components:
   parameters:
     Page:

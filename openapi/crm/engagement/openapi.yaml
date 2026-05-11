@@ -59,6 +59,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all subscriptions
+      x-operation-id: get_subscriptions_list
+      x-controller: rerp_crm::engagement::controller::subscriptions
+      x-handler-name: subscriptions
     post:
       operationId: create_subscription
       summary: Create a new subscription from a closed opportunity
@@ -77,6 +80,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+              examples:
+                default: &id001
+                  id: 00000000-0000-0000-0000-000000000018
+                  customer_id: 00000000-0000-0000-0000-000000000019
+                  plan: professional
+                  status: active
+                  mrr: 99.0
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -91,6 +103,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new subscriptions
+      x-operation-id: post_subscriptions_list
+      x-controller: rerp_crm::engagement::controller::subscriptions
+      x-handler-name: subscriptions
   /subscriptions/{id}:
     get:
       operationId: get_subscription
@@ -111,6 +126,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -118,6 +135,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get subscriptions by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::engagement::controller::subscriptions::id
+      x-handler-name: subscriptions_id
     put:
       operationId: update_subscription
       summary: Update subscription
@@ -143,6 +163,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -173,6 +195,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update subscriptions by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::engagement::controller::subscriptions::id
+      x-handler-name: subscriptions_id
     delete:
       operationId: delete_subscription
       summary: Cancel subscription
@@ -207,6 +232,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete subscriptions by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::engagement::controller::subscriptions::id
+      x-handler-name: subscriptions_id
   /subscriptions/{id}/renew:
     post:
       operationId: renew_subscription
@@ -239,6 +267,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '500':
@@ -265,6 +295,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Renew a subscription
+      x-operation-id: post_subscriptions_renew
+      x-controller: rerp_crm::engagement::controller::subscriptions::id::renew
+      x-handler-name: subscriptions_id_renew
   /subscriptions/mrr:
     get:
       operationId: get_mrr
@@ -285,6 +318,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all subscriptions
+      x-operation-id: get_mrr
+      x-controller: rerp_crm::engagement::controller::subscriptions::mrr
+      x-handler-name: subscriptions_mrr
   /subscriptions/churn:
     get:
       operationId: get_churn_metrics
@@ -314,6 +350,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all subscriptions
+      x-operation-id: get_churn
+      x-controller: rerp_crm::engagement::controller::subscriptions::churn
+      x-handler-name: subscriptions_churn
   /renewals/upcoming:
     get:
       operationId: list_upcoming_renewals
@@ -342,6 +381,9 @@ paths:
       security:
       - bearerAuth: []
       description: Renew a subscription
+      x-operation-id: get_upcoming
+      x-controller: rerp_crm::engagement::controller::renewals::upcoming
+      x-handler-name: renewals_upcoming
   /goals:
     get:
       operationId: list_goals
@@ -385,6 +427,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all goals
+      x-operation-id: get_goals_list
+      x-controller: rerp_crm::engagement::controller::goals
+      x-handler-name: goals
     post:
       operationId: create_goal
       summary: Create a new goal
@@ -403,6 +448,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
+              examples:
+                default: &id002
+                  id: 00000000-0000-0000-0000-000000000020
+                  name: Close 10 deals
+                  target: 10
+                  current: 7
+                  period: quarterly
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -417,6 +471,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new goals
+      x-operation-id: post_goals_list
+      x-controller: rerp_crm::engagement::controller::goals
+      x-handler-name: goals
   /goals/{id}:
     get:
       operationId: get_goal
@@ -437,6 +494,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
+              examples:
+                default: *id002
         '404':
           description: Not found
         '401':
@@ -444,6 +503,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get goals by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::engagement::controller::goals::id
+      x-handler-name: goals_id
     put:
       operationId: update_goal
       summary: Update goal
@@ -469,6 +531,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
         '404':
@@ -499,6 +563,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update goals by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::engagement::controller::goals::id
+      x-handler-name: goals_id
   /goals/{id}/progress:
     put:
       operationId: update_goal_progress
@@ -532,6 +599,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Goal'
+              examples:
+                default: *id002
         '404':
           description: Not found
         '403':
@@ -562,6 +631,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update goals by ID
+      x-operation-id: put_progress_by_id
+      x-controller: rerp_crm::engagement::controller::goals::id::progress
+      x-handler-name: goals_id_progress
   /leaderboard:
     get:
       operationId: get_leaderboard
@@ -603,6 +675,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get performance leaderboard
+      x-operation-id: get_leaderboard_list
+      x-controller: rerp_crm::engagement::controller::leaderboard
+      x-handler-name: leaderboard
   /badges:
     get:
       operationId: list_badges
@@ -623,6 +698,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all badges
+      x-operation-id: get_badges_list
+      x-controller: rerp_crm::engagement::controller::badges
+      x-handler-name: badges
   /users/{id}/badges:
     get:
       operationId: get_user_badges
@@ -650,6 +728,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get users by ID
+      x-operation-id: get_badges_by_id
+      x-controller: rerp_crm::engagement::controller::users::id::badges
+      x-handler-name: users_id_badges
   /customers/{id}/health:
     get:
       operationId: get_customer_health
@@ -677,6 +758,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get customer health score
+      x-operation-id: get_health_by_id
+      x-controller: rerp_crm::engagement::controller::customers::id::health
+      x-handler-name: customers_id_health
   /customers/at-risk:
     get:
       operationId: list_at_risk_customers
@@ -707,6 +791,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get at-risk customers
+      x-operation-id: get_at-risk
+      x-controller: rerp_crm::engagement::controller::customers::at-risk
+      x-handler-name: customers_at-risk
 components:
   parameters:
     Page:

@@ -42,6 +42,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUTMCampaign'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000017
+                    name: Q1 Marketing
+                    status: active
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -49,6 +60,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all utm
+      x-operation-id: get_campaigns
+      x-controller: rerp_crm::marketing::controller::utm::campaigns
+      x-handler-name: utm_campaigns
     post:
       operationId: create_utms_campaign
       summary: Create a new UTM campaign
@@ -67,6 +81,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
+              examples:
+                default: &id001
+                  id: 00000000-0000-0000-0000-000000000017
+                  name: Q1 Marketing
+                  type: email
+                  status: active
         '400':
           description: Invalid request
         '500':
@@ -81,6 +101,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new utm
+      x-operation-id: post_campaigns
+      x-controller: rerp_crm::marketing::controller::utm::campaigns
+      x-handler-name: utm_campaigns
   /utm/campaigns/{id}:
     get:
       operationId: get_utms_campaign
@@ -101,6 +124,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
+              examples:
+                default: *id001
         '404':
           description: Not found
         '401':
@@ -108,6 +133,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get utm by ID
+      x-operation-id: get_id_by_id
+      x-controller: rerp_crm::marketing::controller::utm::campaigns::id
+      x-handler-name: utm_campaigns_id
     put:
       operationId: update_utms_campaign
       summary: Update UTM campaign
@@ -133,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
         '404':
@@ -163,6 +193,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update utm by ID
+      x-operation-id: put_id_by_id
+      x-controller: rerp_crm::marketing::controller::utm::campaigns::id
+      x-handler-name: utm_campaigns_id
     delete:
       operationId: delete_utms_campaign
       summary: Soft-delete UTM campaign
@@ -197,6 +230,9 @@ paths:
       security:
       - bearerAuth: []
       description: Delete utm by ID
+      x-operation-id: delete_id_by_id
+      x-controller: rerp_crm::marketing::controller::utm::campaigns::id
+      x-handler-name: utm_campaigns_id
   /utm/mediums:
     get:
       operationId: list_utms_mediums
@@ -210,6 +246,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUTMMedium'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000036
+                    name: email
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -217,6 +263,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all utm
+      x-operation-id: get_mediums
+      x-controller: rerp_crm::marketing::controller::utm::mediums
+      x-handler-name: utm_mediums
     post:
       operationId: create_utms_medium
       summary: Create a new UTM medium
@@ -235,6 +284,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UTMMedium'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000036
+                  name: email
+                  description: Email marketing medium
         '400':
           description: Invalid request
         '500':
@@ -249,6 +303,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new utm
+      x-operation-id: post_mediums
+      x-controller: rerp_crm::marketing::controller::utm::mediums
+      x-handler-name: utm_mediums
   /utm/sources:
     get:
       operationId: list_utms_sources
@@ -262,6 +319,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUTMSource'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000037
+                    name: newsletter
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized
         '404':
@@ -269,6 +336,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all utm
+      x-operation-id: get_sources
+      x-controller: rerp_crm::marketing::controller::utm::sources
+      x-handler-name: utm_sources
     post:
       operationId: create_utms_source
       summary: Create a new UTM source
@@ -287,6 +357,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UTMSource'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000037
+                  name: newsletter
+                  description: Newsletter traffic source
         '400':
           description: Invalid request
         '500':
@@ -301,6 +376,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new utm
+      x-operation-id: post_sources
+      x-controller: rerp_crm::marketing::controller::utm::sources
+      x-handler-name: utm_sources
   /forms/{id}:
     post:
       operationId: submit_form
@@ -327,6 +405,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormSubmissionResult'
+              examples:
+                default:
+                  form_id: 00000000-0000-0000-0000-000000000030
+                  submitted: true
+                  lead_id: 00000000-0000-0000-0000-000000000001
+                  submitted_at: '2024-01-15T10:30:00Z'
         '400':
           description: Validation failed
         '404':
@@ -343,6 +427,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Perform an action on forms
+      x-operation-id: post_id_by_id
+      x-controller: rerp_crm::marketing::controller::forms::id
+      x-handler-name: forms_id
   /forms/{id}/config:
     get:
       operationId: get_form_config
@@ -363,6 +450,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebForm'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000030
+                  name: Contact Us Form
+                  fields:
+                  - name
+                  - email
+                  - message
+                  enabled: true
         '404':
           description: Not found
         '401':
@@ -370,6 +466,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get web form configuration
+      x-operation-id: get_config_by_id
+      x-controller: rerp_crm::marketing::controller::forms::id::config
+      x-handler-name: forms_id_config
   /analytics/track:
     post:
       operationId: track_page_view
@@ -389,6 +488,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisitorTracking'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000035
+                  visitor_id: 00000000-0000-0000-0000-000000000014
+                  page: /pricing
+                  duration: 45
+                  timestamp: '2024-01-15T10:30:00Z'
         '500':
           description: Internal server error
           content:
@@ -403,6 +509,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Track visitor activity on a page
+      x-operation-id: post_track
+      x-controller: rerp_crm::marketing::controller::analytics::track
+      x-handler-name: analytics_track
   /analytics/visitors:
     get:
       operationId: list_visitors
@@ -427,6 +536,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedVisitorTracking'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000035
+                    visitor_id: 00000000-0000-0000-0000-000000000014
+                    page: /pricing
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -434,6 +554,9 @@ paths:
       security:
       - bearerAuth: []
       description: List all analytics
+      x-operation-id: get_visitors
+      x-controller: rerp_crm::marketing::controller::analytics::visitors
+      x-handler-name: analytics_visitors
   /analytics/visitors/identify:
     post:
       operationId: identify_visitor
@@ -485,6 +608,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Identify a visitor by their session
+      x-operation-id: post_identify
+      x-controller: rerp_crm::marketing::controller::analytics::visitors::identify
+      x-handler-name: analytics_visitors_identify
   /campaigns/{id}/leads:
     get:
       operationId: get_campaign_leads
@@ -507,6 +633,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCampaignLeadResult'
+              examples:
+                default:
+                  items:
+                  - campaign_id: 00000000-0000-0000-0000-000000000017
+                    lead_id: 00000000-0000-0000-0000-000000000001
+                    converted: true
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -514,6 +651,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
+      x-operation-id: get_leads_by_id
+      x-controller: rerp_crm::marketing::controller::campaigns::id::leads
+      x-handler-name: campaigns_id_leads
   /campaigns/{id}/revenue:
     get:
       operationId: get_campaign_revenue
@@ -562,6 +702,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get revenue attributed to a campaign
+      x-operation-id: get_revenue_by_id
+      x-controller: rerp_crm::marketing::controller::campaigns::id::revenue
+      x-handler-name: campaigns_id_revenue
   /events/register:
     post:
       operationId: register_event
@@ -581,6 +724,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventRegistration'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000028
+                  event_id: 00000000-0000-0000-0000-000000000029
+                  contact_id: 00000000-0000-0000-0000-000000000002
+                  registered_at: '2024-01-15T10:30:00Z'
+                  status: confirmed
         '400':
           description: Invalid request
         '500':
@@ -595,6 +745,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Register for an event
+      x-operation-id: post_register
+      x-controller: rerp_crm::marketing::controller::events::register
+      x-handler-name: events_register
   /events/{id}/registrations:
     get:
       operationId: get_event_registrations
@@ -617,6 +770,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedEventRegistration'
+              examples:
+                default:
+                  items:
+                  - id: 00000000-0000-0000-0000-000000000028
+                    event_id: 00000000-0000-0000-0000-000000000029
+                    status: confirmed
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -624,6 +788,9 @@ paths:
       security:
       - bearerAuth: []
       description: Get event registrations
+      x-operation-id: get_registrations_by_id
+      x-controller: rerp_crm::marketing::controller::events::id::registrations
+      x-handler-name: events_id_registrations
   /surveys/submit:
     post:
       operationId: submit_survey
@@ -643,6 +810,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SurveyResponse'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000032
+                  survey_id: 00000000-0000-0000-0000-000000000033
+                  contact_id: 00000000-0000-0000-0000-000000000002
+                  score: 4
+                  feedback: Great experience!
         '400':
           description: Invalid request
         '500':
@@ -657,6 +831,9 @@ paths:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Submit a survey response
+      x-operation-id: post_submit
+      x-controller: rerp_crm::marketing::controller::surveys::submit
+      x-handler-name: surveys_submit
 components:
   parameters:
     Page:
