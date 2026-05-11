@@ -2,9 +2,8 @@ openapi: 3.1.0
 info:
   title: Accounts Receivable
   version: 1.0.0
-  description: 'Accounts receivable management service handling customer invoices,
-    payments, collections, and aging analysis. Supports the full AR lifecycle: invoice
-    creation, payment application, credit memos, dispute management, and aging reporting.
+  description: 'Accounts receivable management service handling customer invoices, payments, collections, and aging analysis.
+    Supports the full AR lifecycle: invoice creation, payment application, credit memos, dispute management, and aging reporting.
     Integrates with the general ledger for account posting.'
   contact:
     name: RERP Accounting API Support
@@ -32,8 +31,8 @@ paths:
     get:
       operationId: list_customer_invoices
       summary: List customer invoices
-      description: Paginated list of all customer invoices with AR-specific fields
-        including aging bucket and outstanding amounts.
+      description: Paginated list of all customer invoices with AR-specific fields including aging bucket and outstanding
+        amounts.
       parameters:
       - name: page
         in: query
@@ -123,8 +122,8 @@ paths:
     post:
       operationId: create_customer_invoice
       summary: Create customer invoice
-      description: Create a new AR record for an invoice. Links the invoice to the
-        customer and initializes the outstanding amount tracking.
+      description: Create a new AR record for an invoice. Links the invoice to the customer and initializes the outstanding
+        amount tracking.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -152,13 +151,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
@@ -167,8 +166,8 @@ paths:
     get:
       operationId: get_customer_invoice
       summary: Get customer invoice by id
-      description: Retrieve a single customer invoice with its full AR details including
-        aging, payment history, and credit memo history.
+      description: Retrieve a single customer invoice with its full AR details including aging, payment history, and credit
+        memo history.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -193,8 +192,7 @@ paths:
     put:
       operationId: update_customer_invoice
       summary: Update customer invoice
-      description: Update an AR record's status or aging bucket. Does not modify the
-        base invoice.
+      description: Update an AR record's status or aging bucket. Does not modify the base invoice.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -229,13 +227,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -243,8 +241,7 @@ paths:
     delete:
       operationId: delete_customer_invoice
       summary: Delete customer invoice
-      description: Delete a customer invoice record. Only allowed for invoices in
-        DRAFT status.
+      description: Delete a customer invoice record. Only allowed for invoices in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -272,8 +269,7 @@ paths:
     get:
       operationId: list_payments
       summary: List payments
-      description: Paginated list of all customer payments with filtering by status,
-        date range, customer, and payment method.
+      description: Paginated list of all customer payments with filtering by status, date range, customer, and payment method.
       parameters:
       - name: page
         in: query
@@ -360,8 +356,7 @@ paths:
     post:
       operationId: create_payment
       summary: Create payment
-      description: Record a new customer payment. Optionally auto-apply to oldest
-        outstanding invoices if auto_apply is true.
+      description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is true.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -383,13 +378,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /payments/{id}:
     get:
@@ -420,8 +415,7 @@ paths:
     put:
       operationId: update_payment
       summary: Update payment
-      description: Update a payment's details. Only pending or partially applied payments
-        can be modified.
+      description: Update a payment's details. Only pending or partially applied payments can be modified.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -459,16 +453,15 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
       operationId: delete_payment
       summary: Delete payment
-      description: Delete a payment. Only pending payments can be deleted. Applied
-        payments must be voided instead.
+      description: Delete a payment. Only pending payments can be deleted. Applied payments must be voided instead.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -524,8 +517,7 @@ paths:
     post:
       operationId: create_payment_application
       summary: Apply payment to invoice
-      description: Apply an amount from a payment to a specific customer invoice.
-        Supports partial applications.
+      description: Apply an amount from a payment to a specific customer invoice. Supports partial applications.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -559,17 +551,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /payments/{id}/auto-apply:
     post:
       operationId: auto_apply_payment
       summary: Auto-apply payment
-      description: Automatically apply a payment to the oldest outstanding customer
-        invoices.
+      description: Automatically apply a payment to the oldest outstanding customer invoices.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -595,20 +586,19 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /credit-memos:
     get:
       operationId: list_credit_memos
       summary: List credit memos
-      description: Paginated list of all credit memos with filtering by customer,
-        reason, and status.
+      description: Paginated list of all credit memos with filtering by customer, reason, and status.
       parameters:
       - name: page
         in: query
@@ -692,20 +682,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /collections:
     get:
       operationId: list_collection_activities
       summary: List collection activities
-      description: Paginated list of all collection activities with filtering by customer,
-        type, and follow-up status.
+      description: Paginated list of all collection activities with filtering by customer, type, and follow-up status.
       parameters:
       - name: page
         in: query
@@ -776,8 +765,7 @@ paths:
     post:
       operationId: create_collection_activity
       summary: Create collection activity
-      description: Record a new collection activity (call, email, letter, etc.) against
-        a customer invoice.
+      description: Record a new collection activity (call, email, letter, etc.) against a customer invoice.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -799,20 +787,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /ar-agings:
     get:
       operationId: list_ar_agings
       summary: List AR aging records
-      description: List all AR aging analysis records, optionally filtered by customer
-        or company.
+      description: List all AR aging analysis records, optionally filtered by customer or company.
       parameters:
       - name: page
         in: query
@@ -859,8 +846,7 @@ paths:
     post:
       operationId: create_ar_aging
       summary: Create AR aging record
-      description: Create a new AR aging record for analysis. Usually auto-generated
-        by scheduled jobs.
+      description: Create a new AR aging record for analysis. Usually auto-generated by scheduled jobs.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -882,13 +868,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /ar-agings/{id}:
     get:
@@ -919,8 +905,7 @@ paths:
     get:
       operationId: aging_summary
       summary: Aging summary report
-      description: Generate a company-wide or customer-specific AR aging summary with
-        DSO and collection efficiency metrics.
+      description: Generate a company-wide or customer-specific AR aging summary with DSO and collection efficiency metrics.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -1042,13 +1027,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /follow-up-runs:
     post:
@@ -1072,13 +1057,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /collection-cases:
     get:
@@ -1112,13 +1097,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /payment-promises:
     post:
@@ -1142,13 +1127,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /customer-statements/send:
     post:
@@ -1172,13 +1157,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
 components:
   parameters:
@@ -1229,8 +1214,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -1251,11 +1235,20 @@ components:
     CustomerInvoice:
       type: object
       required:
+      - aging_bucket
+      - company_id
+      - created_at
+      - credit_limit_check
+      - currency_code
+      - customer_id
+      - due_date
       - id
       - invoice_id
-      - customer_id
-      - currency_code
+      - original_amount
+      - outstanding_amount
       - status
+      - terms
+      - updated_at
       properties:
         id:
           type: string
@@ -1433,11 +1426,18 @@ components:
     Payment:
       type: object
       required:
-      - id
       - amount
+      - applied_at
+      - company_id
       - currency_code
-      - payment_method
+      - customer_id
+      - gl_entry_id
+      - id
+      - notes
       - payment_date
+      - payment_method
+      - posted_to_gl
+      - reference_number
       - status
       properties:
         id:
@@ -1600,10 +1600,10 @@ components:
     PaymentApplication:
       type: object
       required:
+      - applied_amount
+      - customer_invoice_id
       - id
       - payment_id
-      - customer_invoice_id
-      - applied_amount
       properties:
         id:
           type: string
@@ -1758,10 +1758,15 @@ components:
     CollectionActivity:
       type: object
       required:
-      - id
-      - customer_invoice_id
       - activity_type
+      - assigned_to
+      - company_id
+      - customer_invoice_id
       - date
+      - id
+      - next_follow_up_date
+      - notes
+      - updated_at
       properties:
         id:
           type: string
@@ -2058,9 +2063,11 @@ components:
     CollectionCase:
       type: object
       required:
-      - id
+      - assigned_to
       - customer_id
+      - id
       - status
+      - total_due
       properties:
         id:
           type: string
@@ -2103,10 +2110,11 @@ components:
     PaymentPromise:
       type: object
       required:
-      - id
       - customer_id
+      - id
       - promised_amount
       - promised_date
+      - status
       properties:
         id:
           type: string
@@ -2364,14 +2372,14 @@ components:
     AgingSummary:
       type: object
       required:
-      - company_id
       - as_of_date
-      - total_outstanding
-      - current
       - bucket_1_30
       - bucket_31_60
       - bucket_61_90
       - bucket_90_plus
+      - company_id
+      - current
+      - total_outstanding
       properties:
         company_id:
           type: string

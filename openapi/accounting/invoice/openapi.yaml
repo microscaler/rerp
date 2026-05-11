@@ -2,10 +2,9 @@ openapi: 3.1.0
 info:
   title: Invoice
   version: 1.0.0
-  description: Core invoice management service providing the shared invoice entity
-    and operations used by both Accounts Receivable and Accounts Payable. Manages
-    invoice creation, lifecycle, line items, tax calculation, and the AR/AP split.
-    All invoices flow through this service before being claimed by AR or AP sub-services.
+  description: Core invoice management service providing the shared invoice entity and operations used by both Accounts Receivable
+    and Accounts Payable. Manages invoice creation, lifecycle, line items, tax calculation, and the AR/AP split. All invoices
+    flow through this service before being claimed by AR or AP sub-services.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -30,8 +29,8 @@ paths:
     get:
       operationId: list_invoices
       summary: List invoices
-      description: Paginated list of all invoices across both AR and AP with filtering
-        by type, status, date range, entity, and currency.
+      description: Paginated list of all invoices across both AR and AP with filtering by type, status, date range, entity,
+        and currency.
       parameters:
       - name: page
         in: query
@@ -140,8 +139,8 @@ paths:
     post:
       operationId: create_invoice
       summary: Create invoice
-      description: Create a new invoice. Supports both sales and purchase invoice
-        types. Line items are optional; total is auto-calculated if provided.
+      description: Create a new invoice. Supports both sales and purchase invoice types. Line items are optional; total is
+        auto-calculated if provided.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -163,19 +162,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id004
             application/json:
               schema:
@@ -184,8 +183,7 @@ paths:
     get:
       operationId: get_invoice
       summary: Get invoice by id
-      description: Retrieve a single invoice with its full details including line
-        items, tax breakdown, and workflow history.
+      description: Retrieve a single invoice with its full details including line items, tax breakdown, and workflow history.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -210,8 +208,8 @@ paths:
     put:
       operationId: update_invoice
       summary: Update invoice
-      description: Update a draft or confirmed invoice. Cannot modify posted, cancelled,
-        or voided invoices. Use workflow actions for state transitions.
+      description: Update a draft or confirmed invoice. Cannot modify posted, cancelled, or voided invoices. Use workflow
+        actions for state transitions.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -252,10 +250,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
       operationId: delete_invoice
@@ -313,8 +311,7 @@ paths:
     post:
       operationId: create_line_item
       summary: Add line item
-      description: Add a line item to an invoice. Only allowed for invoices in DRAFT
-        status.
+      description: Add a line item to an invoice. Only allowed for invoices in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -355,17 +352,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /invoices/{id}/line-items/{line_id}:
     put:
       operationId: update_line_item
       summary: Update line item
-      description: Update a specific line item. Only allowed for invoices in DRAFT
-        status.
+      description: Update a specific line item. Only allowed for invoices in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -409,16 +405,15 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
       operationId: delete_line_item
       summary: Delete line item
-      description: Delete a line item from an invoice. Only allowed for invoices in
-        DRAFT status.
+      description: Delete a line item from an invoice. Only allowed for invoices in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -452,8 +447,7 @@ paths:
     get:
       operationId: list_tax_rates
       summary: List tax rates
-      description: List all configured tax rates with filtering by country, code,
-        and effective date.
+      description: List all configured tax rates with filtering by country, code, and effective date.
       parameters:
       - name: page
         in: query
@@ -515,8 +509,7 @@ paths:
     get:
       operationId: calculate_tax
       summary: Calculate tax for line items
-      description: Calculate tax for a set of line items using the configured tax
-        rates and codes.
+      description: Calculate tax for a set of line items using the configured tax rates and codes.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -564,8 +557,8 @@ paths:
     post:
       operationId: approve_invoice
       summary: Approve invoice
-      description: Approve a purchase invoice for payment. Transitions status from
-        PENDING_APPROVAL to APPROVED and creates an approval record.
+      description: Approve a purchase invoice for payment. Transitions status from PENDING_APPROVAL to APPROVED and creates
+        an approval record.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -597,17 +590,16 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /invoices/{id}/post:
     post:
       operationId: post_invoice
       summary: Post invoice to GL
-      description: Post a confirmed invoice to the general ledger. Creates GL entries
-        and transitions status to POSTED.
+      description: Post a confirmed invoice to the general ledger. Creates GL entries and transitions status to POSTED.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -645,7 +637,7 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
   /invoices/{id}/cancel:
     post:
@@ -683,17 +675,16 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /invoices/{id}/void:
     post:
       operationId: void_invoice
       summary: Void invoice
-      description: Void a posted invoice. Creates a voided record and reverses GL
-        entries.
+      description: Void a posted invoice. Creates a voided record and reverses GL entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -725,17 +716,16 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /invoices/{id}/workflow-history:
     get:
       operationId: get_invoice_workflow_history
       summary: Get workflow history
-      description: Get the full workflow history (approvals, posts, cancellations)
-        for an invoice.
+      description: Get the full workflow history (approvals, posts, cancellations) for an invoice.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -761,8 +751,7 @@ paths:
     get:
       operationId: invoice_summary
       summary: Invoice summary report
-      description: Generate an invoice summary report for a period with breakdowns
-        by status and type.
+      description: Generate an invoice summary report for a period with breakdowns by status and type.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -838,13 +827,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /invoices/{id}/payment-matches:
     get:
@@ -893,13 +882,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /invoices/{id}/e-invoice-handoff:
     post:
@@ -924,13 +913,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /invoices/{id}/deferral-handoff:
     post:
@@ -955,13 +944,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
 components:
   parameters:
@@ -1012,8 +1001,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -1034,12 +1022,26 @@ components:
     Invoice:
       type: object
       required:
+      - billing_address_id
+      - company_id
+      - company_total_amount
+      - currency_code
+      - due_date
+      - entity_id
+      - entity_name
+      - exchange_rate
       - id
+      - internal_notes
       - invoice_number
       - invoice_type
+      - notes
+      - posted_at
+      - posted_by
+      - shipping_address_id
       - status
+      - subtotal_amount
+      - tax_amount
       - total_amount
-      - currency_code
       properties:
         id:
           type: string
@@ -1195,6 +1197,7 @@ components:
             type: string
             format: date-time
             nullable: true
+      required: []
     CreateInvoiceRequest:
       type: object
       required:
@@ -1296,12 +1299,22 @@ components:
     InvoiceLineItem:
       type: object
       required:
+      - amount
+      - description
+      - discount_amount
+      - discount_percent
+      - gl_account_credit
+      - gl_account_debit
       - id
       - invoice_id
-      - description
+      - product_code
+      - product_id
+      - product_name
       - quantity
+      - tax_amount
+      - tax_code
+      - tax_rate
       - unit_price
-      - amount
       properties:
         id:
           type: string
@@ -1542,9 +1555,9 @@ components:
     InvoiceApprovalAction:
       type: object
       required:
+      - action
       - id
       - invoice_id
-      - action
       properties:
         id:
           type: string
@@ -1601,10 +1614,10 @@ components:
     InvoicePayment:
       type: object
       required:
-      - id
-      - invoice_id
       - amount
       - currency_code
+      - id
+      - invoice_id
       - status
       properties:
         id:
@@ -1663,8 +1676,8 @@ components:
       required:
       - id
       - invoice_id
-      - target_service
       - status
+      - target_service
       properties:
         id:
           type: string
@@ -1781,11 +1794,10 @@ components:
     InvoiceSummary:
       type: object
       required:
-      - period
-      - total_invoices
-      - total_amount
       - by_status
       - by_type
+      - total_amount
+      - total_invoices
       properties:
         period_start:
           type: string

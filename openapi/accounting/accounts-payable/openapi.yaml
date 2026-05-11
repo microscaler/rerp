@@ -2,9 +2,8 @@ openapi: 3.1.0
 info:
   title: Accounts Payable
   version: 1.0.0
-  description: 'Accounts payable management service handling vendor invoices, payments,
-    approvals, and cash flow forecasting. Supports the full AP lifecycle: invoice
-    receipt, approval workflow, payment scheduling, and vendor reconciliation. Integrates
+  description: 'Accounts payable management service handling vendor invoices, payments, approvals, and cash flow forecasting.
+    Supports the full AP lifecycle: invoice receipt, approval workflow, payment scheduling, and vendor reconciliation. Integrates
     with the general ledger for account posting.'
   contact:
     name: RERP Accounting API Support
@@ -30,8 +29,7 @@ paths:
     get:
       operationId: list_vendor_invoices
       summary: List vendor invoices
-      description: Paginated list of all vendor invoices with AP-specific fields including
-        approval status and payment status.
+      description: Paginated list of all vendor invoices with AP-specific fields including approval status and payment status.
       parameters:
       - name: page
         in: query
@@ -130,8 +128,8 @@ paths:
     post:
       operationId: create_vendor_invoice
       summary: Create vendor invoice
-      description: Create a new AP record for a vendor invoice. Links the invoice
-        to the vendor and initializes the approval workflow.
+      description: Create a new AP record for a vendor invoice. Links the invoice to the vendor and initializes the approval
+        workflow.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -153,19 +151,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -174,8 +172,7 @@ paths:
     get:
       operationId: get_vendor_invoice
       summary: Get vendor invoice by id
-      description: Retrieve a single vendor invoice with its full AP details including
-        approval history and payment status.
+      description: Retrieve a single vendor invoice with its full AP details including approval history and payment status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -200,8 +197,7 @@ paths:
     put:
       operationId: update_vendor_invoice
       summary: Update vendor invoice
-      description: Update an AP record's details. Does not modify the base invoice
-        - use the Invoice service for that.
+      description: Update an AP record's details. Does not modify the base invoice - use the Invoice service for that.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -236,19 +232,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
     delete:
       operationId: delete_vendor_invoice
       summary: Delete vendor invoice
-      description: Delete a vendor invoice record. Only allowed for invoices in DRAFT
-        status.
+      description: Delete a vendor invoice record. Only allowed for invoices in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -276,8 +271,7 @@ paths:
     get:
       operationId: list_payments
       summary: List payments
-      description: Paginated list of all vendor payments with filtering by status,
-        date range, and vendor.
+      description: Paginated list of all vendor payments with filtering by status, date range, and vendor.
       parameters:
       - name: page
         in: query
@@ -363,8 +357,7 @@ paths:
     post:
       operationId: create_payment
       summary: Create payment
-      description: Schedule a new vendor payment. Optionally auto-disburse if auto_disburse
-        is true.
+      description: Schedule a new vendor payment. Optionally auto-disburse if auto_disburse is true.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -386,13 +379,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /payments/{id}:
     get:
@@ -423,8 +416,7 @@ paths:
     put:
       operationId: update_payment
       summary: Update payment
-      description: Update a payment's details. Only scheduled or pending payments
-        can be modified.
+      description: Update a payment's details. Only scheduled or pending payments can be modified.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -462,10 +454,10 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
       operationId: delete_payment
@@ -498,8 +490,7 @@ paths:
     get:
       operationId: list_approvals
       summary: List approvals
-      description: List all approval records with filtering by invoice, approver,
-        and status.
+      description: List all approval records with filtering by invoice, approver, and status.
       parameters:
       - name: page
         in: query
@@ -555,8 +546,7 @@ paths:
     post:
       operationId: create_approval
       summary: Submit approval action
-      description: Approve, reject, or request more information on an invoice as part
-        of the approval workflow.
+      description: Approve, reject, or request more information on an invoice as part of the approval workflow.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -584,17 +574,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /commitments:
     get:
       operationId: list_payment_commitments
       summary: List payment commitments
-      description: List all payment commitments (approved invoices awaiting payment)
-        with filtering by vendor and due date.
+      description: List all payment commitments (approved invoices awaiting payment) with filtering by vendor and due date.
       parameters:
       - name: page
         in: query
@@ -654,8 +643,7 @@ paths:
     get:
       operationId: cash_flow_forecast
       summary: Cash flow forecast
-      description: Generate a cash flow forecast for the AP service showing upcoming
-        payment commitments and scheduled payments.
+      description: Generate a cash flow forecast for the AP service showing upcoming payment commitments and scheduled payments.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -734,13 +722,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /payment-batches/{id}/approve:
     post:
@@ -761,13 +749,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /payment-batches/{id}/export-payment-file:
     post:
@@ -798,13 +786,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /vendor-invoices/{id}/register-payment:
     post:
@@ -835,13 +823,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /vendor-invoices/{id}/three-way-match:
     post:
@@ -872,13 +860,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
 components:
   parameters:
@@ -929,8 +917,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -951,12 +938,25 @@ components:
     VendorInvoice:
       type: object
       required:
-      - id
-      - invoice_id
-      - vendor_id
-      - currency_code
-      - status
+      - amount
       - approval_status
+      - approved_at
+      - approved_by
+      - company_id
+      - created_at
+      - currency_code
+      - description
+      - due_date
+      - id
+      - invoice_date
+      - invoice_id
+      - invoice_number
+      - net_amount
+      - payment_status
+      - status
+      - tax_amount
+      - terms
+      - vendor_id
       properties:
         id:
           type: string
@@ -1203,12 +1203,19 @@ components:
     VendorPayment:
       type: object
       required:
-      - id
+      - actual_payment_date
       - amount
+      - company_id
       - currency_code
-      - payment_method
+      - gl_entry_id
+      - id
+      - notes
       - payment_date
+      - payment_method
+      - posted_to_gl
+      - reference_number
       - status
+      - vendor_id
       properties:
         id:
           type: string
@@ -1366,10 +1373,15 @@ components:
     VendorInvoiceLineItem:
       type: object
       required:
+      - amount
+      - description
+      - gl_account
       - id
       - invoice_id
-      - description
-      - amount
+      - product_id
+      - quantity
+      - tax_code
+      - unit_price
       properties:
         id:
           type: string
@@ -1450,11 +1462,11 @@ components:
     ApprovalRecord:
       type: object
       required:
+      - action
+      - approver_id
+      - date
       - id
       - invoice_id
-      - approver_id
-      - action
-      - date
       properties:
         id:
           type: string
@@ -1563,8 +1575,8 @@ components:
       type: object
       required:
       - company_id
-      - period_start
       - period_end
+      - period_start
       - total_commitments
       - total_payments
       properties:
@@ -1660,8 +1672,8 @@ components:
       required:
       - company_id
       - payment_method
-      - vendor_invoice_ids
       - scheduled_payment_date
+      - vendor_invoice_ids
       properties:
         company_id:
           type: string

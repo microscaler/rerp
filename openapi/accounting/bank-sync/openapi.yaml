@@ -2,9 +2,8 @@ openapi: 3.1.0
 info:
   title: Bank Sync
   version: 1.0.0
-  description: Bank synchronization service managing bank account connections, statement
-    imports, reconciliations, and cash management. Supports multiple bank integrations,
-    automated reconciliation, and bank feed monitoring.
+  description: Bank synchronization service managing bank account connections, statement imports, reconciliations, and cash
+    management. Supports multiple bank integrations, automated reconciliation, and bank feed monitoring.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -29,8 +28,7 @@ paths:
     get:
       operationId: list_bank_accounts
       summary: List bank accounts
-      description: Paginated list of all bank accounts with filtering by type, status,
-        and company.
+      description: Paginated list of all bank accounts with filtering by type, status, and company.
       parameters:
       - name: page
         in: query
@@ -132,19 +130,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -213,19 +211,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
     delete:
       operationId: delete_bank_account
       summary: Delete bank account
-      description: Delete a bank account. Only allowed for closed or inactive accounts
-        with no transactions.
+      description: Delete a bank account. Only allowed for closed or inactive accounts with no transactions.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -320,8 +317,7 @@ paths:
     post:
       operationId: create_bank_statement
       summary: Import bank statement
-      description: Import a new bank statement with transactions. Supports CSV, OFX,
-        QIF, and MT940 formats.
+      description: Import a new bank statement with transactions. Supports CSV, OFX, QIF, and MT940 formats.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -343,13 +339,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /statements/{id}:
     get:
@@ -412,20 +408,19 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /transactions:
     get:
       operationId: list_bank_transactions
       summary: List bank transactions
-      description: List all bank transactions with filtering by account, date, status,
-        and counterparty.
+      description: List all bank transactions with filtering by account, date, status, and counterparty.
       x-brrtrouter-impl: true
       parameters:
       - name: page
@@ -549,17 +544,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /transactions/auto-match:
     post:
       operationId: auto_match_transactions
       summary: Auto-match transactions
-      description: Automatically match raw transactions to existing entries using
-        amount, date, and description matching.
+      description: Automatically match raw transactions to existing entries using amount, date, and description matching.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -610,13 +604,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /reconciliations:
     get:
@@ -715,17 +709,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /reconciliations/{id}/complete:
     post:
       operationId: complete_reconciliation
       summary: Complete bank reconciliation
-      description: Complete a bank reconciliation. Only allowed when the difference
-        is zero (balanced).
+      description: Complete a bank reconciliation. Only allowed when the difference is zero (balanced).
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -760,10 +753,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /reports/reconciliation:
     get:
@@ -879,13 +872,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /transactions/{id}/suggestions:
     get:
@@ -934,13 +927,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /transactions/{id}/unreconcile:
     post:
@@ -961,13 +954,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /transactions/{id}/write-off:
     post:
@@ -998,13 +991,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /transactions/{id}/exchange-difference:
     post:
@@ -1035,13 +1028,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
 components:
   parameters:
@@ -1092,8 +1085,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -1114,11 +1106,12 @@ components:
     BankAccount:
       type: object
       required:
+      - account_number
+      - bank_name
+      - company_id
+      - currency_code
       - id
       - name
-      - account_number
-      - currency_code
-      - company_id
       - status
       properties:
         id:
@@ -1322,10 +1315,13 @@ components:
     BankStatement:
       type: object
       required:
-      - id
       - bank_account_id
-      - statement_date
+      - closing_balance
       - currency_code
+      - id
+      - opening_balance
+      - statement_date
+      - statement_number
       properties:
         id:
           type: string
@@ -1417,8 +1413,7 @@ components:
         start_date:
           type: string
           format: date
-          description: Statement period start. Auto-derived from transactions if not
-            provided.
+          description: Statement period start. Auto-derived from transactions if not provided.
         statement_date:
           type: string
           format: date
@@ -1448,11 +1443,12 @@ components:
     BankTransaction:
       type: object
       required:
+      - amount
+      - currency_code
+      - description
       - id
       - statement_id
       - transaction_date
-      - amount
-      - currency_code
       properties:
         id:
           type: string
@@ -1623,10 +1619,10 @@ components:
     BankReconciliation:
       type: object
       required:
-      - id
       - bank_account_id
-      - statement_id
+      - id
       - reconciliation_date
+      - statement_id
       properties:
         id:
           type: string
@@ -1861,8 +1857,9 @@ components:
     CashPosition:
       type: object
       required:
-      - company_id
       - as_of_date
+      - available_balance
+      - company_id
       - total_cash
       properties:
         company_id:

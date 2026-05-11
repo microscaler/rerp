@@ -59,19 +59,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -129,13 +129,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
     delete:
       operationId: delete_edi_document
@@ -191,13 +191,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-mappings/{id}:
     get:
@@ -249,13 +249,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
     delete:
       operationId: delete_edi_mapping
@@ -308,13 +308,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-validation-profiles:
     get:
@@ -351,13 +351,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-submissions:
     get:
@@ -398,13 +398,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-submissions/{id}/submit:
     post:
@@ -429,13 +429,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-submissions/{id}/status:
     get:
@@ -478,13 +478,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /edi-acknowledgments:
     get:
@@ -588,10 +588,10 @@ components:
     EdiProfile:
       type: object
       required:
+      - active
       - id
       - name
       - standard
-      - active
       properties:
         id:
           type: string
@@ -625,10 +625,10 @@ components:
     EdiValidationProfile:
       type: object
       required:
-      - id
-      - profile_id
-      - name
       - active
+      - id
+      - name
+      - profile_id
       properties:
         id:
           type: string
@@ -658,8 +658,8 @@ components:
     EdiSubmission:
       type: object
       required:
-      - id
       - document_id
+      - id
       - profile_id
       - status
       properties:
@@ -713,14 +713,14 @@ components:
     EdiDocument:
       type: object
       required:
-      - id
+      - acknowledgment_sent
       - document_number
       - document_type
       - format_id
-      - status
+      - id
       - received_at
       - retry_count
-      - acknowledgment_sent
+      - status
       properties:
         id:
           type: string
@@ -877,12 +877,13 @@ components:
     EdiMapping:
       type: object
       required:
-      - id
-      - format_id
+      - description
       - document_type
-      - mapping_name
       - field_mappings
+      - format_id
+      - id
       - is_active
+      - mapping_name
       properties:
         id:
           type: string
@@ -934,9 +935,10 @@ components:
     EdiAcknowledgment:
       type: object
       required:
-      - id
-      - document_id
       - acknowledgment_type
+      - document_id
+      - id
+      - received_at
       - status
       properties:
         id:
@@ -992,7 +994,6 @@ components:
       - document_number
       - document_type
       - format_id
-      - status
       properties:
         document_number:
           type: string

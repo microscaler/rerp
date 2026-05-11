@@ -2,10 +2,9 @@ openapi: 3.1.0
 info:
   title: Budget Management
   version: 1.0.0
-  description: Budget management service for financial planning, budget creation,
-    variance analysis, and forecasting. Supports multi-level budgets by department,
-    cost center, GL account, and period. Tracks actuals against budget with real-time
-    variance reporting.
+  description: Budget management service for financial planning, budget creation, variance analysis, and forecasting. Supports
+    multi-level budgets by department, cost center, GL account, and period. Tracks actuals against budget with real-time variance
+    reporting.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -30,8 +29,7 @@ paths:
     get:
       operationId: list_budgets
       summary: List budgets
-      description: Paginated list of all budgets with filtering by fiscal year, status,
-        department, and company.
+      description: Paginated list of all budgets with filtering by fiscal year, status, department, and company.
       parameters:
       - name: page
         in: query
@@ -121,19 +119,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id004
             application/json:
               schema:
@@ -167,8 +165,7 @@ paths:
     put:
       operationId: update_budget
       summary: Update budget
-      description: Update a budget. Only allowed for DRAFT status budgets. To submit
-        for approval, use the submit endpoint.
+      description: Update a budget. Only allowed for DRAFT status budgets. To submit for approval, use the submit endpoint.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -209,10 +206,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
       operationId: delete_budget
@@ -245,8 +242,7 @@ paths:
     post:
       operationId: submit_budget
       summary: Submit budget for approval
-      description: Submit a budget for approval. Transitions status from DRAFT to
-        SUBMITTED.
+      description: Submit a budget for approval. Transitions status from DRAFT to SUBMITTED.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -278,10 +274,10 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /budgets/{id}/lines:
     get:
@@ -369,13 +365,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /variance:
     get:
@@ -520,13 +516,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /budgets/{id}/confirm:
     post:
@@ -547,13 +543,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /budgets/{id}/cancel:
     post:
@@ -574,13 +570,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /budgets/{id}/complete:
     post:
@@ -601,13 +597,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /budgets/{id}/reopen:
     post:
@@ -628,13 +624,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /budget-revisions:
     get:
@@ -668,13 +664,13 @@ paths:
           description: Validation error
           content: *id003
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
 components:
   parameters:
@@ -725,8 +721,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -747,10 +742,11 @@ components:
     Budget:
       type: object
       required:
+      - company_id
+      - description
+      - fiscal_year
       - id
       - name
-      - fiscal_year
-      - company_id
       - status
       properties:
         id:
@@ -958,10 +954,10 @@ components:
     BudgetLine:
       type: object
       required:
-      - id
-      - budget_id
-      - period
       - amount
+      - budget_id
+      - id
+      - period
       properties:
         id:
           type: string
@@ -1081,8 +1077,8 @@ components:
       type: object
       required:
       - budget_id
-      - period_start
       - period_end
+      - period_start
       properties:
         id:
           type: string
@@ -1170,10 +1166,10 @@ components:
     Forecast:
       type: object
       required:
-      - id
+      - as_of_date
       - budget_id
       - forecast_type
-      - as_of_date
+      - id
       properties:
         id:
           type: string
@@ -1313,8 +1309,9 @@ components:
     BudgetRevision:
       type: object
       required:
-      - id
       - budget_id
+      - id
+      - reason
       - revision_number
       - status
       properties:

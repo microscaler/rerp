@@ -2,10 +2,9 @@ openapi: 3.1.0
 info:
   title: Financial Reports
   version: 1.0.0
-  description: 'Financial reporting service providing the full suite of accounting
-    reports: Balance Sheet, Profit & Loss (Income Statement), Cash Flow Statement,
-    General Ledger, Trial Balance, and Custom Reports. All reports integrate with
-    the general ledger for accurate financial data.'
+  description: 'Financial reporting service providing the full suite of accounting reports: Balance Sheet, Profit & Loss (Income
+    Statement), Cash Flow Statement, General Ledger, Trial Balance, and Custom Reports. All reports integrate with the general
+    ledger for accurate financial data.'
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -32,8 +31,8 @@ paths:
     get:
       operationId: generate_balance_sheet
       summary: Generate Balance Sheet
-      description: Generate a Balance Sheet report for a company at a given date,
-        showing assets, liabilities, and equity with account-level detail.
+      description: Generate a Balance Sheet report for a company at a given date, showing assets, liabilities, and equity
+        with account-level detail.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -70,8 +69,7 @@ paths:
     get:
       operationId: generate_income_statement
       summary: Generate Income Statement
-      description: Generate a Profit & Loss report for a period, showing revenue,
-        COGS, operating expenses, and net income.
+      description: Generate a Profit & Loss report for a period, showing revenue, COGS, operating expenses, and net income.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -108,8 +106,7 @@ paths:
     get:
       operationId: generate_cash_flow
       summary: Generate Cash Flow Statement
-      description: Generate a Cash Flow Statement showing operating, investing, and
-        financing activities.
+      description: Generate a Cash Flow Statement showing operating, investing, and financing activities.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -146,8 +143,8 @@ paths:
     get:
       operationId: generate_general_ledger
       summary: Generate General Ledger Report
-      description: Generate a General Ledger report showing all journal entries with
-        debits, credits, and running balances for a period.
+      description: Generate a General Ledger report showing all journal entries with debits, credits, and running balances
+        for a period.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -184,8 +181,7 @@ paths:
     get:
       operationId: generate_trial_balance
       summary: Generate Trial Balance
-      description: Generate a Trial Balance report showing all account balances at
-        a point in time, with debits and credits.
+      description: Generate a Trial Balance report showing all account balances at a point in time, with debits and credits.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -301,19 +297,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -382,13 +378,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
     delete:
       operationId: delete_custom_report
@@ -461,13 +457,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /report-executions:
     get:
@@ -554,13 +550,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /report-definitions/{id}/lines:
     get:
@@ -620,13 +616,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /statutory-report-packs:
     get:
@@ -688,8 +684,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header
-        as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
     PaginatedResponse:
       type: object
@@ -712,9 +707,6 @@ components:
       required:
       - company_id
       - period_end
-      - total_assets
-      - total_liabilities
-      - total_equity
       properties:
         id:
           type: string
@@ -836,10 +828,9 @@ components:
       type: object
       required:
       - company_id
-      - period_start
-      - period_end
-      - total_revenue
       - net_income
+      - period_end
+      - period_start
       properties:
         id:
           type: string
