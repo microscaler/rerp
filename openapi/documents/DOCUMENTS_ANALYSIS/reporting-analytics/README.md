@@ -2,6 +2,8 @@
 
 > **Component:** Document processing metrics, extraction quality, workflow performance, and business intelligence
 > **Priority:** P4 — Valuable for management justification but not for first buyers
+> **DocuPipe Reference:** Credit consumption tracking, pages processed, API call counts, cost metrics
+> **Rossum Reference:** Workflow reporting — automation rates, team performance, processing times, exception rates, SLA compliance
 
 ---
 
@@ -9,7 +11,7 @@
 
 **Buyer Question:** *Can I measure the value of document intelligence — accuracy rates, processing times, cost savings, ROI — with dashboards and reports that justify the investment?*
 
-If the answer is no, you have a document processing tool, not a business intelligence platform. The ROI of document intelligence is invisible without metrics. Management needs to see accuracy rates, processing volumes, time savings, and cost reductions to justify continued investment. Reporting is the bridge between technical performance and business value.
+If the answer is no, you have a document processing tool, not a business intelligence platform. The ROI of document intelligence is invisible without metrics. Management needs to see accuracy rates, processing volumes, time savings, and cost reductions to justify continued investment. Reporting is the bridge between technical performance and business value. This component defines how metrics are collected, how reports are generated, and how insights are presented to decision-makers.
 
 ---
 
@@ -32,15 +34,18 @@ Reporting & Analytics is the intelligence layer on top of the document pipeline:
 
 ### Metric Entity
 
+The raw data point. Every measurement is stored here with dimensions for slicing.
+
 | Field | Type | Required | Purpose |
 |-------|------|----------|---------|
 | `id` | UUID | Yes | Primary key |
-| `metric_name` | String (128) | Yes | Metric name |
+| `metric_name` | String (128) | Yes | Metric name (e.g., pages_processed, extraction_accuracy) |
 | `metric_value` | Float | Yes | Metric value |
-| `dimension_type` | String (64) | No | Dimension (document_type, team, etc.) |
+| `dimension_type` | String (64) | No | Dimension (document_type, team, department) |
 | `dimension_id` | UUID | No | Dimension identifier |
-| `timestamp` | DateTime | Yes | Metric timestamp |
-| `source` | String (64) | Yes | Metric source system |
+| `timestamp` | DateTime | Yes | Metric timestamp (minute/hour/day granularity) |
+| `source` | String (64) | Yes | Metric source system (ocr, extraction, workflow) |
+| `tags` | String[] | No | Additional tags for grouping |
 
 ### Report Entity
 
@@ -48,12 +53,27 @@ Reporting & Analytics is the intelligence layer on top of the document pipeline:
 |-------|------|----------|---------|
 | `id` | UUID | Yes | Primary key |
 | `name` | String (255) | Yes | Report name |
-| `template` | JSONB | Yes | Report template definition |
-| `schedule` | String (64) | No | Cron schedule |
+| `template` | JSONB | Yes | Report template definition (metrics, filters, charts) |
+| `schedule` | String (64) | No | Cron schedule (empty = manual only) |
 | `recipients` | UUID[] | No | Report recipients |
 | `format` | Enum: [PDF, CSV, HTML] | No | Output format |
-| `is_active` | Boolean | No | Report activation |
+| `is_active` | Boolean | No | Report activation (default: true) |
 | `created_at` | DateTime | Yes | Creation timestamp |
+| `last_generated_at` | DateTime | No | Last generation timestamp |
+
+### Dashboard Widget Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `dashboard_id` | UUID | Yes | Parent dashboard |
+| `name` | String (255) | Yes | Widget name |
+| `widget_type` | Enum: [COUNTER, LINE_CHART, BAR_CHART, TABLE, GAUGE] | Yes | Widget type |
+| `metric` | String (128) | Yes | Connected metric |
+| `config` | JSONB | Yes | Widget configuration (filters, colors, thresholds) |
+| `position_x` | Integer | No | Grid position X |
+| `position_y` | Integer | No | Grid position Y |
+| `width` | Integer | No | Widget width (1-12 columns) |
 
 ### Dashboard Entity
 
@@ -61,46 +81,59 @@ Reporting & Analytics is the intelligence layer on top of the document pipeline:
 |-------|------|----------|---------|
 | `id` | UUID | Yes | Primary key |
 | `name` | String (255) | Yes | Dashboard name |
-| `widgets` | JSONB | Yes | Widget definitions |
+| `widgets` | JSONB | Yes | Widget definitions (array of widget IDs) |
 | `owner_id` | UUID | Yes | Dashboard owner |
-| `is_default` | Boolean | No | Default dashboard |
+| `is_default` | Boolean | No | Default dashboard for users |
+| `is_public` | Boolean | No | Shareable with team |
 | `created_at` | DateTime | Yes | Creation timestamp |
 
 ---
 
-## Required API Endpoints
+## Entity Relationships
 
-### Dashboard & Metrics
+```
+Metric (central data source)
+  ├── Dashboard Widget (many-to-one)    ← via metric name
+  └── Report (many-to-one)              ← via metrics in template
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/dashboard` | Get default dashboard data |
-| `GET` | `/dashboard/custom` | Get custom dashboard data |
-| `GET` | `/metrics` | List all available metrics |
-| `GET` | `/metrics/{name}` | Get specific metric data |
-| `GET` | `/metrics/trend` | Get metric trend over time |
+Report
+  └── Metric (many-to-one)              ← via metrics in template
 
-### Reports
+Dashboard
+  └── Dashboard Widget (one-to-many)    ← via dashboard_id
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/reports` | List all reports |
-| `POST` | `/reports` | Create report |
-| `GET` | `/reports/{id}` | Get report details |
-| `PATCH` | `/reports/{id}` | Update report |
-| `DELETE` | `/reports/{id}` | Delete report |
-| `POST` | `/reports/{id}/generate` | Generate report |
-| `GET` | `/reports/{id}/download` | Download generated report |
+Dashboard Widget
+  ├── Dashboard (many-to-one)           ← via dashboard_id
+  └── Metric (many-to-one)              ← via metric name
+```
 
-### Analytics
+---
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/analytics/processing` | Processing analytics |
-| `GET` | `/analytics/quality` | Extraction quality analytics |
-| `GET` | `/analytics/workflow` | Workflow analytics |
-| `GET` | `/analytics/costs` | Cost analytics |
-| `GET` | `/analytics/trends` | Trend analysis |
+## Rossum Technical Patterns to Follow
+
+### Pattern 1: Workflow Automation Analytics
+
+Rossum provides comprehensive workflow reporting that tracks:
+- **Automation rates** — Percentage of documents processed without human intervention
+- **Team performance** — Processing times, correction rates, approvals per team member
+- **Processing times** — End-to-end time from ingestion to final approval
+- **Exception rates** — Percentage of documents requiring manual review
+- **SLA compliance** — Percentage of documents processed within SLA timeframes
+
+This reporting is designed for enterprise management — proving ROI to stakeholders. The key insight is that document processing metrics should be presented in business terms (time saved, cost reduced, accuracy improved), not technical terms (API calls, page counts).
+
+**Recommendation: RERP should present metrics in business terms.** Instead of "pages processed," show "documents processed." Instead of "API calls," show "time saved." The dashboard should answer: how many invoices were processed? How many were auto-approved? What's the average processing time? What's the error rate? How much time/money was saved?
+
+### Pattern 2: Confidence Score Distributions
+
+Rossum tracks confidence scores across all extractions. This reveals:
+- **High-confidence extractions** (≥0.95) — auto-approved
+- **Medium-confidence extractions** (0.7-0.95) — reviewed by junior staff
+- **Low-confidence extractions** (<0.7) — reviewed by senior staff or rejected
+
+The distribution of confidence scores directly correlates with automation rates and operational costs. By tracking this over time, organizations can identify which document types are improving and which need more attention.
+
+**Recommendation: RERP should implement confidence score distribution analytics.** Track the distribution of confidence scores over time, grouped by document type, schema, and user. This enables targeted improvements — if a document type has consistently low confidence scores, the extraction schema needs refinement.
 
 ---
 
@@ -109,55 +142,77 @@ Reporting & Analytics is the intelligence layer on top of the document pipeline:
 ### DocuPipe: Basic Usage Metrics
 DocuPipe provides basic usage metrics: pages processed, credits consumed, API call counts. No extraction quality reports or workflow analytics. Cost metrics are straightforward (credits × rate) but limited to credit consumption. No trend analysis or custom dashboards. The focus is on operational metrics, not business intelligence.
 
-### AWS Textract: AWS Native Analytics
+**Key weakness:** Only credit consumption tracking, no quality or performance metrics.
+
+### AWS Textract: CloudWatch Integration
 Textract integrates with AWS CloudWatch for monitoring and AWS QuickSight for analytics. You can track API calls, page counts, error rates, and latency through CloudWatch. QuickSight provides dashboards and trend analysis. The advantage is deep AWS integration with unlimited customization. The disadvantage is operational complexity — you're building analytics on AWS primitives.
+
+**Key strengths:** CloudWatch integration, QuickSight dashboards, unlimited customization
+**Key weaknesses:** Operational complexity, AWS lock-in, operational metrics only
 
 ### Rossum: Enterprise Workflow Analytics
 Rossum provides comprehensive workflow reporting: automation rates, team performance, processing times, exception rates. The validation screen includes metrics on review times and correction patterns. Custom business logic can generate tailored reports. The analytics are designed for enterprise management — proving ROI to stakeholders.
 
-### Hyperscience: Accuracy-First Analytics
-Hyperscience provides accuracy benchmarks and processing metrics. The ORCA Challenge demonstrates accuracy rates (99.5%) with detailed breakdowns by document type. Processing speed analytics track throughput vs. human processing. ROI calculators help justify automation investments. Analytics are designed for regulated industries where accuracy and compliance are measurable.
+**Key strengths:** Workflow analytics, team performance tracking, ROI reporting
+**Key weaknesses:** Enterprise-only, no self-hosted option
 
-### Adobe PDF Services: Transaction Analytics
-Adobe PDF Services tracks document transactions, API calls, and API health. The developer console shows usage trends and error rates. No extraction quality metrics (Adobe doesn't perform extraction, just PDF manipulation). Cost analytics are based on transaction counts. The analytics are operational, not business-focused.
-
-### Paperless-ngx: Community Analytics
+### Paperless-ngx: Basic Dashboard Statistics
 Paperless-ngx provides basic dashboard statistics: total documents, storage used, OCR results, processing times. Customizable dashboard with saved views. No extraction quality metrics (no extraction pipeline). The analytics are designed for personal or small-team use, not enterprise reporting. Free and self-hosted.
+
+**Key strengths:** Free, self-hosted, basic statistics
+**Key weaknesses:** No extraction quality metrics, no ROI reporting
 
 ### M-Files: Enterprise BI Integration
 M-Files integrates with Microsoft Power BI and other BI tools. Deep Microsoft 365 integration means documents are searchable and analyzable in Power BI, Excel, and other M365 tools. Custom reporting with metadata-driven dimensions. The analytics are designed for enterprise business intelligence — connecting document data to broader business metrics.
+
+**Key strengths:** Power BI integration, M365 analytics, metadata-driven dimensions
+**Key weaknesses:** Enterprise pricing, Microsoft lock-in
+
+---
+
+## Competitive Positioning
+
+### Where RERP Wins
+- **Self-hosted, no analytics licensing** — Unlike Rossum (included in $18k+/yr) or M-Files (enterprise pricing), RERP provides full analytics at zero cost
+- **Business-term metrics** — Unlike DocuPipe (credit consumption) or Textract (API calls), RERP presents metrics in business terms (time saved, accuracy, ROI)
+- **OpenAPI-defined metrics** — Every metric is defined in OpenAPI specs, enabling automatic SDK generation and BI tool integration
+
+### Where RERP Lags
+- **No metrics collection** — Not yet implemented
+- **No dashboards** — Not yet implemented
+- **No ROI reporting** — Not yet implemented
 
 ---
 
 ## Implementation Roadmap
 
 ### Phase 1: Basic Metrics (2-3 weeks) — P4
-1. Define Metric entity
-2. Implement processing volume metrics
-3. Basic dashboard with key metrics
-4. Document type distribution charts
-5. Processing time statistics
+1. Define `Metric` entity with dimension support
+2. Implement processing volume metrics (documents processed, pages processed)
+3. Basic dashboard with key metrics (counter widgets)
+4. Document type distribution charts (bar charts)
+5. Processing time statistics (average, median, p95)
 
 ### Phase 2: Quality Analytics (3-4 weeks) — P4
-1. Extraction accuracy metrics
-2. Confidence score distributions
-3. Exception rate tracking
-4. Human review statistics
-5. Quality trend analysis
+1. Extraction accuracy metrics (confidence score distributions)
+2. Exception rate tracking (documents requiring manual review)
+3. Human review statistics (review times, correction rates)
+4. Quality trend analysis (accuracy over time, by document type)
+5. Confidence score distribution charts
 
 ### Phase 3: Business Analytics (4-6 weeks) — P4
-1. Cost analytics (per document type, team, department)
-2. ROI calculation and reporting
-3. Workflow bottleneck analysis
-4. SLA compliance reporting
-5. Custom dashboard builder
+1. Cost analytics (processing cost per document type, team, department)
+2. ROI calculation and reporting (time saved, cost reduced, accuracy improved)
+3. Workflow bottleneck analysis (throughput by stage, approval times)
+4. SLA compliance reporting (documents processed within SLA timeframes)
+5. Custom dashboard builder (drag-and-drop widget editor)
 
 ### Phase 4: Advanced BI (3-4 weeks) — P4
-1. Scheduled report generation
-2. Report export (PDF, CSV, HTML)
-3. Email report distribution
-4. Power BI / Tableau integration
-5. Predictive analytics (volume forecasting)
+1. Scheduled report generation (cron-based, PDF/CSV/HTML output)
+2. Report export and email distribution
+3. Power BI / Tableau integration (OData feed for BI tools)
+4. Predictive analytics (volume forecasting, error prediction)
+5. Executive summary generation (automated narrative reports)
 
 ---
 

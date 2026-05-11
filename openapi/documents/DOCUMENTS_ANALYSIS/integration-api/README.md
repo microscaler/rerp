@@ -2,6 +2,8 @@
 
 > **Component:** REST API design, webhook support, SDK generation, and third-party integrations
 > **Priority:** P3 — Critical for dev-first positioning
+> **DocuPipe Reference:** POST /workflow/on_submit_document (chained operations), webhooks for async callbacks, base64 document uploads
+> **Docparser Reference:** GET /v1/parsers, HTTP Basic Auth with API key, rate limiting (60/min single, 30/min batch)
 
 ---
 
@@ -9,7 +11,7 @@
 
 **Buyer Question:** *Can I integrate document processing into my existing applications with type-safe SDKs, webhooks, and API contracts — without vendor lock-in or proprietary formats?*
 
-If the answer is no, you have a point solution, not a platform. The value of document intelligence compounds when it connects to your entire technology stack. Without clean APIs, webhooks, and SDKs, document processing is an island — you have to manually export and import data, which defeats automation.
+If the answer is no, you have a point solution, not a platform. The value of document intelligence compounds when it connects to your entire technology stack. Without clean APIs, webhooks, and SDKs, document processing is an island — you have to manually export and import data, which defeats automation. This component defines how the platform exposes its capabilities, how third-party systems integrate with it, and how SDKs are generated and distributed.
 
 ---
 
@@ -32,15 +34,17 @@ Integration & API is the connectivity layer:
 
 ### API Key Entity
 
+The authentication credential for programmatic access.
+
 | Field | Type | Required | Purpose |
 |-------|------|----------|---------|
 | `id` | UUID | Yes | Primary key |
-| `name` | String (255) | Yes | API key name |
-| `key_prefix` | String (8) | Yes | First 8 chars for identification |
-| `key_hash` | String (64) | Yes | Hashed API key (never stored plain) |
-| `permissions` | String[] | Yes | Allowed permissions |
-| `rate_limit` | Integer | No | Requests per minute |
-| `is_active` | Boolean | No | Key activation |
+| `name` | String (255) | Yes | API key name (for identification) |
+| `key_prefix` | String (8) | Yes | First 8 chars shown to user (never the full key) |
+| `key_hash` | String (64) | Yes | SHA-256 hash of API key (never stored plain) |
+| `permissions` | String[] | Yes | Allowed permissions (document:read, document:write, etc.) |
+| `rate_limit` | Integer | No | Requests per minute (0 = unlimited) |
+| `is_active` | Boolean | No | Key activation (default: true) |
 | `created_at` | DateTime | Yes | Creation timestamp |
 | `last_used_at` | DateTime | No | Last use timestamp |
 
@@ -52,8 +56,9 @@ Integration & API is the connectivity layer:
 | `url` | String (1000) | Yes | Webhook endpoint URL |
 | `events` | String[] | Yes | Subscribed event types |
 | `secret` | String (64) | No | HMAC signing secret |
-| `is_active` | Boolean | No | Subscription activation |
+| `is_active` | Boolean | No | Subscription activation (default: true) |
 | `created_at` | DateTime | Yes | Creation timestamp |
+| `last_triggered_at` | DateTime | No | Last trigger timestamp |
 
 ### Webhook Event Entity
 
@@ -61,105 +66,166 @@ Integration & API is the connectivity layer:
 |-------|------|----------|---------|
 | `id` | UUID | Yes | Primary key |
 | `event_type` | String (128) | Yes | Event type |
-| `payload` | JSONB | Yes | Event payload |
+| `payload` | JSONB | Yes | Event payload data |
+| `signature` | String (64) | No | HMAC-SHA256 signature |
 | `status` | Enum: [PENDING, SENT, FAILED, RETRYING] | Yes | Delivery status |
-| `attempts` | Integer | Yes | Retry count |
+| `attempts` | Integer | Yes | Retry count (max 5, exponential backoff) |
+| `next_retry_at` | DateTime | No | Next retry timestamp |
+| `created_at` | DateTime | Yes | Creation timestamp |
+| `delivered_at` | DateTime | No | Delivery timestamp |
+
+### Integration Endpoint Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String (255) | Yes | Integration name (e.g., "SAP AP") |
+| `url` | String (1000) | Yes | Integration endpoint URL |
+| `auth_type` | Enum: [NONE, API_KEY, OAUTH2, BASIC] | Yes | Authentication type |
+| `payload_template` | JSONB | No | Payload template for data export |
+| `is_active` | Boolean | No | Integration activation (default: true) |
 | `created_at` | DateTime | Yes | Creation timestamp |
 
 ---
 
-## Required API Endpoints
+## Entity Relationships
 
-### API Key Management
+```
+API Key
+  ├── Webhook Event (one-to-many)         ← via API key in webhook headers
+  └── Integration Endpoint (one-to-many)  ← via API key for auth
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/keys` | List API keys |
-| `POST` | `/api/keys` | Create API key |
-| `DELETE` | `/api/keys/{id}` | Revoke API key |
-| `GET` | `/api/keys/{id}/usage` | Get key usage statistics |
+Webhook Subscription
+  ├── Webhook Event (one-to-many)         ← via subscription_id
+  └── API Key (many-to-one)               ← via API key that created subscription
 
-### Webhook Management
+Webhook Event
+  └── Webhook Subscription (many-to-one)  ← via subscription_id
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/webhooks` | List webhook subscriptions |
-| `POST` | `/webhooks` | Create webhook subscription |
-| `PATCH` | `/webhooks/{id}` | Update webhook |
-| `DELETE` | `/webhooks/{id}` | Delete webhook |
-| `POST` | `/webhooks/{id}/test` | Test webhook delivery |
-| `GET` | `/webhooks/{id}/events` | Get webhook event history |
+Integration Endpoint
+  └── API Key (many-to-one)               ← via API key used for auth
+```
 
-### API Versioning
+---
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/version` | Get current API version |
-| `GET` | `/api/changelog` | API changelog |
-| `GET` | `/api/supported-versions` | List supported versions |
+## DocuPipe Technical Patterns to Follow
+
+### Pattern 1: Webhook as First-Class Citizen
+
+DocuPipe uses webhooks as the primary delivery mechanism for async processing results. When a document processing job completes, a webhook is fired immediately — no polling needed. This is the right pattern for document processing because:
+- Processing can take seconds to minutes (longer than HTTP request timeout)
+- Webhooks eliminate the need for polling loops in client code
+- Webhooks reduce API call volume (no repeated GET requests)
+
+```python
+# DocuPipe webhook pattern
+# Client registers webhook URL
+HEADERS = {"accept": "application/json", "X-API-Key": api_key}
+
+# After job completes, DocuPipe fires webhook to registered URL
+# with JSON payload containing documentId, jobId, and result
+def handle_webhook(request):
+    payload = request.json  # {"documentId": "...", "jobId": "...", "result": {...}}
+    # Process the result
+    return {"status": "received"}, 200
+```
+
+**Recommendation: RERP should implement webhooks as the primary delivery mechanism.** Support webhook registration on document creation, workflow completion, and extraction result availability. Use exponential backoff for retries (2s, 4s, 8s, 16s, 32s — max 5 attempts). Sign all webhook payloads with HMAC-SHA256 so recipients can verify authenticity.
+
+### Pattern 2: Rate Limiting with Clear Headers
+
+Docparser implements rate limits at the API level:
+- 60 calls/minute for single document results (`GET /v1/results/<parser_id>/<document_id>`)
+- 30 calls/minute for batch results (`GET /v1/results/<parser_id>`)
+- When limits are exceeded, the API returns 429 Too Many Requests
+
+**Recommendation: RERP should implement rate limiting with standard headers.** Return `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` headers with every response. When the limit is exceeded, return 429 with a `Retry-After` header. Per-key rate limits allow enterprise customers to request higher limits.
 
 ---
 
 ## Competitive Intelligence Deep Dive
 
-### DocuPipe: Clean REST API
-DocuPipe has excellent API documentation at readme.io. REST API with JSON request/response. API key authentication. Webhooks for async processing callbacks. SDKs for TypeScript and Python. The API is well-designed and developer-friendly. No GraphQL support. Rate limits are generous on paid plans.
+### DocuPipe: Clean REST API with Chained Operations
+DocuPipe has excellent API documentation. REST API with JSON request/response. API key authentication (X-API-Key header). Webhooks for async processing callbacks. SDKs for TypeScript and Python. The API is well-designed and developer-friendly. No GraphQL support. Rate limits are generous on paid plans.
 
-### AWS Textract: Infrastructure API
+**Key strengths:** Clean REST API, chained operations via workflow endpoint, webhook support
+**Key weaknesses:** No GraphQL, no SDK generation, no OpenAPI spec
+
+### AWS Textract: AWS SDK-Driven
 Textract uses AWS SDKs (boto3 for Python, aws-sdk for JavaScript, etc.) rather than a direct REST API. The advantage is language-specific SDKs with auto-generated client libraries. The disadvantage is AWS SDK complexity — you're tied to AWS's API design patterns. No webhook support — you must poll or use S3 event notifications.
 
-### Docparser: Developer-Friendly API
-Docparser provides a clean REST API with JSON request/response. API key authentication. Webhook support for parsing completion. Export to JSON, XML, CSV, Excel. Integration with 100+ services via Zapier, Make, and native connectors. The API is well-documented with code examples in multiple languages.
+**Key strengths:** Multi-language SDKs, AWS-native integration
+**Key weaknesses:** AWS SDK complexity, no direct REST API, no self-hosted
 
-### Rossum: Enterprise API
-Rossum provides a comprehensive REST API with full CRUD operations. OAuth 2.0 authentication. Webhook support for workflow events. API rate limits are configured per enterprise contract. Integration with SAP, Coupa, Workday, and Oracle via API. No public SDKs — enterprise support includes custom integration assistance.
+### Docparser: Developer-Friendly API with SDKs
+Docparser provides a clean REST API with JSON request/response. HTTP Basic Auth with API key. Webhook support for parsing completion. Export to JSON, XML, CSV, Excel. Integration with 100+ services via Zapier, Make, and native connectors. Rate limits: 60/min single, 30/min batch. SDKs for PHP, Node.js, Python (third-party), and Salesforce Apex.
 
-### Hyperscience: Python-First API
-Hyperscience's API is designed for Python developers. Human-readable Python code for custom extraction logic. REST API with JSON request/response. OAuth 2.0 authentication. Webhook support for event notifications. The API is designed to be extensible — developers can add custom logic without modifying the core platform.
+**Key strengths:** REST API, SDKs for multiple languages, webhook support
+**Key weaknesses:** Older API (last updated 2018), no OpenAPI spec, no GraphQL
 
-### Adobe PDF Services: Developer SDKs
-Adobe provides SDKs for JavaScript, Python, and Java. REST API with Document Transaction model (each PDF operation costs 1 transaction). Free tier: 500 transactions/month. The API is well-documented with interactive examples. No webhook support — operations are synchronous.
+### Hyperscience: API-First with Custom Code Blocks
+Hyperscience treats integrations as configurable Blocks within the workflow engine. Integration Blocks enable data to flow between systems — RPA platforms, databases, content management systems, and custom applications. API-first architecture with Python SDK for custom code blocks. Supports AWS, Google, Azure, on-premises, and FedRAMP High deployments.
+
+**Key strengths:** API-first, custom code blocks, multi-deployment
+**Key weaknesses:** Enterprise-only, no self-hosted option
 
 ### Paperless-ngx: Open API
 Paperless-ngx provides a REST API with Swagger/OpenAPI documentation. Token-based authentication. No webhooks — you must poll for changes. The API supports CRUD operations on all entities (documents, tags, correspondents, types). Community-maintained SDKs for Python and JavaScript.
+
+**Key strengths:** OpenAPI documentation, token auth, community SDKs
+**Key weaknesses:** No webhooks, polling-only, community-maintained SDKs
+
+---
+
+## Competitive Positioning
+
+### Where RERP Wins
+- **OpenAPI-first with auto-generated SDKs** — Unlike DocuPipe (no OpenAPI) or Docparser (no OpenAPI), RERP generates SDKs from OpenAPI specs
+- **Multi-language SDK generation** — Unlike Docparser (PHP, Node, third-party Python), RERP generates TypeScript, Python, Rust, and Go from a single spec
+- **Webhooks + polling** — Unlike Paperless-ngx (polling only), RERP supports both webhooks and polling
+
+### Where RERP Lags
+- **No SDK generation** — Not yet implemented
+- **No webhook delivery** — Not yet implemented
+- **No API documentation** — Not yet implemented
 
 ---
 
 ## Implementation Roadmap
 
 ### Phase 1: Core API (2-3 weeks) — P3
-1. Define API Key entity with secure storage
-2. Implement API key authentication
-3. Rate limiting per API key
-4. Basic REST API documentation (OpenAPI spec)
-5. API key usage tracking
+1. Define `API Key` entity with secure key storage (hash only)
+2. Implement API key authentication middleware
+3. Rate limiting per API key (Redis-backed counter)
+4. Basic REST API documentation (OpenAPI spec generation)
+5. API key usage tracking and audit logging
 
 ### Phase 2: Webhooks & Events (3-4 weeks) — P3
-1. Define Webhook Subscription entity
-2. Implement webhook delivery system
-3. HMAC signature verification for webhook payloads
-4. Retry logic with exponential backoff
-5. Webhook event history and monitoring
+1. Define `Webhook Subscription` entity with event filtering
+2. Implement webhook delivery system with HTTP POST
+3. HMAC-SHA256 signature verification for webhook payloads
+4. Retry logic with exponential backoff (2s, 4s, 8s, 16s, 32s)
+5. Webhook event history and monitoring dashboard
 
 ### Phase 3: SDK Generation (2-3 weeks) — P3
-1. Generate TypeScript SDK from OpenAPI spec
-2. Generate Python SDK from OpenAPI spec
-3. Generate Rust SDK from OpenAPI spec
-4. SDK versioning aligned with API versioning
-5. SDK documentation with examples
+1. Implement OpenAPI spec generation from RERP models
+2. Generate TypeScript SDK from OpenAPI spec (openapi-typescript-codegen)
+3. Generate Python SDK from OpenAPI spec (openapi-python-client)
+4. Generate Rust SDK from OpenAPI spec (openapi-rust)
+5. Publish SDKs to npm, PyPI, crates.io with version alignment
 
 ### Phase 4: Advanced Features (3-4 weeks) — P4
 1. OAuth 2.0 authentication support
-2. GraphQL endpoint for flexible queries
+2. GraphQL endpoint for flexible queries (GraphQL schema from OpenAPI)
 3. API versioning with migration guides
-4. Integration marketplace (pre-built connectors)
+4. Integration marketplace (pre-built connectors for SAP, Workday, etc.)
 5. API analytics and usage dashboard
 
 ---
 
 ## Key Takeaway for Buyers
 
-RERP Documents' API pitch is **OpenAPI-first, multi-language SDKs, and self-hosted**. Unlike Textract (AWS SDKs only) or Rossum (enterprise API only), RERP provides developer-friendly APIs with automatic SDK generation for TypeScript, Python, and Rust. Unlike Adobe (per-transaction pricing), RERP has zero per-API-call costs for self-hosted use.
+RERP Documents' API pitch is **OpenAPI-first, multi-language SDKs, and self-hosted**. Unlike DocuPipe (no OpenAPI) or Textract (AWS SDKs only), RERP provides developer-friendly APIs with automatic SDK generation for TypeScript, Python, and Rust. Unlike Adobe (per-transaction pricing), RERP has zero per-API-call costs for self-hosted use.
 
 The OpenAPI-first approach means every API change is version-controlled, documented, and automatically generates type-safe SDKs. The Rust-native API delivers sub-millisecond latency for all endpoints. And because the API is fully defined in OpenAPI, every client gets complete API documentation, automatic validation, and tooling that works out of the box.
 
