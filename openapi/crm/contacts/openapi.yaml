@@ -621,6 +621,7 @@ components:
         country_id:
           type: string
           format: uuid
+      description: Request body for creating a new contact person
     UpdateContactRequest:
       type: object
       properties:
@@ -681,6 +682,7 @@ components:
       - zip
       - country_id
       - active
+      description: Request body for updating an existing contact person
     ContactHierarchy:
       type: object
       properties:
@@ -708,6 +710,7 @@ components:
                 type: boolean
       required:
       - children
+      description: Contact tree showing parent-child relationships
     MergeContactsRequest:
       type: object
       required:
@@ -720,6 +723,7 @@ components:
         remove_id:
           type: string
           format: uuid
+      description: Request body for merging two duplicate contacts
     MergeResult:
       type: object
       properties:
@@ -779,6 +783,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Contact'
+      description: Paginated list of Contact records
   securitySchemes:
     bearerAuth:
       type: http

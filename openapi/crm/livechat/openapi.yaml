@@ -1027,6 +1027,7 @@ components:
           type: array
           items:
             type: string
+      description: Request body for creating a new chat session
     SendChatRequest:
       type: object
       required:
@@ -1034,6 +1035,7 @@ components:
       properties:
         visitor_id:
           type: string
+      description: Request body for sending a chat message
     ConvertChatRequest:
       type: object
       required:
@@ -1062,6 +1064,7 @@ components:
           type: array
           items:
             type: string
+      description: Request body for converting a chat session to a lead
     ChatConversionResult:
       type: object
       properties:
@@ -1080,6 +1083,7 @@ components:
       - chat_id
       - lead_id
       - contact_id
+      description: Result of converting a chat to a lead
     ChatTranscript:
       type: object
       properties:
@@ -1104,6 +1108,7 @@ components:
       - started_at
       - ended_at
       - duration_seconds
+      description: Chat transcript with message history and session metadata
     ChatMessage:
       type: object
       required:
@@ -1149,6 +1154,7 @@ components:
         sender_id:
           type: string
           format: uuid
+      description: Request body for sending a message in a chat session
     Agent:
       type: object
       required:
@@ -1211,6 +1217,7 @@ components:
           type: array
           items:
             type: string
+      description: Request body for creating a new agent
     UpdateAgentRequest:
       type: object
       properties:
@@ -1226,6 +1233,7 @@ components:
       - max_concurrent
       - skills
       - is_online
+      description: Request body for updating an existing agent
     AgentStatusRequest:
       type: object
       required:
@@ -1233,6 +1241,7 @@ components:
       properties:
         is_online:
           type: boolean
+      description: Request body for updating agent online status
     AgentMetrics:
       type: object
       properties:
@@ -1270,12 +1279,14 @@ components:
       - ACTIVE
       - CLOSED
       - TRANSFERRED
+      description: Enum of chat statuses (waiting, active, closed, missed)
     SenderType:
       type: string
       enum:
       - AGENT
       - VISITOR
       - BOT
+      description: Enum of message sender types (agent, visitor, system)
     PaginatedResponse:
       type: object
       required:
@@ -1316,6 +1327,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Agent'
+      description: Paginated list of Agent records
     PaginatedChatSession:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1325,6 +1337,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ChatSession'
+      description: Paginated list of ChatSession records
     PaginatedChatMessage:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1334,6 +1347,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ChatMessage'
+      description: Paginated list of ChatMessage records
     PaginatedAgentStatus:
       type: object
       properties:
@@ -1350,6 +1364,7 @@ components:
       - name
       - is_online
       - active_sessions
+      description: Paginated list of AgentStatus records
     AgentQueueItem:
       type: object
       required:
@@ -1374,6 +1389,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/AgentQueueItem'
+      description: Paginated list of AgentQueueItem records
   securitySchemes:
     bearerAuth:
       type: http

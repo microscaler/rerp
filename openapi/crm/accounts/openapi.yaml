@@ -566,6 +566,7 @@ components:
         country_id:
           type: string
           format: uuid
+      description: Request body for creating a new account/organization
     UpdateAccountRequest:
       type: object
       properties:
@@ -630,6 +631,7 @@ components:
       - zip
       - country_id
       - active
+      description: Request body for updating an existing account/organization
     AccountHierarchy:
       type: object
       properties:
@@ -655,6 +657,7 @@ components:
                 type: string
       required:
       - children
+      description: Account tree with parent-child relationships for org structure
     AccountContactSummary:
       type: object
       properties:
@@ -675,6 +678,7 @@ components:
       - email
       - phone
       - function
+      description: Summary of contacts associated with an account
     AccountReport:
       type: object
       properties:
@@ -707,6 +711,7 @@ components:
       - by_size
       - total_accounts
       - total_employees
+      description: Analytics report data for an account including metrics and KPIs
     Accountcontactsummarys:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -716,6 +721,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/AccountContactSummary'
+      description: Collection of account-contact summary records
     ErrorResponse:
       type: object
       required:
@@ -756,6 +762,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Account'
+      description: Paginated list of Account records
   securitySchemes:
     bearerAuth:
       type: http

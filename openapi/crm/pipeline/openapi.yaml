@@ -1141,6 +1141,7 @@ components:
         recurring_revenue:
           type: number
           format: double
+      description: Request body for creating a new lead
     UpdateLeadRequest:
       type: object
       properties:
@@ -1258,6 +1259,7 @@ components:
       - source_id
       - date_deadline
       - lost_reason_id
+      description: Request body for updating an existing lead
     Stage:
       type: object
       required:
@@ -1351,6 +1353,7 @@ components:
           maximum: 16
         description:
           type: string
+      description: Request body for creating a new pipeline stage
     UpdateStageRequest:
       type: object
       properties:
@@ -1391,6 +1394,7 @@ components:
       - fold
       - color
       - description
+      description: Request body for updating an existing stage
     StageChangeRequest:
       type: object
       required:
@@ -1406,6 +1410,7 @@ components:
         comment:
           type: string
           description: Optional comment on stage change
+      description: Request body for transitioning a lead to a new stage
     ConvertLeadRequest:
       type: object
       properties:
@@ -1426,6 +1431,7 @@ components:
       - type
       - create_contact
       - create_account
+      description: Request body for converting a lead to contact/account
     ConversionResult:
       type: object
       properties:
@@ -1461,6 +1467,7 @@ components:
       - email
       - phone
       - name
+      description: Request body for checking lead duplicates by email/phone/name
     DuplicateDetectionResult:
       type: object
       properties:
@@ -1484,6 +1491,7 @@ components:
         merge_id:
           type: string
           format: uuid
+      description: Request body for merging duplicate leads
     MergeResult:
       type: object
       properties:
@@ -1543,6 +1551,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Lead'
+      description: Paginated list of Lead records
     PaginatedStage:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1552,6 +1561,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Stage'
+      description: Paginated list of Stage records
     PaginatedPipelineSummary:
       type: object
       required:
@@ -1589,6 +1599,7 @@ components:
               avg_days_in_stage:
                 type: number
                 format: float
+      description: Paginated list of PipelineSummary records
   parameters:
     Id:
       name: id

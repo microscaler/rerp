@@ -1168,6 +1168,7 @@ components:
         is_active:
           type: boolean
           default: true
+      description: Request body for creating a new workflow automation
     UpdateWorkflowRequest:
       type: object
       properties:
@@ -1194,6 +1195,7 @@ components:
       - description
       - sequence
       - is_active
+      description: Request body for updating an existing workflow
     Rule:
       type: object
       required:
@@ -1263,6 +1265,7 @@ components:
           type: boolean
         sequence:
           type: integer
+      description: Request body for creating a new workflow rule
     UpdateRuleRequest:
       type: object
       properties:
@@ -1287,6 +1290,7 @@ components:
       - condition_value
       - is_active
       - sequence
+      description: Request body for updating an existing rule
     Trigger:
       type: object
       required:
@@ -1347,6 +1351,7 @@ components:
         enabled:
           type: boolean
           default: true
+      description: Request body for creating a new workflow trigger
     UpdateTriggerRequest:
       type: object
       properties:
@@ -1365,6 +1370,7 @@ components:
       - schedule
       - entity
       - field
+      description: Request body for updating an existing trigger
     WorkflowExecution:
       type: object
       properties:
@@ -1394,6 +1400,7 @@ components:
       - triggered_by
       - started_at
       - completed_at
+      description: Record of a workflow execution event with timing and status
     WorkflowExecutionResult:
       type: object
       properties:
@@ -1479,6 +1486,7 @@ components:
           format: date-time
         action_config:
           type: object
+      description: Request body for scheduling a one-time action
     RecurringActionRequest:
       type: object
       required:
@@ -1493,6 +1501,7 @@ components:
           description: Cron expression
         action_config:
           type: object
+      description: Request body for scheduling a recurring action
     TriggerType:
       type: string
       enum:
@@ -1504,6 +1513,7 @@ components:
       - ON_CREATE
       - ON_UPDATE
       - ON_DELETE
+      description: Enum of trigger types (event-based, schedule-based, webhook-based)
     ActionType:
       type: string
       enum:
@@ -1515,6 +1525,7 @@ components:
       - CREATE_RECORD
       - SET_VALUE
       - ESCALATE
+      description: Enum of action types (notification, assign, update, create, etc.)
     ConditionOperator:
       type: string
       enum:
@@ -1528,6 +1539,7 @@ components:
       - IS_NOT_EMPTY
       - IN
       - NOT_IN
+      description: Enum of condition operators (equals, contains, greater_than, etc.)
     ConditionValueType:
       type: string
       enum:
@@ -1537,6 +1549,7 @@ components:
       - BOOLEAN
       - DATE
       - ENTITY
+      description: Enum of condition value types (string, number, date, boolean)
     ExecutionStatus:
       type: string
       enum:
@@ -1545,6 +1558,7 @@ components:
       - SUCCESS
       - FAILED
       - CANCELLED
+      description: Enum of workflow execution statuses (running, completed, failed)
     Workflowexecutions:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1554,6 +1568,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/WorkflowExecution'
+      description: Collection of workflow execution records
     Scheduledactions:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1563,6 +1578,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ScheduledAction'
+      description: Collection of scheduled action records
     ErrorResponse:
       type: object
       required:
@@ -1603,6 +1619,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Workflow'
+      description: Paginated list of Workflow records
     PaginatedRule:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1612,6 +1629,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Rule'
+      description: Paginated list of Rule records
     PaginatedTrigger:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1621,6 +1639,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Trigger'
+      description: Paginated list of Trigger records
   securitySchemes:
     bearerAuth:
       type: http

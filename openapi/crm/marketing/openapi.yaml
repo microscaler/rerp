@@ -936,6 +936,7 @@ components:
         company_id:
           type: string
           format: uuid
+      description: UTM campaign tracking parameters
     CreateUTMCampaignRequest:
       type: object
       required:
@@ -947,6 +948,7 @@ components:
           type: boolean
         sequence:
           type: integer
+      description: Request body for creating a new UTM campaign
     UpdateUTMCampaignRequest:
       type: object
       properties:
@@ -960,6 +962,7 @@ components:
       - name
       - active
       - sequence
+      description: Request body for updating an existing UTM campaign
     UTMMedium:
       type: object
       required:
@@ -975,6 +978,7 @@ components:
         active:
           type: boolean
           default: true
+      description: UTM medium type definition
     CreateUTMMediumRequest:
       type: object
       required:
@@ -984,6 +988,7 @@ components:
           type: string
         active:
           type: boolean
+      description: Request body for creating a new UTM medium
     UTMSource:
       type: object
       required:
@@ -1002,6 +1007,7 @@ components:
         active:
           type: boolean
           default: true
+      description: UTM source definition for traffic attribution
     CreateUTMSourceRequest:
       type: object
       required:
@@ -1014,6 +1020,7 @@ components:
           format: uuid
         active:
           type: boolean
+      description: Request body for creating a new UTM source
     WebForm:
       type: object
       required:
@@ -1080,6 +1087,7 @@ components:
         visitor_id:
           type: string
           description: Anonymous visitor ID (from cookie)
+      description: Request body for submitting a marketing form
     FormSubmissionResult:
       type: object
       properties:
@@ -1152,6 +1160,7 @@ components:
           type: string
         ip_address:
           type: string
+      description: Request body for tracking a visitor page view
     IdentifyVisitorRequest:
       type: object
       required:
@@ -1163,6 +1172,7 @@ components:
         email:
           type: string
           format: email
+      description: Request body for identifying a returning visitor
     EventRegistrationRequest:
       type: object
       required:
@@ -1189,6 +1199,7 @@ components:
         source:
           type: string
           default: web
+      description: Request body for registering for an event
     EventRegistration:
       type: object
       required:
@@ -1241,6 +1252,7 @@ components:
         responses:
           type: object
           description: All survey answers as key-value pairs
+      description: Request body for submitting a survey response
     SurveyResponse:
       type: object
       required:
@@ -1306,6 +1318,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/EventRegistration'
+      description: Paginated list of EventRegistration records
     PaginatedUTMCampaign:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1315,6 +1328,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UTMCampaign'
+      description: Paginated list of UTMCampaign records
     PaginatedUTMMedium:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1324,6 +1338,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UTMMedium'
+      description: Paginated list of UTMMedium records
     PaginatedUTMSource:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1333,6 +1348,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UTMSource'
+      description: Paginated list of UTMSource records
     PaginatedVisitorTracking:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1342,6 +1358,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/VisitorTracking'
+      description: Paginated list of VisitorTracking records
     CampaignLeadResult:
       type: object
       required:
@@ -1367,6 +1384,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/CampaignLeadResult'
+      description: Paginated list of CampaignLeadResult records
   securitySchemes:
     bearerAuth:
       type: http

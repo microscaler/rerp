@@ -1376,6 +1376,7 @@ components:
         saved:
           type: boolean
           default: false
+      description: Request body for building a report with filters and groupings
     SavedReport:
       type: object
       properties:
@@ -1396,6 +1397,7 @@ components:
       required:
       - name
       - type
+      description: Saved report with configuration and cached results
     ReportScheduleRequest:
       type: object
       required:
@@ -1416,6 +1418,7 @@ components:
         schedule:
           type: string
           description: Cron expression
+      description: Request body for scheduling a report
     ReportSchedule:
       type: object
       properties:
@@ -1443,6 +1446,7 @@ components:
       - recipient_ids
       - is_active
       - last_sent
+      description: Schedule configuration for automated report generation
     PaginatedResponse:
       type: object
       required:
@@ -1511,6 +1515,7 @@ components:
               avg_days_in_stage:
                 type: number
                 format: float
+      description: Paginated list of PipelineSummary records
     PaginatedConversionrate:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1520,6 +1525,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ConversionRate'
+      description: Paginated list of ConversionRate records
     PaginatedForecastentry:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1529,6 +1535,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ForecastEntry'
+      description: Paginated list of ForecastEntry records
     LeadSourceReport:
       type: object
       required:
@@ -1610,6 +1617,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LeadSourceReport'
+      description: Paginated list of LeadSourceReport records
     PaginatedLeaderboardEntry:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1619,6 +1627,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LeaderboardEntry'
+      description: Paginated list of LeaderboardEntry records
     PaginatedForecastAccuracyEntry:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1628,6 +1637,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ForecastAccuracyEntry'
+      description: Paginated list of ForecastAccuracyEntry records
   securitySchemes:
     bearerAuth:
       type: http

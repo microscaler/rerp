@@ -1137,6 +1137,7 @@ components:
           default: false
         default_value:
           type: string
+      description: Request body for creating a custom field definition
     UpdateCustomFieldRequest:
       type: object
       properties:
@@ -1160,6 +1161,7 @@ components:
       - visible
       - searchable
       - default_value
+      description: Request body for updating a custom field definition
     Webhook:
       type: object
       required:
@@ -1226,6 +1228,7 @@ components:
           type: object
         retry_count:
           type: integer
+      description: Request body for creating a webhook endpoint
     UpdateWebhookRequest:
       type: object
       properties:
@@ -1252,6 +1255,7 @@ components:
       - secret
       - is_active
       - retry_count
+      description: Request body for updating a webhook endpoint
     WebhookDeliveryLog:
       type: object
       properties:
@@ -1375,6 +1379,7 @@ components:
         expires_at:
           type: string
           format: date-time
+      description: Request body for creating an API key
     Integration:
       type: object
       required:
@@ -1421,6 +1426,7 @@ components:
           type: object
         sync_direction:
           $ref: '#/components/schemas/SyncDirection'
+      description: Request body for creating a third-party integration
     FieldType:
       type: string
       enum:
@@ -1438,6 +1444,8 @@ components:
       - SELECT
       - MANY2ONE
       - MANY2MANY
+      description: Enum of custom field types (text, number, date, boolean, select,
+        email, phone)
     AuditAction:
       type: string
       enum:
@@ -1447,6 +1455,7 @@ components:
       - READ
       - EXPORT
       - IMPORT
+      description: Enum of audit action types (create, update, delete, login, logout)
     WebhookEvent:
       type: string
       enum:
@@ -1457,6 +1466,7 @@ components:
       - opportunity.lost
       - contact.create
       - subscription.renewal_due
+      description: Enum of webhook event types (lead.created, contact.updated, etc.)
     WebhookDeliveryStatus:
       type: string
       enum:
@@ -1464,6 +1474,7 @@ components:
       - SUCCESS
       - FAILED
       - RETRYING
+      description: Enum of webhook delivery statuses (pending, sent, failed, retrying)
     IntegrationType:
       type: string
       enum:
@@ -1472,18 +1483,21 @@ components:
       - MARKETING
       - SUPPORT
       - CUSTOM
+      description: Enum of integration types (email, calendar, crm, accounting)
     SyncDirection:
       type: string
       enum:
       - CRM_TO_EXTERNAL
       - EXTERNAL_TO_CRM
       - BIDIRECTIONAL
+      description: Enum of sync directions (inbound, outbound, bidirectional)
     SyncStatus:
       type: string
       enum:
       - IDLE
       - SYNCING
       - ERROR
+      description: Enum of sync statuses (syncing, completed, failed, paused)
     PaginatedResponse:
       type: object
       required:
@@ -1524,6 +1538,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Webhook'
+      description: Paginated list of Webhook records
     PaginatedApiKey:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1533,6 +1548,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ApiKey'
+      description: Paginated list of ApiKey records
     PaginatedAuditLogEntry:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1542,6 +1558,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/AuditLogEntry'
+      description: Paginated list of AuditLogEntry records
     PaginatedCustomField:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1551,6 +1568,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/CustomField'
+      description: Paginated list of CustomField records
     PaginatedIntegration:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1560,6 +1578,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Integration'
+      description: Paginated list of Integration records
     PaginatedWebhookDeliveryLog:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1569,6 +1588,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/WebhookDeliveryLog'
+      description: Paginated list of WebhookDeliveryLog records
   securitySchemes:
     bearerAuth:
       type: http

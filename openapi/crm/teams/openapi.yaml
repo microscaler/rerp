@@ -603,6 +603,7 @@ components:
           - MY_TEAM
           - MY_COMPANY
           - ALL
+      description: Request body for creating a new team
     UpdateTeamRequest:
       type: object
       properties:
@@ -641,6 +642,7 @@ components:
       - assignment_domain
       - emoji
       - privacy_security
+      description: Request body for updating an existing team
     TeamMember:
       type: object
       required:
@@ -707,6 +709,7 @@ components:
         quota_monthly:
           type: number
           format: double
+      description: Request body for adding a member to a team
     AssignmentResult:
       type: object
       properties:
@@ -731,6 +734,7 @@ components:
       - assigned_count
       - failed_count
       - details
+      description: Result of lead assignment with counts and details
     PaginatedResponse:
       type: object
       required:
@@ -755,6 +759,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/TeamMember'
+      description: Collection of team members with metadata
     ErrorResponse:
       type: object
       required:
@@ -780,6 +785,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Team'
+      description: Paginated list of Team records
     UnassignedLead:
       type: object
       required:
@@ -801,6 +807,7 @@ components:
           type: string
         source:
           type: string
+      description: Lead data for unassigned leads in the queue
     PaginatedUnassignedLeads:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -810,6 +817,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UnassignedLead'
+      description: Paginated list of UnassignedLead records
   parameters:
     Id:
       name: id

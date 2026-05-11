@@ -1284,6 +1284,7 @@ components:
               type: string
             color:
               type: string
+      description: Score thresholds defining hot/warm/cold levels
     UpdateThresholdsRequest:
       type: object
       properties:
@@ -1294,6 +1295,7 @@ components:
       required:
       - hot_threshold
       - warm_threshold
+      description: Request body for updating lead scoring thresholds
     EnrichmentLookupRequest:
       type: object
       required:
@@ -1309,6 +1311,7 @@ components:
           type: string
         website:
           type: string
+      description: Request body for enriching lead from email lookup
     WebsiteEnrichmentRequest:
       type: object
       required:
@@ -1319,6 +1322,7 @@ components:
           format: uri
         company_name:
           type: string
+      description: Request body for enriching lead from website lookup
     BatchEnrichmentRequest:
       type: object
       required:
@@ -1336,6 +1340,7 @@ components:
           - HUNTER
           - ZOOMINFO
           - APOLLO
+      description: Request body for batch-enriching leads from external sources
     EnrichmentResponse:
       type: object
       properties:
@@ -1395,6 +1400,8 @@ components:
       required:
       - company
       - person
+      description: Result of enriching lead data from external sources including company
+        and person info
     EnrichmentResult:
       type: object
       properties:
@@ -1444,6 +1451,7 @@ components:
       - role_based
       - domain_valid
       - mx_records_exist
+      description: Result of email verification including deliverability check
     PhoneVerificationResult:
       type: object
       properties:
@@ -1459,6 +1467,7 @@ components:
       - phone
       - valid
       - carrier
+      description: Result of phone verification including carrier detection
     LeadMiningRequest:
       type: object
       required:
@@ -1477,6 +1486,7 @@ components:
         limit:
           type: integer
           default: 50
+      description: Request body for searching ICP-matched leads
     ICPMatchRequest:
       type: object
       required:
@@ -1488,6 +1498,7 @@ components:
         limit:
           type: integer
           default: 50
+      description: Request body for matching leads against ideal customer profile
     DiscoveredLead:
       type: object
       properties:
@@ -1518,12 +1529,15 @@ components:
       - title
       - industry
       - match_score
+      description: A discovered lead match from ICP-based prospecting with contact
+        and company details
     ScoreBucket:
       type: string
       enum:
       - HOT
       - WARM
       - COLD
+      description: Enum of score buckets (hot, warm, cold, unscored)
     CompanySize:
       type: string
       enum:
@@ -1531,6 +1545,7 @@ components:
       - SMB
       - MID_MARKET
       - ENTERPRISE
+      description: Enum of company size categories (micro, small, medium, enterprise)
     PersonRole:
       type: string
       enum:
@@ -1539,6 +1554,7 @@ components:
       - INDIVIDUAL_CONTRIBUTOR
       - INTERN
       - OTHER
+      description: Enum of person roles (decision_maker, influencer, end_user)
     PersonSeniority:
       type: string
       enum:
@@ -1549,12 +1565,14 @@ components:
       - SENIOR
       - MID
       - JUNIOR
+      description: Enum of seniority levels (junior, mid, senior, executive, c_suite)
     EnrichmentStatus:
       type: string
       enum:
       - PENDING
       - SUCCESS
       - FAILED
+      description: Enum of enrichment statuses (pending, completed, failed)
     EnrichmentSource:
       type: string
       enum:
@@ -1563,12 +1581,14 @@ components:
       - ZOOMINFO
       - APOLLO
       - LINKEDIN
+      description: Enum of data enrichment sources (clearbit, hunter, linkedin)
     PhoneType:
       type: string
       enum:
       - MOBILE
       - LANDLINE
       - VOIP
+      description: Enum of phone types (mobile, landline, toll_free)
     PaginatedResponse:
       type: object
       required:
@@ -1609,6 +1629,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ScoringFrequency'
+      description: Paginated list of ScoringFrequency records
     LeadScoreSummary:
       type: object
       required:
@@ -1653,6 +1674,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LeadScoreSummary'
+      description: Paginated list of LeadScoreSummary records
     PaginatedLeadScoreRanked:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1662,6 +1684,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/LeadScoreRanked'
+      description: Paginated list of LeadScoreRanked records
   securitySchemes:
     bearerAuth:
       type: http

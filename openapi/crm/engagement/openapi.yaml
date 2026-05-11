@@ -971,6 +971,7 @@ components:
           type: string
         seats:
           type: integer
+      description: Request body for creating a new customer subscription
     UpdateSubscriptionRequest:
       type: object
       properties:
@@ -994,6 +995,7 @@ components:
       - seats
       - payment_method
       - cancellation_reason
+      description: Request body for updating an existing subscription
     MRRMetrics:
       type: object
       properties:
@@ -1021,6 +1023,7 @@ components:
       - churn_mrr
       - net_mrr
       - period
+      description: Monthly Recurring Revenue metrics with breakdown by source
     ChurnMetrics:
       type: object
       properties:
@@ -1042,6 +1045,7 @@ components:
       - churn_rate
       - churned_revenue
       - period
+      description: Churn rate metrics including counts and revenue impact
     Goal:
       type: object
       required:
@@ -1120,6 +1124,7 @@ components:
         currency_id:
           type: string
           format: uuid
+      description: Request body for creating a new performance goal
     UpdateGoalRequest:
       type: object
       properties:
@@ -1141,6 +1146,7 @@ components:
       - start_date
       - end_date
       - is_active
+      description: Request body for updating an existing goal
     Badge:
       type: object
       required:
@@ -1164,6 +1170,7 @@ components:
           description: Achievement criteria (JSON)
         is_active:
           type: boolean
+      description: Badge definition with name, criteria, and icon
     UserBadge:
       type: object
       required:
@@ -1186,6 +1193,7 @@ components:
           format: date-time
         badge:
           $ref: '#/components/schemas/Badge'
+      description: Record of a user earning a badge with timestamp
     CustomerHealthScore:
       type: object
       required:
@@ -1221,6 +1229,7 @@ components:
           format: date-time
         risk_level:
           $ref: '#/components/schemas/RiskLevel'
+      description: Customer health score with contributing sub-scores
     SubscriptionStatus:
       type: string
       enum:
@@ -1229,12 +1238,14 @@ components:
       - CANCELLED
       - TRIAL
       - PAST_DUE
+      description: Enum of subscription statuses (active, cancelled, past_due)
     BillingCycle:
       type: string
       enum:
       - MONTHLY
       - QUARTERLY
       - ANNUALLY
+      description: Enum of billing cycles (monthly, quarterly, annual)
     GoalType:
       type: string
       enum:
@@ -1243,12 +1254,14 @@ components:
       - CALLS
       - MEETINGS
       - LEADS
+      description: Enum of goal types (revenue, activity, retention)
     RiskLevel:
       type: string
       enum:
       - HEALTHY
       - AT_RISK
       - CHURN_RISK
+      description: Enum of risk levels (low, medium, high, critical)
     Userbadges:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1258,6 +1271,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/UserBadge'
+      description: Collection of user badge records
     ErrorResponse:
       type: object
       required:
@@ -1298,6 +1312,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Subscription'
+      description: Paginated list of Subscription records
     PaginatedGoal:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1307,6 +1322,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Goal'
+      description: Paginated list of Goal records
     PaginatedBadge:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1316,6 +1332,7 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Badge'
+      description: Paginated list of Badge records
   securitySchemes:
     bearerAuth:
       type: http
