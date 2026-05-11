@@ -2,8 +2,8 @@ openapi: 3.1.0
 info:
   title: Audit Controls
   version: 1.0.0
-  description: Cross-service accounting controls service for approval policies, segregation
-    rules, signature requests, audit events, and control exceptions.
+  description: Cross-service accounting controls service for approval policies, segregation rules, signature requests, audit
+    events, and control exceptions.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -66,19 +66,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id003
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id004
             application/json:
               schema:
@@ -118,13 +118,13 @@ paths:
           description: Validation error
           content: *id001
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id002
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id003
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /signature-requests:
     get:
@@ -170,13 +170,13 @@ paths:
           description: Validation error
           content: *id001
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id002
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id003
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /signature-requests/{id}/sign:
     post:
@@ -202,13 +202,13 @@ paths:
           description: Validation error
           content: *id001
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id002
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id003
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
   /audit-events:
     get:
@@ -277,13 +277,13 @@ paths:
           description: Validation error
           content: *id001
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id002
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id003
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
 components:
   securitySchemes:
@@ -314,6 +314,22 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    CompanyId:
+      name: X-Company-ID
+      in: header
+      required: true
+      description: Company identifier for multi-tenant scoping
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Free text search across resources
+      schema:
+        type: string
   schemas:
     ApprovalPolicy:
       type: object
