@@ -85,6 +85,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSubscriptionRequest'
+            examples:
+              default: &id002
+                customer_id: 00000000-0000-0000-0000-000000000019
+                plan: professional
       responses:
         '201':
           description: Subscription created
@@ -168,6 +172,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateSubscriptionRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Subscription updated
@@ -453,6 +459,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateGoalRequest'
+            examples:
+              default: &id004
+                name: Close 10 deals
+                target: 10
+                period: quarterly
       responses:
         '201':
           description: Goal created
@@ -461,7 +472,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Goal'
               examples:
-                default: &id002
+                default: &id003
                   id: 00000000-0000-0000-0000-000000000020
                   name: Close 10 deals
                   target: 10
@@ -507,7 +518,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Goal'
               examples:
-                default: *id002
+                default: *id003
         '404':
           description: Not found
         '401':
@@ -536,6 +547,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateGoalRequest'
+            examples:
+              default: *id004
       responses:
         '200':
           description: Goal updated
@@ -544,7 +557,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Goal'
               examples:
-                default: *id002
+                default: *id003
         '400':
           description: Invalid request
         '404':
@@ -612,7 +625,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Goal'
               examples:
-                default: *id002
+                default: *id003
         '404':
           description: Not found
         '403':

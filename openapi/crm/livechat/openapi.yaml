@@ -554,6 +554,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAgentRequest'
+            examples:
+              default: &id004
+                name: Agent Smith
+                email: agent@example.com
       responses:
         '201':
           description: Agent created
@@ -630,6 +634,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAgentRequest'
+            examples:
+              default: *id004
       responses:
         '200':
           description: Agent updated
@@ -728,6 +734,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaginatedAgentStatusRequest'
+            examples:
+              default: *id004
       responses:
         '200':
           description: Agent status updated

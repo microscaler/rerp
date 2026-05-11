@@ -90,6 +90,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateUTMCampaignRequest'
+            examples:
+              default: &id002
+                name: Q1 Marketing Campaign
+                type: email
       responses:
         '201':
           description: Campaign created
@@ -170,6 +174,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateUTMCampaignRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Campaign updated
@@ -293,6 +299,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateUTMMediumRequest'
+            examples:
+              default:
+                name: email
+                description: Email marketing medium
       responses:
         '201':
           description: Medium created
@@ -366,6 +376,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateUTMSourceRequest'
+            examples:
+              default:
+                name: newsletter
+                description: Newsletter traffic source
       responses:
         '201':
           description: Source created
@@ -733,6 +747,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EventRegistrationRequest'
+            examples:
+              default:
+                event_id: 00000000-0000-0000-0000-000000000029
+                contact_id: 00000000-0000-0000-0000-000000000002
       responses:
         '201':
           description: Event registered

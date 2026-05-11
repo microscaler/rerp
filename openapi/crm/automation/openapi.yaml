@@ -73,6 +73,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWorkflowRequest'
+            examples:
+              default: &id002
+                name: Lead Assignment
+                description: Auto-assign leads based on region
+                enabled: true
       responses:
         '201':
           description: Workflow created
@@ -155,6 +160,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWorkflowRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Workflow updated
@@ -284,6 +291,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRuleRequest'
+            examples:
+              default: &id003
+                name: Assign to region A
+                condition:
+                  field: region
+                  operator: equals
+                  value: A
+                action:
+                  type: assign
+                  value: team-001
       responses:
         '201':
           description: Rule created
@@ -292,7 +309,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rule'
               examples:
-                default: &id002
+                default: &id004
                   id: 00000000-0000-0000-0000-000000000008
                   name: Assign to region A
                   condition:
@@ -443,6 +460,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRuleRequest'
+            examples:
+              default: *id003
       responses:
         '201':
           description: Rule created
@@ -451,7 +470,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rule'
               examples:
-                default: *id002
+                default: *id004
         '400':
           description: Invalid request
         '500':
@@ -490,7 +509,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rule'
               examples:
-                default: *id002
+                default: *id004
         '404':
           description: Not found
         '401':
@@ -519,6 +538,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateRuleRequest'
+            examples:
+              default: *id003
       responses:
         '200':
           description: Rule updated
@@ -527,7 +548,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rule'
               examples:
-                default: *id002
+                default: *id004
         '400':
           description: Invalid request
         '404':
@@ -700,6 +721,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTriggerRequest'
+            examples:
+              default: &id006
+                name: On Lead Create
+                event: lead.created
+                enabled: true
       responses:
         '201':
           description: Trigger created
@@ -708,7 +734,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Trigger'
               examples:
-                default: &id003
+                default: &id005
                   id: 00000000-0000-0000-0000-000000000009
                   name: On Lead Create
                   event: lead.created
@@ -753,7 +779,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Trigger'
               examples:
-                default: *id003
+                default: *id005
         '404':
           description: Not found
         '401':
@@ -782,6 +808,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTriggerRequest'
+            examples:
+              default: *id006
       responses:
         '200':
           description: Trigger updated
@@ -790,7 +818,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Trigger'
               examples:
-                default: *id003
+                default: *id005
         '400':
           description: Invalid request
         '404':
@@ -923,7 +951,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
               examples:
-                default: &id004
+                default: &id007
                   id: 00000000-0000-0000-0000-000000000026
                   type: email
                   scheduled_at: '2024-01-16T10:00:00Z'
@@ -965,7 +993,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
               examples:
-                default: *id004
+                default: *id007
         '500':
           description: Internal server error
           content:

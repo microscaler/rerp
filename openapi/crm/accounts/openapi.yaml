@@ -88,6 +88,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccountRequest'
+            examples:
+              default: &id002
+                name: Acme Corp
+                website: https://acme.com
+                industry: Technology
+                size: medium
+                owner_id: 00000000-0000-0000-0000-000000000010
       responses:
         '201':
           description: Account created
@@ -172,6 +179,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAccountRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Account updated

@@ -992,6 +992,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LeadMiningRequest'
+            examples:
+              default:
+                name: John Doe
+                email: john@example.com
+                phone: +1-555-0123
+                company: Acme Corp
+                source: website
       responses:
         '200':
           description: Mining results

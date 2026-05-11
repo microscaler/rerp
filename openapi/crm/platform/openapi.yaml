@@ -79,6 +79,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCustomFieldRequest'
+            examples:
+              default: &id002
+                entity: lead
+                name: priority
+                type: string
+                required: false
       responses:
         '201':
           description: Custom field created
@@ -157,6 +163,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Custom field updated
@@ -306,7 +314,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id002
+                  - &id003
                     id: 00000000-0000-0000-0000-000000000022
                     url: https://example.com/webhook
                     events:
@@ -341,6 +349,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWebhookRequest'
+            examples:
+              default: &id004
+                url: https://example.com/webhook
+                events:
+                - lead.created
+                - lead.updated
+                enabled: true
       responses:
         '201':
           description: Webhook created
@@ -349,7 +364,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id002
+                default: *id003
         '400':
           description: Invalid request
         '500':
@@ -388,7 +403,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id002
+                default: *id003
         '404':
           description: Not found
         '401':
@@ -417,6 +432,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWebhookRequest'
+            examples:
+              default: *id004
       responses:
         '200':
           description: Webhook updated
@@ -425,7 +442,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id002
+                default: *id003
         '400':
           description: Invalid request
         '404':
@@ -742,6 +759,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateApiKeyRequest'
+            examples:
+              default:
+                name: Production API
+                enabled: true
       responses:
         '201':
           description: API key created
@@ -850,7 +871,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id003
+                  - &id005
                     id: 00000000-0000-0000-0000-000000000024
                     name: Slack Integration
                     type: messaging
@@ -883,6 +904,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIntegrationRequest'
+            examples:
+              default:
+                name: Slack Integration
+                type: messaging
       responses:
         '201':
           description: Integration configured
@@ -891,7 +916,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id003
+                default: *id005
         '400':
           description: Invalid request
         '500':
@@ -973,7 +998,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id003
+                default: *id005
         '404':
           description: Not found
         '401':

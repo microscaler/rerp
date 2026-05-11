@@ -795,6 +795,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportBuildRequest'
+            examples:
+              default: &id002
+                name: Monthly Pipeline Report
+                type: pipeline
+                schedule: monthly
       responses:
         '200':
           description: Report results
@@ -911,6 +916,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportScheduleRequest'
+            examples:
+              default: *id002
       responses:
         '201':
           description: Report scheduled

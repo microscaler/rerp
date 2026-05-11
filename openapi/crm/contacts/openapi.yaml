@@ -95,6 +95,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateContactRequest'
+            examples:
+              default: &id002
+                first_name: Jane
+                last_name: Smith
+                email: jane@example.com
+                phone: +1-555-0124
+                title: Marketing Director
+                account_id: 00000000-0000-0000-0000-000000000003
       responses:
         '201':
           description: Contact created
@@ -210,6 +218,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateContactRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Contact updated
@@ -404,6 +414,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MergeContactsRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Merge completed

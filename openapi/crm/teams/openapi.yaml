@@ -88,6 +88,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTeamRequest'
+            examples:
+              default: &id002
+                name: Sales Team Alpha
+                description: Enterprise sales team
       responses:
         '201':
           description: Team created
@@ -164,6 +168,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTeamRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Team updated
@@ -313,6 +319,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AddTeamMemberRequest'
+            examples:
+              default: *id002
       responses:
         '201':
           description: Member added

@@ -140,6 +140,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLeadRequest'
+            examples:
+              default: &id002
+                name: John Doe
+                email: john@example.com
+                phone: +1-555-0123
+                company: Acme Corp
+                source: website
       responses:
         '201':
           description: Lead created
@@ -216,6 +223,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateLeadRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Lead updated
@@ -314,6 +323,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StageChangeRequest'
+            examples:
+              default: &id003
+                name: Discovery
+                order: 1
+                pipeline_id: 00000000-0000-0000-0000-000000000005
       responses:
         '200':
           description: Lead stage updated
@@ -374,6 +388,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConvertLeadRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Converted lead with new IDs
@@ -489,6 +505,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/MergeLeadsRequest'
+            examples:
+              default: *id002
       responses:
         '200':
           description: Merge completed
@@ -613,7 +631,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id002
+                  - &id004
                     id: 00000000-0000-0000-0000-000000000004
                     name: Discovery
                     order: 1
@@ -646,6 +664,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateStageRequest'
+            examples:
+              default: *id003
       responses:
         '201':
           description: Stage created
@@ -654,7 +674,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id002
+                default: *id004
         '400':
           description: Invalid request
         '500':
@@ -693,7 +713,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id002
+                default: *id004
         '404':
           description: Not found
         '401':
@@ -722,6 +742,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateStageRequest'
+            examples:
+              default: *id003
       responses:
         '200':
           description: Stage updated
@@ -730,7 +752,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id002
+                default: *id004
         '400':
           description: Invalid request
         '404':
