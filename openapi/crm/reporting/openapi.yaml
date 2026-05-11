@@ -810,10 +810,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ReportBuildRequest'
             examples:
-              default: &id002
+              default: &id003
                 name: Monthly Pipeline Report
                 type: pipeline
                 schedule: monthly
+        description: Build a report with current filters and parameters
       responses:
         '200':
           description: Report results
@@ -829,6 +830,13 @@ paths:
                     type: object
                   saved:
                     type: boolean
+              examples:
+                default: &id002
+                  report_id: 00000000-0000-0000-0000-000000000019
+                  data:
+                    total_opportunities: 50
+                    total_revenue: 250000
+                  saved: true
         '500':
           description: Internal server error
           content:
@@ -851,6 +859,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id002
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -931,7 +941,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ReportScheduleRequest'
             examples:
-              default: *id002
+              default: *id003
+        description: Schedule a report to be generated periodically
       responses:
         '201':
           description: Report scheduled
@@ -992,6 +1003,7 @@ paths:
                   enum:
                   - CSV
                   - JSON
+        description: Export report data to a specified file format
       responses:
         '200':
           description: Exported data
@@ -1002,6 +1014,11 @@ paths:
             application/json:
               schema:
                 type: object
+              examples:
+                default: &id004
+                  success: true
+                  format: csv
+                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
         '500':
           description: Internal server error
           content:
@@ -1024,6 +1041,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id004
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':

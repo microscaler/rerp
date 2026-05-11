@@ -394,6 +394,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConvertChatRequest'
+        description: Convert a chat session into a new lead in the CRM
       responses:
         '200':
           description: Chat converted to lead
@@ -425,6 +426,11 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  success: true
+                  lead_id: 00000000-0000-0000-0000-000000000003
+                  chat_id: 00000000-0000-0000-0000-000000000009
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:

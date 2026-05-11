@@ -556,6 +556,12 @@ paths:
                     type: boolean
                   response_code:
                     type: integer
+              examples:
+                default:
+                  success: true
+                  webhook_id: 00000000-0000-0000-0000-000000000016
+                  status_code: 200
+                  response_time_ms: 45
         '500':
           description: Internal server error
           content:
@@ -719,6 +725,11 @@ paths:
                       $ref: '#/components/schemas/AuditLogEntry'
                   total:
                     type: integer
+              examples:
+                default:
+                  entity: lead
+                  entity_id: 00000000-0000-0000-0000-000000000003
+                  log_entries: []
         '404':
           description: Entity not found
         '401':
@@ -843,6 +854,7 @@ paths:
                 key:
                   type: string
                   description: API key (plain text, not hashed)
+        description: Validate an API key or bearer token for access
       responses:
         '200':
           description: Validation result
@@ -857,6 +869,13 @@ paths:
                     type: object
                   rate_limit_remaining:
                     type: integer
+              examples:
+                default:
+                  valid: true
+                  user_id: u001
+                  permissions:
+                  - crm:read
+                  - crm:write
         '500':
           description: Internal server error
           content:
@@ -980,6 +999,11 @@ paths:
                     format: uuid
                   status:
                     type: string
+              examples:
+                default:
+                  success: true
+                  integration_id: 00000000-0000-0000-0000-000000000018
+                  records_synced: 25
         '500':
           description: Internal server error
           content:

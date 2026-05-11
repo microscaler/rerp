@@ -75,6 +75,10 @@ paths:
                     type: integer
                   time_ms:
                     type: integer
+              examples:
+                default: &id001
+                  scores_computed: 5
+                  time_ms: 120
         '500':
           description: Internal server error
           content:
@@ -91,6 +95,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id001
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -122,6 +128,7 @@ paths:
                   items:
                     type: string
                     format: uuid
+        description: Calculate lead scores for multiple leads in bulk
       responses:
         '200':
           description: Scores computed
@@ -153,6 +160,10 @@ paths:
                               impact:
                                 type: number
                                 format: float
+              examples:
+                default: &id002
+                  scores_computed: 10
+                  time_ms: 250
         '500':
           description: Internal server error
           content:
@@ -169,6 +180,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id002
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -322,6 +335,10 @@ paths:
                     type: integer
                   frequencies_updated:
                     type: integer
+              examples:
+                default:
+                  success: true
+                  frequencies_rebuilt: 3
         '500':
           description: Internal server error
           content:
@@ -383,6 +400,11 @@ paths:
       responses:
         '200':
           description: Thresholds updated
+          content:
+            application/json:
+              schema: {}
+              examples:
+                default: {}
         '400':
           description: Invalid request
         '403':
@@ -435,7 +457,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id001
+                  - &id003
                     total_leads: 150
                     hot: 45
                     warm: 65
@@ -474,7 +496,7 @@ paths:
               examples:
                 default:
                   items:
-                  - *id001
+                  - *id003
                   total: 1
                   page: 1
                   per_page: 20
@@ -509,7 +531,7 @@ paths:
               examples:
                 default:
                   items:
-                  - *id001
+                  - *id003
                   total: 1
                   page: 1
                   per_page: 20
@@ -575,6 +597,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EnrichmentLookupRequest'
+        description: Enrich lead data from external sources using email lookup
       responses:
         '200':
           description: Enrichment result
@@ -583,7 +606,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
               examples:
-                default: &id002
+                default: &id004
                   lead_id: 00000000-0000-0000-0000-000000000001
                   company: Acme Corp
                   industry: Technology
@@ -607,6 +630,15 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  company:
+                    name: Example Inc
+                    domain: example.com
+                    industry: Technology
+                  person:
+                    name: John Doe
+                    title: CTO
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
@@ -628,6 +660,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WebsiteEnrichmentRequest'
+        description: Enrich lead data from external sources using website lookup
       responses:
         '200':
           description: Enrichment result
@@ -636,7 +669,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
               examples:
-                default: *id002
+                default: *id004
         '500':
           description: Internal server error
           content:
@@ -653,6 +686,13 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  company:
+                    name: Target Corp
+                    domain: target.com
+                    industry: Retail
+                  confidence: 0.85
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -676,6 +716,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BatchEnrichmentRequest'
+        description: Enrich multiple leads from external sources in batch
       responses:
         '200':
           description: Batch enrichment results
@@ -694,6 +735,11 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EnrichmentResponse'
+              examples:
+                default: &id005
+                  enriched: 10
+                  failed: 0
+                  results: []
         '500':
           description: Internal server error
           content:
@@ -710,6 +756,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id005
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -741,6 +789,7 @@ paths:
                 lead_id:
                   type: string
                   format: uuid
+        description: Auto-fill lead data from external sources based on email or domain
       responses:
         '200':
           description: Auto-fill changes
@@ -749,7 +798,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
               examples:
-                default: *id002
+                default: *id004
         '500':
           description: Internal server error
           content:
@@ -766,6 +815,13 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  company:
+                    name: Example Inc
+                    domain: example.com
+                  person:
+                    name: John Doe
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -866,6 +922,12 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  email: test@example.com
+                  valid: true
+                  disposable: false
+                  role_based: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
@@ -895,6 +957,7 @@ paths:
                   items:
                     type: string
                     format: email
+        description: Verify multiple email addresses in batch
       responses:
         '200':
           description: Batch verification results
@@ -913,6 +976,11 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EmailVerificationResult'
+              examples:
+                default: &id006
+                  verified: 10
+                  valid: 8
+                  invalid: 2
         '500':
           description: Internal server error
           content:
@@ -929,6 +997,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id006
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -987,6 +1057,12 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  phone: +1-555-0123
+                  valid: true
+                  carrier: Verizon
+                  phone_type: mobile
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -1032,6 +1108,13 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+              examples:
+                default: &id007
+                  total_matches: 150
+                  leads:
+                  - name: John Doe
+                    email: john@target.com
+                    company: Target Corp
         '500':
           description: Internal server error
           content:
@@ -1048,6 +1131,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id007
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -1086,6 +1171,13 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+              examples:
+                default: &id008
+                  total_matches: 50
+                  leads:
+                  - name: Jane Smith
+                    email: jane@ideal.com
+                    company: Ideal Corp
         '500':
           description: Internal server error
           content:
@@ -1102,6 +1194,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id008
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':

@@ -446,6 +446,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FormSubmissionRequest'
+        description: Submit a marketing form to capture lead information
       responses:
         '201':
           description: Lead created from form
@@ -634,6 +635,11 @@ paths:
                   lead_id:
                     type: string
                     format: uuid
+              examples:
+                default: &id003
+                  visitor_id: v001
+                  identified: true
+                  email: user@example.com
         '500':
           description: Internal server error
           content:
@@ -650,6 +656,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default: *id003
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -745,6 +753,11 @@ paths:
                   average_deal_size:
                     type: number
                     format: double
+              examples:
+                default:
+                  campaign_id: 00000000-0000-0000-0000-000000000012
+                  total_revenue: 25000
+                  conversions: 15
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':

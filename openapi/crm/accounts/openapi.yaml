@@ -79,6 +79,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '500':
@@ -296,6 +302,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '404':
           description: Not found
         '401':
@@ -339,6 +351,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '404':
           description: Not found
         '401':
@@ -382,6 +400,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '404':
           description: Not found
         '401':
@@ -405,6 +429,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':

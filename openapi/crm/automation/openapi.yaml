@@ -66,6 +66,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -279,6 +285,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '404':
           description: Workflow not found
         '401':
@@ -425,6 +437,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -456,6 +474,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -657,6 +681,8 @@ paths:
                 lead_data:
                   type: object
                   description: Sample lead data for evaluation
+        description: Test a workflow rule with sample data to verify conditions and
+          actions
       responses:
         '200':
           description: Rule test result
@@ -719,6 +745,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -935,6 +967,11 @@ paths:
                     type: boolean
                   workflows_fired:
                     type: integer
+              examples:
+                default:
+                  success: true
+                  trigger_id: 00000000-0000-0000-0000-000000000008
+                  workflow_execution_id: 00000000-0000-0000-0000-000000000032
         '500':
           description: Internal server error
           content:
@@ -964,6 +1001,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScheduleActionRequest'
+        description: Schedule a one-time action at a specific time
       responses:
         '201':
           description: Action scheduled
@@ -1006,6 +1044,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecurringActionRequest'
+        description: Schedule a recurring action with a defined interval
       responses:
         '201':
           description: Recurring action scheduled
@@ -1048,6 +1087,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':

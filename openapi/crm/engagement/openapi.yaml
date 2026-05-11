@@ -78,6 +78,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -294,6 +300,7 @@ paths:
                 value:
                   type: number
                   format: double
+        description: Renew a subscription before or after expiration
       responses:
         '200':
           description: Subscription renewed
@@ -321,6 +328,11 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  success: true
+                  subscription_id: 00000000-0000-0000-0000-000000000013
+                  new_end_date: '2025-01-01T00:00:00Z'
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -345,6 +357,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -377,6 +395,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -408,6 +432,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -454,6 +484,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -712,6 +748,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -735,6 +777,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized
         '404':
@@ -765,6 +813,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -795,6 +849,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '404':
           description: Customer not found
         '401':
@@ -828,6 +888,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':

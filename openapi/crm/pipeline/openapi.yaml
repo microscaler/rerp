@@ -439,6 +439,11 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  success: true
+                  contact_id: 00000000-0000-0000-0000-000000000002
+                  account_id: 00000000-0000-0000-0000-000000000001
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -496,6 +501,12 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  is_duplicate: true
+                  matches:
+                  - id: 00000000-0000-0000-0000-000000000004
+                    confidence: 0.95
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
@@ -562,6 +573,11 @@ paths:
                   id:
                     type: string
                     format: uuid
+              examples:
+                default:
+                  success: true
+                  kept_id: 00000000-0000-0000-0000-000000000001
+                  merged_id: 00000000-0000-0000-0000-000000000004
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
