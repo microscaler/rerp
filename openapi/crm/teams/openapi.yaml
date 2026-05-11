@@ -2,247 +2,345 @@ openapi: 3.1.0
 info:
   title: Teams
   version: 1.0.0
-  description: Sales team management — teams, members, auto-assignment, unassigned queue.
+  description: "Sales team management \u2014 teams, members, auto-assignment, unassigned queue."
 servers:
-  - url: /api/v1/crm/teams
-    description: Teams API
+- url: http://localhost:10352/api/v1/crm/teams
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/teams
+  description: Teams API
 tags:
-  - name: teams
-    description: Team CRUD
-  - name: members
-    description: Team member management
+- name: teams
+  description: Team CRUD
+- name: members
+  description: Team member management
 paths:
   /teams:
     get:
       operationId: list_teams
       summary: List sales teams
-      tags: [teams]
+      tags:
+      - teams
       parameters:
-        - name: page
-          in: query
-          schema: {type: integer, minimum: 1, default: 1}
-        - name: limit
-          in: query
-          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
-        - name: search
-          in: query
-          schema: {type: string}
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: List of teams
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items: { $ref: '#/components/schemas/Team' }
-                  total: {type: integer}
-        '401': {description: Unauthorized}
-        '500': {description: Internal server error}
+                $ref: '#/components/schemas/PaginatedTeam'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
     post:
       operationId: create_team
       summary: Create a new sales team
-      tags: [teams]
+      tags:
+      - teams
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateTeamRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
       responses:
         '201':
           description: Team created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Team' }
-        '400': {description: Invalid request}
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/Team'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /teams/{id}:
     get:
       operationId: get_team
       summary: Get team by id with member stats
-      tags: [teams]
+      tags:
+      - teams
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Team details
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Team' }
-        '404': {description: Not found}
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/Team'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
     put:
       operationId: update_team
       summary: Update team fields
-      tags: [teams]
+      tags:
+      - teams
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateTeamRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateTeamRequest'
       responses:
         '200':
           description: Team updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Team' }
-        '400': {description: Invalid request}
-        '404': {description: Not found}
+              schema:
+                $ref: '#/components/schemas/Team'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_team
       summary: Delete team
-      tags: [teams]
+      tags:
+      - teams
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        '204': {description: Team deleted}
-        '404': {description: Not found}
+        '204':
+          description: Team deleted
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
   /teams/{id}/members:
     get:
       operationId: list_team_members
       summary: List team members with stats
-      tags: [members]
+      tags:
+      - members
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
-        - name: page
-          in: query
-          schema: {type: integer, minimum: 1, default: 1}
-        - name: limit
-          in: query
-          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
       responses:
         '200':
           description: List of team members
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items: { $ref: '#/components/schemas/TeamMember' }
-                  total: {type: integer}
-        '404': {description: Team not found}
+                $ref: '#/components/schemas/TeamMembers'
+        '404':
+          description: Team not found
+      security:
+      - bearerAuth: []
     post:
       operationId: add_team_member
       summary: Add a member to a sales team
-      tags: [members]
+      tags:
+      - members
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AddTeamMemberRequest' }
+            schema:
+              $ref: '#/components/schemas/AddTeamMemberRequest'
       responses:
         '201':
           description: Member added
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/TeamMember' }
-        '400': {description: Invalid request}
-        '404': {description: Team not found}
+              schema:
+                $ref: '#/components/schemas/TeamMember'
+        '400':
+          description: Invalid request
+        '404':
+          description: Team not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /teams/{id}/members/{member_id}:
     delete:
       operationId: remove_team_member
       summary: Remove a member from a sales team
-      tags: [members]
+      tags:
+      - members
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
-        - name: member_id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: member_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        '204': {description: Member removed}
-        '404': {description: Not found}
+        '204':
+          description: Member removed
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
   /queues/unassigned:
     get:
       operationId: list_unassigned
       summary: List unassigned leads for auto-assignment
-      tags: [teams]
+      tags:
+      - teams
       parameters:
-        - name: page
-          in: query
-          schema: {type: integer, minimum: 1, default: 1}
-        - name: limit
-          in: query
-          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
-        - name: team_id
-          in: query
-          schema: {type: string, format: uuid}
-        - name: filter_stage
-          in: query
-          schema: {type: string, enum: [UNASSIGNED, AWAITING_ASSIGNMENT]}
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_stage
+        in: query
+        schema:
+          type: string
+          enum:
+          - UNASSIGNED
+          - AWAITING_ASSIGNMENT
       responses:
         '200':
           description: List of unassigned leads
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        lead_id: {type: string, format: uuid}
-                        lead_name: {type: string}
-                        email_from: {type: string}
-                        source: {type: string}
-                        created_at: {type: string, format: date-time}
-                  total: {type: integer}
+                $ref: '#/components/schemas/PaginatedUnassignedLeads'
+      security:
+      - bearerAuth: []
   /assign/run:
     post:
       operationId: run_assignment
       summary: Manually trigger lead assignment
-      tags: [teams]
+      tags:
+      - teams
       responses:
         '200':
           description: Assignment completed
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AssignmentResult' }
-        '400': {description: Invalid request}
-
+              schema:
+                $ref: '#/components/schemas/AssignmentResult'
+        '400':
+          description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
 components:
   schemas:
     Team:
       type: object
-      required: [id, name, assignment_enabled]
+      required:
+      - id
+      - name
+      - assignment_enabled
       properties:
-        id: {type: string, format: uuid}
-        name: {type: string, maxLength: 128}
-        description: {type: string}
-        alias_name: {type: string, maxLength: 128, description: Email alias for lead creation}
-        use_leads: {type: boolean, default: true}
-        use_opportunities: {type: boolean, default: true}
-        assignment_enabled: {type: boolean}
-        assignment_auto_enabled: {type: boolean, default: false}
-        assignment_optout: {type: boolean}
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        alias_name:
+          type: string
+          maxLength: 128
+          description: Email alias for lead creation
+        use_leads:
+          type: boolean
+          default: true
+        use_opportunities:
+          type: boolean
+          default: true
+        assignment_enabled:
+          type: boolean
+        assignment_auto_enabled:
+          type: boolean
+          default: false
+        assignment_optout:
+          type: boolean
         assignment_max:
           type: integer
           readOnly: true
@@ -251,83 +349,271 @@ components:
           type: string
           maxLength: 64
           description: Domain filter for lead routing
-        emoji: {type: string, maxLength: 16}
+        emoji:
+          type: string
+          maxLength: 16
         privacy_security:
           type: string
-          enum: [MY_TEAM, MY_COMPANY, ALL]
+          enum:
+          - MY_TEAM
+          - MY_COMPANY
+          - ALL
           description: Record visibility scope
-        create_date: {type: string, format: date-time, readOnly: true}
-        # Joined stats
-        member_count: {type: integer, readOnly: true}
-        active_lead_count: {type: integer, readOnly: true}
-        total_revenue: {type: number, format: double, readOnly: true}
-
+        create_date:
+          type: string
+          format: date-time
+          readOnly: true
+        member_count:
+          type: integer
+          readOnly: true
+        active_lead_count:
+          type: integer
+          readOnly: true
+        total_revenue:
+          type: number
+          format: double
+          readOnly: true
     CreateTeamRequest:
       type: object
-      required: [name]
+      required:
+      - name
       properties:
-        name: {type: string, maxLength: 128}
-        description: {type: string}
-        use_leads: {type: boolean}
-        use_opportunities: {type: boolean}
-        assignment_enabled: {type: boolean}
-        assignment_auto_enabled: {type: boolean}
-        assignment_domain: {type: string}
-        emoji: {type: string}
-        privacy_security: {type: string, enum: [MY_TEAM, MY_COMPANY, ALL]}
-
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        use_leads:
+          type: boolean
+        use_opportunities:
+          type: boolean
+        assignment_enabled:
+          type: boolean
+        assignment_auto_enabled:
+          type: boolean
+        assignment_domain:
+          type: string
+        emoji:
+          type: string
+        privacy_security:
+          type: string
+          enum:
+          - MY_TEAM
+          - MY_COMPANY
+          - ALL
     UpdateTeamRequest:
       type: object
       properties:
-        name: {type: string}
-        description: {type: string}
-        use_leads: {type: boolean}
-        use_opportunities: {type: boolean}
-        assignment_enabled: {type: boolean}
-        assignment_auto_enabled: {type: boolean}
-        assignment_optout: {type: boolean}
-        assignment_domain: {type: string}
-        emoji: {type: string}
-        privacy_security: {type: string, enum: [MY_TEAM, MY_COMPANY, ALL]}
-
+        name:
+          type: string
+        description:
+          type: string
+        use_leads:
+          type: boolean
+        use_opportunities:
+          type: boolean
+        assignment_enabled:
+          type: boolean
+        assignment_auto_enabled:
+          type: boolean
+        assignment_optout:
+          type: boolean
+        assignment_domain:
+          type: string
+        emoji:
+          type: string
+        privacy_security:
+          type: string
+          enum:
+          - MY_TEAM
+          - MY_COMPANY
+          - ALL
     TeamMember:
       type: object
-      required: [id, user_id, crm_team_id, assignment_enabled, assignment_max]
+      required:
+      - id
+      - user_id
+      - crm_team_id
+      - assignment_enabled
+      - assignment_max
       properties:
-        id: {type: string, format: uuid}
-        user_id: {type: string, format: uuid}
-        crm_team_id: {type: string, format: uuid}
-        assignment_enabled: {type: boolean}
-        assignment_optout: {type: boolean}
-        assignment_domain: {type: string, maxLength: 64}
-        assignment_max: {type: integer, description: 30-day lead capacity}
-        lead_day_count: {type: integer, readOnly: true}
-        lead_month_count: {type: integer, readOnly: true}
-        quota_monthly: {type: number, format: double}
-        quota_quarterly: {type: number, format: double}
-        quota_yearly: {type: number, format: double}
-        color: {type: integer, minimum: 1, maximum: 16}
-        user_name: {type: string, readOnly: true}
-
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        crm_team_id:
+          type: string
+          format: uuid
+        assignment_enabled:
+          type: boolean
+        assignment_optout:
+          type: boolean
+        assignment_domain:
+          type: string
+          maxLength: 64
+        assignment_max:
+          type: integer
+          description: 30-day lead capacity
+        lead_day_count:
+          type: integer
+          readOnly: true
+        lead_month_count:
+          type: integer
+          readOnly: true
+        quota_monthly:
+          type: number
+          format: double
+        quota_quarterly:
+          type: number
+          format: double
+        quota_yearly:
+          type: number
+          format: double
+        color:
+          type: integer
+          minimum: 1
+          maximum: 16
+        user_name:
+          type: string
+          readOnly: true
     AddTeamMemberRequest:
       type: object
-      required: [user_id]
+      required:
+      - user_id
       properties:
-        user_id: {type: string, format: uuid}
-        assignment_max: {type: integer}
-        assignment_domain: {type: string}
-        quota_monthly: {type: number, format: double}
-
+        user_id:
+          type: string
+          format: uuid
+        assignment_max:
+          type: integer
+        assignment_domain:
+          type: string
+        quota_monthly:
+          type: number
+          format: double
     AssignmentResult:
       type: object
       properties:
-        assigned_count: {type: integer}
-        failed_count: {type: integer}
+        assigned_count:
+          type: integer
+        failed_count:
+          type: integer
         details:
           type: array
           items:
             type: object
             properties:
-              lead_id: {type: string, format: uuid}
-              assigned_to: {type: string, format: uuid}
-              reason: {type: string}
+              lead_id:
+                type: string
+                format: uuid
+              assigned_to:
+                type: string
+                format: uuid
+              reason:
+                type: string
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    TeamMembers:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/TeamMember'
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedTeam:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Team'
+    UnassignedLead:
+      type: object
+      required:
+      - lead_id
+      - lead_name
+      - created_at
+      - email_from
+      - source
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        lead_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        email_from:
+          type: string
+        source:
+          type: string
+    PaginatedUnassignedLeads:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/UnassignedLead'
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -4,57 +4,63 @@ info:
   version: 1.0.0
   description: Analytics, dashboards, forecasts, and reporting for CRM operations.
 servers:
-  - url: /api/v1/crm/reporting
-    description: CRM Reporting API
+- url: http://localhost:10352/api/v1/crm/reporting
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/reporting
+  description: Reporting API
 tags:
-  - name: pipeline
-    description: Pipeline health and revenue summary
-  - name: conversion
-    description: Lead-to-revenue conversion analytics
-  - name: performance
-    description: Rep and team performance metrics
-  - name: win-loss
-    description: Win rate and loss analysis
-  - name: forecast
-    description: Revenue forecasting
-  - name: reports
-    description: Custom report builder and scheduling
+- name: pipeline
+  description: Pipeline health and revenue summary
+- name: conversion
+  description: Lead-to-revenue conversion analytics
+- name: performance
+  description: Rep and team performance metrics
+- name: win-loss
+  description: Win rate and loss analysis
+- name: forecast
+  description: Revenue forecasting
+- name: reports
+  description: Custom report builder and scheduling
 paths:
   /analytics/pipeline-summary:
     get:
       operationId: get_pipeline_summary
       summary: Get pipeline summary grouped by stage
-      tags: [pipeline]
+      tags:
+      - pipeline
       parameters:
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: start_date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: end_date
-          in: query
-          schema:
-            type: string
-            format: date
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Pipeline summary
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PipelineSummary'
+                $ref: '#/components/schemas/PaginatedPipelinesummary'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
   /analytics/pipeline-weighted:
     get:
       operationId: get_weighted_pipeline
       summary: Get weighted pipeline by team/rep
-      tags: [pipeline]
+      tags:
+      - pipeline
       responses:
         '200':
           description: Weighted pipeline data
@@ -62,63 +68,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeightedPipeline'
+      security:
+      - bearerAuth: []
   /analytics/conversion-rates:
     get:
       operationId: get_conversion_rates
       summary: Get conversion rates by period
-      tags: [conversion]
+      tags:
+      - conversion
       parameters:
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
-            default: MONTH
-        - name: start_date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: end_date
-          in: query
-          schema:
-            type: string
-            format: date
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+          default: MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Conversion rates
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ConversionRate'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedConversionrate'
+      security:
+      - bearerAuth: []
   /analytics/funnel:
     get:
       operationId: get_funnel
       summary: Get full funnel visualization data
-      tags: [conversion]
+      tags:
+      - conversion
       parameters:
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
-        - name: start_date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: end_date
-          in: query
-          schema:
-            type: string
-            format: date
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Funnel data
@@ -126,69 +139,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FunnelData'
+      security:
+      - bearerAuth: []
   /analytics/lead-sources:
     get:
       operationId: get_lead_source_effectiveness
       summary: Get lead volume and revenue by source
-      tags: [conversion]
+      tags:
+      - conversion
       responses:
         '200':
           description: Lead source effectiveness
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        source_id:
-                          type: string
-                          format: uuid
-                        source_name:
-                          type: string
-                          lead_count:
-                            type: integer
-                          opportunities:
-                            type: integer
-                          won_deals:
-                            type: integer
-                          revenue:
-                            type: number
-                            format: double
-                          win_rate:
-                            type: number
-                            format: float
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedLeadSourceReport'
+      security:
+      - bearerAuth: []
   /analytics/rep-performance:
     get:
       operationId: get_rep_performance
       summary: Get individual rep performance metrics
-      tags: [performance]
+      tags:
+      - performance
       parameters:
-        - name: user_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
-        - name: start_date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: end_date
-          in: query
-          schema:
-            type: string
-            format: date
+      - name: user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Rep performance data
@@ -196,22 +194,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
+      security:
+      - bearerAuth: []
   /analytics/team-performance:
     get:
       operationId: get_team_performance
       summary: Get team-level performance summary
-      tags: [performance]
+      tags:
+      - performance
       parameters:
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
       responses:
         '200':
           description: Team performance summary
@@ -219,72 +224,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamPerformance'
+      security:
+      - bearerAuth: []
   /analytics/leaderboard:
     get:
       operationId: get_leaderboard
       summary: Get ranked list of reps
-      tags: [performance]
+      tags:
+      - performance
       parameters:
-        - name: metric
-          in: query
-          schema:
-            type: string
-            enum: [REVENUE, DEALS_WON, WEIGHTED_PIPELINE]
-            default: REVENUE
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
+      - name: metric
+        in: query
+        schema:
+          type: string
+          enum:
+          - REVENUE
+          - DEALS_WON
+          - WEIGHTED_PIPELINE
+          default: REVENUE
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Leaderboard
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        rank:
-                          type: integer
-                        user_id:
-                          type: string
-                          format: uuid
-                        user_name:
-                          type: string
-                          value:
-                            type: number
-                            format: double
+                $ref: '#/components/schemas/PaginatedLeaderboardEntry'
+      security:
+      - bearerAuth: []
   /analytics/win-loss:
     get:
       operationId: get_win_loss_analysis
       summary: Get historical win/loss analysis
-      tags: [win-loss]
+      tags:
+      - win-loss
       parameters:
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER, YEAR]
-        - name: start_date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: end_date
-          in: query
-          schema:
-            type: string
-            format: date
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Win/loss analysis
@@ -292,11 +298,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WinLossAnalysis'
+      security:
+      - bearerAuth: []
   /analytics/time-to-close:
     get:
       operationId: get_time_to_close
       summary: Get average close duration breakdown
-      tags: [win-loss]
+      tags:
+      - win-loss
       responses:
         '200':
           description: Time-to-close data
@@ -304,95 +313,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimeToCloseAnalysis'
+      security:
+      - bearerAuth: []
   /analytics/forecast/monthly:
     get:
       operationId: get_monthly_forecast
       summary: Get monthly revenue forecast
-      tags: [forecast]
+      tags:
+      - forecast
       parameters:
-        - name: team_id
-          in: query
-          schema:
-            type: string
-            format: uuid
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Monthly forecast
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForecastEntry'
-                  total_weighted_pipeline:
-                    type: number
-                    format: double
-                  total_expected:
-                    type: number
-                    format: double
+                $ref: '#/components/schemas/PaginatedForecastentry'
+      security:
+      - bearerAuth: []
   /analytics/forecast/quarterly:
     get:
       operationId: get_quarterly_forecast
       summary: Get quarterly revenue forecast
-      tags: [forecast]
+      tags:
+      - forecast
       responses:
         '200':
           description: Quarterly forecast
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ForecastEntry'
+                $ref: '#/components/schemas/PaginatedForecastentry'
+      security:
+      - bearerAuth: []
   /analytics/forecast/accuracy:
     get:
       operationId: get_forecast_accuracy
       summary: Get forecast vs actual variance analysis
-      tags: [forecast]
+      tags:
+      - forecast
       parameters:
-        - name: period
-          in: query
-          schema:
-            type: string
-            enum: [WEEK, MONTH, QUARTER]
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
       responses:
         '200':
           description: Forecast accuracy
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        period:
-                          type: string
-                        expected:
-                          type: number
-                          format: double
-                        actual:
-                          type: number
-                          format: double
-                        variance:
-                          type: number
-                          format: double
-                        variance_pct:
-                          type: number
-                          format: float
+                $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
+      security:
+      - bearerAuth: []
   /reports/build:
     post:
       operationId: build_report
       summary: Build a custom report with filters
-      tags: [reports]
+      tags:
+      - reports
       requestBody:
         required: true
         content:
@@ -414,18 +402,22 @@ paths:
                     type: object
                   saved:
                     type: boolean
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /reports/{id}:
     get:
       operationId: get_saved_report
       summary: Get a saved report
-      tags: [reports]
+      tags:
+      - reports
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Saved report
@@ -435,18 +427,21 @@ paths:
                 $ref: '#/components/schemas/SavedReport'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /reports/{id}/schedule:
     post:
       operationId: schedule_report
       summary: Schedule a report for delivery
-      tags: [reports]
+      tags:
+      - reports
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -462,11 +457,15 @@ paths:
                 $ref: '#/components/schemas/ReportSchedule'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /reports/export:
     post:
       operationId: export_report
       summary: Export report data to CSV/JSON
-      tags: [reports]
+      tags:
+      - reports
       requestBody:
         required: true
         content:
@@ -479,7 +478,9 @@ paths:
                   format: uuid
                 format:
                   type: string
-                  enum: [CSV, JSON]
+                  enum:
+                  - CSV
+                  - JSON
       responses:
         '200':
           description: Exported data
@@ -490,7 +491,9 @@ paths:
             application/json:
               schema:
                 type: object
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
 components:
   parameters:
     Page:
@@ -513,42 +516,14 @@ components:
       in: query
       schema:
         type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
-    # ======================== PIPELINE ========================
-    PipelineSummary:
-      type: object
-      required: [total_opportunities, total_revenue, total_weighted_revenue, stages]
-      properties:
-        total_opportunities:
-          type: integer
-        total_revenue:
-          type: number
-          format: double
-        total_weighted_revenue:
-          type: number
-          format: double
-        stages:
-          type: array
-          items:
-            type: object
-            properties:
-              stage_id:
-                type: string
-                format: uuid
-              stage_name:
-                type: string
-              count:
-                type: integer
-              total_revenue:
-                type: number
-                format: double
-              weighted_revenue:
-                type: number
-                format: double
-              avg_days_in_stage:
-                type: number
-                format: float
-
     WeightedPipeline:
       type: object
       properties:
@@ -580,8 +555,6 @@ components:
               weighted_revenue:
                 type: number
                 format: double
-
-    # ======================== CONVERSION ========================
     ConversionRate:
       type: object
       properties:
@@ -607,7 +580,6 @@ components:
         total_won_revenue:
           type: number
           format: double
-
     FunnelData:
       type: object
       properties:
@@ -626,8 +598,6 @@ components:
               conversion_from_previous:
                 type: number
                 format: float
-
-    # ======================== PERFORMANCE ========================
     RepPerformance:
       type: object
       properties:
@@ -669,7 +639,6 @@ components:
           format: float
         activity_count:
           type: integer
-
     TeamPerformance:
       type: object
       properties:
@@ -691,8 +660,6 @@ components:
         win_rate:
           type: number
           format: float
-
-    # ======================== WIN/LOSS ========================
     WinLossAnalysis:
       type: object
       properties:
@@ -725,7 +692,6 @@ components:
               revenue_impact:
                 type: number
                 format: double
-
     TimeToCloseAnalysis:
       type: object
       properties:
@@ -752,8 +718,6 @@ components:
               avg_days:
                 type: number
                 format: float
-
-    # ======================== FORECAST ========================
     ForecastEntry:
       type: object
       properties:
@@ -777,15 +741,20 @@ components:
         variance:
           type: number
           format: double
-
-    # ======================== REPORTS ========================
     ReportBuildRequest:
       type: object
-      required: [type]
+      required:
+      - type
       properties:
         type:
           type: string
-          enum: [PIPELINE, CONVERSION, PERFORMANCE, WIN_LOSS, FORECAST, CUSTOM]
+          enum:
+          - PIPELINE
+          - CONVERSION
+          - PERFORMANCE
+          - WIN_LOSS
+          - FORECAST
+          - CUSTOM
         filters:
           type: object
           description: Filter criteria
@@ -796,7 +765,6 @@ components:
         saved:
           type: boolean
           default: false
-
     SavedReport:
       type: object
       properties:
@@ -814,14 +782,18 @@ components:
         created_at:
           type: string
           format: date-time
-
     ReportScheduleRequest:
       type: object
-      required: [frequency, recipient_ids]
+      required:
+      - frequency
+      - recipient_ids
       properties:
         frequency:
           type: string
-          enum: [DAILY, WEEKLY, MONTHLY]
+          enum:
+          - DAILY
+          - WEEKLY
+          - MONTHLY
         recipient_ids:
           type: array
           items:
@@ -830,7 +802,6 @@ components:
         schedule:
           type: string
           description: Cron expression
-
     ReportSchedule:
       type: object
       properties:
@@ -852,3 +823,187 @@ components:
         last_sent:
           type: string
           format: date-time
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedPipelinesummary:
+      type: object
+      required:
+      - total_opportunities
+      - total_revenue
+      - total_weighted_revenue
+      - stages
+      properties:
+        total_opportunities:
+          type: integer
+        total_revenue:
+          type: number
+          format: double
+        total_weighted_revenue:
+          type: number
+          format: double
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+                format: uuid
+              stage_name:
+                type: string
+              count:
+                type: integer
+              total_revenue:
+                type: number
+                format: double
+              weighted_revenue:
+                type: number
+                format: double
+              avg_days_in_stage:
+                type: number
+                format: float
+    PaginatedConversionrate:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ConversionRate'
+    PaginatedForecastentry:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ForecastEntry'
+    LeadSourceReport:
+      type: object
+      required:
+      - source_id
+      - source_name
+      - lead_count
+      - opportunities
+      - won_deals
+      - revenue
+      - win_rate
+      properties:
+        source_id:
+          type: string
+          format: uuid
+        source_name:
+          type: string
+        lead_count:
+          type: integer
+        opportunities:
+          type: integer
+        won_deals:
+          type: integer
+        revenue:
+          type: number
+          format: double
+        win_rate:
+          type: number
+          format: float
+    LeaderboardEntry:
+      type: object
+      required:
+      - user_id
+      - user_name
+      - rank
+      - value
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        rank:
+          type: integer
+        value:
+          type: number
+          format: double
+    ForecastAccuracyEntry:
+      type: object
+      required:
+      - period
+      - expected
+      - actual
+      - variance
+      - variance_pct
+      properties:
+        period:
+          type: string
+        expected:
+          type: number
+          format: double
+        actual:
+          type: number
+          format: double
+        variance:
+          type: number
+          format: double
+        variance_pct:
+          type: number
+          format: float
+    PaginatedLeadSourceReport:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeadSourceReport'
+    PaginatedLeaderboardEntry:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeaderboardEntry'
+    PaginatedForecastAccuracyEntry:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ForecastAccuracyEntry'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

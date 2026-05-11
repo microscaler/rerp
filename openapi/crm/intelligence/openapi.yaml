@@ -4,23 +4,26 @@ info:
   version: 1.0.0
   description: Predictive analytics, lead scoring, enrichment, and data verification.
 servers:
-  - url: /api/v1/crm/intelligence
-    description: CRM Intelligence API
+- url: http://localhost:10352/api/v1/crm/intelligence
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/intelligence
+  description: Intelligence API
 tags:
-  - name: scoring
-    description: Lead scoring and probability
-  - name: enrichment
-    description: Data enrichment from external sources
-  - name: verification
-    description: Email and phone verification
-  - name: mining
-    description: Lead discovery and mining
+- name: scoring
+  description: Lead scoring and probability
+- name: enrichment
+  description: Data enrichment from external sources
+- name: verification
+  description: Email and phone verification
+- name: mining
+  description: Lead discovery and mining
 paths:
   /leads/score-batch:
     post:
       operationId: score_all_leads
       summary: Compute scores for all leads (triggers Bayesian PLS rebuild)
-      tags: [scoring]
+      tags:
+      - scoring
       requestBody:
         content:
           application/json:
@@ -43,18 +46,23 @@ paths:
                     type: integer
                   time_ms:
                     type: integer
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/score-bulk:
     post:
       operationId: score_leads_bulk
       summary: Score a batch of specific leads
-      tags: [scoring]
+      tags:
+      - scoring
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [lead_ids]
+              required:
+              - lead_ids
               properties:
                 lead_ids:
                   type: array
@@ -92,18 +100,22 @@ paths:
                               impact:
                                 type: number
                                 format: float
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/{id}/score:
     get:
       operationId: get_lead_score
       summary: Get score for a single lead
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Lead score
@@ -113,18 +125,21 @@ paths:
                 $ref: '#/components/schemas/LeadScore'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /leads/{id}/score/explain:
     get:
       operationId: explain_lead_score
       summary: Get score explanation with top contributing factors
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Score explanation
@@ -134,37 +149,36 @@ paths:
                 $ref: '#/components/schemas/ScoreExplanation'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /scoring/frequencies:
     get:
       operationId: list_scoring_frequencies
       summary: View scoring frequency data
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_variable
-          in: query
-          schema:
-            type: string
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_variable
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: Scoring frequencies
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ScoringFrequency'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedScoringFrequency'
+      security:
+      - bearerAuth: []
   /scoring/frequencies/rebuild:
     post:
       operationId: rebuild_scoring_frequencies
       summary: Rebuild scoring frequency tables from historical data
-      tags: [scoring]
+      tags:
+      - scoring
       responses:
         '200':
           description: Frequencies rebuilt
@@ -177,11 +191,15 @@ paths:
                     type: integer
                   frequencies_updated:
                     type: integer
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /scoring/thresholds:
     get:
       operationId: get_scoring_thresholds
       summary: Get hot/warm/cold thresholds
-      tags: [scoring]
+      tags:
+      - scoring
       responses:
         '200':
           description: Scoring thresholds
@@ -189,10 +207,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoringThresholds'
+      security:
+      - bearerAuth: []
     put:
       operationId: update_scoring_thresholds
       summary: Update hot/warm/cold thresholds
-      tags: [scoring]
+      tags:
+      - scoring
       requestBody:
         required: true
         content:
@@ -204,137 +225,87 @@ paths:
           description: Thresholds updated
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/hot:
     get:
       operationId: list_hot_leads
       summary: List all hot leads (score >= 75)
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Hot leads
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        lead_id:
-                          type: string
-                          format: uuid
-                        lead_name:
-                          type: string
-                        score:
-                          type: number
-                          format: float
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+      security:
+      - bearerAuth: []
   /leads/warm:
     get:
       operationId: list_warm_leads
       summary: List all warm leads (score 40-74)
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Warm leads
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        lead_id:
-                          type: string
-                          format: uuid
-                        lead_name:
-                          type: string
-                        score:
-                          type: number
-                          format: float
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+      security:
+      - bearerAuth: []
   /leads/cold:
     get:
       operationId: list_cold_leads
       summary: List all cold leads (score < 40)
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Cold leads
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        lead_id:
-                          type: string
-                          format: uuid
-                        lead_name:
-                          type: string
-                        score:
-                          type: number
-                          format: float
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+      security:
+      - bearerAuth: []
   /leads/ranked:
     get:
       operationId: list_ranked_leads
       summary: List all leads sorted by score descending
-      tags: [scoring]
+      tags:
+      - scoring
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Leads ranked by score
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        rank:
-                          type: integer
-                        lead_id:
-                          type: string
-                          format: uuid
-                        lead_name:
-                          type: string
-                        score:
-                          type: number
-                          format: float
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedLeadScoreRanked'
+      security:
+      - bearerAuth: []
   /enrichment/lookup:
     post:
       operationId: lookup_enrichment
       summary: Enrich a lead by email address
-      tags: [enrichment]
+      tags:
+      - enrichment
       requestBody:
         required: true
         content:
@@ -350,11 +321,15 @@ paths:
                 $ref: '#/components/schemas/EnrichmentResponse'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /enrichment/website:
     post:
       operationId: lookup_by_website
       summary: Enrich by company website
-      tags: [enrichment]
+      tags:
+      - enrichment
       requestBody:
         required: true
         content:
@@ -368,11 +343,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /enrichment/batch:
     post:
       operationId: batch_enrich
       summary: Enrich multiple records at once
-      tags: [enrichment]
+      tags:
+      - enrichment
       requestBody:
         required: true
         content:
@@ -397,18 +376,23 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EnrichmentResponse'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /enrichment/auto-fill:
     post:
       operationId: auto_fill
       summary: Auto-fill from partial email data
-      tags: [enrichment]
+      tags:
+      - enrichment
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [email]
+              required:
+              - email
               properties:
                 email:
                   type: string
@@ -422,18 +406,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /enrichment/{id}/result:
     get:
       operationId: get_enrichment_result
       summary: Get enrichment result by request ID
-      tags: [enrichment]
+      tags:
+      - enrichment
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Enrichment result
@@ -443,18 +431,22 @@ paths:
                 $ref: '#/components/schemas/EnrichmentResult'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /verify/email:
     post:
       operationId: verify_email
       summary: Verify a single email address
-      tags: [verification]
+      tags:
+      - verification
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [email]
+              required:
+              - email
               properties:
                 email:
                   type: string
@@ -468,18 +460,23 @@ paths:
                 $ref: '#/components/schemas/EmailVerificationResult'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /verify/batch:
     post:
       operationId: verify_batch
       summary: Verify a list of emails
-      tags: [verification]
+      tags:
+      - verification
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [emails]
+              required:
+              - emails
               properties:
                 emails:
                   type: array
@@ -504,18 +501,23 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EmailVerificationResult'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /verify/phone:
     post:
       operationId: verify_phone
       summary: Verify a phone number
-      tags: [verification]
+      tags:
+      - verification
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [phone]
+              required:
+              - phone
               properties:
                 phone:
                   type: string
@@ -526,11 +528,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhoneVerificationResult'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /mining/search:
     post:
       operationId: search_leads
       summary: Search for leads matching ICP criteria
-      tags: [mining]
+      tags:
+      - mining
       requestBody:
         required: true
         content:
@@ -551,11 +557,15 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /mining/icp-match:
     post:
       operationId: find_icp_matches
       summary: Find leads matching Ideal Customer Profile
-      tags: [mining]
+      tags:
+      - mining
       requestBody:
         required: true
         content:
@@ -576,7 +586,9 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
 components:
   parameters:
     Page:
@@ -599,11 +611,19 @@ components:
       in: query
       schema:
         type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
-    # ======================== SCORING ========================
     LeadScore:
       type: object
-      required: [lead_id, probability]
+      required:
+      - lead_id
+      - probability
       properties:
         id:
           type: string
@@ -642,7 +662,6 @@ components:
         total_records:
           type: integer
           readOnly: true
-
     ScoreExplanation:
       type: object
       properties:
@@ -672,10 +691,13 @@ components:
                 description: Positive pushes up, negative pushes down
         total_records:
           type: integer
-
     ScoringFrequency:
       type: object
-      required: [variable, value, won_count, lost_count]
+      required:
+      - variable
+      - value
+      - won_count
+      - lost_count
       properties:
         id:
           type: string
@@ -696,10 +718,12 @@ components:
         total:
           type: integer
           readOnly: true
-
     ScoringThresholds:
       type: object
-      required: [hot, warm, cold]
+      required:
+      - hot
+      - warm
+      - cold
       properties:
         hot:
           type: object
@@ -730,7 +754,6 @@ components:
               type: string
             color:
               type: string
-
     UpdateThresholdsRequest:
       type: object
       properties:
@@ -738,11 +761,10 @@ components:
           type: integer
         warm_threshold:
           type: integer
-
-    # ======================== ENRICHMENT ========================
     EnrichmentLookupRequest:
       type: object
-      required: [email]
+      required:
+      - email
       properties:
         email:
           type: string
@@ -754,20 +776,20 @@ components:
           type: string
         website:
           type: string
-
     WebsiteEnrichmentRequest:
       type: object
-      required: [website]
+      required:
+      - website
       properties:
         website:
           type: string
           format: uri
         company_name:
           type: string
-
     BatchEnrichmentRequest:
       type: object
-      required: [emails]
+      required:
+      - emails
       properties:
         emails:
           type: array
@@ -776,8 +798,11 @@ components:
             format: email
         source:
           type: string
-          enum: [CLEARBIT, HUNTER, ZOOMINFO, APOLLO]
-
+          enum:
+          - CLEARBIT
+          - HUNTER
+          - ZOOMINFO
+          - APOLLO
     EnrichmentResponse:
       type: object
       properties:
@@ -834,7 +859,6 @@ components:
               type: string
             linkedin_url:
               type: string
-
     EnrichmentResult:
       type: object
       properties:
@@ -858,8 +882,6 @@ components:
         completed_at:
           type: string
           format: date-time
-
-    # ======================== VERIFICATION ========================
     EmailVerificationResult:
       type: object
       properties:
@@ -875,7 +897,6 @@ components:
           type: boolean
         mx_records_exist:
           type: boolean
-
     PhoneVerificationResult:
       type: object
       properties:
@@ -887,25 +908,28 @@ components:
           type: string
         phone_type:
           $ref: '#/components/schemas/PhoneType'
-
-    # ======================== MINING ========================
     LeadMiningRequest:
       type: object
-      required: [criteria]
+      required:
+      - criteria
       properties:
         criteria:
           type: object
           description: Search criteria JSON (industry, size, location, title, etc.)
         source:
           type: string
-          enum: [CLEARBIT, ZOOMINFO, APOLLO, LINKEDIN]
+          enum:
+          - CLEARBIT
+          - ZOOMINFO
+          - APOLLO
+          - LINKEDIN
         limit:
           type: integer
           default: 50
-
     ICPMatchRequest:
       type: object
-      required: [icp_profile]
+      required:
+      - icp_profile
       properties:
         icp_profile:
           type: object
@@ -913,7 +937,6 @@ components:
         limit:
           type: integer
           default: 50
-
     DiscoveredLead:
       type: object
       properties:
@@ -936,32 +959,147 @@ components:
           type: number
           format: float
           description: ICP match score (0-100)
-
-    # ======================== ENUMS ========================
     ScoreBucket:
       type: string
-      enum: [HOT, WARM, COLD]
-
+      enum:
+      - HOT
+      - WARM
+      - COLD
     CompanySize:
       type: string
-      enum: [STARTUP, SMB, MID_MARKET, ENTERPRISE]
-
+      enum:
+      - STARTUP
+      - SMB
+      - MID_MARKET
+      - ENTERPRISE
     PersonRole:
       type: string
-      enum: [EXECUTIVE, MANAGER, INDIVIDUAL_CONTRIBUTOR, INTERN, OTHER]
-
+      enum:
+      - EXECUTIVE
+      - MANAGER
+      - INDIVIDUAL_CONTRIBUTOR
+      - INTERN
+      - OTHER
     PersonSeniority:
       type: string
-      enum: [C_LEVEL, VP, DIRECTOR, MANAGER, SENIOR, MID, JUNIOR]
-
+      enum:
+      - C_LEVEL
+      - VP
+      - DIRECTOR
+      - MANAGER
+      - SENIOR
+      - MID
+      - JUNIOR
     EnrichmentStatus:
       type: string
-      enum: [PENDING, SUCCESS, FAILED]
-
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
     EnrichmentSource:
       type: string
-      enum: [CLEARBIT, HUNTER, ZOOMINFO, APOLLO, LINKEDIN]
-
+      enum:
+      - CLEARBIT
+      - HUNTER
+      - ZOOMINFO
+      - APOLLO
+      - LINKEDIN
     PhoneType:
       type: string
-      enum: [MOBILE, LANDLINE, VOIP]
+      enum:
+      - MOBILE
+      - LANDLINE
+      - VOIP
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedScoringFrequency:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ScoringFrequency'
+    LeadScoreSummary:
+      type: object
+      required:
+      - lead_id
+      - lead_name
+      - score
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        lead_name:
+          type: string
+        score:
+          type: number
+          format: float
+    LeadScoreRanked:
+      type: object
+      required:
+      - lead_id
+      - lead_name
+      - rank
+      - score
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        lead_name:
+          type: string
+        rank:
+          type: integer
+        score:
+          type: number
+          format: float
+    PaginatedLeadScoreSummary:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeadScoreSummary'
+    PaginatedLeadScoreRanked:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeadScoreRanked'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

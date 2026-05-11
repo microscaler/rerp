@@ -4,69 +4,68 @@ info:
   version: 1.0.0
   description: Real-time live chat service with visitor tracking, agent management, and chat-to-lead conversion.
 servers:
-  - url: /api/v1/crm/livechat
-    description: Live Chat API
+- url: http://localhost:10352/api/v1/crm/livechat
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/livechat
+  description: Livechat API
 tags:
-  - name: chats
-    description: Chat session management
-  - name: messages
-    description: Chat message management
-  - name: agents
-    description: Chat agent management
+- name: chats
+  description: Chat session management
+- name: messages
+  description: Chat message management
+- name: agents
+  description: Chat agent management
 paths:
   /chats:
     get:
       operationId: list_chats
       summary: List chat sessions
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Search'
-        - name: filter_status
-          in: query
-          schema:
-            type: string
-            enum: [WAITING, ACTIVE, CLOSED, TRANSFERRED]
-        - name: filter_agent_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: filter_started_after
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: filter_started_before
-          in: query
-          schema:
-            type: string
-            format: date-time
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: filter_status
+        in: query
+        schema:
+          type: string
+          enum:
+          - WAITING
+          - ACTIVE
+          - CLOSED
+          - TRANSFERRED
+      - name: filter_agent_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_started_after
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: filter_started_before
+        in: query
+        schema:
+          type: string
+          format: date-time
       responses:
         '200':
           description: List of chat sessions
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ChatSession'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedChatSession'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_chat
       summary: Start a new chat session
-      tags: [chats]
+      tags:
+      - chats
       requestBody:
         required: true
         content:
@@ -82,40 +81,40 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /chats/active:
     get:
       operationId: list_active_chats
       summary: List currently active chat sessions
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Active chat sessions
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ChatSession'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedChatSession'
+      security:
+      - bearerAuth: []
   /chats/{id}:
     get:
       operationId: get_chat
       summary: Get chat session by id
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Chat session details
@@ -125,34 +124,40 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
     delete:
       operationId: delete_chat
       summary: Delete chat session transcript
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Chat deleted
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /chats/{id}/message:
     post:
       operationId: send_chat_message
       summary: Send a message in a chat session
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -170,18 +175,22 @@ paths:
           description: Invalid request
         '404':
           description: Chat not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /chats/{id}/close:
     post:
       operationId: close_chat
       summary: Close a chat session
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Chat closed
@@ -191,20 +200,24 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /chats/{id}/transcript:
     get:
       operationId: get_chat_transcript
       summary: Get full chat transcript
-      tags: [chats]
+      tags:
+      - chats
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Chat transcript
@@ -214,11 +227,14 @@ paths:
                 $ref: '#/components/schemas/ChatTranscript'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /chats/convert:
     post:
       operationId: convert_chat_to_lead
       summary: Convert a chat session into a CRM lead
-      tags: [chats]
+      tags:
+      - chats
       requestBody:
         required: true
         content:
@@ -234,50 +250,53 @@ paths:
                 $ref: '#/components/schemas/ChatConversionResult'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /messages:
     get:
       operationId: list_messages
       summary: List all messages across sessions
-      tags: [messages]
+      tags:
+      - messages
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_session_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: filter_sender_type
-          in: query
-          schema:
-            type: string
-            enum: [AGENT, VISITOR, BOT]
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_session_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_sender_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - AGENT
+          - VISITOR
+          - BOT
       responses:
         '200':
           description: List of messages
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ChatMessage'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedChatMessage'
+      security:
+      - bearerAuth: []
   /messages/{id}:
     get:
       operationId: get_message
       summary: Get message by id
-      tags: [messages]
+      tags:
+      - messages
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Message details
@@ -287,38 +306,37 @@ paths:
                 $ref: '#/components/schemas/ChatMessage'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /agents:
     get:
       operationId: list_agents
       summary: List all chat agents
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_online
-          in: query
-          schema:
-            type: boolean
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_online
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: List of agents
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Agent'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedAgent'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_agent
       summary: Create a new chat agent
-      tags: [agents]
+      tags:
+      - agents
       requestBody:
         required: true
         content:
@@ -334,18 +352,22 @@ paths:
                 $ref: '#/components/schemas/Agent'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /agents/{id}:
     get:
       operationId: get_agent
       summary: Get agent by id
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Agent details
@@ -355,17 +377,20 @@ paths:
                 $ref: '#/components/schemas/Agent'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
     put:
       operationId: update_agent
       summary: Update agent fields
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -383,40 +408,47 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_agent
       summary: Delete agent
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Agent deleted
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /agents/{id}/status:
     put:
       operationId: set_agent_status
       summary: Set an agent's online/offline status
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AgentStatusRequest'
+              $ref: '#/components/schemas/PaginatedAgentStatusRequest'
       responses:
         '200':
           description: Agent status updated
@@ -426,35 +458,37 @@ paths:
                 $ref: '#/components/schemas/Agent'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /agents/status:
     get:
       operationId: get_all_agent_status
       summary: Get all agent online statuses
-      tags: [agents]
+      tags:
+      - agents
       responses:
         '200':
           description: All agent statuses
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AgentStatus'
+                $ref: '#/components/schemas/PaginatedAgentStatus'
+      security:
+      - bearerAuth: []
   /agents/{id}/metrics:
     get:
       operationId: get_agent_metrics
       summary: Get agent performance metrics
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Agent metrics
@@ -464,51 +498,37 @@ paths:
                 $ref: '#/components/schemas/AgentMetrics'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /agents/queue:
     get:
       operationId: get_waiting_queue
       summary: Get current waiting queue for chat
-      tags: [agents]
+      tags:
+      - agents
       parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 20
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
       responses:
         '200':
           description: Waiting queue
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        visitor_id:
-                          type: string
-                        waiting_since:
-                          type: string
-                          format: date-time
-                        page_views:
-                          type: integer
-                  total:
-                    type: integer
-                  next_available_agent_id:
-                    type: string
-                    format: uuid
-
+                $ref: '#/components/schemas/PaginatedAgentQueueItem'
+      security:
+      - bearerAuth: []
 components:
   parameters:
     Page:
@@ -531,15 +551,21 @@ components:
       in: query
       schema:
         type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
-    # ======================== CHAT SESSION ========================
     ChatSession:
       type: object
       required:
-        - id
-        - agent_id
-        - status
-        - started_at
+      - id
+      - agent_id
+      - status
+      - started_at
       properties:
         id:
           type: string
@@ -589,10 +615,10 @@ components:
           type: string
           format: date-time
           readOnly: true
-
     CreateChatRequest:
       type: object
-      required: [visitor_id]
+      required:
+      - visitor_id
       properties:
         visitor_id:
           type: string
@@ -613,17 +639,17 @@ components:
           type: array
           items:
             type: string
-
     SendChatRequest:
       type: object
-      required: [visitor_id]
+      required:
+      - visitor_id
       properties:
         visitor_id:
           type: string
-
     ConvertChatRequest:
       type: object
-      required: [chat_id]
+      required:
+      - chat_id
       properties:
         chat_id:
           type: string
@@ -648,7 +674,6 @@ components:
           type: array
           items:
             type: string
-
     ChatConversionResult:
       type: object
       properties:
@@ -663,7 +688,6 @@ components:
           format: uuid
         lead:
           type: object
-
     ChatTranscript:
       type: object
       properties:
@@ -682,16 +706,14 @@ components:
           format: date-time
         duration_seconds:
           type: integer
-
-    # ======================== CHAT MESSAGE ========================
     ChatMessage:
       type: object
       required:
-        - id
-        - session_id
-        - sender_type
-        - message
-        - sent_at
+      - id
+      - session_id
+      - sender_type
+      - message
+      - sent_at
       properties:
         id:
           type: string
@@ -716,10 +738,10 @@ components:
         read_at:
           type: string
           format: date-time
-
     SendMessageRequest:
       type: object
-      required: [message]
+      required:
+      - message
       properties:
         message:
           type: string
@@ -728,14 +750,12 @@ components:
         sender_id:
           type: string
           format: uuid
-
-    # ======================== AGENT ========================
     Agent:
       type: object
       required:
-        - id
-        - is_online
-        - max_concurrent
+      - id
+      - is_online
+      - max_concurrent
       properties:
         id:
           type: string
@@ -752,7 +772,7 @@ components:
           readOnly: true
         max_concurrent:
           type: integer
-          description: "Max concurrent chats (default: 3)"
+          description: 'Max concurrent chats (default: 3)'
         total_chats_today:
           type: integer
           readOnly: true
@@ -776,10 +796,10 @@ components:
           type: string
           format: date-time
           readOnly: true
-
     CreateAgentRequest:
       type: object
-      required: [user_id]
+      required:
+      - user_id
       properties:
         user_id:
           type: string
@@ -791,7 +811,6 @@ components:
           type: array
           items:
             type: string
-
     UpdateAgentRequest:
       type: object
       properties:
@@ -803,27 +822,13 @@ components:
             type: string
         is_online:
           type: boolean
-
     AgentStatusRequest:
       type: object
-      required: [is_online]
+      required:
+      - is_online
       properties:
         is_online:
           type: boolean
-
-    AgentStatus:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        is_online:
-          type: boolean
-        active_sessions:
-          type: integer
-
     AgentMetrics:
       type: object
       properties:
@@ -845,12 +850,111 @@ components:
           type: integer
         chats_this_week:
           type: integer
-
-    # ======================== ENUMS ========================
     ChatStatus:
       type: string
-      enum: [WAITING, ACTIVE, CLOSED, TRANSFERRED]
-
+      enum:
+      - WAITING
+      - ACTIVE
+      - CLOSED
+      - TRANSFERRED
     SenderType:
       type: string
-      enum: [AGENT, VISITOR, BOT]
+      enum:
+      - AGENT
+      - VISITOR
+      - BOT
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedAgent:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Agent'
+    PaginatedChatSession:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ChatSession'
+    PaginatedChatMessage:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ChatMessage'
+    PaginatedAgentStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_online:
+          type: boolean
+        active_sessions:
+          type: integer
+    AgentQueueItem:
+      type: object
+      required:
+      - visitor_id
+      - page_views
+      - waiting_since
+      properties:
+        visitor_id:
+          type: string
+        page_views:
+          type: integer
+        waiting_since:
+          type: string
+          format: date-time
+    PaginatedAgentQueueItem:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AgentQueueItem'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

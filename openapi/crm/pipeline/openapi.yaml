@@ -2,376 +2,563 @@ openapi: 3.1.0
 info:
   title: Pipeline
   version: 1.0.0
-  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline summary.
+  description: "Pipeline service \u2014 leads, opportunities, stages, lead conversion, pipeline summary."
 servers:
-  - url: /api/v1/crm/pipeline
-    description: Pipeline API
+- url: http://localhost:10352/api/v1/crm/pipeline
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/pipeline
+  description: Pipeline API
 tags:
-  - name: leads
-    description: Lead and opportunity lifecycle
-  - name: stages
-    description: Pipeline stage management
+- name: leads
+  description: Lead and opportunity lifecycle
+- name: stages
+  description: Pipeline stage management
 paths:
   /leads:
     get:
       operationId: list_leads
       summary: List leads and opportunities
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: page
-          in: query
-          schema: {type: integer, minimum: 1, default: 1}
-        - name: limit
-          in: query
-          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
-        - name: search
-          in: query
-          schema: {type: string}
-        - name: filter_type
-          in: query
-          schema: {type: string, enum: [LEAD, OPPORTUNITY]}
-        - name: filter_stage_id
-          in: query
-          schema: {type: string, format: uuid}
-        - name: filter_user_id
-          in: query
-          schema: {type: string, format: uuid}
-        - name: filter_team_id
-          in: query
-          schema: {type: string, format: uuid}
-        - name: filter_probability_gt
-          in: query
-          schema: {type: number, format: float}
-        - name: filter_active
-          in: query
-          schema: {type: boolean}
-        - name: filter_won_status
-          in: query
-          schema: {type: string, enum: [PENDING, WON, LOST]}
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: filter_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - LEAD
+          - OPPORTUNITY
+      - name: filter_stage_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_probability_gt
+        in: query
+        schema:
+          type: number
+          format: float
+      - name: filter_active
+        in: query
+        schema:
+          type: boolean
+      - name: filter_won_status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - WON
+          - LOST
       responses:
         '200':
           description: List of leads
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items: { $ref: '#/components/schemas/Lead' }
-                  total: {type: integer}
-                  page: {type: integer}
-                  limit: {type: integer}
-        '401': {description: Unauthorized}
-        '500': {description: Internal server error}
+                $ref: '#/components/schemas/PaginatedLead'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
     post:
       operationId: create_lead
       summary: Create a new lead or opportunity
-      tags: [leads]
+      tags:
+      - leads
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateLeadRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateLeadRequest'
       responses:
         '201':
           description: Lead created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Lead' }
-        '400': {description: Invalid request}
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/{id}:
     get:
       operationId: get_lead
       summary: Get lead by id
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Lead details
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Lead' }
-        '404': {description: Not found}
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
     put:
       operationId: update_lead
       summary: Update lead fields
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateLeadRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateLeadRequest'
       responses:
         '200':
           description: Lead updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Lead' }
-        '400': {description: Invalid request}
-        '404': {description: Not found}
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_lead
       summary: Soft-delete lead
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        '204': {description: Lead deleted}
-        '404': {description: Not found}
+        '204':
+          description: Lead deleted
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
   /leads/{id}/stage:
     patch:
       operationId: change_stage
       summary: Move lead to a new pipeline stage
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/StageChangeRequest' }
+            schema:
+              $ref: '#/components/schemas/StageChangeRequest'
       responses:
         '200':
           description: Lead stage updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Lead' }
-        '400': {description: Invalid stage transition}
-        '404': {description: Not found}
+              schema:
+                $ref: '#/components/schemas/Lead'
+        '400':
+          description: Invalid stage transition
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/{id}/convert:
     post:
       operationId: convert_lead
       summary: Convert lead to opportunity or create contact/account
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ConvertLeadRequest' }
+            schema:
+              $ref: '#/components/schemas/ConvertLeadRequest'
       responses:
         '200':
           description: Converted lead with new IDs
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ConversionResult' }
-        '404': {description: Not found}
+              schema:
+                $ref: '#/components/schemas/ConversionResult'
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/detect-duplicates:
     post:
       operationId: detect_duplicates
       summary: Detect duplicate leads by email/phone/name
-      tags: [leads]
+      tags:
+      - leads
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DuplicateDetectionRequest' }
+            schema:
+              $ref: '#/components/schemas/DuplicateDetectionRequest'
       responses:
         '200':
           description: Duplicate lead IDs
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/DuplicateDetectionResult' }
-        '400': {description: Invalid request}
+              schema:
+                $ref: '#/components/schemas/DuplicateDetectionResult'
+        '400':
+          description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /leads/{id}/merge:
     post:
       operationId: merge_leads
       summary: Merge two leads (keep one, archive other, combine data)
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/MergeLeadsRequest' }
+            schema:
+              $ref: '#/components/schemas/MergeLeadsRequest'
       responses:
         '200':
           description: Merge completed
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MergeResult' }
-        '400': {description: Invalid request}
+              schema:
+                $ref: '#/components/schemas/MergeResult'
+        '400':
+          description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /pipeline/summary:
     get:
       operationId: pipeline_summary
       summary: Get pipeline summary grouped by stage
-      tags: [leads]
+      tags:
+      - leads
       parameters:
-        - name: team_id
-          in: query
-          schema: {type: string, format: uuid}
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Pipeline summary
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/PipelineSummary' }
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/PaginatedPipelineSummary'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
   /stages:
     get:
       operationId: list_stages
       summary: List pipeline stages ordered by sequence
-      tags: [stages]
+      tags:
+      - stages
       parameters:
-        - name: page
-          in: query
-          schema: {type: integer, minimum: 1, default: 1}
-        - name: limit
-          in: query
-          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
-        - name: filter_team_id
-          in: query
-          schema: {type: string, format: uuid}
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      - name: filter_team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: List of stages
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items: { $ref: '#/components/schemas/Stage' }
-                  total: {type: integer}
-        '401': {description: Unauthorized}
+                $ref: '#/components/schemas/PaginatedStage'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_stage
       summary: Create a new pipeline stage
-      tags: [stages]
+      tags:
+      - stages
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateStageRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateStageRequest'
       responses:
         '201':
           description: Stage created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Stage' }
-        '400': {description: Invalid request}
+              schema:
+                $ref: '#/components/schemas/Stage'
+        '400':
+          description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /stages/{id}:
     get:
       operationId: get_stage
       summary: Get stage by id
-      tags: [stages]
+      tags:
+      - stages
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Stage details
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Stage' }
-        '404': {description: Not found}
-        '401': {description: Unauthorized}
+              schema:
+                $ref: '#/components/schemas/Stage'
+        '404':
+          description: Not found
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
     put:
       operationId: update_stage
       summary: Update stage fields
-      tags: [stages]
+      tags:
+      - stages
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateStageRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateStageRequest'
       responses:
         '200':
           description: Stage updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Stage' }
-        '400': {description: Invalid request}
-        '404': {description: Not found}
+              schema:
+                $ref: '#/components/schemas/Stage'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_stage
       summary: Delete stage (only if no leads in it)
-      tags: [stages]
+      tags:
+      - stages
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema: {type: string, format: uuid}
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        '204': {description: Stage deleted}
-        '404': {description: Not found}
-        '409': {description: Stage is in use}
-
+        '204':
+          description: Stage deleted
+        '404':
+          description: Not found
+        '409':
+          description: Stage is in use
+      security:
+      - bearerAuth: []
 components:
   schemas:
-    # ======================== LEAD ========================
     Lead:
       type: object
-      required: [id, name, type, create_date, active]
+      required:
+      - id
+      - name
+      - type
+      - create_date
+      - active
       properties:
-        id: {type: string, format: uuid}
-        name: {type: string, maxLength: 255}
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
         type:
           type: string
-          enum: [LEAD, OPPORTUNITY]
+          enum:
+          - LEAD
+          - OPPORTUNITY
           description: LEAD = qualification, OPPORTUNITY = pipeline
-        email_from: {type: string, format: email, maxLength: 255}
-        email_normalized: {type: string, maxLength: 255}
-        phone: {type: string, maxLength: 64}
-        phone_sanitized: {type: string, maxLength: 64}
-        mobile: {type: string, maxLength: 64}
+        email_from:
+          type: string
+          format: email
+          maxLength: 255
+        email_normalized:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 64
+        phone_sanitized:
+          type: string
+          maxLength: 64
+        mobile:
+          type: string
+          maxLength: 64
         title:
           type: string
-          enum: [MR, MRS, MME]
+          enum:
+          - MR
+          - MRS
+          - MME
           description: Salutation
-        function: {type: string, maxLength: 128}
-        contact_name: {type: string, maxLength: 255}
-        company_name: {type: string, maxLength: 255}
-        website: {type: string, format: uri, maxLength: 255}
-        description: {type: string}
-        referred_by: {type: string, maxLength: 255}
+        function:
+          type: string
+          maxLength: 128
+        contact_name:
+          type: string
+          maxLength: 255
+        company_name:
+          type: string
+          maxLength: 255
+        website:
+          type: string
+          format: uri
+          maxLength: 255
+        description:
+          type: string
+        referred_by:
+          type: string
+          maxLength: 255
         priority:
           type: string
-          enum: [LOW, NORMAL, HIGH, URGENT]
-        active: {type: boolean}
-        is_blacklisted: {type: boolean}
-        color: {type: integer, minimum: 1, maximum: 16}
-        # Pipeline
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+          - URGENT
+        active:
+          type: boolean
+        is_blacklisted:
+          type: boolean
+        color:
+          type: integer
+          minimum: 1
+          maximum: 16
         stage_id:
           type: string
           format: uuid
           description: Current pipeline stage
         tag_ids:
           type: array
-          items: {type: string, format: uuid}
+          items:
+            type: string
+            format: uuid
         probability:
           type: number
           format: float
@@ -382,20 +569,48 @@ components:
           format: float
           minimum: 0
           maximum: 100
-        is_automated_probability: {type: boolean}
-        date_deadline: {type: string, format: date}
-        date_open: {type: string, format: date-time, readOnly: true}
-        date_closed: {type: string, format: date-time, readOnly: true}
-        date_last_stage_update: {type: string, format: date-time, readOnly: true}
-        day_open: {type: number, format: float, readOnly: true}
-        day_close: {type: number, format: float, readOnly: true}
-        # Revenue
-        expected_revenue: {type: number, format: double}
-        prorated_revenue: {type: number, format: double, readOnly: true}
-        recurring_revenue: {type: number, format: double}
-        recurring_plan_id: {type: string, format: uuid}
-        recurring_revenue_monthly: {type: number, format: double, readOnly: true}
-        # Partner linkage
+        is_automated_probability:
+          type: boolean
+        date_deadline:
+          type: string
+          format: date
+        date_open:
+          type: string
+          format: date-time
+          readOnly: true
+        date_closed:
+          type: string
+          format: date-time
+          readOnly: true
+        date_last_stage_update:
+          type: string
+          format: date-time
+          readOnly: true
+        day_open:
+          type: number
+          format: float
+          readOnly: true
+        day_close:
+          type: number
+          format: float
+          readOnly: true
+        expected_revenue:
+          type: number
+          format: double
+        prorated_revenue:
+          type: number
+          format: double
+          readOnly: true
+        recurring_revenue:
+          type: number
+          format: double
+        recurring_plan_id:
+          type: string
+          format: uuid
+        recurring_revenue_monthly:
+          type: number
+          format: double
+          readOnly: true
         partner_id:
           type: string
           format: uuid
@@ -412,189 +627,395 @@ components:
           type: string
           format: uuid
           description: Sales team
-        # UTM
-        campaign_id: {type: string, format: uuid}
-        medium_id: {type: string, format: uuid}
-        source_id: {type: string, format: uuid}
-        # Won/Lost
+        campaign_id:
+          type: string
+          format: uuid
+        medium_id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
         won_status:
           type: string
-          enum: [PENDING, WON, LOST]
-        lost_reason_id: {type: string, format: uuid}
-        # Duplicate detection
+          enum:
+          - PENDING
+          - WON
+          - LOST
+        lost_reason_id:
+          type: string
+          format: uuid
         duplicate_lead_ids:
           type: array
-          items: {type: string, format: uuid}
-        duplicate_lead_count: {type: integer}
-        # Timestamps
-        create_date: {type: string, format: date-time, readOnly: true}
-        write_date: {type: string, format: date-time, readOnly: true}
-        write_uid: {type: string, format: uuid}
-        # Stage info (joined)
-        stage_name: {type: string, readOnly: true}
-        stage_probability: {type: integer, readOnly: true}
-        stage_color: {type: integer, readOnly: true}
-        is_rotting: {type: boolean, readOnly: true}
-
+          items:
+            type: string
+            format: uuid
+        duplicate_lead_count:
+          type: integer
+        create_date:
+          type: string
+          format: date-time
+          readOnly: true
+        write_date:
+          type: string
+          format: date-time
+          readOnly: true
+        write_uid:
+          type: string
+          format: uuid
+        stage_name:
+          type: string
+          readOnly: true
+        stage_probability:
+          type: integer
+          readOnly: true
+        stage_color:
+          type: integer
+          readOnly: true
+        is_rotting:
+          type: boolean
+          readOnly: true
     CreateLeadRequest:
       type: object
-      required: [name]
+      required:
+      - name
       properties:
-        name: {type: string, maxLength: 255}
-        type: {type: string, enum: [LEAD, OPPORTUNITY], default: LEAD}
-        email_from: {type: string, format: email}
-        email: {type: string, format: email}
-        phone: {type: string}
-        mobile: {type: string}
-        title: {type: string, enum: [MR, MRS, MME]}
-        function: {type: string}
-        contact_name: {type: string}
-        company_name: {type: string}
-        website: {type: string, format: uri}
-        description: {type: string}
-        referred_by: {type: string}
-        priority: {type: string, enum: [LOW, NORMAL, HIGH, URGENT]}
-        stage_id: {type: string, format: uuid}
+        name:
+          type: string
+          maxLength: 255
+        type:
+          type: string
+          enum:
+          - LEAD
+          - OPPORTUNITY
+          default: LEAD
+        email_from:
+          type: string
+          format: email
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        mobile:
+          type: string
+        title:
+          type: string
+          enum:
+          - MR
+          - MRS
+          - MME
+        function:
+          type: string
+        contact_name:
+          type: string
+        company_name:
+          type: string
+        website:
+          type: string
+          format: uri
+        description:
+          type: string
+        referred_by:
+          type: string
+        priority:
+          type: string
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+          - URGENT
+        stage_id:
+          type: string
+          format: uuid
         tag_ids:
           type: array
-          items: {type: string, format: uuid}
-        expected_revenue: {type: number, format: double}
-        probability: {type: number, format: float, minimum: 0, maximum: 100}
-        user_id: {type: string, format: uuid}
-        team_id: {type: string, format: uuid}
-        partner_id: {type: string, format: uuid}
-        company_id: {type: string, format: uuid}
-        campaign_id: {type: string, format: uuid}
-        medium_id: {type: string, format: uuid}
-        source_id: {type: string, format: uuid}
-        date_deadline: {type: string, format: date}
-        recurring_plan_id: {type: string, format: uuid}
-        recurring_revenue: {type: number, format: double}
-
+          items:
+            type: string
+            format: uuid
+        expected_revenue:
+          type: number
+          format: double
+        probability:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+        user_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        partner_id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        medium_id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
+        date_deadline:
+          type: string
+          format: date
+        recurring_plan_id:
+          type: string
+          format: uuid
+        recurring_revenue:
+          type: number
+          format: double
     UpdateLeadRequest:
       type: object
       properties:
-        name: {type: string}
-        type: {type: string, enum: [LEAD, OPPORTUNITY]}
-        email_from: {type: string}
-        email: {type: string, format: email}
-        phone: {type: string}
-        mobile: {type: string}
-        title: {type: string, enum: [MR, MRS, MME]}
-        function: {type: string}
-        contact_name: {type: string}
-        company_name: {type: string}
-        website: {type: string, format: uri}
-        description: {type: string}
-        referred_by: {type: string}
-        priority: {type: string, enum: [LOW, NORMAL, HIGH, URGENT]}
-        active: {type: boolean}
-        stage_id: {type: string, format: uuid}
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - LEAD
+          - OPPORTUNITY
+        email_from:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        mobile:
+          type: string
+        title:
+          type: string
+          enum:
+          - MR
+          - MRS
+          - MME
+        function:
+          type: string
+        contact_name:
+          type: string
+        company_name:
+          type: string
+        website:
+          type: string
+          format: uri
+        description:
+          type: string
+        referred_by:
+          type: string
+        priority:
+          type: string
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+          - URGENT
+        active:
+          type: boolean
+        stage_id:
+          type: string
+          format: uuid
         tag_ids:
           type: array
-          items: {type: string, format: uuid}
-        expected_revenue: {type: number, format: double}
-        probability: {type: number, format: float}
-        user_id: {type: string, format: uuid}
-        team_id: {type: string, format: uuid}
-        partner_id: {type: string, format: uuid}
-        company_id: {type: string, format: uuid}
-        campaign_id: {type: string, format: uuid}
-        medium_id: {type: string, format: uuid}
-        source_id: {type: string, format: uuid}
-        date_deadline: {type: string, format: date}
-        lost_reason_id: {type: string, format: uuid}
-
-    # ======================== STAGE ========================
+          items:
+            type: string
+            format: uuid
+        expected_revenue:
+          type: number
+          format: double
+        probability:
+          type: number
+          format: float
+        user_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        partner_id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        medium_id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
+        date_deadline:
+          type: string
+          format: date
+        lost_reason_id:
+          type: string
+          format: uuid
     Stage:
       type: object
-      required: [id, name, sequence, probability]
+      required:
+      - id
+      - name
+      - sequence
+      - probability
       properties:
-        id: {type: string, format: uuid}
-        name: {type: string, maxLength: 128}
-        sequence: {type: integer, minimum: 1, description: Order in pipeline}
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        sequence:
+          type: integer
+          minimum: 1
+          description: Order in pipeline
         probability:
           type: integer
           minimum: 0
           maximum: 100
           description: Win probability for this stage
-        is_won: {type: boolean, description: Marks final Won stage}
-        is_lost: {type: boolean, description: Marks a Lost stage}
+        is_won:
+          type: boolean
+          description: Marks final Won stage
+        is_lost:
+          type: boolean
+          description: Marks a Lost stage
         rotting_threshold_days:
           type: integer
           minimum: 1
           description: Days before stage shows as stale
-        requirements: {type: string, description: Internal requirements/tooltip}
+        requirements:
+          type: string
+          description: Internal requirements/tooltip
         team_ids:
           type: array
-          items: {type: string, format: uuid}
-        fold: {type: boolean, description: Folded in Kanban when no deals}
-        color: {type: integer, minimum: 1, maximum: 16}
-        description: {type: string}
-        # Joined
-        lead_count: {type: integer, readOnly: true}
-
+          items:
+            type: string
+            format: uuid
+        fold:
+          type: boolean
+          description: Folded in Kanban when no deals
+        color:
+          type: integer
+          minimum: 1
+          maximum: 16
+        description:
+          type: string
+        lead_count:
+          type: integer
+          readOnly: true
     CreateStageRequest:
       type: object
-      required: [name, sequence, probability]
+      required:
+      - name
+      - sequence
+      - probability
       properties:
-        name: {type: string, maxLength: 128}
-        sequence: {type: integer, minimum: 1}
-        probability: {type: integer, minimum: 0, maximum: 100}
-        is_won: {type: boolean}
-        is_lost: {type: boolean}
-        rotting_threshold_days: {type: integer, minimum: 1}
-        requirements: {type: string}
+        name:
+          type: string
+          maxLength: 128
+        sequence:
+          type: integer
+          minimum: 1
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        is_won:
+          type: boolean
+        is_lost:
+          type: boolean
+        rotting_threshold_days:
+          type: integer
+          minimum: 1
+        requirements:
+          type: string
         team_ids:
           type: array
-          items: {type: string, format: uuid}
-        fold: {type: boolean}
-        color: {type: integer, minimum: 1, maximum: 16}
-        description: {type: string}
-
+          items:
+            type: string
+            format: uuid
+        fold:
+          type: boolean
+        color:
+          type: integer
+          minimum: 1
+          maximum: 16
+        description:
+          type: string
     UpdateStageRequest:
       type: object
       properties:
-        name: {type: string}
-        sequence: {type: integer}
-        probability: {type: integer}
-        is_won: {type: boolean}
-        is_lost: {type: boolean}
-        rotting_threshold_days: {type: integer}
-        requirements: {type: string}
+        name:
+          type: string
+        sequence:
+          type: integer
+        probability:
+          type: integer
+        is_won:
+          type: boolean
+        is_lost:
+          type: boolean
+        rotting_threshold_days:
+          type: integer
+        requirements:
+          type: string
         team_ids:
           type: array
-          items: {type: string, format: uuid}
-        fold: {type: boolean}
-        color: {type: integer}
-        description: {type: string}
-
-    # ======================== CONVERSION ========================
+          items:
+            type: string
+            format: uuid
+        fold:
+          type: boolean
+        color:
+          type: integer
+        description:
+          type: string
     StageChangeRequest:
       type: object
-      required: [stage_id]
+      required:
+      - stage_id
       properties:
-        stage_id: {type: string, format: uuid}
+        stage_id:
+          type: string
+          format: uuid
         lost_reason_id:
           type: string
           format: uuid
           description: Required when transitioning to a lost stage
-        comment: {type: string, description: Optional comment on stage change}
-
+        comment:
+          type: string
+          description: Optional comment on stage change
     ConvertLeadRequest:
       type: object
       properties:
         type:
           type: string
-          enum: [OPPORTUNITY, CONTACT, BOTH]
+          enum:
+          - OPPORTUNITY
+          - CONTACT
+          - BOTH
           description: What to create from lead
-        create_contact: {type: boolean, default: false}
-        create_account: {type: boolean, default: false}
-
+        create_contact:
+          type: boolean
+          default: false
+        create_account:
+          type: boolean
+          default: false
     ConversionResult:
       type: object
       properties:
-        lead_id: {type: string, format: uuid}
+        lead_id:
+          type: string
+          format: uuid
         contact_id:
           type: string
           format: uuid
@@ -605,54 +1026,157 @@ components:
           description: Created account if requested
         converted_lead:
           type: object
-
-    # ======================== PIPELINE SUMMARY ========================
-    PipelineSummary:
-      type: object
-      required: [total_opportunities, total_revenue, total_weighted_revenue, stages]
-      properties:
-        total_opportunities: {type: integer}
-        total_revenue: {type: number, format: double}
-        total_weighted_revenue: {type: number, format: double}
-        stages:
-          type: array
-          items:
-            type: object
-            properties:
-              stage_id: {type: string, format: uuid}
-              stage_name: {type: string}
-              count: {type: integer}
-              total_revenue: {type: number, format: double}
-              weighted_revenue: {type: number, format: double}
-              avg_days_in_stage: {type: number, format: float}
-
-    # ======================== DUPLICATE DETECTION ========================
     DuplicateDetectionRequest:
       type: object
       properties:
-        email: {type: string, format: email}
-        phone: {type: string}
-        name: {type: string}
-
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        name:
+          type: string
     DuplicateDetectionResult:
       type: object
       properties:
         duplicates:
           type: array
-          items: {type: string, format: uuid}
-
-    # ======================== MERGE ========================
+          items:
+            type: string
+            format: uuid
     MergeLeadsRequest:
       type: object
-      required: [keep_id, merge_id]
+      required:
+      - keep_id
+      - merge_id
       properties:
-        keep_id: {type: string, format: uuid}
-        merge_id: {type: string, format: uuid}
-
+        keep_id:
+          type: string
+          format: uuid
+        merge_id:
+          type: string
+          format: uuid
     MergeResult:
       type: object
       properties:
-        kept_id: {type: string, format: uuid}
-        merged_id: {type: string, format: uuid}
-        merged_tag_count: {type: integer}
-        merged_description_additions: {type: integer}
+        kept_id:
+          type: string
+          format: uuid
+        merged_id:
+          type: string
+          format: uuid
+        merged_tag_count:
+          type: integer
+        merged_description_additions:
+          type: integer
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedLead:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Lead'
+    PaginatedStage:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Stage'
+    PaginatedPipelineSummary:
+      type: object
+      required:
+      - total_opportunities
+      - total_revenue
+      - total_weighted_revenue
+      - stages
+      properties:
+        total_opportunities:
+          type: integer
+        total_revenue:
+          type: number
+          format: double
+        total_weighted_revenue:
+          type: number
+          format: double
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+                format: uuid
+              stage_name:
+                type: string
+              count:
+                type: integer
+              total_revenue:
+                type: number
+                format: double
+              weighted_revenue:
+                type: number
+                format: double
+              avg_days_in_stage:
+                type: number
+                format: float
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

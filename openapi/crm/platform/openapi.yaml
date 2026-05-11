@@ -4,52 +4,51 @@ info:
   version: 1.0.0
   description: Custom fields, webhooks, audit logging, API keys, and integrations.
 servers:
-  - url: /api/v1/crm/platform
-    description: CRM Platform API
+- url: http://localhost:10352/api/v1/crm/platform
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/platform
+  description: Platform API
 tags:
-  - name: custom-fields
-    description: Custom field definitions per entity
-  - name: webhooks
-    description: Webhook delivery for entity events
-  - name: audit-log
-    description: Immutable audit trail of all operations
-  - name: api-keys
-    description: API key management and authentication
-  - name: integrations
-    description: Third-party integration configuration
+- name: custom-fields
+  description: Custom field definitions per entity
+- name: webhooks
+  description: Webhook delivery for entity events
+- name: audit-log
+  description: Immutable audit trail of all operations
+- name: api-keys
+  description: API key management and authentication
+- name: integrations
+  description: Third-party integration configuration
 paths:
   /custom-fields:
     get:
       operationId: list_custom_fields
       summary: List all custom fields
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_entity
-          in: query
-          schema:
-            type: string
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_entity
+        in: query
+        schema:
+          type: string
       responses:
         '200':
           description: List of custom fields
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CustomField'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedCustomField'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_custom_field
       summary: Create a custom field on any entity
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       requestBody:
         required: true
         content:
@@ -67,18 +66,22 @@ paths:
           description: Invalid request
         '403':
           description: Insufficient permissions
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /custom-fields/{id}:
     get:
       operationId: get_custom_field
       summary: Get custom field by id
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Custom field details
@@ -88,17 +91,20 @@ paths:
                 $ref: '#/components/schemas/CustomField'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
     put:
       operationId: update_custom_field
       summary: Update custom field
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -116,87 +122,89 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_custom_field
       summary: Delete custom field
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Custom field deleted
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /entities/{entity}/custom-fields:
     get:
       operationId: list_entity_custom_fields
       summary: List custom fields for a specific entity
-      tags: [custom-fields]
+      tags:
+      - custom-fields
       parameters:
-        - name: entity
-          in: path
-          required: true
-          schema:
-            type: string
-            enum: [crm.lead, crm.contact, crm.account, crm.stage, crm.team, crm.opportunity]
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - name: entity
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - crm.lead
+          - crm.contact
+          - crm.account
+          - crm.stage
+          - crm.team
+          - crm.opportunity
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Custom fields for entity
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CustomField'
-                  entity:
-                    type: string
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedCustomField'
         '404':
           description: Entity not found
-
+      security:
+      - bearerAuth: []
   /webhooks:
     get:
       operationId: list_webhooks
       summary: List all webhooks
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_active
-          in: query
-          schema:
-            type: boolean
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_active
+        in: query
+        schema:
+          type: boolean
       responses:
         '200':
           description: List of webhooks
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Webhook'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedWebhook'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_webhook
       summary: Create a new webhook
-      tags: [webhooks]
+      tags:
+      - webhooks
       requestBody:
         required: true
         content:
@@ -212,18 +220,22 @@ paths:
                 $ref: '#/components/schemas/Webhook'
         '400':
           description: Invalid request
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /webhooks/{id}:
     get:
       operationId: get_webhook
       summary: Get webhook by id
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Webhook details
@@ -233,17 +245,20 @@ paths:
                 $ref: '#/components/schemas/Webhook'
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
     put:
       operationId: update_webhook
       summary: Update webhook
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -261,34 +276,41 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
     delete:
       operationId: delete_webhook
       summary: Delete webhook
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Webhook deleted
         '404':
           description: Not found
+      security:
+      - bearerAuth: []
   /webhooks/{id}/test:
     post:
       operationId: test_webhook
       summary: Send a test webhook payload
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Test webhook sent
@@ -301,101 +323,102 @@ paths:
                     type: boolean
                   response_code:
                     type: integer
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /webhooks/{id}/logs:
     get:
       operationId: list_webhook_logs
       summary: Get webhook delivery logs
-      tags: [webhooks]
+      tags:
+      - webhooks
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Delivery logs
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/WebhookDeliveryLog'
-                  total:
-                    type: integer
-
+                $ref: '#/components/schemas/PaginatedWebhookDeliveryLog'
+      security:
+      - bearerAuth: []
   /audit-log:
     get:
       operationId: list_audit_log
       summary: Get audit log entries
-      tags: [audit-log]
+      tags:
+      - audit-log
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
-        - name: filter_entity
-          in: query
-          schema:
-            type: string
-        - name: filter_action
-          in: query
-          schema:
-            type: string
-            enum: [CREATE, UPDATE, DELETE, READ, EXPORT, IMPORT]
-        - name: filter_user_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: filter_date_from
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: filter_date_to
-          in: query
-          schema:
-            type: string
-            format: date-time
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_entity
+        in: query
+        schema:
+          type: string
+      - name: filter_action
+        in: query
+        schema:
+          type: string
+          enum:
+          - CREATE
+          - UPDATE
+          - DELETE
+          - READ
+          - EXPORT
+          - IMPORT
+      - name: filter_user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_date_from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: filter_date_to
+        in: query
+        schema:
+          type: string
+          format: date-time
       responses:
         '200':
           description: Audit log entries
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AuditLogEntry'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedAuditLogEntry'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
   /audit-log/{entity}/{entity_id}:
     get:
       operationId: get_entity_audit_log
       summary: Get audit log for a specific entity record
-      tags: [audit-log]
+      tags:
+      - audit-log
       parameters:
-        - name: entity
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: entity_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+      - name: entity
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: entity_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Entity audit log
@@ -412,32 +435,30 @@ paths:
                     type: integer
         '404':
           description: Entity not found
-
+      security:
+      - bearerAuth: []
   /api-keys:
     get:
       operationId: list_api_keys
       summary: List all API keys
-      tags: [api-keys]
+      tags:
+      - api-keys
       responses:
         '200':
           description: List of API keys
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ApiKey'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedApiKey'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_api_key
       summary: Generate a new API key
-      tags: [api-keys]
+      tags:
+      - api-keys
       requestBody:
         required: true
         content:
@@ -459,24 +480,28 @@ paths:
                     type: string
                   key:
                     type: string
-                    description: "This key will only be shown once — save it now."
+                    description: "This key will only be shown once \u2014 save it now."
                   key_hash:
                     type: string
         '400':
           description: Invalid request
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /auth/validate:
     post:
       operationId: validate_api_key
       summary: Validate an API key and return permissions
-      tags: [api-keys]
+      tags:
+      - api-keys
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [key]
+              required:
+              - key
               properties:
                 key:
                   type: string
@@ -495,32 +520,31 @@ paths:
                     type: object
                   rate_limit_remaining:
                     type: integer
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /integrations:
     get:
       operationId: list_integrations
       summary: List all configured integrations
-      tags: [integrations]
+      tags:
+      - integrations
       responses:
         '200':
           description: List of integrations
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Integration'
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedIntegration'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     post:
       operationId: create_integration
       summary: Configure a new integration
-      tags: [integrations]
+      tags:
+      - integrations
       requestBody:
         required: true
         content:
@@ -536,19 +560,22 @@ paths:
                 $ref: '#/components/schemas/Integration'
         '400':
           description: Invalid request
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /integrations/{id}/sync:
     post:
       operationId: trigger_integration_sync
       summary: Manually trigger a data sync for an integration
-      tags: [integrations]
+      tags:
+      - integrations
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Sync triggered
@@ -562,19 +589,22 @@ paths:
                     format: uuid
                   status:
                     type: string
-
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /integrations/{id}/status:
     get:
       operationId: get_integration_status
       summary: Get integration sync status and health
-      tags: [integrations]
+      tags:
+      - integrations
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Integration status
@@ -584,7 +614,8 @@ paths:
                 $ref: '#/components/schemas/Integration'
         '404':
           description: Not found
-
+      security:
+      - bearerAuth: []
 components:
   parameters:
     Page:
@@ -607,17 +638,23 @@ components:
       in: query
       schema:
         type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
-    # ======================== CUSTOM FIELDS ========================
     CustomField:
       type: object
       required:
-        - id
-        - entity
-        - name
-        - label
-        - field_type
-        - visible
+      - id
+      - entity
+      - name
+      - label
+      - field_type
+      - visible
       properties:
         id:
           type: string
@@ -651,14 +688,23 @@ components:
           type: string
           format: date-time
           readOnly: true
-
     CreateCustomFieldRequest:
       type: object
-      required: [entity, name, label, field_type]
+      required:
+      - entity
+      - name
+      - label
+      - field_type
       properties:
         entity:
           type: string
-          enum: [crm.lead, crm.contact, crm.account, crm.stage, crm.team, crm.opportunity]
+          enum:
+          - crm.lead
+          - crm.contact
+          - crm.account
+          - crm.stage
+          - crm.team
+          - crm.opportunity
         name:
           type: string
           maxLength: 128
@@ -679,7 +725,6 @@ components:
           default: false
         default_value:
           type: string
-
     UpdateCustomFieldRequest:
       type: object
       properties:
@@ -697,11 +742,14 @@ components:
           type: boolean
         default_value:
           type: string
-
-    # ======================== WEBHOOKS ========================
     Webhook:
       type: object
-      required: [id, name, url, events, is_active]
+      required:
+      - id
+      - name
+      - url
+      - events
+      - is_active
       properties:
         id:
           type: string
@@ -737,10 +785,12 @@ components:
           type: string
           format: date-time
           readOnly: true
-
     CreateWebhookRequest:
       type: object
-      required: [name, url, events]
+      required:
+      - name
+      - url
+      - events
       properties:
         name:
           type: string
@@ -757,7 +807,6 @@ components:
           type: object
         retry_count:
           type: integer
-
     UpdateWebhookRequest:
       type: object
       properties:
@@ -777,7 +826,6 @@ components:
           type: object
         retry_count:
           type: integer
-
     WebhookDeliveryLog:
       type: object
       properties:
@@ -800,11 +848,15 @@ components:
           format: date-time
         retry_count:
           type: integer
-
-    # ======================== AUDIT LOG ========================
     AuditLogEntry:
       type: object
-      required: [id, entity, entity_id, action, user_id, created_at]
+      required:
+      - id
+      - entity
+      - entity_id
+      - action
+      - user_id
+      - created_at
       properties:
         id:
           type: string
@@ -830,11 +882,12 @@ components:
           type: string
           format: date-time
           readOnly: true
-
-    # ======================== API KEYS ========================
     ApiKey:
       type: object
-      required: [id, name, is_active]
+      required:
+      - id
+      - name
+      - is_active
       properties:
         id:
           type: string
@@ -865,10 +918,11 @@ components:
         expires_at:
           type: string
           format: date-time
-
     CreateApiKeyRequest:
       type: object
-      required: [name, scopes]
+      required:
+      - name
+      - scopes
       properties:
         name:
           type: string
@@ -885,11 +939,12 @@ components:
         expires_at:
           type: string
           format: date-time
-
-    # ======================== INTEGRATIONS ========================
     Integration:
       type: object
-      required: [id, name, type]
+      required:
+      - id
+      - name
+      - type
       properties:
         id:
           type: string
@@ -915,10 +970,11 @@ components:
           type: string
           format: date-time
           readOnly: true
-
     CreateIntegrationRequest:
       type: object
-      required: [name, type]
+      required:
+      - name
+      - type
       properties:
         name:
           type: string
@@ -928,38 +984,153 @@ components:
           type: object
         sync_direction:
           $ref: '#/components/schemas/SyncDirection'
-
-    # ======================== ENUMS ========================
     FieldType:
       type: string
       enum:
-        [STRING, INTEGER, FLOAT, BOOLEAN, DATE, DATETIME, EMAIL, PHONE,
-         URL, TEXT, HTML, SELECT, MANY2ONE, MANY2MANY]
-
+      - STRING
+      - INTEGER
+      - FLOAT
+      - BOOLEAN
+      - DATE
+      - DATETIME
+      - EMAIL
+      - PHONE
+      - URL
+      - TEXT
+      - HTML
+      - SELECT
+      - MANY2ONE
+      - MANY2MANY
     AuditAction:
       type: string
-      enum: [CREATE, UPDATE, DELETE, READ, EXPORT, IMPORT]
-
+      enum:
+      - CREATE
+      - UPDATE
+      - DELETE
+      - READ
+      - EXPORT
+      - IMPORT
     WebhookEvent:
       type: string
       enum:
-        [lead.create, lead.update, lead.delete,
-         opportunity.won, opportunity.lost,
-         contact.create,
-         subscription.renewal_due]
-
+      - lead.create
+      - lead.update
+      - lead.delete
+      - opportunity.won
+      - opportunity.lost
+      - contact.create
+      - subscription.renewal_due
     WebhookDeliveryStatus:
       type: string
-      enum: [PENDING, SUCCESS, FAILED, RETRYING]
-
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      - RETRYING
     IntegrationType:
       type: string
-      enum: [ERP, ACCOUNTING, MARKETING, SUPPORT, CUSTOM]
-
+      enum:
+      - ERP
+      - ACCOUNTING
+      - MARKETING
+      - SUPPORT
+      - CUSTOM
     SyncDirection:
       type: string
-      enum: [CRM_TO_EXTERNAL, EXTERNAL_TO_CRM, BIDIRECTIONAL]
-
+      enum:
+      - CRM_TO_EXTERNAL
+      - EXTERNAL_TO_CRM
+      - BIDIRECTIONAL
     SyncStatus:
       type: string
-      enum: [IDLE, SYNCING, ERROR]
+      enum:
+      - IDLE
+      - SYNCING
+      - ERROR
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+    PaginatedWebhook:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Webhook'
+    PaginatedApiKey:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ApiKey'
+    PaginatedAuditLogEntry:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditLogEntry'
+    PaginatedCustomField:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CustomField'
+    PaginatedIntegration:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Integration'
+    PaginatedWebhookDeliveryLog:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/WebhookDeliveryLog'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
