@@ -1,0 +1,20 @@
+name = "rerp"
+
+k8s_namespace = "rerp"
+
+docker_image_prefix = "localhost:5001/rerp-%s-%s"
+helm_chart_path = "helm/rerp-microservice"
+
+generate_bff = true
+shared_kind_infra = true
+
+brrtrouter_path = "../BRRTRouter"
+
+# Port range — photon auto-assigns all discovered services from 8101–8200.
+# See ~/.config/photon/global_ports.yaml for the full registry.
+port_base = "8101"
+
+[[suites]]
+name = "accounting"
+openapi_dir = "openapi/accounting"
+microservices_dir = "microservices/accounting"

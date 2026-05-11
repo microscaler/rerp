@@ -312,7 +312,7 @@ pub struct EdiError {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct EdiStandard {
+pub struct EdiFormat {
     pub code: String,
 
     pub created_at: String,
@@ -332,13 +332,6 @@ pub struct EdiStandard {
     pub updated_at: String,
 
     pub version: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct EdiSubmissionStatus {
-    pub code: String,
-
-    pub description: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -508,7 +501,7 @@ pub struct GetEdiMappingResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct GetEdiSubmissionResponse {
+pub struct GetEdiSubmissionStatusResponse {
     pub document_id: String,
 
     pub external_reference: String,

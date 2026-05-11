@@ -115,7 +115,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
 
     dispatcher.register_typed_with_stack_size(
         "get_edi_submission_status",
-        crate::controllers::get_edi_submission_status::GetEdiSubmissionController,
+        crate::controllers::get_edi_submission_status::GetEdiSubmissionStatusController,
         20480,
     );
 
@@ -293,7 +293,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             }
             "get_edi_submission_status" => {
                 let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_edi_submission_status::GetEdiSubmissionController,
+                    crate::controllers::get_edi_submission_status::GetEdiSubmissionStatusController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
