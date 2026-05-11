@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: General Ledger
   version: 1.0.0
-  description: 'Core accounting service managing general ledger accounts, chart of accounts, journals, journal entries with debit/credit lines, fiscal periods, and trial balance reporting. Supports full double-entry accounting lifecycle: draft, approved, posted, reconciled, and reversed.'
+  description: 'Core accounting service managing general ledger accounts, chart of
+    accounts, journals, journal entries with debit/credit lines, fiscal periods, and
+    trial balance reporting. Supports full double-entry accounting lifecycle: draft,
+    approved, posted, reconciled, and reversed.'
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -43,7 +46,8 @@ paths:
     get:
       operationId: list_accounts
       summary: List ledger accounts
-      description: Paginated list of all general ledger accounts, filtered by type, parent, and active status.
+      description: Paginated list of all general ledger accounts, filtered by type,
+        parent, and active status.
       parameters:
       - name: page
         in: query
@@ -131,10 +135,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Account code already exists in this chart
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
@@ -142,7 +158,8 @@ paths:
     get:
       operationId: get_account
       summary: Get account by id
-      description: Retrieve a single general ledger account with its full hierarchy and balance information.
+      description: Retrieve a single general ledger account with its full hierarchy
+        and balance information.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -167,7 +184,8 @@ paths:
     put:
       operationId: update_account
       summary: Update account
-      description: 'Update an existing account. Note: posting an account''s code or type may be restricted if posted entries reference it.'
+      description: 'Update an existing account. Note: posting an account''s code or
+        type may be restricted if posted entries reference it.'
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -195,10 +213,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       operationId: delete_account
       summary: Delete account
-      description: Soft delete an account. Cannot delete if the account has posted entries or is referenced by posted journal entries.
+      description: Soft delete an account. Cannot delete if the account has posted
+        entries or is referenced by posted journal entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -220,7 +257,8 @@ paths:
     get:
       operationId: get_account_balance
       summary: Get account balance
-      description: Get the current balance of an account for a specified period, including opening balance, debits, credits, and closing balance.
+      description: Get the current balance of an account for a specified period, including
+        opening balance, debits, credits, and closing balance.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -235,7 +273,8 @@ paths:
         schema:
           type: string
           format: uuid
-        description: Fiscal period to calculate balance for. If omitted, returns total balance.
+        description: Fiscal period to calculate balance for. If omitted, returns total
+          balance.
       - name: currency_code
         in: query
         required: false
@@ -261,7 +300,8 @@ paths:
     get:
       operationId: list_chart_of_accounts
       summary: List chart of accounts
-      description: List all chart of accounts hierarchies. Supports filtering by parent to get sub-accounts.
+      description: List all chart of accounts hierarchies. Supports filtering by parent
+        to get sub-accounts.
       parameters:
       - name: page
         in: query
@@ -330,7 +370,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /chart-of-accounts/{id}:
     get:
       operationId: get_chart_of_account
@@ -387,6 +436,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_chart_of_account
       summary: Delete chart of account
@@ -412,7 +473,8 @@ paths:
     get:
       operationId: list_journals
       summary: List accounting journals
-      description: List all accounting journals with their configuration, types, and sequences.
+      description: List all accounting journals with their configuration, types, and
+        sequences.
       parameters:
       - name: page
         in: query
@@ -465,7 +527,8 @@ paths:
     post:
       operationId: create_journal
       summary: Create journal
-      description: Create a new accounting journal. Journals define the source of entries and control numbering sequences.
+      description: Create a new accounting journal. Journals define the source of
+        entries and control numbering sequences.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -485,7 +548,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /journals/{id}:
     get:
       operationId: get_journal
@@ -542,10 +614,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_journal
       summary: Archive journal
-      description: Archive a journal (soft delete). Cannot archive if the journal has posted entries in open periods.
+      description: Archive a journal (soft delete). Cannot archive if the journal
+        has posted entries in open periods.
       parameters:
       - name: id
         in: path
@@ -572,7 +657,8 @@ paths:
     get:
       operationId: list_journal_entries
       summary: List journal entries
-      description: Paginated list of all journal entries with optional filtering by status, date range, journal, account, and fiscal period.
+      description: Paginated list of all journal entries with optional filtering by
+        status, date range, journal, account, and fiscal period.
       parameters:
       - name: page
         in: query
@@ -660,7 +746,9 @@ paths:
     post:
       operationId: create_journal_entry
       summary: Create journal entry
-      description: Create a new journal entry with mandatory debit/credit line items. Total debits must equal total credits (double-entry accounting). Entries start in DRAFT status and must be approved and posted.
+      description: Create a new journal entry with mandatory debit/credit line items.
+        Total debits must equal total credits (double-entry accounting). Entries start
+        in DRAFT status and must be approved and posted.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -676,22 +764,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/JournalEntry'
         '400':
-          description: Validation error (e.g., unbalanced debits/credits, invalid date)
+          description: Validation error (e.g., unbalanced debits/credits, invalid
+            date)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Journal entry date is in a closed fiscal period
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /journal-entries/{id}:
     get:
       operationId: get_journal_entry
       summary: Get journal entry by id
-      description: Retrieve a single journal entry with its full debit/credit line items.
+      description: Retrieve a single journal entry with its full debit/credit line
+        items.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -716,7 +812,8 @@ paths:
     put:
       operationId: update_journal_entry
       summary: Update journal entry
-      description: Update a journal entry. Only entries in DRAFT status can be modified. Entries with lines must remain balanced after update.
+      description: Update a journal entry. Only entries in DRAFT status can be modified.
+        Entries with lines must remain balanced after update.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -743,7 +840,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Not found
           content:
@@ -756,10 +853,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_journal_entry
       summary: Delete journal entry
-      description: Delete a journal entry. Only entries in DRAFT status can be deleted. Posted entries must be reversed instead.
+      description: Delete a journal entry. Only entries in DRAFT status can be deleted.
+        Posted entries must be reversed instead.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -787,7 +891,9 @@ paths:
     post:
       operationId: approve_journal_entry
       summary: Approve journal entry
-      description: Transition a journal entry from DRAFT to APPROVED status. An approved entry cannot be modified but can be posted. The entry must have balanced lines (total debit = total credit).
+      description: Transition a journal entry from DRAFT to APPROVED status. An approved
+        entry cannot be modified but can be posted. The entry must have balanced lines
+        (total debit = total credit).
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -821,11 +927,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /journal-entries/{id}/post:
     post:
       operationId: post_journal_entry
       summary: Post journal entry
-      description: Transition a journal entry from APPROVED to POSTED status. Posting finalizes the entry and updates all account balances. Cannot post entries with dates in closed fiscal periods.
+      description: Transition a journal entry from APPROVED to POSTED status. Posting
+        finalizes the entry and updates all account balances. Cannot post entries
+        with dates in closed fiscal periods.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -859,11 +973,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /journal-entries/{id}/reverse:
     post:
       operationId: reverse_journal_entry
       summary: Reverse journal entry
-      description: Create a reversing entry for a posted journal entry. The new entry has opposite debits/credits and same amount. The original entry is marked as REVERSED.
+      description: Create a reversing entry for a posted journal entry. The new entry
+        has opposite debits/credits and same amount. The original entry is marked
+        as REVERSED.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -897,11 +1019,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /journal-entries/bulk-approve:
     post:
       operationId: bulk_approve_journal_entries
       summary: Bulk approve journal entries
-      description: Approve multiple journal entries in a single operation. Returns success/failure for each entry ID.
+      description: Approve multiple journal entries in a single operation. Returns
+        success/failure for each entry ID.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -921,7 +1053,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /journal-entries/bulk-post:
     post:
       operationId: bulk_post_journal_entries
@@ -946,12 +1087,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /fiscal-periods:
     get:
       operationId: list_fiscal_periods
       summary: List fiscal periods
-      description: List all accounting fiscal periods with their date ranges and lock status.
+      description: List all accounting fiscal periods with their date ranges and lock
+        status.
       parameters:
       - name: page
         in: query
@@ -1001,7 +1152,8 @@ paths:
     post:
       operationId: create_fiscal_period
       summary: Create fiscal period
-      description: Create a new accounting fiscal period with date range and lock settings.
+      description: Create a new accounting fiscal period with date range and lock
+        settings.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -1021,7 +1173,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /fiscal-periods/{id}:
     get:
       operationId: get_fiscal_period
@@ -1050,7 +1211,8 @@ paths:
     put:
       operationId: update_fiscal_period
       summary: Update fiscal period
-      description: Update a fiscal period's date range or lock settings. Cannot modify dates if the period has posted entries.
+      description: Update a fiscal period's date range or lock settings. Cannot modify
+        dates if the period has posted entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1084,10 +1246,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_fiscal_period
       summary: Delete fiscal period
-      description: Delete a fiscal period. Cannot delete if the period has posted entries.
+      description: Delete a fiscal period. Cannot delete if the period has posted
+        entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1115,7 +1287,8 @@ paths:
     get:
       operationId: trial_balance
       summary: Trial balance report
-      description: Generate a trial balance report showing all account balances at a point in time or for a period.
+      description: Generate a trial balance report showing all account balances at
+        a point in time or for a period.
       x-brrtrouter-impl: true
       parameters:
       - name: period_id
@@ -1189,7 +1362,8 @@ paths:
     get:
       operationId: ledger_report
       summary: General ledger report
-      description: Generate a detailed general ledger report showing all journal entry lines for a period, filtered by accounts, journals, and date range.
+      description: Generate a detailed general ledger report showing all journal entry
+        lines for a period, filtered by accounts, journals, and date range.
       x-brrtrouter-impl: true
       parameters:
       - name: period_id
@@ -1251,7 +1425,8 @@ paths:
     get:
       operationId: account_balances_report
       summary: Account balances report
-      description: Get balances for multiple accounts with opening, debit, credit, and closing amounts. Returns a summary across all accounts.
+      description: Get balances for multiple accounts with opening, debit, credit,
+        and closing amounts. Returns a summary across all accounts.
       x-brrtrouter-impl: true
       parameters:
       - name: period_id
@@ -1379,7 +1554,9 @@ paths:
     get:
       operationId: list_chart_templates
       summary: List chart of accounts templates
-      description: List all available chart of accounts templates. Templates are reusable COA definitions that can be deployed to new companies. Supports filtering by jurisdiction, status, and version.
+      description: List all available chart of accounts templates. Templates are reusable
+        COA definitions that can be deployed to new companies. Supports filtering
+        by jurisdiction, status, and version.
       parameters:
       - name: page
         in: query
@@ -1430,7 +1607,9 @@ paths:
     post:
       operationId: create_chart_template
       summary: Create chart template
-      description: Create a new chart of accounts template. Templates define a complete COA structure including account hierarchy, default accounts, and fiscal year settings. Can be deployed to create a new company's accounting setup.
+      description: Create a new chart of accounts template. Templates define a complete
+        COA structure including account hierarchy, default accounts, and fiscal year
+        settings. Can be deployed to create a new company's accounting setup.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -1450,12 +1629,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /chart-templates/{id}:
     get:
       operationId: get_chart_template
       summary: Get chart template by id
-      description: Retrieve a chart of accounts template with its full account hierarchy and configuration.
+      description: Retrieve a chart of accounts template with its full account hierarchy
+        and configuration.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1480,7 +1669,8 @@ paths:
     put:
       operationId: update_chart_template
       summary: Update chart template
-      description: Update a chart of accounts template. Only templates in DRAFT status can be modified.
+      description: Update a chart of accounts template. Only templates in DRAFT status
+        can be modified.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1514,10 +1704,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_chart_template
       summary: Delete chart template
-      description: Soft delete a chart template. Only templates in DRAFT status can be deleted.
+      description: Soft delete a chart template. Only templates in DRAFT status can
+        be deleted.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1545,7 +1745,9 @@ paths:
     post:
       operationId: deploy_chart_template
       summary: Deploy chart template
-      description: Deploy a chart of accounts template to create a new company's accounting setup. Creates a new ChartOfAccount hierarchy, default accounts, and fiscal year configuration.
+      description: Deploy a chart of accounts template to create a new company's accounting
+        setup. Creates a new ChartOfAccount hierarchy, default accounts, and fiscal
+        year configuration.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1579,11 +1781,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /fiscal-years:
     get:
       operationId: list_fiscal_years
       summary: List fiscal years
-      description: List all fiscal years with their periods, lock status, and closing information. Supports filtering by year, company, and open/closed status.
+      description: List all fiscal years with their periods, lock status, and closing
+        information. Supports filtering by year, company, and open/closed status.
       parameters:
       - name: page
         in: query
@@ -1636,7 +1848,9 @@ paths:
     post:
       operationId: create_fiscal_year
       summary: Create fiscal year
-      description: Create a new fiscal year with auto-generated periods based on the company's fiscal calendar configuration. A fiscal year must be created before any journal entries can be posted.
+      description: Create a new fiscal year with auto-generated periods based on the
+        company's fiscal calendar configuration. A fiscal year must be created before
+        any journal entries can be posted.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -1656,18 +1870,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Fiscal year already exists for this company and year
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /fiscal-years/{id}:
     get:
       operationId: get_fiscal_year
       summary: Get fiscal year by id
-      description: Retrieve fiscal year details including all periods, lock status, and closing information.
+      description: Retrieve fiscal year details including all periods, lock status,
+        and closing information.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1692,7 +1913,8 @@ paths:
     put:
       operationId: update_fiscal_year
       summary: Update fiscal year
-      description: Update a fiscal year's name or fiscal month/day settings. Cannot update if the year has any closed periods with posted entries.
+      description: Update a fiscal year's name or fiscal month/day settings. Cannot
+        update if the year has any closed periods with posted entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1726,10 +1948,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_fiscal_year
       summary: Delete fiscal year
-      description: Delete a fiscal year. Only years with no periods or no posted entries can be deleted.
+      description: Delete a fiscal year. Only years with no periods or no posted entries
+        can be deleted.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1757,7 +1989,9 @@ paths:
     post:
       operationId: close_fiscal_year
       summary: Close fiscal year
-      description: Close a fiscal year, locking all periods. No journal entries can be added or modified in closed periods. The year is marked as closed and a closing date is recorded.
+      description: Close a fiscal year, locking all periods. No journal entries can
+        be added or modified in closed periods. The year is marked as closed and a
+        closing date is recorded.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1791,11 +2025,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /fiscal-years/{id}/open:
     post:
       operationId: reopen_fiscal_year
       summary: Reopen fiscal year
-      description: Reopen a closed fiscal year. This allows modifications to periods within the year. Requires appropriate permissions.
+      description: Reopen a closed fiscal year. This allows modifications to periods
+        within the year. Requires appropriate permissions.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1823,11 +2067,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /fiscal-years/{id}/periods:
     get:
       operationId: list_fiscal_year_periods
       summary: List periods in fiscal year
-      description: Get all fiscal periods within a fiscal year, including their dates, lock status, and number of posted entries.
+      description: Get all fiscal periods within a fiscal year, including their dates,
+        lock status, and number of posted entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1866,7 +2120,9 @@ paths:
     post:
       operationId: generate_fiscal_year_periods
       summary: Generate periods for fiscal year
-      description: Generate all fiscal periods for a fiscal year based on its calendar configuration (monthly, quarterly, or custom periods). Periods are created in DRAFT status.
+      description: Generate all fiscal periods for a fiscal year based on its calendar
+        configuration (monthly, quarterly, or custom periods). Periods are created
+        in DRAFT status.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -1900,11 +2156,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /fiscal-positions:
     get:
       operationId: list_fiscal_positions
       summary: List fiscal positions
-      description: List all fiscal positions. Fiscal positions map accounts and taxes from one jurisdiction to another (e.g., domestic vs. export sales tax mapping).
+      description: List all fiscal positions. Fiscal positions map accounts and taxes
+        from one jurisdiction to another (e.g., domestic vs. export sales tax mapping).
       parameters:
       - name: page
         in: query
@@ -1952,7 +2218,9 @@ paths:
     post:
       operationId: create_fiscal_position
       summary: Create fiscal position
-      description: Create a new fiscal position with account and tax mapping rules. Fiscal positions are used to automatically map accounts/taxes based on partner country, sale/purchase type, or other conditions.
+      description: Create a new fiscal position with account and tax mapping rules.
+        Fiscal positions are used to automatically map accounts/taxes based on partner
+        country, sale/purchase type, or other conditions.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -1972,12 +2240,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /fiscal-positions/{id}:
     get:
       operationId: get_fiscal_position
       summary: Get fiscal position by id
-      description: Retrieve fiscal position details including all account and tax mapping rules.
+      description: Retrieve fiscal position details including all account and tax
+        mapping rules.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2030,10 +2308,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_fiscal_position
       summary: Delete fiscal position
-      description: Soft delete a fiscal position. Cannot delete if referenced by posted entries.
+      description: Soft delete a fiscal position. Cannot delete if referenced by posted
+        entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2061,7 +2352,8 @@ paths:
     get:
       operationId: list_payment_terms
       summary: List payment terms
-      description: List all payment term definitions. Payment terms define when payments are due (net 30, 60, 90), early payment discounts, and installment schedules.
+      description: List all payment term definitions. Payment terms define when payments
+        are due (net 30, 60, 90), early payment discounts, and installment schedules.
       parameters:
       - name: page
         in: query
@@ -2114,7 +2406,9 @@ paths:
     post:
       operationId: create_payment_term
       summary: Create payment term
-      description: Create a new payment term definition. Supports net payment (e.g., net 30), early payment discounts (e.g., 2/10 net 30), installment schedules, and custom terms.
+      description: Create a new payment term definition. Supports net payment (e.g.,
+        net 30), early payment discounts (e.g., 2/10 net 30), installment schedules,
+        and custom terms.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -2134,12 +2428,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /payment-terms/{id}:
     get:
       operationId: get_payment_term
       summary: Get payment term by id
-      description: Retrieve a payment term with its complete installment schedule and discount rules.
+      description: Retrieve a payment term with its complete installment schedule
+        and discount rules.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2192,10 +2496,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_payment_term
       summary: Delete payment term
-      description: Soft delete a payment term. Cannot delete if referenced by posted invoices or entries.
+      description: Soft delete a payment term. Cannot delete if referenced by posted
+        invoices or entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2223,7 +2540,9 @@ paths:
     get:
       operationId: list_payment_methods
       summary: List payment methods
-      description: List all payment method definitions used across journals and payments. Payment methods include checks, wire transfers, credit cards, digital wallets, and bank transfers.
+      description: List all payment method definitions used across journals and payments.
+        Payment methods include checks, wire transfers, credit cards, digital wallets,
+        and bank transfers.
       parameters:
       - name: page
         in: query
@@ -2284,7 +2603,8 @@ paths:
     post:
       operationId: create_payment_method
       summary: Create payment method
-      description: Create a new payment method definition. Includes type, associated bank account/journal, and routing details for electronic payments.
+      description: Create a new payment method definition. Includes type, associated
+        bank account/journal, and routing details for electronic payments.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -2304,12 +2624,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /payment-methods/{id}:
     get:
       operationId: get_payment_method
       summary: Get payment method by id
-      description: Retrieve payment method details including associated payment method lines (account mappings).
+      description: Retrieve payment method details including associated payment method
+        lines (account mappings).
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2362,10 +2692,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_payment_method
       summary: Delete payment method
-      description: Soft delete a payment method. Cannot delete if referenced by posted payments.
+      description: Soft delete a payment method. Cannot delete if referenced by posted
+        payments.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2393,7 +2736,9 @@ paths:
     get:
       operationId: list_payment_method_journal_mappings
       summary: List journal mappings for payment method
-      description: Get all journal-to-account mappings for a payment method. Each mapping defines which journal and account is used when this payment method is selected.
+      description: Get all journal-to-account mappings for a payment method. Each
+        mapping defines which journal and account is used when this payment method
+        is selected.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2430,7 +2775,9 @@ paths:
     get:
       operationId: list_tax_repartition_lines
       summary: List tax repartition lines
-      description: List all tax repartition line definitions. Tax repartition lines define how a tax is split across multiple accounts (e.g., 80% to tax expense, 20% to tax payable).
+      description: List all tax repartition line definitions. Tax repartition lines
+        define how a tax is split across multiple accounts (e.g., 80% to tax expense,
+        20% to tax payable).
       parameters:
       - name: page
         in: query
@@ -2458,7 +2805,8 @@ paths:
           enum:
           - TAX
           - BASE
-        description: Filter by repartition type (TAX for tax accounts, BASE for base accounts)
+        description: Filter by repartition type (TAX for tax accounts, BASE for base
+          accounts)
       responses:
         '200':
           description: Paginated list of tax repartition lines
@@ -2481,7 +2829,9 @@ paths:
     post:
       operationId: create_tax_repartition_line
       summary: Create tax repartition line
-      description: Create a new tax repartition line that defines how a tax amount is allocated to accounts. Used in conjunction with tax definitions to split taxes across base and tax accounts.
+      description: Create a new tax repartition line that defines how a tax amount
+        is allocated to accounts. Used in conjunction with tax definitions to split
+        taxes across base and tax accounts.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -2501,12 +2851,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /tax-repartition-lines/{id}:
     get:
       operationId: get_tax_repartition_line
       summary: Get tax repartition line by id
-      description: Retrieve a tax repartition line definition with its account mapping and ratio.
+      description: Retrieve a tax repartition line definition with its account mapping
+        and ratio.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2531,7 +2891,8 @@ paths:
     put:
       operationId: update_tax_repartition_line
       summary: Update tax repartition line
-      description: Update a tax repartition line's account, ratio, or tag. Cannot update if referenced by posted entries.
+      description: Update a tax repartition line's account, ratio, or tag. Cannot
+        update if referenced by posted entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2565,10 +2926,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_tax_repartition_line
       summary: Delete tax repartition line
-      description: Soft delete a tax repartition line. Cannot delete if referenced by posted entries.
+      description: Soft delete a tax repartition line. Cannot delete if referenced
+        by posted entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -2620,6 +2991,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LockDate'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /journal-items:
     get:
       operationId: list_journal_items
@@ -2659,6 +3042,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalItemReconciliation'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /journal-items/unreconcile:
     post:
       operationId: unreconcile_journal_items
@@ -2673,6 +3068,18 @@ paths:
       responses:
         '200':
           description: Journal items unreconciled
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /currency-revaluations:
     post:
       operationId: create_currency_revaluation
@@ -2691,14 +3098,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrencyRevaluation'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header
+        as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Page size limit
     Account:
       type: object
       required:
@@ -2752,7 +3231,8 @@ components:
           description: ISO 4217 currency code (e.g., USD, EUR, GBP)
         is_active:
           type: boolean
-          description: Whether the account is active (inactive accounts can still be referenced by historical entries)
+          description: Whether the account is active (inactive accounts can still
+            be referenced by historical entries)
         is_system_account:
           type: boolean
           description: System-defined account that cannot be modified or deleted
@@ -2982,7 +3462,8 @@ components:
           type: string
           maxLength: 10
           pattern: ^[A-Z]{1,5}$
-          description: Short code used as prefix for entry numbers (e.g., 'GEN', 'SAL', 'PCH')
+          description: Short code used as prefix for entry numbers (e.g., 'GEN', 'SAL',
+            'PCH')
         type:
           type: string
           enum:
@@ -3028,7 +3509,8 @@ components:
           description: Whether the journal is available for new entries
         restrict_mode_hash_table:
           type: boolean
-          description: If true, posted entries are secured with a hash (cannot be modified)
+          description: If true, posted entries are secured with a hash (cannot be
+            modified)
         created_at:
           type: string
           format: date-time
@@ -3294,7 +3776,8 @@ components:
         analytic_distribution:
           type: object
           nullable: true
-          description: 'Analytic/accounting distribution (e.g., {1: 50.0, 2: 50.0} for 50/50 split across cost centers)'
+          description: 'Analytic/accounting distribution (e.g., {1: 50.0, 2: 50.0}
+            for 50/50 split across cost centers)'
         tax_ids:
           type: array
           items:
@@ -3362,7 +3845,8 @@ components:
           description: Exchange rate to company currency
         lines:
           type: array
-          description: Debit/credit line items. At least 2 lines required. Total debits must equal total credits.
+          description: Debit/credit line items. At least 2 lines required. Total debits
+            must equal total credits.
           items:
             $ref: '#/components/schemas/LineItemRequest'
           minItems: 2
@@ -3444,11 +3928,13 @@ components:
           type: string
           maxLength: 500
           nullable: true
-          description: Override description for the reversing entry. Auto-generated if not provided.
+          description: Override description for the reversing entry. Auto-generated
+            if not provided.
         use_original_date:
           type: boolean
           default: false
-          description: If true, use the original entry date. If false, use current date.
+          description: If true, use the original entry date. If false, use current
+            date.
     FiscalPeriod:
       type: object
       required:
@@ -3496,7 +3982,8 @@ components:
         is_open:
           type: boolean
           nullable: true
-          description: Computed field - true if current date is within period and not locked
+          description: Computed field - true if current date is within period and
+            not locked
         created_at:
           type: string
           format: date-time
@@ -3745,7 +4232,11 @@ components:
           maxLength: 100
     LockDate:
       type: object
-      required: [id, company_id, lock_type, locked_through_date]
+      required:
+      - id
+      - company_id
+      - lock_type
+      - locked_through_date
       properties:
         id:
           type: string
@@ -3755,7 +4246,11 @@ components:
           format: uuid
         lock_type:
           type: string
-          enum: [FISCAL, TAX, ALL_USERS, NON_ADVISER_USERS]
+          enum:
+          - FISCAL
+          - TAX
+          - ALL_USERS
+          - NON_ADVISER_USERS
         locked_through_date:
           type: string
           format: date
@@ -3764,14 +4259,21 @@ components:
           nullable: true
     CreateLockDateRequest:
       type: object
-      required: [company_id, lock_type, locked_through_date]
+      required:
+      - company_id
+      - lock_type
+      - locked_through_date
       properties:
         company_id:
           type: string
           format: uuid
         lock_type:
           type: string
-          enum: [FISCAL, TAX, ALL_USERS, NON_ADVISER_USERS]
+          enum:
+          - FISCAL
+          - TAX
+          - ALL_USERS
+          - NON_ADVISER_USERS
         locked_through_date:
           type: string
           format: date
@@ -3780,7 +4282,12 @@ components:
           nullable: true
     JournalItem:
       type: object
-      required: [id, journal_entry_id, account_id, debit, credit]
+      required:
+      - id
+      - journal_entry_id
+      - account_id
+      - debit
+      - credit
       properties:
         id:
           type: string
@@ -3805,7 +4312,8 @@ components:
           nullable: true
     ReconcileJournalItemsRequest:
       type: object
-      required: [journal_item_ids]
+      required:
+      - journal_item_ids
       properties:
         journal_item_ids:
           type: array
@@ -3817,7 +4325,8 @@ components:
           nullable: true
     UnreconcileJournalItemsRequest:
       type: object
-      required: [reconciliation_id]
+      required:
+      - reconciliation_id
       properties:
         reconciliation_id:
           type: string
@@ -3827,7 +4336,10 @@ components:
           nullable: true
     JournalItemReconciliation:
       type: object
-      required: [id, journal_item_ids, status]
+      required:
+      - id
+      - journal_item_ids
+      - status
       properties:
         id:
           type: string
@@ -3839,10 +4351,15 @@ components:
             format: uuid
         status:
           type: string
-          enum: [RECONCILED, UNRECONCILED]
+          enum:
+          - RECONCILED
+          - UNRECONCILED
     CreateCurrencyRevaluationRequest:
       type: object
-      required: [company_id, currency_code, revaluation_date]
+      required:
+      - company_id
+      - currency_code
+      - revaluation_date
       properties:
         company_id:
           type: string
@@ -3861,7 +4378,11 @@ components:
             format: uuid
     CurrencyRevaluation:
       type: object
-      required: [id, company_id, currency_code, status]
+      required:
+      - id
+      - company_id
+      - currency_code
+      - status
       properties:
         id:
           type: string
@@ -3875,14 +4396,19 @@ components:
           maxLength: 3
         status:
           type: string
-          enum: [DRAFT, POSTED, REVERSED]
+          enum:
+          - DRAFT
+          - POSTED
+          - REVERSED
         journal_entry_id:
           type: string
           format: uuid
           nullable: true
     PaginatedLockDates:
       type: object
-      required: [items, total]
+      required:
+      - items
+      - total
       properties:
         items:
           type: array
@@ -3892,7 +4418,9 @@ components:
           type: integer
     PaginatedJournalItems:
       type: object
-      required: [items, total]
+      required:
+      - items
+      - total
       properties:
         items:
           type: array
@@ -4238,7 +4766,6 @@ components:
           type: string
           description: Human-readable error for this line field
           example: Debit exceeds expected amount
-    # Chart of Accounts Templates (AccountChartTemplate)
     ChartTemplate:
       type: object
       required:
@@ -4269,7 +4796,8 @@ components:
           type: string
           minLength: 2
           maxLength: 5
-          description: ISO 3166-1 alpha-2 or ISO 4217 currency code (e.g., 'US', 'FR', 'DE')
+          description: ISO 3166-1 alpha-2 or ISO 4217 currency code (e.g., 'US', 'FR',
+            'DE')
         version:
           type: string
           maxLength: 20
@@ -4526,7 +5054,6 @@ components:
           maxLength: 50
           nullable: true
           description: Override code for created chart of accounts
-    # Fiscal Year Management (AccountFiscalYear)
     FiscalYear:
       type: object
       required:
@@ -4725,7 +5252,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPeriod'
-    # Fiscal Position (AccountFiscalPosition + AccountFiscalPositionAccount)
     FiscalPosition:
       type: object
       required:
@@ -4987,7 +5513,6 @@ components:
         destination_tax_id:
           type: string
           format: uuid
-    # Payment Terms (AccountPaymentTerm + AccountPaymentTermLine)
     PaymentTerm:
       type: object
       required:
@@ -5200,7 +5725,6 @@ components:
           type: number
           format: double
           nullable: true
-    # Payment Methods (AccountPaymentMethod + AccountPaymentMethodLine)
     PaymentMethod:
       type: object
       required:
@@ -5423,7 +5947,6 @@ components:
         is_default:
           type: boolean
           default: false
-    # Tax Repartition Lines (AccountTaxRepartitionLine)
     TaxRepartitionLine:
       type: object
       required:
@@ -5450,7 +5973,8 @@ components:
           enum:
           - TAX
           - BASE
-          description: Whether this line maps to a tax account (TAX) or base account (BASE)
+          description: Whether this line maps to a tax account (TAX) or base account
+            (BASE)
         account_id:
           type: string
           format: uuid

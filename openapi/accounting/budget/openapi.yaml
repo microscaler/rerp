@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: Budget Management
   version: 1.0.0
-  description: Budget management service for financial planning, budget creation, variance analysis, and forecasting. Supports multi-level budgets by department, cost center, GL account, and period. Tracks actuals against budget with real-time variance reporting.
+  description: Budget management service for financial planning, budget creation,
+    variance analysis, and forecasting. Supports multi-level budgets by department,
+    cost center, GL account, and period. Tracks actuals against budget with real-time
+    variance reporting.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -27,7 +30,8 @@ paths:
     get:
       operationId: list_budgets
       summary: List budgets
-      description: Paginated list of all budgets with filtering by fiscal year, status, department, and company.
+      description: Paginated list of all budgets with filtering by fiscal year, status,
+        department, and company.
       parameters:
       - name: page
         in: query
@@ -115,7 +119,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /budgets/{id}:
     get:
       operationId: get_budget
@@ -145,7 +167,8 @@ paths:
     put:
       operationId: update_budget
       summary: Update budget
-      description: Update a budget. Only allowed for DRAFT status budgets. To submit for approval, use the submit endpoint.
+      description: Update a budget. Only allowed for DRAFT status budgets. To submit
+        for approval, use the submit endpoint.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -179,6 +202,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_budget
       summary: Delete budget
@@ -210,7 +245,8 @@ paths:
     post:
       operationId: submit_budget
       summary: Submit budget for approval
-      description: Submit a budget for approval. Transitions status from DRAFT to SUBMITTED.
+      description: Submit a budget for approval. Transitions status from DRAFT to
+        SUBMITTED.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -238,6 +274,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /budgets/{id}/lines:
     get:
       operationId: list_budget_lines
@@ -316,13 +361,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Budget not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /variance:
     get:
       operationId: variance_report
@@ -464,7 +518,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /budgets/{id}/confirm:
     post:
       operationId: confirm_budget
@@ -480,6 +543,18 @@ paths:
       responses:
         '200':
           description: Budget confirmed
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /budgets/{id}/cancel:
     post:
       operationId: cancel_budget
@@ -495,6 +570,18 @@ paths:
       responses:
         '200':
           description: Budget cancelled
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /budgets/{id}/complete:
     post:
       operationId: complete_budget
@@ -510,6 +597,18 @@ paths:
       responses:
         '200':
           description: Budget completed
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /budgets/{id}/reopen:
     post:
       operationId: reopen_budget
@@ -525,6 +624,18 @@ paths:
       responses:
         '200':
           description: Budget reopened
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /budget-revisions:
     get:
       operationId: list_budget_revisions
@@ -553,14 +664,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BudgetRevision'
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header
+        as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Page size limit
     Budget:
       type: object
       required:
@@ -1129,7 +1312,11 @@ components:
           format: date-time
     BudgetRevision:
       type: object
-      required: [id, budget_id, revision_number, status]
+      required:
+      - id
+      - budget_id
+      - revision_number
+      - status
       properties:
         id:
           type: string
@@ -1141,7 +1328,12 @@ components:
           type: integer
         status:
           type: string
-          enum: [DRAFT, SUBMITTED, APPROVED, REJECTED, APPLIED]
+          enum:
+          - DRAFT
+          - SUBMITTED
+          - APPROVED
+          - REJECTED
+          - APPLIED
         reason:
           type: string
           nullable: true
@@ -1151,7 +1343,9 @@ components:
           nullable: true
     CreateBudgetRevisionRequest:
       type: object
-      required: [budget_id, reason]
+      required:
+      - budget_id
+      - reason
       properties:
         budget_id:
           type: string
@@ -1162,7 +1356,9 @@ components:
           type: array
           items:
             type: object
-            required: [budget_line_id, revised_amount]
+            required:
+            - budget_line_id
+            - revised_amount
             properties:
               budget_line_id:
                 type: string
@@ -1176,7 +1372,9 @@ components:
           nullable: true
     PaginatedBudgetRevisions:
       type: object
-      required: [items, total]
+      required:
+      - items
+      - total
       properties:
         items:
           type: array

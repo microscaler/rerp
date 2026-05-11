@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: Financial Reports
   version: 1.0.0
-  description: 'Financial reporting service providing the full suite of accounting reports: Balance Sheet, Profit & Loss (Income Statement), Cash Flow Statement, General Ledger, Trial Balance, and Custom Reports. All reports integrate with the general ledger for accurate financial data.'
+  description: 'Financial reporting service providing the full suite of accounting
+    reports: Balance Sheet, Profit & Loss (Income Statement), Cash Flow Statement,
+    General Ledger, Trial Balance, and Custom Reports. All reports integrate with
+    the general ledger for accurate financial data.'
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -29,7 +32,8 @@ paths:
     get:
       operationId: generate_balance_sheet
       summary: Generate Balance Sheet
-      description: Generate a Balance Sheet report for a company at a given date, showing assets, liabilities, and equity with account-level detail.
+      description: Generate a Balance Sheet report for a company at a given date,
+        showing assets, liabilities, and equity with account-level detail.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -66,7 +70,8 @@ paths:
     get:
       operationId: generate_income_statement
       summary: Generate Income Statement
-      description: Generate a Profit & Loss report for a period, showing revenue, COGS, operating expenses, and net income.
+      description: Generate a Profit & Loss report for a period, showing revenue,
+        COGS, operating expenses, and net income.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -103,7 +108,8 @@ paths:
     get:
       operationId: generate_cash_flow
       summary: Generate Cash Flow Statement
-      description: Generate a Cash Flow Statement showing operating, investing, and financing activities.
+      description: Generate a Cash Flow Statement showing operating, investing, and
+        financing activities.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -140,7 +146,8 @@ paths:
     get:
       operationId: generate_general_ledger
       summary: Generate General Ledger Report
-      description: Generate a General Ledger report showing all journal entries with debits, credits, and running balances for a period.
+      description: Generate a General Ledger report showing all journal entries with
+        debits, credits, and running balances for a period.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -177,7 +184,8 @@ paths:
     get:
       operationId: generate_trial_balance
       summary: Generate Trial Balance
-      description: Generate a Trial Balance report showing all account balances at a point in time, with debits and credits.
+      description: Generate a Trial Balance report showing all account balances at
+        a point in time, with debits and credits.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -291,7 +299,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /custom-reports/{id}:
     get:
       operationId: get_custom_report
@@ -349,6 +375,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_custom_report
       summary: Delete custom report
@@ -418,7 +459,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /report-executions:
     get:
       operationId: list_report_executions
@@ -500,6 +550,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /report-definitions/{id}/lines:
     get:
       operationId: list_report_definition_lines
@@ -554,6 +616,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportExport'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /statutory-report-packs:
     get:
       operationId: list_statutory_report_packs
@@ -566,13 +640,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedStatutoryReportPacks'
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header
+        as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Page size limit
     BalanceSheet:
       type: object
       required:

@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Treasury
   version: 1.0.0
-  description: Treasury service for liquidity planning, cash positioning, cash forecasts, bank relationships, and cash transfer planning.
+  description: Treasury service for liquidity planning, cash positioning, cash forecasts,
+    bank relationships, and cash transfer planning.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -84,6 +85,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CashForecast'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /liquidity-plans:
     get:
       operationId: list_liquidity_plans
@@ -124,6 +149,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LiquidityPlan'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /bank-relationships:
     get:
       operationId: list_bank_relationships
@@ -155,6 +192,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankRelationship'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /cash-transfers:
     get:
       operationId: list_cash_transfers
@@ -196,6 +245,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CashTransfer'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -203,38 +264,57 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
     Page:
       name: page
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         default: 1
+      description: Page number (1-indexed)
     Limit:
       name: limit
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
     CompanyId:
       name: company_id
       in: query
+      required: false
       schema:
         type: string
         format: uuid
-  responses:
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+      description: Filter by company UUID
   schemas:
     CashPosition:
       type: object
-      required: [id, company_id, as_of_date, currency_code, available_cash]
+      required:
+      - id
+      - company_id
+      - as_of_date
+      - currency_code
+      - available_cash
       properties:
         id:
           type: string
@@ -260,7 +340,11 @@ components:
           format: double
     CashForecast:
       type: object
-      required: [id, company_id, horizon, status]
+      required:
+      - id
+      - company_id
+      - horizon
+      - status
       properties:
         id:
           type: string
@@ -284,7 +368,11 @@ components:
           format: date
     CreateCashForecastRequest:
       type: object
-      required: [company_id, horizon, start_date, end_date]
+      required:
+      - company_id
+      - horizon
+      - start_date
+      - end_date
       properties:
         company_id:
           type: string
@@ -303,7 +391,11 @@ components:
           format: date
     LiquidityPlan:
       type: object
-      required: [id, company_id, status, plan_date]
+      required:
+      - id
+      - company_id
+      - status
+      - plan_date
       properties:
         id:
           type: string
@@ -326,7 +418,9 @@ components:
           format: double
     CreateLiquidityPlanRequest:
       type: object
-      required: [company_id, plan_date]
+      required:
+      - company_id
+      - plan_date
       properties:
         company_id:
           type: string
@@ -339,7 +433,11 @@ components:
           format: double
     BankRelationship:
       type: object
-      required: [id, bank_name, relationship_type, active]
+      required:
+      - id
+      - bank_name
+      - relationship_type
+      - active
       properties:
         id:
           type: string
@@ -348,12 +446,19 @@ components:
           type: string
         relationship_type:
           type: string
-          enum: [OPERATING, CREDIT_FACILITY, INVESTMENT, CASH_POOL, OTHER]
+          enum:
+          - OPERATING
+          - CREDIT_FACILITY
+          - INVESTMENT
+          - CASH_POOL
+          - OTHER
         active:
           type: boolean
     CreateBankRelationshipRequest:
       type: object
-      required: [bank_name, relationship_type]
+      required:
+      - bank_name
+      - relationship_type
       properties:
         bank_name:
           type: string
@@ -361,7 +466,12 @@ components:
           type: string
     CashTransfer:
       type: object
-      required: [id, source_account_id, destination_account_id, amount, status]
+      required:
+      - id
+      - source_account_id
+      - destination_account_id
+      - amount
+      - status
       properties:
         id:
           type: string
@@ -389,7 +499,11 @@ components:
           - FAILED
     CreateCashTransferRequest:
       type: object
-      required: [source_account_id, destination_account_id, amount, currency_code]
+      required:
+      - source_account_id
+      - destination_account_id
+      - amount
+      - currency_code
       properties:
         source_account_id:
           type: string
@@ -451,7 +565,10 @@ components:
               $ref: '#/components/schemas/CashTransfer'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -461,7 +578,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string

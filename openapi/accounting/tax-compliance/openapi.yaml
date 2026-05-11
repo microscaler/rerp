@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Tax Compliance
   version: 1.0.0
-  description: Tax compliance service for tax periods, jurisdiction rules, statutory tax returns, tax payments, and audit packs.
+  description: Tax compliance service for tax periods, jurisdiction rules, statutory
+    tax returns, tax payments, and audit packs.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -63,6 +64,28 @@ paths:
                 $ref: '#/components/schemas/TaxPeriod'
         '400':
           $ref: '#/components/responses/ValidationError'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /tax-rules:
     get:
       operationId: list_tax_rules
@@ -111,6 +134,19 @@ paths:
                 $ref: '#/components/schemas/TaxRule'
         '400':
           $ref: '#/components/responses/ValidationError'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /tax-returns:
     get:
       operationId: list_tax_returns
@@ -162,6 +198,19 @@ paths:
                 $ref: '#/components/schemas/TaxReturn'
         '400':
           $ref: '#/components/responses/ValidationError'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /tax-returns/{id}/validate:
     post:
       operationId: validate_tax_return
@@ -178,6 +227,21 @@ paths:
                 $ref: '#/components/schemas/TaxReturnValidationResult'
         '404':
           $ref: '#/components/responses/NotFound'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /tax-returns/{id}/submit:
     post:
       operationId: submit_tax_return
@@ -200,6 +264,19 @@ paths:
                 $ref: '#/components/schemas/TaxReturnSubmission'
         '409':
           $ref: '#/components/responses/Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /tax-payments:
     get:
       operationId: list_tax_payments
@@ -236,6 +313,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxPayment'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /tax-audit-packs:
     get:
       operationId: list_tax_audit_packs
@@ -272,6 +361,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxAuditPack'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -307,35 +408,17 @@ components:
       schema:
         type: string
         format: uuid
-  responses:
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: Invalid state transition or conflicting data
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    ValidationError:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ValidationError'
   schemas:
     TaxPeriod:
       type: object
-      required: [id, company_id, jurisdiction_code, tax_type, start_date, end_date, status]
+      required:
+      - id
+      - company_id
+      - jurisdiction_code
+      - tax_type
+      - start_date
+      - end_date
+      - status
       properties:
         id:
           type: string
@@ -371,7 +454,12 @@ components:
           - CLOSED
     CreateTaxPeriodRequest:
       type: object
-      required: [company_id, jurisdiction_code, tax_type, start_date, end_date]
+      required:
+      - company_id
+      - jurisdiction_code
+      - tax_type
+      - start_date
+      - end_date
       properties:
         company_id:
           type: string
@@ -398,7 +486,13 @@ components:
           format: date
     TaxRule:
       type: object
-      required: [id, jurisdiction_code, tax_type, name, effective_from, active]
+      required:
+      - id
+      - jurisdiction_code
+      - tax_type
+      - name
+      - effective_from
+      - active
       properties:
         id:
           type: string
@@ -429,7 +523,11 @@ components:
           type: boolean
     CreateTaxRuleRequest:
       type: object
-      required: [jurisdiction_code, tax_type, name, effective_from]
+      required:
+      - jurisdiction_code
+      - tax_type
+      - name
+      - effective_from
       properties:
         jurisdiction_code:
           type: string
@@ -455,7 +553,13 @@ components:
           format: date
     TaxReturn:
       type: object
-      required: [id, company_id, period_id, return_type, status, total_due]
+      required:
+      - id
+      - company_id
+      - period_id
+      - return_type
+      - status
+      - total_due
       properties:
         id:
           type: string
@@ -490,7 +594,10 @@ components:
           format: date-time
     CreateTaxReturnRequest:
       type: object
-      required: [company_id, period_id, return_type]
+      required:
+      - company_id
+      - period_id
+      - return_type
       properties:
         company_id:
           type: string
@@ -502,7 +609,10 @@ components:
           type: string
     TaxReturnValidationResult:
       type: object
-      required: [return_id, valid, issues]
+      required:
+      - return_id
+      - valid
+      - issues
       properties:
         return_id:
           type: string
@@ -515,7 +625,9 @@ components:
             type: string
     SubmitTaxReturnRequest:
       type: object
-      required: [submitted_by, declaration]
+      required:
+      - submitted_by
+      - declaration
       properties:
         submitted_by:
           type: string
@@ -524,7 +636,10 @@ components:
           type: string
     TaxReturnSubmission:
       type: object
-      required: [id, return_id, status]
+      required:
+      - id
+      - return_id
+      - status
       properties:
         id:
           type: string
@@ -538,7 +653,11 @@ components:
           type: string
     TaxPayment:
       type: object
-      required: [id, return_id, amount, status]
+      required:
+      - id
+      - return_id
+      - amount
+      - status
       properties:
         id:
           type: string
@@ -561,7 +680,9 @@ components:
           format: date-time
     CreateTaxPaymentRequest:
       type: object
-      required: [return_id, amount]
+      required:
+      - return_id
+      - amount
       properties:
         return_id:
           type: string
@@ -571,7 +692,11 @@ components:
           format: double
     TaxAuditPack:
       type: object
-      required: [id, return_id, status, artifact_count]
+      required:
+      - id
+      - return_id
+      - status
+      - artifact_count
       properties:
         id:
           type: string
@@ -581,12 +706,17 @@ components:
           format: uuid
         status:
           type: string
-          enum: [DRAFT, GENERATING, READY, ARCHIVED]
+          enum:
+          - DRAFT
+          - GENERATING
+          - READY
+          - ARCHIVED
         artifact_count:
           type: integer
     CreateTaxAuditPackRequest:
       type: object
-      required: [return_id]
+      required:
+      - return_id
       properties:
         return_id:
           type: string
@@ -638,7 +768,10 @@ components:
               $ref: '#/components/schemas/TaxAuditPack'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -648,7 +781,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
@@ -656,7 +791,10 @@ components:
           type: string
     ValidationError:
       type: object
-      required: [error, message, fields]
+      required:
+      - error
+      - message
+      - fields
       properties:
         error:
           type: string

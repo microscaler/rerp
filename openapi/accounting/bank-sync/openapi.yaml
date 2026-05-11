@@ -2,7 +2,9 @@ openapi: 3.1.0
 info:
   title: Bank Sync
   version: 1.0.0
-  description: Bank synchronization service managing bank account connections, statement imports, reconciliations, and cash management. Supports multiple bank integrations, automated reconciliation, and bank feed monitoring.
+  description: Bank synchronization service managing bank account connections, statement
+    imports, reconciliations, and cash management. Supports multiple bank integrations,
+    automated reconciliation, and bank feed monitoring.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -27,7 +29,8 @@ paths:
     get:
       operationId: list_bank_accounts
       summary: List bank accounts
-      description: Paginated list of all bank accounts with filtering by type, status, and company.
+      description: Paginated list of all bank accounts with filtering by type, status,
+        and company.
       parameters:
       - name: page
         in: query
@@ -127,7 +130,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /bank-accounts/{id}:
     get:
       operationId: get_bank_account
@@ -185,10 +206,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_bank_account
       summary: Delete bank account
-      description: Delete a bank account. Only allowed for closed or inactive accounts with no transactions.
+      description: Delete a bank account. Only allowed for closed or inactive accounts
+        with no transactions.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -283,7 +320,8 @@ paths:
     post:
       operationId: create_bank_statement
       summary: Import bank statement
-      description: Import a new bank statement with transactions. Supports CSV, OFX, QIF, and MT940 formats.
+      description: Import a new bank statement with transactions. Supports CSV, OFX,
+        QIF, and MT940 formats.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -303,7 +341,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /statements/{id}:
     get:
       operationId: get_bank_statement
@@ -361,11 +408,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /transactions:
     get:
       operationId: list_bank_transactions
       summary: List bank transactions
-      description: List all bank transactions with filtering by account, date, status, and counterparty.
+      description: List all bank transactions with filtering by account, date, status,
+        and counterparty.
       x-brrtrouter-impl: true
       parameters:
       - name: page
@@ -475,7 +535,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Transaction or matched entry not found
           content:
@@ -488,11 +548,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /transactions/auto-match:
     post:
       operationId: auto_match_transactions
       summary: Auto-match transactions
-      description: Automatically match raw transactions to existing entries using amount, date, and description matching.
+      description: Automatically match raw transactions to existing entries using
+        amount, date, and description matching.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -541,7 +608,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /reconciliations:
     get:
       operationId: list_reconciliations
@@ -631,18 +707,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Reconciliation already exists for this account and date
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /reconciliations/{id}/complete:
     post:
       operationId: complete_reconciliation
       summary: Complete bank reconciliation
-      description: Complete a bank reconciliation. Only allowed when the difference is zero (balanced).
+      description: Complete a bank reconciliation. Only allowed when the difference
+        is zero (balanced).
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -663,7 +746,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Not found
           content:
@@ -676,6 +759,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /reports/reconciliation:
     get:
       operationId: reconciliation_report
@@ -786,6 +875,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationModel'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /transactions/{id}/suggestions:
     get:
       operationId: get_transaction_reconciliation_suggestions
@@ -829,6 +930,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationResult'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /transactions/{id}/unreconcile:
     post:
       operationId: unreconcile_transaction
@@ -844,6 +957,18 @@ paths:
       responses:
         '200':
           description: Transaction unreconciled
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /transactions/{id}/write-off:
     post:
       operationId: create_transaction_write_off
@@ -869,6 +994,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationAdjustment'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /transactions/{id}/exchange-difference:
     post:
       operationId: create_transaction_exchange_difference
@@ -894,14 +1031,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationAdjustment'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header
+        as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Page size limit
     BankAccount:
       type: object
       required:
@@ -1208,7 +1417,8 @@ components:
         start_date:
           type: string
           format: date
-          description: Statement period start. Auto-derived from transactions if not provided.
+          description: Statement period start. Auto-derived from transactions if not
+            provided.
         statement_date:
           type: string
           format: date

@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Lease Accounting
   version: 1.0.0
-  description: Lease accounting service for leases, payment schedules, lease liabilities, right-of-use assets, and lease modifications.
+  description: Lease accounting service for leases, payment schedules, lease liabilities,
+    right-of-use assets, and lease modifications.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -63,6 +64,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Lease'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /lease-payment-schedules:
     get:
       operationId: list_lease_payment_schedules
@@ -99,6 +124,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeasePaymentSchedule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /lease-liabilities:
     get:
       operationId: list_lease_liabilities
@@ -163,6 +200,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaseModification'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /lease-modifications/{id}/approve:
     post:
       operationId: approve_lease_modification
@@ -177,6 +226,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaseModification'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -209,7 +270,12 @@ components:
   schemas:
     Lease:
       type: object
-      required: [id, lease_number, classification, status, commencement_date]
+      required:
+      - id
+      - lease_number
+      - classification
+      - status
+      - commencement_date
       properties:
         id:
           type: string
@@ -240,7 +306,10 @@ components:
           format: double
     CreateLeaseRequest:
       type: object
-      required: [lease_number, classification, commencement_date]
+      required:
+      - lease_number
+      - classification
+      - commencement_date
       properties:
         lease_number:
           type: string
@@ -258,7 +327,11 @@ components:
           format: double
     LeasePaymentSchedule:
       type: object
-      required: [id, lease_id, payment_date, amount]
+      required:
+      - id
+      - lease_id
+      - payment_date
+      - amount
       properties:
         id:
           type: string
@@ -278,7 +351,11 @@ components:
           maxLength: 3
     CreateLeasePaymentScheduleRequest:
       type: object
-      required: [lease_id, payment_date, amount, currency_code]
+      required:
+      - lease_id
+      - payment_date
+      - amount
+      - currency_code
       properties:
         lease_id:
           type: string
@@ -295,7 +372,11 @@ components:
           maxLength: 3
     LeaseLiability:
       type: object
-      required: [id, lease_id, opening_balance, closing_balance]
+      required:
+      - id
+      - lease_id
+      - opening_balance
+      - closing_balance
       properties:
         id:
           type: string
@@ -311,7 +392,11 @@ components:
           format: double
     RightOfUseAsset:
       type: object
-      required: [id, lease_id, asset_id, carrying_value]
+      required:
+      - id
+      - lease_id
+      - asset_id
+      - carrying_value
       properties:
         id:
           type: string
@@ -327,7 +412,11 @@ components:
           format: double
     LeaseModification:
       type: object
-      required: [id, lease_id, status, effective_date]
+      required:
+      - id
+      - lease_id
+      - status
+      - effective_date
       properties:
         id:
           type: string
@@ -337,7 +426,11 @@ components:
           format: uuid
         status:
           type: string
-          enum: [DRAFT, APPROVED, POSTED, CANCELLED]
+          enum:
+          - DRAFT
+          - APPROVED
+          - POSTED
+          - CANCELLED
         effective_date:
           type: string
           format: date
@@ -345,7 +438,10 @@ components:
           type: string
     CreateLeaseModificationRequest:
       type: object
-      required: [lease_id, effective_date, reason]
+      required:
+      - lease_id
+      - effective_date
+      - reason
       properties:
         lease_id:
           type: string
@@ -356,18 +452,56 @@ components:
         reason:
           type: string
     PaginatedLeases:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/Lease' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Lease'
     PaginatedLeasePaymentSchedules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeasePaymentSchedule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeasePaymentSchedule'
     PaginatedLeaseLiabilities:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseLiability' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeaseLiability'
     PaginatedRightOfUseAssets:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RightOfUseAsset' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RightOfUseAsset'
     PaginatedLeaseModifications:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseModification' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeaseModification'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -377,7 +511,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string

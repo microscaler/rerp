@@ -2,7 +2,10 @@ openapi: 3.1.0
 info:
   title: Asset Management
   version: 1.0.0
-  description: Fixed asset management service handling asset lifecycle from acquisition to disposal. Supports depreciation scheduling, asset tracking, revaluation, and integration with general ledger for asset accounts. Compliant with common depreciation methods and tax regulations.
+  description: Fixed asset management service handling asset lifecycle from acquisition
+    to disposal. Supports depreciation scheduling, asset tracking, revaluation, and
+    integration with general ledger for asset accounts. Compliant with common depreciation
+    methods and tax regulations.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -27,7 +30,8 @@ paths:
     get:
       operationId: list_assets
       summary: List assets
-      description: Paginated list of all fixed assets with filtering by category, status, location, department, and useful life range.
+      description: Paginated list of all fixed assets with filtering by category,
+        status, location, department, and useful life range.
       parameters:
       - name: page
         in: query
@@ -138,12 +142,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /assets/{id}:
     get:
       operationId: get_asset
       summary: Get asset by id
-      description: Retrieve a single asset with full details including depreciation schedule and revaluation history.
+      description: Retrieve a single asset with full details including depreciation
+        schedule and revaluation history.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -168,7 +191,8 @@ paths:
     put:
       operationId: update_asset
       summary: Update asset
-      description: Update an asset's details. Does not allow modification of acquisition cost or date after depreciation starts.
+      description: Update an asset's details. Does not allow modification of acquisition
+        cost or date after depreciation starts.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -197,15 +221,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Cannot update depreciation-related fields after depreciation starts
+          description: Cannot update depreciation-related fields after depreciation
+            starts
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
     delete:
       operationId: delete_asset
       summary: Delete asset
-      description: Delete an asset. Only allowed for assets in ACTIVE status with no depreciation entries.
+      description: Delete an asset. Only allowed for assets in ACTIVE status with
+        no depreciation entries.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -224,7 +262,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Cannot delete asset with depreciation entries or non-active status
+          description: Cannot delete asset with depreciation entries or non-active
+            status
           content:
             application/json:
               schema:
@@ -293,11 +332,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /assets/bulk-depreciate:
     post:
       operationId: bulk_depreciate
       summary: Run depreciation for all assets
-      description: Run depreciation for all active assets for a given period. Used for month-end/year-end close.
+      description: Run depreciation for all active assets for a given period. Used
+        for month-end/year-end close.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -337,7 +386,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /revaluations:
     get:
       operationId: list_revaluations
@@ -410,7 +468,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Asset not found
           content:
@@ -423,11 +481,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /disposals:
     get:
       operationId: list_disposals
       summary: List disposals
-      description: List all asset disposals with filtering by type, date range, and asset.
+      description: List all asset disposals with filtering by type, date range, and
+        asset.
       x-brrtrouter-impl: true
       parameters:
       - name: page
@@ -518,7 +583,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Asset not found
           content:
@@ -531,6 +596,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /categories:
     get:
       operationId: list_asset_categories
@@ -597,12 +668,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /reports/asset-summary:
     get:
       operationId: asset_summary
       summary: Asset summary report
-      description: Generate a company-wide asset summary with breakdown by category, status, and depreciation expenses.
+      description: Generate a company-wide asset summary with breakdown by category,
+        status, and depreciation expenses.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -669,6 +750,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetModel'
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /assets/{id}/validate:
     post:
       operationId: validate_asset
@@ -684,6 +777,18 @@ paths:
       responses:
         '200':
           description: Asset validated
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /assets/{id}/pause-depreciation:
     post:
       operationId: pause_asset_depreciation
@@ -699,6 +804,18 @@ paths:
       responses:
         '200':
           description: Asset depreciation paused
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /assets/{id}/resume-depreciation:
     post:
       operationId: resume_asset_depreciation
@@ -714,6 +831,18 @@ paths:
       responses:
         '200':
           description: Asset depreciation resumed
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /assets/{id}/modify:
     post:
       operationId: modify_asset
@@ -739,14 +868,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
+        '400':
+          description: Validation error
+          content: *id003
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+      description: JWT bearer token for authentication. Include in Authorization header
+        as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+        page:
+          type: integer
+          description: Current page number
+        limit:
+          type: integer
+          description: Page size limit
     Asset:
       type: object
       required:
@@ -1455,7 +1656,11 @@ components:
           format: uuid
     AssetModel:
       type: object
-      required: [id, name, depreciation_method, useful_life_months]
+      required:
+      - id
+      - name
+      - depreciation_method
+      - useful_life_months
       properties:
         id:
           type: string
@@ -1465,7 +1670,11 @@ components:
           maxLength: 200
         depreciation_method:
           type: string
-          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
         useful_life_months:
           type: integer
           minimum: 1
@@ -1487,14 +1696,21 @@ components:
           nullable: true
     CreateAssetModelRequest:
       type: object
-      required: [name, depreciation_method, useful_life_months]
+      required:
+      - name
+      - depreciation_method
+      - useful_life_months
       properties:
         name:
           type: string
           maxLength: 200
         depreciation_method:
           type: string
-          enum: [STRAIGHT_LINE, DECLINING_BALANCE, SUM_OF_YEARS_DIGITS, UNITS_OF_PRODUCTION]
+          enum:
+          - STRAIGHT_LINE
+          - DECLINING_BALANCE
+          - SUM_OF_YEARS_DIGITS
+          - UNITS_OF_PRODUCTION
         useful_life_months:
           type: integer
           minimum: 1
@@ -1504,7 +1720,9 @@ components:
           nullable: true
     ModifyAssetRequest:
       type: object
-      required: [effective_date, reason]
+      required:
+      - effective_date
+      - reason
       properties:
         effective_date:
           type: string
@@ -1524,7 +1742,9 @@ components:
           nullable: true
     PaginatedAssetModels:
       type: object
-      required: [items, total]
+      required:
+      - items
+      - total
       properties:
         items:
           type: array
@@ -1744,6 +1964,7 @@ components:
                 example: proceeds
               message:
                 type: string
-                example: Disposal proceeds cannot exceed net book value without proper documentation
+                example: Disposal proceeds cannot exceed net book value without proper
+                  documentation
 security:
 - bearerAuth: []

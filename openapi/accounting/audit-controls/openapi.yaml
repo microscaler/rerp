@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Audit Controls
   version: 1.0.0
-  description: Cross-service accounting controls service for approval policies, segregation rules, signature requests, audit events, and control exceptions.
+  description: Cross-service accounting controls service for approval policies, segregation
+    rules, signature requests, audit events, and control exceptions.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -58,6 +59,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalPolicy'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /segregation-rules:
     get:
       operationId: list_segregation_rules
@@ -89,6 +114,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SegregationRule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /signature-requests:
     get:
       operationId: list_signature_requests
@@ -129,6 +166,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignatureRequest'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /signature-requests/{id}/sign:
     post:
       operationId: sign_signature_request
@@ -149,6 +198,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignatureRequest'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /audit-events:
     get:
       operationId: list_audit_events
@@ -212,6 +273,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ControlException'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -244,7 +317,11 @@ components:
   schemas:
     ApprovalPolicy:
       type: object
-      required: [id, service_name, action_name, active]
+      required:
+      - id
+      - service_name
+      - action_name
+      - active
       properties:
         id:
           type: string
@@ -259,7 +336,9 @@ components:
           type: integer
     CreateApprovalPolicyRequest:
       type: object
-      required: [service_name, action_name]
+      required:
+      - service_name
+      - action_name
       properties:
         service_name:
           type: string
@@ -269,7 +348,12 @@ components:
           type: integer
     SegregationRule:
       type: object
-      required: [id, service_name, initiator_role, approver_role, active]
+      required:
+      - id
+      - service_name
+      - initiator_role
+      - approver_role
+      - active
       properties:
         id:
           type: string
@@ -284,7 +368,10 @@ components:
           type: boolean
     CreateSegregationRuleRequest:
       type: object
-      required: [service_name, initiator_role, approver_role]
+      required:
+      - service_name
+      - initiator_role
+      - approver_role
       properties:
         service_name:
           type: string
@@ -294,7 +381,12 @@ components:
           type: string
     SignatureRequest:
       type: object
-      required: [id, service_name, entity_id, requested_by, status]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - requested_by
+      - status
       properties:
         id:
           type: string
@@ -316,7 +408,10 @@ components:
           - CANCELLED
     CreateSignatureRequest:
       type: object
-      required: [service_name, entity_id, requested_by]
+      required:
+      - service_name
+      - entity_id
+      - requested_by
       properties:
         service_name:
           type: string
@@ -328,7 +423,9 @@ components:
           format: uuid
     SignRequest:
       type: object
-      required: [signed_by, declaration]
+      required:
+      - signed_by
+      - declaration
       properties:
         signed_by:
           type: string
@@ -337,7 +434,13 @@ components:
           type: string
     AuditEvent:
       type: object
-      required: [id, service_name, entity_id, action, actor_id, occurred_at]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - action
+      - actor_id
+      - occurred_at
       properties:
         id:
           type: string
@@ -357,7 +460,12 @@ components:
           format: date-time
     ControlException:
       type: object
-      required: [id, service_name, entity_id, status, reason]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - status
+      - reason
       properties:
         id:
           type: string
@@ -378,7 +486,10 @@ components:
           type: string
     CreateControlExceptionRequest:
       type: object
-      required: [service_name, entity_id, reason]
+      required:
+      - service_name
+      - entity_id
+      - reason
       properties:
         service_name:
           type: string
@@ -388,18 +499,56 @@ components:
         reason:
           type: string
     PaginatedApprovalPolicies:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ApprovalPolicy' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ApprovalPolicy'
     PaginatedSegregationRules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SegregationRule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/SegregationRule'
     PaginatedSignatureRequests:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SignatureRequest' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/SignatureRequest'
     PaginatedAuditEvents:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/AuditEvent' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditEvent'
     PaginatedControlExceptions:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ControlException' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ControlException'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -409,7 +558,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string

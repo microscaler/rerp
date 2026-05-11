@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Revenue Recognition
   version: 1.0.0
-  description: Revenue and expense recognition service for deferred revenue, deferred expenses, recognition schedules, recognition rules, and recognition runs.
+  description: Revenue and expense recognition service for deferred revenue, deferred
+    expenses, recognition schedules, recognition rules, and recognition runs.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -54,6 +55,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionRule'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /recognition-schedules:
     get:
       operationId: list_recognition_schedules
@@ -90,6 +115,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionSchedule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /deferred-revenues:
     get:
       operationId: list_deferred_revenues
@@ -121,6 +158,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredItem'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /deferred-expenses:
     get:
       operationId: list_deferred_expenses
@@ -152,6 +201,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredItem'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /recognition-runs:
     get:
       operationId: list_recognition_runs
@@ -192,6 +253,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionRun'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /recognition-runs/{id}/post:
     post:
       operationId: post_recognition_run
@@ -208,6 +281,19 @@ paths:
                 $ref: '#/components/schemas/RecognitionRun'
         '409':
           $ref: '#/components/responses/Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -237,17 +323,14 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-  responses:
-    Conflict:
-      description: Invalid recognition state
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     RecognitionRule:
       type: object
-      required: [id, name, method, active]
+      required:
+      - id
+      - name
+      - method
+      - active
       properties:
         id:
           type: string
@@ -265,7 +348,9 @@ components:
           type: boolean
     CreateRecognitionRuleRequest:
       type: object
-      required: [name, method]
+      required:
+      - name
+      - method
       properties:
         name:
           type: string
@@ -278,7 +363,12 @@ components:
           - MANUAL
     RecognitionSchedule:
       type: object
-      required: [id, rule_id, source_invoice_id, total_amount, recognized_amount]
+      required:
+      - id
+      - rule_id
+      - source_invoice_id
+      - total_amount
+      - recognized_amount
       properties:
         id:
           type: string
@@ -301,7 +391,11 @@ components:
           maxLength: 3
     CreateRecognitionScheduleRequest:
       type: object
-      required: [rule_id, source_invoice_id, total_amount, currency_code]
+      required:
+      - rule_id
+      - source_invoice_id
+      - total_amount
+      - currency_code
       properties:
         rule_id:
           type: string
@@ -318,7 +412,11 @@ components:
           maxLength: 3
     DeferredItem:
       type: object
-      required: [id, schedule_id, item_type, balance]
+      required:
+      - id
+      - schedule_id
+      - item_type
+      - balance
       properties:
         id:
           type: string
@@ -328,13 +426,17 @@ components:
           format: uuid
         item_type:
           type: string
-          enum: [REVENUE, EXPENSE]
+          enum:
+          - REVENUE
+          - EXPENSE
         balance:
           type: number
           format: double
     CreateDeferredItemRequest:
       type: object
-      required: [schedule_id, balance]
+      required:
+      - schedule_id
+      - balance
       properties:
         schedule_id:
           type: string
@@ -344,7 +446,10 @@ components:
           format: double
     RecognitionRun:
       type: object
-      required: [id, fiscal_period_id, status]
+      required:
+      - id
+      - fiscal_period_id
+      - status
       properties:
         id:
           type: string
@@ -364,24 +469,63 @@ components:
           format: uuid
     CreateRecognitionRunRequest:
       type: object
-      required: [fiscal_period_id]
+      required:
+      - fiscal_period_id
       properties:
         fiscal_period_id:
           type: string
           format: uuid
     PaginatedRecognitionRules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionRule'
     PaginatedRecognitionSchedules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionSchedule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionSchedule'
     PaginatedDeferredRevenues:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeferredItem'
     PaginatedDeferredExpenses:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeferredItem'
     PaginatedRecognitionRuns:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRun' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionRun'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -391,7 +535,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string

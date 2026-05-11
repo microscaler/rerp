@@ -30,25 +30,15 @@ paths:
       - $ref: '#/components/parameters/Search'
       responses:
         '200':
-          description: List of edi-documents
+          description: Paginated list of EDI documents
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EdiDocument'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedEdiDocuments'
     post:
       operationId: create_edi_document
       summary: Create edi-document
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
@@ -64,6 +54,28 @@ paths:
                 $ref: '#/components/schemas/EdiDocument'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /edi-documents/{id}:
     get:
       operationId: get_edi_document
@@ -87,6 +99,7 @@ paths:
     put:
       operationId: update_edi_document
       summary: Update edi-document
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -109,6 +122,21 @@ paths:
                 $ref: '#/components/schemas/EdiDocument'
         '404':
           description: Not found
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_edi_document
       summary: Delete edi-document
@@ -134,25 +162,15 @@ paths:
       - $ref: '#/components/parameters/Search'
       responses:
         '200':
-          description: List of edi-mappings
+          description: Paginated list of EDI mappings
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EdiMapping'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedEdiMappings'
     post:
       operationId: create_edi_mapping
       summary: Create edi-mapping
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
@@ -168,6 +186,19 @@ paths:
                 $ref: '#/components/schemas/EdiMapping'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-mappings/{id}:
     get:
       operationId: get_edi_mapping
@@ -191,6 +222,7 @@ paths:
     put:
       operationId: update_edi_mapping
       summary: Update edi-mapping
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -213,6 +245,18 @@ paths:
                 $ref: '#/components/schemas/EdiMapping'
         '404':
           description: Not found
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
     delete:
       operationId: delete_edi_mapping
       summary: Delete edi-mapping
@@ -260,6 +304,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiProfile'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-validation-profiles:
     get:
       operationId: list_edi_validation_profiles
@@ -291,6 +347,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiValidationProfile'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-submissions:
     get:
       operationId: list_edi_submissions
@@ -326,6 +394,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-submissions/{id}/submit:
     post:
       operationId: submit_edi_submission
@@ -345,6 +425,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-submissions/{id}/status:
     get:
       operationId: get_edi_submission_status
@@ -382,6 +474,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /edi-acknowledgments:
     get:
       operationId: list_edi_acknowledgments
@@ -417,26 +521,48 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
     Page:
       name: page
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         default: 1
+      description: Page number (1-indexed)
     Limit:
       name: limit
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 20
+      description: Page size (1-100)
     Search:
       name: search
       in: query
+      required: false
       schema:
         type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   schemas:
     EdiStandard:
       type: string
@@ -1032,6 +1158,24 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/EdiError'
+    PaginatedEdiDocuments:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiDocument'
+    PaginatedEdiMappings:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiMapping'
     PaginatedResponse:
       type: object
       required:
@@ -1045,5 +1189,24 @@ components:
           type: integer
         limit:
           type: integer
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
 security:
 - bearerAuth: []

@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Documents Extraction
   version: 1.0.0
-  description: Accounting document ingestion and extraction service for OCR, classification, review, approval, and linkage to invoices, bills, bank statements, and EDI documents.
+  description: Accounting document ingestion and extraction service for OCR, classification,
+    review, approval, and linkage to invoices, bills, bank statements, and EDI documents.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -79,6 +80,28 @@ paths:
                 $ref: '#/components/schemas/AccountingDocument'
         '400':
           $ref: '#/components/responses/ValidationError'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /accounting-documents/{id}/classify:
     post:
       operationId: classify_accounting_document
@@ -101,6 +124,21 @@ paths:
                 $ref: '#/components/schemas/DocumentClassification'
         '404':
           $ref: '#/components/responses/NotFound'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /extraction-jobs:
     get:
       operationId: list_extraction_jobs
@@ -137,6 +175,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExtractionJob'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /extraction-results:
     get:
       operationId: list_extraction_results
@@ -178,6 +228,19 @@ paths:
                 $ref: '#/components/schemas/ExtractionApproval'
         '409':
           $ref: '#/components/responses/Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
   /documents/{id}/link-invoice:
     post:
       operationId: link_document_to_invoice
@@ -198,6 +261,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentLink'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
   /documents/{id}/link-bank-statement:
     post:
       operationId: link_document_to_bank_statement
@@ -218,6 +293,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentLink'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id001
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id002
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -247,35 +334,15 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-  responses:
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: Invalid workflow state
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    ValidationError:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ValidationError'
   schemas:
     AccountingDocument:
       type: object
-      required: [id, document_type, status, file_name, uploaded_at]
+      required:
+      - id
+      - document_type
+      - status
+      - file_name
+      - uploaded_at
       properties:
         id:
           type: string
@@ -313,7 +380,9 @@ components:
           format: date-time
     CreateAccountingDocumentRequest:
       type: object
-      required: [file_name, source_uri]
+      required:
+      - file_name
+      - source_uri
       properties:
         company_id:
           type: string
@@ -341,7 +410,10 @@ components:
           default: false
     DocumentClassification:
       type: object
-      required: [document_id, document_type, confidence]
+      required:
+      - document_id
+      - document_type
+      - confidence
       properties:
         document_id:
           type: string
@@ -364,7 +436,11 @@ components:
             type: string
     ExtractionJob:
       type: object
-      required: [id, document_id, status, created_at]
+      required:
+      - id
+      - document_id
+      - status
+      - created_at
       properties:
         id:
           type: string
@@ -389,7 +465,8 @@ components:
           format: date-time
     CreateExtractionJobRequest:
       type: object
-      required: [document_id]
+      required:
+      - document_id
       properties:
         document_id:
           type: string
@@ -398,7 +475,11 @@ components:
           type: string
     ExtractionResult:
       type: object
-      required: [id, job_id, document_id, extracted_fields]
+      required:
+      - id
+      - job_id
+      - document_id
+      - extracted_fields
       properties:
         id:
           type: string
@@ -417,7 +498,8 @@ components:
           format: double
     ApproveExtractionRequest:
       type: object
-      required: [approved_by]
+      required:
+      - approved_by
       properties:
         approved_by:
           type: string
@@ -427,7 +509,10 @@ components:
           additionalProperties: true
     ExtractionApproval:
       type: object
-      required: [document_id, approved_by, approved_at]
+      required:
+      - document_id
+      - approved_by
+      - approved_at
       properties:
         document_id:
           type: string
@@ -440,7 +525,8 @@ components:
           format: date-time
     LinkDocumentRequest:
       type: object
-      required: [target_id]
+      required:
+      - target_id
       properties:
         target_id:
           type: string
@@ -449,7 +535,11 @@ components:
           type: string
     DocumentLink:
       type: object
-      required: [id, document_id, target_id, target_type]
+      required:
+      - id
+      - document_id
+      - target_id
+      - target_type
       properties:
         id:
           type: string
@@ -491,7 +581,10 @@ components:
               $ref: '#/components/schemas/ExtractionResult'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -501,7 +594,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
@@ -509,7 +604,10 @@ components:
           type: string
     ValidationError:
       type: object
-      required: [error, message, fields]
+      required:
+      - error
+      - message
+      - fields
       properties:
         error:
           type: string

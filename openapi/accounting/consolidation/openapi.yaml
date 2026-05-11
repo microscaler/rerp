@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Consolidation
   version: 1.0.0
-  description: Multi-company consolidation service for consolidation groups, consolidation runs, elimination rules, elimination entries, and group reporting packs.
+  description: Multi-company consolidation service for consolidation groups, consolidation
+    runs, elimination rules, elimination entries, and group reporting packs.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -54,6 +55,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsolidationGroup'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /consolidation-runs:
     get:
       operationId: list_consolidation_runs
@@ -90,6 +115,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsolidationRun'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /consolidation-runs/{id}/execute:
     post:
       operationId: execute_consolidation_run
@@ -106,6 +143,19 @@ paths:
                 $ref: '#/components/schemas/ConsolidationRun'
         '409':
           $ref: '#/components/responses/Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
   /elimination-rules:
     get:
       operationId: list_elimination_rules
@@ -137,6 +187,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EliminationRule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
   /elimination-entries:
     get:
       operationId: list_elimination_entries
@@ -192,6 +254,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupReportingPack'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: Unauthorized — invalid or expired token
+          content: *id002
+        '403':
+          description: Forbidden — insufficient permissions
+          content: *id003
+        '409':
+          description: Conflict — resource already exists or violates business rules
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -221,17 +295,13 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-  responses:
-    Conflict:
-      description: Invalid consolidation state
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     ConsolidationGroup:
       type: object
-      required: [id, name, reporting_currency_code]
+      required:
+      - id
+      - name
+      - reporting_currency_code
       properties:
         id:
           type: string
@@ -247,7 +317,9 @@ components:
           format: uuid
     CreateConsolidationGroupRequest:
       type: object
-      required: [name, reporting_currency_code]
+      required:
+      - name
+      - reporting_currency_code
       properties:
         name:
           type: string
@@ -262,7 +334,11 @@ components:
             format: uuid
     ConsolidationRun:
       type: object
-      required: [id, group_id, fiscal_period_id, status]
+      required:
+      - id
+      - group_id
+      - fiscal_period_id
+      - status
       properties:
         id:
           type: string
@@ -287,7 +363,9 @@ components:
           format: date-time
     CreateConsolidationRunRequest:
       type: object
-      required: [group_id, fiscal_period_id]
+      required:
+      - group_id
+      - fiscal_period_id
       properties:
         group_id:
           type: string
@@ -297,7 +375,11 @@ components:
           format: uuid
     EliminationRule:
       type: object
-      required: [id, group_id, name, active]
+      required:
+      - id
+      - group_id
+      - name
+      - active
       properties:
         id:
           type: string
@@ -309,12 +391,19 @@ components:
           type: string
         rule_type:
           type: string
-          enum: [INTERCOMPANY_AR_AP, INTERCOMPANY_REVENUE_EXPENSE, INVESTMENT_EQUITY, CUSTOM]
+          enum:
+          - INTERCOMPANY_AR_AP
+          - INTERCOMPANY_REVENUE_EXPENSE
+          - INVESTMENT_EQUITY
+          - CUSTOM
         active:
           type: boolean
     CreateEliminationRuleRequest:
       type: object
-      required: [group_id, name, rule_type]
+      required:
+      - group_id
+      - name
+      - rule_type
       properties:
         group_id:
           type: string
@@ -325,7 +414,11 @@ components:
           type: string
     EliminationEntry:
       type: object
-      required: [id, run_id, rule_id, amount]
+      required:
+      - id
+      - run_id
+      - rule_id
+      - amount
       properties:
         id:
           type: string
@@ -347,7 +440,11 @@ components:
           format: uuid
     GroupReportingPack:
       type: object
-      required: [id, run_id, status, artifact_uri]
+      required:
+      - id
+      - run_id
+      - status
+      - artifact_uri
       properties:
         id:
           type: string
@@ -357,29 +454,71 @@ components:
           format: uuid
         status:
           type: string
-          enum: [GENERATING, READY, ARCHIVED]
+          enum:
+          - GENERATING
+          - READY
+          - ARCHIVED
         artifact_uri:
           type: string
     CreateGroupReportingPackRequest:
       type: object
-      required: [run_id]
+      required:
+      - run_id
       properties:
         run_id:
           type: string
           format: uuid
     PaginatedConsolidationGroups:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ConsolidationGroup' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ConsolidationGroup'
     PaginatedConsolidationRuns:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ConsolidationRun' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ConsolidationRun'
     PaginatedEliminationRules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/EliminationRule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EliminationRule'
     PaginatedEliminationEntries:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/EliminationEntry' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EliminationEntry'
     PaginatedGroupReportingPacks:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/GroupReportingPack' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/GroupReportingPack'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
@@ -389,7 +528,9 @@ components:
           type: integer
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
