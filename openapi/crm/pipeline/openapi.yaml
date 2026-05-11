@@ -91,6 +91,7 @@ paths:
           description: Internal server error
       security:
       - bearerAuth: []
+      description: Get leads associated with a campaign
     post:
       operationId: create_lead
       summary: Create a new lead or opportunity
@@ -122,6 +123,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get leads associated with a campaign
   /leads/{id}:
     get:
       operationId: get_lead
@@ -148,6 +150,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: Get leads by ID
     put:
       operationId: update_lead
       summary: Update lead fields
@@ -200,6 +203,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update leads by ID
     delete:
       operationId: delete_lead
       summary: Soft-delete lead
@@ -231,6 +235,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete leads by ID
   /leads/{id}/stage:
     patch:
       operationId: change_stage
@@ -284,6 +289,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Partially update leads by ID
   /leads/{id}/convert:
     post:
       operationId: convert_lead
@@ -330,6 +336,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Perform an action on leads
   /leads/detect-duplicates:
     post:
       operationId: detect_duplicates
@@ -370,6 +377,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new leads
   /leads/{id}/merge:
     post:
       operationId: merge_leads
@@ -417,6 +425,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Perform an action on leads
   /pipeline/summary:
     get:
       operationId: pipeline_summary
@@ -440,6 +449,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all pipeline
   /stages:
     get:
       operationId: list_stages
@@ -476,6 +486,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all stages
     post:
       operationId: create_stage
       summary: Create a new pipeline stage
@@ -505,6 +516,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new stages
   /stages/{id}:
     get:
       operationId: get_stage
@@ -531,6 +543,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: Get stages by ID
     put:
       operationId: update_stage
       summary: Update stage fields
@@ -583,6 +596,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update stages by ID
     delete:
       operationId: delete_stage
       summary: Delete stage (only if no leads in it)
@@ -616,6 +630,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete stages by ID
 components:
   schemas:
     Lead:

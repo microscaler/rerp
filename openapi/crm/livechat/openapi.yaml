@@ -62,6 +62,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all chats
     post:
       operationId: create_chat
       summary: Start a new chat session
@@ -91,6 +92,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new chats
   /chats/active:
     get:
       operationId: list_active_chats
@@ -109,6 +111,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedChatSession'
       security:
       - bearerAuth: []
+      description: List all chats
   /chats/{id}:
     get:
       operationId: get_chat
@@ -133,6 +136,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get chats by ID
     delete:
       operationId: delete_chat
       summary: Delete chat session transcript
@@ -164,6 +168,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete chats by ID
   /chats/{id}/message:
     post:
       operationId: send_chat_message
@@ -203,6 +208,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Perform an action on chats
   /chats/{id}/close:
     post:
       operationId: close_chat
@@ -234,6 +240,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Perform an action on chats
   /chats/{id}/transcript:
     get:
       operationId: get_chat_transcript
@@ -260,6 +267,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get chat session transcript
   /chats/convert:
     post:
       operationId: convert_chat_to_lead
@@ -300,6 +308,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new chats
   /messages:
     get:
       operationId: list_messages
@@ -331,6 +340,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedChatMessage'
       security:
       - bearerAuth: []
+      description: List all messages
   /messages/{id}:
     get:
       operationId: get_message
@@ -355,6 +365,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get messages by ID
   /agents:
     get:
       operationId: list_agents
@@ -379,6 +390,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all agents
     post:
       operationId: create_agent
       summary: Create a new chat agent
@@ -408,6 +420,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new agents
   /agents/{id}:
     get:
       operationId: get_agent
@@ -432,6 +445,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get agents by ID
     put:
       operationId: update_agent
       summary: Update agent fields
@@ -484,6 +498,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update agents by ID
     delete:
       operationId: delete_agent
       summary: Delete agent
@@ -515,6 +530,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete agents by ID
   /agents/{id}/status:
     put:
       operationId: set_agent_status
@@ -566,6 +582,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get or update agent status
   /agents/status:
     get:
       operationId: get_all_agent_status
@@ -581,6 +598,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedAgentStatus'
       security:
       - bearerAuth: []
+      description: Get or update agent status
   /agents/{id}/metrics:
     get:
       operationId: get_agent_metrics
@@ -605,6 +623,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get agent performance metrics
   /agents/queue:
     get:
       operationId: get_waiting_queue
@@ -634,6 +653,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedAgentQueueItem'
       security:
       - bearerAuth: []
+      description: List all agents
 components:
   parameters:
     Page:

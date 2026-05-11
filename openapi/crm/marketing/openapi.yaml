@@ -46,6 +46,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all utm
     post:
       operationId: create_utms_campaign
       summary: Create a new UTM campaign
@@ -75,6 +76,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new utm
   /utm/campaigns/{id}:
     get:
       operationId: get_utms_campaign
@@ -99,6 +101,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get utm by ID
     put:
       operationId: update_utms_campaign
       summary: Update UTM campaign
@@ -151,6 +154,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update utm by ID
     delete:
       operationId: delete_utms_campaign
       summary: Soft-delete UTM campaign
@@ -182,6 +186,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete utm by ID
   /utm/mediums:
     get:
       operationId: list_utms_mediums
@@ -199,6 +204,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all utm
     post:
       operationId: create_utms_medium
       summary: Create a new UTM medium
@@ -228,6 +234,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new utm
   /utm/sources:
     get:
       operationId: list_utms_sources
@@ -245,6 +252,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all utm
     post:
       operationId: create_utms_source
       summary: Create a new UTM source
@@ -274,6 +282,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new utm
   /forms/{id}:
     post:
       operationId: submit_form
@@ -313,6 +322,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Perform an action on forms
   /forms/{id}/config:
     get:
       operationId: get_form_config
@@ -337,6 +347,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get web form configuration
   /analytics/track:
     post:
       operationId: track_page_view
@@ -365,6 +376,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Track visitor activity on a page
   /analytics/visitors:
     get:
       operationId: list_visitors
@@ -391,6 +403,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedVisitorTracking'
       security:
       - bearerAuth: []
+      description: List all analytics
   /analytics/visitors/identify:
     post:
       operationId: identify_visitor
@@ -437,6 +450,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Identify a visitor by their session
   /campaigns/{id}/leads:
     get:
       operationId: get_campaign_leads
@@ -461,6 +475,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedCampaignLeadResult'
       security:
       - bearerAuth: []
+      description: Get leads associated with a campaign
   /campaigns/{id}/revenue:
     get:
       operationId: get_campaign_revenue
@@ -504,6 +519,7 @@ paths:
                     format: double
       security:
       - bearerAuth: []
+      description: Get revenue attributed to a campaign
   /events/register:
     post:
       operationId: register_event
@@ -534,6 +550,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Register for an event
   /events/{id}/registrations:
     get:
       operationId: get_event_registrations
@@ -558,6 +575,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedEventRegistration'
       security:
       - bearerAuth: []
+      description: Get event registrations
   /surveys/submit:
     post:
       operationId: submit_survey
@@ -588,6 +606,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Submit a survey response
 components:
   parameters:
     Page:

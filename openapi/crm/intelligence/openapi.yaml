@@ -65,6 +65,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Score a batch of leads asynchronously
   /leads/score-bulk:
     post:
       operationId: score_leads_bulk
@@ -135,6 +136,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Score a batch of leads synchronously
   /leads/{id}/score:
     get:
       operationId: get_lead_score
@@ -159,6 +161,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get leads by ID
   /leads/{id}/score/explain:
     get:
       operationId: explain_lead_score
@@ -183,6 +186,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Explain scoring factors for a lead
   /scoring/frequencies:
     get:
       operationId: list_scoring_frequencies
@@ -205,6 +209,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedScoringFrequency'
       security:
       - bearerAuth: []
+      description: List all scoring
   /scoring/frequencies/rebuild:
     post:
       operationId: rebuild_scoring_frequencies
@@ -232,6 +237,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Rebuild scoring frequencies from historical data
   /scoring/thresholds:
     get:
       operationId: get_scoring_thresholds
@@ -247,6 +253,7 @@ paths:
                 $ref: '#/components/schemas/ScoringThresholds'
       security:
       - bearerAuth: []
+      description: List all scoring
     put:
       operationId: update_scoring_thresholds
       summary: Update hot/warm/cold thresholds
@@ -286,6 +293,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update scoring by ID
   /leads/hot:
     get:
       operationId: list_hot_leads
@@ -304,6 +312,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
       security:
       - bearerAuth: []
+      description: List all leads
   /leads/warm:
     get:
       operationId: list_warm_leads
@@ -322,6 +331,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
       security:
       - bearerAuth: []
+      description: List all leads
   /leads/cold:
     get:
       operationId: list_cold_leads
@@ -340,6 +350,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
       security:
       - bearerAuth: []
+      description: List all leads
   /leads/ranked:
     get:
       operationId: list_ranked_leads
@@ -358,6 +369,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedLeadScoreRanked'
       security:
       - bearerAuth: []
+      description: List all leads
   /enrichment/lookup:
     post:
       operationId: lookup_enrichment
@@ -398,6 +410,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Enrich lead data from email address
   /enrichment/website:
     post:
       operationId: lookup_by_website
@@ -436,6 +449,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Enrich lead data from company website
   /enrichment/batch:
     post:
       operationId: batch_enrich
@@ -485,6 +499,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new enrichment
   /enrichment/auto-fill:
     post:
       operationId: auto_fill
@@ -531,6 +546,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Auto-fill lead data from email domain
   /enrichment/{id}/result:
     get:
       operationId: get_enrichment_result
@@ -555,6 +571,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get enrichment by ID
   /verify/email:
     post:
       operationId: verify_email
@@ -601,6 +618,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Verify email address validity
   /verify/batch:
     post:
       operationId: verify_batch
@@ -658,6 +676,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Verify email addresses in batch
   /verify/phone:
     post:
       operationId: verify_phone
@@ -701,6 +720,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Verify phone number validity
   /mining/search:
     post:
       operationId: search_leads
@@ -746,6 +766,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new mining
   /mining/icp-match:
     post:
       operationId: find_icp_matches
@@ -791,6 +812,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Find leads matching ideal customer profile
 components:
   parameters:
     Page:

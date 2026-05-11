@@ -67,6 +67,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get pipeline summary with stage breakdown
   /analytics/pipeline-weighted:
     get:
       operationId: get_weighted_pipeline
@@ -94,6 +95,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get weighted pipeline revenue
   /analytics/conversion-rates:
     get:
       operationId: get_conversion_rates
@@ -142,6 +144,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get conversion rate analytics
   /analytics/funnel:
     get:
       operationId: get_funnel
@@ -189,6 +192,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: List all analytics
   /analytics/lead-sources:
     get:
       operationId: get_lead_source_effectiveness
@@ -216,6 +220,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get lead source analytics
   /analytics/rep-performance:
     get:
       operationId: get_rep_performance
@@ -268,6 +273,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get representative performance metrics
   /analytics/team-performance:
     get:
       operationId: get_team_performance
@@ -310,6 +316,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get team performance metrics
   /analytics/leaderboard:
     get:
       operationId: get_leaderboard
@@ -361,6 +368,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get performance leaderboard
   /analytics/win-loss:
     get:
       operationId: get_win_loss_analysis
@@ -408,6 +416,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get win/loss analysis
   /analytics/time-to-close:
     get:
       operationId: get_time_to_close
@@ -435,6 +444,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get time-to-close analytics
   /analytics/forecast/monthly:
     get:
       operationId: get_monthly_forecast
@@ -468,6 +478,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get monthly forecast
   /analytics/forecast/quarterly:
     get:
       operationId: get_quarterly_forecast
@@ -495,6 +506,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get quarterly forecast
   /analytics/forecast/accuracy:
     get:
       operationId: get_forecast_accuracy
@@ -531,6 +543,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get forecast accuracy metrics
   /reports/build:
     post:
       operationId: build_report
@@ -583,6 +596,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Build a custom report
   /reports/{id}:
     get:
       operationId: get_saved_report
@@ -619,6 +633,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get reports by ID
   /reports/{id}/schedule:
     post:
       operationId: schedule_report
@@ -662,6 +677,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Schedule a report to run on a recurring basis
   /reports/export:
     post:
       operationId: export_report
@@ -718,6 +734,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Export report data to a file
 components:
   parameters:
     Page:

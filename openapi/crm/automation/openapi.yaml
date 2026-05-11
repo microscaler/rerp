@@ -54,6 +54,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all workflows
     post:
       operationId: create_workflow
       summary: Create a new workflow
@@ -83,6 +84,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new workflows
   /workflows/{id}:
     get:
       operationId: get_workflow
@@ -107,6 +109,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get workflows by ID
     put:
       operationId: update_workflow
       summary: Update workflow
@@ -159,6 +162,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update workflows by ID
     delete:
       operationId: delete_workflow
       summary: Delete workflow
@@ -190,6 +194,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete workflows by ID
   /workflows/{id}/rules:
     get:
       operationId: list_workflow_rules
@@ -216,6 +221,7 @@ paths:
           description: Workflow not found
       security:
       - bearerAuth: []
+      description: Get workflow rules
     post:
       operationId: create_workflow_rule
       summary: Add a rule to a workflow
@@ -254,6 +260,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get workflow rules
   /workflows/{id}/run:
     post:
       operationId: run_workflow
@@ -285,6 +292,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Run a workflow manually
   /workflows/{id}/run-history:
     get:
       operationId: list_workflow_run_history
@@ -309,6 +317,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Get workflow execution history
   /rules:
     get:
       operationId: list_rules
@@ -334,6 +343,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: Get workflow rules
     post:
       operationId: create_rule
       summary: Create a standalone rule (adds to a workflow)
@@ -363,6 +373,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get workflow rules
   /rules/{id}:
     get:
       operationId: get_rule
@@ -387,6 +398,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get workflow rules
     put:
       operationId: update_rule
       summary: Update rule
@@ -439,6 +451,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get workflow rules
     delete:
       operationId: delete_rule
       summary: Delete rule
@@ -470,6 +483,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Get workflow rules
   /rules/test:
     post:
       operationId: test_rule
@@ -505,6 +519,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Get workflow rules
   /triggers:
     get:
       operationId: list_triggers
@@ -541,6 +556,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all triggers
     post:
       operationId: create_trigger
       summary: Create a new trigger
@@ -570,6 +586,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new triggers
   /triggers/{id}:
     get:
       operationId: get_trigger
@@ -594,6 +611,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get triggers by ID
     put:
       operationId: update_trigger
       summary: Update trigger (enable/disable, schedule)
@@ -646,6 +664,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update triggers by ID
     delete:
       operationId: delete_trigger
       summary: Delete trigger
@@ -677,6 +696,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete triggers by ID
   /triggers/{id}/fire:
     post:
       operationId: fire_trigger
@@ -711,6 +731,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Fire a trigger manually
   /actions/schedule:
     post:
       operationId: schedule_action
@@ -739,6 +760,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Schedule a report to run on a recurring basis
   /actions/recurring:
     post:
       operationId: schedule_recurring_action
@@ -767,6 +789,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new actions
   /actions/upcoming:
     get:
       operationId: list_upcoming_actions
@@ -785,6 +808,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: List all actions
 components:
   parameters:
     Page:

@@ -68,6 +68,7 @@ paths:
           description: Internal server error
       security:
       - bearerAuth: []
+      description: List all contacts
     post:
       operationId: create_contact
       summary: Create a new contact
@@ -99,6 +100,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new contacts
   /contacts/search-by-email:
     get:
       operationId: search_contacts_by_email
@@ -121,6 +123,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Search contacts by email address
   /contacts/{id}:
     get:
       operationId: get_contact
@@ -147,6 +150,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: Get contacts by ID
     put:
       operationId: update_contact
       summary: Update contact fields
@@ -199,6 +203,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update contacts by ID
     delete:
       operationId: delete_contact
       summary: Soft-delete contact
@@ -230,6 +235,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete contacts by ID
   /contacts/{id}/tree:
     get:
       operationId: get_contact_hierarchy
@@ -254,6 +260,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get hierarchical tree structure
   /contacts/{id}/leads:
     get:
       operationId: get_contact_related_leads
@@ -291,6 +298,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get leads associated with a campaign
   /contacts/{id}/accounts:
     get:
       operationId: get_contact_accounts
@@ -315,6 +323,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get contacts by ID
   /contacts/merge:
     post:
       operationId: merge_contacts
@@ -357,6 +366,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new contacts
 components:
   schemas:
     Contact:

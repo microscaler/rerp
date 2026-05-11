@@ -44,6 +44,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all custom-fields
     post:
       operationId: create_custom_field
       summary: Create a custom field on any entity
@@ -75,6 +76,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new custom-fields
   /custom-fields/{id}:
     get:
       operationId: get_custom_field
@@ -99,6 +101,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get custom-fields by ID
     put:
       operationId: update_custom_field
       summary: Update custom field
@@ -151,6 +154,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update custom-fields by ID
     delete:
       operationId: delete_custom_field
       summary: Delete custom field
@@ -182,6 +186,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete custom-fields by ID
   /entities/{entity}/custom-fields:
     get:
       operationId: list_entity_custom_fields
@@ -214,6 +219,7 @@ paths:
           description: Entity not found
       security:
       - bearerAuth: []
+      description: Get entities by ID
   /webhooks:
     get:
       operationId: list_webhooks
@@ -238,6 +244,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all webhooks
     post:
       operationId: create_webhook
       summary: Create a new webhook
@@ -267,6 +274,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new webhooks
   /webhooks/{id}:
     get:
       operationId: get_webhook
@@ -291,6 +299,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get webhooks by ID
     put:
       operationId: update_webhook
       summary: Update webhook
@@ -343,6 +352,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update webhooks by ID
     delete:
       operationId: delete_webhook
       summary: Delete webhook
@@ -374,6 +384,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete webhooks by ID
   /webhooks/{id}/test:
     post:
       operationId: test_webhook
@@ -408,6 +419,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Test a rule configuration
   /webhooks/{id}/logs:
     get:
       operationId: list_webhook_logs
@@ -432,6 +444,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedWebhookDeliveryLog'
       security:
       - bearerAuth: []
+      description: Get webhook delivery logs
   /audit-log:
     get:
       operationId: list_audit_log
@@ -482,6 +495,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all audit-log
   /audit-log/{entity}/{entity_id}:
     get:
       operationId: get_entity_audit_log
@@ -519,6 +533,7 @@ paths:
           description: Entity not found
       security:
       - bearerAuth: []
+      description: Get audit-log by ID
   /api-keys:
     get:
       operationId: list_api_keys
@@ -536,6 +551,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all api-keys
     post:
       operationId: create_api_key
       summary: Generate a new API key
@@ -576,6 +592,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new api-keys
   /auth/validate:
     post:
       operationId: validate_api_key
@@ -617,6 +634,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Validate an API key or token
   /integrations:
     get:
       operationId: list_integrations
@@ -634,6 +652,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all integrations
     post:
       operationId: create_integration
       summary: Configure a new integration
@@ -663,6 +682,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new integrations
   /integrations/{id}/sync:
     post:
       operationId: trigger_integration_sync
@@ -698,6 +718,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Sync integration data with external system
   /integrations/{id}/status:
     get:
       operationId: get_integration_status
@@ -722,6 +743,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get or update agent status
 components:
   parameters:
     Page:

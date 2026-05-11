@@ -56,6 +56,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all subscriptions
     post:
       operationId: create_subscription
       summary: Create a new subscription from a closed opportunity
@@ -85,6 +86,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new subscriptions
   /subscriptions/{id}:
     get:
       operationId: get_subscription
@@ -109,6 +111,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get subscriptions by ID
     put:
       operationId: update_subscription
       summary: Update subscription
@@ -161,6 +164,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update subscriptions by ID
     delete:
       operationId: delete_subscription
       summary: Cancel subscription
@@ -192,6 +196,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete subscriptions by ID
   /subscriptions/{id}/renew:
     post:
       operationId: renew_subscription
@@ -245,6 +250,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Renew a subscription
   /subscriptions/mrr:
     get:
       operationId: get_mrr
@@ -260,6 +266,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: List all subscriptions
   /subscriptions/churn:
     get:
       operationId: get_churn_metrics
@@ -284,6 +291,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: List all subscriptions
   /renewals/upcoming:
     get:
       operationId: list_upcoming_renewals
@@ -307,6 +315,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Renew a subscription
   /goals:
     get:
       operationId: list_goals
@@ -347,6 +356,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all goals
     post:
       operationId: create_goal
       summary: Create a new goal
@@ -376,6 +386,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new goals
   /goals/{id}:
     get:
       operationId: get_goal
@@ -400,6 +411,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get goals by ID
     put:
       operationId: update_goal
       summary: Update goal
@@ -452,6 +464,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update goals by ID
   /goals/{id}/progress:
     put:
       operationId: update_goal_progress
@@ -510,6 +523,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update goals by ID
   /leaderboard:
     get:
       operationId: get_leaderboard
@@ -546,6 +560,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Get performance leaderboard
   /badges:
     get:
       operationId: list_badges
@@ -563,6 +578,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all badges
   /users/{id}/badges:
     get:
       operationId: get_user_badges
@@ -585,6 +601,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Get users by ID
   /customers/{id}/health:
     get:
       operationId: get_customer_health
@@ -609,6 +626,7 @@ paths:
           description: Customer not found
       security:
       - bearerAuth: []
+      description: Get customer health score
   /customers/at-risk:
     get:
       operationId: list_at_risk_customers
@@ -634,6 +652,7 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
       security:
       - bearerAuth: []
+      description: Get at-risk customers
 components:
   parameters:
     Page:

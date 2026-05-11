@@ -63,6 +63,7 @@ paths:
           description: Internal server error
       security:
       - bearerAuth: []
+      description: List all accounts
     post:
       operationId: create_account
       summary: Create a new account/company
@@ -94,6 +95,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Create a new accounts
   /accounts/{id}:
     get:
       operationId: get_account
@@ -120,6 +122,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: Get accounts by ID
     put:
       operationId: update_account
       summary: Update account fields
@@ -172,6 +175,7 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      description: Update accounts by ID
     delete:
       operationId: delete_account
       summary: Soft-delete account
@@ -203,6 +207,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
+      description: Delete accounts by ID
   /accounts/{id}/tree:
     get:
       operationId: get_account_hierarchy
@@ -227,6 +232,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get hierarchical tree structure
   /accounts/{id}/contacts:
     get:
       operationId: get_account_contacts
@@ -264,6 +270,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get accounts by ID
   /accounts/{id}/leads:
     get:
       operationId: get_account_leads
@@ -301,6 +308,7 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
+      description: Get leads associated with a campaign
   /accounts/reports/summary:
     get:
       operationId: get_accounts_report
@@ -318,6 +326,7 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+      description: List all accounts
 components:
   schemas:
     Account:
