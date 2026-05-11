@@ -114,6 +114,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateChatRequest'
+        description: Create a new chat session
       responses:
         '201':
           description: Chat session created
@@ -263,6 +264,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SendMessageRequest'
+        description: Send a message in a chat session
       responses:
         '201':
           description: Message sent
@@ -572,6 +574,7 @@ paths:
               default: &id004
                 name: Agent Smith
                 email: agent@example.com
+        description: Create a new agent
       responses:
         '201':
           description: Agent created
@@ -650,6 +653,7 @@ paths:
               $ref: '#/components/schemas/UpdateAgentRequest'
             examples:
               default: *id004
+        description: Update an existing agent
       responses:
         '200':
           description: Agent updated
@@ -750,6 +754,7 @@ paths:
               $ref: '#/components/schemas/PaginatedAgentStatusRequest'
             examples:
               default: *id004
+        description: Update agent online status
       responses:
         '200':
           description: Agent status updated

@@ -161,6 +161,7 @@ paths:
                 phone: +1-555-0123
                 company: Acme Corp
                 source: website
+        description: Create a new lead
       responses:
         '201':
           description: Lead created
@@ -239,6 +240,7 @@ paths:
               $ref: '#/components/schemas/UpdateLeadRequest'
             examples:
               default: *id002
+        description: Update an existing lead
       responses:
         '200':
           description: Lead updated
@@ -342,6 +344,7 @@ paths:
                 name: Discovery
                 order: 1
                 pipeline_id: 00000000-0000-0000-0000-000000000005
+        description: Change lead to a new pipeline stage
       responses:
         '200':
           description: Lead stage updated
@@ -404,6 +407,7 @@ paths:
               $ref: '#/components/schemas/ConvertLeadRequest'
             examples:
               default: *id002
+        description: Convert a lead to contact and/or account
       responses:
         '200':
           description: Converted lead with new IDs
@@ -458,6 +462,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DuplicateDetectionRequest'
+        description: Check for duplicate leads
       responses:
         '200':
           description: Duplicate lead IDs
@@ -521,6 +526,7 @@ paths:
               $ref: '#/components/schemas/MergeLeadsRequest'
             examples:
               default: *id002
+        description: Merge duplicate leads
       responses:
         '200':
           description: Merge completed
@@ -680,6 +686,7 @@ paths:
               $ref: '#/components/schemas/CreateStageRequest'
             examples:
               default: *id003
+        description: Create a new pipeline stage
       responses:
         '201':
           description: Stage created
@@ -758,6 +765,7 @@ paths:
               $ref: '#/components/schemas/UpdateStageRequest'
             examples:
               default: *id003
+        description: Update a pipeline stage
       responses:
         '200':
           description: Stage updated

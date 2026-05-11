@@ -92,6 +92,7 @@ paths:
                 name: Lead Assignment
                 description: Auto-assign leads based on region
                 enabled: true
+        description: Create a new workflow automation
       responses:
         '201':
           description: Workflow created
@@ -176,6 +177,7 @@ paths:
               $ref: '#/components/schemas/UpdateWorkflowRequest'
             examples:
               default: *id002
+        description: Update an existing workflow
       responses:
         '200':
           description: Workflow updated
@@ -315,6 +317,7 @@ paths:
                 action:
                   type: assign
                   value: team-001
+        description: Add a rule to a workflow
       responses:
         '201':
           description: Rule created
@@ -476,6 +479,7 @@ paths:
               $ref: '#/components/schemas/CreateRuleRequest'
             examples:
               default: *id003
+        description: Create a new workflow rule
       responses:
         '201':
           description: Rule created
@@ -554,6 +558,7 @@ paths:
               $ref: '#/components/schemas/UpdateRuleRequest'
             examples:
               default: *id003
+        description: Update an existing rule
       responses:
         '200':
           description: Rule updated
@@ -740,6 +745,7 @@ paths:
                 name: On Lead Create
                 event: lead.created
                 enabled: true
+        description: Create a new workflow trigger
       responses:
         '201':
           description: Trigger created
@@ -824,6 +830,7 @@ paths:
               $ref: '#/components/schemas/UpdateTriggerRequest'
             examples:
               default: *id006
+        description: Update an existing trigger
       responses:
         '200':
           description: Trigger updated

@@ -106,6 +106,7 @@ paths:
               default: &id002
                 name: Sales Team Alpha
                 description: Enterprise sales team
+        description: Create a new team
       responses:
         '201':
           description: Team created
@@ -184,6 +185,7 @@ paths:
               $ref: '#/components/schemas/UpdateTeamRequest'
             examples:
               default: *id002
+        description: Update an existing team
       responses:
         '200':
           description: Team updated
@@ -335,6 +337,7 @@ paths:
               $ref: '#/components/schemas/AddTeamMemberRequest'
             examples:
               default: *id002
+        description: Add a member to a team
       responses:
         '201':
           description: Member added

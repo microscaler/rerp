@@ -117,6 +117,7 @@ paths:
                 phone: +1-555-0124
                 title: Marketing Director
                 account_id: 00000000-0000-0000-0000-000000000003
+        description: Create a new contact person
       responses:
         '201':
           description: Contact created
@@ -234,6 +235,7 @@ paths:
               $ref: '#/components/schemas/UpdateContactRequest'
             examples:
               default: *id002
+        description: Update an existing contact
       responses:
         '200':
           description: Contact updated

@@ -99,6 +99,7 @@ paths:
                 name: priority
                 type: string
                 required: false
+        description: Create a new custom field definition
       responses:
         '201':
           description: Custom field created
@@ -179,6 +180,7 @@ paths:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
             examples:
               default: *id002
+        description: Update a custom field definition
       responses:
         '200':
           description: Custom field updated
@@ -370,6 +372,7 @@ paths:
                 - lead.created
                 - lead.updated
                 enabled: true
+        description: Create a new webhook endpoint
       responses:
         '201':
           description: Webhook created
@@ -448,6 +451,7 @@ paths:
               $ref: '#/components/schemas/UpdateWebhookRequest'
             examples:
               default: *id004
+        description: Update an existing webhook
       responses:
         '200':
           description: Webhook updated
@@ -777,6 +781,7 @@ paths:
               default:
                 name: Production API
                 enabled: true
+        description: Create a new API key
       responses:
         '201':
           description: API key created
@@ -922,6 +927,7 @@ paths:
               default:
                 name: Slack Integration
                 type: messaging
+        description: Create a new integration
       responses:
         '201':
           description: Integration configured

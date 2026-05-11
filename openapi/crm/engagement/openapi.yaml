@@ -103,6 +103,7 @@ paths:
               default: &id002
                 customer_id: 00000000-0000-0000-0000-000000000019
                 plan: professional
+        description: Create a new customer subscription
       responses:
         '201':
           description: Subscription created
@@ -188,6 +189,7 @@ paths:
               $ref: '#/components/schemas/UpdateSubscriptionRequest'
             examples:
               default: *id002
+        description: Update an existing subscription
       responses:
         '200':
           description: Subscription updated
@@ -478,6 +480,7 @@ paths:
                 name: Close 10 deals
                 target: 10
                 period: quarterly
+        description: Create a new performance goal
       responses:
         '201':
           description: Goal created
@@ -563,6 +566,7 @@ paths:
               $ref: '#/components/schemas/UpdateGoalRequest'
             examples:
               default: *id004
+        description: Update an existing goal
       responses:
         '200':
           description: Goal updated
@@ -631,6 +635,7 @@ paths:
                 delta:
                   type: number
                   format: double
+        description: Update goal progress and milestones
       responses:
         '200':
           description: Progress updated

@@ -109,6 +109,7 @@ paths:
                 industry: Technology
                 size: medium
                 owner_id: 00000000-0000-0000-0000-000000000010
+        description: Create a new account/organization in the CRM
       responses:
         '201':
           description: Account created
@@ -195,6 +196,7 @@ paths:
               $ref: '#/components/schemas/UpdateAccountRequest'
             examples:
               default: *id002
+        description: Update an existing account by ID
       responses:
         '200':
           description: Account updated

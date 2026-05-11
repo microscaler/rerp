@@ -108,6 +108,7 @@ paths:
               default: &id002
                 name: Q1 Marketing Campaign
                 type: email
+        description: Create a new UTM campaign
       responses:
         '201':
           description: Campaign created
@@ -190,6 +191,7 @@ paths:
               $ref: '#/components/schemas/UpdateUTMCampaignRequest'
             examples:
               default: *id002
+        description: Update a UTM campaign
       responses:
         '200':
           description: Campaign updated
@@ -317,6 +319,7 @@ paths:
               default:
                 name: email
                 description: Email marketing medium
+        description: Create a new UTM medium type
       responses:
         '201':
           description: Medium created
@@ -394,6 +397,7 @@ paths:
               default:
                 name: newsletter
                 description: Newsletter traffic source
+        description: Create a new UTM source type
       responses:
         '201':
           description: Source created
@@ -525,6 +529,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TrackPageViewRequest'
+        description: Track a visitor page view
       responses:
         '201':
           description: Page view tracked
@@ -613,6 +618,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IdentifyVisitorRequest'
+        description: Identify a returning visitor
       responses:
         '200':
           description: Visitor identified
@@ -765,6 +771,7 @@ paths:
               default:
                 event_id: 00000000-0000-0000-0000-000000000029
                 contact_id: 00000000-0000-0000-0000-000000000002
+        description: Register for an event
       responses:
         '201':
           description: Event registered
@@ -851,6 +858,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SurveyResponseRequest'
+        description: Submit a survey response
       responses:
         '201':
           description: Survey submitted
