@@ -6,6 +6,17 @@ info:
   x-api-version: CRM Accounts API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
+  contact:
+    name: RERP API Support
+    url: https://docs.rerp.com/support
+    email: api-support@rerp.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-api-docs:
+    service: accounts
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
 servers:
 - url: http://localhost:10352/api/v1/crm/accounts
   description: Local development (direct to service, port from port-registry)
@@ -773,3 +784,6 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+externalDocs:
+  description: Accounts API Reference
+  url: https://docs.rerp.com/crm/accounts/api-reference
