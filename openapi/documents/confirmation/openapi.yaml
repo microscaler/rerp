@@ -1,0 +1,604 @@
+openapi: 3.1.0
+info:
+  title: Confirmation
+  version: 1.0.0
+  description: User verification and approval workflow service for the Documents suite.
+servers:
+- url: /api/v1/documents/confirmation
+  description: Confirmation API
+tags:
+- name: confirmations
+  description: Confirmation workflow management
+- name: auto-approve-rules
+  description: Auto-approve rule management
+paths:
+  /confirmations/pending:
+    get:
+      operationId: list_pending_confirmations
+      summary: List pending confirmations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of pending confirmations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationsListResponse'
+      tags:
+      - confirmations
+  /confirmations/{id}:
+    get:
+      operationId: get_confirmation
+      summary: Get confirmation details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Confirmation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Confirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+  /confirmations/{id}/approve:
+    post:
+      operationId: approve_confirmation
+      summary: Approve extraction (triggers target module API asynchronously)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Confirmation approved; target module API called asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationApproved'
+        '404':
+          description: Not found
+        '400':
+          description: Cannot approve (e.g., already approved)
+      tags:
+      - confirmations
+  /confirmations/{id}/reject:
+    post:
+      operationId: reject_confirmation
+      summary: Reject extraction (returns to manual review)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectRequest'
+      responses:
+        '200':
+          description: Confirmation rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Confirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+  /confirmations/{id}/correct:
+    post:
+      operationId: correct_confirmation
+      summary: Correct extracted data (updates schema/ML model)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrectRequest'
+      responses:
+        '200':
+          description: Correction recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Confirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+  /confirmations/batch-approve:
+    post:
+      operationId: batch_approve_confirmations
+      summary: Approve multiple confirmations at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchApproveRequest'
+      responses:
+        '202':
+          description: Batch approval submitted asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResult'
+        '400':
+          description: Invalid request
+      tags:
+      - confirmations
+  /documents/{id}/split:
+    post:
+      operationId: split_document
+      summary: Split a multi-page document into separate documents (async)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SplitRequest'
+      responses:
+        '202':
+          description: Document split scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SplitResult'
+        '404':
+          description: Document not found
+      tags:
+      - confirmations
+  /documents/{id}/merge:
+    post:
+      operationId: merge_documents
+      summary: Merge multiple documents into one (async)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeRequest'
+      responses:
+        '202':
+          description: Document merge scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergedDocument'
+        '404':
+          description: Document not found
+      tags:
+      - confirmations
+  /rules:
+    get:
+      operationId: list_auto_approve_rules
+      summary: List auto-approve rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of auto-approve rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoApproveRulesListResponse'
+      tags:
+      - auto-approve-rules
+    post:
+      operationId: create_auto_approve_rule
+      summary: Create an auto-approve rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoApproveRuleDef'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoApproveRule'
+        '400':
+          description: Invalid request
+      tags:
+      - auto-approve-rules
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Confirmation:
+      type: object
+      required:
+      - id
+      - document_id
+      - status
+      - classification
+      - extraction
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        execution_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Associated pipeline execution
+        status:
+          type: string
+          enum: [pending, approved, rejected, corrected, expired]
+        classification:
+          type: object
+          description: Document classification result
+        extraction:
+          type: object
+          description: Extraction results awaiting review
+        extracted_data:
+          type: object
+          nullable: true
+          description: Structured extracted fields
+        confidence:
+          type: number
+          format: decimal
+          nullable: true
+        target_module:
+          type: string
+          nullable: true
+        target_endpoint:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+    ConfirmationApproved:
+      type: object
+      required:
+      - id
+      - document_id
+      - action
+      - status
+      - created_record_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+          description: Organization this confirmation belongs to
+        action:
+          type: string
+          enum: [approve]
+        status:
+          type: string
+          enum: [approved]
+        created_record_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Record ID created in target module
+        target_module:
+          type: string
+        target_endpoint:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    RejectRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          description: Optional rejection reason
+    CorrectRequest:
+      type: object
+      required:
+      - org_id
+      - corrections
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        corrections:
+          type: object
+          description: Field-level corrections to extracted data
+    SplitRequest:
+      type: object
+      required:
+      - org_id
+      - document_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+          description: Page numbers to split (if omitted, splits by separator detection)
+    SplitResult:
+      type: object
+      required:
+      - original_id
+      - split_ids
+      properties:
+        original_id:
+          type: string
+          format: uuid
+        split_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+    MergeRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      - output_filename
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        output_filename:
+          type: string
+    MergedDocument:
+      type: object
+      required:
+      - id
+      - document_ids
+      - storage_uri
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        storage_uri:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ConfirmationsListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Confirmation'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    BatchApproveRequest:
+      type: object
+      required:
+      - confirmation_ids
+      properties:
+        confirmation_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs of confirmations to approve
+    BatchResult:
+      type: object
+      required:
+      - total
+      - success
+      - failed
+      properties:
+        total:
+          type: integer
+        success:
+          type: integer
+        failed:
+          type: integer
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              success:
+                type: boolean
+              error:
+                type: string
+                nullable: true
+    AutoApproveRule:
+      type: object
+      required:
+      - id
+      - org_id
+      - document_type
+      - min_confidence
+      - target_modules
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+        min_confidence:
+          type: number
+          format: decimal
+          description: Minimum confidence to auto-approve
+        target_modules:
+          type: array
+          items:
+            type: string
+          description: Modules this rule applies to (empty = all)
+        enabled:
+          type: boolean
+          default: true
+        created_at:
+          type: string
+          format: date-time
+    AutoApproveRuleDef:
+      type: object
+      required:
+      - org_id
+      - document_type
+      - min_confidence
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        org_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+        min_confidence:
+          type: number
+          format: decimal
+        target_modules:
+          type: array
+          items:
+            type: string
+          default: []
+        enabled:
+          type: boolean
+          default: true
+    AutoApproveRulesListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutoApproveRule'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

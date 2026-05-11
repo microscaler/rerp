@@ -1,0 +1,696 @@
+openapi: 3.1.0
+info:
+  title: Intake Service
+  version: 1.0.0
+  description: Multi-channel document ingestion gateway. Receives documents from email, URL, drag-and-drop, mobile, and webhooks, then writes them into core/.
+servers:
+- url: /api/v1/documents/intake
+  description: Intake Service API
+tags:
+- name: intake
+  description: Document ingestion endpoints — upload, URL fetch, batch, email
+- name: email-aliases
+  description: Suite-level email routing aliases
+- name: mobile
+  description: Mobile app sync status
+paths:
+  /upload:
+    post:
+      operationId: upload_document
+      summary: Upload document with metadata
+      description: Upload a document file via multipart/form-data. Metadata is merged into the document record in core/. Writes to core/.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document file (pdf, image, docx, etc.)
+                org_id:
+                  type: string
+                  format: uuid
+                  description: Organization ID (RLS-scoped)
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Target folder ID
+                metadata:
+                  type: object
+                  nullable: true
+                  description: Arbitrary metadata (source, tags, sender_email)
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Document uploaded and queued for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /url:
+    post:
+      operationId: submit_url
+      summary: Submit document by URL
+      description: Submit a document to be fetched by RERP from the given URL. RERP downloads the file and stores it in core/.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDocumentRequest'
+      responses:
+        '201':
+          description: Document URL queued for fetch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Invalid URL or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /batch:
+    post:
+      operationId: batch_upload
+      summary: Batch upload multiple documents
+      description: Upload multiple documents in a single request. Each document is processed independently. Failing documents do not block successful ones.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Array of document files
+                org_id:
+                  type: string
+                  format: uuid
+                  description: Organization ID (RLS-scoped)
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Target folder ID for all documents
+                metadata:
+                  type: object
+                  nullable: true
+                  description: Shared metadata applied to all documents
+                  additionalProperties: true
+                per_file_metadata:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                  nullable: true
+                  description: Per-file metadata overrides (must match order of files array)
+      responses:
+        '201':
+          description: Batch upload accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResult'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /email:
+    post:
+      operationId: receive_email
+      summary: Webhook email forwarding
+      description: Webhook endpoint for email forwarding. Receives an EmailPayload from an email provider and creates a document in core/. The document metadata includes sender, recipients, subject, and attachments.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailPayload'
+      responses:
+        '202':
+          description: Email accepted for processing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted:
+                    type: boolean
+                    example: true
+                  document_ids:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                    description: Document IDs created for each attachment
+                required:
+                - accepted
+                - document_ids
+        '400':
+          description: Invalid email payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /email-aliases:
+    get:
+      operationId: list_email_aliases
+      summary: List configured email aliases
+      description: List all suite-level email aliases configured for the current organization. Aliases determine the target suite and routing scope for email-forwarded documents.
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of email aliases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailAlias'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: create_email_alias
+      summary: Create email alias
+      description: Create a new suite-level email alias. When documents arrive via this email address, they are routed to the specified suite and module.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailAlias'
+      responses:
+        '201':
+          description: Email alias created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailAlias'
+        '400':
+          description: Invalid alias configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Email address already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /email-aliases/{id}:
+    delete:
+      operationId: delete_email_alias
+      summary: Remove email alias
+      description: Remove an existing email alias. Documents sent to this address will no longer be auto-routed.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Email alias removed
+        '404':
+          description: Alias not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+  /mobile/status:
+    get:
+      operationId: mobile_sync_status
+      summary: Mobile app sync status
+      description: Get the current sync status for the mobile app. Reports pending uploads, processing state, and any sync errors for the authenticated user's documents.
+      responses:
+        '200':
+          description: Mobile sync status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileStatus'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-service: intake
+      x-service-base-path: /api/v1/documents/intake
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Document:
+      type: object
+      description: Document record stored in core/. Includes ID, file metadata, storage URI, status, and JSONB metadata.
+      required:
+      - id
+      - org_id
+      - filename
+      - file_type
+      - file_size
+      - storage_uri
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique document identifier
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        user_id:
+          type: string
+          format: uuid
+          description: User who uploaded or created the document
+        filename:
+          type: string
+          description: Original filename
+        file_type:
+          type: string
+          description: MIME type or extension (pdf, image, docx, etc.)
+        file_size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        storage_uri:
+          type: string
+          description: S3/MinIO storage path (s3://bucket/path/uuid.pdf)
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Target folder ID
+        status:
+          type: string
+          description: Processing status — uploaded, processing, extracted, failed
+          enum:
+          - uploaded
+          - processing
+          - extracted
+          - failed
+        metadata:
+          type: object
+          nullable: true
+          description: JSONB metadata — source (email/camera/webhook), tags, sender_email, etc.
+          additionalProperties: true
+        search_vector:
+          type: string
+          description: PostgreSQL tsvector for full-text search (read-only)
+        created_at:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        extraction_result:
+          type: object
+          nullable: true
+          description: JSONB extraction result when available (schema-agnostic fields)
+          additionalProperties: true
+    CreateDocumentRequest:
+      type: object
+      description: Request body for URL submission and batch metadata. Includes target org, folder, and file URL or metadata.
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public URL to fetch the document from
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Target folder ID
+        metadata:
+          type: object
+          nullable: true
+          description: Document metadata — source, tags, sender_email
+          additionalProperties: true
+    BatchResult:
+      type: object
+      description: Result of a batch upload operation. Each item reports success or failure for one document.
+      required:
+      - total
+      - successful
+      - failed
+      - items
+      properties:
+        total:
+          type: integer
+          description: Total number of documents in the batch
+        successful:
+          type: integer
+          description: Number of documents successfully uploaded
+        failed:
+          type: integer
+          description: Number of documents that failed
+        items:
+          type: array
+          items:
+            type: object
+            required:
+            - index
+            - status
+            properties:
+              index:
+                type: integer
+                description: Zero-based index in the original files array
+              status:
+                type: string
+                enum:
+                - success
+                - failed
+                description: Per-document status
+              document_id:
+                type: string
+                format: uuid
+                nullable: true
+                description: Document ID if successful
+              error:
+                type: string
+                nullable: true
+                description: Error message if failed
+              filename:
+                type: string
+                description: Original filename
+    EmailPayload:
+      type: object
+      description: Email payload received from an email forwarding webhook. Includes sender, recipients, subject, body, and attachments.
+      required:
+      - to
+      - from
+      - subject
+      - body
+      - attachments
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Recipient email addresses
+        from:
+          type: string
+          format: email
+          description: Sender email address
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+          nullable: true
+          description: CC recipients
+        bcc:
+          type: array
+          items:
+            type: string
+            format: email
+          nullable: true
+          description: BCC recipients
+        subject:
+          type: string
+          description: Email subject line
+        body:
+          type: string
+          description: Email body text
+        body_html:
+          type: string
+          nullable: true
+          description: Email body in HTML format
+        received_at:
+          type: string
+          format: date-time
+          description: Timestamp when the email was received
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAttachment'
+          description: List of file attachments from the email
+        headers:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+          description: Raw email headers (for debugging/trace)
+    EmailAttachment:
+      type: object
+      description: A single file attachment from an email.
+      required:
+      - filename
+      - content_type
+      - storage_uri
+      properties:
+        filename:
+          type: string
+          description: Original filename of the attachment
+        content_type:
+          type: string
+          description: MIME type of the attachment
+        storage_uri:
+          type: string
+          description: S3/MinIO storage path where the attachment content is stored (s3://bucket/path/uuid.pdf)
+        size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Optional additional metadata (e.g., checksum, encoding)
+    EmailAlias:
+      type: object
+      description: A suite-level email alias used for routing email-forwarded documents. One alias per suite, optionally scoped to a module.
+      required:
+      - id
+      - org_id
+      - email_address
+      - suite
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique alias identifier
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        email_address:
+          type: string
+          format: email
+          description: The configured email address (e.g., invoices@company.rerp.local)
+        suite:
+          type: string
+          description: Target RERP suite (e.g., accounts, crm, hr, inventory)
+        module:
+          type: string
+          nullable: true
+          description: Optional module within the suite (e.g., ap, ar)
+        auto_approve:
+          type: boolean
+          nullable: true
+          default: false
+          description: Whether documents arriving via this alias should auto-approve
+        created_at:
+          type: string
+          format: date-time
+          description: Alias creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last update timestamp
+    MobileStatus:
+      type: object
+      description: Mobile app sync status report. Reports pending uploads, in-progress processing, and errors for the authenticated user.
+      required:
+      - last_sync
+      - pending_count
+      - processing_count
+      properties:
+        last_sync:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of the last successful sync
+        pending_count:
+          type: integer
+          description: Number of documents pending upload from the mobile device
+        processing_count:
+          type: integer
+          description: Number of documents currently being processed (extract, classify, route)
+        failed_count:
+          type: integer
+          description: Number of documents that failed processing and need user attention
+        sync_errors:
+          type: array
+          items:
+            type: object
+            properties:
+              document_id:
+                type: string
+                format: uuid
+                description: Document ID with a sync error
+              error:
+                type: string
+                description: Error message describing the sync failure
+              created_at:
+                type: string
+                format: date-time
+                description: When the error was recorded
+          nullable: true
+          description: List of recent sync errors (up to last 10)
+        device_info:
+          type: object
+          nullable: true
+          properties:
+            platform:
+              type: string
+              description: Mobile platform (ios, android)
+            app_version:
+              type: string
+              description: Mobile app version
+            last_seen:
+              type: string
+              format: date-time
+              description: Last time the device connected
+          description: Device and app metadata for the current session
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true

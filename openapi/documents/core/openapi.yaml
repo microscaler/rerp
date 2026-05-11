@@ -1,48 +1,104 @@
 openapi: 3.1.0
 info:
-  title: Document Management
+  title: Document Management (Core)
   version: 1.0.0
-  description: Document management service for storing and organizing documents.
+  description: Core document storage service for the Documents suite. Handles document lifecycle, versioning, folders, and file access.
 servers:
 - url: /api/v1/documents/core
-  description: Document Management API
-tags: []
+  description: Document Core API
+tags:
+- name: documents
+  description: Document management operations
+- name: folders
+  description: Folder/tree management operations
+- name: versions
+  description: Document versioning operations
+- name: storage
+  description: File access and storage operations
 paths:
   /documents:
     get:
       operationId: list_documents
-      summary: List documents
+      summary: List documents (paginated)
       parameters:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Full-text search across document metadata
+      - name: folder_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+          nullable: true
+        description: Filter by folder
+      - name: document_type
+        in: query
+        required: false
+        schema:
+          type: string
+          nullable: true
+        description: Filter by document type
       responses:
         '200':
           description: List of documents
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Document'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedDocuments'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
     post:
       operationId: create_document
-      summary: Create document
+      summary: Upload a new document
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateDocumentRequest'
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                org_id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+                document_type:
+                  type: string
+                  nullable: true
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                metadata:
+                  type: object
+                  additionalProperties: true
       responses:
         '201':
           description: Document created
@@ -52,10 +108,28 @@ paths:
                 $ref: '#/components/schemas/Document'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
   /documents/{id}:
     get:
       operationId: get_document
-      summary: Get document by id
+      summary: Get document metadata
       parameters:
       - name: id
         in: path
@@ -71,10 +145,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
         '404':
-          description: Not found
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
     put:
       operationId: update_document
-      summary: Update document
+      summary: Update document metadata
       parameters:
       - name: id
         in: path
@@ -96,7 +176,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Document'
         '404':
-          description: Not found
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
     delete:
       operationId: delete_document
       summary: Delete document
@@ -111,36 +197,240 @@ paths:
         '204':
           description: Document deleted
         '404':
-          description: Not found
-  /folders:
-    get:
-      operationId: list_folders
-      summary: List folders
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of folders
+          description: Document not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Folder'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
+  /documents/{id}/versions:
+    get:
+      operationId: list_document_versions
+      summary: List all versions of a document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVersions'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - versions
+    post:
+      operationId: create_document_version
+      summary: Create a new version of a document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                note:
+                  type: string
+                  nullable: true
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Version created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - versions
+  /documents/{id}/download:
+    get:
+      operationId: download_document
+      summary: Download the raw document file
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Document file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - storage
+  /documents/{id}/presigned-url:
+    get:
+      operationId: get_presigned_upload_url
+      summary: Get a presigned URL for uploading a document file to S3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: content_type
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: content_length
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Presigned URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignedUrl'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - storage
+  /documents/{id}/presigned-download:
+    get:
+      operationId: get_presigned_download_url
+      summary: Get a presigned URL for downloading the document file from S3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: version_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+          nullable: true
+      responses:
+        '200':
+          description: Presigned download URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignedUrl'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - storage
+  /documents/search:
+    get:
+      operationId: search_documents
+      summary: Full-text search across all documents
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Search query
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDocuments'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - documents
+  /folders:
+    get:
+      operationId: list_folders
+      summary: List folder tree for the current organization
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter folder names
+      responses:
+        '200':
+          description: Folder tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolderTree'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - folders
     post:
       operationId: create_folder
-      summary: Create folder
+      summary: Create a new folder
       requestBody:
         required: true
         content:
@@ -156,10 +446,22 @@ paths:
                 $ref: '#/components/schemas/Folder'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - folders
   /folders/{id}:
     get:
       operationId: get_folder
-      summary: Get folder by id
+      summary: Get folder details
       parameters:
       - name: id
         in: path
@@ -175,10 +477,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Folder'
         '404':
-          description: Not found
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - folders
     put:
       operationId: update_folder
-      summary: Update folder
+      summary: Update folder details
       parameters:
       - name: id
         in: path
@@ -200,10 +508,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Folder'
         '404':
-          description: Not found
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - folders
     delete:
       operationId: delete_folder
-      summary: Delete folder
+      summary: Delete folder (does not delete documents within it)
       parameters:
       - name: id
         in: path
@@ -215,116 +529,19 @@ paths:
         '204':
           description: Folder deleted
         '404':
-          description: Not found
-  /versions:
-    get:
-      operationId: list_versions
-      summary: List versions
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      responses:
-        '200':
-          description: List of versions
+          description: Folder not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Version'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-    post:
-      operationId: create_version
-      summary: Create version
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateVersionRequest'
-      responses:
-        '201':
-          description: Version created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Version'
-        '400':
-          description: Invalid request
-  /versions/{id}:
-    get:
-      operationId: get_version
-      summary: Get version by id
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Version details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Version'
-        '404':
-          description: Not found
-    put:
-      operationId: update_version
-      summary: Update version
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateVersionRequest'
-      responses:
-        '200':
-          description: Version updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Version'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_version
-      summary: Delete version
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Version deleted
-        '404':
-          description: Not found
+                $ref: '#/components/schemas/Error'
+      tags:
+      - folders
 components:
   parameters:
     Page:
       name: page
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
@@ -332,14 +549,290 @@ components:
     Limit:
       name: limit
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 20
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
-  schemas: {}
+  schemas:
+    Document:
+      type: object
+      required:
+      - id
+      - org_id
+      - title
+      - storage_uri
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+          description: Organization this document belongs to
+        title:
+          type: string
+        document_type:
+          type: string
+          nullable: true
+          description: e.g., invoice, contract, resume
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent folder
+        file_name:
+          type: string
+          description: Original filename
+        file_size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        content_type:
+          type: string
+          description: MIME type
+        storage_uri:
+          type: string
+          description: S3 storage path for the file
+        current_version_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Latest version ID
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, archived, deleted]
+          default: active
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    UpdateDocumentRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        document_type:
+          type: string
+          nullable: true
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+    Folder:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent folder, null for root
+        path:
+          type: string
+          description: Full path (e.g., /finance/invoices/2024)
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    UpdateFolderRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+    CreateFolderRequest:
+      type: object
+      required:
+      - org_id
+      - name
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+    FolderTree:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Folder'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    Version:
+      type: object
+      required:
+      - id
+      - document_id
+      - storage_uri
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        version_number:
+          type: integer
+          description: Sequential version number (1, 2, ...)
+        org_id:
+          type: string
+          format: uuid
+        storage_uri:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          format: int64
+        content_type:
+          type: string
+        note:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    CreateVersionRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        file:
+          type: string
+          format: binary
+          description: New file content for the version
+        note:
+          type: string
+          nullable: true
+    PresignedUrl:
+      type: object
+      required:
+      - url
+      - expires_at
+      properties:
+        url:
+          type: string
+          description: Presigned S3 URL
+        expires_at:
+          type: string
+          format: date-time
+          description: When the URL expires
+        method:
+          type: string
+          enum: [GET, PUT]
+          description: HTTP method to use with the URL
+    PaginatedDocuments:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    PaginatedVersions:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Version'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Additional context for debugging

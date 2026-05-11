@@ -1,0 +1,512 @@
+openapi: 3.1.0
+info:
+  title: Document Pipeline
+  version: 1.0.0
+  description: Workflow orchestration service for the Documents suite. Manages multi-step document processing flows.
+servers:
+- url: /api/v1/documents/pipeline
+  description: Document Pipeline API
+tags:
+- name: pipeline
+  description: Pipeline job management
+- name: documents
+  description: Document processing operations
+paths:
+  /pipelines:
+    post:
+      operationId: create_pipeline
+      summary: Create a pipeline definition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelineDef'
+      responses:
+        '201':
+          description: Pipeline created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '400':
+          description: Invalid request
+      tags:
+      - pipeline
+  /pipelines/{id}/execute:
+    post:
+      operationId: execute_pipeline
+      summary: Execute pipeline on document(s)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteRequest'
+      responses:
+        '202':
+          description: Pipeline execution started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineJob'
+        '404':
+          description: Pipeline not found
+      tags:
+      - pipeline
+  /pipelines/{id}/status:
+    get:
+      operationId: get_pipeline_status
+      summary: Check pipeline execution status
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pipeline status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineJob'
+        '404':
+          description: Pipeline execution not found
+      tags:
+      - pipeline
+  /pipelines/{id}/result:
+    get:
+      operationId: get_pipeline_result
+      summary: Get pipeline execution output
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pipeline result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineResult'
+        '404':
+          description: Not found
+      tags:
+      - pipeline
+  /executions:
+    get:
+      operationId: list_executions
+      summary: List all pipeline executions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of executions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionsListResponse'
+      tags:
+      - pipeline
+  /executions/{id}:
+    get:
+      operationId: get_execution
+      summary: Get execution details with audit trail
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Execution details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionDetail'
+        '404':
+          description: Not found
+      tags:
+      - pipeline
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Pipeline:
+      type: object
+      required:
+      - id
+      - name
+      - stages
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        stages:
+          type: array
+          items:
+            type: string
+            enum: [ingest, parse, classify, extract, route, confirm, create, notify]
+          description: Ordered pipeline stages
+        rules:
+          type: object
+          nullable: true
+          description: Pipeline-level configuration overrides
+        created_at:
+          type: string
+          format: date-time
+    PipelineDef:
+      type: object
+      required:
+      - name
+      - stages
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        name:
+          type: string
+        description:
+          type: string
+        stages:
+          type: array
+          items:
+            type: string
+            enum: [ingest, parse, classify, extract, route, confirm, create, notify]
+        rules:
+          type: object
+          nullable: true
+    PipelineJob:
+      type: object
+      required:
+      - id
+      - document_ids
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum: [queued, running, complete, failed, cancelled]
+        current_stage:
+          type: string
+          nullable: true
+        progress:
+          type: object
+          properties:
+            total:
+              type: integer
+            completed:
+              type: integer
+            failed:
+              type: integer
+        result_json:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    ExecuteRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional custom pipeline; uses default if omitted
+        pipeline_name:
+          type: string
+          nullable: true
+          description: Alternative to pipeline_id — lookup by name within org
+    ExecutionDetail:
+      type: object
+      required:
+      - id
+      - document_id
+      - stage
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+        stage:
+          type: string
+          description: Current processing stage
+          enum: [ingest, parse, classify, extract, route, confirm, create, notify, complete, failed, manual_review]
+        status:
+          type: string
+          enum: [queued, running, complete, failed, skipped]
+        result_json:
+          type: object
+          nullable: true
+        error_msg:
+          type: string
+          nullable: true
+        retry_count:
+          type: integer
+          default: 0
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    PipelineResult:
+      type: object
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        extraction:
+          type: object
+          nullable: true
+        classification:
+          type: object
+          nullable: true
+        routing:
+          type: object
+          nullable: true
+        confirmed:
+          type: boolean
+        created_record:
+          type: object
+          nullable: true
+    ConfirmRequest:
+      type: object
+      required:
+      - org_id
+      - action
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [approve, reject]
+        notes:
+          type: string
+          nullable: true
+    CorrectRequest:
+      type: object
+      required:
+      - org_id
+      - corrections
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        corrections:
+          type: object
+          description: Field-level corrections to extracted data
+    Confirmation:
+      type: object
+      required:
+      - id
+      - document_id
+      - action
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        execution_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [approve, reject, correct]
+        notes:
+          type: string
+          nullable: true
+        corrected_data:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    SplitRequest:
+      type: object
+      required:
+      - org_id
+      - document_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+          description: Page numbers to split (if omitted, splits by separator detection)
+    SplitResult:
+      type: object
+      required:
+      - original_id
+      - split_ids
+      properties:
+        original_id:
+          type: string
+          format: uuid
+        split_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+    MergeRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      - output_filename
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        output_filename:
+          type: string
+    MergedDocument:
+      type: object
+      required:
+      - id
+      - document_ids
+      - storage_uri
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        storage_uri:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ExecutionsListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionDetail'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

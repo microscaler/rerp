@@ -1,0 +1,317 @@
+openapi: 3.1.0
+info:
+  title: Document Analysis
+  version: 1.0.0
+  description: LLM-based document Q&A and analysis service for the Documents suite.
+servers:
+- url: /api/v1/documents/analyze
+  description: Document Analysis API
+tags:
+- name: analyze
+  description: Document analysis and Q&A operations
+paths:
+  /documents/{id}/analyze:
+    post:
+      operationId: analyze_document
+      summary: Ask a question about a document
+      description: Asynchronously ask a question about a document. The LLM generates an answer based on document context. Returns an AnalysisJob for polling. If a cached analysis result exists for this query, it may be returned immediately with 200.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: Cached analysis result returned immediately
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+        '202':
+          description: Analysis job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request (e.g. query too long)
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - analyze
+  /analysis/{id}:
+    get:
+      operationId: get_analysis_job
+      summary: Get analysis job status or result
+      description: Poll an analysis job by ID. Returns the job status or the final AnalysisResult if processing is complete.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Analysis job result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisJob'
+        '404':
+          description: Job not found
+      tags:
+      - analyze
+  /documents/{id}/analysis:
+    get:
+      operationId: get_analysis
+      summary: Get cached analysis results for a document
+      description: Returns the most recent analysis result for a document. This is a cached lookup, not a new analysis.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+        '404':
+          description: No analysis found
+      tags:
+      - analyze
+  /documents/analyze-bulk:
+    post:
+      operationId: analyze_documents_bulk
+      summary: Ask a question about multiple documents
+      description: Asynchronously ask a question that may reference multiple documents. The LLM processes all documents and generates a synthesized answer. Maximum 20 documents per request. Returns an AnalysisJob for polling.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeBulkRequest'
+      responses:
+        '200':
+          description: Cached analysis result returned immediately
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+        '202':
+          description: Analysis job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisJob'
+        '400':
+          description: Invalid request (e.g. too many documents, query too long)
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+      - analyze
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    AnalyzeRequest:
+      type: object
+      required:
+      - org_id
+      - query
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        query:
+          type: string
+          maxLength: 2000
+          description: Free-text question about the document
+        model:
+          type: string
+          nullable: true
+          description: Optional model override
+        context_window:
+          type: integer
+          default: 4000
+          description: Token context window size
+        max_tokens:
+          type: integer
+          default: 2000
+          description: Maximum tokens in the response
+    AnalyzeBulkRequest:
+      type: object
+      required:
+      - org_id
+      - query
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        query:
+          type: string
+          maxLength: 2000
+          description: Free-text question about multiple documents
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 20
+          description: Document UUIDs to analyze (max 20)
+        model:
+          type: string
+          nullable: true
+          description: Optional model override
+    AnalysisResult:
+      type: object
+      required:
+      - id
+      - query
+      - answer
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null if bulk analysis
+        query:
+          type: string
+        answer:
+          type: string
+          description: LLM-generated answer
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              page:
+                type: integer
+              text:
+                type: string
+              confidence:
+                type: number
+                format: decimal
+          description: Source passages from the document
+        tokens_used:
+          type: object
+          properties:
+            prompt_tokens:
+              type: integer
+            completion_tokens:
+              type: integer
+            total_tokens:
+              type: integer
+        model:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    AnalysisJob:
+      type: object
+      required:
+      - id
+      - query
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID for polling via GET /analysis/{id}
+        document_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null if bulk analysis
+        query:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, complete, failed]
+        result:
+          nullable: true
+          $ref: '#/components/schemas/AnalysisResult'
+          description: Final analysis result (available when status is complete)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

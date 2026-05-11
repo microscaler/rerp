@@ -1,0 +1,448 @@
+openapi: 3.1.0
+info:
+  title: Document Extraction
+  version: 1.0.0
+  description: OCR, table extraction, and schema-based field extraction service for the Documents suite.
+servers:
+- url: /api/v1/documents/extract
+  description: Document Extraction API
+tags:
+- name: extraction
+  description: Document extraction operations
+- name: schemas
+  description: Extraction schema management
+paths:
+  /documents/{id}/parse:
+    post:
+      operationId: parse_document
+      summary: Submit document for OCR + table extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParseRequest'
+      responses:
+        '202':
+          description: Extraction job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request
+      tags:
+      - extraction
+  /documents/{id}/standardize:
+    post:
+      operationId: standardize_document
+      summary: Extract fields using a schema
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StandardizeRequest'
+      responses:
+        '202':
+          description: Standardization job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request
+      tags:
+      - extraction
+  /documents/{id}/extract/{schema_id}:
+    get:
+      operationId: get_extraction_result
+      summary: Get extraction results for a document and schema
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: schema_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extraction results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractionResult'
+        '404':
+          description: Not found
+      tags:
+      - extraction
+  /documents/{id}/extract/{schema_id}/highlights:
+    get:
+      operationId: get_extraction_highlights
+      summary: Get bounding box coordinates for extracted fields
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: schema_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Bounding box coordinates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Highlights'
+        '404':
+          description: Not found
+      tags:
+      - extraction
+  /schemas:
+    get:
+      operationId: list_schemas
+      summary: List extraction schemas
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of schemas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemasListResponse'
+      tags:
+      - schemas
+    post:
+      operationId: create_schema
+      summary: Create or edit an extraction schema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchemaDef'
+      responses:
+        '201':
+          description: Schema created or updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schema'
+        '400':
+          description: Invalid request
+      tags:
+      - schemas
+  /schemas/generate:
+    post:
+      operationId: generate_schema
+      summary: Auto-generate schema from sample documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateSchemaRequest'
+      responses:
+        '201':
+          description: Schema generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schema'
+        '400':
+          description: Invalid request
+      tags:
+      - schemas
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    ParseRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        schema_id:
+          type: string
+          format: uuid
+          description: Optional schema to use; if omitted, auto-detect
+    StandardizeRequest:
+      type: object
+      required:
+      - org_id
+      - schema_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        schema_id:
+          type: string
+          format: uuid
+          description: Schema to use for extraction
+    ExtractionJob:
+      type: object
+      required:
+      - id
+      - document_id
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID for status polling
+        document_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, processing, complete, failed]
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ExtractionResult:
+      type: object
+      required:
+      - id
+      - document_id
+      - result_json
+      - confidence
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        result_json:
+          type: object
+          description: Extracted fields as JSON (schema-dependent)
+        confidence:
+          type: number
+          format: decimal
+          description: Overall extraction confidence (0.0-1.0)
+        status:
+          type: string
+          enum: [processing, complete, failed]
+        highlights_json:
+          type: array
+          items:
+            $ref: '#/components/schemas/Highlight'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Highlight:
+      type: object
+      description: Bounding box coordinates for a single extracted field
+      properties:
+        field_name:
+          type: string
+        page:
+          type: integer
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: float
+        width:
+          type: number
+          format: float
+        height:
+          type: number
+          format: float
+    Highlights:
+      type: object
+      required:
+      - highlights
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        schema_id:
+          type: string
+          format: uuid
+        highlights:
+          type: array
+          items:
+            $ref: '#/components/schemas/Highlight'
+    Schema:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - schema_def
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        schema_def:
+          type: object
+          description: JSON schema definition for field extraction
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+                enum: [string, number, date, currency, boolean, array, object]
+              description:
+                type: string
+              required:
+                type: boolean
+                default: false
+        created_at:
+          type: string
+          format: date-time
+    SchemaDef:
+      type: object
+      required:
+      - name
+      - schema_def
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        name:
+          type: string
+        schema_def:
+          type: object
+        description:
+          type: string
+    SchemasListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schema'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    GenerateSchemaRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+          description: Optional schema name
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true

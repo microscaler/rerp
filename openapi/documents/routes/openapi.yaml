@@ -1,0 +1,436 @@
+openapi: 3.1.0
+info:
+  title: Routing Rules
+  version: 1.0.0
+  description: Routing rules engine for the Documents suite. Maps document types to target RERP modules.
+servers:
+- url: /api/v1/documents/routes
+  description: Routing Rules API
+tags:
+- name: routes
+  description: Routing rule management
+paths:
+  /routes:
+    get:
+      operationId: list_routes
+      summary: List all routing rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of routing rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesListResponse'
+      tags:
+      - routes
+    post:
+      operationId: create_route
+      summary: Create a routing rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteDef'
+      responses:
+        '201':
+          description: Route created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '400':
+          description: Invalid request
+      tags:
+      - routes
+  /routes/{id}:
+    get:
+      operationId: get_route
+      summary: Get routing rule details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Routing rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '404':
+          description: Not found
+      tags:
+      - routes
+    put:
+      operationId: update_route
+      summary: Update a routing rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteDef'
+      responses:
+        '200':
+          description: Route updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+        '404':
+          description: Not found
+      tags:
+      - routes
+    delete:
+      operationId: delete_route
+      summary: Delete a routing rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Route deleted
+        '404':
+          description: Not found
+      tags:
+      - routes
+  /routes/{id}/test:
+    post:
+      operationId: test_route
+      summary: Test routing rule with a sample document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestRouteRequest'
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResult'
+        '404':
+          description: Route not found
+      tags:
+      - routes
+  /routes/by-document-type:
+    get:
+      operationId: get_routes_by_document_type
+      summary: Get routes for a document type
+      parameters:
+      - name: document_type
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Matching routes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Route'
+      tags:
+      - routes
+  /routes/import:
+    post:
+      operationId: import_routes
+      summary: Bulk import routing rules from YAML/JSON
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportRoutesRequest'
+      responses:
+        '201':
+          description: Routes imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResult'
+        '400':
+          description: Invalid request
+      tags:
+      - routes
+  /routes/export:
+    get:
+      operationId: export_routes
+      summary: Export all routing rules
+      responses:
+        '200':
+          description: Exported rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Route'
+      tags:
+      - routes
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    Route:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - document_type
+      - target_module
+      - target_endpoint
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        document_type:
+          type: string
+        source:
+          type: array
+          items:
+            type: string
+            enum: [email, camera, webhook, upload]
+          description: Intake channels this rule applies to
+        target_module:
+          type: string
+          description: Target RERP module name (e.g. accounts-payable, crm)
+        target_endpoint:
+          type: string
+          description: API endpoint to create/update record (e.g. /api/v1/accounts-payable/invoices)
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Extraction schema to use
+        auto_approve:
+          type: boolean
+          default: false
+        auto_approve_threshold:
+          type: number
+          format: decimal
+          default: 0.85
+          description: Confidence threshold for auto-approve
+        notify:
+          type: array
+          items:
+            type: string
+          description: User roles or user IDs to notify
+        fallback_route:
+          type: string
+          nullable: true
+          description: What to do if confidence < threshold (e.g. manual_review)
+        retry_count:
+          type: integer
+          default: 3
+        retry_delay:
+          type: integer
+          default: 60
+          description: Seconds between retries
+        created_at:
+          type: string
+          format: date-time
+    RouteDef:
+      type: object
+      required:
+      - org_id
+      - name
+      - document_type
+      - target_module
+      - target_endpoint
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        document_type:
+          type: string
+        source:
+          type: array
+          items:
+            type: string
+            enum: [email, camera, webhook, upload]
+          default: []
+        target_module:
+          type: string
+        target_endpoint:
+          type: string
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        auto_approve:
+          type: boolean
+          default: false
+        auto_approve_threshold:
+          type: number
+          format: decimal
+          default: 0.85
+        notify:
+          type: array
+          items:
+            type: string
+          default: []
+        fallback_route:
+          type: string
+          nullable: true
+        retry_count:
+          type: integer
+          default: 3
+        retry_delay:
+          type: integer
+          default: 60
+    RoutesListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    TestRouteRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          description: Existing document to test against
+        raw_text:
+          type: string
+          description: Raw text to test routing with (if no document_id)
+    TestResult:
+      type: object
+      required:
+      - matched
+      - rule
+      properties:
+        matched:
+          type: boolean
+        rule:
+          nullable: true
+          $ref: '#/components/schemas/Route'
+        confidence:
+          type: number
+          format: decimal
+          nullable: true
+        auto_approved:
+          type: boolean
+    ImportRoutesRequest:
+      type: object
+      required:
+      - org_id
+      - rules
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteDef'
+    ImportResult:
+      type: object
+      required:
+      - imported
+      - failed
+      properties:
+        imported:
+          type: integer
+        failed:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
