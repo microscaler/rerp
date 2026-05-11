@@ -1,0 +1,497 @@
+openapi: 3.1.0
+info:
+  title: Stock Movements
+  version: 1.0.0
+  description: Stock movements service tracking all stock transfers, adjustments, receipts, and dispatches.
+servers:
+- url: /api/v1/inventory/stock-movements
+  description: Stock Movements API
+tags:
+- name: StockMovements
+  description: Stock movement transactions (transfers, adjustments, receipts, dispatches)
+paths:
+  /stock-movements:
+    get:
+      operationId: list_stock_movements
+      summary: List stock movements
+      description: List all stock movement records with pagination and search
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stock movements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockMovement'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+      x-brrtrouter-impl: true
+    post:
+      operationId: create_stock_movement
+      summary: Create stock movement
+      description: Create a new stock movement record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockMovementRequest'
+      responses:
+        '201':
+          description: Stock movement created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+  /stock-movements/{id}:
+    get:
+      operationId: get_stock_movement
+      summary: Get stock movement by id
+      description: Get details of a specific stock movement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock movement details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: update_stock_movement
+      summary: Update stock movement
+      description: Update stock movement details (only if pending)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockMovementRequest'
+      responses:
+        '200':
+          description: Stock movement updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_stock_movement
+      summary: Delete stock movement
+      description: Delete a stock movement (only if pending and not authorized)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Stock movement deleted
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+  /stock-movements/{id}/confirm:
+    post:
+      operationId: confirm_stock_movement
+      summary: Confirm stock movement
+      description: Confirm and finalize a pending stock movement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock movement confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+  /stock-movements/{id}/cancel:
+    post:
+      operationId: cancel_stock_movement
+      summary: Cancel stock movement
+      description: Cancel a pending stock movement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock movement cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number for pagination
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Search term for filtering
+      schema:
+        type: string
+  schemas:
+    StockMovement:
+      type: object
+      required:
+      - id
+      - movement_type
+      - status
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the stock movement
+        movement_type:
+          type: string
+          enum:
+          - receipt
+          - dispatch
+          - transfer
+          - adjustment_in
+          - adjustment_out
+          - return
+          description: Type of stock movement
+        reference_number:
+          type: string
+          description: Reference number (e.g., PO number, SO number)
+        source_location_id:
+          type: string
+          format: uuid
+          description: Source warehouse location ID (for transfers/dispatches)
+        destination_location_id:
+          type: string
+          format: uuid
+          description: Destination warehouse location ID (for transfers/receipts)
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - cancelled
+          description: Current status of the movement
+        notes:
+          type: string
+          description: Notes or comments about the movement
+        created_by:
+          type: string
+          format: uuid
+          description: User who created the movement
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    CreateStockMovementRequest:
+      type: object
+      required:
+      - movement_type
+      - items
+      properties:
+        movement_type:
+          type: string
+          enum:
+          - receipt
+          - dispatch
+          - transfer
+          - adjustment_in
+          - adjustment_out
+          - return
+          description: Type of stock movement
+        reference_number:
+          type: string
+          description: Reference number (e.g., PO number, SO number)
+        source_location_id:
+          type: string
+          format: uuid
+          description: Source warehouse location ID
+        destination_location_id:
+          type: string
+          format: uuid
+          description: Destination warehouse location ID
+        notes:
+          type: string
+          description: Notes or comments
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovementItem'
+          description: Stock items involved in this movement
+    UpdateStockMovementRequest:
+      type: object
+      properties:
+        reference_number:
+          type: string
+          description: Reference number
+        source_location_id:
+          type: string
+          format: uuid
+          description: Source warehouse location ID
+        destination_location_id:
+          type: string
+          format: uuid
+          description: Destination warehouse location ID
+        notes:
+          type: string
+          description: Notes or comments
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovementItem'
+          description: Stock items involved in this movement
+    StockMovementItem:
+      type: object
+      required:
+      - stock_id
+      - quantity
+      properties:
+        stock_id:
+          type: string
+          format: uuid
+          description: Stock item ID
+        quantity:
+          type: integer
+          description: Quantity involved in this movement
+        unit_cost:
+          type: number
+          format: double
+          description: Unit cost for valuation purposes
+    StockLocation:
+      type: object
+      required:
+      - location_id
+      - location_name
+      - quantity
+      properties:
+        location_id:
+          type: string
+          format: uuid
+          description: Warehouse location identifier
+        location_name:
+          type: string
+          description: Name of the warehouse location
+        quantity:
+          type: integer
+          description: Quantity at this location
+        reserved_quantity:
+          type: integer
+          description: Reserved quantity at this location
+    UpdateStockAvailabilityRequest:
+      type: object
+      required:
+      - locations
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockLocationUpdate'
+          description: Locations to update
+    StockLocationUpdate:
+      type: object
+      required:
+      - location_id
+      - quantity
+      properties:
+        location_id:
+          type: string
+          format: uuid
+          description: Warehouse location identifier
+        quantity:
+          type: integer
+          description: New quantity at this location
+        reserved_quantity:
+          type: integer
+          description: New reserved quantity at this location
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+- httpBearer: []

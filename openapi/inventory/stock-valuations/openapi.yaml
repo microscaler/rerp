@@ -1,0 +1,551 @@
+openapi: 3.1.0
+info:
+  title: Stock Valuations
+  version: 1.0.0
+  description: Stock valuations service handling inventory costing, FIFO valuation, weighted average costing, and inventory valuation reporting.
+servers:
+- url: /api/v1/inventory/stock-valuations
+  description: Stock Valuations API
+tags:
+- name: StockValuations
+  description: Inventory costing and valuation methods
+paths:
+  /stock-valuations:
+    get:
+      operationId: list_stock_valuations
+      summary: List stock valuations
+      description: List all stock valuation records with pagination and search
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stock valuations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockValuation'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+      x-brrtrouter-impl: true
+    post:
+      operationId: create_stock_valuation
+      summary: Create stock valuation
+      description: Create a new stock valuation record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockValuationRequest'
+      responses:
+        '201':
+          description: Stock valuation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+  /stock-valuations/{id}:
+    get:
+      operationId: get_stock_valuation
+      summary: Get stock valuation by id
+      description: Get details of a specific stock valuation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock valuation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: update_stock_valuation
+      summary: Update stock valuation
+      description: Update stock valuation details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockValuationRequest'
+      responses:
+        '200':
+          description: Stock valuation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValuation'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_stock_valuation
+      summary: Delete stock valuation
+      description: Delete a stock valuation record
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Stock valuation deleted
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+  /stock-valuations/{stock_id}/cost:
+    get:
+      operationId: get_stock_current_cost
+      summary: Get current stock cost
+      description: Get current costing for a specific stock item using configured valuation method
+      parameters:
+      - name: stock_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Current stock cost details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCurrentCost'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: update_stock_cost
+      summary: Update stock cost
+      description: Manually override the current cost for a stock item
+      parameters:
+      - name: stock_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockCostRequest'
+      responses:
+        '200':
+          description: Stock cost updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockCurrentCost'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+  /valuations/methods:
+    get:
+      operationId: get_valuation_methods
+      summary: Get valuation methods
+      description: Get available valuation methods for inventory costing
+      responses:
+        '200':
+          description: List of valuation methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  methods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValuationMethod'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+  /valuations/methods/{method_id}:
+    put:
+      operationId: update_valuation_method
+      summary: Update valuation method
+      description: Update the valuation method for a stock item
+      parameters:
+      - name: method_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateValuationMethodRequest'
+      responses:
+        '200':
+          description: Valuation method updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValuationMethod'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number for pagination
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Search term for filtering
+      schema:
+        type: string
+  schemas:
+    StockValuation:
+      type: object
+      required:
+      - id
+      - stock_id
+      - method_id
+      - last_cost
+      - total_value
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the stock valuation
+        stock_id:
+          type: string
+          format: uuid
+          description: Stock item ID
+        method_id:
+          type: string
+          format: uuid
+          description: Valuation method ID (FIFO, LIFO, weighted average)
+        last_cost:
+          type: number
+          format: double
+          description: Last recorded unit cost
+        total_value:
+          type: number
+          format: double
+          description: Total inventory value (quantity × cost)
+        quantity_on_hand:
+          type: integer
+          description: Current quantity on hand
+        currency:
+          type: string
+          description: Currency code (e.g., USD, EUR)
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    CreateStockValuationRequest:
+      type: object
+      required:
+      - stock_id
+      - method_id
+      - last_cost
+      properties:
+        stock_id:
+          type: string
+          format: uuid
+          description: Stock item ID
+        method_id:
+          type: string
+          format: uuid
+          description: Valuation method ID
+        last_cost:
+          type: number
+          format: double
+          description: Last recorded unit cost
+        quantity_on_hand:
+          type: integer
+          description: Current quantity on hand
+        currency:
+          type: string
+          description: Currency code
+    UpdateStockValuationRequest:
+      type: object
+      properties:
+        method_id:
+          type: string
+          format: uuid
+          description: Valuation method ID
+        last_cost:
+          type: number
+          format: double
+          description: Last recorded unit cost
+        quantity_on_hand:
+          type: integer
+          description: Current quantity on hand
+        currency:
+          type: string
+          description: Currency code
+    StockCurrentCost:
+      type: object
+      required:
+      - stock_id
+      - unit_cost
+      - total_value
+      - valuation_method
+      properties:
+        stock_id:
+          type: string
+          format: uuid
+          description: Stock item ID
+        unit_cost:
+          type: number
+          format: double
+          description: Current unit cost based on valuation method
+        total_value:
+          type: number
+          format: double
+          description: Total inventory value
+        valuation_method:
+          type: string
+          enum:
+          - fifo
+          - lifo
+          - weighted_average
+          - specific_cost
+          description: Valuation method used
+        quantity_on_hand:
+          type: integer
+          description: Current quantity on hand
+        currency:
+          type: string
+          description: Currency code
+        last_cost_change:
+          type: string
+          format: date-time
+          description: Last cost change timestamp
+    ValuationMethod:
+      type: object
+      required:
+      - id
+      - name
+      - description
+      - is_default
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the valuation method
+        name:
+          type: string
+          description: Method name (e.g., FIFO, LIFO, Weighted Average)
+        description:
+          type: string
+          description: Detailed description of the method
+        is_default:
+          type: boolean
+          description: Whether this is the default valuation method
+    UpdateStockCostRequest:
+      type: object
+      required:
+      - unit_cost
+      properties:
+        unit_cost:
+          type: number
+          format: double
+          description: New unit cost
+        reason:
+          type: string
+          description: Reason for cost change
+    UpdateValuationMethodRequest:
+      type: object
+      required:
+      - method_id
+      properties:
+        method_id:
+          type: string
+          format: uuid
+          description: New valuation method ID
+        effective_date:
+          type: string
+          format: date-time
+          description: Date when the new method takes effect
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+- httpBearer: []

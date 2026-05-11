@@ -1,0 +1,503 @@
+openapi: 3.1.0
+info:
+  title: Inventory Stock
+  version: 1.0.0
+  description: Stock management service tracking inventory items, quantities, and availability across locations.
+servers:
+- url: /api/v1/inventory/stock
+  description: Inventory Stock API
+tags:
+- name: Stocks
+  description: Inventory stock items and their availability
+paths:
+  /stocks:
+    get:
+      operationId: list_stocks
+      summary: List stocks
+      description: List all stock items with pagination and search
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: List of stocks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Stock'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+      x-brrtrouter-impl: true
+    post:
+      operationId: create_stock
+      summary: Create stock
+      description: Create a new stock item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStockRequest'
+      responses:
+        '201':
+          description: Stock created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+  /stocks/{id}:
+    get:
+      operationId: get_stock
+      summary: Get stock by id
+      description: Get stock item details by ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: update_stock
+      summary: Update stock
+      description: Update stock item details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockRequest'
+      responses:
+        '200':
+          description: Stock updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stock'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict
+          $ref: '#/components/responses/Conflict'
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_stock
+      summary: Delete stock
+      description: Delete a stock item
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Stock deleted
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+  /stocks/{id}/availability:
+    get:
+      operationId: get_stock_availability
+      summary: Get stock availability
+      description: Get current availability across all locations for a stock item
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Stock availability details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockAvailability'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: update_stock_availability
+      summary: Update stock availability
+      description: Update stock availability quantities
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockAvailabilityRequest'
+      responses:
+        '200':
+          description: Stock availability updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockAvailability'
+        '400':
+          description: Invalid request
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Not found
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number for pagination
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Search term for filtering
+      schema:
+        type: string
+  schemas:
+    Stock:
+      type: object
+      required:
+      - id
+      - sku
+      - name
+      - status
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the stock item
+        sku:
+          type: string
+          description: Stock keeping unit
+        name:
+          type: string
+          description: Name of the stock item
+        description:
+          type: string
+          description: Detailed description
+        category:
+          type: string
+          description: Product category
+        unit:
+          type: string
+          description: Unit of measure (e.g., piece, kg, liter)
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          - discontinued
+          description: Current status of the stock item
+        reorder_point:
+          type: integer
+          description: Minimum quantity before reorder is triggered
+        reorder_quantity:
+          type: integer
+          description: Quantity to reorder when below reorder point
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    CreateStockRequest:
+      type: object
+      required:
+      - sku
+      - name
+      properties:
+        sku:
+          type: string
+          description: Stock keeping unit
+        name:
+          type: string
+          description: Name of the stock item
+        description:
+          type: string
+          description: Detailed description
+        category:
+          type: string
+          description: Product category
+        unit:
+          type: string
+          description: Unit of measure
+        reorder_point:
+          type: integer
+          description: Minimum quantity before reorder is triggered
+        reorder_quantity:
+          type: integer
+          description: Quantity to reorder when below reorder point
+    UpdateStockRequest:
+      type: object
+      properties:
+        sku:
+          type: string
+          description: Stock keeping unit
+        name:
+          type: string
+          description: Name of the stock item
+        description:
+          type: string
+          description: Detailed description
+        category:
+          type: string
+          description: Product category
+        unit:
+          type: string
+          description: Unit of measure
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          - discontinued
+          description: Current status of the stock item
+        reorder_point:
+          type: integer
+          description: Minimum quantity before reorder is triggered
+        reorder_quantity:
+          type: integer
+          description: Quantity to reorder when below reorder point
+    StockAvailability:
+      type: object
+      required:
+      - stock_id
+      - total_quantity
+      - reserved_quantity
+      - available_quantity
+      - locations
+      properties:
+        stock_id:
+          type: string
+          format: uuid
+          description: Stock item identifier
+        total_quantity:
+          type: integer
+          description: Total quantity across all locations
+        reserved_quantity:
+          type: integer
+          description: Quantity reserved for orders
+        available_quantity:
+          type: integer
+          description: Available quantity (total - reserved)
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockLocation'
+          description: Availability per location
+    StockLocation:
+      type: object
+      required:
+      - location_id
+      - location_name
+      - quantity
+      properties:
+        location_id:
+          type: string
+          format: uuid
+          description: Warehouse location identifier
+        location_name:
+          type: string
+          description: Name of the warehouse location
+        quantity:
+          type: integer
+          description: Quantity at this location
+        reserved_quantity:
+          type: integer
+          description: Reserved quantity at this location
+    UpdateStockAvailabilityRequest:
+      type: object
+      required:
+      - locations
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockLocationUpdate'
+          description: Locations to update
+    StockLocationUpdate:
+      type: object
+      required:
+      - location_id
+      - quantity
+      properties:
+        location_id:
+          type: string
+          format: uuid
+          description: Warehouse location identifier
+        quantity:
+          type: integer
+          description: New quantity at this location
+        reserved_quantity:
+          type: integer
+          description: New reserved quantity at this location
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+- httpBearer: []
