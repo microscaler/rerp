@@ -1032,6 +1032,7 @@ components:
         type: integer
         minimum: 1
         default: 1
+      description: Page number for pagination (1-indexed)
     Limit:
       name: limit
       in: query
@@ -1040,11 +1041,13 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+      description: 'Maximum number of items per page (default: 20, max: 100)'
     Search:
       name: search
       in: query
       schema:
         type: string
+      description: Search query string for filtering resources
     Id:
       name: id
       in: path
@@ -1052,6 +1055,7 @@ components:
       schema:
         type: string
         format: uuid
+      description: Unique identifier for the resource
   schemas:
     CustomField:
       type: object
