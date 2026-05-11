@@ -66,6 +66,12 @@ paths:
           description: Invalid request
         '403':
           description: Insufficient permissions
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -122,6 +128,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -142,6 +166,18 @@ paths:
           description: Custom field deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /entities/{entity}/custom-fields:
@@ -220,6 +256,12 @@ paths:
                 $ref: '#/components/schemas/Webhook'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -276,6 +318,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -296,6 +356,18 @@ paths:
           description: Webhook deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /webhooks/{id}/test:
@@ -323,6 +395,12 @@ paths:
                     type: boolean
                   response_code:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -485,6 +563,12 @@ paths:
                     type: string
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -520,6 +604,12 @@ paths:
                     type: object
                   rate_limit_remaining:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -560,6 +650,12 @@ paths:
                 $ref: '#/components/schemas/Integration'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -589,6 +685,12 @@ paths:
                     format: uuid
                   status:
                     type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -742,6 +844,12 @@ components:
           type: boolean
         default_value:
           type: string
+      required:
+      - label
+      - required
+      - visible
+      - searchable
+      - default_value
     Webhook:
       type: object
       required:
@@ -826,6 +934,13 @@ components:
           type: object
         retry_count:
           type: integer
+      required:
+      - name
+      - url
+      - events
+      - secret
+      - is_active
+      - retry_count
     WebhookDeliveryLog:
       type: object
       properties:
@@ -848,6 +963,13 @@ components:
           format: date-time
         retry_count:
           type: integer
+      required:
+      - webhook_id
+      - event
+      - response_status
+      - response_body
+      - delivered_at
+      - retry_count
     AuditLogEntry:
       type: object
       required:

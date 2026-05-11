@@ -85,6 +85,12 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -143,6 +149,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -163,6 +187,18 @@ paths:
           description: Account deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /accounts/{id}/tree:
@@ -478,6 +514,24 @@ components:
           format: uuid
         active:
           type: boolean
+      required:
+      - name
+      - email
+      - phone
+      - website
+      - industry_id
+      - company_size
+      - employees
+      - annual_revenue
+      - description
+      - parent_id
+      - street
+      - street2
+      - city
+      - state_id
+      - zip
+      - country_id
+      - active
     AccountHierarchy:
       type: object
       properties:
@@ -501,6 +555,8 @@ components:
                 format: uuid
               name:
                 type: string
+      required:
+      - children
     AccountContactSummary:
       type: object
       properties:
@@ -515,6 +571,12 @@ components:
           type: string
         function:
           type: string
+      required:
+      - contact_id
+      - name
+      - email
+      - phone
+      - function
     AccountReport:
       type: object
       properties:
@@ -542,6 +604,11 @@ components:
           type: integer
         total_employees:
           type: integer
+      required:
+      - by_industry
+      - by_size
+      - total_accounts
+      - total_employees
     Accountcontactsummarys:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'

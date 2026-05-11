@@ -75,6 +75,12 @@ paths:
                 $ref: '#/components/schemas/Subscription'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -131,6 +137,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -151,6 +175,18 @@ paths:
           description: Subscription cancelled
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /subscriptions/{id}/renew:
@@ -187,6 +223,12 @@ paths:
                 $ref: '#/components/schemas/Subscription'
         '404':
           description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -312,6 +354,12 @@ paths:
                 $ref: '#/components/schemas/Goal'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -368,6 +416,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -406,6 +472,24 @@ paths:
                 $ref: '#/components/schemas/Goal'
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -683,6 +767,12 @@ components:
           type: string
         cancellation_reason:
           type: string
+      required:
+      - end_date
+      - value
+      - seats
+      - payment_method
+      - cancellation_reason
     MRRMetrics:
       type: object
       properties:
@@ -703,6 +793,13 @@ components:
           format: double
         period:
           type: string
+      required:
+      - current_mrr
+      - new_mrr
+      - expansion_mrr
+      - churn_mrr
+      - net_mrr
+      - period
     ChurnMetrics:
       type: object
       properties:
@@ -718,6 +815,12 @@ components:
           format: double
         period:
           type: string
+      required:
+      - total_subscriptions
+      - churned_subscriptions
+      - churn_rate
+      - churned_revenue
+      - period
     Goal:
       type: object
       required:
@@ -810,6 +913,12 @@ components:
           format: date
         is_active:
           type: boolean
+      required:
+      - name
+      - target_value
+      - start_date
+      - end_date
+      - is_active
     Badge:
       type: object
       required:

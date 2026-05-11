@@ -46,6 +46,12 @@ paths:
                     type: integer
                   time_ms:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -100,6 +106,12 @@ paths:
                               impact:
                                 type: number
                                 format: float
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -191,6 +203,12 @@ paths:
                     type: integer
                   frequencies_updated:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -225,6 +243,24 @@ paths:
           description: Thresholds updated
         '400':
           description: Invalid request
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -321,6 +357,12 @@ paths:
                 $ref: '#/components/schemas/EnrichmentResponse'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -343,6 +385,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -376,6 +424,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EnrichmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -406,6 +460,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrichmentResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -460,6 +520,12 @@ paths:
                 $ref: '#/components/schemas/EmailVerificationResult'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -501,6 +567,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/EmailVerificationResult'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -528,6 +600,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhoneVerificationResult'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -557,6 +635,12 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -586,6 +670,12 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -691,6 +781,11 @@ components:
                 description: Positive pushes up, negative pushes down
         total_records:
           type: integer
+      required:
+      - lead_id
+      - probability
+      - contributing_factors
+      - total_records
     ScoringFrequency:
       type: object
       required:
@@ -761,6 +856,9 @@ components:
           type: integer
         warm_threshold:
           type: integer
+      required:
+      - hot_threshold
+      - warm_threshold
     EnrichmentLookupRequest:
       type: object
       required:
@@ -859,6 +957,9 @@ components:
               type: string
             linkedin_url:
               type: string
+      required:
+      - company
+      - person
     EnrichmentResult:
       type: object
       properties:
@@ -882,6 +983,9 @@ components:
         completed_at:
           type: string
           format: date-time
+      required:
+      - enrichment_request_id
+      - completed_at
     EmailVerificationResult:
       type: object
       properties:
@@ -897,6 +1001,13 @@ components:
           type: boolean
         mx_records_exist:
           type: boolean
+      required:
+      - email
+      - valid
+      - disposable
+      - role_based
+      - domain_valid
+      - mx_records_exist
     PhoneVerificationResult:
       type: object
       properties:
@@ -908,6 +1019,10 @@ components:
           type: string
         phone_type:
           $ref: '#/components/schemas/PhoneType'
+      required:
+      - phone
+      - valid
+      - carrier
     LeadMiningRequest:
       type: object
       required:
@@ -959,6 +1074,14 @@ components:
           type: number
           format: float
           description: ICP match score (0-100)
+      required:
+      - name
+      - email
+      - phone
+      - company
+      - title
+      - industry
+      - match_score
     ScoreBucket:
       type: string
       enum:

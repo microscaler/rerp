@@ -53,6 +53,18 @@ paths:
                 $ref: '#/components/schemas/PaginatedPipelinesummary'
         '401':
           description: Unauthorized
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/pipeline-weighted:
@@ -68,6 +80,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeightedPipeline'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/conversion-rates:
@@ -104,6 +128,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedConversionrate'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/funnel:
@@ -139,6 +175,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FunnelData'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/lead-sources:
@@ -154,6 +202,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadSourceReport'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/rep-performance:
@@ -194,6 +254,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/team-performance:
@@ -224,6 +296,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamPerformance'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/leaderboard:
@@ -263,6 +347,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeaderboardEntry'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/win-loss:
@@ -298,6 +394,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WinLossAnalysis'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/time-to-close:
@@ -313,6 +421,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimeToCloseAnalysis'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/forecast/monthly:
@@ -334,6 +454,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/forecast/quarterly:
@@ -349,6 +481,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastentry'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /analytics/forecast/accuracy:
@@ -373,6 +517,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /reports/build:
@@ -402,6 +558,18 @@ paths:
                     type: object
                   saved:
                     type: boolean
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -427,6 +595,18 @@ paths:
                 $ref: '#/components/schemas/SavedReport'
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /reports/{id}/schedule:
@@ -457,6 +637,18 @@ paths:
                 $ref: '#/components/schemas/ReportSchedule'
         '404':
           description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -491,6 +683,18 @@ paths:
             application/json:
               schema:
                 type: object
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -555,6 +759,9 @@ components:
               weighted_revenue:
                 type: number
                 format: double
+      required:
+      - by_team
+      - by_user
     ConversionRate:
       type: object
       properties:
@@ -580,6 +787,16 @@ components:
         total_won_revenue:
           type: number
           format: double
+      required:
+      - period
+      - leads_created
+      - opportunities_created
+      - opportunities_won
+      - opportunities_lost
+      - lead_to_opp_rate
+      - opp_to_won_rate
+      - overall_conversion_rate
+      - total_won_revenue
     FunnelData:
       type: object
       properties:
@@ -598,6 +815,8 @@ components:
               conversion_from_previous:
                 type: number
                 format: float
+      required:
+      - stages
     RepPerformance:
       type: object
       properties:
@@ -639,6 +858,22 @@ components:
           format: float
         activity_count:
           type: integer
+      required:
+      - user_id
+      - user_name
+      - team_id
+      - period
+      - leads_created
+      - opportunities_active
+      - opportunities_won
+      - opportunities_lost
+      - revenue_expected
+      - revenue_won
+      - weighted_pipeline
+      - avg_deal_size
+      - avg_sales_cycle_days
+      - quota_attainment
+      - activity_count
     TeamPerformance:
       type: object
       properties:
@@ -660,6 +895,14 @@ components:
         win_rate:
           type: number
           format: float
+      required:
+      - team_id
+      - team_name
+      - member_count
+      - total_opportunities
+      - total_revenue
+      - weighted_revenue
+      - win_rate
     WinLossAnalysis:
       type: object
       properties:
@@ -692,6 +935,14 @@ components:
               revenue_impact:
                 type: number
                 format: double
+      required:
+      - period
+      - total_closed
+      - won_count
+      - lost_count
+      - win_rate
+      - revenue_won
+      - lost_reasons
     TimeToCloseAnalysis:
       type: object
       properties:
@@ -718,6 +969,10 @@ components:
               avg_days:
                 type: number
                 format: float
+      required:
+      - overall_avg_days
+      - by_stage
+      - by_source
     ForecastEntry:
       type: object
       properties:
@@ -741,6 +996,13 @@ components:
         variance:
           type: number
           format: double
+      required:
+      - period
+      - weighted_pipeline
+      - expected_close_revenue
+      - confidence
+      - actual_close_revenue
+      - variance
     ReportBuildRequest:
       type: object
       required:
@@ -782,6 +1044,9 @@ components:
         created_at:
           type: string
           format: date-time
+      required:
+      - name
+      - type
     ReportScheduleRequest:
       type: object
       required:
@@ -823,6 +1088,12 @@ components:
         last_sent:
           type: string
           format: date-time
+      required:
+      - report_id
+      - frequency
+      - recipient_ids
+      - is_active
+      - last_sent
     PaginatedResponse:
       type: object
       required:

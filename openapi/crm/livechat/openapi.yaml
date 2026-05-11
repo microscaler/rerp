@@ -81,6 +81,12 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -143,6 +149,18 @@ paths:
           description: Chat deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /chats/{id}/message:
@@ -175,6 +193,12 @@ paths:
           description: Invalid request
         '404':
           description: Chat not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -200,6 +224,12 @@ paths:
                 $ref: '#/components/schemas/ChatSession'
         '404':
           description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -250,6 +280,12 @@ paths:
                 $ref: '#/components/schemas/ChatConversionResult'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -352,6 +388,12 @@ paths:
                 $ref: '#/components/schemas/Agent'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -408,6 +450,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -428,6 +488,18 @@ paths:
           description: Agent deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /agents/{id}/status:
@@ -458,6 +530,24 @@ paths:
                 $ref: '#/components/schemas/Agent'
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -688,6 +778,10 @@ components:
           format: uuid
         lead:
           type: object
+      required:
+      - chat_id
+      - lead_id
+      - contact_id
     ChatTranscript:
       type: object
       properties:
@@ -706,6 +800,12 @@ components:
           format: date-time
         duration_seconds:
           type: integer
+      required:
+      - session_id
+      - messages
+      - started_at
+      - ended_at
+      - duration_seconds
     ChatMessage:
       type: object
       required:
@@ -822,6 +922,10 @@ components:
             type: string
         is_online:
           type: boolean
+      required:
+      - max_concurrent
+      - skills
+      - is_online
     AgentStatusRequest:
       type: object
       required:
@@ -850,6 +954,14 @@ components:
           type: integer
         chats_this_week:
           type: integer
+      required:
+      - agent_id
+      - total_chats
+      - avg_duration_seconds
+      - avg_response_time_seconds
+      - satisfaction_avg
+      - chats_today
+      - chats_this_week
     ChatStatus:
       type: string
       enum:
@@ -930,6 +1042,10 @@ components:
           type: boolean
         active_sessions:
           type: integer
+      required:
+      - name
+      - is_online
+      - active_sessions
     AgentQueueItem:
       type: object
       required:

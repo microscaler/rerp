@@ -73,6 +73,12 @@ paths:
                 $ref: '#/components/schemas/Workflow'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -129,6 +135,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -149,6 +173,18 @@ paths:
           description: Workflow deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /workflows/{id}/rules:
@@ -206,6 +242,12 @@ paths:
           description: Invalid request
         '404':
           description: Workflow not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -231,6 +273,12 @@ paths:
                 $ref: '#/components/schemas/WorkflowExecutionResult'
         '404':
           description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -303,6 +351,12 @@ paths:
                 $ref: '#/components/schemas/Rule'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -359,6 +413,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -379,6 +451,18 @@ paths:
           description: Rule deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /rules/test:
@@ -407,6 +491,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleTestResult'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -466,6 +556,12 @@ paths:
                 $ref: '#/components/schemas/Trigger'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -522,6 +618,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -542,6 +656,18 @@ paths:
           description: Trigger deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /triggers/{id}/fire:
@@ -569,6 +695,12 @@ paths:
                     type: boolean
                   workflows_fired:
                     type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -591,6 +723,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -613,6 +751,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -767,6 +911,11 @@ components:
           type: integer
         is_active:
           type: boolean
+      required:
+      - name
+      - description
+      - sequence
+      - is_active
     Rule:
       type: object
       required:
@@ -853,6 +1002,11 @@ components:
           type: boolean
         sequence:
           type: integer
+      required:
+      - condition_field
+      - condition_value
+      - is_active
+      - sequence
     Trigger:
       type: object
       required:
@@ -925,6 +1079,11 @@ components:
           type: string
         field:
           type: string
+      required:
+      - enabled
+      - schedule
+      - entity
+      - field
     WorkflowExecution:
       type: object
       properties:
@@ -949,6 +1108,11 @@ components:
         result_summary:
           type: object
           description: Summary of actions executed
+      required:
+      - workflow_id
+      - triggered_by
+      - started_at
+      - completed_at
     WorkflowExecutionResult:
       type: object
       properties:
@@ -963,6 +1127,11 @@ components:
           type: array
           items:
             type: string
+      required:
+      - workflow_id
+      - executed
+      - actions_ran
+      - errors
     RuleTestResult:
       type: object
       properties:
@@ -979,6 +1148,11 @@ components:
           type: array
           items:
             type: string
+      required:
+      - rule_id
+      - condition_met
+      - matching_conditions
+      - actions_to_fire
     ScheduledAction:
       type: object
       required:

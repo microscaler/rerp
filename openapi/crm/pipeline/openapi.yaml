@@ -112,6 +112,12 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -170,6 +176,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -190,6 +214,18 @@ paths:
           description: Lead deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /leads/{id}/stage:
@@ -222,6 +258,24 @@ paths:
           description: Invalid stage transition
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -252,6 +306,12 @@ paths:
                 $ref: '#/components/schemas/ConversionResult'
         '404':
           description: Not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -276,6 +336,12 @@ paths:
                 $ref: '#/components/schemas/DuplicateDetectionResult'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -307,6 +373,12 @@ paths:
                 $ref: '#/components/schemas/MergeResult'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -389,6 +461,12 @@ paths:
                 $ref: '#/components/schemas/Stage'
         '400':
           description: Invalid request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -447,6 +525,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -469,6 +565,18 @@ paths:
           description: Not found
         '409':
           description: Stage is in use
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
 components:
@@ -859,6 +967,35 @@ components:
         lost_reason_id:
           type: string
           format: uuid
+      required:
+      - name
+      - type
+      - email_from
+      - email
+      - phone
+      - mobile
+      - title
+      - function
+      - contact_name
+      - company_name
+      - website
+      - description
+      - referred_by
+      - priority
+      - active
+      - stage_id
+      - tag_ids
+      - expected_revenue
+      - probability
+      - user_id
+      - team_id
+      - partner_id
+      - company_id
+      - campaign_id
+      - medium_id
+      - source_id
+      - date_deadline
+      - lost_reason_id
     Stage:
       type: object
       required:
@@ -979,6 +1116,18 @@ components:
           type: integer
         description:
           type: string
+      required:
+      - name
+      - sequence
+      - probability
+      - is_won
+      - is_lost
+      - rotting_threshold_days
+      - requirements
+      - team_ids
+      - fold
+      - color
+      - description
     StageChangeRequest:
       type: object
       required:
@@ -1010,6 +1159,10 @@ components:
         create_account:
           type: boolean
           default: false
+      required:
+      - type
+      - create_contact
+      - create_account
     ConversionResult:
       type: object
       properties:
@@ -1026,6 +1179,10 @@ components:
           description: Created account if requested
         converted_lead:
           type: object
+      required:
+      - lead_id
+      - contact_id
+      - account_id
     DuplicateDetectionRequest:
       type: object
       properties:
@@ -1036,6 +1193,10 @@ components:
           type: string
         name:
           type: string
+      required:
+      - email
+      - phone
+      - name
     DuplicateDetectionResult:
       type: object
       properties:
@@ -1044,6 +1205,8 @@ components:
           items:
             type: string
             format: uuid
+      required:
+      - duplicates
     MergeLeadsRequest:
       type: object
       required:
@@ -1069,6 +1232,11 @@ components:
           type: integer
         merged_description_additions:
           type: integer
+      required:
+      - kept_id
+      - merged_id
+      - merged_tag_count
+      - merged_description_additions
     PaginatedResponse:
       type: object
       required:

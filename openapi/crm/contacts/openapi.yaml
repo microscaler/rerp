@@ -90,6 +90,12 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -170,6 +176,24 @@ paths:
           description: Invalid request
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource version mismatch or duplicate"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -190,6 +214,18 @@ paths:
           description: Contact deleted
         '404':
           description: Not found
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
   /contacts/{id}/tree:
@@ -300,6 +336,12 @@ paths:
           description: Invalid request
         '404':
           description: Contact not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -490,6 +532,23 @@ components:
           format: uuid
         active:
           type: boolean
+      required:
+      - name
+      - email
+      - phone
+      - mobile
+      - title
+      - function
+      - department
+      - company_id
+      - parent_id
+      - street
+      - street2
+      - city
+      - state_id
+      - zip
+      - country_id
+      - active
     ContactHierarchy:
       type: object
       properties:
@@ -515,6 +574,8 @@ components:
                 type: string
               is_company:
                 type: boolean
+      required:
+      - children
     MergeContactsRequest:
       type: object
       required:
@@ -540,6 +601,11 @@ components:
           type: integer
         merged_account_count:
           type: integer
+      required:
+      - kept_id
+      - removed_id
+      - merged_lead_count
+      - merged_account_count
     ErrorResponse:
       type: object
       required:
