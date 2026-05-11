@@ -10,14 +10,16 @@ servers:
 - url: /api/v1/crm/automation
   description: Automation API
 tags:
-- name: workflows
-  description: Workflow definitions and management
+- name: actions
+  description: Scheduled and manual actions
+- name: automation-execution
+  description: Workflow execution and run history
 - name: rules
   description: Condition-action rules within workflows
 - name: triggers
   description: Event hooks that fire workflows
-- name: actions
-  description: Scheduled and manual actions
+- name: workflows
+  description: Workflow definitions and management
 paths:
   /workflows:
     get:

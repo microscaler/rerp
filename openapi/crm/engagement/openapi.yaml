@@ -10,16 +10,28 @@ servers:
 - url: /api/v1/crm/engagement
   description: Engagement API
 tags:
-- name: subscriptions
-  description: Subscription and recurring revenue management
-- name: renewals
-  description: Renewal tracking and alerts
-- name: goals
-  description: Gamification goals and achievements
 - name: badges
   description: Badge definitions and user achievements
+- name: engagement-badges
+  description: Badge definitions and awards
+- name: engagement-health
+  description: Customer health scores and risk assessment
+- name: engagement-leaderboard
+  description: Performance leaderboards and rankings
+- name: goals
+  description: Gamification goals and achievements
+- name: goals-progress
+  description: Goal progress updates and milestones
 - name: health
   description: Customer health scoring
+- name: renewals
+  description: Renewal tracking and alerts
+- name: subscriptions
+  description: Subscription and recurring revenue management
+- name: subscriptions-analytics
+  description: Subscription analytics (MRR, churn)
+- name: subscriptions-renewal
+  description: Subscription renewal processing and tracking
 paths:
   /subscriptions:
     get:

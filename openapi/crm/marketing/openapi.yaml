@@ -9,18 +9,34 @@ servers:
 - url: /api/v1/crm/marketing
   description: Marketing API
 tags:
-- name: utm
-  description: Campaign, medium, and source tracking
-- name: forms
-  description: Public web form capture
-- name: visitors
-  description: Anonymous visitor tracking
 - name: campaigns
   description: Campaign reporting and attribution
 - name: events
   description: Event registration tracking
+- name: forms
+  description: Public web form capture
+- name: marketing-analytics
+  description: Visitor tracking and analytics
+- name: marketing-campaigns
+  description: Campaign lead and revenue attribution
+- name: marketing-events
+  description: Event registration and management
+- name: marketing-forms
+  description: Marketing form management
+- name: marketing-surveys
+  description: Survey creation and response collection
 - name: surveys
   description: Survey response tracking
+- name: utm
+  description: Campaign, medium, and source tracking
+- name: utm-campaigns
+  description: UTM campaign management
+- name: utm-mediums
+  description: UTM medium definitions
+- name: utm-sources
+  description: UTM source definitions
+- name: visitors
+  description: Anonymous visitor tracking
 paths:
   /utm/campaigns:
     get:

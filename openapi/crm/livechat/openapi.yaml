@@ -10,12 +10,18 @@ servers:
 - url: /api/v1/crm/livechat
   description: Livechat API
 tags:
-- name: chats
-  description: Chat session management
-- name: messages
-  description: Chat message management
+- name: agent-metrics
+  description: Agent performance metrics and queue status
 - name: agents
   description: Chat agent management
+- name: chats
+  description: Chat session management
+- name: chats-conversion
+  description: Chat-to-lead conversion workflows
+- name: chats-messages
+  description: Chat message operations and transcripts
+- name: messages
+  description: Chat message management
 paths:
   /chats:
     get:

@@ -11,6 +11,16 @@ servers:
 tags:
 - name: contacts
   description: Contact CRUD
+- name: contacts-accounts
+  description: Contact-account associations
+- name: contacts-hierarchy
+  description: Contact tree and relationship management
+- name: contacts-leads
+  description: Contact-lead associations
+- name: contacts-merge
+  description: Contact deduplication and merge operations
+- name: contacts-search
+  description: Contact search and discovery operations
 paths:
   /contacts:
     get:

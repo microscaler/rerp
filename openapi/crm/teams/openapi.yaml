@@ -10,10 +10,14 @@ servers:
 - url: /api/v1/crm/teams
   description: Teams API
 tags:
-- name: teams
-  description: Team CRUD
+- name: lead-assignment
+  description: Automated lead assignment to teams/queues
 - name: members
   description: Team member management
+- name: team-members
+  description: Team member management
+- name: teams
+  description: Team CRUD
 paths:
   /teams:
     get:

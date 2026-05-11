@@ -9,14 +9,28 @@ servers:
 - url: /api/v1/crm/intelligence
   description: Intelligence API
 tags:
-- name: scoring
-  description: Lead scoring and probability
 - name: enrichment
   description: Data enrichment from external sources
-- name: verification
-  description: Email and phone verification
+- name: lead-enrichment
+  description: Lead data enrichment from external sources
+- name: lead-mining
+  description: Prospect discovery and ICP matching
+- name: lead-queues
+  description: Lead hot/warm/cold queue management
+- name: lead-scoring
+  description: Automated lead scoring and ranking
+- name: lead-scoring-frequencies
+  description: Scoring frequency configuration
+- name: lead-scoring-thresholds
+  description: Score threshold definitions
+- name: lead-verification
+  description: Email and phone verification services
 - name: mining
   description: Lead discovery and mining
+- name: scoring
+  description: Lead scoring and probability
+- name: verification
+  description: Email and phone verification
 paths:
   /leads/score-batch:
     post:

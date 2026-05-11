@@ -11,6 +11,14 @@ servers:
 tags:
 - name: accounts
   description: Account/company CRUD
+- name: accounts-contacts
+  description: Account-contact associations
+- name: accounts-hierarchy
+  description: Account parent-child relationships and tree navigation
+- name: accounts-leads
+  description: Account-lead associations
+- name: accounts-reporting
+  description: Account-level analytics and summary reports
 paths:
   /accounts:
     get:

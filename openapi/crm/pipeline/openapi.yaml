@@ -10,8 +10,18 @@ servers:
 - url: /api/v1/crm/pipeline
   description: Pipeline API
 tags:
+- name: lead-conversion
+  description: Lead-to-contact/account conversion
+- name: lead-deduplication
+  description: Lead duplicate detection and merge
+- name: lead-stages
+  description: Lead stage transitions
 - name: leads
   description: Lead and opportunity lifecycle
+- name: pipeline-analytics
+  description: Pipeline summary and weighted forecasting
+- name: pipeline-stage
+  description: Pipeline stage definitions
 - name: stages
   description: Pipeline stage management
 paths:

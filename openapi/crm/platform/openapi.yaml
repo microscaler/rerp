@@ -9,16 +9,18 @@ servers:
 - url: /api/v1/crm/platform
   description: Platform API
 tags:
-- name: custom-fields
-  description: Custom field definitions per entity
-- name: webhooks
-  description: Webhook delivery for entity events
-- name: audit-log
-  description: Immutable audit trail of all operations
 - name: api-keys
   description: API key management and authentication
+- name: audit-log
+  description: Immutable audit trail of all operations
+- name: auth
+  description: Authentication validation
+- name: custom-fields
+  description: Custom field definitions per entity
 - name: integrations
   description: Third-party integration configuration
+- name: webhooks
+  description: Webhook delivery for entity events
 paths:
   /custom-fields:
     get:

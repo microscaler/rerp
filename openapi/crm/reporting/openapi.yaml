@@ -9,18 +9,30 @@ servers:
 - url: /api/v1/crm/reporting
   description: Reporting API
 tags:
-- name: pipeline
-  description: Pipeline health and revenue summary
 - name: conversion
   description: Lead-to-revenue conversion analytics
-- name: performance
-  description: Rep and team performance metrics
-- name: win-loss
-  description: Win rate and loss analysis
 - name: forecast
   description: Revenue forecasting
+- name: performance
+  description: Rep and team performance metrics
+- name: pipeline
+  description: Pipeline health and revenue summary
+- name: report-analytics
+  description: Pipeline, conversion, and funnel analytics
+- name: report-forecast
+  description: Forecasting and accuracy tracking
+- name: report-performance
+  description: Rep and team performance metrics
+- name: report-scheduling
+  description: Report scheduling and export
+- name: report-time-to-close
+  description: Time-to-close analysis
+- name: report-win-loss
+  description: Win/loss analysis
 - name: reports
   description: Custom report builder and scheduling
+- name: win-loss
+  description: Win rate and loss analysis
 paths:
   /analytics/pipeline-summary:
     get:
