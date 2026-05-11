@@ -52,6 +52,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all workflows
@@ -81,6 +83,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -107,6 +111,8 @@ paths:
                 $ref: '#/components/schemas/Workflow'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get workflows by ID
@@ -159,6 +165,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -192,6 +200,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Delete workflows by ID
@@ -219,6 +229,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Workflow not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -257,6 +269,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -289,6 +303,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -315,6 +333,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get workflow execution history
@@ -341,6 +363,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -370,6 +394,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -396,6 +422,8 @@ paths:
                 $ref: '#/components/schemas/Rule'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -448,6 +476,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -481,6 +511,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -516,6 +548,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -554,6 +590,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all triggers
@@ -583,6 +621,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -609,6 +649,8 @@ paths:
                 $ref: '#/components/schemas/Trigger'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get triggers by ID
@@ -661,6 +703,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -694,6 +738,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Delete triggers by ID
@@ -728,6 +774,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -757,6 +807,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -786,6 +840,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -806,6 +864,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all actions

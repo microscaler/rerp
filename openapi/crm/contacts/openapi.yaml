@@ -66,6 +66,8 @@ paths:
           description: Unauthorized
         '500':
           description: Internal server error
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all contacts
@@ -121,6 +123,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Search contacts by email address
@@ -200,6 +206,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -233,6 +241,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Delete contacts by ID
@@ -258,6 +268,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get hierarchical tree structure
@@ -296,6 +308,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
@@ -321,6 +335,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get contacts by ID
@@ -363,6 +379,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

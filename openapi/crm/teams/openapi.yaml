@@ -50,6 +50,8 @@ paths:
           description: Unauthorized
         '500':
           description: Internal server error
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all teams
@@ -161,6 +163,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -194,6 +198,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Delete teams by ID
@@ -232,6 +238,8 @@ paths:
                 $ref: '#/components/schemas/TeamMembers'
         '404':
           description: Team not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get team members
@@ -270,6 +278,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -310,6 +320,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get team members
@@ -352,6 +364,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUnassignedLeads'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get unassigned leads in the queue
@@ -376,6 +392,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

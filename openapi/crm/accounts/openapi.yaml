@@ -61,6 +61,8 @@ paths:
           description: Unauthorized
         '500':
           description: Internal server error
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all accounts
@@ -172,6 +174,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -205,6 +209,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Delete accounts by ID
@@ -230,6 +236,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get hierarchical tree structure
@@ -268,6 +276,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get accounts by ID
@@ -306,6 +316,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
@@ -324,6 +336,8 @@ paths:
                 $ref: '#/components/schemas/PaginatedResponse'
         '401':
           description: Unauthorized
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all accounts

@@ -65,6 +65,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get pipeline summary with stage breakdown
@@ -93,6 +95,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get weighted pipeline revenue
@@ -142,6 +148,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get conversion rate analytics
@@ -190,6 +200,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all analytics
@@ -218,6 +232,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get lead source analytics
@@ -271,6 +289,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get representative performance metrics
@@ -314,6 +336,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get team performance metrics
@@ -366,6 +392,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get performance leaderboard
@@ -414,6 +444,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get win/loss analysis
@@ -442,6 +476,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get time-to-close analytics
@@ -476,6 +514,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get monthly forecast
@@ -504,6 +546,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get quarterly forecast
@@ -541,6 +587,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: Get forecast accuracy metrics
@@ -593,6 +643,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -631,6 +685,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get reports by ID
@@ -674,6 +730,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -731,6 +791,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

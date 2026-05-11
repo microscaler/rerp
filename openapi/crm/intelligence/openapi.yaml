@@ -62,6 +62,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -133,6 +137,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -159,6 +167,8 @@ paths:
                 $ref: '#/components/schemas/LeadScore'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get leads by ID
@@ -184,6 +194,8 @@ paths:
                 $ref: '#/components/schemas/ScoreExplanation'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Explain scoring factors for a lead
@@ -207,6 +219,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedScoringFrequency'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all scoring
@@ -234,6 +250,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -251,6 +271,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoringThresholds'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all scoring
@@ -290,6 +314,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '204':
           description: Resource updated successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Scoring threshold not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -310,6 +338,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all leads
@@ -329,6 +361,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all leads
@@ -348,6 +384,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreSummary'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all leads
@@ -367,6 +407,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedLeadScoreRanked'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
       security:
       - bearerAuth: []
       description: List all leads
@@ -407,6 +451,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -446,6 +492,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -496,6 +546,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -543,6 +597,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -569,6 +627,8 @@ paths:
                 $ref: '#/components/schemas/EnrichmentResult'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       description: Get enrichment by ID
@@ -615,6 +675,8 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -673,6 +735,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -717,6 +783,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -763,6 +833,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -809,6 +883,10 @@ paths:
                   id:
                     type: string
                     format: uuid
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '400':
+          description: Bad request - Invalid request body or parameters
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
