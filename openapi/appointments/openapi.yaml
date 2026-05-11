@@ -1,29 +1,22 @@
 openapi: 3.1.0
 info:
   title: Appointments API Gateway
-  description: 'Appointment scheduling and calendar integration.. This aggregates and proxies requests to Appointments microservices.
-    This is the single entry point for the Appointments system.
+  description: 'Appointment scheduling and calendar integration service. Manages appointments,
+    availability windows, and calendar integrations.
 
 
-    All requests are proxied to the appropriate sub-service:
-
-    - `/api/v1/appointments/core/*` → Core Service
-
-
-    **Note**: This spec is automatically generated from sub-service specs. Do not edit manually - changes will be overwritten
-    on next generation.
-
-
-    **Generation**: This file is completely regenerated (clobbered) each time the generation script runs, ensuring idempotent
-    output.
-
-
-    **Service Discovery**: Sub-services are discovered from openapi/appointments/ directory.'
+    This is the single entry point for the Appointments system.'
   version: 1.0.0
 servers:
 - url: /api/v1/appointments
   description: Appointments API Gateway
-tags: []
+tags:
+- name: appointments
+  description: Appointment CRUD and scheduling operations
+- name: availability
+  description: Resource availability windows and time slots
+- name: calendars
+  description: Calendar entities and external integrations
 paths:
   /appointments:
     get:
@@ -51,8 +44,48 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                default:
+                  items:
+                  - &id001
+                    id: 550e8400-e29b-41d4-a716-446655440001
+                    title: Initial Consultation
+                    description: First meeting to discuss project requirements
+                    customer_id: 550e8400-e29b-41d4-a716-446655440002
+                    customer_name: Jane Smith
+                    customer_email: jane@example.com
+                    customer_phone: +1-555-0123
+                    resource_id: 550e8400-e29b-41d4-a716-446655440003
+                    resource_name: Dr. Brown - Room 1
+                    calendar_id: 550e8400-e29b-41d4-a716-446655440004
+                    start_time: '2024-02-15T10:00:00Z'
+                    end_time: '2024-02-15T11:00:00Z'
+                    status: scheduled
+                    reminder_sent: false
+                    location: Conference Room A
+                    notes: ''
+                    created_at: '2024-02-14T09:00:00Z'
+                    updated_at: '2024-02-14T09:00:00Z'
+                  total: 1
+                  page: 1
+                  limit: 20
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: List appointments with pagination and optional search filtering
+      security:
+      - bearerAuth: []
+      tags:
+      - appointments
+      x-brrtrouter-impl: list_appointments_handler
+      x-operation-id: list_appointments
+      x-controller: AppointmentController
+      x-handler-name: list_appointments
     post:
       operationId: create_appointment
       summary: Create appointment
@@ -62,6 +95,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAppointmentRequest'
+            examples:
+              default:
+                title: Client Meeting
+                description: Quarterly review meeting
+                customer_id: 550e8400-e29b-41d4-a716-446655440002
+                customer_name: Jane Smith
+                customer_email: jane@example.com
+                resource_id: 550e8400-e29b-41d4-a716-446655440003
+                calendar_id: 550e8400-e29b-41d4-a716-446655440004
+                start_time: '2024-02-15T10:00:00Z'
+                end_time: '2024-02-15T11:00:00Z'
+                location: Conference Room A
+        description: Request body for creating a new appointment booking
       responses:
         '201':
           description: Appointment created
@@ -69,10 +115,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+              examples:
+                default: *id001
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Create a new appointment booking
+      security:
+      - bearerAuth: []
+      tags:
+      - appointments
+      x-brrtrouter-impl: create_appointment_handler
+      x-operation-id: create_appointment
+      x-controller: AppointmentController
+      x-handler-name: create_appointment
   /appointments/{id}:
     get:
       operationId: get_appointment
@@ -91,10 +156,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+              examples:
+                default: *id001
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Get appointment details by ID
+      security:
+      - bearerAuth: []
+      tags:
+      - appointments
+      x-brrtrouter-impl: get_appointment_handler
+      x-operation-id: get_appointment
+      x-controller: AppointmentController
+      x-handler-name: get_appointment
     put:
       operationId: update_appointment
       summary: Update appointment
@@ -111,6 +191,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAppointmentRequest'
+        description: Request body for updating an existing appointment
       responses:
         '200':
           description: Appointment updated
@@ -118,10 +199,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+              examples:
+                default: *id001
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Update an existing appointment (reschedule, change status, etc.)
+      security:
+      - bearerAuth: []
+      tags:
+      - appointments
+      x-brrtrouter-impl: update_appointment_handler
+      x-operation-id: update_appointment
+      x-controller: AppointmentController
+      x-handler-name: update_appointment
     delete:
       operationId: delete_appointment
       summary: Delete appointment
@@ -137,8 +237,23 @@ paths:
           description: Appointment deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Cancel and delete an appointment
+      security:
+      - bearerAuth: []
+      tags:
+      - appointments
+      x-brrtrouter-impl: delete_appointment_handler
+      x-operation-id: delete_appointment
+      x-controller: AppointmentController
+      x-handler-name: delete_appointment
   /availabilitys:
     get:
       operationId: list_availabilitys
@@ -165,8 +280,42 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                default:
+                  items:
+                  - &id002
+                    id: 550e8400-e29b-41d4-a716-446655440005
+                    resource_id: 550e8400-e29b-41d4-a716-446655440003
+                    resource_name: Dr. Brown - Room 1
+                    calendar_id: 550e8400-e29b-41d4-a716-446655440004
+                    start_time: '2024-02-15T09:00:00Z'
+                    end_time: '2024-02-15T17:00:00Z'
+                    is_working_hours: true
+                    bookable: true
+                    block_type: working_hours
+                    notes: ''
+                    created_at: '2024-02-14T09:00:00Z'
+                    updated_at: '2024-02-14T09:00:00Z'
+                  total: 1
+                  page: 1
+                  limit: 20
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: List availability windows with pagination and optional search
+      security:
+      - bearerAuth: []
+      tags:
+      - availability
+      x-brrtrouter-impl: list_availabilitys_handler
+      x-operation-id: list_availabilitys
+      x-controller: AvailabilityController
+      x-handler-name: list_availabilitys
     post:
       operationId: create_availability
       summary: Create availability
@@ -176,6 +325,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAvailabilityRequest'
+            examples:
+              default:
+                resource_id: 550e8400-e29b-41d4-a716-446655440003
+                resource_name: Dr. Brown - Room 1
+                calendar_id: 550e8400-e29b-41d4-a716-446655440004
+                start_time: '2024-02-15T09:00:00Z'
+                end_time: '2024-02-15T17:00:00Z'
+                is_working_hours: true
+                bookable: true
+                block_type: working_hours
+        description: Request body for creating a new availability window
       responses:
         '201':
           description: Availability created
@@ -183,10 +343,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Availability'
+              examples:
+                default: *id002
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Create a new availability window for a resource
+      security:
+      - bearerAuth: []
+      tags:
+      - availability
+      x-brrtrouter-impl: create_availability_handler
+      x-operation-id: create_availability
+      x-controller: AvailabilityController
+      x-handler-name: create_availability
   /availabilitys/{id}:
     get:
       operationId: get_availability
@@ -205,10 +384,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Availability'
+              examples:
+                default: *id002
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Get availability window details by ID
+      security:
+      - bearerAuth: []
+      tags:
+      - availability
+      x-brrtrouter-impl: get_availability_handler
+      x-operation-id: get_availability
+      x-controller: AvailabilityController
+      x-handler-name: get_availability
     put:
       operationId: update_availability
       summary: Update availability
@@ -225,6 +419,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAvailabilityRequest'
+        description: Request body for updating an existing availability window
       responses:
         '200':
           description: Availability updated
@@ -232,10 +427,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Availability'
+              examples:
+                default: *id002
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Update an existing availability window
+      security:
+      - bearerAuth: []
+      tags:
+      - availability
+      x-brrtrouter-impl: update_availability_handler
+      x-operation-id: update_availability
+      x-controller: AvailabilityController
+      x-handler-name: update_availability
     delete:
       operationId: delete_availability
       summary: Delete availability
@@ -251,8 +465,23 @@ paths:
           description: Availability deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Delete an availability window
+      security:
+      - bearerAuth: []
+      tags:
+      - availability
+      x-brrtrouter-impl: delete_availability_handler
+      x-operation-id: delete_availability
+      x-controller: AvailabilityController
+      x-handler-name: delete_availability
   /calendars:
     get:
       operationId: list_calendars
@@ -279,8 +508,43 @@ paths:
                     type: integer
                   limit:
                     type: integer
+              examples:
+                default:
+                  items:
+                  - &id003
+                    id: 550e8400-e29b-41d4-a716-446655440004
+                    name: Dr. Browns Calendar
+                    resource_id: 550e8400-e29b-41d4-a716-446655440003
+                    resource_name: Dr. Brown - Room 1
+                    provider: google
+                    external_id: primary
+                    external_account: drbrown@company.com
+                    connected: true
+                    color: '#4285F4'
+                    sync_interval: 15
+                    last_sync_at: '2024-02-14T18:00:00Z'
+                    created_at: '2024-01-01T00:00:00Z'
+                    updated_at: '2024-02-14T18:00:00Z'
+                  total: 1
+                  page: 1
+                  limit: 20
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: List calendars with pagination and optional search filtering
+      security:
+      - bearerAuth: []
+      tags:
+      - calendars
+      x-brrtrouter-impl: list_calendars_handler
+      x-operation-id: list_calendars
+      x-controller: CalendarController
+      x-handler-name: list_calendars
     post:
       operationId: create_calendar
       summary: Create calendar
@@ -290,6 +554,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCalendarRequest'
+            examples:
+              default:
+                name: Dr. Browns Calendar
+                resource_id: 550e8400-e29b-41d4-a716-446655440003
+                resource_name: Dr. Brown - Room 1
+                provider: google
+                external_account: drbrown@company.com
+                color: '#4285F4'
+                sync_interval: 15
+        description: Request body for creating a new calendar integration
       responses:
         '201':
           description: Calendar created
@@ -297,10 +571,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Calendar'
+              examples:
+                default: *id003
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '404':
+          description: Not found - resource does not exist
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Create a new calendar integration
+      security:
+      - bearerAuth: []
+      tags:
+      - calendars
+      x-brrtrouter-impl: create_calendar_handler
+      x-operation-id: create_calendar
+      x-controller: CalendarController
+      x-handler-name: create_calendar
   /calendars/{id}:
     get:
       operationId: get_calendar
@@ -319,10 +612,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Calendar'
+              examples:
+                default: *id003
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Get calendar details by ID
+      security:
+      - bearerAuth: []
+      tags:
+      - calendars
+      x-brrtrouter-impl: get_calendar_handler
+      x-operation-id: get_calendar
+      x-controller: CalendarController
+      x-handler-name: get_calendar
     put:
       operationId: update_calendar
       summary: Update calendar
@@ -339,6 +647,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCalendarRequest'
+        description: Request body for updating an existing calendar
       responses:
         '200':
           description: Calendar updated
@@ -346,10 +655,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Calendar'
+              examples:
+                default: *id003
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Update an existing calendar configuration
+      security:
+      - bearerAuth: []
+      tags:
+      - calendars
+      x-brrtrouter-impl: update_calendar_handler
+      x-operation-id: update_calendar
+      x-controller: CalendarController
+      x-handler-name: update_calendar
     delete:
       operationId: delete_calendar
       summary: Delete calendar
@@ -365,8 +693,23 @@ paths:
           description: Calendar deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '500':
+          description: Internal server error
       x-service: core
       x-service-base-path: /api/v1/appointments/core
+      description: Delete a calendar integration
+      security:
+      - bearerAuth: []
+      tags:
+      - calendars
+      x-brrtrouter-impl: delete_calendar_handler
+      x-operation-id: delete_calendar
+      x-controller: CalendarController
+      x-handler-name: delete_calendar
 components:
   parameters:
     Page:
@@ -407,3 +750,11 @@ components:
           nullable: true
           description: Additional error details
           additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token obtained from login endpoint
+security:
+- bearerAuth: []
