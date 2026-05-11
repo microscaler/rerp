@@ -2,8 +2,8 @@ openapi: 3.1.0
 info:
   title: Tax Compliance
   version: 1.0.0
-  description: Tax compliance service for tax periods, jurisdiction rules, statutory
-    tax returns, tax payments, and audit packs.
+  description: Tax compliance service for tax periods, jurisdiction rules, statutory tax returns, tax payments, and audit
+    packs.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -55,6 +55,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxPeriodRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              jurisdiction_code: US-CA
+              tax_type: 1000.0
+              start_date: '2026-01-15'
+              end_date: '2026-01-15'
+              due_date: '2026-01-15'
       responses:
         '201':
           description: Tax period created
@@ -69,19 +76,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: &id003
             application/json:
               schema:
@@ -125,6 +132,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxRuleRequest'
+            example:
+              jurisdiction_code: US-CA
+              tax_type: 1000.0
+              name: Acme Corporation
+              rate: 1000.0
+              effective_from: sample value
+              effective_to: sample value
       responses:
         '201':
           description: Tax rule created
@@ -139,13 +153,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /tax-returns:
     get:
@@ -189,6 +203,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxReturnRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              period_id: 550e8400-e29b-41d4-a716-446655440000
+              return_type: 1000.0
       responses:
         '201':
           description: Tax return created
@@ -203,13 +221,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /tax-returns/{id}/validate:
     post:
@@ -234,13 +252,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /tax-returns/{id}/submit:
     post:
@@ -255,6 +273,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SubmitTaxReturnRequest'
+            example:
+              submitted_by: sample value
+              declaration: sample value
       responses:
         '202':
           description: Tax return submission accepted
@@ -272,10 +293,10 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
   /tax-payments:
     get:
@@ -306,6 +327,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxPaymentRequest'
+            example:
+              return_id: 1000.0
+              amount: 10000.0
       responses:
         '201':
           description: Tax payment created
@@ -317,13 +341,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
   /tax-audit-packs:
     get:
@@ -354,6 +378,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxAuditPackRequest'
+            example:
+              return_id: 1000.0
       responses:
         '201':
           description: Tax audit pack created
@@ -365,13 +391,13 @@ paths:
           description: Validation error
           content: *id004
         '401':
-          description: Unauthorized — invalid or expired token
+          description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
         '403':
-          description: Forbidden — insufficient permissions
+          description: "Forbidden \u2014 insufficient permissions"
           content: *id002
         '409':
-          description: Conflict — resource already exists or violates business rules
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id003
 components:
   securitySchemes:
@@ -423,11 +449,14 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         jurisdiction_code:
           type: string
+          example: US-CA
         tax_type:
           enum:
           - VAT
@@ -437,21 +466,26 @@ components:
           - PAYROLL
           - CORPORATE_INCOME
           - OTHER
+          example: 1000.0
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
         due_date:
           type: string
           format: date
+          example: '2026-01-15'
         status:
           enum:
           - OPEN
           - LOCKED
           - FILED
           - CLOSED
+          example: active
     CreateTaxPeriodRequest:
       type: object
       required:
@@ -464,8 +498,10 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         jurisdiction_code:
           type: string
+          example: US-CA
         tax_type:
           enum:
           - VAT
@@ -475,15 +511,19 @@ components:
           - PAYROLL
           - CORPORATE_INCOME
           - OTHER
+          example: 1000.0
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
         due_date:
           type: string
           format: date
+          example: '2026-01-15'
     TaxRule:
       type: object
       required:
@@ -497,8 +537,10 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         jurisdiction_code:
           type: string
+          example: US-CA
         tax_type:
           enum:
           - VAT
@@ -508,19 +550,25 @@ components:
           - PAYROLL
           - CORPORATE_INCOME
           - OTHER
+          example: 1000.0
         name:
           type: string
+          example: Acme Corporation
         rate:
           type: number
           format: double
+          example: 1000.0
         effective_from:
           type: string
           format: date
+          example: sample value
         effective_to:
           type: string
           format: date
+          example: sample value
         active:
           type: boolean
+          example: true
     CreateTaxRuleRequest:
       type: object
       required:
@@ -531,6 +579,7 @@ components:
       properties:
         jurisdiction_code:
           type: string
+          example: US-CA
         tax_type:
           enum:
           - VAT
@@ -540,17 +589,22 @@ components:
           - PAYROLL
           - CORPORATE_INCOME
           - OTHER
+          example: 1000.0
         name:
           type: string
+          example: Acme Corporation
         rate:
           type: number
           format: double
+          example: 1000.0
         effective_from:
           type: string
           format: date
+          example: sample value
         effective_to:
           type: string
           format: date
+          example: sample value
     TaxReturn:
       type: object
       required:
@@ -564,14 +618,18 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         period_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         return_type:
           type: string
+          example: 1000.0
         status:
           enum:
           - DRAFT
@@ -582,16 +640,20 @@ components:
           - REJECTED
           - PAID
           - ARCHIVED
+          example: active
         total_due:
           type: number
           format: double
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         submitted_at:
           type: string
           format: date-time
+          example: sample value
     CreateTaxReturnRequest:
       type: object
       required:
@@ -602,11 +664,14 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         period_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         return_type:
           type: string
+          example: 1000.0
     TaxReturnValidationResult:
       type: object
       required:
@@ -617,12 +682,16 @@ components:
         return_id:
           type: string
           format: uuid
+          example: 1000.0
         valid:
           type: boolean
+          example: true
         issues:
           type: array
           items:
             type: string
+          example:
+          - sample value
     SubmitTaxReturnRequest:
       type: object
       required:
@@ -632,8 +701,10 @@ components:
         submitted_by:
           type: string
           format: uuid
+          example: sample value
         declaration:
           type: string
+          example: sample value
     TaxReturnSubmission:
       type: object
       required:
@@ -644,13 +715,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         return_id:
           type: string
           format: uuid
+          example: 1000.0
         status:
           type: string
+          example: active
         external_reference:
           type: string
+          example: EXT-2026-0001
     TaxPayment:
       type: object
       required:
@@ -662,12 +737,15 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         return_id:
           type: string
           format: uuid
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
         status:
           enum:
           - SCHEDULED
@@ -675,9 +753,11 @@ components:
           - SETTLED
           - FAILED
           - CANCELLED
+          example: active
         paid_at:
           type: string
           format: date-time
+          example: 550e8400-e29b-41d4-a716-446655440000
     CreateTaxPaymentRequest:
       type: object
       required:
@@ -687,9 +767,11 @@ components:
         return_id:
           type: string
           format: uuid
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
     TaxAuditPack:
       type: object
       required:
@@ -701,9 +783,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         return_id:
           type: string
           format: uuid
+          example: 1000.0
         status:
           type: string
           enum:
@@ -711,8 +795,10 @@ components:
           - GENERATING
           - READY
           - ARCHIVED
+          example: active
         artifact_count:
           type: integer
+          example: 0
     CreateTaxAuditPackRequest:
       type: object
       required:
@@ -721,6 +807,7 @@ components:
         return_id:
           type: string
           format: uuid
+          example: 1000.0
     PaginatedTaxPeriods:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -775,10 +862,13 @@ components:
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
       required:
@@ -787,8 +877,10 @@ components:
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -798,11 +890,15 @@ components:
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
         fields:
           type: array
           items:
             type: string
+          example:
+          - sample value
 security:
 - bearerAuth: []

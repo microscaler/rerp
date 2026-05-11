@@ -137,6 +137,20 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateVendorInvoiceRequest'
+            example:
+              invoice_id: 1000.0
+              vendor_id: 550e8400-e29b-41d4-a716-446655440000
+              invoice_number: INV-2026-0001
+              invoice_date: 1000.0
+              amount: 10000.0
+              currency_code: USD
+              tax_amount: 1000.0
+              due_date: '2026-01-15'
+              terms: sample value
+              description: Primary operating company
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              line_items: &id005 []
+              auto_approve: true
       responses:
         '201':
           description: VendorInvoice created
@@ -212,6 +226,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateVendorInvoiceRequest'
+            example:
+              status: active
+              approval_status: pending
+              payment_status: pending
+              amount: 10000.0
+              tax_amount: 1000.0
+              due_date: '2026-01-15'
+              terms: sample value
+              description: Primary operating company
       responses:
         '200':
           description: VendorInvoice updated
@@ -365,6 +388,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateVendorPaymentRequest'
+            example:
+              reference_number: REF-2026-0001
+              amount: 10000.0
+              currency_code: USD
+              payment_method: 1000.0
+              payment_date: 1000.0
+              vendor_id: 550e8400-e29b-41d4-a716-446655440000
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              notes: Approved by CFO on 2026-01-15
+              auto_disburse: true
       responses:
         '201':
           description: Payment created
@@ -431,6 +464,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateVendorPaymentRequest'
+            example:
+              amount: 10000.0
+              payment_method: 1000.0
+              payment_date: 1000.0
+              status: active
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Payment updated
@@ -554,6 +593,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateApprovalRequest'
+            example:
+              invoice_id: 1000.0
+              action: sample value
+              notes: Approved by CFO on 2026-01-15
       responses:
         '201':
           description: ApprovalRecord created
@@ -711,6 +754,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentBatchRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              payment_method: 1000.0
+              vendor_invoice_ids: &id006
+              - 950e8400-e29b-41d4-a716-446655440004
+              scheduled_payment_date: 1000.0
+              currency_code: USD
       responses:
         '201':
           description: Payment batch created
@@ -775,6 +825,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ExportPaymentFileRequest'
+            example:
+              file_format: sample value
+              requested_by: sample value
       responses:
         '202':
           description: Payment file generation accepted
@@ -812,6 +865,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterVendorInvoicePaymentRequest'
+            example:
+              amount: 10000.0
+              currency_code: USD
+              payment_method: 1000.0
+              payment_date: 1000.0
+              reference_number: REF-2026-0001
       responses:
         '201':
           description: Vendor payment registered
@@ -849,6 +908,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ThreeWayMatchRequest'
+            example:
+              purchase_order_id: 550e8400-e29b-41d4-a716-446655440000
+              receipt_ids: 550e8400-e29b-41d4-a716-446655440000
+              tolerance_amount: 1000.0
+              tolerance_percent: 1000.0
       responses:
         '200':
           description: Three-way match result
@@ -929,12 +993,15 @@ components:
         total:
           type: integer
           description: Total number of records
+          example: 1
         page:
           type: integer
           description: Current page number
+          example: 1
         limit:
           type: integer
           description: Page size limit
+          example: 1
     VendorInvoice:
       type: object
       required:
@@ -962,42 +1029,51 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this AP record
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Reference to the base Invoice entity in the Invoice service
+          example: 1000.0
         vendor_id:
           type: string
           format: uuid
           description: Vendor this invoice is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_number:
           type: string
           maxLength: 100
           description: Vendor's invoice number for reference
+          example: INV-2026-0001
         invoice_date:
           type: string
           format: date
           description: Date on the vendor invoice
+          example: 1000.0
         amount:
           type: number
           format: double
           minimum: 0
           description: Total invoice amount
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
+          example: USD
         tax_amount:
           type: number
           format: double
           minimum: 0
           description: Tax amount on this invoice
+          example: 1000.0
         net_amount:
           type: number
           format: double
           minimum: 0
           description: Net amount (total - tax)
+          example: 9500.0
         status:
           type: string
           enum:
@@ -1007,6 +1083,7 @@ components:
           - REJECTED
           - POSTED
           description: AP status of this invoice
+          example: active
         approval_status:
           type: string
           enum:
@@ -1015,6 +1092,7 @@ components:
           - REJECTED
           - CANCELLED
           description: Approval workflow status
+          example: pending
         payment_status:
           type: string
           enum:
@@ -1024,10 +1102,12 @@ components:
           - PAID
           - DISPUTED
           description: Payment lifecycle state
+          example: pending
         due_date:
           type: string
           format: date
           description: Payment due date
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1038,31 +1118,38 @@ components:
           - NET_60
           - CUSTOM
           description: Payment terms with this vendor
+          example: sample value
         company_id:
           type: string
           format: uuid
           description: Company this invoice belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         approved_by:
           type: string
           format: uuid
           nullable: true
           description: User who approved this invoice
+          example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
           type: string
           format: date-time
           nullable: true
           description: When the invoice was approved
+          example: '2026-01-15T10:30:00Z'
         description:
           type: string
           maxLength: 2000
           nullable: true
           description: Invoice description/memo
+          example: Primary operating company
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     VendorInvoiceWithDetails:
       allOf:
       - $ref: '#/components/schemas/VendorInvoice'
@@ -1095,36 +1182,44 @@ components:
           type: string
           format: uuid
           description: Base Invoice entity reference
+          example: 1000.0
         vendor_id:
           type: string
           format: uuid
           description: Vendor
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_number:
           type: string
           maxLength: 100
           description: Vendor's invoice number
+          example: INV-2026-0001
         invoice_date:
           type: string
           format: date
           description: Date on the vendor invoice
+          example: 1000.0
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         tax_amount:
           type: number
           format: double
           minimum: 0
           default: 0
+          example: 1000.0
         due_date:
           type: string
           format: date
           nullable: true
           description: Payment due date. Defaults to invoice_date + terms.
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1134,22 +1229,27 @@ components:
           - NET_45
           - NET_60
           - CUSTOM
+          example: sample value
         description:
           type: string
           maxLength: 2000
           nullable: true
+          example: Primary operating company
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         line_items:
           type: array
           items:
             $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
           description: Invoice line items for GL posting
+          example: *id005
         auto_approve:
           type: boolean
           default: false
           description: Bypass approval workflow for invoices below threshold
+          example: true
     UpdateVendorInvoiceRequest:
       type: object
       properties:
@@ -1161,6 +1261,7 @@ components:
           - APPROVED
           - REJECTED
           - POSTED
+          example: active
         approval_status:
           type: string
           enum:
@@ -1168,6 +1269,7 @@ components:
           - APPROVED
           - REJECTED
           - CANCELLED
+          example: pending
         payment_status:
           type: string
           enum:
@@ -1176,17 +1278,21 @@ components:
           - PARTIAL
           - PAID
           - DISPUTED
+          example: pending
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         tax_amount:
           type: number
           format: double
           minimum: 0
+          example: 1000.0
         due_date:
           type: string
           format: date
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1196,10 +1302,12 @@ components:
           - NET_45
           - NET_60
           - CUSTOM
+          example: sample value
         description:
           type: string
           maxLength: 2000
           nullable: true
+          example: Primary operating company
     VendorPayment:
       type: object
       required:
@@ -1221,20 +1329,24 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the payment
+          example: 550e8400-e29b-41d4-a716-446655440000
         reference_number:
           type: string
           maxLength: 100
           nullable: true
           description: Payment reference (check number, wire reference)
+          example: REF-2026-0001
         amount:
           type: number
           format: double
           minimum: 0
           description: Payment amount
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_method:
           type: string
           enum:
@@ -1244,15 +1356,18 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
           description: Scheduled or actual payment date
+          example: 1000.0
         actual_payment_date:
           type: string
           format: date
           nullable: true
           description: When payment was actually sent
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1262,34 +1377,42 @@ components:
           - COMPLETED
           - FAILED
           - CANCELLED
+          example: active
         vendor_id:
           type: string
           format: uuid
           description: Vendor this payment is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
           description: Company this payment belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         posted_to_gl:
           type: boolean
           default: false
           description: Whether payment has been posted to general ledger
+          example: true
         gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry created for this payment
+          example: 650e8400-e29b-41d4-a716-446655440001
         notes:
           type: string
           maxLength: 1000
           nullable: true
           description: Payment notes
+          example: Approved by CFO on 2026-01-15
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateVendorPaymentRequest:
       type: object
       required:
@@ -1303,14 +1426,17 @@ components:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_method:
           type: string
           enum:
@@ -1320,24 +1446,30 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
           description: Scheduled payment date
+          example: 1000.0
         vendor_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         auto_disburse:
           type: boolean
           default: false
           description: Immediately disburse the payment
+          example: true
     UpdateVendorPaymentRequest:
       type: object
       properties:
@@ -1345,6 +1477,7 @@ components:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         payment_method:
           type: string
           enum:
@@ -1354,9 +1487,11 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1366,10 +1501,12 @@ components:
           - COMPLETED
           - FAILED
           - CANCELLED
+          example: active
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     VendorInvoiceLineItem:
       type: object
       required:
@@ -1387,44 +1524,53 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this line item
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Parent vendor invoice
+          example: 1000.0
         product_id:
           type: string
           format: uuid
           nullable: true
           description: Product this line item relates to
+          example: 850e8400-e29b-41d4-a716-446655440028
         quantity:
           type: number
           format: double
           minimum: 0
           description: Quantity invoiced
+          example: 10
         unit_price:
           type: number
           format: double
           minimum: 0
           description: Price per unit
+          example: 500.0
         amount:
           type: number
           format: double
           minimum: 0
           description: Line total (quantity * unit_price)
+          example: 10000.0
         tax_code:
           type: string
           maxLength: 50
           nullable: true
           description: Tax code for this line
+          example: VAT-2026
         description:
           type: string
           maxLength: 1000
           description: Line item description
+          example: Primary operating company
         gl_account:
           type: string
           format: uuid
           nullable: true
           description: GL account for posting
+          example: GL-2026-001
     CreateInvoiceLineItemRequest:
       type: object
       required:
@@ -1435,30 +1581,37 @@ components:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440028
         quantity:
           type: number
           format: double
           minimum: 0
           default: 1
+          example: 10
         unit_price:
           type: number
           format: double
           minimum: 0
+          example: 500.0
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         tax_code:
           type: string
           maxLength: 50
           nullable: true
+          example: VAT-2026
         description:
           type: string
           maxLength: 1000
+          example: Primary operating company
         gl_account:
           type: string
           format: uuid
           nullable: true
+          example: GL-2026-001
     ApprovalRecord:
       type: object
       required:
@@ -1471,14 +1624,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Invoice being approved
+          example: 1000.0
         approver_id:
           type: string
           format: uuid
           description: User who approved/rejected
+          example: 550e8400-e29b-41d4-a716-446655440000
         action:
           type: string
           enum:
@@ -1486,20 +1642,24 @@ components:
           - REJECT
           - REQUEST_INFO
           - DELEGATE
+          example: sample value
         date:
           type: string
           format: date-time
           description: When the action was taken
+          example: '2026-01-15'
         notes:
           type: string
           maxLength: 2000
           nullable: true
           description: Approval/rejection notes
+          example: Approved by CFO on 2026-01-15
         threshold_met:
           type: number
           format: double
           nullable: true
           description: Approval threshold that was met
+          example: 1000.0
     CreateApprovalRequest:
       type: object
       required:
@@ -1509,6 +1669,7 @@ components:
         invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         action:
           type: string
           enum:
@@ -1516,10 +1677,12 @@ components:
           - REJECT
           - REQUEST_INFO
           - DELEGATE
+          example: sample value
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     PaymentCommitment:
       type: object
       required:
@@ -1533,29 +1696,35 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           nullable: true
           description: Related approved invoice
+          example: 1000.0
         vendor_id:
           type: string
           format: uuid
           description: Vendor this commitment is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         amount:
           type: number
           format: double
           minimum: 0
           description: Commitment amount
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency of the commitment
+          example: USD
         due_date:
           type: string
           format: date
           description: Payment due date
+          example: '2026-01-15'
         status:
           type: string
           enum:
@@ -1564,13 +1733,16 @@ components:
           - PAID
           - CANCELLED
           description: Commitment status
+          example: active
         company_id:
           type: string
           format: uuid
           description: Company this commitment belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CashFlowForecast:
       type: object
       required:
@@ -1583,28 +1755,35 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         period_start:
           type: string
           format: date
+          example: '2026-01-01'
         period_end:
           type: string
           format: date
+          example: '2026-01-31'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_commitments:
           type: number
           format: double
           description: Total approved invoices not yet paid
+          example: 1000.0
         total_payments:
           type: number
           format: double
           description: Total scheduled payments in period
+          example: 1000.0
         net_cash_flow:
           type: number
           format: double
           description: Total commitments - total payments
+          example: 5000.0
         by_day:
           type: array
           items:
@@ -1620,6 +1799,7 @@ components:
                 type: number
                 format: double
           description: Daily breakdown
+          example: []
     PaymentBatch:
       type: object
       required:
@@ -1633,9 +1813,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
@@ -1646,6 +1828,7 @@ components:
           - EXPORTED
           - SENT
           - CANCELLED
+          example: active
         payment_method:
           type: string
           enum:
@@ -1655,18 +1838,23 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         total_amount:
           type: number
           format: double
+          example: 11000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_count:
           type: integer
+          example: 0
         scheduled_payment_date:
           type: string
           format: date
+          example: 1000.0
     CreatePaymentBatchRequest:
       type: object
       required:
@@ -1678,6 +1866,7 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_method:
           type: string
           enum:
@@ -1687,18 +1876,22 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         vendor_invoice_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: *id006
         scheduled_payment_date:
           type: string
           format: date
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     ExportPaymentFileRequest:
       type: object
       required:
@@ -1712,9 +1905,11 @@ components:
           - NACHA
           - CHECK_PRINT
           - CSV
+          example: sample value
         requested_by:
           type: string
           format: uuid
+          example: sample value
     PaymentFileExport:
       type: object
       required:
@@ -1725,9 +1920,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         batch_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
@@ -1735,9 +1932,11 @@ components:
           - GENERATING
           - READY
           - FAILED
+          example: active
         artifact_uri:
           type: string
           nullable: true
+          example: s3://reports/2026-01/balance_sheet.pdf
     RegisterVendorInvoicePaymentRequest:
       type: object
       required:
@@ -1750,10 +1949,12 @@ components:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_method:
           type: string
           enum:
@@ -1763,12 +1964,15 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
+          example: 1000.0
         reference_number:
           type: string
           nullable: true
+          example: REF-2026-0001
     ThreeWayMatchRequest:
       type: object
       required:
@@ -1778,19 +1982,23 @@ components:
         purchase_order_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         receipt_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         tolerance_amount:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         tolerance_percent:
           type: number
           format: double
           nullable: true
+          example: 1000.0
     ThreeWayMatchResult:
       type: object
       required:
@@ -1801,10 +2009,13 @@ components:
         vendor_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         matched:
           type: boolean
+          example: true
         variance_count:
           type: integer
+          example: 0
         variances:
           type: array
           items:
@@ -1820,6 +2031,7 @@ components:
                 type: string
               actual:
                 type: string
+          example: []
     PaginatedPaymentBatches:
       type: object
       required:
@@ -1830,8 +2042,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentBatch'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedVendorInvoices:
       type: object
       required:
@@ -1844,14 +2058,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VendorInvoice'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedVendorPayments:
       type: object
       required:
@@ -1864,14 +2083,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VendorPayment'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedApprovals:
       type: object
       required:
@@ -1884,14 +2108,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ApprovalRecord'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedCommitments:
       type: object
       required:
@@ -1904,14 +2133,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentCommitment'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     ErrorResponse:
       type: object
       required:
@@ -1934,6 +2168,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -1963,5 +2198,6 @@ components:
               message:
                 type: string
                 example: Payment amount cannot exceed invoice total
+          example: []
 security:
 - bearerAuth: []

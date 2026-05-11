@@ -148,6 +148,20 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateInvoiceRequest'
+            example:
+              invoice_type: 1000.0
+              entity_id: 550e8400-e29b-41d4-a716-446655440020
+              currency_code: USD
+              exchange_rate: 1.05
+              issued_date: '2026-01-15'
+              due_date: '2026-01-15'
+              billing_address_id: 750e8400-e29b-41d4-a716-446655440022
+              shipping_address_id: 850e8400-e29b-41d4-a716-446655440023
+              notes: Approved by CFO on 2026-01-15
+              internal_notes: Internal review required
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              line_items: &id005 []
+              auto_confirm: true
       responses:
         '201':
           description: Invoice created
@@ -224,6 +238,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateInvoiceRequest'
+            example:
+              due_date: '2026-01-15'
+              notes: Approved by CFO on 2026-01-15
+              internal_notes: Internal review required
+              billing_address_id: 750e8400-e29b-41d4-a716-446655440022
+              shipping_address_id: 850e8400-e29b-41d4-a716-446655440023
+              line_items: &id006 []
+              issued_date: '2026-01-15'
+              currency_code: USD
       responses:
         '200':
           description: Invoice updated
@@ -326,6 +349,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
+            example:
+              product_id: 850e8400-e29b-41d4-a716-446655440028
+              description: Primary operating company
+              quantity: 10
+              unit_price: 500.0
+              discount_percent: 5.0
+              discount_amount: 500.0
+              tax_code: VAT-2026
+              gl_account_debit: GL-DEBIT-2026
+              gl_account_credit: GL-CREDIT-2026
       responses:
         '201':
           description: Line item created
@@ -382,6 +415,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateInvoiceLineItemRequest'
+            example:
+              quantity: 10
+              unit_price: 500.0
+              discount_percent: 5.0
+              discount_amount: 500.0
+              tax_code: VAT-2026
+              description: Primary operating company
+              gl_account_debit: GL-DEBIT-2026
+              gl_account_credit: GL-CREDIT-2026
       responses:
         '200':
           description: Line item updated
@@ -816,6 +858,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterInvoicePaymentRequest'
+            example:
+              amount: 10000.0
+              currency_code: USD
+              payment_date: 1000.0
+              payment_method: 1000.0
+              external_reference: EXT-2026-0001
       responses:
         '201':
           description: Invoice payment registered
@@ -871,6 +919,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateInvoiceCreditNoteRequest'
+            example:
+              reason: Reclassification of asset category
+              amount: 10000.0
       responses:
         '201':
           description: Credit note created
@@ -1013,12 +1064,15 @@ components:
         total:
           type: integer
           description: Total number of records
+          example: 1
         page:
           type: integer
           description: Current page number
+          example: 1
         limit:
           type: integer
           description: Page size limit
+          example: 1
     Invoice:
       type: object
       required:
@@ -1047,10 +1101,12 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this invoice
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_number:
           type: string
           maxLength: 100
           description: Sequential invoice number (auto-generated)
+          example: INV-2026-0001
         invoice_type:
           type: string
           enum:
@@ -1060,6 +1116,7 @@ components:
           - DEBIT_MEMO
           - STANDARD
           description: Type of invoice
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1069,105 +1126,128 @@ components:
           - CANCELLED
           - VOIDED
           description: Invoice lifecycle status
+          example: active
         total_amount:
           type: number
           format: double
           minimum: 0
           description: Grand total including tax
+          example: 11000.0
         subtotal_amount:
           type: number
           format: double
           minimum: 0
           description: Total before tax
+          example: 10000.0
         tax_amount:
           type: number
           format: double
           minimum: 0
           description: Total tax across all line items
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
           description: ISO 4217 currency code
+          example: USD
         exchange_rate:
           type: number
           format: double
           description: Exchange rate to company currency
+          example: 1.05
         company_currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Company's base currency
+          example: USD
         company_total_amount:
           type: number
           format: double
           description: Total in company currency (total_amount * exchange_rate)
+          example: 11000.0
         issued_date:
           type: string
           format: date
           description: Date the invoice was issued
+          example: '2026-01-15'
         due_date:
           type: string
           format: date
           nullable: true
           description: Payment due date
+          example: '2026-01-15'
         billing_entity_id:
           type: string
           format: uuid
           description: Organization issuing this invoice
+          example: 650e8400-e29b-41d4-a716-446655440021
         entity_id:
           type: string
           format: uuid
           description: Customer (SALES) or Vendor (PURCHASE)
+          example: 550e8400-e29b-41d4-a716-446655440020
         entity_name:
           type: string
           maxLength: 200
           description: Human-readable entity name
+          example: Acme Corp
         billing_address_id:
           type: string
           format: uuid
           nullable: true
           description: Billing address reference
+          example: 750e8400-e29b-41d4-a716-446655440022
         shipping_address_id:
           type: string
           format: uuid
           nullable: true
           description: Shipping address reference
+          example: 850e8400-e29b-41d4-a716-446655440023
         notes:
           type: string
           maxLength: 2000
           nullable: true
           description: General notes on the invoice
+          example: Approved by CFO on 2026-01-15
         internal_notes:
           type: string
           maxLength: 2000
           nullable: true
           description: Internal notes not shared with entity
+          example: Internal review required
         company_id:
           type: string
           format: uuid
           description: Company this invoice belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_by:
           type: string
           format: uuid
           description: User who created the invoice
+          example: 950e8400-e29b-41d4-a716-446655440004
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         posted_at:
           type: string
           format: date-time
           nullable: true
           description: When invoice was posted to GL
+          example: '2026-01-15T14:30:00Z'
         posted_by:
           type: string
           format: uuid
           nullable: true
           description: User who posted the invoice
+          example: 950e8400-e29b-41d4-a716-446655440004
     InvoiceWithDetails:
       allOf:
       - $ref: '#/components/schemas/Invoice'
@@ -1213,89 +1293,110 @@ components:
           - CREDIT_MEMO
           - DEBIT_MEMO
           - STANDARD
+          example: 1000.0
         entity_id:
           type: string
           format: uuid
           description: Customer for SALES, Vendor for PURCHASE
+          example: 550e8400-e29b-41d4-a716-446655440020
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         exchange_rate:
           type: number
           format: double
           description: Exchange rate to company currency. Defaults to today's rate.
+          example: 1.05
         issued_date:
           type: string
           format: date
           description: Invoice date. Defaults to today.
+          example: '2026-01-15'
         due_date:
           type: string
           format: date
           nullable: true
           description: Payment due date
+          example: '2026-01-15'
         billing_address_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440022
         shipping_address_id:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440023
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         internal_notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Internal review required
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         line_items:
           type: array
           items:
             $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
           description: Invoice line items
+          example: *id005
         auto_confirm:
           type: boolean
           default: false
           description: Skip DRAFT and auto-confirm on creation
+          example: true
     UpdateInvoiceRequest:
       type: object
       properties:
         due_date:
           type: string
           format: date
+          example: '2026-01-15'
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         internal_notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Internal review required
         billing_address_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440022
         shipping_address_id:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440023
         line_items:
           type: array
           items:
             $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
           description: Replace all line items
+          example: *id006
         issued_date:
           type: string
           format: date
+          example: '2026-01-15'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     InvoiceLineItem:
       type: object
       required:
@@ -1320,39 +1421,47 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this line item
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Parent invoice
+          example: 1000.0
         product_id:
           type: string
           format: uuid
           nullable: true
           description: Product/service this line relates to
+          example: 850e8400-e29b-41d4-a716-446655440028
         product_code:
           type: string
           maxLength: 100
           nullable: true
           description: Product SKU/code
+          example: PROD-2026-001
         product_name:
           type: string
           maxLength: 200
           nullable: true
           description: Product name
+          example: Enterprise License
         description:
           type: string
           maxLength: 1000
           description: Line item description
+          example: Primary operating company
         quantity:
           type: number
           format: double
           minimum: 0
           description: Quantity
+          example: 10
         unit_price:
           type: number
           format: double
           minimum: 0
           description: Price per unit before tax
+          example: 500.0
         discount_percent:
           type: number
           format: double
@@ -1360,48 +1469,58 @@ components:
           maximum: 100
           default: 0
           description: Line-level discount percentage
+          example: 5.0
         discount_amount:
           type: number
           format: double
           minimum: 0
           description: Line-level discount amount
+          example: 500.0
         amount:
           type: number
           format: double
           minimum: 0
           description: Line total (quantity * unit_price - discount)
+          example: 10000.0
         tax_code:
           type: string
           maxLength: 50
           nullable: true
           description: Tax code applied to this line
+          example: VAT-2026
         tax_rate:
           type: number
           format: double
           minimum: 0
           nullable: true
           description: Applied tax rate
+          example: 10.0
         tax_amount:
           type: number
           format: double
           minimum: 0
           description: Tax amount for this line
+          example: 1000.0
         gl_account_debit:
           type: string
           format: uuid
           nullable: true
           description: Debit GL account for posting
+          example: GL-DEBIT-2026
         gl_account_credit:
           type: string
           format: uuid
           nullable: true
           description: Credit GL account for posting
+          example: GL-CREDIT-2026
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateInvoiceLineItemRequest:
       type: object
       required:
@@ -1413,39 +1532,48 @@ components:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440028
         description:
           type: string
           maxLength: 1000
+          example: Primary operating company
         quantity:
           type: number
           format: double
           minimum: 0
+          example: 10
         unit_price:
           type: number
           format: double
           minimum: 0
+          example: 500.0
         discount_percent:
           type: number
           format: double
           minimum: 0
           maximum: 100
           default: 0
+          example: 5.0
         discount_amount:
           type: number
           format: double
           minimum: 0
+          example: 500.0
         tax_code:
           type: string
           maxLength: 50
           nullable: true
+          example: VAT-2026
         gl_account_debit:
           type: string
           format: uuid
           nullable: true
+          example: GL-DEBIT-2026
         gl_account_credit:
           type: string
           format: uuid
           nullable: true
+          example: GL-CREDIT-2026
     UpdateInvoiceLineItemRequest:
       type: object
       properties:
@@ -1453,34 +1581,42 @@ components:
           type: number
           format: double
           minimum: 0
+          example: 10
         unit_price:
           type: number
           format: double
           minimum: 0
+          example: 500.0
         discount_percent:
           type: number
           format: double
           minimum: 0
           maximum: 100
+          example: 5.0
         discount_amount:
           type: number
           format: double
           minimum: 0
+          example: 500.0
         tax_code:
           type: string
           maxLength: 50
           nullable: true
+          example: VAT-2026
         description:
           type: string
           maxLength: 1000
+          example: Primary operating company
         gl_account_debit:
           type: string
           format: uuid
           nullable: true
+          example: GL-DEBIT-2026
         gl_account_credit:
           type: string
           format: uuid
           nullable: true
+          example: GL-CREDIT-2026
     TaxBreakdown:
       type: object
       required:
@@ -1493,18 +1629,22 @@ components:
           type: string
           maxLength: 50
           description: Tax code
+          example: VAT-2026
         rate:
           type: number
           format: double
           description: Applied tax rate (e.g., 0.20 for 20%)
+          example: 1000.0
         taxable_amount:
           type: number
           format: double
           description: Amount subject to tax
+          example: 1000.0
         tax_amount:
           type: number
           format: double
           description: Calculated tax amount
+          example: 1000.0
     TaxRate:
       type: object
       required:
@@ -1516,42 +1656,51 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         code:
           type: string
           maxLength: 50
           description: Tax code (e.g., VAT-STD, TAX-EXEMPT)
+          example: '001'
         rate:
           type: number
           format: double
           description: Tax rate (e.g., 0.20 for 20%)
+          example: 1000.0
         type:
           type: string
           enum:
           - PERCENTAGE
           - FIXED
+          example: general
         name:
           type: string
           maxLength: 200
           description: Human-readable name
+          example: Acme Corporation
         effective_date:
           type: string
           format: date
           nullable: true
           description: Date this rate becomes effective
+          example: '2026-01-15'
         expiry_date:
           type: string
           format: date
           nullable: true
           description: Date this rate expires
+          example: '2026-01-15'
         country_code:
           type: string
           maxLength: 2
           nullable: true
           description: ISO 3166-1 alpha-2 country code
+          example: 0
         description:
           type: string
           maxLength: 500
           nullable: true
+          example: Primary operating company
     InvoiceApprovalAction:
       type: object
       required:
@@ -1562,10 +1711,12 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Invoice being approved
+          example: 1000.0
         action:
           type: string
           enum:
@@ -1575,19 +1726,23 @@ components:
           - POST
           - CANCEL
           - VOID
+          example: sample value
         by_user:
           type: string
           format: uuid
           description: User who performed the action
+          example: sample value
         date:
           type: string
           format: date-time
           description: When the action was performed
+          example: '2026-01-15'
         notes:
           type: string
           maxLength: 1000
           nullable: true
           description: Action notes
+          example: Approved by CFO on 2026-01-15
     RegisterInvoicePaymentRequest:
       type: object
       required:
@@ -1599,18 +1754,23 @@ components:
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_date:
           type: string
           format: date
+          example: 1000.0
         payment_method:
           type: string
+          example: 1000.0
         external_reference:
           type: string
           nullable: true
+          example: EXT-2026-0001
     InvoicePayment:
       type: object
       required:
@@ -1623,16 +1783,20 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         status:
           type: string
           enum:
@@ -1640,6 +1804,7 @@ components:
           - MATCHED
           - POSTED
           - REVERSED
+          example: active
     InvoicePaymentMatch:
       type: object
       required:
@@ -1651,15 +1816,19 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         payment_id:
           type: string
           format: uuid
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
     CreateInvoiceCreditNoteRequest:
       type: object
       required:
@@ -1667,10 +1836,12 @@ components:
       properties:
         reason:
           type: string
+          example: Reclassification of asset category
         amount:
           type: number
           format: double
           nullable: true
+          example: 10000.0
     InvoiceHandoff:
       type: object
       required:
@@ -1682,23 +1853,28 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         target_service:
           type: string
           enum:
           - EDI
           - REVENUE_RECOGNITION
+          example: 1000.0
         status:
           type: string
           enum:
           - QUEUED
           - ACCEPTED
           - FAILED
+          example: active
         external_reference:
           type: string
           nullable: true
+          example: EXT-2026-0001
     PaginatedInvoicePaymentMatches:
       type: object
       required:
@@ -1709,8 +1885,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvoicePaymentMatch'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedInvoices:
       type: object
       required:
@@ -1723,14 +1901,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Invoice'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedLineItems:
       type: object
       required:
@@ -1743,14 +1926,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvoiceLineItem'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedTaxRates:
       type: object
       required:
@@ -1763,14 +1951,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxRate'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedApprovals:
       type: object
       required:
@@ -1783,14 +1976,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvoiceApprovalAction'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     InvoiceSummary:
       type: object
       required:
@@ -1802,34 +2000,48 @@ components:
         period_start:
           type: string
           format: date
+          example: '2026-01-01'
         period_end:
           type: string
           format: date
+          example: '2026-01-31'
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_invoices:
           type: integer
+          example: 1
         total_amount:
           type: number
           format: double
+          example: 11000.0
         by_status:
           type: object
           description: Count and total by invoice status
+          example:
+          - status: active
+            count: 45
+          - status: maintenance
+            count: 5
         by_type:
           type: object
           description: Count and total by invoice type
+          example: standard
         average_invoice_amount:
           type: number
           format: double
+          example: 1000.0
         tax_collected:
           type: number
           format: double
           description: Total tax collected
+          example: 1000.0
     ErrorResponse:
       type: object
       required:
@@ -1852,6 +2064,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -1881,5 +2094,6 @@ components:
               message:
                 type: string
                 example: Line item amount exceeds validation threshold
+          example: []
 security:
 - bearerAuth: []

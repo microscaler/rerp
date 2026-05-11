@@ -48,6 +48,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateConsolidationGroupRequest'
+            example:
+              name: Acme Corporation
+              reporting_currency_code: 1000.0
+              company_ids: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: Consolidation group created
@@ -108,6 +112,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateConsolidationRunRequest'
+            example:
+              group_id: 550e8400-e29b-41d4-a716-446655440000
+              fiscal_period_id: 850e8400-e29b-41d4-a716-446655440003
       responses:
         '201':
           description: Consolidation run created
@@ -180,6 +187,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEliminationRuleRequest'
+            example:
+              group_id: 550e8400-e29b-41d4-a716-446655440000
+              name: Acme Corporation
+              rule_type: standard
       responses:
         '201':
           description: Elimination rule created
@@ -247,6 +258,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateGroupReportingPackRequest'
+            example:
+              run_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: Group reporting pack created
@@ -322,15 +335,19 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         reporting_currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: 1000.0
         parent_company_id:
           type: string
           format: uuid
+          example: 1000.0
     CreateConsolidationGroupRequest:
       type: object
       required:
@@ -339,15 +356,18 @@ components:
       properties:
         name:
           type: string
+          example: Acme Corporation
         reporting_currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: 1000.0
         company_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     ConsolidationRun:
       type: object
       required:
@@ -359,12 +379,15 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         group_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_period_id:
           type: string
           format: uuid
+          example: 850e8400-e29b-41d4-a716-446655440003
         status:
           enum:
           - DRAFT
@@ -374,9 +397,11 @@ components:
           - FAILED
           - APPROVED
           - ARCHIVED
+          example: active
         executed_at:
           type: string
           format: date-time
+          example: sample value
     CreateConsolidationRunRequest:
       type: object
       required:
@@ -386,9 +411,11 @@ components:
         group_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_period_id:
           type: string
           format: uuid
+          example: 850e8400-e29b-41d4-a716-446655440003
     EliminationRule:
       type: object
       required:
@@ -400,11 +427,14 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         group_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         rule_type:
           type: string
           enum:
@@ -412,8 +442,10 @@ components:
           - INTERCOMPANY_REVENUE_EXPENSE
           - INVESTMENT_EQUITY
           - CUSTOM
+          example: standard
         active:
           type: boolean
+          example: true
     CreateEliminationRuleRequest:
       type: object
       required:
@@ -424,10 +456,13 @@ components:
         group_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         rule_type:
           type: string
+          example: standard
     EliminationEntry:
       type: object
       required:
@@ -439,21 +474,27 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         run_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         rule_id:
           type: string
           format: uuid
+          example: sample value
         amount:
           type: number
           format: double
+          example: 10000.0
         source_company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         target_company_id:
           type: string
           format: uuid
+          example: 1000.0
     GroupReportingPack:
       type: object
       required:
@@ -465,17 +506,21 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         run_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
           - GENERATING
           - READY
           - ARCHIVED
+          example: active
         artifact_uri:
           type: string
+          example: s3://reports/2026-01/balance_sheet.pdf
     CreateGroupReportingPackRequest:
       type: object
       required:
@@ -484,6 +529,7 @@ components:
         run_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     PaginatedConsolidationGroups:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -538,10 +584,13 @@ components:
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
       required:
@@ -550,7 +599,9 @@ components:
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
 security:
 - bearerAuth: []

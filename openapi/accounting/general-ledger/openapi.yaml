@@ -121,6 +121,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccountRequest'
+            example:
+              chart_of_account_id: 650e8400-e29b-41d4-a716-446655440001
+              code: '001'
+              name: Acme Corporation
+              account_type: Asset
+              normal_balance: debit
+              currency_code: USD
+              description: Primary operating company
+              is_active: true
       responses:
         '201':
           description: Account created
@@ -197,6 +206,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAccountRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              account_type: Asset
       responses:
         '200':
           description: Account updated
@@ -353,6 +367,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateChartOfAccountRequest'
+            example:
+              code: '001'
+              name: Acme Corporation
+              account_type: Asset
+              parent_id: 1000.0
+              description: Primary operating company
+              is_active: true
       responses:
         '201':
           description: ChartOfAccount created
@@ -418,6 +439,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateChartOfAccountRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              account_type: Asset
       responses:
         '200':
           description: ChartOfAccount updated
@@ -529,6 +555,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateJournalRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              type: general
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              currency_id: 550e8400-e29b-41d4-a716-446655440000
+              default_account_id: 750e8400-e29b-41d4-a716-446655440002
+              suspense_account_id: 750e8400-e29b-41d4-a716-446655440002
+              is_active: true
       responses:
         '201':
           description: Journal created
@@ -594,6 +629,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateJournalRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              default_account_id: 750e8400-e29b-41d4-a716-446655440002
+              suspense_account_id: 750e8400-e29b-41d4-a716-446655440002
+              is_active: true
       responses:
         '200':
           description: Journal updated
@@ -747,6 +788,21 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateJournalEntryRequest'
+            example:
+              journal_id: 550e8400-e29b-41d4-a716-446655440000
+              entry_number: JE-2026-0001
+              entry_date: '2026-01-15'
+              description: Primary operating company
+              reference_number: REF-2026-0001
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              fiscal_period_id: 850e8400-e29b-41d4-a716-446655440003
+              currency_code: USD
+              exchange_rate: 1.05
+              lines: &id006
+              - &id005
+                line_number: 1
+                description: Line 1
+                amount: 10000.0
       responses:
         '201':
           description: 'JournalEntry created (status: DRAFT)'
@@ -817,6 +873,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateJournalEntryRequest'
+            example:
+              entry_date: '2026-01-15'
+              description: Primary operating company
+              reference_number: REF-2026-0001
+              lines: &id007
+              - *id005
       responses:
         '200':
           description: JournalEntry updated
@@ -985,6 +1047,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReverseJournalEntryRequest'
+            example:
+              description: Primary operating company
+              use_original_date: true
       responses:
         '201':
           description: Reversing entry created and original marked as REVERSED
@@ -1025,6 +1090,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BulkApproveRequest'
+            example:
+              entry_ids: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '200':
           description: Bulk approval results
@@ -1059,6 +1126,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BulkPostRequest'
+            example:
+              entry_ids: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '200':
           description: Bulk post results
@@ -1143,6 +1212,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFiscalPeriodRequest'
+            example:
+              name: Acme Corporation
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              start_date: '2026-01-15'
+              end_date: '2026-01-15'
+              year: 2026
+              month: 1
       responses:
         '201':
           description: FiscalPeriod created
@@ -1208,6 +1284,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateFiscalPeriodRequest'
+            example:
+              name: Acme Corporation
+              start_date: '2026-01-15'
+              end_date: '2026-01-15'
+              is_locked: false
+              is_open: true
       responses:
         '200':
           description: FiscalPeriod updated
@@ -1594,6 +1676,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateChartTemplateRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              jurisdiction_code: US-CA
+              version: '1.0'
+              description: Primary operating company
+              currency_code: USD
+              fiscal_month: 1
+              fiscal_day: 1
+              number_of_periods: 12
+              include_subperiods: true
       responses:
         '201':
           description: Chart template created
@@ -1660,6 +1753,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateChartTemplateRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              is_default: true
+              currency_code: USD
       responses:
         '200':
           description: ChartTemplate updated
@@ -1735,6 +1834,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DeployChartTemplateRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              year: 2026
+              chart_of_account_code: 0
       responses:
         '201':
           description: Chart template deployed successfully
@@ -1830,6 +1933,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFiscalYearRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              year: 2026
+              start_date: '2026-01-15'
+              end_date: '2026-01-15'
+              period_type: standard
+              number_of_periods: 12
+              description: Primary operating company
       responses:
         '201':
           description: FiscalYear created with periods
@@ -1900,6 +2011,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateFiscalYearRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
       responses:
         '200':
           description: FiscalYear updated
@@ -1975,6 +2089,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CloseFiscalYearRequest'
+            example:
+              closing_date: '2026-01-31'
       responses:
         '200':
           description: FiscalYear closed
@@ -2104,6 +2220,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GeneratePeriodsRequest'
+            example:
+              period_type: standard
+              number_of_periods: 12
       responses:
         '200':
           description: Periods generated
@@ -2194,6 +2313,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFiscalPositionRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              description: Primary operating company
+              auto_apply: true
+              country_id: 850e8400-e29b-41d4-a716-446655440003
+              state_ids: &id010
+              - 950e8400-e29b-41d4-a716-446655440004
+              account_mappings: 0
+              tax_mappings: 1000.0
       responses:
         '201':
           description: FiscalPosition created
@@ -2260,6 +2390,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateFiscalPositionRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              auto_apply: true
+              country_id: 850e8400-e29b-41d4-a716-446655440003
+              state_ids: &id011
+              - 950e8400-e29b-41d4-a716-446655440004
+              account_mappings: 0
+              tax_mappings: 1000.0
       responses:
         '200':
           description: FiscalPosition updated
@@ -2379,6 +2519,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentTermRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              type: general
+              description: Primary operating company
+              currency_code: USD
+              installment_lines: &id012 []
       responses:
         '201':
           description: PaymentTerm created
@@ -2445,6 +2593,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePaymentTermRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              installment_lines: &id013 []
       responses:
         '200':
           description: PaymentTerm updated
@@ -2572,6 +2725,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentMethodRequest'
+            example:
+              name: Acme Corporation
+              code: '001'
+              payment_method_type: bank
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              is_active: true
+              is_receivable: false
+              is_payable: true
+              description: Primary operating company
+              journal_mappings: &id014 []
       responses:
         '201':
           description: PaymentMethod created
@@ -2638,6 +2801,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePaymentMethodRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              is_active: true
+              is_receivable: false
+              is_payable: true
+              journal_mappings: &id015 []
       responses:
         '200':
           description: PaymentMethod updated
@@ -2793,6 +2963,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTaxRepartitionLineRequest'
+            example:
+              tax_id: 550e8400-e29b-41d4-a716-446655440032
+              repartition_type: tax
+              account_id: 750e8400-e29b-41d4-a716-446655440002
+              ratio: 1.0
+              percentage: 100.0
+              tag_ids: &id016
+              - 550e8400-e29b-41d4-a716-446655440030
       responses:
         '201':
           description: TaxRepartitionLine created
@@ -2859,6 +3037,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTaxRepartitionLineRequest'
+            example:
+              account_id: 750e8400-e29b-41d4-a716-446655440002
+              ratio: 1.0
+              tag_ids: &id017
+              - 550e8400-e29b-41d4-a716-446655440030
       responses:
         '200':
           description: TaxRepartitionLine updated
@@ -2935,6 +3118,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLockDateRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              lock_type: period
+              locked_through_date: '2026-01-31'
+              reason: Reclassification of asset category
       responses:
         '201':
           description: Lock date created
@@ -2986,6 +3174,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReconcileJournalItemsRequest'
+            example:
+              journal_item_ids: &id008
+              - 650e8400-e29b-41d4-a716-446655440001
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Journal items reconciled
@@ -3016,6 +3208,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UnreconcileJournalItemsRequest'
+            example:
+              reconciliation_id: 650e8400-e29b-41d4-a716-446655440036
+              reason: Reclassification of asset category
       responses:
         '200':
           description: Journal items unreconciled
@@ -3042,6 +3237,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCurrencyRevaluationRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              currency_code: USD
+              revaluation_date: '2026-01-15'
+              account_ids: &id009
+              - 850e8400-e29b-41d4-a716-446655440003
       responses:
         '201':
           description: Currency revaluation created
@@ -3122,12 +3323,15 @@ components:
         total:
           type: integer
           description: Total number of records
+          example: 1
         page:
           type: integer
           description: Current page number
+          example: 1
         limit:
           type: integer
           description: Page size limit
+          example: 1
     Account:
       type: object
       required:
@@ -3149,19 +3353,23 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the account
+          example: 550e8400-e29b-41d4-a716-446655440000
         chart_of_account_id:
           type: string
           format: uuid
           description: Parent chart of accounts node
+          example: 650e8400-e29b-41d4-a716-446655440001
         code:
           type: string
           maxLength: 50
           pattern: ^[A-Z0-9._-]+$
           description: Account code (e.g., '1010', '2000.1', '5.1.2')
+          example: '001'
         name:
           type: string
           maxLength: 255
           description: Account display name
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -3171,29 +3379,35 @@ components:
           - REVENUE
           - EXPENSE
           description: Account classification determining normal balance direction
+          example: Asset
         normal_balance:
           type: string
           enum:
           - DEBIT
           - CREDIT
           description: Expected normal balance side for this account type
+          example: debit
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
           description: ISO 4217 currency code (e.g., USD, EUR, GBP)
+          example: USD
         is_active:
           type: boolean
           description: Whether the account is active (inactive accounts can still be referenced by historical entries)
+          example: true
         is_system_account:
           type: boolean
           description: System-defined account that cannot be modified or deleted
+          example: true
         description:
           type: string
           maxLength: 1000
           nullable: true
           description: Optional account description
+          example: Primary operating company
         metadata:
           type: object
           nullable: true
@@ -3205,20 +3419,27 @@ components:
                 type: string
             custom_fields:
               type: object
+          example:
+            version: '1.0'
+            source: system
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         created_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
     AccountWithBalance:
       allOf:
       - $ref: '#/components/schemas/Account'
@@ -3252,12 +3473,15 @@ components:
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         account_code:
           type: string
           maxLength: 50
+          example: '1000'
         account_name:
           type: string
           maxLength: 255
+          example: Cash and Equivalents
         account_type:
           type: string
           enum:
@@ -3266,35 +3490,43 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
         opening_balance:
           type: number
           format: double
           description: Balance at start of period
+          example: 50000.0
         period_debits:
           type: number
           format: double
           description: Total debits in period
+          example: 5000.0
         period_credits:
           type: number
           format: double
           description: Total credits in period
+          example: 5000.0
         closing_balance:
           type: number
           format: double
           description: Balance at end of period
+          example: 55000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         period_id:
           type: string
           format: uuid
           nullable: true
           description: Fiscal period this balance is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
           description: Date as of which balance is calculated
+          example: '2026-01-15'
       required:
       - account_code
       - account_id
@@ -3313,14 +3545,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         code:
           type: string
           maxLength: 50
           description: Chart code for grouping accounts
+          example: '001'
         name:
           type: string
           maxLength: 255
           description: Chart display name
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -3330,26 +3565,33 @@ components:
           - REVENUE
           - EXPENSE
           description: Default account type for accounts in this chart
+          example: Asset
         parent_id:
           type: string
           format: uuid
           nullable: true
           description: Parent chart node for hierarchy
+          example: 1000.0
         level:
           type: integer
           minimum: 0
           description: Hierarchy depth level
+          example: 1
         is_active:
           type: boolean
+          example: true
         description:
           type: string
           nullable: true
+          example: Primary operating company
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateChartOfAccountRequest:
       type: object
       required:
@@ -3360,9 +3602,11 @@ components:
         code:
           type: string
           maxLength: 50
+          example: '001'
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -3371,27 +3615,34 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
         parent_id:
           type: string
           format: uuid
           nullable: true
+          example: 1000.0
         description:
           type: string
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
           default: true
+          example: true
     UpdateChartOfAccountRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         account_type:
           type: string
           enum:
@@ -3400,6 +3651,7 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
     Journal:
       type: object
       required:
@@ -3413,15 +3665,18 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 100
           description: Journal display name (e.g., 'General Journal', 'Sales Journal')
+          example: Acme Corporation
         code:
           type: string
           maxLength: 10
           pattern: ^[A-Z]{1,5}$
           description: Short code used as prefix for entry numbers (e.g., 'GEN', 'SAL', 'PCH')
+          example: '001'
         type:
           type: string
           enum:
@@ -3432,48 +3687,60 @@ components:
           - BANK
           - MISC
           description: Journal type determines default account and entry number format
+          example: general
         company_id:
           type: string
           format: uuid
           description: Company that owns this journal
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_id:
           type: string
           format: uuid
           nullable: true
           description: Default currency for entries in this journal
+          example: 550e8400-e29b-41d4-a716-446655440000
         default_account_id:
           type: string
           format: uuid
           nullable: true
           description: Default account for entries when not specified
+          example: 750e8400-e29b-41d4-a716-446655440002
         suspense_account_id:
           type: string
           format: uuid
           nullable: true
           description: Account for entries awaiting classification
+          example: 750e8400-e29b-41d4-a716-446655440002
         sequence_number_next:
           type: integer
           description: Next sequence number for entry numbering
+          example: 100
         sequence_prefix:
           type: string
           maxLength: 10
           description: Prefix for entry numbering (e.g., 'GEN-2024-')
+          example: SA
         company_code:
           type: string
           maxLength: 50
           description: Company code used in entry numbers
+          example: ACME
         is_active:
           type: boolean
           description: Whether the journal is available for new entries
+          example: true
         restrict_mode_hash_table:
           type: boolean
           description: If true, posted entries are secured with a hash (cannot be modified)
+          example: false
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateJournalRequest:
       type: object
       required:
@@ -3486,11 +3753,13 @@ components:
           type: string
           maxLength: 100
           description: Journal display name
+          example: Acme Corporation
         code:
           type: string
           maxLength: 10
           pattern: ^[A-Z]{1,5}$
           description: Short code for entry numbering prefix
+          example: '001'
         type:
           type: string
           enum:
@@ -3501,43 +3770,54 @@ components:
           - BANK
           - MISC
           description: Journal type
+          example: general
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         default_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         suspense_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         is_active:
           type: boolean
           default: true
+          example: true
     UpdateJournalRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         code:
           type: string
           maxLength: 10
+          example: '001'
         default_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         suspense_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         is_active:
           type: boolean
+          example: true
     JournalEntry:
       type: object
       required:
@@ -3562,29 +3842,35 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         entry_number:
           type: string
           maxLength: 50
           pattern: ^[A-Z0-9\-]+$
           description: Auto-generated or manual entry number (e.g., 'GEN-2024-0001')
+          example: JE-2026-0001
         entry_date:
           type: string
           format: date
           description: Accounting date of the entry
+          example: '2026-01-15'
         description:
           type: string
           maxLength: 500
           description: Entry description/narration
+          example: Primary operating company
         reference_number:
           type: string
           maxLength: 100
           nullable: true
           description: External reference number
+          example: REF-2026-0001
         journal_id:
           type: string
           format: uuid
           nullable: true
           description: Journal this entry belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
@@ -3610,53 +3896,65 @@ components:
           maxLength: 3
           pattern: ^[A-Z]{3}$
           description: ISO 4217 currency code
+          example: USD
         exchange_rate:
           type: number
           format: double
           minimum: 0.0001
           description: Exchange rate to company currency (1 foreign = X company currency)
+          example: 1.05
         company_id:
           type: string
           format: uuid
           nullable: true
           description: Company this entry belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_period_id:
           type: string
           format: uuid
           nullable: true
           description: Fiscal period this entry is posted to
+          example: 850e8400-e29b-41d4-a716-446655440003
         posted_at:
           type: string
           format: date-time
           nullable: true
           description: When the entry was posted
+          example: '2026-01-15T14:30:00Z'
         posted_by:
           type: string
           format: uuid
           nullable: true
           description: User who posted the entry
+          example: 950e8400-e29b-41d4-a716-446655440004
         reversed_at:
           type: string
           format: date-time
           nullable: true
+          example: '2026-01-16T10:00:00Z'
         reversed_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         created_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
     JournalEntryWithLines:
       allOf:
       - $ref: '#/components/schemas/JournalEntry'
@@ -3687,14 +3985,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         journal_entry_id:
           type: string
           format: uuid
           description: Parent journal entry
+          example: 550e8400-e29b-41d4-a716-446655440000
         account_id:
           type: string
           format: uuid
           description: GL account for this line item
+          example: 750e8400-e29b-41d4-a716-446655440002
         debit:
           type: number
           format: double
@@ -3712,45 +4013,57 @@ components:
           maxLength: 500
           nullable: true
           description: Line description/narration
+          example: Acme Corporation
         reference_number:
           type: string
           maxLength: 100
           nullable: true
           description: External reference for this line
+          example: REF-2026-0001
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           nullable: true
           description: Currency for this line (if different from entry currency)
+          example: USD
         amount_currency:
           type: number
           format: double
           nullable: true
           description: Amount in foreign currency (for multi-currency entries)
+          example: USD
         balance:
           type: number
           format: double
           description: Computed balance (debit - credit)
+          example: 0.0
         date:
           type: string
           format: date
           nullable: true
           description: Line-specific date (defaults to entry date)
+          example: '2026-01-15'
         date_maturity:
           type: string
           format: date
           nullable: true
           description: Due date for payable/receivable lines
+          example: '2026-02-15'
         partner_id:
           type: string
           format: uuid
           nullable: true
           description: Customer/vendor partner for this line
+          example: 850e8400-e29b-41d4-a716-446655440008
         analytic_distribution:
           type: object
           nullable: true
           description: 'Analytic/accounting distribution (e.g., {1: 50.0, 2: 50.0} for 50/50 split across cost centers)'
+          example:
+            cost_center: marketing
+            department: sales
+            project: alpha
         tax_ids:
           type: array
           items:
@@ -3758,12 +4071,16 @@ components:
             format: uuid
           nullable: true
           description: Associated tax IDs
+          example:
+          - 550e8400-e29b-41d4-a716-446655440029
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateJournalEntryRequest:
       type: object
       required:
@@ -3777,45 +4094,54 @@ components:
           type: string
           format: uuid
           description: Journal to post this entry to
+          example: 550e8400-e29b-41d4-a716-446655440000
         entry_number:
           type: string
           maxLength: 50
           nullable: true
           description: Auto-generated if not provided
+          example: JE-2026-0001
         entry_date:
           type: string
           format: date
           description: Accounting date for this entry
+          example: '2026-01-15'
         description:
           type: string
           maxLength: 500
           description: Entry narration/description
+          example: Primary operating company
         reference_number:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         company_id:
           type: string
           format: uuid
           nullable: true
           description: Company for this entry
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_period_id:
           type: string
           format: uuid
           nullable: true
           description: Fiscal period to assign
+          example: 850e8400-e29b-41d4-a716-446655440003
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
           description: ISO 4217 currency code
+          example: USD
         exchange_rate:
           type: number
           format: double
           minimum: 0.0001
           default: 1.0
           description: Exchange rate to company currency
+          example: 1.05
         lines:
           type: array
           description: Debit/credit line items. At least 2 lines required. Total debits must equal total credits.
@@ -3823,6 +4149,7 @@ components:
             $ref: '#/components/schemas/LineItemRequest'
           minItems: 2
           maxItems: 100
+          example: *id006
     LineItemRequest:
       type: object
       required:
@@ -3832,67 +4159,85 @@ components:
           type: string
           format: uuid
           description: GL account for this line
+          example: 750e8400-e29b-41d4-a716-446655440002
         debit:
           type: number
           format: double
           minimum: 0
           default: 0.0
           description: Debit amount (positive, non-negative)
+          example: 10000.0
         credit:
           type: number
           format: double
           minimum: 0
           default: 0.0
           description: Credit amount (positive, non-negative)
+          example: 10000.0
         name:
           type: string
           maxLength: 500
           nullable: true
           description: Line narration
+          example: Acme Corporation
         reference_number:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           nullable: true
+          example: USD
         amount_currency:
           type: number
           format: double
           nullable: true
+          example: USD
         partner_id:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440008
         analytic_distribution:
           type: object
           nullable: true
+          example:
+            cost_center: marketing
+            department: sales
+            project: alpha
         tax_ids:
           type: array
           items:
             type: string
             format: uuid
           nullable: true
+          example:
+          - 550e8400-e29b-41d4-a716-446655440029
     UpdateJournalEntryRequest:
       type: object
       properties:
         entry_date:
           type: string
           format: date
+          example: '2026-01-15'
         description:
           type: string
           maxLength: 500
+          example: Primary operating company
         reference_number:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         lines:
           type: array
           items:
             $ref: '#/components/schemas/LineItemRequest'
           description: Replacement line items (entire lines array replaced on update)
+          example: *id007
     ReverseJournalEntryRequest:
       type: object
       properties:
@@ -3901,10 +4246,12 @@ components:
           maxLength: 500
           nullable: true
           description: Override description for the reversing entry. Auto-generated if not provided.
+          example: Primary operating company
         use_original_date:
           type: boolean
           default: false
           description: If true, use the original entry date. If false, use current date.
+          example: true
     FiscalPeriod:
       type: object
       required:
@@ -3920,45 +4267,56 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 100
           description: Period display name (e.g., 'January 2024')
+          example: Acme Corporation
         company_id:
           type: string
           format: uuid
           description: Company this period belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         start_date:
           type: string
           format: date
           description: Period start date (inclusive)
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
           description: Period end date (inclusive)
+          example: '2026-01-15'
         year:
           type: integer
           minimum: 1900
           maximum: 2100
           description: Fiscal year
+          example: 2026
         month:
           type: integer
           minimum: 1
           maximum: 12
           description: Month number (1-12). Null for annual periods.
+          example: 1
         is_locked:
           type: boolean
           description: When true, no new entries can be created/modified in this period
+          example: false
         is_open:
           type: boolean
           nullable: true
           description: Computed field - true if current date is within period and not locked
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateFiscalPeriodRequest:
       type: object
       required:
@@ -3971,41 +4329,52 @@ components:
         name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
         year:
           type: integer
           minimum: 1900
           maximum: 2100
+          example: 2026
         month:
           type: integer
           minimum: 1
           maximum: 12
           nullable: true
           description: Null for annual periods
+          example: 1
     UpdateFiscalPeriodRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
         is_locked:
           type: boolean
+          example: false
         is_open:
           type: boolean
+          example: true
     TrialBalanceReport:
       type: object
       required:
@@ -4018,20 +4387,24 @@ components:
           type: string
           format: date
           description: Report generation date
+          example: '2026-01-15'
         company_id:
           type: string
           format: uuid
           description: Company this report is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         period_id:
           type: string
           format: uuid
           nullable: true
           description: Fiscal period this report covers
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Report currency
+          example: USD
         total_debits:
           type: number
           format: double
@@ -4052,18 +4425,23 @@ components:
           items:
             $ref: '#/components/schemas/TrialBalanceLine'
           description: One line per account
+          example:
+          - *id005
     TrialBalanceLine:
       type: object
       properties:
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         account_code:
           type: string
           maxLength: 50
+          example: '1000'
         account_name:
           type: string
           maxLength: 255
+          example: Cash and Equivalents
         account_type:
           type: string
           enum:
@@ -4072,61 +4450,78 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
         opening_balance:
           type: number
           format: double
           description: Balance at start of period
+          example: 50000.0
         period_debits:
           type: number
           format: double
           description: Total debits during period
+          example: 5000.0
         period_credits:
           type: number
           format: double
           description: Total credits during period
+          example: 5000.0
         closing_balance:
           type: number
           format: double
           description: Balance at end of period
+          example: 55000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     AccountBalancesReport:
       type: object
       properties:
         report_date:
           type: string
           format: date
+          example: '2026-01-15'
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_assets:
           type: number
           format: double
+          example: 500000.0
         total_liabilities:
           type: number
           format: double
+          example: 200000.0
         total_equity:
           type: number
           format: double
+          example: 300000.0
         total_revenue:
           type: number
           format: double
+          example: 200000.0
         total_expenses:
           type: number
           format: double
+          example: 75000.0
         net_income:
           type: number
           format: double
+          example: 75000.0
         lines:
           type: array
           items:
             $ref: '#/components/schemas/AccountBalance'
+          example:
+          - *id005
       required: []
     LedgerReport:
       type: object
@@ -4134,72 +4529,94 @@ components:
         report_date:
           type: string
           format: date
+          example: '2026-01-15'
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         period_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         date_from:
           type: string
           format: date
+          example: '2026-01-01'
         date_to:
           type: string
           format: date
+          example: '2026-01-31'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_lines:
           type: integer
           description: Number of line items in report
+          example: 100
         lines:
           type: array
           items:
             $ref: '#/components/schemas/LedgerReportLine'
+          example:
+          - *id005
     LedgerReportLine:
       type: object
       properties:
         entry_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         entry_number:
           type: string
           maxLength: 50
+          example: JE-2026-0001
         entry_date:
           type: string
           format: date
+          example: '2026-01-15'
         entry_description:
           type: string
+          example: Monthly revenue recognition
         journal_code:
           type: string
           maxLength: 10
+          example: GEN
         line_number:
           type: integer
           description: Line number within the entry
+          example: 1
         account_code:
           type: string
           maxLength: 50
+          example: '1000'
         account_name:
           type: string
           maxLength: 255
+          example: Cash and Equivalents
         debit:
           type: number
           format: double
+          example: 10000.0
         credit:
           type: number
           format: double
+          example: 10000.0
         balance:
           type: number
           format: double
+          example: 0.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         reference:
           type: string
           maxLength: 100
+          example: REF-2026-0001
     LockDate:
       type: object
       required:
@@ -4211,9 +4628,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lock_type:
           type: string
           enum:
@@ -4221,12 +4640,15 @@ components:
           - TAX
           - ALL_USERS
           - NON_ADVISER_USERS
+          example: period
         locked_through_date:
           type: string
           format: date
+          example: '2026-01-31'
         reason:
           type: string
           nullable: true
+          example: Reclassification of asset category
     CreateLockDateRequest:
       type: object
       required:
@@ -4237,6 +4659,7 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lock_type:
           type: string
           enum:
@@ -4244,12 +4667,15 @@ components:
           - TAX
           - ALL_USERS
           - NON_ADVISER_USERS
+          example: period
         locked_through_date:
           type: string
           format: date
+          example: '2026-01-31'
         reason:
           type: string
           nullable: true
+          example: Reclassification of asset category
     JournalItem:
       type: object
       required:
@@ -4262,24 +4688,31 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         journal_entry_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         debit:
           type: number
           format: double
+          example: 10000.0
         credit:
           type: number
           format: double
+          example: 10000.0
         reconciled:
           type: boolean
+          example: false
         reconciliation_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440036
     ReconcileJournalItemsRequest:
       type: object
       required:
@@ -4290,9 +4723,11 @@ components:
           items:
             type: string
             format: uuid
+          example: *id008
         notes:
           type: string
           nullable: true
+          example: Approved by CFO on 2026-01-15
     UnreconcileJournalItemsRequest:
       type: object
       required:
@@ -4301,9 +4736,11 @@ components:
         reconciliation_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440036
         reason:
           type: string
           nullable: true
+          example: Reclassification of asset category
     JournalItemReconciliation:
       type: object
       required:
@@ -4314,16 +4751,20 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         journal_item_ids:
           type: array
           items:
             type: string
             format: uuid
+          example:
+          - 650e8400-e29b-41d4-a716-446655440001
         status:
           type: string
           enum:
           - RECONCILED
           - UNRECONCILED
+          example: active
     CreateCurrencyRevaluationRequest:
       type: object
       required:
@@ -4334,18 +4775,22 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         revaluation_date:
           type: string
           format: date
+          example: '2026-01-15'
         account_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: *id009
     CurrencyRevaluation:
       type: object
       required:
@@ -4357,23 +4802,28 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         status:
           type: string
           enum:
           - DRAFT
           - POSTED
           - REVERSED
+          example: active
         journal_entry_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
     PaginatedLockDates:
       type: object
       required:
@@ -4384,8 +4834,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LockDate'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedJournalItems:
       type: object
       required:
@@ -4396,8 +4848,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JournalItem'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedAccounts:
       type: object
       required:
@@ -4410,6 +4864,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Account'
+          example: []
         total:
           type: integer
           description: Total number of accounts matching the query
@@ -4425,6 +4880,7 @@ components:
         has_more:
           type: boolean
           description: Whether more pages exist
+          example: true
     PaginatedChartOfAccounts:
       type: object
       required:
@@ -4437,14 +4893,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChartOfAccount'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedJournalEntries:
       type: object
       required:
@@ -4457,14 +4918,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JournalEntry'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedJournals:
       type: object
       required:
@@ -4477,14 +4943,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Journal'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedFiscalPeriods:
       type: object
       required:
@@ -4497,14 +4968,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPeriod'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreateAccountRequest:
       type: object
       required:
@@ -4519,15 +4995,18 @@ components:
           type: string
           format: uuid
           description: Parent chart of accounts node
+          example: 650e8400-e29b-41d4-a716-446655440001
         code:
           type: string
           maxLength: 50
           pattern: ^[A-Z0-9._-]+$
           description: Account code (unique within chart)
+          example: '001'
         name:
           type: string
           maxLength: 255
           description: Account display name
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -4536,35 +5015,43 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
         normal_balance:
           type: string
           enum:
           - DEBIT
           - CREDIT
+          example: debit
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
+          example: USD
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
           default: true
+          example: true
     UpdateAccountRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         account_type:
           type: string
           enum:
@@ -4573,6 +5060,7 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
     BulkApproveRequest:
       type: object
       required:
@@ -4586,6 +5074,7 @@ components:
           minItems: 1
           maxItems: 100
           description: List of entry IDs to approve
+          example: 550e8400-e29b-41d4-a716-446655440000
     BulkPostRequest:
       type: object
       required:
@@ -4599,6 +5088,7 @@ components:
           minItems: 1
           maxItems: 100
           description: List of entry IDs to post
+          example: 550e8400-e29b-41d4-a716-446655440000
     BulkActionResult:
       type: object
       required:
@@ -4610,12 +5100,15 @@ components:
         total:
           type: integer
           description: Total entries processed
+          example: 1
         succeeded:
           type: integer
           description: Number of successful operations
+          example: 1
         failed:
           type: integer
           description: Number of failed operations
+          example: 1
         results:
           type: array
           items:
@@ -4631,6 +5124,7 @@ components:
                 nullable: true
               result:
                 nullable: true
+          example: []
     ErrorResponse:
       type: object
       required:
@@ -4656,6 +5150,7 @@ components:
           type: object
           nullable: true
           description: Additional error context
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -4678,29 +5173,35 @@ components:
           items:
             $ref: '#/components/schemas/FieldError'
           description: List of field-level validation errors
+          example: []
         line_errors:
           type: array
           items:
             $ref: '#/components/schemas/LineError'
           nullable: true
           description: Line-level validation errors (for journal entries)
+          example: []
         total_debit:
           type: number
           format: double
           nullable: true
+          example: 10000.0
         total_credit:
           type: number
           format: double
           nullable: true
+          example: 10000.0
         difference:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         tolerance:
           type: number
           format: double
           default: 0.01
           description: Balancing tolerance in the entry's currency
+          example: 1000.0
     FieldError:
       type: object
       required:
@@ -4718,6 +5219,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     LineError:
       type: object
       required:
@@ -4728,6 +5230,7 @@ components:
         index:
           type: integer
           description: Line item index (0-based)
+          example: 1
         field:
           type: string
           description: Field that failed validation
@@ -4753,24 +5256,29 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the chart template
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 255
           description: Display name of the chart template
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
           pattern: ^[A-Z0-9._-]+$
           description: Template code (unique identifier)
+          example: '001'
         jurisdiction_code:
           type: string
           minLength: 2
           maxLength: 5
           description: ISO 3166-1 alpha-2 or ISO 4217 currency code (e.g., 'US', 'FR', 'DE')
+          example: US-CA
         version:
           type: string
           maxLength: 20
           description: Template version (e.g., '1.0', '2.1')
+          example: '1.0'
         status:
           type: string
           enum:
@@ -4778,60 +5286,74 @@ components:
           - ACTIVE
           - DEPRECATED
           description: Template lifecycle status
+          example: active
         company_id:
           type: string
           format: uuid
           description: Owner company (templates are company-scoped or global)
+          example: 550e8400-e29b-41d4-a716-446655440000
         is_active:
           type: boolean
           description: Whether the template is available for use
+          example: true
         is_default:
           type: boolean
           description: Whether this is the default template for the company/jurisdiction
+          example: true
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Default currency for this chart template
+          example: USD
         fiscal_month:
           type: integer
           minimum: 1
           maximum: 12
           nullable: true
           description: Month the fiscal year starts (NULL = calendar year)
+          example: 1
         fiscal_day:
           type: integer
           minimum: 1
           maximum: 7
           nullable: true
           description: Day of week for fiscal week start (1=Mon, 7=Sun)
+          example: 1
         number_of_periods:
           type: integer
           minimum: 1
           maximum: 24
           description: Default number of periods in fiscal year
+          example: 12
         include_subperiods:
           type: boolean
           default: false
           description: Whether to create subperiods within periods
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         created_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
     ChartTemplateWithAccounts:
       allOf:
       - $ref: '#/components/schemas/ChartTemplate'
@@ -4854,12 +5376,15 @@ components:
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         account_code:
           type: string
           maxLength: 50
+          example: '1000'
         account_name:
           type: string
           maxLength: 255
+          example: Cash and Equivalents
         account_type:
           type: string
           enum:
@@ -4868,27 +5393,35 @@ components:
           - EQUITY
           - REVENUE
           - EXPENSE
+          example: Asset
         is_parent:
           type: boolean
           description: Whether this is a parent/summary account
+          example: true
         parent_account_id:
           type: string
           format: uuid
           nullable: true
           description: Parent account ID (for flat list representation)
+          example: 750e8400-e29b-41d4-a716-446655440032
         level:
           type: integer
           nullable: true
           description: Hierarchy level (0 = root)
+          example: 1
         child_count:
           type: integer
           nullable: true
           description: Number of direct child accounts
+          example: 0
         tags:
           type: array
           items:
             type: string
           nullable: true
+          example:
+          - project-2026
+          - active
       required:
       - account_code
       - account_name
@@ -4903,26 +5436,33 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         chart_template_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         chart_of_account_id:
           type: string
           format: uuid
           description: Created chart of accounts hierarchy
+          example: 650e8400-e29b-41d4-a716-446655440001
         fiscal_year_id:
           type: string
           format: uuid
           description: Created fiscal year
+          example: 950e8400-e29b-41d4-a716-446655440004
         account_count:
           type: integer
           description: Number of accounts created
+          example: 0
         created_periods:
           type: integer
           description: Number of fiscal periods created
+          example: 1
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaginatedChartTemplates:
       type: object
       required:
@@ -4935,14 +5475,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChartTemplate'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreateChartTemplateRequest:
       type: object
       required:
@@ -4954,62 +5499,77 @@ components:
           type: string
           maxLength: 255
           description: Display name
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
           pattern: ^[A-Z0-9._-]+$
           description: Unique template code
+          example: '001'
         jurisdiction_code:
           type: string
           minLength: 2
           maxLength: 5
           description: Country/currency code
+          example: US-CA
         version:
           type: string
           maxLength: 20
           default: '1.0'
+          example: '1.0'
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         fiscal_month:
           type: integer
           minimum: 1
           maximum: 12
+          example: 1
         fiscal_day:
           type: integer
           minimum: 1
           maximum: 7
+          example: 1
         number_of_periods:
           type: integer
           minimum: 1
           maximum: 24
           default: 12
+          example: 12
         include_subperiods:
           type: boolean
           default: false
+          example: true
     UpdateChartTemplateRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         is_default:
           type: boolean
+          example: true
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     DeployChartTemplateRequest:
       type: object
       required:
@@ -5019,14 +5579,17 @@ components:
           type: string
           format: uuid
           description: Target company to deploy to
+          example: 550e8400-e29b-41d4-a716-446655440000
         year:
           type: integer
           description: Fiscal year for the initial fiscal year
+          example: 2026
         chart_of_account_code:
           type: string
           maxLength: 50
           nullable: true
           description: Override code for created chart of accounts
+          example: 0
     FiscalYear:
       type: object
       required:
@@ -5042,55 +5605,69 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
           description: Company this fiscal year belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         year:
           type: integer
           description: Fiscal year number (e.g., 2024)
+          example: 2026
         start_date:
           type: string
           format: date
           description: First day of fiscal year
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
           description: Last day of fiscal year
+          example: '2026-01-15'
         is_open:
           type: boolean
           description: Whether the fiscal year is currently open for entries
+          example: true
         is_closed:
           type: boolean
           description: Whether the fiscal year is fully closed
+          example: false
         period_count:
           type: integer
           description: Number of periods in this fiscal year
+          example: 12
         closed_at:
           type: string
           format: date-time
           nullable: true
           description: When the fiscal year was closed
+          example: '2026-01-31T23:59:59Z'
         closed_by:
           type: string
           format: uuid
           nullable: true
           description: User who closed the fiscal year
+          example: 950e8400-e29b-41d4-a716-446655440004
         closing_date:
           type: string
           format: date
           nullable: true
           description: The closing accounting date
+          example: '2026-01-31'
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     FiscalYearWithPeriods:
       allOf:
       - $ref: '#/components/schemas/FiscalYear'
@@ -5113,14 +5690,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FiscalYear'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedFiscalYearPeriods:
       type: object
       required:
@@ -5133,14 +5715,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPeriod'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreateFiscalYearRequest:
       type: object
       required:
@@ -5154,17 +5741,21 @@ components:
           type: string
           format: uuid
           description: Company this fiscal year belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         year:
           type: integer
           description: Fiscal year (e.g., 2024)
+          example: 2026
         start_date:
           type: string
           format: date
           description: First day of fiscal year
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
           description: Last day of fiscal year
+          example: '2026-01-15'
         period_type:
           type: string
           enum:
@@ -5172,25 +5763,30 @@ components:
           - QUARTERLY
           - CUSTOM
           description: How periods are divided within the fiscal year
+          example: standard
         number_of_periods:
           type: integer
           minimum: 1
           maximum: 24
           description: 'Number of periods (default: 12 for monthly, 4 for quarterly)'
+          example: 12
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
     UpdateFiscalYearRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
     CloseFiscalYearRequest:
       type: object
       properties:
@@ -5198,6 +5794,7 @@ components:
           type: string
           format: date
           description: Accounting closing date
+          example: '2026-01-31'
       required: []
     GeneratePeriodsRequest:
       type: object
@@ -5210,10 +5807,12 @@ components:
           - MONTHLY
           - QUARTERLY
           - CUSTOM
+          example: standard
         number_of_periods:
           type: integer
           minimum: 1
           maximum: 24
+          example: 12
     GeneratePeriodsResult:
       type: object
       required:
@@ -5222,10 +5821,12 @@ components:
         periods_created:
           type: integer
           description: Number of periods generated
+          example: 1
         periods:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPeriod'
+          example: 1
     FiscalPosition:
       type: object
       required:
@@ -5238,34 +5839,42 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 255
           description: Fiscal position name
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
           description: Position code (unique within company)
+          example: '001'
         company_id:
           type: string
           format: uuid
           description: Company this fiscal position belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         is_active:
           type: boolean
           description: Whether this fiscal position is active
+          example: true
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         auto_apply:
           type: boolean
           default: false
           description: Whether this position is auto-applied to transactions
+          example: true
         country_id:
           type: string
           format: uuid
           nullable: true
           description: Country this position applies to (for tax mapping)
+          example: 850e8400-e29b-41d4-a716-446655440003
         state_ids:
           type: array
           items:
@@ -5273,12 +5882,16 @@ components:
             format: uuid
           nullable: true
           description: States/provinces this position applies to
+          example:
+          - 950e8400-e29b-41d4-a716-446655440004
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     FiscalPositionWithMappings:
       allOf:
       - $ref: '#/components/schemas/FiscalPosition'
@@ -5304,36 +5917,45 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_position_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         source_account_id:
           type: string
           format: uuid
           description: Account that gets mapped
+          example: 0
         source_account_code:
           type: string
           maxLength: 50
           description: Source account code for display
+          example: '1000'
         source_account_name:
           type: string
           maxLength: 255
           description: Source account name for display
+          example: Cash
         destination_account_id:
           type: string
           format: uuid
           description: Account to map to
+          example: 0
         destination_account_code:
           type: string
           maxLength: 50
           description: Destination account code for display
+          example: '4000'
         destination_account_name:
           type: string
           maxLength: 255
           description: Destination account name for display
+          example: Revenue
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     FiscalPositionTaxMapping:
       type: object
       required:
@@ -5344,28 +5966,35 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_position_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         source_tax_id:
           type: string
           format: uuid
           description: Source tax to be mapped
+          example: 1000.0
         source_tax_name:
           type: string
           maxLength: 255
           description: Source tax name for display
+          example: Sales Tax Input
         destination_tax_id:
           type: string
           format: uuid
           description: Destination tax to map to
+          example: 1000.0
         destination_tax_name:
           type: string
           maxLength: 255
           description: Destination tax name for display
+          example: VAT Output
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaginatedFiscalPositions:
       type: object
       required:
@@ -5378,14 +6007,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPosition'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreateFiscalPositionRequest:
       type: object
       required:
@@ -5396,73 +6030,90 @@ components:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
+          example: '001'
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         auto_apply:
           type: boolean
           default: false
+          example: true
         country_id:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440003
         state_ids:
           type: array
           items:
             type: string
             format: uuid
           nullable: true
+          example: *id010
         account_mappings:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPositionAccountMappingRequest'
           nullable: true
+          example: 0
         tax_mappings:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPositionTaxMappingRequest'
           nullable: true
+          example: 1000.0
     UpdateFiscalPositionRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         auto_apply:
           type: boolean
+          example: true
         country_id:
           type: string
           format: uuid
           nullable: true
+          example: 850e8400-e29b-41d4-a716-446655440003
         state_ids:
           type: array
           items:
             type: string
             format: uuid
           nullable: true
+          example: *id011
         account_mappings:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPositionAccountMappingRequest'
           nullable: true
+          example: 0
         tax_mappings:
           type: array
           items:
             $ref: '#/components/schemas/FiscalPositionTaxMappingRequest'
           nullable: true
+          example: 1000.0
     FiscalPositionAccountMappingRequest:
       type: object
       required:
@@ -5472,9 +6123,11 @@ components:
         source_account_id:
           type: string
           format: uuid
+          example: 0
         destination_account_id:
           type: string
           format: uuid
+          example: 0
     FiscalPositionTaxMappingRequest:
       type: object
       required:
@@ -5484,9 +6137,11 @@ components:
         source_tax_id:
           type: string
           format: uuid
+          example: 1000.0
         destination_tax_id:
           type: string
           format: uuid
+          example: 1000.0
     PaymentTerm:
       type: object
       required:
@@ -5500,21 +6155,26 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 255
           description: Payment term name (e.g., 'Net 30', '2/10 Net 30')
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
           description: Payment term code
+          example: '001'
         company_id:
           type: string
           format: uuid
           description: Company this payment term belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         is_active:
           type: boolean
           description: Whether this payment term is active
+          example: true
         type:
           type: string
           enum:
@@ -5523,21 +6183,26 @@ components:
           - INSTALLMENT
           - CUSTOM
           description: Type of payment term
+          example: general
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency for discount amounts (if applicable)
+          example: USD
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaymentTermWithLines:
       allOf:
       - $ref: '#/components/schemas/PaymentTerm'
@@ -5559,41 +6224,50 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_term_id:
           type: string
           format: uuid
+          example: 1000.0
         name:
           type: string
           maxLength: 255
           nullable: true
           description: Line description (e.g., 'Installment 1 of 3')
+          example: Acme Corporation
         date_percentage:
           type: number
           format: double
           description: Days after invoice date when this installment is due
+          example: 0
         amount_percentage:
           type: number
           format: double
           minimum: 0
           maximum: 100
           description: Percentage of total amount due on this date
+          example: 30.0
         discount_days:
           type: integer
           nullable: true
           description: Days within which discount applies
+          example: 10
         discount_percentage:
           type: number
           format: double
           nullable: true
           description: Discount percentage if paid within discount_days
+          example: 2.0
         discount_amount:
           type: number
           format: double
           nullable: true
           description: Fixed discount amount (if applicable)
+          example: 500.0
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaginatedPaymentTerms:
       type: object
       required:
@@ -5606,14 +6280,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentTerm'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreatePaymentTermRequest:
       type: object
       required:
@@ -5625,12 +6304,15 @@ components:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
+          example: '001'
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         type:
           type: string
           enum:
@@ -5638,36 +6320,44 @@ components:
           - DISCOUNT
           - INSTALLMENT
           - CUSTOM
+          example: general
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         installment_lines:
           type: array
           items:
             $ref: '#/components/schemas/PaymentTermLineRequest'
           nullable: true
+          example: *id012
     UpdatePaymentTermRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         installment_lines:
           type: array
           items:
             $ref: '#/components/schemas/PaymentTermLineRequest'
           nullable: true
+          example: *id013
     PaymentTermLineRequest:
       type: object
       required:
@@ -5678,27 +6368,33 @@ components:
           type: string
           maxLength: 255
           nullable: true
+          example: Acme Corporation
         date_percentage:
           type: number
           format: double
           description: Days after invoice date
+          example: 0
         amount_percentage:
           type: number
           format: double
           minimum: 0
           maximum: 100
           description: Percentage of total amount
+          example: 30.0
         discount_days:
           type: integer
           nullable: true
+          example: 10
         discount_percentage:
           type: number
           format: double
           nullable: true
+          example: 2.0
         discount_amount:
           type: number
           format: double
           nullable: true
+          example: 500.0
     PaymentMethod:
       type: object
       required:
@@ -5712,14 +6408,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 255
           description: Payment method name (e.g., 'Checks', 'Bank Wire')
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
           description: Payment method code
+          example: '001'
         payment_method_type:
           type: string
           enum:
@@ -5732,31 +6431,39 @@ components:
           - CASH
           - OTHER
           description: Type of payment method
+          example: bank
         company_id:
           type: string
           format: uuid
           description: Company this payment method belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         is_active:
           type: boolean
           description: Whether this payment method is active
+          example: true
         is_receivable:
           type: boolean
           default: true
           description: Whether this method is used for customer receipts
+          example: false
         is_payable:
           type: boolean
           default: true
           description: Whether this method is used for vendor payments
+          example: true
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaymentMethodWithLines:
       allOf:
       - $ref: '#/components/schemas/PaymentMethod'
@@ -5778,21 +6485,26 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_method_id:
           type: string
           format: uuid
+          example: 1000.0
         journal_id:
           type: string
           format: uuid
           description: Journal associated with this payment method
+          example: 550e8400-e29b-41d4-a716-446655440000
         journal_code:
           type: string
           maxLength: 10
           description: Journal code for display
+          example: GEN
         journal_name:
           type: string
           maxLength: 255
           description: Journal name for display
+          example: General Journal
         payment_direction:
           type: string
           enum:
@@ -5800,18 +6512,22 @@ components:
           - PAYMENT
           - BOTH
           description: Direction this mapping applies to
+          example: debit
         account_id:
           type: string
           format: uuid
           nullable: true
           description: Override account for this mapping
+          example: 750e8400-e29b-41d4-a716-446655440002
         is_default:
           type: boolean
           default: false
           description: Whether this is the default journal for this payment method
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaginatedPaymentMethods:
       type: object
       required:
@@ -5824,14 +6540,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentMethod'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreatePaymentMethodRequest:
       type: object
       required:
@@ -5843,9 +6564,11 @@ components:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         code:
           type: string
           maxLength: 50
+          example: '001'
         payment_method_type:
           type: string
           enum:
@@ -5857,48 +6580,61 @@ components:
           - BANK_TRANSFER
           - CASH
           - OTHER
+          example: bank
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         is_active:
           type: boolean
           default: true
+          example: true
         is_receivable:
           type: boolean
           default: true
+          example: false
         is_payable:
           type: boolean
           default: true
+          example: true
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         journal_mappings:
           type: array
           items:
             $ref: '#/components/schemas/PaymentMethodJournalMappingRequest'
           nullable: true
+          example: *id014
     UpdatePaymentMethodRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
         is_receivable:
           type: boolean
+          example: false
         is_payable:
           type: boolean
+          example: true
         journal_mappings:
           type: array
           items:
             $ref: '#/components/schemas/PaymentMethodJournalMappingRequest'
           nullable: true
+          example: *id015
     PaymentMethodJournalMappingRequest:
       type: object
       required:
@@ -5908,19 +6644,23 @@ components:
         journal_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_direction:
           type: string
           enum:
           - RECEIPT
           - PAYMENT
           - BOTH
+          example: debit
         account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         is_default:
           type: boolean
           default: false
+          example: true
     TaxRepartitionLine:
       type: object
       required:
@@ -5934,44 +6674,53 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         tax_id:
           type: string
           format: uuid
           description: Parent tax this repartition line belongs to
+          example: 550e8400-e29b-41d4-a716-446655440032
         tax_name:
           type: string
           maxLength: 255
           description: Parent tax name for display
+          example: 1000.0
         repartition_type:
           type: string
           enum:
           - TAX
           - BASE
           description: Whether this line maps to a tax account (TAX) or base account (BASE)
+          example: tax
         account_id:
           type: string
           format: uuid
           description: Account to map this repartition line to
+          example: 750e8400-e29b-41d4-a716-446655440002
         account_code:
           type: string
           maxLength: 50
           description: Account code for display
+          example: '1000'
         account_name:
           type: string
           maxLength: 255
           description: Account name for display
+          example: Cash and Equivalents
         ratio:
           type: number
           format: double
           minimum: 0
           maximum: 1
           description: Ratio of the total tax amount to allocate to this account (0-1)
+          example: 1.0
         percentage:
           type: number
           format: double
           minimum: 0
           maximum: 100
           description: Percentage representation of the ratio
+          example: 100.0
         tag_ids:
           type: array
           items:
@@ -5979,12 +6728,16 @@ components:
             format: uuid
           nullable: true
           description: Analytic tags to apply on this line
+          example:
+          - 550e8400-e29b-41d4-a716-446655440030
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     PaginatedTaxRepartitionLines:
       type: object
       required:
@@ -5997,14 +6750,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxRepartitionLine'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     CreateTaxRepartitionLineRequest:
       type: object
       required:
@@ -6017,49 +6775,58 @@ components:
           type: string
           format: uuid
           description: Parent tax this line belongs to
+          example: 550e8400-e29b-41d4-a716-446655440032
         repartition_type:
           type: string
           enum:
           - TAX
           - BASE
+          example: tax
         account_id:
           type: string
           format: uuid
           description: Account to allocate this repartition to
+          example: 750e8400-e29b-41d4-a716-446655440002
         ratio:
           type: number
           format: double
           minimum: 0
           maximum: 1
           description: Fraction of total amount (sum of ratios should equal 1.0)
+          example: 1.0
         percentage:
           type: number
           format: double
           minimum: 0
           maximum: 100
           description: Percentage equivalent of ratio
+          example: 100.0
         tag_ids:
           type: array
           items:
             type: string
             format: uuid
           nullable: true
+          example: *id016
     UpdateTaxRepartitionLineRequest:
       type: object
       properties:
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         ratio:
           type: number
           format: double
           minimum: 0
           maximum: 1
+          example: 1.0
         tag_ids:
           type: array
           items:
             type: string
             format: uuid
           nullable: true
+          example: *id017
 security:
 - bearerAuth: []

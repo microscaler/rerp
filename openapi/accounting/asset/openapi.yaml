@@ -129,6 +129,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetRequest'
+            example:
+              asset_number: AST-2024-001
+              name: Acme Corporation
+              description: Primary operating company
+              acquisition_cost: 50000.0
+              currency_code: USD
+              acquisition_date: '2024-01-15'
+              location: Building A, Floor 3
+              department_id: 650e8400-e29b-41d4-a716-446655440001
+              custodian_id: 750e8400-e29b-41d4-a716-446655440002
+              useful_life_months: 60
+              depreciation_method: straight_line
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              supplier_id: 650e8400-e29b-41d4-a716-446655440001
+              serial_number: SN-2026-0001
+              warranty_expiry: '2031-01-01'
+              acquisition_gl_entry_id: 550e8400-e29b-41d4-a716-446655440000
+              notes: Approved by CFO on 2026-01-15
+              auto_depreciate: true
       responses:
         '201':
           description: Asset created with depreciation schedule
@@ -204,6 +223,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateAssetRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              location: Building A, Floor 3
+              department_id: 650e8400-e29b-41d4-a716-446655440001
+              custodian_id: 750e8400-e29b-41d4-a716-446655440002
+              status: active
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Asset updated
@@ -307,6 +334,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDepreciationEntryRequest'
+            example:
+              schedule_id: 550e8400-e29b-41d4-a716-446655440000
+              period: 2026-01
+              depreciation_amount: 1000.0
+              post_to_gl: true
       responses:
         '201':
           description: Depreciation entry created
@@ -449,6 +481,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRevaluationRequest'
+            example:
+              asset_id: 550e8400-e29b-41d4-a716-446655440000
+              new_value: 1000.0
+              revaluation_date: '2026-01-15'
+              reason: Reclassification of asset category
+              post_to_gl: true
       responses:
         '201':
           description: Revaluation created
@@ -563,6 +601,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDisposalRequest'
+            example:
+              asset_id: 550e8400-e29b-41d4-a716-446655440000
+              disposal_date: '2026-01-15'
+              disposal_type: standard
+              proceeds: 1000.0
+              currency_code: USD
+              description: Primary operating company
       responses:
         '201':
           description: Disposal created
@@ -648,6 +693,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetCategoryRequest'
+            example:
+              name: Acme Corporation
+              description: Primary operating company
+              default_depreciation_method: true
+              default_useful_life_months: true
+              gl_account_debit: GL-DEBIT-2026
+              gl_account_credit: GL-CREDIT-2026
+              parent_category_id: 650e8400-e29b-41d4-a716-446655440031
+              company_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: Category created
@@ -734,6 +788,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetModelRequest'
+            example:
+              name: Acme Corporation
+              depreciation_method: straight_line
+              useful_life_months: 60
+              residual_value_percent: 1000.0
       responses:
         '201':
           description: Asset model created
@@ -852,6 +911,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ModifyAssetRequest'
+            example:
+              effective_date: '2026-01-15'
+              reason: Reclassification of asset category
+              new_useful_life_months: 1
+              new_residual_value: 1000.0
+              value_adjustment: 1000.0
       responses:
         '200':
           description: Asset modified
@@ -932,12 +997,15 @@ components:
         total:
           type: integer
           description: Total number of records
+          example: 1
         page:
           type: integer
           description: Current page number
+          example: 1
         limit:
           type: integer
           description: Page size limit
+          example: 1
     Asset:
       type: object
       required:
@@ -956,52 +1024,63 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this asset
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_number:
           type: string
           maxLength: 100
           description: Unique asset tag/number
+          example: AST-2024-001
         name:
           type: string
           maxLength: 200
           description: Asset name/description
+          example: Acme Corporation
         description:
           type: string
           maxLength: 2000
           nullable: true
           description: Detailed description
+          example: Primary operating company
         category_id:
           type: string
           format: uuid
           description: Asset category
+          example: sample value
         acquisition_cost:
           type: number
           format: double
           minimum: 0
           description: Original acquisition cost
+          example: 50000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency of the acquisition cost
+          example: USD
         acquisition_date:
           type: string
           format: date
           description: Date the asset was acquired
+          example: '2024-01-15'
         location:
           type: string
           maxLength: 500
           nullable: true
           description: Current location of the asset
+          example: Building A, Floor 3
         department_id:
           type: string
           format: uuid
           nullable: true
           description: Department responsible for the asset
+          example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
           type: string
           format: uuid
           nullable: true
           description: Person responsible for the asset
+          example: 750e8400-e29b-41d4-a716-446655440002
         status:
           type: string
           enum:
@@ -1013,57 +1092,70 @@ components:
           - IN_REPAIR
           - TRANSIT
           description: Asset lifecycle status
+          example: active
         acquisition_gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry created during acquisition
+          example: 550e8400-e29b-41d4-a716-446655440000
         net_book_value:
           type: number
           format: double
           description: Current net book value (cost - accumulated depreciation)
+          example: 35000.0
         accumulated_depreciation:
           type: number
           format: double
           description: Total depreciation to date
+          example: 15000.0
         useful_life_months:
           type: integer
           minimum: 1
           description: Useful life in months
+          example: 60
         company_id:
           type: string
           format: uuid
           description: Company this asset belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
           type: string
           format: uuid
           nullable: true
           description: Original supplier/vendor
+          example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
           type: string
           maxLength: 200
           nullable: true
           description: Manufacturer serial number
+          example: SN-2026-0001
         warranty_expiry:
           type: string
           format: date
           nullable: true
           description: Warranty expiration date
+          example: '2031-01-01'
         insurance_policy:
           type: string
           maxLength: 200
           nullable: true
           description: Insurance policy reference
+          example: POL-2026-0001
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     AssetWithDetails:
       allOf:
       - $ref: '#/components/schemas/Asset'
@@ -1096,40 +1188,50 @@ components:
         asset_number:
           type: string
           maxLength: 100
+          example: AST-2024-001
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         description:
           type: string
           maxLength: 2000
           nullable: true
+          example: Primary operating company
         acquisition_cost:
           type: number
           format: double
           minimum: 0
+          example: 50000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Defaults to company currency
+          example: USD
         acquisition_date:
           type: string
           format: date
+          example: '2024-01-15'
         location:
           type: string
           maxLength: 500
           nullable: true
+          example: Building A, Floor 3
         department_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         useful_life_months:
           type: integer
           minimum: 1
+          example: 60
         depreciation_method:
           type: string
           enum:
@@ -1139,56 +1241,69 @@ components:
           - UNITS_OF_PRODUCTION
           - FOREIGN_EXCHANGE_ADJUSTMENT
           description: Depreciation method. Defaults to STRAIGHT_LINE.
+          example: straight_line
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
           type: string
           maxLength: 200
           nullable: true
+          example: SN-2026-0001
         warranty_expiry:
           type: string
           format: date
           nullable: true
+          example: '2031-01-01'
         acquisition_gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL entry from acquisition invoice
+          example: 550e8400-e29b-41d4-a716-446655440000
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         auto_depreciate:
           type: boolean
           default: true
           description: Automatically create depreciation schedule on creation
+          example: true
     UpdateAssetRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         description:
           type: string
           maxLength: 2000
           nullable: true
+          example: Primary operating company
         location:
           type: string
           maxLength: 500
           nullable: true
+          example: Building A, Floor 3
         department_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440002
         status:
           type: string
           enum:
@@ -1199,10 +1314,12 @@ components:
           - SCRAPPED
           - IN_REPAIR
           - TRANSIT
+          example: active
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     DepreciationSchedule:
       type: object
       required:
@@ -1218,10 +1335,12 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the schedule
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_id:
           type: string
           format: uuid
           description: Asset this schedule belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         method:
           type: string
           enum:
@@ -1230,46 +1349,58 @@ components:
           - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
           - FOREIGN_EXCHANGE_ADJUSTMENT
+          example: bank_transfer
         acquisition_cost:
           type: number
           format: double
           description: Cost basis for calculation
+          example: 50000.0
         salvage_value:
           type: number
           format: double
           minimum: 0
           default: 0
           description: Estimated salvage/scrap value
+          example: 5000.0
         useful_life_months:
           type: integer
           minimum: 1
+          example: 60
         monthly_rate:
           type: number
           format: double
           description: Monthly depreciation rate
+          example: 1
         start_date:
           type: string
           format: date
           description: Depreciation start date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
           description: Depreciation end date
+          example: '2026-01-15'
         total_depreciation:
           type: number
           format: double
           description: Total depreciation over life
+          example: 1000.0
         entries:
           type: array
           items:
             $ref: '#/components/schemas/DepreciationEntry'
           description: Individual depreciation entries
+          example:
+          - entry_id: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     DepreciationEntry:
       type: object
       required:
@@ -1283,45 +1414,56 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this entry
+          example: 550e8400-e29b-41d4-a716-446655440000
         schedule_id:
           type: string
           format: uuid
           description: Depreciation schedule this entry belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_id:
           type: string
           format: uuid
           description: Asset this entry relates to
+          example: 550e8400-e29b-41d4-a716-446655440000
         period:
           type: string
           format: date
           description: Period end date for this entry
+          example: 2026-01
         depreciation_amount:
           type: number
           format: double
           description: Depreciation amount for this period
+          example: 1000.0
         accumulated_depreciation:
           type: number
           format: double
           description: Total accumulated depreciation at this period
+          example: 15000.0
         net_book_value:
           type: number
           format: double
           description: Net book value at this period
+          example: 35000.0
         gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry created for this depreciation
+          example: 650e8400-e29b-41d4-a716-446655440001
         posted_to_gl:
           type: boolean
           default: false
           description: Whether posted to GL
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateDepreciationScheduleRequest:
       type: object
       required:
@@ -1333,6 +1475,7 @@ components:
         asset_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         method:
           type: string
           enum:
@@ -1341,22 +1484,27 @@ components:
           - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
           - FOREIGN_EXCHANGE_ADJUSTMENT
+          example: bank_transfer
         salvage_value:
           type: number
           format: double
           minimum: 0
           default: 0
+          example: 5000.0
         useful_life_months:
           type: integer
           minimum: 1
+          example: 60
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         monthly_rate:
           type: number
           format: double
           nullable: true
           description: Custom monthly rate. Auto-calculated from method if not provided.
+          example: 1
     CreateDepreciationEntryRequest:
       type: object
       required:
@@ -1367,17 +1515,21 @@ components:
         schedule_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         period:
           type: string
           format: date
+          example: 2026-01
         depreciation_amount:
           type: number
           format: double
           minimum: 0
+          example: 1000.0
         post_to_gl:
           type: boolean
           default: true
           description: Create GL entry for this depreciation
+          example: true
     RevaluationRecord:
       type: object
       required:
@@ -1390,38 +1542,47 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_id:
           type: string
           format: uuid
           description: Asset being revalued
+          example: 550e8400-e29b-41d4-a716-446655440000
         previous_value:
           type: number
           format: double
           description: Net book value before revaluation
+          example: 1000.0
         new_value:
           type: number
           format: double
           description: New net book value after revaluation
+          example: 1000.0
         revaluation_date:
           type: string
           format: date
           description: Date of revaluation
+          example: '2026-01-15'
         reason:
           type: string
           maxLength: 1000
           description: Reason for revaluation
+          example: Reclassification of asset category
         gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry for revaluation
+          example: 650e8400-e29b-41d4-a716-446655440001
         created_by:
           type: string
           format: uuid
           description: User who performed revaluation
+          example: 950e8400-e29b-41d4-a716-446655440004
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateRevaluationRequest:
       type: object
       required:
@@ -1433,20 +1594,25 @@ components:
         asset_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         new_value:
           type: number
           format: double
           minimum: 0
+          example: 1000.0
         revaluation_date:
           type: string
           format: date
+          example: '2026-01-15'
         reason:
           type: string
           maxLength: 1000
+          example: Reclassification of asset category
         post_to_gl:
           type: boolean
           default: true
           description: Create GL entry for revaluation
+          example: true
     DisposalRecord:
       type: object
       required:
@@ -1460,14 +1626,17 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_id:
           type: string
           format: uuid
           description: Asset being disposed
+          example: 550e8400-e29b-41d4-a716-446655440000
         disposal_date:
           type: string
           format: date
           description: Date of disposal
+          example: '2026-01-15'
         disposal_type:
           type: string
           enum:
@@ -1477,47 +1646,57 @@ components:
           - TRANSFER
           - WRITE_OFF
           - THEFT
+          example: standard
         net_book_value:
           type: number
           format: double
           description: Net book value at disposal
+          example: 35000.0
         proceeds:
           type: number
           format: double
           minimum: 0
           default: 0
           description: Sale proceeds (0 for scrap/write-off)
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency of proceeds
+          example: USD
         gain_loss:
           type: number
           format: double
           description: Gain (positive) or loss (negative) on disposal
+          example: 1000.0
         description:
           type: string
           maxLength: 2000
           nullable: true
           description: Disposal details
+          example: Primary operating company
         approved_by:
           type: string
           format: uuid
           nullable: true
           description: User who approved the disposal
+          example: 950e8400-e29b-41d4-a716-446655440004
         gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry for disposal
+          example: 650e8400-e29b-41d4-a716-446655440001
         created_by:
           type: string
           format: uuid
           description: User who recorded the disposal
+          example: 950e8400-e29b-41d4-a716-446655440004
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateDisposalRequest:
       type: object
       required:
@@ -1528,9 +1707,11 @@ components:
         asset_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         disposal_date:
           type: string
           format: date
+          example: '2026-01-15'
         disposal_type:
           type: string
           enum:
@@ -1540,19 +1721,23 @@ components:
           - TRANSFER
           - WRITE_OFF
           - THEFT
+          example: standard
         proceeds:
           type: number
           format: double
           minimum: 0
           default: 0
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         description:
           type: string
           maxLength: 2000
           nullable: true
+          example: Primary operating company
     AssetCategory:
       type: object
       required:
@@ -1563,15 +1748,18 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 200
           description: Category name
+          example: Acme Corporation
         description:
           type: string
           maxLength: 500
           nullable: true
           description: Category description
+          example: Primary operating company
         default_depreciation_method:
           type: string
           enum:
@@ -1581,35 +1769,43 @@ components:
           - UNITS_OF_PRODUCTION
           - FOREIGN_EXCHANGE_ADJUSTMENT
           description: Default depreciation method for assets in this category
+          example: true
         default_useful_life_months:
           type: integer
           minimum: 1
           nullable: true
           description: Default useful life in months
+          example: true
         gl_account_debit:
           type: string
           format: uuid
           nullable: true
           description: Default debit GL account for acquisitions
+          example: GL-DEBIT-2026
         gl_account_credit:
           type: string
           format: uuid
           nullable: true
           description: Default credit GL account for depreciation
+          example: GL-CREDIT-2026
         parent_category_id:
           type: string
           format: uuid
           nullable: true
           description: Parent category for hierarchical categories
+          example: 650e8400-e29b-41d4-a716-446655440031
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateAssetCategoryRequest:
       type: object
       required:
@@ -1619,10 +1815,12 @@ components:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         description:
           type: string
           maxLength: 500
           nullable: true
+          example: Primary operating company
         default_depreciation_method:
           type: string
           enum:
@@ -1631,25 +1829,31 @@ components:
           - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
           - FOREIGN_EXCHANGE_ADJUSTMENT
+          example: true
         default_useful_life_months:
           type: integer
           minimum: 1
           nullable: true
+          example: true
         gl_account_debit:
           type: string
           format: uuid
           nullable: true
+          example: GL-DEBIT-2026
         gl_account_credit:
           type: string
           format: uuid
           nullable: true
+          example: GL-CREDIT-2026
         parent_category_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440031
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     AssetModel:
       type: object
       required:
@@ -1661,9 +1865,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         depreciation_method:
           type: string
           enum:
@@ -1671,25 +1877,31 @@ components:
           - DECLINING_BALANCE
           - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
+          example: straight_line
         useful_life_months:
           type: integer
           minimum: 1
+          example: 60
         residual_value_percent:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         asset_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 750e8400-e29b-41d4-a716-446655440027
         depreciation_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440025
         expense_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440026
     CreateAssetModelRequest:
       type: object
       required:
@@ -1700,6 +1912,7 @@ components:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         depreciation_method:
           type: string
           enum:
@@ -1707,13 +1920,16 @@ components:
           - DECLINING_BALANCE
           - SUM_OF_YEARS_DIGITS
           - UNITS_OF_PRODUCTION
+          example: straight_line
         useful_life_months:
           type: integer
           minimum: 1
+          example: 60
         residual_value_percent:
           type: number
           format: double
           nullable: true
+          example: 1000.0
     ModifyAssetRequest:
       type: object
       required:
@@ -1723,19 +1939,24 @@ components:
         effective_date:
           type: string
           format: date
+          example: '2026-01-15'
         reason:
           type: string
+          example: Reclassification of asset category
         new_useful_life_months:
           type: integer
           nullable: true
+          example: 1
         new_residual_value:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         value_adjustment:
           type: number
           format: double
           nullable: true
+          example: 1000.0
     PaginatedAssetModels:
       type: object
       required:
@@ -1746,8 +1967,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssetModel'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedAssets:
       type: object
       required:
@@ -1760,14 +1983,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Asset'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedDepreciationEntries:
       type: object
       required:
@@ -1780,14 +2008,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DepreciationEntry'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedRevaluations:
       type: object
       required:
@@ -1800,14 +2033,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RevaluationRecord'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedDisposals:
       type: object
       required:
@@ -1820,14 +2058,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DisposalRecord'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedAssetCategories:
       type: object
       required:
@@ -1840,14 +2083,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssetCategory'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     AssetSummary:
       type: object
       required:
@@ -1859,28 +2107,35 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_assets:
           type: integer
           description: Count of active assets
+          example: 500000.0
         total_acquisition_cost:
           type: number
           format: double
           description: Total acquisition cost
+          example: 100000.0
         total_accumulated_depreciation:
           type: number
           format: double
           description: Total accumulated depreciation
+          example: 25000.0
         total_net_book_value:
           type: number
           format: double
           description: Total net book value
+          example: 75000.0
         by_category:
           type: array
           items:
@@ -1900,16 +2155,27 @@ components:
                 type: number
                 format: double
           description: Breakdown by category
+          example:
+          - category: Equipment
+            count: 50
+            value: 250000.0
         by_status:
           type: object
           description: Count by status
+          example:
+          - status: active
+            count: 45
+          - status: maintenance
+            count: 5
         depreciation_expense_current_year:
           type: number
           format: double
           description: Total depreciation expense in current fiscal year
+          example: 10000.0
         disposals_current_year:
           type: integer
           description: Number of assets disposed this year
+          example: 5000.0
     ErrorResponse:
       type: object
       required:
@@ -1932,6 +2198,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -1961,5 +2228,6 @@ components:
               message:
                 type: string
                 example: Disposal proceeds cannot exceed net book value without proper documentation
+          example: []
 security:
 - bearerAuth: []

@@ -71,6 +71,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccountingDocumentRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              document_type: standard
+              file_name: Acme Corporation
+              content_type: standard
+              source_uri: sample value
       responses:
         '201':
           description: Accounting document created
@@ -115,6 +121,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClassifyDocumentRequest'
+            example:
+              force_reclassify: true
       responses:
         '200':
           description: Document classification result
@@ -168,6 +176,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateExtractionJobRequest'
+            example:
+              document_id: 550e8400-e29b-41d4-a716-446655440000
+              profile: sample value
       responses:
         '202':
           description: Extraction job accepted
@@ -219,6 +230,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApproveExtractionRequest'
+            example:
+              approved_by: 950e8400-e29b-41d4-a716-446655440004
+              corrections: &id005
+                key: value
       responses:
         '200':
           description: Extraction approved
@@ -254,6 +269,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LinkDocumentRequest'
+            example:
+              target_id: 1000.0
+              link_reason: sample value
       responses:
         '200':
           description: Document linked to invoice
@@ -286,6 +304,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LinkDocumentRequest'
+            example:
+              target_id: 1000.0
+              link_reason: sample value
       responses:
         '200':
           description: Document linked to bank statement
@@ -363,9 +384,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -375,6 +398,7 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         status:
           enum:
           - UPLOADED
@@ -385,15 +409,20 @@ components:
           - LINKED
           - REJECTED
           - ARCHIVED
+          example: active
         file_name:
           type: string
+          example: Acme Corporation
         content_type:
           type: string
+          example: standard
         source_uri:
           type: string
+          example: sample value
         uploaded_at:
           type: string
           format: date-time
+          example: sample value
     CreateAccountingDocumentRequest:
       type: object
       required:
@@ -403,6 +432,7 @@ components:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -412,18 +442,23 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         file_name:
           type: string
+          example: Acme Corporation
         content_type:
           type: string
+          example: standard
         source_uri:
           type: string
+          example: sample value
     ClassifyDocumentRequest:
       type: object
       properties:
         force_reclassify:
           type: boolean
           default: false
+          example: true
     DocumentClassification:
       type: object
       required:
@@ -434,6 +469,7 @@ components:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -443,13 +479,16 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         confidence:
           type: number
           format: double
+          example: 0.85
         reasons:
           type: array
           items:
             type: string
+          example: sample value
     ExtractionJob:
       type: object
       required:
@@ -461,11 +500,14 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile:
           type: string
+          example: sample value
         status:
           enum:
           - PENDING
@@ -473,12 +515,15 @@ components:
           - COMPLETED
           - FAILED
           - CANCELLED
+          example: active
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         completed_at:
           type: string
           format: date-time
+          example: '2026-01-15T14:30:00Z'
     CreateExtractionJobRequest:
       type: object
       required:
@@ -487,8 +532,10 @@ components:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile:
           type: string
+          example: sample value
     ExtractionResult:
       type: object
       required:
@@ -500,18 +547,24 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         job_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         extracted_fields:
           type: object
           additionalProperties: true
+          example:
+            key: value
         confidence:
           type: number
           format: double
+          example: 0.85
     ApproveExtractionRequest:
       type: object
       required:
@@ -520,9 +573,11 @@ components:
         approved_by:
           type: string
           format: uuid
+          example: 950e8400-e29b-41d4-a716-446655440004
         corrections:
           type: object
           additionalProperties: true
+          example: *id005
     ExtractionApproval:
       type: object
       required:
@@ -533,12 +588,15 @@ components:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         approved_by:
           type: string
           format: uuid
+          example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     LinkDocumentRequest:
       type: object
       required:
@@ -547,8 +605,10 @@ components:
         target_id:
           type: string
           format: uuid
+          example: 1000.0
         link_reason:
           type: string
+          example: sample value
     DocumentLink:
       type: object
       required:
@@ -560,14 +620,18 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         target_id:
           type: string
           format: uuid
+          example: 1000.0
         target_type:
           type: string
+          example: 1000.0
     PaginatedAccountingDocuments:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -604,10 +668,13 @@ components:
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
       required:
@@ -616,8 +683,10 @@ components:
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -627,11 +696,15 @@ components:
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
         fields:
           type: array
           items:
             type: string
+          example:
+          - sample value
 security:
 - bearerAuth: []
