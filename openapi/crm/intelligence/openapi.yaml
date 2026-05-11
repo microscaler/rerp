@@ -1,0 +1,967 @@
+openapi: 3.1.0
+info:
+  title: CRM Intelligence
+  version: 1.0.0
+  description: Predictive analytics, lead scoring, enrichment, and data verification.
+servers:
+  - url: /api/v1/crm/intelligence
+    description: CRM Intelligence API
+tags:
+  - name: scoring
+    description: Lead scoring and probability
+  - name: enrichment
+    description: Data enrichment from external sources
+  - name: verification
+    description: Email and phone verification
+  - name: mining
+    description: Lead discovery and mining
+paths:
+  /leads/score-batch:
+    post:
+      operationId: score_all_leads
+      summary: Compute scores for all leads (triggers Bayesian PLS rebuild)
+      tags: [scoring]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                team_id:
+                  type: string
+                  format: uuid
+                  description: Scope to specific team (optional)
+      responses:
+        '200':
+          description: Scoring batch completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scores_computed:
+                    type: integer
+                  time_ms:
+                    type: integer
+  /leads/score-bulk:
+    post:
+      operationId: score_leads_bulk
+      summary: Score a batch of specific leads
+      tags: [scoring]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lead_ids]
+              properties:
+                lead_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Scores computed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id:
+                          type: string
+                          format: uuid
+                        probability:
+                          type: number
+                          format: float
+                        top_factors:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              field:
+                                type: string
+                              value:
+                                type: string
+                              impact:
+                                type: number
+                                format: float
+  /leads/{id}/score:
+    get:
+      operationId: get_lead_score
+      summary: Get score for a single lead
+      tags: [scoring]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lead score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeadScore'
+        '404':
+          description: Not found
+  /leads/{id}/score/explain:
+    get:
+      operationId: explain_lead_score
+      summary: Get score explanation with top contributing factors
+      tags: [scoring]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Score explanation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreExplanation'
+        '404':
+          description: Not found
+  /scoring/frequencies:
+    get:
+      operationId: list_scoring_frequencies
+      summary: View scoring frequency data
+      tags: [scoring]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_variable
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scoring frequencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScoringFrequency'
+                  total:
+                    type: integer
+  /scoring/frequencies/rebuild:
+    post:
+      operationId: rebuild_scoring_frequencies
+      summary: Rebuild scoring frequency tables from historical data
+      tags: [scoring]
+      responses:
+        '200':
+          description: Frequencies rebuilt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  records_processed:
+                    type: integer
+                  frequencies_updated:
+                    type: integer
+  /scoring/thresholds:
+    get:
+      operationId: get_scoring_thresholds
+      summary: Get hot/warm/cold thresholds
+      tags: [scoring]
+      responses:
+        '200':
+          description: Scoring thresholds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringThresholds'
+    put:
+      operationId: update_scoring_thresholds
+      summary: Update hot/warm/cold thresholds
+      tags: [scoring]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateThresholdsRequest'
+      responses:
+        '200':
+          description: Thresholds updated
+        '400':
+          description: Invalid request
+  /leads/hot:
+    get:
+      operationId: list_hot_leads
+      summary: List all hot leads (score >= 75)
+      tags: [scoring]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Hot leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id:
+                          type: string
+                          format: uuid
+                        lead_name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                  total:
+                    type: integer
+  /leads/warm:
+    get:
+      operationId: list_warm_leads
+      summary: List all warm leads (score 40-74)
+      tags: [scoring]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Warm leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id:
+                          type: string
+                          format: uuid
+                        lead_name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                  total:
+                    type: integer
+  /leads/cold:
+    get:
+      operationId: list_cold_leads
+      summary: List all cold leads (score < 40)
+      tags: [scoring]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Cold leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id:
+                          type: string
+                          format: uuid
+                        lead_name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                  total:
+                    type: integer
+  /leads/ranked:
+    get:
+      operationId: list_ranked_leads
+      summary: List all leads sorted by score descending
+      tags: [scoring]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Leads ranked by score
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                        lead_id:
+                          type: string
+                          format: uuid
+                        lead_name:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+                  total:
+                    type: integer
+  /enrichment/lookup:
+    post:
+      operationId: lookup_enrichment
+      summary: Enrich a lead by email address
+      tags: [enrichment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrichmentLookupRequest'
+      responses:
+        '200':
+          description: Enrichment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichmentResponse'
+        '400':
+          description: Invalid request
+  /enrichment/website:
+    post:
+      operationId: lookup_by_website
+      summary: Enrich by company website
+      tags: [enrichment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebsiteEnrichmentRequest'
+      responses:
+        '200':
+          description: Enrichment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichmentResponse'
+  /enrichment/batch:
+    post:
+      operationId: batch_enrich
+      summary: Enrich multiple records at once
+      tags: [enrichment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchEnrichmentRequest'
+      responses:
+        '200':
+          description: Batch enrichment results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  processed:
+                    type: integer
+                  successful:
+                    type: integer
+                  failed:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EnrichmentResponse'
+  /enrichment/auto-fill:
+    post:
+      operationId: auto_fill
+      summary: Auto-fill from partial email data
+      tags: [enrichment]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                lead_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Auto-fill changes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichmentResponse'
+  /enrichment/{id}/result:
+    get:
+      operationId: get_enrichment_result
+      summary: Get enrichment result by request ID
+      tags: [enrichment]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Enrichment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichmentResult'
+        '404':
+          description: Not found
+  /verify/email:
+    post:
+      operationId: verify_email
+      summary: Verify a single email address
+      tags: [verification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailVerificationResult'
+        '400':
+          description: Invalid request
+  /verify/batch:
+    post:
+      operationId: verify_batch
+      summary: Verify a list of emails
+      tags: [verification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [emails]
+              properties:
+                emails:
+                  type: array
+                  items:
+                    type: string
+                    format: email
+      responses:
+        '200':
+          description: Batch verification results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  valid:
+                    type: integer
+                  invalid:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailVerificationResult'
+  /verify/phone:
+    post:
+      operationId: verify_phone
+      summary: Verify a phone number
+      tags: [verification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: Phone verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneVerificationResult'
+  /mining/search:
+    post:
+      operationId: search_leads
+      summary: Search for leads matching ICP criteria
+      tags: [mining]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadMiningRequest'
+      responses:
+        '200':
+          description: Mining results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DiscoveredLead'
+                  total:
+                    type: integer
+  /mining/icp-match:
+    post:
+      operationId: find_icp_matches
+      summary: Find leads matching Ideal Customer Profile
+      tags: [mining]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ICPMatchRequest'
+      responses:
+        '200':
+          description: ICP match results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DiscoveredLead'
+                  total:
+                    type: integer
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    # ======================== SCORING ========================
+    LeadScore:
+      type: object
+      required: [lead_id, probability]
+      properties:
+        id:
+          type: string
+          format: uuid
+        lead_id:
+          type: string
+          format: uuid
+        probability:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+        automated_probability:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+        is_automated_probability:
+          type: boolean
+        top_factors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              value:
+                type: string
+              impact:
+                type: number
+                format: float
+        computation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        total_records:
+          type: integer
+          readOnly: true
+
+    ScoreExplanation:
+      type: object
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        probability:
+          type: number
+          format: float
+        bucket:
+          $ref: '#/components/schemas/ScoreBucket'
+        contributing_factors:
+          type: array
+          items:
+            type: object
+            properties:
+              variable:
+                type: string
+              value:
+                type: string
+              won_rate:
+                type: number
+                format: float
+              impact:
+                type: number
+                format: float
+                description: Positive pushes up, negative pushes down
+        total_records:
+          type: integer
+
+    ScoringFrequency:
+      type: object
+      required: [variable, value, won_count, lost_count]
+      properties:
+        id:
+          type: string
+          format: uuid
+        variable:
+          type: string
+          maxLength: 128
+        value:
+          type: string
+          maxLength: 255
+        won_count:
+          type: integer
+        lost_count:
+          type: integer
+        team_id:
+          type: string
+          format: uuid
+        total:
+          type: integer
+          readOnly: true
+
+    ScoringThresholds:
+      type: object
+      required: [hot, warm, cold]
+      properties:
+        hot:
+          type: object
+          properties:
+            min:
+              type: integer
+            label:
+              type: string
+            color:
+              type: string
+        warm:
+          type: object
+          properties:
+            min:
+              type: integer
+            max:
+              type: integer
+            label:
+              type: string
+            color:
+              type: string
+        cold:
+          type: object
+          properties:
+            max:
+              type: integer
+            label:
+              type: string
+            color:
+              type: string
+
+    UpdateThresholdsRequest:
+      type: object
+      properties:
+        hot_threshold:
+          type: integer
+        warm_threshold:
+          type: integer
+
+    # ======================== ENRICHMENT ========================
+    EnrichmentLookupRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+        lead_id:
+          type: string
+          format: uuid
+        company_name:
+          type: string
+        website:
+          type: string
+
+    WebsiteEnrichmentRequest:
+      type: object
+      required: [website]
+      properties:
+        website:
+          type: string
+          format: uri
+        company_name:
+          type: string
+
+    BatchEnrichmentRequest:
+      type: object
+      required: [emails]
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+        source:
+          type: string
+          enum: [CLEARBIT, HUNTER, ZOOMINFO, APOLLO]
+
+    EnrichmentResponse:
+      type: object
+      properties:
+        company:
+          type: object
+          properties:
+            name:
+              type: string
+            industry:
+              type: string
+            size:
+              $ref: '#/components/schemas/CompanySize'
+            website:
+              type: string
+            location:
+              type: string
+            country:
+              type: string
+            tech_stack:
+              type: array
+              items:
+                type: string
+            funding_total:
+              type: number
+              format: double
+            funding_round:
+              type: string
+            employee_count:
+              type: integer
+            annual_revenue:
+              type: number
+              format: double
+            logo_url:
+              type: string
+            linkedin_url:
+              type: string
+        person:
+          type: object
+          properties:
+            name:
+              type: string
+            title:
+              type: string
+            role:
+              $ref: '#/components/schemas/PersonRole'
+            seniority:
+              $ref: '#/components/schemas/PersonSeniority'
+            email:
+              type: string
+              format: email
+            email_valid:
+              type: boolean
+            phone:
+              type: string
+            linkedin_url:
+              type: string
+
+    EnrichmentResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        enrichment_request_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/EnrichmentStatus'
+        source:
+          $ref: '#/components/schemas/EnrichmentSource'
+        company:
+          type: object
+        person:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    # ======================== VERIFICATION ========================
+    EmailVerificationResult:
+      type: object
+      properties:
+        email:
+          type: string
+        valid:
+          type: boolean
+        disposable:
+          type: boolean
+        role_based:
+          type: boolean
+        domain_valid:
+          type: boolean
+        mx_records_exist:
+          type: boolean
+
+    PhoneVerificationResult:
+      type: object
+      properties:
+        phone:
+          type: string
+        valid:
+          type: boolean
+        carrier:
+          type: string
+        phone_type:
+          $ref: '#/components/schemas/PhoneType'
+
+    # ======================== MINING ========================
+    LeadMiningRequest:
+      type: object
+      required: [criteria]
+      properties:
+        criteria:
+          type: object
+          description: Search criteria JSON (industry, size, location, title, etc.)
+        source:
+          type: string
+          enum: [CLEARBIT, ZOOMINFO, APOLLO, LINKEDIN]
+        limit:
+          type: integer
+          default: 50
+
+    ICPMatchRequest:
+      type: object
+      required: [icp_profile]
+      properties:
+        icp_profile:
+          type: object
+          description: Ideal Customer Profile definition
+        limit:
+          type: integer
+          default: 50
+
+    DiscoveredLead:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        industry:
+          type: string
+        size:
+          $ref: '#/components/schemas/CompanySize'
+        match_score:
+          type: number
+          format: float
+          description: ICP match score (0-100)
+
+    # ======================== ENUMS ========================
+    ScoreBucket:
+      type: string
+      enum: [HOT, WARM, COLD]
+
+    CompanySize:
+      type: string
+      enum: [STARTUP, SMB, MID_MARKET, ENTERPRISE]
+
+    PersonRole:
+      type: string
+      enum: [EXECUTIVE, MANAGER, INDIVIDUAL_CONTRIBUTOR, INTERN, OTHER]
+
+    PersonSeniority:
+      type: string
+      enum: [C_LEVEL, VP, DIRECTOR, MANAGER, SENIOR, MID, JUNIOR]
+
+    EnrichmentStatus:
+      type: string
+      enum: [PENDING, SUCCESS, FAILED]
+
+    EnrichmentSource:
+      type: string
+      enum: [CLEARBIT, HUNTER, ZOOMINFO, APOLLO, LINKEDIN]
+
+    PhoneType:
+      type: string
+      enum: [MOBILE, LANDLINE, VOIP]

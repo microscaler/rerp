@@ -1,0 +1,831 @@
+openapi: 3.1.0
+info:
+  title: CRM Marketing Integration
+  version: 1.0.0
+  description: Campaign tracking, web forms, visitor analytics, events, and surveys.
+servers:
+  - url: /api/v1/crm/marketing
+    description: CRM Marketing API
+tags:
+  - name: utm
+    description: Campaign, medium, and source tracking
+  - name: forms
+    description: Public web form capture
+  - name: visitors
+    description: Anonymous visitor tracking
+  - name: campaigns
+    description: Campaign reporting and attribution
+  - name: events
+    description: Event registration tracking
+  - name: surveys
+    description: Survey response tracking
+paths:
+  /utm/campaigns:
+    get:
+      operationId: list_utms_campaigns
+      summary: List all campaigns
+      tags: [utm]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UTMCampaign'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_utms_campaign
+      summary: Create a new UTM campaign
+      tags: [utm]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUTMCampaignRequest'
+      responses:
+        '201':
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UTMCampaign'
+        '400':
+          description: Invalid request
+  /utm/campaigns/{id}:
+    get:
+      operationId: get_utms_campaign
+      summary: Get UTM campaign by id
+      tags: [utm]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UTMCampaign'
+        '404':
+          description: Not found
+    put:
+      operationId: update_utms_campaign
+      summary: Update UTM campaign
+      tags: [utm]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUTMCampaignRequest'
+      responses:
+        '200':
+          description: Campaign updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UTMCampaign'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+    delete:
+      operationId: delete_utms_campaign
+      summary: Soft-delete UTM campaign
+      tags: [utm]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Campaign deleted
+        '404':
+          description: Not found
+  /utm/mediums:
+    get:
+      operationId: list_utms_mediums
+      summary: List all UTM mediums
+      tags: [utm]
+      responses:
+        '200':
+          description: List of mediums
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UTMMedium'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_utms_medium
+      summary: Create a new UTM medium
+      tags: [utm]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUTMMediumRequest'
+      responses:
+        '201':
+          description: Medium created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UTMMedium'
+        '400':
+          description: Invalid request
+  /utm/sources:
+    get:
+      operationId: list_utms_sources
+      summary: List all UTM sources
+      tags: [utm]
+      responses:
+        '200':
+          description: List of sources
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UTMSource'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_utms_source
+      summary: Create a new UTM source
+      tags: [utm]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUTMSourceRequest'
+      responses:
+        '201':
+          description: Source created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UTMSource'
+        '400':
+          description: Invalid request
+  /forms/{id}:
+    post:
+      operationId: submit_form
+      summary: Public form submission — creates a lead automatically
+      tags: [forms]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FormSubmissionRequest'
+      responses:
+        '201':
+          description: Lead created from form
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSubmissionResult'
+        '400':
+          description: Validation failed
+        '404':
+          description: Form not found
+  /forms/{id}/config:
+    get:
+      operationId: get_form_config
+      summary: Get form configuration for embedding
+      tags: [forms]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Form configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebForm'
+        '404':
+          description: Not found
+  /analytics/track:
+    post:
+      operationId: track_page_view
+      summary: Track a page view for an anonymous visitor
+      tags: [visitors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackPageViewRequest'
+      responses:
+        '201':
+          description: Page view tracked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitorTracking'
+  /analytics/visitors:
+    get:
+      operationId: list_visitors
+      summary: List visitor tracking records
+      tags: [visitors]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_converted
+          in: query
+          schema:
+            type: boolean
+        - name: filter_country
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Visitor tracking data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VisitorTracking'
+                  total:
+                    type: integer
+  /analytics/visitors/identify:
+    post:
+      operationId: identify_visitor
+      summary: Identify an anonymous visitor by email
+      tags: [visitors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentifyVisitorRequest'
+      responses:
+        '200':
+          description: Visitor identified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visitor_id:
+                    type: string
+                  identified:
+                    type: boolean
+                  lead_id:
+                    type: string
+                    format: uuid
+
+  /campaigns/{id}/leads:
+    get:
+      operationId: get_campaign_leads
+      summary: Get leads generated by a campaign
+      tags: [campaigns]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Campaign leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id:
+                          type: string
+                          format: uuid
+                        lead_name:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+  /campaigns/{id}/revenue:
+    get:
+      operationId: get_campaign_revenue
+      summary: Get revenue attributed to a campaign
+      tags: [campaigns]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Campaign revenue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_revenue:
+                    type: number
+                    format: double
+                  total_opportunities:
+                    type: integer
+                  total_won_deals:
+                    type: integer
+                  average_deal_size:
+                    type: number
+                    format: double
+
+  /events/register:
+    post:
+      operationId: register_event
+      summary: Register attendee for an event (creates lead)
+      tags: [events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRegistrationRequest'
+      responses:
+        '201':
+          description: Event registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRegistration'
+        '400':
+          description: Invalid request
+  /events/{id}/registrations:
+    get:
+      operationId: get_event_registrations
+      summary: Get registrations for an event
+      tags: [events]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Event registrations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventRegistration'
+                  total:
+                    type: integer
+  /surveys/submit:
+    post:
+      operationId: submit_survey
+      summary: Submit a survey response (may create lead)
+      tags: [surveys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurveyResponseRequest'
+      responses:
+        '201':
+          description: Survey submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurveyResponse'
+        '400':
+          description: Invalid request
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    # ======================== UTM ========================
+    UTMCampaign:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        active:
+          type: boolean
+          default: true
+        sequence:
+          type: integer
+        company_id:
+          type: string
+          format: uuid
+
+    CreateUTMCampaignRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        active:
+          type: boolean
+        sequence:
+          type: integer
+
+    UpdateUTMCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        active:
+          type: boolean
+        sequence:
+          type: integer
+
+    UTMMedium:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 64
+        active:
+          type: boolean
+          default: true
+
+    CreateUTMMediumRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        active:
+          type: boolean
+
+    UTMSource:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 64
+        medium_id:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+          default: true
+
+    CreateUTMSourceRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        medium_id:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+
+    # ======================== WEB FORM ========================
+    WebForm:
+      type: object
+      required: [id, name, capture_fields]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        redirect_url:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+        capture_fields:
+          type: object
+          description: Schema of fields to capture (key-value definitions)
+        team_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        utm_source_id:
+          type: string
+          format: uuid
+        utm_medium_id:
+          type: string
+          format: uuid
+        utm_campaign_id:
+          type: string
+          format: uuid
+        consent_required:
+          type: boolean
+          default: false
+        consent_text:
+          type: string
+        api_endpoint:
+          type: string
+          readOnly: true
+        embed_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    FormSubmissionRequest:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: object
+          description: Form field values matching capture_fields schema
+        consent_given:
+          type: boolean
+          description: GDPR consent checkbox
+        visitor_id:
+          type: string
+          description: Anonymous visitor ID (from cookie)
+
+    FormSubmissionResult:
+      type: object
+      properties:
+        lead_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        form_id:
+          type: string
+          format: uuid
+        redirect_url:
+          type: string
+
+    # ======================== VISITOR TRACKING ========================
+    VisitorTracking:
+      type: object
+      required: [id, visitor_id, first_seen]
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        url_visited:
+          type: string
+        referrer:
+          type: string
+        user_agent:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        pages_viewed:
+          type: integer
+        converted_to_lead:
+          type: boolean
+        lead_id:
+          type: string
+          format: uuid
+
+    TrackPageViewRequest:
+      type: object
+      required: [visitor_id, url_visited]
+      properties:
+        visitor_id:
+          type: string
+        url_visited:
+          type: string
+        referrer:
+          type: string
+        user_agent:
+          type: string
+        ip_address:
+          type: string
+
+    IdentifyVisitorRequest:
+      type: object
+      required: [visitor_id, email]
+      properties:
+        visitor_id:
+          type: string
+        email:
+          type: string
+          format: email
+
+    # ======================== EVENTS ========================
+    EventRegistrationRequest:
+      type: object
+      required: [event_name, attendee_name, attendee_email]
+      properties:
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+          format: email
+        attendee_phone:
+          type: string
+        attendee_company:
+          type: string
+        attendee_function:
+          type: string
+        source:
+          type: string
+          default: web
+
+    EventRegistration:
+      type: object
+      required: [id, event_name, attendee_email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+        attendee_company:
+          type: string
+        attendee_phone:
+          type: string
+        attendee_function:
+          type: string
+        lead_id:
+          type: string
+          format: uuid
+        source:
+          type: string
+        attended:
+          type: boolean
+        registration_date:
+          type: string
+          format: date-time
+
+    # ======================== SURVEYS ========================
+    SurveyResponseRequest:
+      type: object
+      required: [survey_name, responses]
+      properties:
+        survey_name:
+          type: string
+        respondent_name:
+          type: string
+        respondent_email:
+          type: string
+          format: email
+        responses:
+          type: object
+          description: All survey answers as key-value pairs
+
+    SurveyResponse:
+      type: object
+      required: [id, survey_name, respondent_email]
+      properties:
+        id:
+          type: string
+          format: uuid
+        survey_name:
+          type: string
+        respondent_email:
+          type: string
+        respondent_name:
+          type: string
+        responses:
+          type: object
+        lead_id:
+          type: string
+          format: uuid
+        response_date:
+          type: string
+          format: date-time

@@ -1,0 +1,356 @@
+openapi: 3.1.0
+info:
+  title: Accounts
+  version: 1.0.0
+  description: Account/company management — companies, industry, size, hierarchy.
+servers:
+  - url: /api/v1/crm/accounts
+    description: Accounts API
+tags:
+  - name: accounts
+    description: Account/company CRUD
+paths:
+  /accounts:
+    get:
+      operationId: list_accounts
+      summary: List accounts/companies
+      tags: [accounts]
+      parameters:
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 1, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+        - name: search
+          in: query
+          schema: {type: string}
+        - name: filter_parent_id
+          in: query
+          schema: {type: string, format: uuid}
+        - name: filter_industry_id
+          in: query
+          schema: {type: string, format: uuid}
+        - name: filter_active
+          in: query
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Account' }
+                  total: {type: integer}
+                  page: {type: integer}
+                  limit: {type: integer}
+        '401': {description: Unauthorized}
+        '500': {description: Internal server error}
+    post:
+      operationId: create_account
+      summary: Create a new account/company
+      tags: [accounts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAccountRequest' }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '400': {description: Invalid request}
+        '401': {description: Unauthorized}
+  /accounts/{id}:
+    get:
+      operationId: get_account
+      summary: Get account by id
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '404': {description: Not found}
+        '401': {description: Unauthorized}
+    put:
+      operationId: update_account
+      summary: Update account fields
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateAccountRequest' }
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '400': {description: Invalid request}
+        '404': {description: Not found}
+    delete:
+      operationId: delete_account
+      summary: Soft-delete account
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '204': {description: Account deleted}
+        '404': {description: Not found}
+  /accounts/{id}/tree:
+    get:
+      operationId: get_account_hierarchy
+      summary: Get account's org tree (parent + children)
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Org tree
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountHierarchy' }
+        '404': {description: Not found}
+  /accounts/{id}/contacts:
+    get:
+      operationId: get_account_contacts
+      summary: Get contacts associated with an account
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 1, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+      responses:
+        '200':
+          description: Related contacts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/AccountContactSummary' }
+                  total: {type: integer}
+        '404': {description: Not found}
+  /accounts/{id}/leads:
+    get:
+      operationId: get_account_leads
+      summary: Get leads associated with an account
+      tags: [accounts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 1, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+      responses:
+        '200':
+          description: Related leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id: {type: string, format: uuid}
+                        lead_name: {type: string}
+                        stage_name: {type: string}
+                        expected_revenue: {type: number, format: double}
+                  total: {type: integer}
+        '404': {description: Not found}
+  /accounts/reports/summary:
+    get:
+      operationId: get_accounts_report
+      summary: Get account statistics by industry and size
+      tags: [accounts]
+      responses:
+        '200':
+          description: Account report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountReport' }
+        '401': {description: Unauthorized}
+
+components:
+  schemas:
+    Account:
+      type: object
+      required: [id, name, create_date]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email, maxLength: 255}
+        phone: {type: string, maxLength: 64}
+        website: {type: string, format: uri, maxLength: 255}
+        industry_id:
+          type: string
+          format: uuid
+        industry_name:
+          type: string
+          readOnly: true
+        company_size:
+          type: string
+          enum: [STARTUP, SMB, MID_MARKET, ENTERPRISE]
+        employees: {type: integer}
+        annual_revenue: {type: number, format: double}
+        description: {type: string}
+        parent_id:
+          type: string
+          format: uuid
+          description: Parent company
+        child_ids:
+          type: array
+          items: {type: string, format: uuid}
+          readOnly: true
+        street: {type: string, maxLength: 255}
+        street2: {type: string, maxLength: 255}
+        city: {type: string, maxLength: 128}
+        state_id:
+          type: string
+          format: uuid
+        zip: {type: string, maxLength: 32}
+        country_id:
+          type: string
+          format: uuid
+        country_name:
+          type: string
+          readOnly: true
+        active: {type: boolean, default: true}
+        color: {type: integer, minimum: 1, maximum: 16}
+        create_date: {type: string, format: date-time, readOnly: true}
+        write_date: {type: string, format: date-time, readOnly: true}
+        # Joined counts
+        contact_count: {type: integer, readOnly: true}
+        active_lead_count: {type: integer, readOnly: true}
+        total_revenue: {type: number, format: double, readOnly: true}
+
+    CreateAccountRequest:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email}
+        phone: {type: string}
+        website: {type: string, format: uri}
+        industry_id: {type: string, format: uuid}
+        company_size: {type: string, enum: [STARTUP, SMB, MID_MARKET, ENTERPRISE]}
+        employees: {type: integer}
+        annual_revenue: {type: number, format: double}
+        description: {type: string}
+        parent_id: {type: string, format: uuid}
+        street: {type: string}
+        street2: {type: string}
+        city: {type: string}
+        state_id: {type: string, format: uuid}
+        zip: {type: string}
+        country_id: {type: string, format: uuid}
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        name: {type: string}
+        email: {type: string}
+        phone: {type: string}
+        website: {type: string}
+        industry_id: {type: string, format: uuid}
+        company_size: {type: string, enum: [STARTUP, SMB, MID_MARKET, ENTERPRISE]}
+        employees: {type: integer}
+        annual_revenue: {type: number}
+        description: {type: string}
+        parent_id: {type: string, format: uuid}
+        street: {type: string}
+        street2: {type: string}
+        city: {type: string}
+        state_id: {type: string, format: uuid}
+        zip: {type: string}
+        country_id: {type: string, format: uuid}
+        active: {type: boolean}
+
+    AccountHierarchy:
+      type: object
+      properties:
+        account: { $ref: '#/components/schemas/Account' }
+        parent:
+          type: object
+          properties:
+            id: {type: string, format: uuid}
+            name: {type: string}
+        children:
+          type: array
+          items:
+            type: object
+            properties:
+              id: {type: string, format: uuid}
+              name: {type: string}
+
+    AccountContactSummary:
+      type: object
+      properties:
+        contact_id: {type: string, format: uuid}
+        name: {type: string}
+        email: {type: string}
+        phone: {type: string}
+        function: {type: string}
+
+    AccountReport:
+      type: object
+      properties:
+        by_industry:
+          type: array
+          items:
+            type: object
+            properties:
+              industry: {type: string}
+              count: {type: integer}
+              active_leads: {type: integer}
+        by_size:
+          type: array
+          items:
+            type: object
+            properties:
+              size: {type: string}
+              count: {type: integer}
+        total_accounts: {type: integer}
+        total_employees: {type: integer}

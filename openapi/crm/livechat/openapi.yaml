@@ -2,23 +2,50 @@ openapi: 3.1.0
 info:
   title: Live Chat
   version: 1.0.0
-  description: Real-time live chat service with visitor tracking and agent assignment.
+  description: Real-time live chat service with visitor tracking, agent management, and chat-to-lead conversion.
 servers:
-- url: /api/v1/crm/livechat
-  description: Live Chat API
-tags: []
+  - url: /api/v1/crm/livechat
+    description: Live Chat API
+tags:
+  - name: chats
+    description: Chat session management
+  - name: messages
+    description: Chat message management
+  - name: agents
+    description: Chat agent management
 paths:
   /chats:
     get:
       operationId: list_chats
-      summary: List chats
+      summary: List chat sessions
+      tags: [chats]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+        - name: filter_status
+          in: query
+          schema:
+            type: string
+            enum: [WAITING, ACTIVE, CLOSED, TRANSFERRED]
+        - name: filter_agent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_started_after
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: filter_started_before
+          in: query
+          schema:
+            type: string
+            format: date-time
       responses:
         '200':
-          description: List of chats
+          description: List of chat sessions
           content:
             application/json:
               schema:
@@ -27,16 +54,19 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Chat'
+                      $ref: '#/components/schemas/ChatSession'
                   total:
                     type: integer
                   page:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized
     post:
       operationId: create_chat
-      summary: Create chat
+      summary: Start a new chat session
+      tags: [chats]
       requestBody:
         required: true
         content:
@@ -45,81 +75,183 @@ paths:
               $ref: '#/components/schemas/CreateChatRequest'
       responses:
         '201':
-          description: Chat created
+          description: Chat session created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chat'
+                $ref: '#/components/schemas/ChatSession'
         '400':
           description: Invalid request
+  /chats/active:
+    get:
+      operationId: list_active_chats
+      summary: List currently active chat sessions
+      tags: [chats]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Active chat sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatSession'
+                  total:
+                    type: integer
   /chats/{id}:
     get:
       operationId: get_chat
-      summary: Get chat by id
+      summary: Get chat session by id
+      tags: [chats]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
-          description: Chat details
+          description: Chat session details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Chat'
-        '404':
-          description: Not found
-    put:
-      operationId: update_chat
-      summary: Update chat
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateChatRequest'
-      responses:
-        '200':
-          description: Chat updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
+                $ref: '#/components/schemas/ChatSession'
         '404':
           description: Not found
     delete:
       operationId: delete_chat
-      summary: Delete chat
+      summary: Delete chat session transcript
+      tags: [chats]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Chat deleted
         '404':
           description: Not found
+  /chats/{id}/message:
+    post:
+      operationId: send_chat_message
+      summary: Send a message in a chat session
+      tags: [chats]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+        '400':
+          description: Invalid request
+        '404':
+          description: Chat not found
+  /chats/{id}/close:
+    post:
+      operationId: close_chat
+      summary: Close a chat session
+      tags: [chats]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+        '404':
+          description: Not found
+  /chats/{id}/transcript:
+    get:
+      operationId: get_chat_transcript
+      summary: Get full chat transcript
+      tags: [chats]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Chat transcript
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatTranscript'
+        '404':
+          description: Not found
+  /chats/convert:
+    post:
+      operationId: convert_chat_to_lead
+      summary: Convert a chat session into a CRM lead
+      tags: [chats]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertChatRequest'
+      responses:
+        '200':
+          description: Chat converted to lead
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatConversionResult'
+        '400':
+          description: Invalid request
   /messages:
     get:
       operationId: list_messages
-      summary: List messages
+      summary: List all messages across sessions
+      tags: [messages]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_session_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_sender_type
+          in: query
+          schema:
+            type: string
+            enum: [AGENT, VISITOR, BOT]
       responses:
         '200':
           description: List of messages
@@ -131,99 +263,42 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Message'
+                      $ref: '#/components/schemas/ChatMessage'
                   total:
                     type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
-    post:
-      operationId: create_message
-      summary: Create message
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateMessageRequest'
-      responses:
-        '201':
-          description: Message created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        '400':
-          description: Invalid request
   /messages/{id}:
     get:
       operationId: get_message
       summary: Get message by id
+      tags: [messages]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Message details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
-        '404':
-          description: Not found
-    put:
-      operationId: update_message
-      summary: Update message
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateMessageRequest'
-      responses:
-        '200':
-          description: Message updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-        '404':
-          description: Not found
-    delete:
-      operationId: delete_message
-      summary: Delete message
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Message deleted
+                $ref: '#/components/schemas/ChatMessage'
         '404':
           description: Not found
   /agents:
     get:
       operationId: list_agents
-      summary: List agents
+      summary: List all chat agents
+      tags: [agents]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_online
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: List of agents
@@ -238,13 +313,12 @@ paths:
                       $ref: '#/components/schemas/Agent'
                   total:
                     type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+        '401':
+          description: Unauthorized
     post:
       operationId: create_agent
-      summary: Create agent
+      summary: Create a new chat agent
+      tags: [agents]
       requestBody:
         required: true
         content:
@@ -264,13 +338,14 @@ paths:
     get:
       operationId: get_agent
       summary: Get agent by id
+      tags: [agents]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Agent details
@@ -282,14 +357,15 @@ paths:
           description: Not found
     put:
       operationId: update_agent
-      summary: Update agent
+      summary: Update agent fields
+      tags: [agents]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -303,23 +379,136 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Agent'
+        '400':
+          description: Invalid request
         '404':
           description: Not found
     delete:
       operationId: delete_agent
       summary: Delete agent
+      tags: [agents]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Agent deleted
         '404':
           description: Not found
+  /agents/{id}/status:
+    put:
+      operationId: set_agent_status
+      summary: Set an agent's online/offline status
+      tags: [agents]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentStatusRequest'
+      responses:
+        '200':
+          description: Agent status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          description: Not found
+  /agents/status:
+    get:
+      operationId: get_all_agent_status
+      summary: Get all agent online statuses
+      tags: [agents]
+      responses:
+        '200':
+          description: All agent statuses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AgentStatus'
+  /agents/{id}/metrics:
+    get:
+      operationId: get_agent_metrics
+      summary: Get agent performance metrics
+      tags: [agents]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentMetrics'
+        '404':
+          description: Not found
+  /agents/queue:
+    get:
+      operationId: get_waiting_queue
+      summary: Get current waiting queue for chat
+      tags: [agents]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Waiting queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        visitor_id:
+                          type: string
+                        waiting_since:
+                          type: string
+                          format: date-time
+                        page_views:
+                          type: integer
+                  total:
+                    type: integer
+                  next_available_agent_id:
+                    type: string
+                    format: uuid
+
 components:
   parameters:
     Page:
@@ -342,4 +531,326 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    # ======================== CHAT SESSION ========================
+    ChatSession:
+      type: object
+      required:
+        - id
+        - agent_id
+        - status
+        - started_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+          description: Anonymous visitor ID (session cookie)
+        contact_id:
+          type: string
+          format: uuid
+          description: Converted contact record
+        lead_id:
+          type: string
+          format: uuid
+          description: Converted lead record
+        agent_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ChatStatus'
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        duration_seconds:
+          type: integer
+          readOnly: true
+          description: Session duration in seconds
+        transcript:
+          type: object
+          description: Full chat message history (JSON array of messages)
+        satisfaction_rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Visitor satisfaction rating
+        tags:
+          type: array
+          items:
+            type: string
+          description: Session tags (e.g., pricing, demo)
+        converted_to_lead:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateChatRequest:
+      type: object
+      required: [visitor_id]
+      properties:
+        visitor_id:
+          type: string
+          description: Anonymous visitor ID
+        contact_id:
+          type: string
+          format: uuid
+          description: Pre-linked contact
+        lead_id:
+          type: string
+          format: uuid
+          description: Pre-linked lead
+        agent_id:
+          type: string
+          format: uuid
+          description: Specific agent to assign (optional)
+        tags:
+          type: array
+          items:
+            type: string
+
+    SendChatRequest:
+      type: object
+      required: [visitor_id]
+      properties:
+        visitor_id:
+          type: string
+
+    ConvertChatRequest:
+      type: object
+      required: [chat_id]
+      properties:
+        chat_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Contact/lead name
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        company_name:
+          type: string
+        team_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+
+    ChatConversionResult:
+      type: object
+      properties:
+        chat_id:
+          type: string
+          format: uuid
+        lead_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        lead:
+          type: object
+
+    ChatTranscript:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        duration_seconds:
+          type: integer
+
+    # ======================== CHAT MESSAGE ========================
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - session_id
+        - sender_type
+        - message
+        - sent_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        session_id:
+          type: string
+          format: uuid
+        sender_type:
+          $ref: '#/components/schemas/SenderType'
+        sender_id:
+          type: string
+          format: uuid
+          description: User ID (agent) or bot ID
+        message:
+          type: string
+        is_system:
+          type: boolean
+          description: System message (e.g., "Agent joined")
+        sent_at:
+          type: string
+          format: date-time
+        read_at:
+          type: string
+          format: date-time
+
+    SendMessageRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        sender_type:
+          $ref: '#/components/schemas/SenderType'
+        sender_id:
+          type: string
+          format: uuid
+
+    # ======================== AGENT ========================
+    Agent:
+      type: object
+      required:
+        - id
+        - is_online
+        - max_concurrent
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_online:
+          type: boolean
+        active_sessions:
+          type: integer
+          readOnly: true
+        max_concurrent:
+          type: integer
+          description: "Max concurrent chats (default: 3)"
+        total_chats_today:
+          type: integer
+          readOnly: true
+        avg_response_time_seconds:
+          type: number
+          format: float
+          readOnly: true
+        satisfaction_avg:
+          type: number
+          format: float
+          readOnly: true
+        queue_position:
+          type: integer
+          readOnly: true
+        skills:
+          type: array
+          items:
+            type: string
+          description: Agent skills (e.g., technical, sales)
+        create_date:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateAgentRequest:
+      type: object
+      required: [user_id]
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        max_concurrent:
+          type: integer
+          default: 3
+        skills:
+          type: array
+          items:
+            type: string
+
+    UpdateAgentRequest:
+      type: object
+      properties:
+        max_concurrent:
+          type: integer
+        skills:
+          type: array
+          items:
+            type: string
+        is_online:
+          type: boolean
+
+    AgentStatusRequest:
+      type: object
+      required: [is_online]
+      properties:
+        is_online:
+          type: boolean
+
+    AgentStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_online:
+          type: boolean
+        active_sessions:
+          type: integer
+
+    AgentMetrics:
+      type: object
+      properties:
+        agent_id:
+          type: string
+          format: uuid
+        total_chats:
+          type: integer
+        avg_duration_seconds:
+          type: number
+          format: float
+        avg_response_time_seconds:
+          type: number
+          format: float
+        satisfaction_avg:
+          type: number
+          format: float
+        chats_today:
+          type: integer
+        chats_this_week:
+          type: integer
+
+    # ======================== ENUMS ========================
+    ChatStatus:
+      type: string
+      enum: [WAITING, ACTIVE, CLOSED, TRANSFERRED]
+
+    SenderType:
+      type: string
+      enum: [AGENT, VISITOR, BOT]

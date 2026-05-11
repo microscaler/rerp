@@ -1,100 +1,284 @@
 # Workflow Automation
 
 > **Component:** Trigger-based actions, rules, and scheduled workflows
-> **Competitive Landscape:** Salesforce Flow, Microsoft Power Automate, SAP Process Orchestration, HubSpot Workflows, Zoho Creator
+> **Priority:** P3 — Valuable but non-blocking for initial adoption
+> **Odoo Reference:** ir_cron_data, workflow entity, rule entity, crm_lead scheduling, stage-change triggers
 
-## Pitch
+---
 
-**The Question Every Buyer Asks:** *"Can my CRM automate repetitive tasks, route work to the right people, and enforce business rules — without writing code?"*
+## The Pitch
+
+**Buyer Question:** *Can my CRM automate repetitive tasks, route work to the right people, and enforce business rules — without writing code?*
 
 A CRM that requires manual data entry for every action is a time sink. A CRM that automates: lead assignment, email triggers, stage transitions, approval workflows, and scheduled follow-ups is a force multiplier. This component covers the rules engine that makes CRM work in the background, not just as a data entry UI.
 
 ---
 
-## Functional Requirement Matrix
+## What This Component Does
 
-| Feature | RERP CRM | Odoo CRM | Salesforce | Microsoft Dynamics 365 | SAP CRM | HubSpot | Zoho CRM |
-|---------|----------|----------|------------|------------------------|---------|---------|----------|
-| Trigger-based actions | Planned | ✅ (ir_cron_data) | ✅ (Flow Builder) | ✅ (Power Automate) | ✅ | ✅ (Workflows) | ✅ (Workflows) |
-| Stage-change trigger | Planned | ✅ (stage change) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Field-value trigger | Planned | ✅ (scoring frequency) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Time-based trigger | Planned | ✅ (cron) | ✅ (Delay) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Workflow definitions | Planned | ✅ (workflow entity) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Rule engine | Planned | ✅ (rule entity) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Scheduled actions | Planned | ✅ (ir_cron_data) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Email trigger on event | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Task creation trigger | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Approval workflows | Planned | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| Lead assignment rules | Planned | ✅ (team assignment) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Data validation rules | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Escalation rules | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Cross-service triggers | Planned | ❌ | ✅ (Cross-Object) | ✅ | ✅ | ✅ (Multi-step) | ✅ | ✅ |
-| Conditional branching | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Workflow versioning | Planned | ❌ | ✅ (Deployments) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Workflow testing/debug | Planned | ❌ | ✅ (Test Mode) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Bulk action triggers | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Webhook triggers | Planned | ❌ | ✅ (Platform Events) | ✅ (Webhooks) | ✅ | ✅ (Webhooks) | ✅ | ✅ |
-| Approval chains | Planned | ❌ | ✅ (Multi-level) | ✅ | ✅ | ❌ | ✅ | ❌ |
+1. **Trigger-Based Actions** — When X happens, do Y (stage change, field change, time-based)
+2. **Stage-Change Triggers** — "When lead moves to Proposal, send email, create task, notify manager"
+3. **Field-Value Triggers** — "When expected_revenue > $100K, require approval"
+4. **Time-Based Triggers** — "If no activity in 3 days, send reminder to rep"
+5. **Workflow Definitions** — Composable workflows with conditions and actions
+6. **Rule Engine** — Simple condition-action pairs (IF field=value THEN action)
+7. **Scheduled Actions** — Cron-based recurring tasks (daily digest, weekly review)
+8. **Email Triggers** — Automated emails on conditions (welcome, follow-up, nurture)
+9. **Task Creation Triggers** — Auto-create follow-up tasks on events
+10. **Approval Workflows** — Multi-step approval for discounts, contracts, pricing
+11. **Escalation Rules** — "If deal not updated in 7 days, escalate to manager"
+12. **Cross-Service Triggers** — "When CRM deal closes, create invoice in Accounting"
+
+---
+
+## Entity Model
+
+### Workflow Entity
+
+A workflow is a named collection of rules that fires on a specific trigger:
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String (128) | Yes | Workflow name (e.g., "Proposal Stage Email") |
+| `description` | Text | No | Workflow description |
+| `is_active` | Boolean | Yes | Enable/disable workflow |
+| `trigger_type` | Enum: [STAGE_CHANGE, FIELD_CHANGE, TIME_BASED, WEBHOOK, MANUAL] | Yes | What triggers this workflow |
+| `trigger_config` | JSON | Yes | Trigger-specific configuration |
+| `action_type` | Enum: [SEND_EMAIL, CREATE_TASK, UPDATE_FIELD, ASSIGN_LEAD, CALL_WEBHOOK, CREATE_RECORD] | Yes | What action to perform |
+| `action_config` | JSON | Yes | Action-specific configuration |
+| `conditions` | JSON | Yes | Additional conditions (AND/OR logic) |
+| `sequence` | Integer | Yes | Execution order (lower = earlier) |
+| `created_at` | DateTime | Yes | Creation timestamp |
+| `updated_at` | DateTime | No | Last modification |
+| `run_count` | Integer | Computed | Times this workflow has fired |
+| `last_run` | DateTime | No | Last time it fired |
+
+### Rule Entity
+
+A rule is a condition-action pair within a workflow. A workflow can have multiple rules:
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `workflow_id` | Foreign Key: Workflow | Yes | Parent workflow |
+| `condition_field` | String (128) | Yes | Field to evaluate (e.g., "stage_id", "expected_revenue") |
+| `condition_operator` | Enum: [EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, CONTAINS, NOT_CONTAINS, IS_EMPTY, IS_NOT_EMPTY, IN, NOT_IN] | Yes | Comparison operator |
+| `condition_value` | String | Yes | Value to compare against |
+| `condition_value_type` | Enum: [TEXT, INTEGER, FLOAT, BOOLEAN, DATE, ENTITY] | Yes | Type of condition_value |
+| `action_type` | Enum: [SEND_EMAIL, CREATE_TASK, UPDATE_FIELD, ASSIGN_LEAD, CALL_WEBHOOK, SET_VALUE] | Yes | Action to perform |
+| `action_config` | JSON | Yes | Action-specific configuration |
+| `is_active` | Boolean | Yes | Enable/disable this rule |
+| `sequence` | Integer | Yes | Execution order within workflow |
+
+### Trigger Entity
+
+Triggers are the event hooks that start workflows:
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `workflow_id` | Foreign Key: Workflow | Yes | Associated workflow |
+| `type` | Enum: [STAGE_CHANGE, FIELD_CHANGE, TIME_BASED, WEBHOOK, ON_CREATE, ON_UPDATE, ON_DELETE] | Yes | Trigger type |
+| `entity` | String (64) | Yes | Entity to watch (crm.lead, crm.contact, etc.) |
+| `field` | String (128) | No | Field to watch (for field-based triggers) |
+| `schedule` | String (64) | No | Cron expression (for time-based) |
+| `enabled` | Boolean | Yes | Enable/disable trigger |
+| `last_fired` | DateTime | No | Last time trigger fired |
+
+---
+
+## Trigger-Action Patterns
+
+### Pattern 1: Stage-Change → Email
+
+```
+Workflow: "Proposal Stage Follow-Up"
+Trigger: stage_change
+Condition: stage_id = "proposal" AND days_in_stage > 5
+Action: send_email
+Config: {
+  "template_id": "follow_up_proposal",
+  "recipient": "{{lead.email_from}}",
+  "subject": "Following up on our proposal",
+  "merge_fields": {
+    "name": "{{lead.name}}",
+    "expected_revenue": "{{lead.expected_revenue}}"
+  }
+}
+```
+
+### Pattern 2: Time-Based → Task
+
+```
+Workflow: "Stale Lead Reminder"
+Trigger: time_based (every 24h via cron)
+Condition: lead.days_since_last_activity > 3 AND won_status = PENDING
+Action: create_task
+Config: {
+  "title": "Follow up with {{lead.name}}",
+  "assigned_to": "{{lead.user_id}}",
+  "due_date": "tomorrow",
+  "related_lead_id": "{{lead.id}}"
+}
+```
+
+### Pattern 3: Field-Value → Approval
+
+```
+Workflow: "Discount Approval"
+Trigger: field_change
+Condition: expected_revenue < discount_amount AND discount > 10
+Action: create_task (approval required)
+Config: {
+  "title": "Discount approval needed for {{lead.name}}",
+  "assigned_to": "{{lead.team_id.manager_id}}",
+  "due_date": "in 2 days"
+}
+```
+
+### Pattern 4: On-Create → Assignment
+
+```
+Workflow: "New Lead Assignment"
+Trigger: on_create (entity: crm.lead)
+Condition: team_id = NULL
+Action: assign_lead
+Config: {
+  "algorithm": "round_robin",
+  "team_id": "auto_detect_from_source"
+}
+```
+
+---
+
+## Required API Endpoints
+
+### Workflow Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/workflows` | List all workflows |
+| `GET` | `/workflows/{id}` | Get workflow detail |
+| `POST` | `/workflows` | Create workflow |
+| `PATCH` | `/workflows/{id}` | Update workflow |
+| `DELETE` | `/workflows/{id}` | Delete workflow |
+| `POST` | `/workflows/{id}/run` | Manually trigger workflow |
+| `GET` | `/workflows/{id}/run-history` | History of workflow executions |
+
+### Rule Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/workflows/{id}/rules` | List rules for workflow |
+| `POST` | `/workflows/{id}/rules` | Add rule to workflow |
+| `PATCH` | `/rules/{id}` | Update rule |
+| `DELETE` | `/rules/{id}` | Delete rule |
+| `POST` | `/rules/test` | Test rule against a lead |
+
+### Trigger Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/triggers` | List all triggers |
+| `POST` | `/triggers/{id}/fire` | Manually fire trigger |
+| `GET` | `/triggers/run-history` | Execution history |
+
+### Scheduled Actions
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/actions/schedule` | Schedule one-time action |
+| `POST` | `/actions/recurring` | Schedule recurring action |
+| `GET` | `/actions/upcoming` | Upcoming scheduled actions |
+| `DELETE` | `/actions/{id}` | Cancel scheduled action |
+
+### Webhooks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/webhooks` | List webhooks |
+| `POST` | `/webhooks` | Create webhook |
+| `POST` | `/webhooks/{id}/test` | Test webhook |
+| `GET` | `/webhooks/{id}/delivered` | Delivery history |
+
+---
+
+## Cron Automation (Scheduled Tasks)
+
+These are system-level cron jobs that run on a schedule:
+
+| Cron Job | Schedule | Purpose |
+|----------|----------|---------|
+| `assign_leads` | Daily at 9:00 | Auto-assign unassigned leads |
+| `run_workflows` | Every 5 minutes | Check and fire workflow triggers |
+| `send_digests` | Daily at 8:00 | Send KPI digest emails |
+| `check_rotting` | Every hour | Flag stalled deals |
+| `recompute_scores` | Daily at 2:00 | Rebuild scoring frequencies |
+| `cleanup_old_data` | Weekly | Archive old activities |
 
 ---
 
 ## Competitive Positioning
 
 ### Where RERP Wins
-- **Rust-based rule evaluation** — Evaluating thousands of rules against lead data in Rust is instantaneous. Python-based workflow engines (Odoo) evaluate rules sequentially and can be slow at scale.
-- **API-defined workflows** — Workflow and rule schemas are OpenAPI-defined. Every client gets the same automation logic automatically.
+- **Rust-based rule evaluation** — Evaluating thousands of rules against lead data is instantaneous. Python-based workflows (Odoo) evaluate sequentially and can be slow at scale.
+- **API-defined workflows** — Workflow and rule schemas are OpenAPI-defined. Every client gets the same automation logic.
 - **Self-hosted automation** — No Flow or Power Automate subscription. All automation runs on your infrastructure.
 
 ### Where RERP Lags
-- **Workflow schema exists but has no definition** — The sub-spec defines Workflow, Rule, and Trigger endpoints but schemas are empty. No condition syntax, no action definitions.
-- **No email triggers** — "When a lead enters stage 'Proposal', send email template X" is missing.
-- **No approval workflows** — No discount approval, no contract approval, no escalation chains.
-- **No visual workflow builder** — Salesforce Flow and HubSpot Workflows have drag-and-drop builders. RERP requires API/JSON definition.
+- **Workflow schema exists but has no definition** — Schemas are empty. No condition syntax, no action definitions.
+- **No email triggers** — "When lead enters Proposal, send email template X" is missing.
+- **No approval workflows** — No discount approval, contract approval, escalation chains.
+- **No visual workflow builder** — Salesforce Flow and HubSpot Workflows have drag-and-drop builders.
 
 ---
 
 ## Competitive Intelligence Deep Dive
 
-### Salesforce Flow Builder (Enterprise Automation — $25–$330/user/month)
-**Flow Builder** is a visual drag-and-drop automation tool with 25+ element types. **Record-Triggered Flows** fire on record create/update/delete with conditional branching. **Scheduled Flows** run on cron-like schedules (daily, hourly, weekly). **Platform-Triggered Flows** fire on platform events, API calls, and external webhooks. **Decision elements** provide complex branching logic (AND/OR conditions). **Action elements** create records, send emails, update fields, call Apex, or invoke external APIs. **Error handling** with try/catch blocks and rollback on failure. **Debug mode** with step-by-step execution and data view at each step. **Subflows** for modular, reusable automation. **Deployment** via Change Sets and DevOps Center with environment promotion (sandbox → production). The depth is unmatched: you can build any business process as a Flow — from simple lead assignment to complex multi-org territory routing.
+### Salesforce Flow Builder ($25–$330/user/month)
+**Flow Builder** is a visual drag-and-drop tool with 25+ element types. **Record-Triggered Flows** fire on create/update/delete. **Scheduled Flows** run on cron-like schedules. **Decision elements** provide complex branching. **Error handling** with try/catch and rollback. **Debug mode** with step-by-step execution. **Subflows** for reusable automation. Unmatched depth.
 
-### Microsoft Power Automate (Cross-Platform Automation — $15–$40/user/month)
-**Power Automate** integrates with 700+ connectors (Microsoft 365, SAP, Oracle, SharePoint, Salesforce, Slack, etc.). **Cloud Flows** trigger on CRM events (record create, field change, email received). **Desktop Flows** automate desktop applications via RPA. **Business Process Flows** enforce required fields and stage transitions in Dynamics 365. **Approval Flows** route deals, discounts, and contracts for multi-level approval with conditional routing. **Dataverse Triggers** fire on any change to Dataverse tables. **AI Builder** adds document processing, text classification, and prediction to flows. The integration with Microsoft 365 is the differentiator: automate between CRM, SharePoint, Teams, Outlook, and Excel without writing code.
+### Microsoft Power Automate ($15–$40/user/month)
+**Power Automate** integrates with 700+ connectors. **Cloud Flows** trigger on CRM events. **Business Process Flows** enforce required fields. **Approval Flows** route deals, discounts, contracts. **AI Builder** adds document processing. Integration with Microsoft 365 is the differentiator.
 
-### HubSpot Workflows (SMB Automation — included in Professional/Enterprise tiers)
-**Workflows** are visual automation builders with 50+ action types. **Enrollment triggers** include form submit, property change, date-based (birthday, anniversary), and list membership. **Actions** include email, SMS, update property, create task, enroll in sequence, move to pipeline, and webhook. **Sequences** automate drip email campaigns with activity-based triggers (enroll if no reply in 3 days). **Re-enrollment** for recurring automation (quarterly check-in emails). **Smart Goals** automate based on revenue milestones. **Conditional splits** route contacts down different paths based on properties. The simplicity is the strength: "if this, then that" for marketing and sales automation. No code required.
-
-### Zoho Creator/CRM Workflows (Low-Code Automation — $14–$52/user/month)
-**Zoho Workflow Rules** trigger on record create, update, delete, and time-based events (days after record creation). **Blueprint** enforces strict stage-by-stage workflows — deals can't skip stages, and each stage can require specific data entry or manager approvals. **Approval Processes** support multi-level chains with conditional routing and delegation. **Function Automation** enables custom logic in Deluge script (Zoho's proprietary scripting language). **Custom Functions** call external APIs and process results. **Integration Hub** provides 200+ pre-built integrations for cross-platform automation. Best value for custom automation needs with enterprise-grade features at fraction of the cost.
+### HubSpot Workflows (included in Pro/Ent)
+**Workflows** are visual automation builders with 50+ action types. **Enrollment triggers** include form submit, property change, date-based. **Actions** include email, SMS, update property, create task. **Sequences** automate drip campaigns. **Conditional splits** route contacts differently. Simple "if this, then that" for marketing and sales.
 
 ---
 
-## RERP CRM Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1 (Immediate — 2-3 weeks)
-1. Define `Workflow` entity: id, name, description, is_active, trigger_type, conditions, actions, created_at, updated_at
-2. Define `Rule` entity: id, workflow_id, condition_field, condition_operator, condition_value, action_type, action_data
-3. Define `Trigger` entity: id, workflow_id, type (stage_change, field_change, time_based, webhook), schedule, enabled
-4. Implement workflow creation endpoint (POST /workflows)
-5. Implement rule creation endpoint (POST /rules)
+### Phase 1: Core Engine (2-3 weeks)
+1. Define `Workflow`, `Rule`, `Trigger` entities
+2. Implement workflow creation endpoint (POST /workflows)
+3. Implement rule creation endpoint (POST /rules)
+4. Implement basic stage-change trigger
+5. Implement rule evaluation engine (evaluate conditions against a lead)
 
-### Phase 2 (3-6 weeks)
-1. Implement stage-change trigger (when lead moves to stage X, fire actions)
-2. Implement email-trigger action (send template on condition match)
-3. Implement task-creation action (create follow-up task)
-4. Implement data-validation rule (block stage change if required fields empty)
-5. Implement rule evaluation endpoint (test rules against a lead)
+### Phase 2: Actions & Triggers (2-3 weeks)
+1. Implement email-trigger action (send template on condition match)
+2. Implement task-creation action
+3. Implement field-update action (set value on lead)
+4. Implement lead-assignment action
+5. Implement cron-based scheduled trigger
 
-### Phase 3 (6-12 weeks)
-1. Scheduled actions endpoint (cron-based, configurable intervals)
-2. Cross-service triggers (workflow in CRM triggers action in another service)
-3. Conditional branching (if/else rules in workflow)
-4. Approval workflow chain endpoint
-5. Escalation rules (if no action in X days, notify manager)
-6. Webhook endpoint (external system triggers CRM workflow)
+### Phase 3: Advanced (3-4 weeks)
+1. Cross-service triggers (CRM → Accounting, CRM → Marketing)
+2. Conditional branching (if/else rules in workflow)
+3. Approval workflow chain endpoint
+4. Escalation rules (if no action in X days, notify manager)
+5. Webhook endpoint (external system triggers CRM workflow)
+
+### Phase 4: Builder UI Support (3-4 weeks)
+1. Workflow versioning (track changes over time)
+2. Workflow testing/debug endpoint (test mode)
+3. Bulk action triggers (process many records at once)
+4. Error handling and retry logic
+5. Workflow performance monitoring (execution time, success rate)
 
 ---
 
 ## Key Takeaway for Buyers
 
-Workflow automation is the difference between a passive CRM (records what happened) and an active CRM (makes things happen). A buyer needs to know: *"Can I set up a rule that says 'when a deal reaches Proposal stage and hasn't been updated in 5 days, notify the manager and schedule a follow-up?' — in minutes, not days."* RERP's API-first approach means automation is defined in machine-readable specs, which is great for developers but needs a visual builder for non-technical users. The immediate priority: fill the Workflow/Rule/Trigger schemas and implement stage-change triggers.
+Workflow automation is the difference between a passive CRM and an active CRM. A buyer needs to know: *Can I set up a rule that says 'when a deal reaches Proposal and hasn't been updated in 5 days, notify the manager' — in minutes, not days?* RERP's API-first approach means automation is defined in machine-readable specs. The immediate priority: fill the Workflow/Rule/Trigger schemas and implement stage-change triggers.

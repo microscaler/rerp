@@ -1,0 +1,965 @@
+openapi: 3.1.0
+info:
+  title: CRM Platform & Extensibility
+  version: 1.0.0
+  description: Custom fields, webhooks, audit logging, API keys, and integrations.
+servers:
+  - url: /api/v1/crm/platform
+    description: CRM Platform API
+tags:
+  - name: custom-fields
+    description: Custom field definitions per entity
+  - name: webhooks
+    description: Webhook delivery for entity events
+  - name: audit-log
+    description: Immutable audit trail of all operations
+  - name: api-keys
+    description: API key management and authentication
+  - name: integrations
+    description: Third-party integration configuration
+paths:
+  /custom-fields:
+    get:
+      operationId: list_custom_fields
+      summary: List all custom fields
+      tags: [custom-fields]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_entity
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of custom fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomField'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_custom_field
+      summary: Create a custom field on any entity
+      tags: [custom-fields]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomFieldRequest'
+      responses:
+        '201':
+          description: Custom field created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+        '400':
+          description: Invalid request
+        '403':
+          description: Insufficient permissions
+  /custom-fields/{id}:
+    get:
+      operationId: get_custom_field
+      summary: Get custom field by id
+      tags: [custom-fields]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Custom field details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+        '404':
+          description: Not found
+    put:
+      operationId: update_custom_field
+      summary: Update custom field
+      tags: [custom-fields]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomFieldRequest'
+      responses:
+        '200':
+          description: Custom field updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomField'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+    delete:
+      operationId: delete_custom_field
+      summary: Delete custom field
+      tags: [custom-fields]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Custom field deleted
+        '404':
+          description: Not found
+  /entities/{entity}/custom-fields:
+    get:
+      operationId: list_entity_custom_fields
+      summary: List custom fields for a specific entity
+      tags: [custom-fields]
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [crm.lead, crm.contact, crm.account, crm.stage, crm.team, crm.opportunity]
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Custom fields for entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomField'
+                  entity:
+                    type: string
+                  total:
+                    type: integer
+        '404':
+          description: Entity not found
+
+  /webhooks:
+    get:
+      operationId: list_webhooks
+      summary: List all webhooks
+      tags: [webhooks]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_webhook
+      summary: Create a new webhook
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '201':
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request
+  /webhooks/{id}:
+    get:
+      operationId: get_webhook
+      summary: Get webhook by id
+      tags: [webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Webhook details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: Not found
+    put:
+      operationId: update_webhook
+      summary: Update webhook
+      tags: [webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookRequest'
+      responses:
+        '200':
+          description: Webhook updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+    delete:
+      operationId: delete_webhook
+      summary: Delete webhook
+      tags: [webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Webhook deleted
+        '404':
+          description: Not found
+  /webhooks/{id}/test:
+    post:
+      operationId: test_webhook
+      summary: Send a test webhook payload
+      tags: [webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Test webhook sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sent:
+                    type: boolean
+                  response_code:
+                    type: integer
+  /webhooks/{id}/logs:
+    get:
+      operationId: list_webhook_logs
+      summary: Get webhook delivery logs
+      tags: [webhooks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Delivery logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookDeliveryLog'
+                  total:
+                    type: integer
+
+  /audit-log:
+    get:
+      operationId: list_audit_log
+      summary: Get audit log entries
+      tags: [audit-log]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_entity
+          in: query
+          schema:
+            type: string
+        - name: filter_action
+          in: query
+          schema:
+            type: string
+            enum: [CREATE, UPDATE, DELETE, READ, EXPORT, IMPORT]
+        - name: filter_user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_date_from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: filter_date_to
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLogEntry'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+  /audit-log/{entity}/{entity_id}:
+    get:
+      operationId: get_entity_audit_log
+      summary: Get audit log for a specific entity record
+      tags: [audit-log]
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: entity_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Entity audit log
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLogEntry'
+                  total:
+                    type: integer
+        '404':
+          description: Entity not found
+
+  /api-keys:
+    get:
+      operationId: list_api_keys
+      summary: List all API keys
+      tags: [api-keys]
+      responses:
+        '200':
+          description: List of API keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiKey'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_api_key
+      summary: Generate a new API key
+      tags: [api-keys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApiKeyRequest'
+      responses:
+        '201':
+          description: API key created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  key:
+                    type: string
+                    description: "This key will only be shown once — save it now."
+                  key_hash:
+                    type: string
+        '400':
+          description: Invalid request
+
+  /auth/validate:
+    post:
+      operationId: validate_api_key
+      summary: Validate an API key and return permissions
+      tags: [api-keys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key]
+              properties:
+                key:
+                  type: string
+                  description: API key (plain text, not hashed)
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  scope:
+                    type: object
+                  rate_limit_remaining:
+                    type: integer
+
+  /integrations:
+    get:
+      operationId: list_integrations
+      summary: List all configured integrations
+      tags: [integrations]
+      responses:
+        '200':
+          description: List of integrations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Integration'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_integration
+      summary: Configure a new integration
+      tags: [integrations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIntegrationRequest'
+      responses:
+        '201':
+          description: Integration configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Integration'
+        '400':
+          description: Invalid request
+
+  /integrations/{id}/sync:
+    post:
+      operationId: trigger_integration_sync
+      summary: Manually trigger a data sync for an integration
+      tags: [integrations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Sync triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sync_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+
+  /integrations/{id}/status:
+    get:
+      operationId: get_integration_status
+      summary: Get integration sync status and health
+      tags: [integrations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Integration status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Integration'
+        '404':
+          description: Not found
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    # ======================== CUSTOM FIELDS ========================
+    CustomField:
+      type: object
+      required:
+        - id
+        - entity
+        - name
+        - label
+        - field_type
+        - visible
+      properties:
+        id:
+          type: string
+          format: uuid
+        entity:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 128
+        label:
+          type: string
+          maxLength: 255
+        field_type:
+          $ref: '#/components/schemas/FieldType'
+        options:
+          type: object
+          description: Type-specific options (e.g., select values)
+        required:
+          type: boolean
+        visible:
+          type: boolean
+        searchable:
+          type: boolean
+        default_value:
+          type: string
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateCustomFieldRequest:
+      type: object
+      required: [entity, name, label, field_type]
+      properties:
+        entity:
+          type: string
+          enum: [crm.lead, crm.contact, crm.account, crm.stage, crm.team, crm.opportunity]
+        name:
+          type: string
+          maxLength: 128
+        label:
+          type: string
+          maxLength: 255
+        field_type:
+          $ref: '#/components/schemas/FieldType'
+        options:
+          type: object
+        required:
+          type: boolean
+        visible:
+          type: boolean
+          default: true
+        searchable:
+          type: boolean
+          default: false
+        default_value:
+          type: string
+
+    UpdateCustomFieldRequest:
+      type: object
+      properties:
+        label:
+          type: string
+        field_type:
+          $ref: '#/components/schemas/FieldType'
+        options:
+          type: object
+        required:
+          type: boolean
+        visible:
+          type: boolean
+        searchable:
+          type: boolean
+        default_value:
+          type: string
+
+    # ======================== WEBHOOKS ========================
+    Webhook:
+      type: object
+      required: [id, name, url, events, is_active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        url:
+          type: string
+          maxLength: 512
+        events:
+          type: array
+          items:
+            type: string
+          description: Event types to listen for
+        secret:
+          type: string
+        is_active:
+          type: boolean
+        headers:
+          type: object
+          description: Custom HTTP headers (JSON)
+        retry_count:
+          type: integer
+          default: 3
+        last_triggered:
+          type: string
+          format: date-time
+          readOnly: true
+        last_status:
+          $ref: '#/components/schemas/WebhookDeliveryStatus'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateWebhookRequest:
+      type: object
+      required: [name, url, events]
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+        headers:
+          type: object
+        retry_count:
+          type: integer
+
+    UpdateWebhookRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+        is_active:
+          type: boolean
+        headers:
+          type: object
+        retry_count:
+          type: integer
+
+    WebhookDeliveryLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        webhook_id:
+          type: string
+          format: uuid
+        event:
+          type: string
+        request_body:
+          type: object
+        response_status:
+          type: integer
+        response_body:
+          type: string
+        delivered_at:
+          type: string
+          format: date-time
+        retry_count:
+          type: integer
+
+    # ======================== AUDIT LOG ========================
+    AuditLogEntry:
+      type: object
+      required: [id, entity, entity_id, action, user_id, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        entity:
+          type: string
+          maxLength: 64
+        entity_id:
+          type: string
+        action:
+          $ref: '#/components/schemas/AuditAction'
+        user_id:
+          type: string
+          format: uuid
+        changes:
+          type: object
+          description: Field changes before/after
+        ip_address:
+          type: string
+        user_agent:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    # ======================== API KEYS ========================
+    ApiKey:
+      type: object
+      required: [id, name, is_active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        key_hash:
+          type: string
+          readOnly: true
+        scopes:
+          type: object
+          description: Allowed scopes per entity
+        rate_limit:
+          type: integer
+        ip_whitelist:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        last_used:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+
+    CreateApiKeyRequest:
+      type: object
+      required: [name, scopes]
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        scopes:
+          type: object
+          description: Permissions object
+        rate_limit:
+          type: integer
+        ip_whitelist:
+          type: array
+          items:
+            type: string
+        expires_at:
+          type: string
+          format: date-time
+
+    # ======================== INTEGRATIONS ========================
+    Integration:
+      type: object
+      required: [id, name, type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        type:
+          $ref: '#/components/schemas/IntegrationType'
+        config:
+          type: object
+          description: Configuration including credentials
+        is_active:
+          type: boolean
+        sync_direction:
+          $ref: '#/components/schemas/SyncDirection'
+        last_sync:
+          type: string
+          format: date-time
+        sync_status:
+          $ref: '#/components/schemas/SyncStatus'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateIntegrationRequest:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/IntegrationType'
+        config:
+          type: object
+        sync_direction:
+          $ref: '#/components/schemas/SyncDirection'
+
+    # ======================== ENUMS ========================
+    FieldType:
+      type: string
+      enum:
+        [STRING, INTEGER, FLOAT, BOOLEAN, DATE, DATETIME, EMAIL, PHONE,
+         URL, TEXT, HTML, SELECT, MANY2ONE, MANY2MANY]
+
+    AuditAction:
+      type: string
+      enum: [CREATE, UPDATE, DELETE, READ, EXPORT, IMPORT]
+
+    WebhookEvent:
+      type: string
+      enum:
+        [lead.create, lead.update, lead.delete,
+         opportunity.won, opportunity.lost,
+         contact.create,
+         subscription.renewal_due]
+
+    WebhookDeliveryStatus:
+      type: string
+      enum: [PENDING, SUCCESS, FAILED, RETRYING]
+
+    IntegrationType:
+      type: string
+      enum: [ERP, ACCOUNTING, MARKETING, SUPPORT, CUSTOM]
+
+    SyncDirection:
+      type: string
+      enum: [CRM_TO_EXTERNAL, EXTERNAL_TO_CRM, BIDIRECTIONAL]
+
+    SyncStatus:
+      type: string
+      enum: [IDLE, SYNCING, ERROR]

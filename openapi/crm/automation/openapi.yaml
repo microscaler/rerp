@@ -2,20 +2,38 @@ openapi: 3.1.0
 info:
   title: CRM Automation
   version: 1.0.0
-  description: Workflow automation service for CRM pipelines.
+  description: Workflow automation service for CRM pipelines with triggers, rules, and scheduled actions.
 servers:
-- url: /api/v1/crm/automation
-  description: CRM Automation API
-tags: []
+  - url: /api/v1/crm/automation
+    description: CRM Automation API
+tags:
+  - name: workflows
+    description: Workflow definitions and management
+  - name: rules
+    description: Condition-action rules within workflows
+  - name: triggers
+    description: Event hooks that fire workflows
+  - name: actions
+    description: Scheduled and manual actions
 paths:
   /workflows:
     get:
       operationId: list_workflows
       summary: List workflows
+      tags: [workflows]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Search'
+        - name: filter_active
+          in: query
+          schema:
+            type: boolean
+        - name: filter_trigger_type
+          in: query
+          schema:
+            type: string
+            enum: [STAGE_CHANGE, FIELD_CHANGE, TIME_BASED, WEBHOOK, MANUAL]
       responses:
         '200':
           description: List of workflows
@@ -34,9 +52,12 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized
     post:
       operationId: create_workflow
-      summary: Create workflow
+      summary: Create a new workflow
+      tags: [workflows]
       requestBody:
         required: true
         content:
@@ -56,13 +77,14 @@ paths:
     get:
       operationId: get_workflow
       summary: Get workflow by id
+      tags: [workflows]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Workflow details
@@ -75,13 +97,14 @@ paths:
     put:
       operationId: update_workflow
       summary: Update workflow
+      tags: [workflows]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -95,31 +118,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+        '400':
+          description: Invalid request
         '404':
           description: Not found
     delete:
       operationId: delete_workflow
       summary: Delete workflow
+      tags: [workflows]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Workflow deleted
         '404':
           description: Not found
-  /rules:
+  /workflows/{id}/rules:
     get:
-      operationId: list_rules
-      summary: List rules
+      operationId: list_workflow_rules
+      summary: List rules for a workflow
+      tags: [rules]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: List of rules
@@ -134,13 +166,118 @@ paths:
                       $ref: '#/components/schemas/Rule'
                   total:
                     type: integer
-                  page:
+        '404':
+          description: Workflow not found
+    post:
+      operationId: create_workflow_rule
+      summary: Add a rule to a workflow
+      tags: [rules]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleRequest'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          description: Invalid request
+        '404':
+          description: Workflow not found
+  /workflows/{id}/run:
+    post:
+      operationId: run_workflow
+      summary: Manually trigger a workflow for testing
+      tags: [workflows]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecutionResult'
+        '404':
+          description: Not found
+  /workflows/{id}/run-history:
+    get:
+      operationId: list_workflow_run_history
+      summary: View execution history for a workflow
+      tags: [workflows]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Workflow run history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkflowExecution'
+                  total:
                     type: integer
-                  limit:
+  /rules:
+    get:
+      operationId: list_rules
+      summary: List all rules across workflows
+      tags: [rules]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_workflow_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Rule'
+                  total:
                     type: integer
+        '401':
+          description: Unauthorized
     post:
       operationId: create_rule
-      summary: Create rule
+      summary: Create a standalone rule (adds to a workflow)
+      tags: [rules]
       requestBody:
         required: true
         content:
@@ -160,13 +297,14 @@ paths:
     get:
       operationId: get_rule
       summary: Get rule by id
+      tags: [rules]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Rule details
@@ -179,13 +317,14 @@ paths:
     put:
       operationId: update_rule
       summary: Update rule
+      tags: [rules]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -199,31 +338,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
+        '400':
+          description: Invalid request
         '404':
           description: Not found
     delete:
       operationId: delete_rule
       summary: Delete rule
+      tags: [rules]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Rule deleted
         '404':
           description: Not found
+  /rules/test:
+    post:
+      operationId: test_rule
+      summary: Test a rule against a sample lead
+      tags: [rules]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rule_id:
+                  type: string
+                  format: uuid
+                lead_data:
+                  type: object
+                  description: Sample lead data for evaluation
+      responses:
+        '200':
+          description: Rule test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleTestResult'
   /triggers:
     get:
       operationId: list_triggers
-      summary: List triggers
+      summary: List all triggers
+      tags: [triggers]
       parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_type
+          in: query
+          schema:
+            type: string
+            enum: [STAGE_CHANGE, FIELD_CHANGE, TIME_BASED, WEBHOOK, ON_CREATE, ON_UPDATE, ON_DELETE]
+        - name: filter_enabled
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: List of triggers
@@ -238,13 +414,12 @@ paths:
                       $ref: '#/components/schemas/Trigger'
                   total:
                     type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+        '401':
+          description: Unauthorized
     post:
       operationId: create_trigger
-      summary: Create trigger
+      summary: Create a new trigger
+      tags: [triggers]
       requestBody:
         required: true
         content:
@@ -264,13 +439,14 @@ paths:
     get:
       operationId: get_trigger
       summary: Get trigger by id
+      tags: [triggers]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Trigger details
@@ -282,14 +458,15 @@ paths:
           description: Not found
     put:
       operationId: update_trigger
-      summary: Update trigger
+      summary: Update trigger (enable/disable, schedule)
+      tags: [triggers]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -303,23 +480,109 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Invalid request
         '404':
           description: Not found
     delete:
       operationId: delete_trigger
       summary: Delete trigger
+      tags: [triggers]
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Trigger deleted
         '404':
           description: Not found
+  /triggers/{id}/fire:
+    post:
+      operationId: fire_trigger
+      summary: Manually fire a trigger for testing
+      tags: [triggers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Trigger fired successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  executed:
+                    type: boolean
+                  workflows_fired:
+                    type: integer
+  /actions/schedule:
+    post:
+      operationId: schedule_action
+      summary: Schedule a one-time action
+      tags: [actions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleActionRequest'
+      responses:
+        '201':
+          description: Action scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledAction'
+  /actions/recurring:
+    post:
+      operationId: schedule_recurring_action
+      summary: Schedule a recurring action
+      tags: [actions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringActionRequest'
+      responses:
+        '201':
+          description: Recurring action scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledAction'
+  /actions/upcoming:
+    get:
+      operationId: list_upcoming_actions
+      summary: List upcoming scheduled actions
+      tags: [actions]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Upcoming actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduledAction'
+                  total:
+                    type: integer
+
 components:
   parameters:
     Page:
@@ -342,4 +605,397 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    # ======================== WORKFLOW ========================
+    Workflow:
+      type: object
+      required:
+        - id
+        - name
+        - is_active
+        - trigger_type
+        - trigger_config
+        - action_type
+        - action_config
+        - sequence
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        is_active:
+          type: boolean
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_config:
+          type: object
+          description: Trigger-specific configuration (JSON)
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+          description: Action-specific configuration (JSON)
+        conditions:
+          type: object
+          description: Additional AND/OR conditions (JSON)
+        sequence:
+          type: integer
+          description: Execution order (lower = earlier)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+        run_count:
+          type: integer
+          readOnly: true
+        last_run:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateWorkflowRequest:
+      type: object
+      required: [name, trigger_type, action_type, action_config, conditions]
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_config:
+          type: object
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        conditions:
+          type: object
+        sequence:
+          type: integer
+        is_active:
+          type: boolean
+          default: true
+
+    UpdateWorkflowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_config:
+          type: object
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        conditions:
+          type: object
+        sequence:
+          type: integer
+        is_active:
+          type: boolean
+
+    # ======================== RULE ========================
+    Rule:
+      type: object
+      required:
+        - id
+        - workflow_id
+        - condition_field
+        - condition_operator
+        - sequence
+        - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        condition_field:
+          type: string
+          maxLength: 128
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+          description: Action-specific configuration (JSON)
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateRuleRequest:
+      type: object
+      required: [workflow_id, condition_field, condition_operator, condition_value, action_type, action_config]
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        condition_field:
+          type: string
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+
+    UpdateRuleRequest:
+      type: object
+      properties:
+        condition_field:
+          type: string
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+
+    # ======================== TRIGGER ========================
+    Trigger:
+      type: object
+      required:
+        - id
+        - workflow_id
+        - type
+        - entity
+        - enabled
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+          maxLength: 64
+          description: Entity to watch (crm.lead, crm.contact, etc.)
+        field:
+          type: string
+          maxLength: 128
+          description: Field to watch (for field-based triggers)
+        schedule:
+          type: string
+          description: Cron expression (for time-based triggers)
+        enabled:
+          type: boolean
+        last_fired:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CreateTriggerRequest:
+      type: object
+      required: [workflow_id, type, entity]
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+        field:
+          type: string
+        schedule:
+          type: string
+        enabled:
+          type: boolean
+          default: true
+
+    UpdateTriggerRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        schedule:
+          type: string
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+        field:
+          type: string
+
+    # ======================== EXECUTION ========================
+    WorkflowExecution:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        triggered_by:
+          type: string
+          format: uuid
+          description: User or cron job ID
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/ExecutionStatus'
+        result_summary:
+          type: object
+          description: Summary of actions executed
+
+    WorkflowExecutionResult:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        executed:
+          type: boolean
+        actions_ran:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+
+    RuleTestResult:
+      type: object
+      properties:
+        rule_id:
+          type: string
+          format: uuid
+        condition_met:
+          type: boolean
+        matching_conditions:
+          type: array
+          items:
+            type: string
+        actions_to_fire:
+          type: array
+          items:
+            type: string
+
+    # ======================== ACTIONS ========================
+    ScheduledAction:
+      type: object
+      required:
+        - id
+        - scheduled_at
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        scheduled_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/ExecutionStatus'
+        action_config:
+          type: object
+        executed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    ScheduleActionRequest:
+      type: object
+      required: [workflow_id, scheduled_at]
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        scheduled_at:
+          type: string
+          format: date-time
+        action_config:
+          type: object
+
+    RecurringActionRequest:
+      type: object
+      required: [workflow_id, schedule]
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        schedule:
+          type: string
+          description: Cron expression
+        action_config:
+          type: object
+
+    # ======================== ENUMS ========================
+    TriggerType:
+      type: string
+      enum: [STAGE_CHANGE, FIELD_CHANGE, TIME_BASED, WEBHOOK, MANUAL, ON_CREATE, ON_UPDATE, ON_DELETE]
+
+    ActionType:
+      type: string
+      enum: [SEND_EMAIL, CREATE_TASK, UPDATE_FIELD, ASSIGN_LEAD, CALL_WEBHOOK, CREATE_RECORD, SET_VALUE, ESCALATE]
+
+    ConditionOperator:
+      type: string
+      enum: [EQUALS, NOT_EQUALS, GREATER_THAN, LESS_THAN, CONTAINS, NOT_CONTAINS, IS_EMPTY, IS_NOT_EMPTY, IN, NOT_IN]
+
+    ConditionValueType:
+      type: string
+      enum: [TEXT, INTEGER, FLOAT, BOOLEAN, DATE, ENTITY]
+
+    ExecutionStatus:
+      type: string
+      enum: [PENDING, RUNNING, SUCCESS, FAILED, CANCELLED]

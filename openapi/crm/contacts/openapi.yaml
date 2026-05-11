@@ -1,0 +1,367 @@
+openapi: 3.1.0
+info:
+  title: Contacts
+  version: 1.0.0
+  description: Contact management service — contacts, org hierarchy, addresses.
+servers:
+  - url: /api/v1/crm/contacts
+    description: Contacts API
+tags:
+  - name: contacts
+    description: Contact CRUD
+paths:
+  /contacts:
+    get:
+      operationId: list_contacts
+      summary: List contacts
+      tags: [contacts]
+      parameters:
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 1, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+        - name: search
+          in: query
+          schema: {type: string}
+        - name: filter_company_id
+          in: query
+          schema: {type: string, format: uuid}
+        - name: filter_parent_id
+          in: query
+          schema: {type: string, format: uuid}
+        - name: filter_email
+          in: query
+          schema: {type: string, format: email}
+        - name: filter_active
+          in: query
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Contact' }
+                  total: {type: integer}
+                  page: {type: integer}
+                  limit: {type: integer}
+        '401': {description: Unauthorized}
+        '500': {description: Internal server error}
+    post:
+      operationId: create_contact
+      summary: Create a new contact
+      tags: [contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateContactRequest' }
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+        '400': {description: Invalid request}
+        '401': {description: Unauthorized}
+  /contacts/search-by-email:
+    get:
+      operationId: search_contacts_by_email
+      summary: Find contacts matching an email address
+      tags: [contacts]
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema: {type: string, format: email}
+      responses:
+        '200':
+          description: Matching contacts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Contact' }
+                  total: {type: integer}
+  /contacts/{id}:
+    get:
+      operationId: get_contact
+      summary: Get contact by id
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+        '404': {description: Not found}
+        '401': {description: Unauthorized}
+    put:
+      operationId: update_contact
+      summary: Update contact fields
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateContactRequest' }
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Contact' }
+        '400': {description: Invalid request}
+        '404': {description: Not found}
+    delete:
+      operationId: delete_contact
+      summary: Soft-delete contact
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '204': {description: Contact deleted}
+        '404': {description: Not found}
+  /contacts/{id}/tree:
+    get:
+      operationId: get_contact_hierarchy
+      summary: Get contact's org tree (parent + children)
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Org tree
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContactHierarchy' }
+        '404': {description: Not found}
+  /contacts/{id}/leads:
+    get:
+      operationId: get_contact_related_leads
+      summary: Get leads associated with a contact
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+        - name: page
+          in: query
+          schema: {type: integer, minimum: 1, default: 1}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+      responses:
+        '200':
+          description: Related leads
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lead_id: {type: string, format: uuid}
+                        lead_name: {type: string}
+                        stage_name: {type: string}
+                        expected_revenue: {type: number, format: double}
+                  total: {type: integer}
+        '404': {description: Not found}
+  /contacts/{id}/accounts:
+    get:
+      operationId: get_contact_accounts
+      summary: Get accounts associated with a contact
+      tags: [contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Related accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        account_id: {type: string, format: uuid}
+                        account_name: {type: string}
+                  total: {type: integer}
+        '404': {description: Not found}
+  /contacts/merge:
+    post:
+      operationId: merge_contacts
+      summary: Merge two contacts (keep one, delete other, update references)
+      tags: [contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MergeContactsRequest' }
+      responses:
+        '200':
+          description: Merge completed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MergeResult' }
+        '400': {description: Invalid request}
+        '404': {description: Contact not found}
+
+components:
+  schemas:
+    Contact:
+      type: object
+      required: [id, name, create_date]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email, maxLength: 255}
+        phone: {type: string, maxLength: 64}
+        mobile: {type: string, maxLength: 64}
+        title:
+          type: string
+          enum: [MR, MRS, MME]
+          description: Salutation
+        function: {type: string, maxLength: 128}
+        department: {type: string, maxLength: 128}
+        company_id:
+          type: string
+          format: uuid
+          description: Parent company/account
+        is_company: {type: boolean, default: false}
+        parent_id:
+          type: string
+          format: uuid
+          description: Parent contact for org structure
+        street: {type: string, maxLength: 255}
+        street2: {type: string, maxLength: 255}
+        city: {type: string, maxLength: 128}
+        state_id:
+          type: string
+          format: uuid
+        zip: {type: string, maxLength: 32}
+        country_id:
+          type: string
+          format: uuid
+        user_ids:
+          type: array
+          items: {type: string, format: uuid}
+        active: {type: boolean, default: true}
+        color: {type: integer, minimum: 1, maximum: 16}
+        create_date: {type: string, format: date-time, readOnly: true}
+        write_date: {type: string, format: date-time, readOnly: true}
+        # Child contacts count (joined)
+        child_contact_ids:
+          type: array
+          items: {type: string, format: uuid}
+          readOnly: true
+        lead_count: {type: integer, readOnly: true}
+        opportunity_count: {type: integer, readOnly: true}
+
+    CreateContactRequest:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, maxLength: 255}
+        email: {type: string, format: email}
+        phone: {type: string}
+        mobile: {type: string}
+        title: {type: string, enum: [MR, MRS, MME]}
+        function: {type: string}
+        department: {type: string}
+        company_id: {type: string, format: uuid}
+        parent_id: {type: string, format: uuid}
+        street: {type: string}
+        street2: {type: string}
+        city: {type: string}
+        state_id: {type: string, format: uuid}
+        zip: {type: string}
+        country_id: {type: string, format: uuid}
+
+    UpdateContactRequest:
+      type: object
+      properties:
+        name: {type: string}
+        email: {type: string}
+        phone: {type: string}
+        mobile: {type: string}
+        title: {type: string, enum: [MR, MRS, MME]}
+        function: {type: string}
+        department: {type: string}
+        company_id: {type: string, format: uuid}
+        parent_id: {type: string, format: uuid}
+        street: {type: string}
+        street2: {type: string}
+        city: {type: string}
+        state_id: {type: string, format: uuid}
+        zip: {type: string}
+        country_id: {type: string, format: uuid}
+        active: {type: boolean}
+
+    ContactHierarchy:
+      type: object
+      properties:
+        contact: { $ref: '#/components/schemas/Contact' }
+        parent:
+          type: object
+          properties:
+            id: {type: string, format: uuid}
+            name: {type: string}
+        children:
+          type: array
+          items:
+            type: object
+            properties:
+              id: {type: string, format: uuid}
+              name: {type: string}
+              is_company: {type: boolean}
+
+    MergeContactsRequest:
+      type: object
+      required: [keep_id, remove_id]
+      properties:
+        keep_id: {type: string, format: uuid}
+        remove_id: {type: string, format: uuid}
+
+    MergeResult:
+      type: object
+      properties:
+        kept_id: {type: string, format: uuid}
+        removed_id: {type: string, format: uuid}
+        merged_lead_count: {type: integer}
+        merged_account_count: {type: integer}

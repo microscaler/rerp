@@ -1,110 +1,319 @@
 # Platform & Extensibility
 
 > **Component:** Multi-tenancy, integrations, SDK, APIs, and developer ecosystem
-> **Competitive Landscape:** Salesforce Platform, Microsoft Power Platform, SAP BTP, HubSpot App Marketplace, Zoho Marketplace
-
-## Pitch
-
-**The Question Every Buyer Asks:** *"Can I extend my CRM to fit my unique processes, or do I have to compromise and change my business?"*
-
-Every business has processes that don't fit neatly into a CRM's default model. Custom fields, integrations with ERP/finance tools, custom objects, webhook hooks, and developer APIs are what separate a point solution from a platform. A buyer needs to know: *"If my business process requires a field that doesn't exist today, can I add it? If I need my CRM to push data to my inventory system, can I connect it?"*
+> **Priority:** P4 — Important for enterprise but not for first buyers
+> **Odoo Reference:** module system, ORM, access control rules, ir.model.access, ir.attachment
 
 ---
 
-## Functional Requirement Matrix
+## The Pitch
 
-| Feature | RERP CRM | Odoo CRM | Salesforce | Microsoft Dynamics 365 | SAP CRM | HubSpot | Zoho CRM |
-|---------|----------|----------|------------|------------------------|---------|---------|----------|
-| Custom fields per entity | Planned | ✅ | ✅ (10K+) | ✅ | ✅ | ✅ | ✅ |
-| Custom objects | Planned | ❌ | ✅ (Custom Objects) | ✅ (Dataverse) | ✅ | ❌ | ✅ |
-| API-first design | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| REST API coverage | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| GraphQL API | Planned | ❌ | ✅ (GraphQL) | ✅ | ❌ | ✅ | ✅ | ❌ |
-| SDK for multiple languages | Planned | ✅ | ✅ (Force.com SDK) | ✅ (.NET, Java) | ✅ | ✅ | ✅ |
-| Webhooks | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| OAuth2/OIDC auth | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Rate limiting | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Sandbox/dev environment | Planned | ❌ | ✅ (Sandbox) | ✅ (Sandbox) | ✅ | ✅ | ✅ | ✅ |
-| API versioning | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Data export API | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Data import API | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Third-party app marketplace | Planned | ❌ | ✅ (AppExchange) | ✅ (PCN Marketplace) | ✅ (SAP Store) | ✅ (App Marketplace) | ✅ (Marketplace) | ✅ (Extensions) |
-| Plugin/integration framework | Planned | ✅ (Module system) | ✅ (Apex) | ✅ (Plugins) | ✅ (BTP) | ✅ (Integrations) | ✅ (Functions) |
-| Two-way ERP sync | Planned | ❌ | ✅ (ERP Connectors) | ✅ (SAP/Nav) | ✅ (Native) | ✅ (QuickBooks) | ✅ (Books/Inventory) |
-| Document management integration | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Single Sign-On (SSO) | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Role-based permissions | Planned | ❌ | ✅ (Profiles/Roles) | ✅ (Security Roles) | ✅ | ✅ (Teams) | ✅ (Roles) |
-| Field-level security | Planned | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| Audit logging | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Change data capture | Planned | ❌ | ✅ (CDC) | ✅ (Dataverse) | ✅ | ❌ | ✅ | ✅ |
+**Buyer Question:** *Can I extend my CRM to fit my unique processes, or do I have to compromise and change my business?*
+
+Every business has processes that don't fit neatly into a CRM's default model. Custom fields, integrations with ERP/finance tools, custom objects, webhook hooks, and developer APIs are what separate a point solution from a platform. A buyer needs to know: *If my business process requires a field that doesn't exist today, can I add it? If I need my CRM to push data to my inventory system, can I connect it?*
+
+---
+
+## What This Component Does
+
+1. **Custom Fields** — Add fields to any entity without code changes
+2. **Custom Objects** — Define new entity types (e.g., "Property" for real estate CRM)
+3. **API-First Design** — Every operation exposed via REST API, covered by OpenAPI spec
+4. **REST API Coverage** — Full CRUD on all entities with filtering, sorting, pagination
+5. **GraphQL API** — Flexible queries for complex data fetching (optional)
+6. **SDK Generation** — Auto-generate client SDKs from OpenAPI specs (TypeScript, Python, Go, Java)
+7. **Webhooks** — Real-time notifications when entities change
+8. **OAuth2/OIDC Auth** — Standard authentication with scoped permissions
+9. **Rate Limiting** — Configurable per API key/client
+10. **Sandbox/Dev Environment** — Isolated development instance with separate data
+11. **API Versioning** — Backward-compatible API evolution
+12. **Data Import/Export API** — Bulk operations for migration and backup
+13. **Third-Party Marketplace** — Distribution for community-built integrations
+14. **Plugin/Integration Framework** — Extensible architecture for custom logic
+15. **Two-Way ERP Sync** — Bidirectional data sync with ERP systems
+16. **Document Management** — Attach files to any record
+17. **Single Sign-On (SSO)** — OIDC, SAML for enterprise authentication
+18. **Role-Based Permissions** — Granular access control
+19. **Field-Level Security** — Control visibility per field per role
+20. **Audit Logging** — Who changed what, when (compliance requirement)
+21. **Change Data Capture (CDC)** — Real-time change stream for event-driven architecture
+
+---
+
+## Entity Model
+
+### Custom Field Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `entity` | String (64) | Yes | Target entity (crm.lead, crm.contact, etc.) |
+| `name` | String (128) | Yes | Field name (machine-readable) |
+| `label` | String (255) | Yes | Display label (human-readable) |
+| `field_type` | Enum: [STRING, INTEGER, FLOAT, BOOLEAN, DATE, DATETIME, EMAIL, PHONE, URL, TEXT, HTML, SELECT, MANY2ONE, MANY2MANY] | Yes | Data type |
+| `options` | JSON | No | Type-specific options (e.g., select values, related entity) |
+| `required` | Boolean | No | Is field required? |
+| `visible` | Boolean | Yes | Visible in API responses |
+| `searchable` | Boolean | Yes | Included in search |
+| `default_value` | String | No | Default value |
+| `created_by` | Foreign Key: User | Yes | Who created |
+| `created_at` | DateTime | Yes | When created |
+
+### Webhook Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String (128) | Yes | Webhook name |
+| `url` | String (512) | Yes | Target URL for POST |
+| `events` | JSON | Yes | Event types to listen for (create, update, delete on entities) |
+| `secret` | String (255) | No | HMAC secret for signature verification |
+| `is_active` | Boolean | Yes | Enable/disable |
+| `headers` | JSON | No | Custom HTTP headers |
+| `retry_count` | Integer | Yes | Max retry attempts |
+| `last_triggered` | DateTime | No | When last fired |
+| `last_status` | Enum: [PENDING, SUCCESS, FAILED, RETRYING] | No | Last delivery status |
+| `created_at` | DateTime | Yes | Creation timestamp |
+
+### Audit Log Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `entity` | String (64) | Yes | Entity type (crm.lead, etc.) |
+| `entity_id` | UUID | Yes | Record ID |
+| `action` | Enum: [CREATE, UPDATE, DELETE, READ, EXPORT, IMPORT] | Yes | Action performed |
+| `user_id` | UUID | Yes | User who performed action |
+| `changes` | JSON | Yes | Field changes (before/after) |
+| `ip_address` | String (64) | No | Client IP |
+| `user_agent` | String (512) | No | Browser/client |
+| `created_at` | DateTime | Yes | When action occurred |
+
+### API Key Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String (128) | Yes | Key name (label) |
+| `key_hash` | String (255) | Yes | Hashed API key (never stored in plaintext) |
+| `scopes` | JSON | Yes | Allowed scopes (read, write, admin per entity) |
+| `rate_limit` | Integer | No | Requests per minute |
+| `ip_whitelist` | JSON | No | Allowed IP addresses |
+| `is_active` | Boolean | Yes | Enable/disable |
+| `last_used` | DateTime | No | When last used |
+| `created_at` | DateTime | Yes | Creation timestamp |
+| `expires_at` | DateTime | No | Expiration date |
+
+### Integration Entity
+
+| Field | Type | Required | Purpose |
+|-------|------|----------|---------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String (128) | Yes | Integration name (e.g., "QuickBooks", "SAP") |
+| `type` | Enum: [ERP, ACCOUNTING, MARKETING, SUPPORT, CUSTOM] | Yes | Integration category |
+| `config` | JSON | Yes | Configuration (credentials, endpoints) |
+| `is_active` | Boolean | Yes | Enable/disable |
+| `sync_direction` | Enum: [CRM_TO_EXTERNAL, EXTERNAL_TO_CRM, BIDIRECTIONAL] | Yes | Data flow |
+| `last_sync` | DateTime | No | Last sync timestamp |
+| `sync_status` | Enum: [IDLE, SYNCING, ERROR] | No | Current sync status |
+
+---
+
+## API Architecture
+
+### REST API Coverage
+
+Every entity in RERP CRM should be accessible via REST:
+
+```
+Standard CRUD:
+  GET    /entities/{type}         — List records (with filtering)
+  GET    /entities/{type}/{id}    — Get single record
+  POST   /entities/{type}         — Create record
+  PATCH  /entities/{type}/{id}    — Update record
+  DELETE /entities/{type}/{id}    — Soft delete
+
+Bulk Operations:
+  POST   /entities/{type}/bulk    — Bulk create/update/delete
+  GET    /entities/{type}/export   — Export to CSV/JSON
+  POST   /entities/{type}/import   — Import from CSV/JSON
+
+Search:
+  GET    /entities/{type}/search/{query}  — Full-text search
+  POST   /entities/{type}/filter          — Advanced filters
+
+Relationships:
+  GET    /entities/{type}/{id}/relationships  — All related entities
+```
+
+### Webhook Events
+
+| Event | Payload | Use Case |
+|-------|---------|----------|
+| `lead.create` | Lead object | Create contact in external system |
+| `lead.update` | Lead object + changes | Sync field changes |
+| `lead.delete` | Lead ID | Archive in external system |
+| `opportunity.won` | Opportunity object | Trigger invoice generation |
+| `opportunity.lost` | Opportunity object | Log loss reason in analytics |
+| `contact.create` | Contact object | Sync to email marketing tool |
+| `subscription.renewal_due` | Subscription + alert | Notify rep of upcoming renewal |
+
+Webhook payload example:
+```json
+{
+  "event": "lead.create",
+  "timestamp": "2026-05-10T14:30:00Z",
+  "data": {
+    "id": "abc123",
+    "name": "Acme Corp Deal",
+    "email_from": "john@acme.com",
+    "expected_revenue": 50000,
+    "stage_id": "qualified"
+  }
+}
+```
+
+### SDK Generation
+
+From the OpenAPI spec, generate SDKs for popular languages:
+
+```bash
+# Generate TypeScript SDK
+openapi-generator-cli generate -i openapi/crm/openapi.yaml -g typescript-axios -o sdk/typescript
+
+# Generate Python SDK
+openapi-generator-cli generate -i openapi/crm/openapi.yaml -g python -o sdk/python
+
+# Generate Go SDK
+openapi-generator-cli generate -i openapi/crm/openapi.yaml -g go -o sdk/go
+
+# Generate Java SDK
+openapi-generator-cli generate -i openapi/crm/openapi.yaml -g java -o sdk/java
+```
+
+---
+
+## Required API Endpoints
+
+### Custom Fields
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/custom-fields` | List all custom fields |
+| `POST` | `/custom-fields` | Create custom field |
+| `PATCH` | `/custom-fields/{id}` | Update custom field |
+| `DELETE` | `/custom-fields/{id}` | Delete custom field |
+| `GET` | `/entities/{type}/custom-fields` | Custom fields for an entity |
+
+### Webhooks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/webhooks` | List all webhooks |
+| `POST` | `/webhooks` | Create webhook |
+| `PATCH` | `/webhooks/{id}` | Update webhook |
+| `DELETE` | `/webhooks/{id}` | Delete webhook |
+| `POST` | `/webhooks/{id}/test` | Test webhook delivery |
+| `GET` | `/webhooks/{id}/logs` | Delivery logs |
+
+### API Keys & Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api-keys` | List API keys |
+| `POST` | `/api-keys` | Generate new API key |
+| `DELETE` | `/api-keys/{id}` | Revoke API key |
+| `GET` | `/auth/validate` | Validate API key |
+
+### Audit & Compliance
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/audit-log` | Audit log entries |
+| `GET` | `/audit-log/{entity}/{id}` | Audit log for specific record |
+| `GET` | `/audit-log/export` | Export audit log |
+
+### Integrations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/integrations` | List integrations |
+| `POST` | `/integrations` | Configure integration |
+| `POST` | `/integrations/{id}/sync` | Trigger manual sync |
+| `GET` | `/integrations/{id}/status` | Sync status |
+
+### Data Operations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/data/import` | Bulk import from CSV/JSON |
+| `GET` | `/data/export` | Bulk export to CSV/JSON |
+| `GET` | `/data/schemas` | Entity schemas (for import/export validation) |
 
 ---
 
 ## Competitive Positioning
 
 ### Where RERP Wins
-- **OpenAPI-first from day one** — Every entity, endpoint, schema, and parameter is machine-readable. This enables automatic client SDK generation, API testing, documentation, and contract testing. No other CRM exposes its entire data model this cleanly.
-- **Rust performance at scale** — API latency is sub-millisecond. Bulk operations on 100,000+ records complete in seconds, not minutes.
-- **Self-hosted extensibility** — No app marketplace, no third-party approval process. Write your integration and deploy it yourself.
-- **No vendor lock-in** — You own the code, the data, and the infrastructure. No per-API-call pricing, no rate limits on your own data.
+- **OpenAPI-first from day one** — Every entity, endpoint, schema, and parameter is machine-readable. Enables automatic SDK generation, API testing, documentation, and contract testing.
+- **Rust performance at scale** — Sub-millisecond API latency. Bulk operations on 100,000+ records complete in seconds.
+- **Self-hosted extensibility** — No app marketplace approval process. Write integration and deploy.
+- **No vendor lock-in** — Own the code, data, and infrastructure. No per-API-call pricing.
 
 ### Where RERP Lags
-- **No custom objects** — Salesforce's Custom Objects let you model any business entity without code. RERP requires OpenAPI spec changes and regeneration.
-- **No webhook system** — No way for external systems to react to CRM events in real-time.
-- **No sandbox** — No isolated development environment. Changes go straight to production.
-- **No app marketplace** — No ecosystem of pre-built integrations. Every integration is custom.
-- **No audit logging** — No trail of who changed what and when. Required for compliance (SOC 2, HIPAA, GDPR).
+- **No custom objects** — Salesforce lets you model any entity without code. RERP requires spec changes.
+- **No webhook system** — No way for external systems to react to CRM events.
+- **No sandbox** — No isolated development environment.
+- **No app marketplace** — No ecosystem of pre-built integrations.
+- **No audit logging** — No trail for compliance (SOC 2, HIPAA, GDPR).
 
 ---
 
 ## Competitive Intelligence Deep Dive
 
 ### Salesforce Platform (The Platform King — $25–$330/user/month)
-**AppExchange** has 7,000+ vetted apps spanning ERP, e-commerce, marketing, and industry-specific solutions. **Custom Objects** with relationships (1:N, M:N) and 10,000+ fields per object. **Apex** (Java-like) for server-side logic with trigger framework, test coverage requirements (75%+), and governor limits. **Force.com** for full-stack development with custom sites, Visualforce pages, and Lightning Components. **Sandbox** environments (Developer, Partial Copy, Full) for isolated testing with data cloning. **Change Sets** and **DevOps Center** for CI/CD with version control, automated testing, and environment promotion (sandbox → production). **API** covers 95%+ of platform functionality with REST, SOAP, Bulk, Streaming, and GraphQL endpoints. **Einstein AI** and **MuleSoft** (acquired) for enterprise integration. **Platform Events** for real-time event-driven architecture. The ecosystem is the moat: once you build on the platform (especially with AppExchange apps), leaving is prohibitively expensive.
+**AppExchange** has 7,000+ vetted apps. **Custom Objects** with 10,000+ fields per object. **Apex** for server-side logic. **Sandbox** environments for isolated testing. **Change Sets** and **DevOps Center** for CI/CD. **API** covers 95%+ of platform with REST, SOAP, Bulk, Streaming, GraphQL. **Platform Events** for real-time event-driven architecture. The ecosystem is the moat.
 
-### Microsoft Power Platform (Citizen Developer Platform — $5–$40/user/month add-on)
-**Power Apps** for no-code/low-code apps with canvas and model-driven approaches. **Power Automate** for 700+ connector workflows (SharePoint, Excel, Teams, Salesforce, SAP). **Power BI** for embedded analytics with DAX and natural language queries. **Dataverse** as the unified data platform with relational tables, business rules, and AI Builder. **PCF (Power Apps Component Framework)** for custom UI components. **Teams integration** lets reps build bots and workflows in the collaboration layer. **Azure integration** for AI/ML, serverless functions, and event streaming. **Logic Apps** for enterprise-grade ETL and integration. The advantage is zero friction for Microsoft shops: if you can use Excel, you can build a Power App. Copilot-in-Apps generates apps from natural language descriptions.
+### Microsoft Power Platform ($5–$40/user/month add-on)
+**Power Apps** for no-code/low-code apps. **Power Automate** for 700+ connector workflows. **Dataverse** as unified data platform. **Teams integration** for real-time collaboration. **Azure integration** for AI/ML and serverless. The advantage: if you can use Excel, you can build a Power App.
 
-### SAP Business Technology Platform (Enterprise Integration — custom pricing)
-**BTP** connects SAP CRM/S/4HANA to ERP, SCM, analytics, and IoT. **Integration Suite** (SAP CPI) for API management, data integration, and event streaming with 1,000+ pre-built connectors. **Extended Entity Model** for custom data structures on top of S/4HANA Business Partner and Customer. **ABAP Platform** for legacy code extension and modernization. **SAP Analytics Cloud** for embedded BI with planning and predictive analytics. **SAP Process Orchestration** for complex B2B workflows. **SAP Cloud ALM** for application lifecycle management. Best for organizations running SAP ERP who need CRM-to-ERP continuity with unified data model and no data duplication.
-
-### HubSpot App Marketplace (Developer Ecosystem — Free → $1,800+/month)
-**2,000+ integrations** from accounting (QuickBooks, Xero) to ecommerce (Shopify, WooCommerce) to support (Zendesk, Intercom). **Hapikey** and **OAuth2** for authentication with scoped permissions. **Webhooks** for real-time events on contact, deal, and ticket changes. **CRM SDK** for custom integrations with TypeScript, Python, and JavaScript libraries. **Developer Hub** with comprehensive documentation, sandbox accounts, and code samples. **Free tier** lets developers build and test without cost. **Private Apps** for internal integrations. **Public Apps** for marketplace distribution. **Partner Program** for revenue-sharing with top integration developers. The barrier to entry is low: build an integration, list it on the marketplace, and tap into 188,000+ paying customers.
-
-### Zoho Marketplace (Value Integrations — $14–$52/user/month)
-**500+ extensions** for CRM spanning finance, HR, project management, and industry verticals. **Zoho Flow** for no-code integrations between 400+ apps with drag-and-drop workflow builder. **Zoho Creator** for custom low-code apps that integrate natively with CRM data. **API** with comprehensive coverage (REST), batch operations, and bulk API for large data sets. **Deluge** scripting for custom logic (Zoho's proprietary language — "get a record from Zoho CRM, calculate a value, update a field in Zoho Books"). **Marketplace** for distribution with revenue-sharing for top partners. **Zoho One** (unified platform) bundles 40+ apps with single sign-on and shared data model. Best value platform for organizations that need extensions without enterprise pricing.
-
-### Pipedrive (Minimal Extensibility — $15–$99/user/month + Zapier)
-Pipedrive has **no custom objects** and **limited custom fields**. **API** covers core entities (leads, deals, contacts, companies) but not all features. **Webhooks** for real-time notifications on deal and contact changes. **500+ Zapier integrations** handle most automation needs without code. **Google Workspace integration** is native (email, calendar, contacts sync). **Chrome Extension** for one-click data capture from any website. No SDK, no app marketplace, no custom objects, no sandbox. The philosophy: "simple API, simple integrations, no platform." For teams under 20 who need basics: sufficient. For enterprises needing deep extensibility: insufficient.
+### HubSpot App Marketplace (Free → $1,800+/month)
+**2,000+ integrations** from accounting to ecommerce to support. **Webhooks** for real-time events. **CRM SDK** with TypeScript, Python, JS libraries. **Developer Hub** with docs and sandboxes. **Private Apps** for internal integrations. Low barrier: build, list, tap into 188,000+ customers.
 
 ---
 
-## RERP CRM Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1 (Immediate — 2-3 weeks)
-1. Add custom fields endpoint (POST /entities/{type}/custom-fields)
+### Phase 1: API Foundation (2-3 weeks)
+1. Add custom fields endpoint (POST /custom-fields)
 2. Implement CRUD for custom field values
-3. Add rate limiting to all endpoints (configurable per API key)
+3. Add rate limiting to all endpoints
 4. Implement OAuth2 client credentials flow
 5. Add API key management endpoint
 
-### Phase 2 (3-6 weeks)
-1. Define webhook endpoint (POST /webhooks, GET /webhooks/{id}/events)
+### Phase 2: Webhooks & Audit (2-3 weeks)
+1. Define webhook entity and endpoint
 2. Implement webhook trigger on entity create/update/delete
-3. Implement change data capture (CDC) endpoint
-4. Add audit logging (who changed what, when)
-5. Implement API versioning (version header or path)
+3. Implement audit logging (who changed what, when)
+4. Add API versioning (header or path)
+5. Implement change data capture endpoint
 
-### Phase 3 (6-12 weeks)
+### Phase 3: Extensibility (3-4 weeks)
 1. Custom objects system (user-defined entity model)
-2. SDK generation from OpenAPI specs (TypeScript, Python, Go, Java)
-3. Sandbox/dev environment (parallel instance with separate data)
-4. Data import/export API (CSV, JSON, bulk operations)
-5. Two-way ERP sync endpoint (bidirectional data sync)
-6. SSO integration (OIDC, SAML)
+2. SDK generation pipeline (TypeScript, Python, Go, Java)
+3. Sandbox/dev environment
+4. Data import/export API (CSV, JSON, bulk)
+5. Two-way ERP sync endpoint
+
+### Phase 4: Enterprise Features (3-4 weeks)
+1. SSO integration (OIDC, SAML)
+2. Field-level security
+3. GraphQL API (optional)
+4. App marketplace infrastructure
+5. Plugin/integration framework
 
 ---
 
 ## Key Takeaway for Buyers
 
-Platform extensibility is the differentiator between a product and a platform. A buyer with unique business processes needs to know: *"Can I customize this CRM to fit me, or do I have to adapt to the CRM?"* RERP's OpenAPI-first architecture is a genuine advantage here: the entire data model is machine-readable, which enables SDK generation, contract testing, and automatic documentation. The disadvantage is that RERP lacks the ecosystem (app marketplace, custom objects, sandbox) that makes Salesforce and Microsoft sticky. The path forward: start with API-first extensibility (custom fields, webhooks, audit logs), then build up to custom objects and the sandbox environment.
+Platform extensibility separates a product from a platform. RERP's OpenAPI-first architecture is a genuine advantage: the entire data model is machine-readable, enabling SDK generation, contract testing, and automatic documentation. The path forward: start with API-first extensibility (custom fields, webhooks, audit logs), then build up to custom objects and the sandbox environment.

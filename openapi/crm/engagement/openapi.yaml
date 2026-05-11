@@ -1,0 +1,881 @@
+openapi: 3.1.0
+info:
+  title: CRM Engagement
+  version: 1.0.0
+  description: Customer engagement service for subscriptions, renewals, gamification, and health scoring.
+servers:
+  - url: /api/v1/crm/engagement
+    description: CRM Engagement API
+tags:
+  - name: subscriptions
+    description: Subscription and recurring revenue management
+  - name: renewals
+    description: Renewal tracking and alerts
+  - name: goals
+    description: Gamification goals and achievements
+  - name: badges
+    description: Badge definitions and user achievements
+  - name: health
+    description: Customer health scoring
+paths:
+  /subscriptions:
+    get:
+      operationId: list_subscriptions
+      summary: List all subscriptions
+      tags: [subscriptions]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_status
+          in: query
+          schema:
+            type: string
+            enum: [ACTIVE, EXPIRED, CANCELLED, TRIAL, PAST_DUE]
+        - name: filter_customer_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_subscription
+      summary: Create a new subscription from a closed opportunity
+      tags: [subscriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionRequest'
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid request
+  /subscriptions/{id}:
+    get:
+      operationId: get_subscription
+      summary: Get subscription by id
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Not found
+    put:
+      operationId: update_subscription
+      summary: Update subscription
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+    delete:
+      operationId: delete_subscription
+      summary: Cancel subscription
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Subscription cancelled
+        '404':
+          description: Not found
+  /subscriptions/{id}/renew:
+    post:
+      operationId: renew_subscription
+      summary: Renew an active or expired subscription
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_end_date:
+                  type: string
+                  format: date
+                value:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Subscription renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Not found
+  /subscriptions/mrr:
+    get:
+      operationId: get_mrr
+      summary: Get monthly recurring revenue metrics
+      tags: [subscriptions]
+      responses:
+        '200':
+          description: MRR metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MRRMetrics'
+  /subscriptions/churn:
+    get:
+      operationId: get_churn_metrics
+      summary: Get churn rate and churned customers
+      tags: [subscriptions]
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [MONTH, QUARTER, YEAR]
+      responses:
+        '200':
+          description: Churn metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChurnMetrics'
+  /renewals/upcoming:
+    get:
+      operationId: list_upcoming_renewals
+      summary: List upcoming renewals
+      tags: [renewals]
+      parameters:
+        - name: days_ahead
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+            default: 30
+      responses:
+        '200':
+          description: Upcoming renewals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  total:
+                    type: integer
+  /goals:
+    get:
+      operationId: list_goals
+      summary: List all goals
+      tags: [goals]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: filter_type
+          in: query
+          schema:
+            type: string
+            enum: [REVENUE, DEALS, CALLS, MEETINGS, LEADS]
+        - name: filter_user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Goal'
+                  total:
+                    type: integer
+        '401':
+          description: Unauthorized
+    post:
+      operationId: create_goal
+      summary: Create a new goal
+      tags: [goals]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGoalRequest'
+      responses:
+        '201':
+          description: Goal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid request
+  /goals/{id}:
+    get:
+      operationId: get_goal
+      summary: Get goal by id with progress
+      tags: [goals]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Goal details with progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '404':
+          description: Not found
+    put:
+      operationId: update_goal
+      summary: Update goal
+      tags: [goals]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGoalRequest'
+      responses:
+        '200':
+          description: Goal updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid request
+        '404':
+          description: Not found
+  /goals/{id}/progress:
+    put:
+      operationId: update_goal_progress
+      summary: Update goal progress (called when a deal closes, etc.)
+      tags: [goals]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completed_value:
+                  type: number
+                  format: double
+                delta:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '404':
+          description: Not found
+  /leaderboard:
+    get:
+      operationId: get_leaderboard
+      summary: Get ranked list of users by metric
+      tags: [goals]
+      parameters:
+        - name: metric
+          in: query
+          schema:
+            type: string
+            enum: [REVENUE, DEALS, LEADS, MEETINGS]
+            default: REVENUE
+        - name: period_start
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: period_end
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank:
+                          type: integer
+                        user_id:
+                          type: string
+                          format: uuid
+                        user_name:
+                          type: string
+                        value:
+                          type: number
+                          format: double
+  /badges:
+    get:
+      operationId: list_badges
+      summary: List all available badges
+      tags: [badges]
+      responses:
+        '200':
+          description: List of badges
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Badge'
+        '401':
+          description: Unauthorized
+  /users/{id}/badges:
+    get:
+      operationId: get_user_badges
+      summary: Get user's earned badges
+      tags: [badges]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User's earned badges
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserBadge'
+  /customers/{id}/health:
+    get:
+      operationId: get_customer_health
+      summary: Get customer health score
+      tags: [health]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Customer health score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerHealthScore'
+        '404':
+          description: Customer not found
+  /customers/at-risk:
+    get:
+      operationId: list_at_risk_customers
+      summary: List customers with health score below threshold
+      tags: [health]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: threshold
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            default: 40
+      responses:
+        '200':
+          description: At-risk customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        customer_id:
+                          type: string
+                          format: uuid
+                        customer_name:
+                          type: string
+                        health_score:
+                          type: integer
+                        last_activity:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+  schemas:
+    # ======================== SUBSCRIPTION ========================
+    Subscription:
+      type: object
+      required:
+        - id
+        - status
+        - billing_cycle
+        - start_date
+        - value
+      properties:
+        id:
+          type: string
+          format: uuid
+        opportunity_id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        plan_id:
+          type: string
+          format: uuid
+        plan_name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        renewal_date:
+          type: string
+          format: date
+        renewal_automatic:
+          type: boolean
+        value:
+          type: number
+          format: double
+        monthly_value:
+          type: number
+          format: double
+          readOnly: true
+        currency_id:
+          type: string
+          format: uuid
+        billing_cycle:
+          $ref: '#/components/schemas/BillingCycle'
+        payment_method:
+          type: string
+        seats:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+        cancellation_reason:
+          type: string
+        churn_risk_score:
+          type: number
+          format: float
+          description: Churn probability (0-100)
+
+    CreateSubscriptionRequest:
+      type: object
+      required: [opportunity_id, plan_id, start_date, value, billing_cycle]
+      properties:
+        opportunity_id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid
+        plan_id:
+          type: string
+          format: uuid
+        plan_name:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        renewal_automatic:
+          type: boolean
+        value:
+          type: number
+          format: double
+        billing_cycle:
+          $ref: '#/components/schemas/BillingCycle'
+        payment_method:
+          type: string
+        seats:
+          type: integer
+
+    UpdateSubscriptionRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        end_date:
+          type: string
+          format: date
+        value:
+          type: number
+          format: double
+        seats:
+          type: integer
+        payment_method:
+          type: string
+        cancellation_reason:
+          type: string
+
+    MRRMetrics:
+      type: object
+      properties:
+        current_mrr:
+          type: number
+          format: double
+        new_mrr:
+          type: number
+          format: double
+        expansion_mrr:
+          type: number
+          format: double
+        churn_mrr:
+          type: number
+          format: double
+        net_mrr:
+          type: number
+          format: double
+        period:
+          type: string
+
+    ChurnMetrics:
+      type: object
+      properties:
+        total_subscriptions:
+          type: integer
+        churned_subscriptions:
+          type: integer
+        churn_rate:
+          type: number
+          format: float
+        churned_revenue:
+          type: number
+          format: double
+        period:
+          type: string
+
+    # ======================== GOALS ========================
+    Goal:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - target_value
+        - start_date
+        - end_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        type:
+          $ref: '#/components/schemas/GoalType'
+        target_value:
+          type: number
+          format: double
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        user_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        currency_id:
+          type: string
+          format: uuid
+        is_active:
+          type: boolean
+        completed_value:
+          type: number
+          format: double
+          readOnly: true
+        completion_percentage:
+          type: number
+          format: float
+          readOnly: true
+
+    CreateGoalRequest:
+      type: object
+      required: [name, type, target_value, start_date, end_date]
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/GoalType'
+        target_value:
+          type: number
+          format: double
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        user_id:
+          type: string
+          format: uuid
+        team_id:
+          type: string
+          format: uuid
+        currency_id:
+          type: string
+          format: uuid
+
+    UpdateGoalRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        target_value:
+          type: number
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+
+    # ======================== BADGES ========================
+    Badge:
+      type: object
+      required: [id, name, criteria]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        icon:
+          type: string
+          maxLength: 32
+        criteria:
+          type: object
+          description: Achievement criteria (JSON)
+        is_active:
+          type: boolean
+
+    UserBadge:
+      type: object
+      required: [id, user_id, badge_id, earned_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        badge_id:
+          type: string
+          format: uuid
+        earned_at:
+          type: string
+          format: date-time
+        badge:
+          $ref: '#/components/schemas/Badge'
+
+    # ======================== HEALTH ========================
+    CustomerHealthScore:
+      type: object
+      required: [customer_id, score]
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Overall health score (0-100)
+        engagement_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        support_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        usage_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        payment_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        last_updated:
+          type: string
+          format: date-time
+        risk_level:
+          $ref: '#/components/schemas/RiskLevel'
+
+    # ======================== ENUMS ========================
+    SubscriptionStatus:
+      type: string
+      enum: [ACTIVE, EXPIRED, CANCELLED, TRIAL, PAST_DUE]
+
+    BillingCycle:
+      type: string
+      enum: [MONTHLY, QUARTERLY, ANNUALLY]
+
+    GoalType:
+      type: string
+      enum: [REVENUE, DEALS, CALLS, MEETINGS, LEADS]
+
+    RiskLevel:
+      type: string
+      enum: [HEALTHY, AT_RISK, CHURN_RISK]

@@ -1,96 +1,249 @@
 # Predictive Analytics
 
-> **Component:** AI/ML-powered lead scoring, forecasting, and recommendations
-> **Competitive Landscape:** Salesforce Einstein, Microsoft Copilot, HubSpot AI, SAP AI Core, Zoho Zia
-
-## Pitch
-
-**The Question Every Buyer Asks:** *"Which leads should my team pursue first, and which deals will actually close?"*
-
-In a world where sales reps have limited time and infinite leads, predictive analytics answers: **who to call, when to call, and what to say.** This component covers lead scoring, win probability, revenue forecasting, and AI-driven recommendations. It's the difference between a CRM that records history and a CRM that predicts the future.
+> **Component:** AI/ML-powered lead scoring, win probability, and deal recommendations
+> **Priority:** P2 — Differentiator that separates record-keeping from prediction
+> **Odoo Reference:** crm.lead.scoring.frequency (Bayesian PLS), scoring frequency fields, PLS_UPDATE_BATCH cron
 
 ---
 
-## Functional Requirement Matrix
+## The Pitch
 
-| Feature | RERP CRM | Odoo CRM | Salesforce | Microsoft Dynamics 365 | SAP CRM | HubSpot | Zoho CRM |
-|---------|----------|----------|------------|------------------------|---------|---------|----------|
-| Manual probability field | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Automated probability scoring | Planned | ✅ (Bayesian PLS) | ✅ (Einstein Lead Score) | ✅ (Copilot) | ✅ | ✅ (Lead Scoring) | ✅ (Zia) |
-| Predictive lead scoring model | Planned | ✅ (Bayesian) | ✅ (Einstein) | ✅ (Azure ML) | ✅ | ✅ (ML) | ✅ (ML) |
-| Scoring by field values | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Historical win-rate computation | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Scoring model retraining | Planned | ✅ (PLS_UPDATE_BATCH) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Probability tooltip/explanation | Planned | ✅ (scores per field) | ✅ | ✅ | ❌ | ✅ | ✅ |
-| Lead scoring thresholds | Planned | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| Lead scoring activity | Planned | ✅ (cron trigger) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Win/loss pattern detection | Planned | ✅ (frequency tables) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Next best action AI | Planned | ❌ | ✅ (Einstein Next Best Action) | ✅ (Copilot) | ✅ | ✅ | ✅ |
-| Deal risk scoring | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Sentiment analysis on emails | Planned | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
-| Churn prediction | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Predictive pipeline forecasting | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Anomaly detection in pipeline | Planned | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Custom scoring model (user-defined) | Planned | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Scoring model versioning | Planned | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+**Buyer Question:** *Which leads should my team pursue first, and which deals will actually close?*
+
+In a world where sales reps have limited time and infinite leads, predictive analytics answers: **who to call, when to call, and what to say.** This component covers lead scoring (who's hot vs cold), win probability (which deals will close), revenue forecasting (how much pipeline), and AI-driven recommendations (next best action). It's the difference between a CRM that records history and a CRM that predicts the future.
+
+---
+
+## What This Component Does
+
+1. **Lead Scoring** — Automated probability (0-100) based on historical data
+2. **Explainability** — Show the rep WHY a lead scored high (not a black box)
+3. **Deal Risk** — Flag at-risk deals based on inactivity, stage slippage, or unusual patterns
+4. **Scoring Model Training** — Update scoring frequencies from won/lost history
+5. **Next Best Action** — Recommend the optimal next step based on winning deal patterns
+6. **Sentiment Analysis** — Analyze email tone for engagement signals (Phase 3)
+7. **Churn Prediction** — Predict which customers will churn (Phase 3)
+
+---
+
+## Entity Model
+
+### Scoring Frequency Entity
+
+The foundation of the Bayesian scoring model. Each row captures: "For team X, when field Y had value Z, it resulted in N won deals and M lost deals."
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `id` | UUID | Primary key |
+| `variable` | String (128) | Field name being scored (e.g., "email_state", "phone_state", "source_id") |
+| `value` | String (255) | Field value (e.g., "correct", "incorrect", "google") |
+| `won_count` | Integer | Times this combo led to a won deal |
+| `lost_count` | Integer | Times this combo led to a lost deal |
+| `team_id` | Foreign Key: Team | Optional team scoping (NULL = global) |
+| `total` | Integer | Computed: won_count + lost_count |
+
+**Configuration:** Scoring is applied to specific fields defined in a configuration parameter:
+
+| Variable | Field on Lead | Values |
+|----------|--------------|--------|
+| `phone_state` | phone validation | "correct", "incorrect", "na" |
+| `email_state` | email validation | "correct", "incorrect", "na" |
+| `country_id` | country | Country ID (1, 2, 3, ...) |
+| `source_id` | lead source | Source ID |
+| `lang_id` | language | Language ID |
+| `tag_ids` | classification tags | Tag IDs |
+| `industry_id` | industry | Industry ID |
+
+### Lead Score Entity
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `id` | UUID | Primary key |
+| `lead_id` | Foreign Key: Lead | The lead being scored |
+| `probability` | Float (0-100) | Computed probability |
+| `automated_probability` | Float (0-100) | AI-computed probability (same as probability) |
+| `is_automated_probability` | Boolean | Override flag |
+| `top_factors` | JSON | Top contributing factors (explainability) |
+| `computation_date` | DateTime | When this score was computed |
+| `total_records` | Integer | Records used for computation |
+
+### Scoring Score Thresholds
+
+| Threshold | Score Range | Label | Color |
+|-----------|------------|-------|-------|
+| HOT | 75-100 | Hot lead | Green |
+| WARM | 40-74 | Warm lead | Yellow |
+| COLD | 0-39 | Cold lead | Gray |
+
+---
+
+## The Bayesian Scoring Algorithm
+
+This is Odoo's PLS (Predictive Lead Scoring) — a simplified Bayesian inference that's fully explainable.
+
+### The Math
+
+```
+P(Won | Field=Value) = P(Field=Value | Won) × P(Won) / P(Field=Value)
+
+Where:
+  P(Won) = total_won_deals / total_deals (prior probability)
+  P(Field=Value | Won) = won_count_for_value / total_won_deals
+  P(Field=Value) = (won_count + lost_count) / total_records
+```
+
+### Score Computation for a Lead
+
+For a lead with fields F = {email_state=correct, phone_state=correct, source=google}:
+
+```
+1. Look up each field value in ScoringFrequency table
+2. For each: compute P(Won | Field=Value)
+3. Combine all probabilities: score = Π P(Won | Fi=Vi) / Σ P(Won | Fi=Vi)
+4. Normalize to 0-100 scale
+5. Return top 3 contributing factors for explainability
+```
+
+### Example
+
+```
+Lead: email=correct, phone=correct, source=google, country=US
+
+ScoringFrequency data:
+  email_state=correct, team=ALL: won=800, lost=200 → P(Won|email=correct) = 0.80
+  phone_state=correct, team=ALL: won=750, lost=250 → P(Won|phone=correct) = 0.75
+  source_id=google, team=ALL: won=500, lost=500 → P(Won|source=google) = 0.50
+  country_id=US, team=ALL: won=600, lost=400 → P(Won|country=US) = 0.60
+
+Combined:
+  P(Won | email=correct ∧ phone=correct ∧ source=google ∧ country=US)
+  ≈ 0.80 × 0.75 × 0.50 × 0.60 / Σ(all_combos)
+  = 0.18 / (weighted sum)
+  = 72.3 (WARM)
+
+Top factors: email_state=correct (+15%), phone_state=correct (+12%), country=US (+8%)
+```
+
+### Retraining the Model
+
+```
+PLS_UPDATE_BATCH cron job:
+  1. Query all closed (won/lost) leads for the period
+  2. For each lead, extract field values for configured scoring fields
+  3. Update won_count/lost_count in ScoringFrequency table
+  4. Recompute all lead scores from scratch
+  5. Store new scores in LeadScore table
+```
+
+---
+
+## Required API Endpoints
+
+### Scoring Core
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/leads/{id}/score` | Get score for a single lead |
+| `POST` | `/leads/score-batch` | Score all leads (triggers recomputation) |
+| `GET` | `/leads/{id}/score/explain` | Top contributing factors with weights |
+| `GET` | `/scoring/frequencies` | View scoring frequency data |
+| `POST` | `/scoring/frequencies/rebuild` | Rebuild from historical data |
+
+### Score Management
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/scoring/thresholds` | Get hot/warm/cold thresholds |
+| `PUT` | `/scoring/thresholds` | Update thresholds |
+| `GET` | `/scoring/model-configuration` | View which fields are scored |
+| `PUT` | `/scoring/model-configuration` | Update scoring field configuration |
+| `GET` | `/scoring/accuracy` | Historical scoring accuracy report |
+
+### Lead Buckets
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/leads/hot` | List all hot leads (score >= 75) |
+| `GET` | `/leads/warm` | List all warm leads (40-74) |
+| `GET` | `/leads/cold` | List all cold leads (< 40) |
+| `GET` | `/leads/ranked` | All leads sorted by score |
+
+---
+
+## Odoo Technical Patterns to Follow
+
+### Pattern 1: Scoring is Cron-Based, Not Real-Time
+Odoo's PLS_UPDATE_BATCH runs as a scheduled cron job (daily by default). It doesn't compute scores on-write because scoring requires scanning the entire won/lost history. This is computationally expensive and best done in batch.
+
+**Recommendation: RERP should implement scoring as a batch operation triggered by cron. The API provides `POST /leads/score-batch` to trigger on-demand.**
+
+### Pattern 2: Explainability via Top Factors
+Odoo's scoring returns the top contributing factors (fields that pushed the score up or down). This builds trust — the rep sees WHY a lead is scored 82, not just "82."
+
+**Recommendation: Always return top_factors in scoring responses.**
+
+### Pattern 3: Team-Scoped Scoring
+Scoring frequencies can be scoped to a specific team. Team A might score differently from Team B based on their historical data. NULL team_id means global scoring.
+
+**Recommendation: RERP should support team-scoped scoring frequencies.**
 
 ---
 
 ## Competitive Positioning
 
 ### Where RERP Wins
-- **Bayesian probability with explainability** — Odoo's PLS (Predictive Lead Scoring) uses Bayes' Theorem and shows the user exactly which field values contribute to the score. This is explainable AI, not a black box.
-- **Rust-level computation** — Scoring 100,000 leads with Bayesian inference in Rust is orders of magnitude faster than Python-based implementations.
-- **Self-hosted AI** — No subscription fees for Einstein or Copilot. The model runs on your infrastructure, on your data.
+- **Bayesian probability with explainability** — Reps see WHY a lead is scored high. This builds trust, not blind faith in a black box.
+- **Rust-level computation** — Scoring 100,000 leads with Bayesian inference in Rust is orders of magnitude faster than Python.
+- **Self-hosted AI** — No subscription fees. The model runs on your infrastructure.
 
 ### Where RERP Lags
-- **No scoring model deployed** — The infrastructure for PLS exists conceptually (frequency tables, batch update), but no endpoints or schemas are defined.
-- **No next-best-action recommendations** — Salesforce Einstein and HubSpot AI go beyond scoring to tell reps what to do next.
-- **No NLP/sentiment analysis** — No analysis of email tone, deal sentiment, or communication quality.
+- **No scoring model deployed** — Infrastructure for PLS exists conceptually but no endpoints or schemas defined.
+- **No next-best-action** — No recommendation engine.
+- **No NLP/sentiment analysis** — No email tone or deal sentiment.
 
 ---
 
 ## Competitive Intelligence Deep Dive
 
-### Salesforce Einstein AI (Enterprise Standard — $100–$330/user/month add-on)
-**Einstein Lead Score** uses ML on 200+ data signals to score leads 1–100, with feature importance showing which fields drive the score. **Einstein Opportunity Scoring** predicts deal win probability with confidence intervals. **Einstein Next Best Action** recommends optimal next step (call, email, meeting) based on patterns from 10M+ similar deals. **Einstein Discovery** provides deeper analytics with natural language explanations ("Deals with multi-year contracts close 3x faster"). **Email Insight** analyzes sent/received emails for sentiment, response likelihood, and missing key data. **Activity Capture** automatically logs emails and calendar events, then uses AI to surface insights. Enterprise tier includes **Predictive Lead Scoring** trained on your org's data. Additional cost on top of core Sales Cloud license.
+### Salesforce Einstein AI ($100–$330/user/month add-on)
+Einstein Lead Score uses ML on 200+ signals with feature importance. Einstein Opportunity Scoring predicts win probability with confidence intervals. Einstein Next Best Action recommends optimal next step based on patterns from 10M+ similar deals. Email Insight analyzes tone and response likelihood. Einstein Discovery provides natural language explanations.
 
-### Microsoft Copilot for Sales (AI Assistant — $30/user/month add-on)
-Copilot reads Outlook emails, Teams meetings, and Dynamics 365 notes to generate **deal summaries**, **next step recommendations**, and **competitive intelligence**. **Copilot Chat** lets reps ask "What's blocking this deal?" and get answers from the full data context (emails, meetings, notes, opportunities). **Meeting Summary** generates action items and follow-ups from Teams calls automatically. **Email Composition** drafts personalized emails based on contact history and deal context. **Predictive Insights** flag at-risk deals based on engagement patterns. **Competitive Win/Loss** analysis identifies win drivers from historical data. Best for Microsoft shops where Copilot is already embedded in Teams/Outlook — the marginal cost is the Copilot add-on.
+### Microsoft Copilot for Sales ($30/user/month add-on)
+Copilot reads Outlook emails and Teams meetings to generate deal summaries. Copilot Chat lets reps ask "What's blocking this deal?" Meeting Summary generates action items from Teams calls. Predictive Insights flag at-risk deals. Best for Microsoft shops where Copilot is already embedded.
 
-### HubSpot AI (SMB-Focused — included in Professional/Enterprise tiers)
-**Lead Scoring** is simple: assign points for actions (page views, email opens, form fills, deal stage changes). No ML training required — rules-based with optional AI enhancement. **Conversation Intelligence** (part of Sales Hub) analyzes call recordings for keywords, sentiment, and talk-to-listen ratio. **Chatspot** is a Copilot-like assistant for deal insights — ask "What's the status of deal X?" in natural language. **Content Recommendations** suggest next best content based on contact engagement. **Deal Predictions** flag deals at risk based on stalled activity. **AI Writing Assistant** drafts emails, notes, and meeting summaries. No separate ML engineering — everything is built-in.
+### HubSpot AI (included in Pro/Ent)
+Lead Scoring is rules-based with optional AI enhancement. Conversation Intelligence analyzes call recordings. Chatspot is a Copilot-like assistant for deal insights. Deal Predictions flag stalled deals. No separate ML engineering — everything built-in.
 
-### Zoho Zia (Value AI — $5/user/month add-on)
-**Zia** provides lead scores, deal predictions, email sentiment, voice commands, and anomaly detection. **Lead Scoring** uses ML from historical won/lost data. **Deal Probability** predicts win rate per opportunity. **Email Sentiment** analyzes email tone for engagement signals. **Zia Insights** surface patterns in sales data ("Your Q3 conversion rate drops 40% after July"). **Zia Q&A** lets managers ask natural language questions about pipeline ("Show me deals at risk this quarter"). **Voice Commands** ("Zia, create a task for John to call Acme Corp"). **Anomaly Detection** flags unusual patterns (sudden pipeline drop, atypical deal duration). Best value AI integration at $5/user/month.
+### Zoho Zia ($5/user/month add-on)
+Lead Scoring, Deal Probability, Email Sentiment, Zia Q&A (natural language analytics), Voice Commands, Anomaly Detection. Best value AI integration.
 
 ---
 
-## RERP CRM Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1 (Immediate — 2-3 weeks)
-1. Define `LeadScore` entity: lead_id, probability, automated_probability, computation_date
-2. Define `ScoringFrequency` entity: field, value, won_count, lost_count, team_id
-3. Add automated_probability and is_automated_probability to Lead/Opportunity schemas
-4. Implement scoring computation endpoint (compute scores for all leads)
-5. Implement scoring frequency rebuild endpoint (update from historical data)
+### Phase 1: Scoring Foundation (2-3 weeks) — P2
+1. Define `LeadScore` entity with lead_id, probability, top_factors, computation_date
+2. Define `ScoringFrequency` entity with variable, value, won_count, lost_count, team_id
+3. Add `automated_probability` and `is_automated_probability` to Lead entity
+4. Implement `POST /leads/score-batch` endpoint
+5. Implement scoring frequency rebuild endpoint
 
-### Phase 2 (3-6 weeks)
-1. Implement scoring tooltip/explanation endpoint (return top contributing factors)
-2. Implement scoring model configuration (which fields to use, thresholds)
-3. Add scoring cron job (scheduled recomputation)
-4. Implement lead scoring thresholds (Hot/Warm/Cold buckets)
-5. Add probability tooltip to Lead/Opportunity detail endpoint
+### Phase 2: Explainability & Config (2-3 weeks) — P2
+1. Implement `GET /leads/{id}/score/explain` (top contributing factors)
+2. Implement scoring model configuration endpoint
+3. Add hot/warm/cold thresholds
+4. Implement lead buckets endpoint (GET /leads/hot, /leads/warm, /leads/cold)
+5. Add scoring cron job (scheduled recomputation)
 
-### Phase 3 (6-12 weeks)
+### Phase 3: Advanced Analytics (4-6 weeks) — P2
 1. Custom scoring model (user-defined field weights)
-2. Deal risk scoring (combining probability with deal age, activity level)
+2. Deal risk scoring (combine probability with deal age, activity level)
 3. Next-best-action recommendations (based on similar winning deals)
-4. Anomaly detection in pipeline (unusual patterns, stalled deals)
-5. Scoring model versioning (track how scores evolve)
+4. Anomaly detection (unusual pipeline patterns)
+5. Scoring model versioning (track how scores evolve over time)
 
 ---
 
 ## Key Takeaway for Buyers
 
-Predictive analytics is where CRM becomes a competitive advantage. A buyer doesn't just want to track deals — they want to **win more deals**. RERP's Bayesian approach with explainability is a genuine differentiator: reps can see WHY a lead is scored high, not just a black-box number. This builds trust in the system. The work ahead is building the scoring engine and exposing it via API. Once deployed, RERP can compete with Einstein-level analytics without the enterprise price tag.
+Predictive analytics is where CRM becomes a competitive advantage. A buyer doesn't just want to track deals — they want to **win more deals**. RERP's Bayesian approach with explainability is a genuine differentiator: reps can see WHY a lead is scored high, not just a black-box number. The work ahead is building the scoring engine and exposing it via API.

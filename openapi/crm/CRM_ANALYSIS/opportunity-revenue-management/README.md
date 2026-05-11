@@ -1,101 +1,240 @@
 # Opportunity & Revenue Management
 
-> **Component:** Deal tracking, forecasting, and revenue analytics
-> **Competitive Landscape:** Salesforce, Microsoft Dynamics, SAP, HubSpot, Zoho, Pipedrive
-
-## Pitch
-
-**The Question Every Buyer Asks:** *"Can I trust my revenue forecast, and can I see exactly where every dollar of pipeline is headed?"*
-
-Revenue management is where CRM meets finance. If your pipeline forecast doesn't match reality, your CFO stops trusting the sales team, the sales team stops trusting the CRM, and you're left with a spreadsheet and a bad relationship. This component covers deal tracking, revenue calculation, forecasting, and recurring revenue models.
+> **Component:** Deal tracking, forecasting, recurring revenue, and pipeline analytics
+> **Priority:** P1 — Financial model essential for sales teams and CFO trust
+> **Odoo Reference:** crm.lead.revenue fields, crm.recurring.plan (20 lines), prorated_revenue computation
 
 ---
 
-## Functional Requirement Matrix
+## The Pitch
 
-| Feature | RERP CRM | Odoo CRM | Salesforce | Microsoft Dynamics 365 | SAP CRM | HubSpot | Zoho CRM | Pipedrive |
-|---------|----------|----------|------------|------------------------|---------|---------|----------|-----------|
-| Expected revenue field | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Probability-weighted revenue | Planned | ✅ (prorated_revenue) | ✅ (Expected Amount) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Recurring revenue tracking | Planned | ✅ | ✅ (Revenue Schedule) | ✅ | ✅ | ✅ (Recurring Revenue) | ✅ | ❌ |
-| Monthly recurring revenue | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Recurring revenue plans | Planned | ✅ (crm.recurring.plan) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Revenue schedule/segments | Planned | ❌ | ✅ (Revenue Schedules) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Forecast categories | Planned | ❌ | ✅ (Pipeline/Opps Close) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Forecast rollup by manager | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Quota management | Planned | ❌ | ✅ (Quotas) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Revenue attribution | Planned | ✅ (campaign_id) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Deal staging/rounding | Planned | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Quote generation | Planned | ❌ | ✅ (CPQ) | ✅ (Quotes) | ✅ | ✅ (Quotes) | ✅ | ✅ |
-| Contract management | Planned | ❌ | ✅ (CLM) | ✅ (Contracts) | ✅ | ✅ | ✅ | ✅ |
-| Multi-currency | Planned | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Discount management | Planned | ❌ | ✅ (Discount Tiers) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Price book integration | Planned | ❌ | ✅ (Price Books) | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Revenue recognition | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Win rate by period | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Pipeline coverage ratio | Planned | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+**Buyer Question:** *Can I trust my revenue forecast, and can I see exactly where every dollar of pipeline is headed?*
+
+Revenue management is where CRM meets finance. If your pipeline forecast doesn't match reality, your CFO stops trusting the sales team, the sales team stops trusting the CRM, and you're left with a spreadsheet and a bad relationship. This component covers deal value tracking, revenue calculation (probability-weighted), recurring revenue models, forecasting, and the financial data that makes pipeline visible to the C-suite.
+
+---
+
+## What This Component Does
+
+1. **Deal Value** — Every opportunity has an expected_revenue (deal size)
+2. **Weighted Revenue** — expected_revenue × probability = prorated_revenue (realistic view of pipeline)
+3. **Recurring Revenue** — Monthly/quarterly/annual recurring revenue (MRR/ARR) for subscription deals
+4. **Revenue Schedules** — Split recurring revenue across months for financial reporting
+5. **Forecasting** — Aggregate pipeline by stage, by rep, by period (month/quarter/year)
+6. **Currency** — Multi-currency support with exchange rates
+7. **Win Rate Analytics** — Historical conversion rates by period, rep, stage, source
+8. **Pipeline Coverage** — Ratio of total pipeline to quota (e.g., 3x coverage = need $3M pipeline for $1M quota)
+
+---
+
+## Entity Model
+
+### Revenue Fields on Lead/Opportunity
+
+These fields live on the unified crm.lead entity (Type = OPPORTUNITY):
+
+| Field | Type | Computed | Purpose |
+|-------|------|----------|---------|
+| `expected_revenue` | Decimal(15,2) | No | Expected deal value (manual entry) |
+| `probability` | Float (0-100) | Computed from Stage | Win probability from current stage |
+| `automated_probability` | Float (0-100) | Computed from AI | Bayesian scoring probability |
+| `is_automated_probability` | Boolean | No | Use AI score vs manual probability |
+| `prorated_revenue` | Decimal(15,2) | Yes | `expected_revenue × probability / 100` |
+| `expected_amount` | Decimal(15,2) | Yes | Same as prorated_revenue (Salesforce terminology) |
+
+### Recurring Revenue Model
+
+For subscription-based businesses (SaaS, managed services):
+
+**RecurringPlan Entity**
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `id` | UUID | Primary key |
+| `name` | String (128) | Plan name (e.g., "Monthly", "Quarterly", "Annual") |
+| `number_of_months` | Integer | Duration in months (1, 3, 12) |
+| `sequence` | Integer | Display order |
+| `is_recurring` | Boolean | Whether this plan recurs |
+| `renewal_automatic` | Boolean | Auto-renew at end |
+
+**Revenue Fields Added by RecurringPlan**
+
+| Field | Type | Computed | Purpose |
+|-------|------|----------|---------|
+| `recurring_plan_id` | Foreign Key: RecurringPlan | No | Revenue plan type |
+| `recurring_revenue` | Decimal(15,2) | No | Total recurring deal value |
+| `recurring_revenue_monthly` | Decimal(15,2) | Yes | `recurring_revenue / number_of_months` |
+| `recurring_revenue_monthly_prorated` | Decimal(15,2) | Yes | `recurring_revenue_monthly × probability / 100` |
+| `recurring_revenue_prorated` | Decimal(15,2) | Yes | Total prorated recurring revenue |
+| `close_date` | Date | No | Expected deal close date (used for MRR timing) |
+| `date_deadline` | Date | No | Same as close_date; deadline for closing |
+
+### Forecast Entity
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `id` | UUID | Primary key |
+| `opportunity_id` | Foreign Key: Opportunity | The deal |
+| `period` | Enum: [MONTH, QUARTER, YEAR] | Time period for forecast |
+| `forecast_month` | Integer | Month number (1-12) |
+| `forecast_quarter` | Integer | Quarter number (1-4) |
+| `forecast_year` | Integer | Year |
+| `category` | Enum: [BEST_CASE, MOST_LIKELY, WORST_CASE, PIPELINE] | Forecast category |
+| `expected_amount` | Decimal(15,2) | Forecasted revenue for this period |
+| `manager_id` | Foreign Key: User | Manager reviewing forecast |
+| `confidence` | Float (0-100) | Confidence in this forecast |
+
+---
+
+## Financial Calculations
+
+### Weighted Pipeline Calculation
+
+```
+Total Weighted Pipeline = Σ(opportunity.expected_revenue × stage.probability / 100)
+                         = Σ(opportunity.prorated_revenue)
+
+Per Rep = Σ(opportunities where user_id = rep)
+Per Team = Σ(opportunities where team_id = team)
+Per Stage = Σ(opportunities where stage_id = stage)
+Per Period = Σ(opportunities where month(close_date) = X)
+```
+
+### MRR Calculation
+
+```
+New MRR = Σ(new deals closed this month with recurring_revenue / number_of_months)
+Churn MRR = Σ(churned deals' recurring_revenue / number_of_months)
+Expansion MRR = Σ(upgrades' additional recurring_revenue)
+Net MRR = New MRR + Expansion MRR - Churn MRR
+```
+
+### Pipeline Coverage Ratio
+
+```
+Pipeline Coverage = Total Weighted Pipeline / Sales Quota
+
+Example:
+  Quota: $1,000,000
+  Weighted Pipeline: $3,000,000
+  Coverage: 3.0x (healthy)
+
+  Typical targets: 2.5x - 4.0x depending on close rate
+```
+
+---
+
+## Required API Endpoints
+
+### Revenue Operations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/pipeline/revenue-summary` | Total, weighted, MRR, ARR pipeline |
+| `GET` | `/pipeline/weighted` | Σ(amount × probability) by stage/team/rep |
+| `POST` | `/opportunities/{id}/update-revenue` | Update expected_revenue, probability, plan |
+| `GET` | `/recurring/forecast` | Monthly recurring revenue forecast |
+
+### Forecasting
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/forecasts/monthly` | Monthly revenue forecast by team/rep |
+| `GET` | `/forecasts/quarterly` | Quarterly revenue forecast |
+| `GET` | `/forecasts/actual-vs-forecast` | Variance analysis |
+| `GET` | `/forecasts/pipeline-coverage` | Pipeline vs quota coverage ratio |
+
+### Win/Loss Analytics
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/analytics/win-rate` | Historical win rate by period/rep/stage |
+| `GET` | `/analytics/time-to-close` | Average days from open to close |
+| `GET` | `/analytics/source-effectiveness` | Win rate and revenue by lead source |
+| `GET` | `/analytics/deal-velocity` | Average days per stage |
+
+---
+
+## Odoo Technical Patterns to Follow
+
+### Pattern 1: Average-Aggregated Float for Probability
+Odoo's `probability` field uses `avg_aggregate=True` which means it's included in group-by aggregations. When you group opportunities by team, the probability is averaged. This is important for accurate pipeline forecasting.
+
+**Recommendation: RERP should define probability as a Float with aggregation support.**
+
+### Pattern 2: Computed Monetary Fields
+Odoo uses `compute=` methods for `prorated_revenue`, `recurring_revenue_monthly`, etc. These are stored (not just computed on read) so they can be indexed and queried efficiently.
+
+**Recommendation: RERP should define these as computed fields stored in the database, not derived on-read. This enables aggregation queries without runtime computation.**
+
+### Pattern 3: RecurringPlan as Configuration
+Odoo's `crm.recurring.plan` is a configuration entity — it defines reusable plan types. Opportunities reference it, but the plan itself is independent. This allows "Annual Plan" to be used across thousands of opportunities without duplication.
+
+**Recommendation: RERP should define RecurringPlan as a separate entity, seeded with common plans (Monthly, Quarterly, Annual), referenced by opportunities.**
 
 ---
 
 ## Competitive Positioning
 
 ### Where RERP Wins
-- **Rust precision for financial calculations** — No floating-point surprises. Monetary types are handled with exact decimal arithmetic.
-- **OpenAPI-defined revenue schemas** — Revenue schedules, forecast categories, and quota structures are machine-readable and auto-generated for all clients.
-- **Self-hosted finance integration** — No per-feature pricing for CPQ or revenue management. Everything is in the codebase.
+- **Rust precision for financial calculations** — No floating-point surprises. Decimal types handle monetary values exactly.
+- **OpenAPI-defined revenue schemas** — Revenue schedules, forecast categories, and quota structures are machine-readable for all clients.
+- **Self-hosted finance integration** — No per-feature pricing for CPQ or revenue management. Everything in the codebase.
 
 ### Where RERP Lags
-- **No revenue fields at all** — The entities exist but have no financial data model. This is the most critical gap after pipeline stages.
-- **No forecasting** — Without probability * expected_revenue, there's no forecast. Without forecast categories, there's no pipeline visibility.
-- **No recurring revenue models** — No subscription revenue, no revenue schedules, no price books.
+- **No revenue fields at all** — Zero financial data model in any entity.
+- **No forecasting** — No probability × expected_revenue computation.
+- **No recurring revenue** — No subscription models.
 
 ---
 
 ## Competitive Intelligence Deep Dive
 
-### Salesforce Revenue Cloud (Enterprise — $25–$330/user/month)
-Salesforce's **Revenue Cloud** is the enterprise gold standard. **Opportunity Amount × Probability = Expected Revenue** computed in real-time. **Revenue Schedules** split revenue across months (12/24/36) for recurring deals. **Price Books** with tiered pricing and discount schedules. **Quotes** with full CPQ (Configure, Price, Quote) — product bundles, option sets, and approval workflows. **Forecasting** with customizable categories (O/P/Closed/Worst/Best/Pipeline) and quota management at every org level. **Einstein Forecasting** uses ML on historical data to predict revenue shortfalls 90 days out. **Revenue Recognition** automates ASC 606/IFRS 15 compliance. The ecosystem is unmatched: 3,000+ AppExchange apps for revenue management.
+### Salesforce Revenue Cloud ($25–$330/user/month)
+Enterprise gold standard. Revenue Cloud includes Revenue Schedules (split across 12/24/36 months), Price Books with tiered pricing, Quotes with full CPQ, Forecasting with categories (O/P/Closed/Worst/Best), and Quota management. Einstein Forecasting uses ML to predict shortfalls 90 days out. ASC 606/IFRS 15 revenue recognition is native.
 
-### Microsoft Dynamics 365 (Finance Integration — $65–$200/user/month)
-Dynamics integrates with **Dynamics 365 Finance & Operations** — quotes flow directly into invoices, orders, and general ledger. **Revenue management** tracks revenue recognition over time with automatic journal entries. **Quote management** includes pricing formulas, discount rules, and margin analysis. **Customer Insights** enriches deal data with financial signals (payment history, credit score). **Sales Hub** includes deal profit/loss tracking per opportunity. Best for organizations needing CRM-to-ERP continuity with full financial audit trails.
+### Microsoft Dynamics ($65–$200/user/month)
+Integrates with Finance & Operations — quotes flow directly into invoices and general ledger. Revenue recognition tracks over time with automatic journal entries. Margin analysis per deal shows COGS.
 
-### SAP CRM/S/4HANA (Manufacturing B2B — custom pricing)
-SAP's CRM handles **complex pricing matrices**, **volume discounts**, **contract-based pricing**, and **multi-channel revenue** (online, retail, wholesale). Deep integration with SAP S/4HANA means every quote flows directly into production planning, inventory allocation, and order fulfillment. **Margin analysis** per deal shows cost-of-goods-sold in real-time. **Revenue recognition** is native — no add-on needed. Best for manufacturing and distribution where CRM directly drives production.
+### HubSpot ($20–$1,800+/month)
+Recurring Revenue module tracks MRR/ARR with churn tracking. Quotes are simple — create, send via email, accept with e-signature. Forecasting uses historical close rates. Simplicity is the selling point.
 
-### HubSpot (SMB Revenue — Free → $1,800+/month for Enterprise)
-HubSpot's **Recurring Revenue** module tracks MRR/ARR from subscription deals with built-in churn tracking. **Quotes** are simple — create, send via email, accept with e-signature. **Deal pipelines** show revenue at each stage with real-time weighted pipeline calculation. **Forecasting** uses historical close rates per rep to predict revenue. **Revenue Analytics** shows trends over time. The simplicity is the selling point: no CPQ complexity, just "what's the deal worth?" For SMB to mid-market, this is sufficient.
-
-### Zoho CRM (Value Revenue — $14–$52/user/month)
-Zoho's **Forecasting** supports quota management, pipeline forecasting, and team-level rollups. **Revenue forecasting** uses historical data to predict monthly/quarterly revenue. **Price Books** support multi-tier pricing per product and customer segment. **Discount approval workflows** require manager sign-off for discounts above thresholds. **Deal tracking** includes margin calculations (revenue - cost). **Zoho Subscriptions** (integrated app) handles recurring revenue, renewals, and dunning management. Best value for mid-market with complex pricing.
-
-### Pipedrive (Simple Revenue — $15–$99/user/month)
-Pipedrive shows **Revenue in Pipeline** (total deal value) and **Weighted Revenue** (stage probability × amount). **Revenue widgets** display monthly trends. That's it for native revenue management. No quotes, no recurring revenue, no forecasting. For teams where revenue calculation is handled in a separate tool (QuickBooks, Xero), this is sufficient.
+### Zoho ($14–$52/user/month)
+Forecasting with quota management and team rollups. Price Books with multi-tier pricing. Discount approval workflows. Zoho Subscriptions handles recurring revenue and dunning.
 
 ---
 
-## RERP CRM Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1 (Immediate — 2 weeks)
-1. Define revenue fields on Opportunity: `expected_revenue: Monetary`, `probability: Float`, `close_date: Date`
-2. Compute `prorated_revenue = expected_revenue * probability / 100`
-3. Add `expected_revenue` and `probability` to Lead entity
-4. Implement pipeline revenue summary endpoint (total/weighted by stage)
+### Phase 1: Revenue Fields (1-2 weeks) — P1
+1. Add `expected_revenue`, `probability`, `close_date` to Lead entity
+2. Compute `prorated_revenue = expected_revenue × probability / 100`
+3. Implement `pipeline/revenue-summary` endpoint (total, weighted by stage/team)
+4. Add `date_deadline` for forecast timing
 
-### Phase 2 (2-4 weeks)
-1. Define `RecurringPlan` entity: name, number_of_months, sequence
-2. Add `recurring_plan_id` and `recurring_revenue` to Opportunity
-3. Compute `recurring_revenue_monthly` and `recurring_revenue_monthly_prorated`
-4. Implement revenue forecasting endpoint (by month/quarter)
+### Phase 2: Recurring Revenue (2-3 weeks) — P1
+1. Define `RecurringPlan` entity with seed data (Monthly, Quarterly, Annual)
+2. Add `recurring_plan_id`, `recurring_revenue`, `close_date` to Lead
+3. Compute MRR and prorated MRR on Lead
+4. Implement `recurring/forecast` endpoint
+5. Implement pipeline coverage ratio calculation
 
-### Phase 3 (4-8 weeks)
-1. Multi-currency support (base_currency, exchange_rate)
+### Phase 3: Forecasting (2-3 weeks) — P1
+1. Define `Forecast` entity with period, category, manager
+2. Implement monthly/quarterly forecast endpoints
+3. Implement actual-vs-forecast variance endpoint
+4. Add forecast by team/rep rollup
+5. Pipeline coverage ratio endpoint
+
+### Phase 4: Advanced Revenue (3-4 weeks) — P2
+1. Multi-currency support with exchange rates
 2. Quote generation endpoint (Opportunity → Quote)
 3. Price book endpoint (products, prices, tiers)
-4. Forecast categories endpoint
-5. Quota management (per rep, per period)
+4. Win rate by period endpoint
+5. Deal velocity tracking (avg days per stage)
 
 ---
 
 ## Key Takeaway for Buyers
 
-Revenue management is the bridge between sales and finance. A buyer needs to trust that when their sales team says "$5M in pipeline," the number is real — not a sales rep's guess. RERP's advantage is precision and transparency. The OpenAPI-defined revenue model means every client sees the same numbers, calculated the same way, at sub-millisecond latency. But the work is ahead: the financial data model doesn't exist yet.
+Revenue management is the bridge between sales and finance. A buyer needs to trust that when their sales team says "$5M in pipeline," the number is real — not a guess. RERP's advantage is precision and transparency through OpenAPI-defined revenue models. The immediate priority: add expected_revenue, probability, and prorated_revenue to the Lead entity, then compute the weighted pipeline.
