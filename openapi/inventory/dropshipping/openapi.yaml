@@ -6,7 +6,11 @@ info:
 servers:
 - url: /api/v1/inventory/dropshipping
   description: Dropshipping API
-tags: []
+tags:
+- name: dropship-orders
+  description: Customer-facing dropship orders
+- name: vendor-orders
+  description: Supplier-facing vendor orders
 paths:
   /dropship-orders:
     get:
@@ -34,6 +38,21 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: List all dropship orders with pagination
+      security:
+      - httpBearer: []
+      tags:
+      - dropship-orders
+      x-brrtrouter-impl: list_dropship_orders_handler
+      x-operation-id: list_dropship_orders
+      x-controller: DropshipOrderController
+      x-handler-name: list_dropship_orders
     post:
       operationId: create_dropship_order
       summary: Create dropship-order
@@ -43,6 +62,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDropshipOrderRequest'
+        description: Request body for creating a new dropship order
       responses:
         '201':
           description: DropshipOrder created
@@ -52,6 +72,23 @@ paths:
                 $ref: '#/components/schemas/DropshipOrder'
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Create a new dropship order
+      security:
+      - httpBearer: []
+      tags:
+      - dropship-orders
+      x-brrtrouter-impl: create_dropship_order_handler
+      x-operation-id: create_dropship_order
+      x-controller: DropshipOrderController
+      x-handler-name: create_dropship_order
   /dropship-orders/{id}:
     get:
       operationId: get_dropship_order
@@ -72,6 +109,21 @@ paths:
                 $ref: '#/components/schemas/DropshipOrder'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Get dropship order details by ID
+      security:
+      - httpBearer: []
+      tags:
+      - dropship-orders
+      x-brrtrouter-impl: get_dropship_order_handler
+      x-operation-id: get_dropship_order
+      x-controller: DropshipOrderController
+      x-handler-name: get_dropship_order
     put:
       operationId: update_dropship_order
       summary: Update dropship-order
@@ -88,6 +140,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateDropshipOrderRequest'
+        description: Request body for updating an existing dropship order
       responses:
         '200':
           description: DropshipOrder updated
@@ -97,6 +150,25 @@ paths:
                 $ref: '#/components/schemas/DropshipOrder'
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Update an existing dropship order
+      security:
+      - httpBearer: []
+      tags:
+      - dropship-orders
+      x-brrtrouter-impl: update_dropship_order_handler
+      x-operation-id: update_dropship_order
+      x-controller: DropshipOrderController
+      x-handler-name: update_dropship_order
     delete:
       operationId: delete_dropship_order
       summary: Delete dropship-order
@@ -112,6 +184,18 @@ paths:
           description: DropshipOrder deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Delete dropship-order
+      security:
+      - httpBearer: []
+      x-brrtrouter-impl: dropship-orders_id_handler
   /vendor-orders:
     get:
       operationId: list_vendor_orders
@@ -138,6 +222,21 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: List all vendor orders with pagination
+      security:
+      - httpBearer: []
+      tags:
+      - vendor-orders
+      x-brrtrouter-impl: list_vendor_orders_handler
+      x-operation-id: list_vendor_orders
+      x-controller: VendorOrderController
+      x-handler-name: list_vendor_orders
     post:
       operationId: create_vendor_order
       summary: Create vendor-order
@@ -147,6 +246,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateVendorOrderRequest'
+        description: Request body for creating a new vendor order
       responses:
         '201':
           description: VendorOrder created
@@ -156,6 +256,23 @@ paths:
                 $ref: '#/components/schemas/VendorOrder'
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Create a new vendor order
+      security:
+      - httpBearer: []
+      tags:
+      - vendor-orders
+      x-brrtrouter-impl: create_vendor_order_handler
+      x-operation-id: create_vendor_order
+      x-controller: VendorOrderController
+      x-handler-name: create_vendor_order
   /vendor-orders/{id}:
     get:
       operationId: get_vendor_order
@@ -176,6 +293,21 @@ paths:
                 $ref: '#/components/schemas/VendorOrder'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Get vendor order details by ID
+      security:
+      - httpBearer: []
+      tags:
+      - vendor-orders
+      x-brrtrouter-impl: get_vendor_order_handler
+      x-operation-id: get_vendor_order
+      x-controller: VendorOrderController
+      x-handler-name: get_vendor_order
     put:
       operationId: update_vendor_order
       summary: Update vendor-order
@@ -192,6 +324,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateVendorOrderRequest'
+        description: Request body for updating an existing vendor order
       responses:
         '200':
           description: VendorOrder updated
@@ -201,6 +334,25 @@ paths:
                 $ref: '#/components/schemas/VendorOrder'
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Update an existing vendor order
+      security:
+      - httpBearer: []
+      tags:
+      - vendor-orders
+      x-brrtrouter-impl: update_vendor_order_handler
+      x-operation-id: update_vendor_order
+      x-controller: VendorOrderController
+      x-handler-name: update_vendor_order
     delete:
       operationId: delete_vendor_order
       summary: Delete vendor-order
@@ -216,6 +368,18 @@ paths:
           description: VendorOrder deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Delete vendor-order
+      security:
+      - httpBearer: []
+      x-brrtrouter-impl: vendor-orders_id_handler
 components:
   parameters:
     Page:
@@ -238,4 +402,271 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    BaseEntity:
+      type: object
+      description: Base entity with audit fields
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    DropshipOrder:
+      type: object
+      description: Customer-facing dropship order with vendor assignments and fulfillment
+        tracking
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          order_number:
+            type: string
+            description: Customer-facing order number
+          customer_id:
+            type: string
+            format: uuid
+            description: Customer reference
+          customer_name:
+            type: string
+            description: Customer display name
+          customer_email:
+            type: string
+            format: email
+            description: Customer email for notifications
+          customer_address:
+            type: string
+            description: Shipping address
+          status:
+            type: string
+            enum:
+            - pending
+            - confirmed
+            - partially_shipped
+            - shipped
+            - delivered
+            - cancelled
+            - returned
+            description: Order fulfillment status
+          customer_price:
+            type: number
+            format: double
+            description: Total customer-facing price
+          vendor_cost:
+            type: number
+            format: double
+            description: Total cost from vendors
+          profit_margin:
+            type: number
+            format: double
+            description: Calculated profit margin
+          items:
+            type: array
+            items:
+              type: object
+            description: Order line items
+          vendor_assignments:
+            type: array
+            items:
+              type: object
+            description: Mapping of items to vendors
+          notes:
+            type: string
+            description: Internal notes
+    CreateDropshipOrderRequest:
+      type: object
+      description: Request body for creating a new dropship order
+      required:
+      - customer_id
+      - items
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+          description: Customer reference
+        customer_name:
+          type: string
+          description: Customer display name
+        customer_email:
+          type: string
+          format: email
+          description: Customer email
+        customer_address:
+          type: string
+          description: Shipping address
+        items:
+          type: array
+          items:
+            type: object
+          description: Order line items with product, quantity, customer price
+        notes:
+          type: string
+          description: Internal notes
+    UpdateDropshipOrderRequest:
+      type: object
+      description: Request body for updating an existing dropship order
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - partially_shipped
+          - shipped
+          - delivered
+          - cancelled
+          description: Order status update
+        customer_address:
+          type: string
+          description: Update shipping address
+        notes:
+          type: string
+          description: Update notes
+    VendorOrder:
+      type: object
+      description: Supplier-facing order linked to a dropship order
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          dropship_order_id:
+            type: string
+            format: uuid
+            description: Parent dropship order
+          vendor_id:
+            type: string
+            format: uuid
+            description: Supplier reference
+          vendor_name:
+            type: string
+            description: Supplier display name
+          vendor_email:
+            type: string
+            format: email
+            description: Supplier contact email
+          vendor_order_number:
+            type: string
+            description: Supplier-side order number
+          items:
+            type: array
+            items:
+              type: object
+            description: Order line items with vendor pricing
+          vendor_cost:
+            type: number
+            format: double
+            description: Total vendor cost
+          vendor_price:
+            type: number
+            format: double
+            description: Total vendor price including markup
+          status:
+            type: string
+            enum:
+            - pending
+            - confirmed
+            - processing
+            - shipped
+            - delivered
+            - cancelled
+            description: Vendor order status
+          expected_delivery:
+            type: string
+            format: date-time
+            nullable: true
+            description: Expected delivery date
+          tracking_number:
+            type: string
+            nullable: true
+            description: Shipping tracking number
+          notes:
+            type: string
+            description: Internal notes
+    CreateVendorOrderRequest:
+      type: object
+      description: Request body for creating a new vendor order
+      required:
+      - dropship_order_id
+      - vendor_id
+      - items
+      properties:
+        dropship_order_id:
+          type: string
+          format: uuid
+          description: Parent dropship order ID
+        vendor_id:
+          type: string
+          format: uuid
+          description: Supplier ID
+        items:
+          type: array
+          items:
+            type: object
+          description: Line items with vendor pricing and quantities
+        expected_delivery:
+          type: string
+          format: date-time
+          nullable: true
+          description: Expected delivery date
+        notes:
+          type: string
+          description: Internal notes
+    UpdateVendorOrderRequest:
+      type: object
+      description: Request body for updating an existing vendor order
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - processing
+          - shipped
+          - delivered
+          - cancelled
+          description: Order status update
+        expected_delivery:
+          type: string
+          format: date-time
+          nullable: true
+          description: Updated expected delivery
+        tracking_number:
+          type: string
+          nullable: true
+          description: Shipping tracking number
+        notes:
+          type: string
+          description: Update notes
+    Error:
+      type: object
+      description: Standard error response
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token
+security:
+- httpBearer: []
