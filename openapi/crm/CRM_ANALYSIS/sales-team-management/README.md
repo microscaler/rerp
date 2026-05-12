@@ -213,6 +213,9 @@ Odoo's `assignment_max` is a 30-day capacity. The daily quota is `assignment_max
 
 ---
 
+
+### ServiceNow: Territory & Activity-Driven Teams
+ServiceNow provides Sales Territory Management (geographic, product, or industry-based segments), Activity Management (plan/execute/tracks emails, meetings, calls, demos), and Team Management within Opportunity records. Sales agents are defined by their **fulfiller role** (not salesperson role) — this reflects ServiceNow's DNA as a service platform. Territory coverage is managed through automated assignment rules in Flow Designer. **Unique feature:** Activity Management is integrated with the broader service workflow — a sales meeting can trigger IT provisioning, HR onboarding, or field service dispatch as part of the same AI-orchestrated flow. **Gap vs. Salesforce:** No Role Hierarchy, no Territory Management 2.0, no Shared Activities across orgs. **Gap vs. Pipedrive:** No Activities Dashboard per rep with call/email/meeting tracking widgets. **Gap vs. Microsoft:** No Dynamics Team Insights with LinkedIn org changes.
 ## Implementation Roadmap
 
 ### Phase 1: Core Teams (1-2 weeks) — P1

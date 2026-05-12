@@ -298,6 +298,9 @@ Contacts and companies only — no accounts, no opportunities. The pipeline IS t
 
 ---
 
+
+### ServiceNow: Workflow-Nurtured Leads, Buying Groups
+ServiceNow's Lead Management captures leads via web-to-lead, API, and integrations. Leads are nurtured into opportunities through automated sequences. **Buying Groups** is unique: create solution-specific stakeholder groups linked to opportunities, with role assignments (economic buyer, technical evaluator, champion). Unlike Salesforce's account-contact-opportunity trinity, ServiceNow's model is case-first — contacts and accounts exist primarily as context for service delivery, not as standalone CRM objects. Lead scoring is embedded in Now Assist (AI-driven next-best-action). **Gap vs. Salesforce:** No duplicate rules, no Einstein Data Cloud identity resolution, no custom lead fields extension to 10,000+. **Gap vs. HubSpot:** No contact properties model (2,000+ custom fields), no Identify (anonymous visitor tracking).
 ## Implementation Roadmap
 
 ### Phase 1: Core Schema (2-3 weeks) — P0

@@ -238,6 +238,9 @@ Pipedrive has **no native marketing features**. Connects to Zapier, Mailchimp, H
 
 ---
 
+
+### ServiceNow: Customer Engagement Sequences (Not Traditional Marketing)
+ServiceNow does not have a traditional marketing automation platform like HubSpot Marketing Hub or Pardot. Instead, **Customer Engagement Sequences** provide automated multi-channel outreach (email, SMS, voice, chat) tied to the opportunity lifecycle. These are workflow-driven sequences: when an opportunity hits a certain stage, a predefined sequence of personalized messages is sent via AI agents. **Integration with Google AI** enables automated voice and chat self-service for customer outreach. **Gap vs. HubSpot:** No Email Marketing, no Ads, no Content Strategy, no SEO tools, no Forms/Landing Pages, no Social Media publishing. **Gap vs. Pardot:** No B2B Marketing Automation (lead scoring, drip campaigns, account-based marketing). **Unique strength:** Engagement sequences are unified with post-sale service — a customer engagement sequence seamlessly transitions to case management when the customer responds.
 ## Implementation Roadmap
 
 ### Phase 1: UTM Tracking (1-2 weeks)

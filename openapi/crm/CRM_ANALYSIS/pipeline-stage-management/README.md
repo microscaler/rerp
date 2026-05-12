@@ -241,6 +241,9 @@ Zoho's **Blueprint** enforces strict stage-by-stage workflows — deals can't sk
 
 ---
 
+
+### ServiceNow: Structured Opportunity Pipelines
+ServiceNow uses Opportunity Management with a tabbed interface (not Kanban). Each opportunity contains: Details (basic info, source, competitor), Catalog (product offerings), Needs (needs templates with product recommendations), Line Items, Allocations (sales credit distribution), Competitors, Tasks, Team, Contacts, Emails, Quotes. Pipelines are workflow-driven rather than visual — deals advance through configured stages via AI agents rather than drag-and-drop. **Stage transitions** are controlled by Flow Designer (ServiceNow's no-code workflow builder), not manual rep action. **Gap vs. Pipedrive:** No visual Kanban, no activity-based selling rules. **Gap vs. Salesforce:** No Sales Path with required fields per stage, no Pipeline Forecasts with O/P/Closed/Worst/Best categories. **Unique strength:** Multi-party opportunity collaboration (team, contacts, channel partners) with granular permissions.
 ## Implementation Roadmap
 
 ### Phase 1: Core Stage Model (1-2 weeks) — P0

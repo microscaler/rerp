@@ -256,6 +256,9 @@ Odoo uses a daily cron job (`digest_data`) that generates digest emails with KPI
 
 ---
 
+
+### ServiceNow: Performance Analytics & Custom Dashboards
+ServiceNow provides **Performance Analytics** (predictive insights, trend analysis, predictive alerting) and custom dashboards within the Service Operations Workspace. Reporting is built on RaptorDB for ultra-fast workflow performance. Sales-specific reporting includes pipeline visibility, forecast accuracy, and revenue attribution. **Gap vs. Salesforce:** No Einstein Analytics (Tableau CRM) with ML-powered insights, no CRM Analytics with forecast management. **Gap vs. Microsoft:** No Power BI integration with D365 Sales data. **Gap vs. HubSpot:** No native dashboards with drag-and-drop customization. **Unique strength:** Cross-functional reporting — pipeline data is visible alongside service metrics, IT performance, and HR data on unified dashboards. Process Mining tracks actual workflow execution for continuous improvement. AI Control Tower monitors AI agent performance alongside business outcomes.
 ## Implementation Roadmap
 
 ### Phase 1: Pipeline Analytics (1-2 weeks)

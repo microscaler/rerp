@@ -283,6 +283,9 @@ In Odoo Enterprise, subscriptions bridge CRM → Sales → Invoicing → Account
 
 ---
 
+
+### ServiceNow: Customer Engagement Suite (The Real Differentiator)
+ServiceNow's **Customer Engagement Suite** is its crown jewel — a unified platform for pre-sale, sale, and post-sale customer interactions. Unlike Salesforce's Service Cloud (post-sale only) or HubSpot's CRM (pre-sale focused), ServiceNow covers the **entire customer lifecycle** on one platform. **Key capabilities:** AI agents resolve simple requests autonomously, complex cases route with full context, cross-department scenarios (sales + IT + HR + field service) are orchestrated seamlessly. **Pure Storage results:** unified sales/fulfillment/service platform, 40% cost reduction in transformation, 82 NPS, 7x faster resolution times. **Gap vs. Salesforce:** No Service Cloud with omnichannel routing. **Gap vs. Zendesk:** No specialized contact center with AI-powered routing. **Unique strength:** One platform for everything customer — sales, service, field service, customer success. No data silos between sales and service teams.
 ## Implementation Roadmap
 
 ### Phase 1: Livechat Core (2-3 weeks)

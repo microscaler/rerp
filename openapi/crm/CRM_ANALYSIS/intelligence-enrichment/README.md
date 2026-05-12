@@ -236,6 +236,9 @@ Built-in intelligence platform (no add-on cost). **Lead Synthesis** enriches fro
 
 ---
 
+
+### ServiceNow: Workflow Intelligence (Not Lead Enrichment)
+ServiceNow does not offer traditional lead/contact enrichment services like Clearbit, ZoomInfo, or Hunter. Instead, intelligence is derived from **workflow data and AI analysis**: Workflow Data Fabric unifies enterprise data (CRM, ERP, IT, HR) into a composable data layer; Cuein acquisition (2025) added conversation data analysis to extract insights from siloed multi-channel interactions; Now Assist provides AI-generated summaries and recommendations. **No external enrichment APIs** — ServiceNow expects data to come from internal systems (Service Desk, ERP, HR, ITSM) rather than purchased databases. **Gap vs. Salesforce:** No Einstein Data Cloud for real-time identity resolution. **Gap vs. HubSpot:** No Clearbit auto-enrichment on contact creation. **Gap vs. Microsoft:** No LinkedIn Sales Navigator integration for real-time org changes. **Unique strength:** Enterprise-wide data unification — when combined with ITSM/HRSD/CSM data, ServiceNow has a 360° view of both customers AND employees that pure-play CRMs cannot match.
 ## Implementation Roadmap
 
 ### Phase 1: Enrichment Foundation (3-4 weeks)

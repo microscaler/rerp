@@ -204,6 +204,9 @@ Forecasting with quota management and team rollups. Price Books with multi-tier 
 
 ---
 
+
+### ServiceNow: CPQ-Integrated Opportunities
+ServiceNow Opportunity Management integrates directly with the Product Catalog and Pricing Engine for real-time pricing. Opportunities flow through: Opportunity → Quote → Order. **Logik.ai CPQ** (acquired 2025) provides AI-powered configuration, guided selling, and millisecond quote response. Keysight reports 40% quote processing reduction. CORT eliminated order processing delays; ATN International cut order processing from hours to <1 minute. Pure Storage unified quote-to-cash on one platform. **Revenue forecasting** uses pipeline analysis combined with historical performance via Now Assist AI. **Unique features:** Sales credit allocations (transparent revenue attribution across team members), Channel Partner management (Full permissions vs. Tracking-only), Needs Analysis templates for AI-driven product recommendations. **Gap vs. Salesforce:** No Revenue Objects, no CPQ Cloud with advanced discounting. **Gap vs. Microsoft:** No D365 Sales with embedded financial models.
 ## Implementation Roadmap
 
 ### Phase 1: Revenue Fields (1-2 weeks) — P1

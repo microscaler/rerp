@@ -280,6 +280,9 @@ Odoo's timeline is not a single table — it's an aggregation of mail.message, c
 
 ---
 
+
+### ServiceNow: Omnichannel Communication via Service Cloud
+ServiceNow's communication capabilities are primarily **service-oriented** — email, chat, voice, and social are unified under Customer Service Management. The ServiceNow Otto AI assistant handles inbound communications autonomously. **IntegrationHub** pre-built connectors link communication channels (Slack, Teams, Zoom, Five9, NiCE). **Zoom integration** enables AI Companion triggers that launch actionable workflows in Now Assist. **Five9 integration** combines ServiceNow CSM with CCaaS for real-time transcription, unified routing, and consolidated agent workspace. **Gap vs. Salesforce:** No Conga/Slack deep integration for sales emails. **Gap vs. HubSpot:** No Conversations inbox (email, chat, SMS, social in one place). **Gap vs. Microsoft:** No Teams native integration for sales collaboration. **Unique strength:** Communication is workflow-embedded — every email, call, or chat is a workflow event that can trigger automated follow-ups, case creation, or opportunity updates.
 ## Implementation Roadmap
 
 ### Phase 1: Core Communication (2-3 weeks)
