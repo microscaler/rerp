@@ -6,7 +6,13 @@ info:
 servers:
 - url: /api/v1/inventory/warehouse
   description: Warehouse Operations API
-tags: []
+tags:
+- name: warehouses
+  description: Warehouse entities and configuration
+- name: locations
+  description: Storage locations within warehouses
+- name: transfers
+  description: Inter-location and inter-warehouse stock transfers
 paths:
   /warehouses:
     get:
@@ -34,6 +40,21 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: List warehouses with pagination
+      security:
+      - httpBearer: []
+      tags:
+      - warehouses
+      x-brrtrouter-impl: list_warehouses_handler
+      x-operation-id: list_warehouses
+      x-controller: WarehouseController
+      x-handler-name: list_warehouses
     post:
       operationId: create_warehouse
       summary: Create warehouse
@@ -43,6 +64,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWarehouseRequest'
+        description: Request body for creating a new warehouse
       responses:
         '201':
           description: Warehouse created
@@ -52,6 +74,23 @@ paths:
                 $ref: '#/components/schemas/Warehouse'
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Create a new warehouse
+      security:
+      - httpBearer: []
+      tags:
+      - warehouses
+      x-brrtrouter-impl: create_warehouse_handler
+      x-operation-id: create_warehouse
+      x-controller: WarehouseController
+      x-handler-name: create_warehouse
   /warehouses/{id}:
     get:
       operationId: get_warehouse
@@ -72,6 +111,21 @@ paths:
                 $ref: '#/components/schemas/Warehouse'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Get warehouse details by ID
+      security:
+      - httpBearer: []
+      tags:
+      - warehouses
+      x-brrtrouter-impl: get_warehouse_handler
+      x-operation-id: get_warehouse
+      x-controller: WarehouseController
+      x-handler-name: get_warehouse
     put:
       operationId: update_warehouse
       summary: Update warehouse
@@ -88,6 +142,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWarehouseRequest'
+        description: Request body for updating an existing warehouse
       responses:
         '200':
           description: Warehouse updated
@@ -97,6 +152,25 @@ paths:
                 $ref: '#/components/schemas/Warehouse'
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Update an existing warehouse
+      security:
+      - httpBearer: []
+      tags:
+      - warehouses
+      x-brrtrouter-impl: update_warehouse_handler
+      x-operation-id: update_warehouse
+      x-controller: WarehouseController
+      x-handler-name: update_warehouse
     delete:
       operationId: delete_warehouse
       summary: Delete warehouse
@@ -112,6 +186,23 @@ paths:
           description: Warehouse deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Delete a warehouse
+      security:
+      - httpBearer: []
+      tags:
+      - warehouses
+      x-brrtrouter-impl: delete_warehouse_handler
+      x-operation-id: delete_warehouse
+      x-controller: WarehouseController
+      x-handler-name: delete_warehouse
   /locations:
     get:
       operationId: list_locations
@@ -138,6 +229,21 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: List storage locations with pagination
+      security:
+      - httpBearer: []
+      tags:
+      - locations
+      x-brrtrouter-impl: list_locations_handler
+      x-operation-id: list_locations
+      x-controller: LocationController
+      x-handler-name: list_locations
     post:
       operationId: create_location
       summary: Create location
@@ -147,6 +253,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLocationRequest'
+        description: Request body for creating a new storage location
       responses:
         '201':
           description: Location created
@@ -156,6 +263,23 @@ paths:
                 $ref: '#/components/schemas/Location'
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Create a new storage location
+      security:
+      - httpBearer: []
+      tags:
+      - locations
+      x-brrtrouter-impl: create_location_handler
+      x-operation-id: create_location
+      x-controller: LocationController
+      x-handler-name: create_location
   /locations/{id}:
     get:
       operationId: get_location
@@ -176,6 +300,21 @@ paths:
                 $ref: '#/components/schemas/Location'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Get location details by ID
+      security:
+      - httpBearer: []
+      tags:
+      - locations
+      x-brrtrouter-impl: get_location_handler
+      x-operation-id: get_location
+      x-controller: LocationController
+      x-handler-name: get_location
     put:
       operationId: update_location
       summary: Update location
@@ -192,6 +331,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateLocationRequest'
+        description: Request body for updating an existing location
       responses:
         '200':
           description: Location updated
@@ -201,6 +341,25 @@ paths:
                 $ref: '#/components/schemas/Location'
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Update an existing location
+      security:
+      - httpBearer: []
+      tags:
+      - locations
+      x-brrtrouter-impl: update_location_handler
+      x-operation-id: update_location
+      x-controller: LocationController
+      x-handler-name: update_location
     delete:
       operationId: delete_location
       summary: Delete location
@@ -216,6 +375,23 @@ paths:
           description: Location deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Delete a location
+      security:
+      - httpBearer: []
+      tags:
+      - locations
+      x-brrtrouter-impl: delete_location_handler
+      x-operation-id: delete_location
+      x-controller: LocationController
+      x-handler-name: delete_location
   /transfers:
     get:
       operationId: list_transfers
@@ -242,6 +418,21 @@ paths:
                     type: integer
                   limit:
                     type: integer
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: List stock transfers with pagination
+      security:
+      - httpBearer: []
+      tags:
+      - transfers
+      x-brrtrouter-impl: list_transfers_handler
+      x-operation-id: list_transfers
+      x-controller: TransferController
+      x-handler-name: list_transfers
     post:
       operationId: create_transfer
       summary: Create transfer
@@ -251,6 +442,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTransferRequest'
+        description: Request body for creating a new stock transfer
       responses:
         '201':
           description: Transfer created
@@ -260,6 +452,23 @@ paths:
                 $ref: '#/components/schemas/Transfer'
         '400':
           description: Invalid request
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Create a new stock transfer
+      security:
+      - httpBearer: []
+      tags:
+      - transfers
+      x-brrtrouter-impl: create_transfer_handler
+      x-operation-id: create_transfer
+      x-controller: TransferController
+      x-handler-name: create_transfer
   /transfers/{id}:
     get:
       operationId: get_transfer
@@ -280,6 +489,21 @@ paths:
                 $ref: '#/components/schemas/Transfer'
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Get transfer details by ID
+      security:
+      - httpBearer: []
+      tags:
+      - transfers
+      x-brrtrouter-impl: get_transfer_handler
+      x-operation-id: get_transfer
+      x-controller: TransferController
+      x-handler-name: get_transfer
     put:
       operationId: update_transfer
       summary: Update transfer
@@ -296,6 +520,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTransferRequest'
+        description: Request body for updating an existing transfer
       responses:
         '200':
           description: Transfer updated
@@ -305,6 +530,25 @@ paths:
                 $ref: '#/components/schemas/Transfer'
         '404':
           description: Not found
+        '400':
+          description: Bad request - invalid input parameters
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Update transfer status or details
+      security:
+      - httpBearer: []
+      tags:
+      - transfers
+      x-brrtrouter-impl: update_transfer_handler
+      x-operation-id: update_transfer
+      x-controller: TransferController
+      x-handler-name: update_transfer
     delete:
       operationId: delete_transfer
       summary: Delete transfer
@@ -320,6 +564,23 @@ paths:
           description: Transfer deleted
         '404':
           description: Not found
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+        '403':
+          description: Forbidden - insufficient permissions
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
+        '500':
+          description: Internal server error
+      description: Delete a transfer
+      security:
+      - httpBearer: []
+      tags:
+      - transfers
+      x-brrtrouter-impl: delete_transfer_handler
+      x-operation-id: delete_transfer
+      x-controller: TransferController
+      x-handler-name: delete_transfer
 components:
   parameters:
     Page:
@@ -342,4 +603,359 @@ components:
       in: query
       schema:
         type: string
-  schemas: {}
+  schemas:
+    BaseEntity:
+      type: object
+      description: Base entity with audit fields
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+    Warehouse:
+      type: object
+      description: A physical warehouse with address and configuration
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          name:
+            type: string
+            description: Warehouse display name
+          code:
+            type: string
+            description: Unique warehouse code (e.g., WH-NYC-01)
+          address:
+            type: string
+            description: Street address
+          city:
+            type: string
+            description: City
+          state:
+            type: string
+            description: State or province
+          country:
+            type: string
+            description: Country code (ISO 3166-1 alpha-2)
+          postal_code:
+            type: string
+            description: Postal or ZIP code
+          capacity:
+            type: integer
+            nullable: true
+            description: Total capacity in cubic meters
+          status:
+            type: string
+            enum:
+            - active
+            - inactive
+            - maintenance
+            description: Warehouse operational status
+          timezone:
+            type: string
+            description: IANA timezone identifier
+    CreateWarehouseRequest:
+      type: object
+      description: Request body for creating a new warehouse
+      required:
+      - name
+      - code
+      properties:
+        name:
+          type: string
+          description: Warehouse display name
+        code:
+          type: string
+          description: Unique warehouse code
+        address:
+          type: string
+          description: Street address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province
+        country:
+          type: string
+          description: Country code (ISO 3166-1 alpha-2)
+        postal_code:
+          type: string
+          description: Postal or ZIP code
+        capacity:
+          type: integer
+          nullable: true
+          description: Total capacity in cubic meters
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          - maintenance
+          description: Initial status
+        timezone:
+          type: string
+          description: IANA timezone identifier
+    UpdateWarehouseRequest:
+      type: object
+      description: Request body for updating an existing warehouse
+      properties:
+        name:
+          type: string
+          description: Warehouse display name
+        address:
+          type: string
+          description: Street address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province
+        country:
+          type: string
+          description: Country code
+        postal_code:
+          type: string
+          description: Postal or ZIP code
+        capacity:
+          type: integer
+          nullable: true
+          description: Total capacity in cubic meters
+        status:
+          type: string
+          enum:
+          - active
+          - inactive
+          - maintenance
+          description: Operational status
+        timezone:
+          type: string
+          description: IANA timezone identifier
+    Location:
+      type: object
+      description: A storage location within a warehouse (aisle, shelf, bin)
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          warehouse_id:
+            type: string
+            format: uuid
+            description: Parent warehouse reference
+          name:
+            type: string
+            description: Location name (e.g., Aisle-A, Shelf-3)
+          code:
+            type: string
+            description: Unique location code (e.g., WH-NYC-01-A-03)
+          type:
+            type: string
+            enum:
+            - storage
+            - packing
+            - shipping
+            - receiving
+            - returns
+            description: Location type
+          parent_location_id:
+            type: string
+            format: uuid
+            nullable: true
+            description: Hierarchical parent location
+          capacity:
+            type: integer
+            nullable: true
+            description: Capacity in cubic meters or units
+          is_active:
+            type: boolean
+            description: Whether this location is currently in use
+          notes:
+            type: string
+            description: Additional notes
+    CreateLocationRequest:
+      type: object
+      description: Request body for creating a new storage location
+      required:
+      - warehouse_id
+      - name
+      - code
+      properties:
+        warehouse_id:
+          type: string
+          format: uuid
+          description: Parent warehouse ID
+        name:
+          type: string
+          description: Location name
+        code:
+          type: string
+          description: Unique location code
+        type:
+          type: string
+          enum:
+          - storage
+          - packing
+          - shipping
+          - receiving
+          - returns
+          description: Location type
+        parent_location_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent location for hierarchy
+        capacity:
+          type: integer
+          nullable: true
+          description: Capacity
+        is_active:
+          type: boolean
+          description: Whether location is active
+        notes:
+          type: string
+          description: Additional notes
+    UpdateLocationRequest:
+      type: object
+      description: Request body for updating an existing location
+      properties:
+        name:
+          type: string
+          description: Location name
+        type:
+          type: string
+          enum:
+          - storage
+          - packing
+          - shipping
+          - receiving
+          - returns
+          description: Location type
+        capacity:
+          type: integer
+          nullable: true
+          description: Capacity
+        is_active:
+          type: boolean
+          description: Toggle active status
+        notes:
+          type: string
+          description: Notes
+    Transfer:
+      type: object
+      description: Stock transfer between locations or warehouses
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          source_location_id:
+            type: string
+            format: uuid
+            description: Source location
+          destination_location_id:
+            type: string
+            format: uuid
+            description: Destination location
+          status:
+            type: string
+            enum:
+            - pending
+            - in_transit
+            - completed
+            - cancelled
+            description: Transfer status
+          estimated_arrival:
+            type: string
+            format: date-time
+            nullable: true
+            description: Expected arrival date
+          actual_arrival:
+            type: string
+            format: date-time
+            nullable: true
+            description: Actual arrival date
+          notes:
+            type: string
+            description: Transfer notes
+    CreateTransferRequest:
+      type: object
+      description: Request body for creating a new stock transfer
+      required:
+      - source_location_id
+      - destination_location_id
+      properties:
+        source_location_id:
+          type: string
+          format: uuid
+          description: Source location ID
+        destination_location_id:
+          type: string
+          format: uuid
+          description: Destination location ID
+        estimated_arrival:
+          type: string
+          format: date-time
+          nullable: true
+          description: Expected arrival
+        notes:
+          type: string
+          description: Transfer notes
+    UpdateTransferRequest:
+      type: object
+      description: Request body for updating an existing transfer
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          - in_transit
+          - completed
+          - cancelled
+          description: Transfer status update
+        estimated_arrival:
+          type: string
+          format: date-time
+          nullable: true
+          description: Updated expected arrival
+        actual_arrival:
+          type: string
+          format: date-time
+          nullable: true
+          description: Mark as arrived
+        notes:
+          type: string
+          description: Transfer notes
+    Error:
+      type: object
+      description: Standard error response
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token
+security:
+- httpBearer: []
