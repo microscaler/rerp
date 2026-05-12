@@ -1,0 +1,6 @@
+Docparser is a document data extraction tool designed to streamline the process of extracting information from various document formats including PDFs, Word files, and images. It employs advanced Zonal OCR technology and pattern recognition to automate data extraction tasks. Key features include:
+- **Upload/Import Options**: Files can be uploaded directly, imported from cloud storage, or sent through API.
+- **Rule Definition**: Users can easily set extraction rules without coding, utilizing preset options for their specific documents.
+- **Data Export**: Extracted data can be downloaded in multiple formats such as Excel, CSV, JSON, or XML.
+
+Docparser supports diverse document types including invoices, purchase orders, bank statements, contracts, and HR forms. The platform is suitable for multiple industries including accounting, e-commerce, legal, and logistics, and offers integration with various cloud applications. They also provide the option to create custom templates for unique documents.

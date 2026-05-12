@@ -1,0 +1,445 @@
+Odoo Inventory • Features
+  URL: https://www.odoo.com/app/inventory-features
+  Manage all storage, stock, and replenishments for all your warehouses. Easily handle transfers to, from, and between warehouses in one system.
+
+  --- Content ---
+  [Skip to Content](https://www.odoo.com/app/inventory-features#wrap)
+  
+  ## Storage
+  
+  #### Locations
+  
+  Create and manage specific storage locations, like shelves, aisles, cold storage rooms, and pallet racks.
+  
+  #### Putaway rules
+  
+  Automatically route products to ideal storage locations based on real-time capacity (storage categories), product storage needs, and picking accessibility.
+  
+  #### Operations
+  
+  Create dedicated locations to receive products, sort, pack, and other warehouse operations.
+  
+  #### Smart removal
+  
+  Choose product removal strategies (FIFO, FEFO, nearest available zone, LEFO) and streamline picker paths with the right picking method (single, batch, cluster, wave).
+  
+  ## Operations
+  
+  #### Role-based to-do list
+  
+  Dedicated dashboards to keep the order fulfillment, purchasing, quality, picking, packing, and receiving teams on top of their daily tasks. Tasks with the earliest deadline are prioritized to ensure orders are fulfilled on time, every time.
+  
+  #### Receipts
+  
+  Manage incoming shipments with vendor-provided arrival dates and automatic unit of measure conversion for received quantities. (e.g. buy in tons and sell in kg.)
+  
+  #### Returns
+  
+  Set predefined routes for return condition assessment, refurbishing, restocking, or disposal. When integrated with the Accounting app, the returned product's updated inventory valuation immediately hits your books.
+  
+  #### Pick
+  
+  Create smart automatic batches based on shipping carriers, serial numbers, specific quantities, and total weight for picker convenience. If stock is insufficient, the option to create a backorder is available.
+  
+  #### Pack
+  
+  Assign barcodes to sealed packages for content tracking, with location updates of the package also reflecting the location of contained products.
+  
+  #### Scrap
+  
+  Scrap products in just a few clicks and get clear reports on scrap: their costs, reasons and volumes.
+  
+  #### Inventory adjustments
+  
+  Schedule recurring stock counts on vital storage locations, products, or lots to keep inventory up to date all the time.
+  
+  ## Advanced routes
+  
+  #### Drop-ship
+  
+  Coordinate with the supplier to deliver certain products directly to customers.
+  
+  #### Cross-dock
+  
+  Unload incoming material and directly transfer to outbound gates with little to no storage in between.
+  
+  #### Push and pull rules
+  
+  Create custom routes to automatically plan transfers between any warehouses and locations.
+  
+  #### By shipping method
+  
+  Set up order fulfillment routes tailored to different shipping methods (pickup at store, post-office, third-party shipping, etc)
+  
+  #### Subcontracting
+  
+  After confirming the sales order, auto-generate delivery documents for raw materials, bill the subcontractor, and if needed, run quality checks before shipping subcontracted product to the customer.
+  
+  #### Multi-warehouse
+  
+  Manage all storage, stock, and replenishments for all your warehouses. Easily handle transfers to, from, and between warehouses in one system.
+  
+  ## Productivity
+  
+  #### Barcode
+  
+  Streamline \*any\* warehouse operation using a barcode scanner: receipts, pickings, inventory adjustments. Update and perform real-time warehouse actions, anytime and anywhere. Supports GS1, EAN13, and EAN14 out of the box.
+  
+  #### Customer portal
+  
+  Live web page where customers can track the status of their order, payment, and delivery status. Begin a return directly on this page generate a printable barcode of the order and customized return instructions, so your employees can easily process the returned item with a barcode upon receipt.
+  
+  #### Replenishment alerts
+  
+  Notify procurement managers about low stock and vendor lead times to assist with reordering schedules.
+  
+  #### Smart scheduler
+  
+  Odoo automatic scheduler triggers operations automatically for you based on product availability and forecasts of orders.
+  
+  #### Search products by location
+  
+  Locate products, their storage locations, and quantities from a single dashboard.
+  
+  #### Search by barcode
+  
+  Locate any warehouse document, simply by scanning the barcode.
+  
+  #### Reservation methods
+  
+  Choose from three methods— at confirmation, manual, or scheduled date—to manage available stock while considering customer priority.
+  
+  ## Replenishment
+  
+  #### Forecast
+  
+  Forecasted report of on-hand, incoming, and outgoing stock while operations are happening in real-time. Calculate out-of-stock dates for products based on customer orders, shipment dates, and manufacturing orders so you can swiftly react to vendor order deadlines and lead times.
+  
+  #### Purchase orders
+  
+  Automatically create requests for quotation when stock forecasts fall below a defined threshold.
+  
+  #### Reordering rules
+  
+  Trigger purchases, inter-warehouse transfers, and manufacturing orders based on customizable rules for minimum and maximum stock.
+  
+  #### Lead times
+  
+  Manage your just-in-time inventory (JIT) with a comprehensive and integrated variety of lead planning inputs that get factored in on every order.
+  
+  #### Make-to-order
+  
+  Trigger purchase and manufacturing orders upon sales order confirmation. Customizable routes for warehouses, products, and orders.
+  
+  ## Traceability
+  
+  #### Quotation to shipment
+  
+  Track every step of your product's journey, from vendor to customer in granular detail. At the confirmation of a sales order, purchase orders, warehouse transfers, and delivery orders are triggered to procure and release products to the customer.
+  
+  #### Lots/serial numbers
+  
+  View a dedicated report to track products from supplier to customer. Rich product identity records enable advanced tracing into after-sales services.
+  
+  #### Perpetual inventory valuation
+  
+  Real-time accounting records generated for a product from stock purchases, scraps, and other inventory actions.
+  
+  #### Audit trail
+  
+  Log all user actions: such as stock moves, counts, adjustments, approvals of adjustments, and record modifications.
+  
+  ## Products
+  
+  #### Types
+  
+  Categorize products into three types: storable, consumable (not stockable), and services (not stockable).
+  
+  #### Expiration dates
+  
+  Automatic reminders and picking priority determined by best removal and expiration dates.
+  
+  #### Variants
+  
+  Customize product variants for customer preferences and make data-driven purchasing decisions with real-time stock counts for each variant and components.
+  
+  #### Custom fields
+  
+  Add custom fields on warehouse transfer documents, products, and even serial numbers for additional traceability.
+  
+  #### Vendor pricelist
+  
+  Upload vendor price lists with product descriptions, prices, and delivery times.
+  
+  #### Shipping labels
+  
+  Generate shipping labels for integrated carriers: Fedex, DHL, UPS, USPS, Bpost, Sendcloud (EU), Easypost (North America), and Shiprocket (India).
+  
+  ## Inventory Valuation
+  
+  #### Costing methods
+  
+  Supports first-in, first out (FIFO), average cost (AVCO), and standard price costing methods.
+  
+  #### Valuation methods
+  
+  Supports continental or Anglo-Saxon accounting.
+  
+  #### Perpetual inventory valuation
+  
+  Real-time accounting records generated for a product from stock purchases, scraps, and other inventory actions.
+  
+  #### Landed costs
+  
+  Generate real-time cost reports based on vendor bills, taxes, tariffs, fuel surcharges, and other handling fees. Automatically generates an accounting record for end-of-quarter reporting and price adjustments.
+  
+  ## Reporting
+  
+  #### Double entry inventory
+  
+  Full stock moves report to map and trace product moves from supplier to customer.
+  
+  #### Modify posted records
+  
+  Lock or unlock any warehouse document (receipt/picking/manufacturing order) after it is posted to correct any mistakes in product consumption or prices.
+  
+  #### Stock aging report
+  
+  Monitor how long items have been in the warehouse. Quantities are sorted by receipt date, allowing you to stay informed about products nearing expiration.
+  
+  ## Integrations
+  
+  #### Returns
+  
+  Integrate with the Sales app to generate display return instructions, and printable barcode of the order and defined return location in the Customer Portal. Keeps the customer informed with timestamps and return status, right on the Customer Portal.
+  
+  #### Calculate shipping
+  
+  Integrate with third-party shipping carriers to calculate cost of shipping based on product weights, and customer address.
+  
+  #### Blanket Orders
+  
+  Get the best prices for materials by scheduling recurring orders with pre-defined vendors, order quantities, and expected arrival dates. (Integration with Purchase app)
+  
+  #### Quality checks
+  
+  Set up recurring inspection checks at any point of your warehouse flow: reception, returns, subcontracting, etc.
+  
+  #### Development
+  
+  Customize and adapt Odoo to your business needs by using the API to integrate with third-party logistics (3PL) services, as well as with hardware devices like scales, barcode scanners, and RFID (Radio-Frequency Identification) systems.
+  
+  #### Rental
+  
+  Manage pickups, packing, shipping, and return of rental products, directly in Inventory.
+  --- End Content ---
+
+Inventory management software - Odoo
+  URL: https://www.odoo.com/app/inventory
+  All the features done right. · Fast barcode scanner · Reduce distances with smart routes · Inventory valuation · Clear reservation mechanism · Clear traceability.
+
+  --- Content ---
+  [Skip to Content](https://www.odoo.com/app/inventory#wrap)
+  
+  # Modern inventory system
+  
+  Reduce stockouts, speed up operations, optimize routes and get real time visibility with Odoo's warehouse management app.
+  
+  [Start now - It's free](https://www.odoo.com/trial?selected_app=stock)
+  
+  [Meet an advisor](https://www.odoo.com/app/inventory#)
+  
+  - [Micro Business (1-5 employees)](https://www.odoo.com/appointment/7440)
+  - [Small Business (6-50 employees)](https://www.odoo.com/appointment/181)
+  - [Midsized company (51-250 employees)](https://www.odoo.com/appointment/6865)
+  - [Micro entreprise (1-5 employés) - Français](https://www.odoo.com/appointment/10498)
+  - [Petite entreprise (6-50 employés) - Français](https://www.odoo.com/appointment/1481)
+  - [Empresas Pequeñas (<50 empleados) - Español](https://www.odoo.com/appointment/7511)
+  - [Large company (250+ employees)](https://www.odoo.com/appointment/1113)
+  
+  Free, forever, with unlimited users. [See why](https://www.odoo.com/app/inventory#)
+  
+  [![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/hero_image.webp)![](https://odoocdn.com/openerp_website/static/src/img/icons/play.svg)](https://www.odoo.com/app/inventory#)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/plus.svg)
+  
+  ##### Automate vendor reminders too!
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/automate_vendor.webp)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/grey_arrow_md_04.svg)
+  
+  ## Flawless replenishments
+  
+  **Never run out-of-stock** with smart replenishment strategies like min-max rules, MTO, or the master production schedule. Let Odoo propose, or trigger purchase orders automatically. Then automate vendor follow-ups to minimize communication risks : PO acknowledgment, receipt schedule confirmation a few days before, etc.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/blue_truck.svg)
+  
+  ##### Replenishment
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/arrow_dot_02.svg)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/yellow_shield_2.svg)
+  
+  ##### Quality control
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/arrow_dot_02.svg)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/hand-truch.svg)
+  
+  ##### Storage
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/grey_arrow_loop_01.svg)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/device.png)
+  
+  ## Speed up receipt, quality control and storage
+  
+  **Control incoming and outgoing shipments** with push and pull rules, GS-1 codes, and customizable routes.
+  
+  Use put-away strategies to optimize your storage: slow-fast movers, ABC analysis, cross-dock... all you need to reduce the number of parts moved, and distances.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/snippets/s_wd_persona/bg_green.svg)
+  
+  _Works offline: No WiFi coverage issues!_
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/snippets/s_wd_persona/bob.png)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/graphics/arrow_zig_zag_down_right.svg)
+  
+  ## Optimize your warehouse
+  
+  **Real-time inventory management** with all the features: serial numbers, lots, packaging, reservation strategies, cycle counting, KPIs, and more...
+  
+  Blazing-fast inventory lookup: instantly know the location of all your products across multiple warehouses or multiple companies.
+  
+  ![warehouse](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/optimize_warehouse.webp)![](https://odoocdn.com/openerp_website/static/src/img/icons/yellow_unbox.svg)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/grey_arrow_md_04.svg)
+  
+  ## Minimize picking movements
+  
+  Choose the right strategy for you: single, cluster, wave, or batch picking. Trigger goods to release using multiple reservation strategies. Implementing the rights strategies allows to pick and pack 30% extra products with the same team.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/wave-picking.svg)
+  
+  ##### Wave picking
+  
+  Launch picking orders per aisle, or area, and regroup at packing zone. Ideal for large warehouses.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/cluster-picking.svg)
+  
+  ##### Cluster picking
+  
+  Pick multiple orders in one trip, and prepare orders as you pick, to save time at packing. Ideal for small products.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/batch-picking.svg)
+  
+  ##### Batch picking
+  
+  Regroup multiple orders in one picking, and consolidate at the packing zone.
+  
+  ## Packing has never been easier
+  
+  Odoo integrates with carriers to print shipping labels, quality controls, and different packing units such as parts, boxes, pallets, and more.
+  
+  ![truck](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/truck.webp)
+  
+  ## All the features    done right.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/heart.svg)
+  
+  #### Fast barcode scanner
+  
+  Blazing fast as most operations are performed offline; zero latency scans! Supports barcode, QR Code and GS-1, and is even optimized for products without barcodes.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/heart.svg)
+  
+  #### Reduce distances with smart routes
+  
+  Optimized procurement: map out your complex routes in Odoo and automatically plan transfers.
+  
+  Full control over supply chain operations with valuable actions between different apps.
+  
+  ![smarts routes](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/smarts_routes.webp)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/heart.svg)
+  
+  #### Inventory valuation
+  
+  Whether you do perpetual or periodical, Odoo supports multiple valuation methods: FIFO, Average Price, LIFO, Standard price.
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/heart.svg)
+  
+  #### Clear reservation mechanism
+  
+  ![dashboard](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/reservation_mechanism.webp)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/icons/heart.svg)
+  
+  #### Clear traceability
+  
+  Real-time reports on stock, inventory moves, and production.
+  
+  ![dashboard](https://odoocdn.com/openerp_website/static/src/img/apps/inventory/traceability.webp)
+  
+  [See all features![](https://odoocdn.com/openerp_website/static/src/img/arrows/secondary_arrow_sm_03.svg)](https://www.odoo.com/app/inventory-features)
+  
+  ### One need, one app.
+  
+  Expand as you grow.
+  
+  [![Odoo Sales icon](https://download.odoocdn.com/icons/sale/static/description/icon.svg)](https://www.odoo.com/app/sales)
+  
+  ##### Sales
+  
+  Order quantities based on demand
+  
+  [![Odoo Manufacturing icon](https://download.odoocdn.com/icons/mrp/static/description/icon.svg)](https://www.odoo.com/app/manufacturing)
+  
+  ##### Manufacturing
+  
+  Coordinate JIT manufacturing
+  
+  [![Odoo Purchase icon](https://download.odoocdn.com/icons/purchase/static/description/icon.svg)](https://www.odoo.com/app/purchase)
+  
+  ##### Purchase
+  
+  Automated replenishment
+  
+  [![Odoo Accounting icon](https://download.odoocdn.com/icons/accountant/static/description/icon.svg)](https://www.odoo.com/app/accounting)
+  
+  ##### Accounting
+  
+  Automated inventory valuation
+  
+  [![Odoo Quality icon](https://download.odoocdn.com/icons/quality_control/static/description/icon.svg)](https://www.odoo.com/app/quality)
+  
+  ##### Quality
+  
+  Setup control points
+  
+  [See all Apps![](https://odoocdn.com/openerp_website/static/src/img/arrows/secondary_arrow_sm_03.svg)](https://www.odoo.com/page/all-apps)
+  
+  ###### Join 15 million  ![](https://odoocdn.com/openerp_website/static/src/img/graphics/arrow_circular_down_left.svg)happy    users
+  
+  who grow their business with Odoo
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/arrows/grey_arrow_loop_02.svg)
+  
+  ![](https://odoocdn.com/openerp_website/static/src/img/snippets/s_wd_testimonials/quote.svg)
+  
+  > Odoo Inventory replaced our legacy spreadsheets which were unable to keep up with our growing business. The biggest benefits we realized were saving time by using a simpler system, and greater overall accessibility to our inventory.
+  
+  ![Jeremy B. picture](https://odoocdn.com/openerp_website/static/src/img/snippets/s_wd_testimonials/avatar/jeremy_b.webp)
+  
+  **Jeremy B.**
+  
+  Mid-market Business Owner
+  
+  ### Being organized   never felt so good
+  
+  [Start now - It's free](https://www.odoo.com/trial?selected_app=stock) ![](https://odoocdn.com/openerp_website/static/src/img/arrows/secondary_arrow_sm_01.svg)No credit card required
+  
+  Instant access
+  --- End Content ---

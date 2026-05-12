@@ -1,0 +1,291 @@
+Managing inventory - Business Central - Microsoft Learn
+  URL: https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory
+  This article describes how to manage the physical products you trade in by creating an inventory item card.
+
+  --- Content ---
+  Table of contents Exit editor mode
+  
+  Ask LearnAsk Learn
+  
+  Reading modeTable of contents[Read in English](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory)Add to CollectionsAdd to plan[Edit](https://github.com/MicrosoftDocs/dynamics365smb-docs/blob/main/business-central/inventory-manage-inventory.md)
+  
+  * * *
+  
+  Copy MarkdownPrint
+  
+  * * *
+  
+  Note
+  
+  Access to this page requires authorization. You can try [signing in](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#) or changing directories.
+  
+  
+  Access to this page requires authorization. You can try changing directories.
+  
+  
+  # Manage inventory
+  
+  Feedback
+  
+  Summarize this article for me
+  
+  
+  For each physical product, you must create an item card of the **Inventory** type. You can register items you offer to customers but don't keep in inventory as catalog items, which you can convert to inventory items when necessary. You can increase or decrease the quantity of an item in inventory by posting directly to the item ledger entries. For example, after a physical count or if you don't record purchases.
+  
+  Inventory increases and decreases are naturally also recorded when you post purchase and sales documents, respectively. To learn more, go to [Record Purchases](https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-how-record-purchases), [Sell Products](https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-sell-products), and [Invoice Sales](https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-invoice-sales). Transfers between locations change inventory quantities across your company's warehouses.
+  
+  To make it easier to find items, you can categorize items and give them attributes to search and sort by.
+  
+  Note
+  
+  The physical handling of items is referred to as warehouse activities. Learn more at [Warehouse Management Overview](https://learn.microsoft.com/en-us/dynamics365/business-central/design-details-warehouse-management).
+  
+  Planning for items to fulfill demand is covered as part of supply planning functionality. Learn more at [Planning](https://learn.microsoft.com/en-us/dynamics365/business-central/production-planning).
+  
+  [Section titled: Inventory analytics](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#inventory-analytics)
+  
+  ## Inventory analytics
+  
+  This section describes the analytical tools you can use to get insights into your inventory data.
+  
+  Expand table
+  
+  | To... | Go to... |
+  | --- | --- |
+  | Get an overview of capabilities for analyzing inventory data. | [Sales analytics overview](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-analytics-overview) |
+  | Analyze and monitor your inventory KPIs with the Power BI Inventory apps. | [Power BI Inventory app](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-powerbi-app)<br>[Power BI Inventory Valuation app](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-valuation-powerbi-app) |
+  | Do ad-hoc analysis of inventory data directly on list pages and queries. | [Ad-hoc analysis of inventory data](https://learn.microsoft.com/en-us/dynamics365/business-central/ad-hoc-analysis-inventory) |
+  | Explore built-in inventory reports. | [Built-in inventory and warehouse reports](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-wms-reports) |
+  
+  [Section titled: Inventory reconciliation](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#inventory-reconciliation)
+  
+  ## Inventory reconciliation
+  
+  When you post inventory transactions, such as sales shipments, purchase invoices, or inventory adjustments, the changed item costs are recorded in item value entries. To reflect this change in inventory value in your financial books, the inventory costs are automatically posted to the related inventory accounts in the general ledger. For each inventory transaction you post, the appropriate values are posted to the inventory account, adjustment account, and COGS account in the general ledger. To learn more, go to [Reconcile Inventory Costs with the General Ledger](https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger).
+  
+  Although inventory costs automatically post to the general ledger, the costs of goods must apply to the related outbound sales transaction, especially in situations where you sell goods before you invoice the purchase of those goods. This assignment is referred to as cost adjustment. Item costs are automatically adjusted when you post item transactions, but you can also adjust item costs manually. To learn more, go to [Adjust Item Costs](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-adjust-item-costs).
+  
+  [Section titled: Related tasks](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#related-tasks)
+  
+  ## Related tasks
+  
+  The following table outlines related tasks.
+  
+  Expand table
+  
+  | To... | Go to... |
+  | --- | --- |
+  | Create item cards for inventory items that you trade in. | [Register New Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-register-new-items) |
+  | Structure parent items you sell as kits consisting of the parent's components or that you assemble to order or to stock. | [Work with Bills of Material](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-boms) |
+  | Maintain an overview of items and help you find and sort items by organizing them in categories. | [Categorize Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-categorize-items) |
+  | Assign item attributes of different value types to your items so it's easier to sort and find them. | [Work with Item Attributes](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-item-attributes) |
+  | Create special item cards for items you offer to customers but don't maintain in inventory. | [Work with Catalog Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-nonstock-items) |
+  | Perform physical counting of your inventory with the **Physical Inventory Order** and **Physical Inventory Recording** pages. | [Count Inventory Using Documents](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-inventory-with-documents) |
+  | Perform physical counting, make negative or positive adjustments, and change information, such as location or lot number, on item ledger entries. | [Count, Adjust, and Reclassify Inventory Using Journals](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify) |
+  | View the availability of items per location, by period, by sales or purchase event, or by their use on assembly or production bills of material (BOMs). | [View the Availability of Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-availability-overview) |
+  | Transfer inventory items between locations using transfer orders, to manage warehouse activities, or with the item reclassification journal. | [Transfer Inventory Between Locations](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-transfer-between-locations) |
+  | Reserve inventory or inbound items for sales orders, purchase orders, service orders, assembly orders, transfer orders, or production orders. | [Reserve Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-to-reserve-items) |
+  | Set up item tracking so you can track item serial numbers, such as when you need to track items because of recalls. | [Set Up Item Tracking with Serial, Lot, and Package Numbers](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-setup-item-tracking) |
+  | Assign serial numbers or lot numbers to any outbound or inbound document or journal line. | [Work with Serial and Lot Numbers](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-item-tracking) |
+  | Find where any serial or lot number was used in its supply chain, such as in recall situations. | [Trace Item-Tracked Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-to-trace-item-tracked-items) |
+  | Set up a vendor's or customer's own item description on your item card so you can quickly insert their item description on trade documents. | [Use Item References](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-use-item-cross-refs) |
+  | Block items from being entered on sales or purchase lines or from being posted in any transaction. | [Block Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-block-items) |
+  | Manage business operations in sales offices, purchasing departments, or plant planning offices across multiple locations. | [Work with Responsibility Centers](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-responsibility-centers) |
+  
+  [Section titled: Related information](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#related-information)
+  
+  ## Related information
+  
+  [Warehouse Management Overview](https://learn.microsoft.com/en-us/dynamics365/business-central/design-details-warehouse-management)
+  
+  [Purchasing](https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-manage-purchasing)
+  
+  [Sales](https://learn.microsoft.com/en-us/dynamics365/business-central/sales-manage-sales)
+  
+  [Managing Inventory Costs](https://learn.microsoft.com/en-us/dynamics365/business-central/finance-manage-inventory-costs)
+  
+  [Work with Business Central](https://learn.microsoft.com/en-us/dynamics365/business-central/ui-work-product)
+  
+  [General Business Functionality](https://learn.microsoft.com/en-us/dynamics365/business-central/ui-across-business-areas)
+  
+  [Section titled: Start a free trial!](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#section)
+  
+  ## Start a [free trial!](https://go.microsoft.com/fwlink/?linkid=847861)
+  
+  [Find free e-learning modules for Business Central here](https://learn.microsoft.com/en-us/training/dynamics365/business-central)
+  
+  * * *
+  
+  ## Feedback
+  
+  Was this page helpful?
+  
+  
+  YesNoNo
+  
+  Need help with this topic?
+  
+  
+  Want to try using Ask Learn to clarify or guide you through this topic?
+  
+  
+  Ask LearnAsk Learn
+  
+  Suggest a fix?
+  
+  * * *
+  
+  ## Additional resources
+  
+  Training
+  
+  
+  Learning path
+  
+  
+  [Get started with inventory management in Microsoft Dynamics 365 Business Central - Training](https://learn.microsoft.com/en-us/training/paths/get-started-inventory-management/?source=recommendations)
+  
+  Do you buy and sell inventory items? If you do, this module will discuss how to create items and enter quantities.
+  
+  
+  Certification
+  
+  
+  [Microsoft Certified: Dynamics 365 Supply Chain Management Functional Consultant Associate - Certifications](https://learn.microsoft.com/en-us/credentials/certifications/d365-functional-consultant-supply-chain-management/?source=recommendations)
+  
+  Design and configure Dynamics 365 Supply chain Management and related tools.
+  
+  
+  * * *
+  
+  - Last updated on 04/08/2026
+  
+  Ask Learn is an AI assistant that can answer questions, clarify concepts, and define terms using trusted Microsoft documentation.
+  
+  Please sign in to use Ask Learn.
+  
+  [Sign in](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory#)
+  --- End Content ---
+
+Setting up inventory - Business Central - Microsoft Learn
+  URL: https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-setup-inventory
+  Describes how to set up your stock and inventory processes, including transfer routes and locations, such as warehouses.
+
+  --- Content ---
+  Table of contents Exit editor mode
+  
+  Ask LearnAsk Learn
+  
+  Reading modeTable of contents[Read in English](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-setup-inventory)Add to CollectionsAdd to plan[Edit](https://github.com/MicrosoftDocs/dynamics365smb-docs/blob/main/business-central/inventory-setup-inventory.md)
+  
+  * * *
+  
+  Copy MarkdownPrint
+  
+  * * *
+  
+  Note
+  
+  Access to this page requires authorization. You can try [signing in](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-setup-inventory#) or changing directories.
+  
+  
+  Access to this page requires authorization. You can try changing directories.
+  
+  
+  # Setting up inventory
+  
+  Feedback
+  
+  Summarize this article for me
+  
+  
+  Before you can manage warehouse activities and inventory costing, you must configure the rules and values that define the company's inventory policies.
+  
+  You can provide better customer service and optimize your supply chain by organizing your inventory at different addresses. You can then buy, store, or sell items at different locations and transfer inventory between them.
+  
+  After you set up your inventory, you can manage various processes related to item transactions. For more information, see [Manage Inventory](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory) and [Warehouse Management Overview](https://learn.microsoft.com/en-us/dynamics365/business-central/design-details-warehouse-management).
+  
+  Expand table
+  
+  | To | See |
+  | --- | --- |
+  | Define the general inventory setup, such as number series and how to use locations. | [Set Up General Inventory Information](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-setup-general) |
+  | Configure an efficient distribution model with a combination of different locations and responsibility centers assigned to business partners or employees. | [Work with Responsibility Centers](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-responsibility-centers) |
+  | Organize your inventory at multiple locations, including transfer routes. | [Set Up Locations](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-register-new-items) |
+  | Create item cards for inventory, noninventory, or service items that you trade in. | [Register New Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-register-new-items) |
+  | Use the **Copy Item** function to quickly create a new item card based on an existing one. | [Copy Existing Items to Create New Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-copy-items) |
+  | Learn how to fill in the **Type** field on item cards according to the business purpose. | [About Item Types](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-about-item-types) |
+  | Set up multiple units of measure (UOM) for an item that you can use as alternate UOMs, for example, on sales, purchasing, or production transactions. | [Set Up Item Units of Measure](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-setup-units-of-measure) |
+  | As a supplement to item cards, record information about your items in a specific location or of a specific variant. | [Set Up Stock Keeping Units](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-to-set-up-stockkeeping-units) |
+  | Assign items to categories and give them attributes to help you and customers find items. | [Categorize Items](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-categorize-items) |
+  | Import multiple item pictures in one go from a zip file where the files are named according to item numbers. | [Import Multiple Item Pictures](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-import-item-pictures) |
+  | Specify default reports to be used for different document types. | [Report Selection in Business Central](https://learn.microsoft.com/en-us/dynamics365/business-central/across-report-selections) |
+  
+  [Section titled: Related information](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-setup-inventory#related-information)
+  
+  ## Related information
+  
+  [Managing Inventory](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-manage-inventory)
+  
+  [Managing Purchasing](https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-manage-purchasing)
+  
+  [Managing Sales](https://learn.microsoft.com/en-us/dynamics365/business-central/sales-manage-sales)
+  
+  [Warehouse Management Overview](https://learn.microsoft.com/en-us/dynamics365/business-central/design-details-warehouse-management) [Work with Business Central](https://learn.microsoft.com/en-us/dynamics365/business-central/ui-work-product)
+  
+  [General Business Functionality](https://learn.microsoft.com/en-us/dynamics365/business-central/ui-across-business-areas)
+  
+  [Find free e-learning modules for Business Central here](https://learn.microsoft.com/en-us/training/dynamics365/business-central)
+  
+  * * *
+  
+  ## Feedback
+  
+  Was this page helpful?
+  
+  
+  YesNoNo
+  
+  Need help with this topic?
+  
+  
+  Want to try using Ask Learn to clarify or guide you through this topic?
+  
+  
+  Ask LearnAsk Learn
+  
+  Suggest a fix?
+  
+  * * *
+  
+  ## Additional resources
+  
+  Training
+  
+  
+  Learning path
+  
+  
+  [Get started with inventory management in Microsoft Dynamics 365 Business Central - Training](https://learn.microsoft.com/en-us/training/paths/get-started-inventory-management/?source=recommendations)
+  
+  Do you buy and sell inventory items? If you do, this module will discuss how to create items and enter quantities.
+  
+  
+  Certification
+  
+  
+  [Microsoft Certified: Dynamics 365 Supply Chain Management Functional Consultant Associate - Certifications](https://learn.microsoft.com/en-us/credentials/certifications/d365-functional-consultant-supply-chain-management/?source=recommendations)
+  
+  Design and configure Dynamics 365 Supply chain Management and related tools.
+  
+  
+  * * *
+  
+  - Last updated on 06/17/2024
+  
+  Ask Learn is an AI assistant that can answer questions, clarify concepts, and define terms using trusted Microsoft documentation.
+  
+  Please sign in to use Ask Learn.
+  
+  [Sign in](https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-setup-inventory#)
+  --- End Content ---

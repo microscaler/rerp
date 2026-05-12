@@ -1,0 +1,789 @@
+NetSuite Applications Suite - Inventory Management Overview
+  URL: https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/article_161970666917.html
+  Using inventory features, you can monitor real-time information about your inventory costs, quantities, and asset values.
+
+  --- Content ---
+  1. [Cloud](https://docs.oracle.com/en/cloud/index.html)/
+  2. [Cloud Applications](https://docs.oracle.com/en/cloud/saas/index.html)/
+  3. [NetSuite](https://docs.oracle.com/en/cloud/saas/netsuite/index.html)
+  
+  NetSuite Applications Suite
+  
+  Share on LinkedInShare on XShare on FacebookShare on Email
+  
+  - [What's New](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/set_N20140200.html)
+  
+  
+  Managing your inventory is one of the most important tasks of running your business. With effective inventory management, you can streamline your stock levels to reduce costs and maximize revenue and profits.
+  
+  Good inventory management begins with having accurate, accessible information about your inventory. Quality information is crucial to answering inventory questions that arise on a daily basis, such as:
+  
+  - How many items do I have and where?
+  
+  - How many items have I committed to sell?
+  
+  - Should I order more items or materials now?
+  
+  
+  Your answers to these questions direct your inventory management decisions. Using reports and inventory analysis, you can answer these questions accurately and respond with better decisions.
+  
+  ## Basic Inventory Management
+  
+  Using inventory features, you can monitor real-time information about your inventory costs, quantities, and asset values. With this information, you can make informed decisions about buying and selling your inventory.
+  
+  Because the [Inventory Workflow](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2251098.html) is integrated in your account from procurement to sales, each transaction updates inventory records. It also reports immediately to give you precise, real-time information about your inventory. You can always access current stock information.
+  
+  For example, when an employee sells or receives items, the quantities available are updated on item records when you enter the transaction. You do not have to re-enter information to adjust your inventory records.
+  
+  See [Basic Inventory Management](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_N2250682.html).
+  
+  ## Advanced Inventory Management
+  
+  Keeping track of quantities of stock lets you know if orders can be fulfilled, when to reorder more, and report on inventory quantities. If you use Advanced Inventory Management, accurate stock data helps you automate demand-based inventory replenishment.
+  
+  Plan inventory based on supply and demand calculations using [Demand Planning](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2286970.html) and [Available to Promise](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2300269.html).
+  
+  Expand inventory commitment calculations to consider future and on-hand inventory on supply orders using [Supply Allocation](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_156424975823.html).
+  
+  See [Advanced Inventory Management](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_N2285050.html).
+  
+  ## Inventory Reporting
+  
+  NetSuite reports enable you to access data about your inventory. The real-time information in the following reports can be used to assess whether stock levels and profit margins are where you want them to be.
+  
+  - Examine stock levels using the [Current Inventory Snapshot Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2355248.html). The [Inventory Activity Detail Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2355966.html) details item activity per transaction.
+  
+  - Examine merchandise turn rates using the [Inventory Turnover Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2356560.html). This can help you determine how frequently you should order stock.
+  
+  - The [Physical Inventory Worksheet](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2354418.html) lets you do a physical stock count to be sure the physical stock matches the quantities showing in your account records.
+  
+  - Examine inventory values and profitability with the [Inventory Profitability Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2358569.html), [Inventory Valuation Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2358933.html), and [Inventory Revenue Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2359520.html).
+  
+  - Find out which items are ready to be fulfilled on the [Items Pending Fulfillment Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2356254.html) and which items are not yet available to fill orders with the [Inventory Back Order Report](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_N2355658.html).
+  
+  
+  See [Inventory Reporting](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_N2353200.html).
+  
+  [General Notices](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_N000004.html)
+  
+  Previous Page
+  
+  Next Page
+  
+  On This Page
+  
+  - [What's New](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/set_N20140200.html)
+  --- End Content ---
+
+What Is the Inventory Module? Features and Benefits - NetSuite
+  URL: https://www.netsuite.com/portal/resource/articles/erp/inventory-module.shtml
+  Key capabilities include inventory tracking and management, order management, supplier management and reporting and analytics. Investing in an ...
+
+  --- Content ---
+  1. [Company](https://www.netsuite.com/portal/aboutus.shtml)
+  2. [Educational Resources](https://www.netsuite.com/portal/resource/overview.shtml)
+  3. [Business Solution Articles](https://www.netsuite.com/portal/resource/business-solutions-articles.shtml)
+  4. [ERP](https://www.netsuite.com/portal/resource/business-solutions-articles/erp-back-office.shtml)
+  
+  # What Is the Inventory Module? Features and Benefits
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/author-abby-jenkins.png)[Abby Jenkins](https://www.netsuite.com/portal/resource/authors/abby-jenkins.shtml) \| Product Marketing Manager
+  
+  July 18, 2024
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/erp/bnr-inventory-module.jpg)
+  
+  When it comes to inventory management, the goal for most companies is to achieve the sweet
+  spot of maintaining the
+  right amount of inventory — not so much that they tie up cash in overstock and not so
+  little that
+  they’re unable to meet customer demand. Because so many factors can impact inventory
+  levels — supplier
+  issues, customer demand, warehousing and logistics and financial considerations, to name a
+  few — many
+  companies invest in inventory management software that integrates with their other key
+  enterprise systems. A
+  cloud-based enterprise resource planning (ERP) solution with an inventory management module
+  offers companies
+  inventory-specific functionality along with built-in integration with other modules, such as
+  supply chain
+  management, financial management, customer relationship management and human resources.
+  
+  ## What Is an Inventory Module?
+  
+  An ERP solution automates various mission-critical financial and operational business
+  processes across a company.
+  This software can include a variety of modules configured within it, each specifically
+  designed to support a
+  particular department or function. An ERP inventory management module helps a company better
+  manage its [inventory](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory.shtml) and associated costs
+  with the goal of having enough stock to satisfy
+  customer demand without investing too much of its cash in excess inventory. The inventory
+  management module is
+  designed to store and analyze inventory data and automate related tasks. Because it’s
+  part of the overall ERP
+  solution, it can share data and insights with other modules in the system.
+  
+  Key Takeaways
+  
+  - An ERP inventory management module is used to manage and optimize inventory so that a
+  company can maintain
+  appropriate levels of stock without tying up unnecessary cash in excess inventory.
+  - The inventory management module should provide full visibility into all inventory across
+  locations and sales
+  channels.
+  - Key capabilities include inventory tracking and management, order management, supplier
+  management and reporting
+  and
+  analytics.
+  - Investing in an inventory module offers a host of potential benefits, including improved
+  financial performance
+  and
+  better customer experience.
+  
+  ## Inventory Module Explained
+  
+  An inventory management module provides a complete picture of a company’s inventory. It
+  can be used to track
+  and manage current [inventory](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory.shtml) across all of a company’s locations as well as incoming
+  stock, thanks to its
+  integration with a supply chain management module within the same ERP system. Similarly, an
+  inventory module can
+  also ingest customer demand insights from sales transactions or [customer relationship management (CRM)](https://www.netsuite.com/portal/resource/articles/crm/what-is-crm.shtml) data to inform
+  decisions around
+  inventory turnover and purchasing. This single, real-time view into inventory across
+  locations and sales channels
+  can help a business ensure enough product availability to meet demand while also freeing up
+  cash that might
+  otherwise be tied up in excess inventory.
+  
+  Inventory management modules provide a number of tools to streamline [inventory management](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory-management.shtml) and
+  optimize inventory
+  levels. Purchasing managers can use an inventory management module to account for issues,
+  such as fluctuation in
+  demand, seasonality and supply chain or logistics disruptions, when making restocking
+  decisions. Using demand-based
+  replenishment, they can configure the software to dynamically manage item reorder points and
+  maintain stock levels.
+  The module can also generate tasks and alerts based on an analysis of relevant information,
+  including historical
+  sales data, average lead time and number of inventory days of supply. With increased
+  visibility across multiple
+  locations, companies can more effectively monitor stock levels and sell-through rates
+  — the amount of
+  inventory sold within a given period relative to the amount of inventory received within the
+  same period — to
+  optimize inventory availability.
+  
+  And it’s not just those working in purchasing or inventory management roles who benefit
+  from the insights and
+  functionality that an ERP inventory management module can offer. Shipping and logistics
+  managers, for example, can
+  use the software to predefine order fulfillment rules so they don’t wind up creating
+  multiple shipments for a
+  single order. Sales associates, meanwhile, can prevent lost sales resulting from dreaded
+  out-of-stock situations by
+  logging into the system to hold, transfer or ship items directly to their customers.
+  
+  ## Inventory Module Key Features
+  
+  The inventory management module within an ERP system is designed to improve a company’s
+  oversight of key
+  inventory processes to better manage costs, product availability and productivity. The goal
+  is [inventory\\
+  control](https://www.netsuite.com/portal/resource/articles/inventory-management/what-are-inventory-management-controls.shtml): the ability
+  of a business to maintain the stock necessary to fulfill anticipated orders from customers
+  while keeping inventory
+  costs at a minimum.
+  
+  Good inventory control requires data from purchasing, shipping, warehousing, storing,
+  receiving, customer service and
+  more. Tracking all this data manually would be difficult for any business and analyzing the
+  data in order to
+  optimize inventory management would be almost impossible. That’s where the inventory
+  management module of an
+  ERP system delivers its value. A modern module offers a number of key features that
+  facilitate greater inventory
+  control. These include:
+  
+  ### Inventory Tracking and Management
+  
+  Using spreadsheets or pen and paper to track inventory is inefficient, error-prone and
+  unsustainable. Yet, many
+  companies still rely on this approach. The inability to track and trace products from
+  supplier to customer order is
+  one of the biggest hurdles to effective [inventory management](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory-management.shtml).
+  An ERP inventory module can offer real-time
+  visibility into inventory companywide, wherever it’s stored or managed — from
+  warehouses, to logistics
+  provider locations, to retail stores. Having one source of truth for inventory is essential,
+  and an inventory
+  management module brings together all the relevant information into a single, centralized
+  location. An inventory
+  management dashboard can help business managers visualize critical data, such as inventory
+  counts and projected
+  stock levels, and alert them to issues, including overstock situations or anticipated
+  shortfalls.
+  
+  ### Order Management
+  
+  It takes a veritable village to fulfill a customer’s order. Multiple parties work
+  behind the scenes —
+  from sales pros and customer relationship managers to warehouse pickers and shipping
+  partners — to make sure
+  orders are fulfilled correctly and quickly. But given customers’ increasing demands
+  for fast shipping,
+  that’s no small task. [Order management](https://www.netsuite.com/portal/resource/articles/erp/order-management.shtml)
+  functionality within an inventory module can track and
+  streamline the entire process, from the moment the customer places an order until the minute
+  it arrives at their
+  door. The inventory module digitizes the process, providing visibility into order
+  acceptance, fulfillment, shipping,
+  delivery and any post-sales service. The biggest challenges to efficient order management
+  are inventory and
+  fulfillment inaccuracies and cost control. Order management features within an inventory
+  module can automate key
+  tasks in this process and pull in important data along the way to address common issues. The
+  module also monitors
+  and analyzes order management key performance indicators (KPIs) to measure performance over
+  time and uncover
+  opportunities to improve the process.
+  
+  ### Supplier Management
+  
+  Inventory management converges with another important business process: supply chain
+  management. Maintaining adequate
+  inventory depends on getting the right shipments from suppliers at the right price at the
+  right time. Any supplier
+  glitch can have a profound impact on inventory levels and turnover. That quickly became
+  evident during the COVID-19
+  pandemic, which is why more companies are looking to technology to better manage their
+  supply chains today. In fact,
+  79% of respondents to McKinsey’s 2023 Supply Chain Pulse Survey said they’ve
+  implemented dashboards for
+  end-to-end supply chain visibility. This type of robust [supplier\\
+  management](https://www.netsuite.com/portal/resource/articles/erp/supplier-relationship-management-srm.shtml) is a key feature of an ERP
+  inventory management module. This functionality helps companies ensure timely deliveries by
+  anticipating disruption,
+  preventing stockouts, managing lead times, measuring supplier performance and maintaining
+  supplier diversity and
+  backup options to deal with potential issues.
+  
+  ### Reporting and Analytics
+  
+  Manual reporting and analytics within inventory management are time-consuming and prone to
+  error. Worse yet, manual
+  processes make it difficult for businesses to manage their inventory in a timely way, which
+  can result in excess
+  inventory and other costly situations. With the right inventory management module, companies
+  have a host of reports
+  and analytics capabilities at their fingertips. They can easily analyze data and produce
+  reports on [inventory\\
+  KPIs](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory-management-kpis-metrics.shtml), such as inventory
+  performance and profitability, stock levels, inventory value, cost of goods sold, inventory
+  forecasts and shipment
+  trends. Such analytics and reporting facilitate better-informed decisions and improved
+  performance. A company that
+  finds its inventory values trending higher with the potential to increase overhead and
+  reduce profitability, for
+  example, will want to investigate which items might be contributing to the trend and explore
+  new purchasing
+  practices based on costs and turnover rates. Steady and healthy inventory profitability on a
+  popular product, on the
+  other hand, is a positive trend, indicating that a company should maintain its current price
+  point and stock levels
+  for the item.
+  
+  ## Inventory Module Benefits
+  
+  An inventory management module can better equip companies to overcome the most common [inventory\\
+  management challenges](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory-management-challenges.shtml), including inaccurate
+  data, inconsistent tracking, inefficient order management and supplier issues. Implementing
+  an ERP system with a
+  robust inventory module enables companies to track and manage their inventory, orders and
+  sales down to the
+  individual SKU level. This increased visibility, particularly when integrated with the other
+  common operational and
+  financial modules within an ERP system, provides a number of key benefits, including:
+  
+  ### Lower Holding Costs
+  
+  Keeping too many goods in stock — that is, more than customers are likely to order
+  — comes at a price.
+  Indeed, nearly half (48%) of logistics managers surveyed by CNBC in 2023 said warehouse
+  costs were the biggest
+  inflationary issue they faced in inventory management. Such holding costs, which include
+  warehousing, insurance,
+  labor, transportation, depreciation, inventory shrinkage and damaged, spoiled or obsolete
+  inventory, eat up cash
+  that could be used more strategically to boost the bottom line. Demand-based planning
+  enabled by a modern inventory
+  management module allows companies to optimize inventory based on relevant data so that
+  they’re less likely to
+  end up with warehouses packed with goods no one is buying.
+  
+  ### Reduced Stock Obsolescence
+  
+  Obsolete inventory is defined as any inventory a company can no longer sell or that has seen
+  a reduction in value. A
+  product can face obsolescence due to its natural shelf life, changing customer preferences
+  or advances in
+  technology, for example. Whatever the reason, obsolete inventory is a drag on agility and
+  profitability in the same
+  way overstocked warehouses are: They both tie up valuable cash in items the company is
+  unable to sell. Greater
+  visibility into inventory levels, along with better demand forecasting, can help avoid this
+  problem. Companies that
+  use an ERP inventory management module can easily keep an eye on inventory turnover ratios
+  to identify products with
+  lower turnover rates and proactively address stock obsolescence issues and the accumulation
+  of unsellable inventory.
+  
+  
+  ### Fewer Stockouts
+  
+  Having too few of an item is also a costly issue for companies. While less visible than piles
+  of last year’s
+  smartphones sitting in a warehouse or rotting apples in the back of a grocery store,
+  stockouts can be just as
+  damaging to sales and customer satisfaction and loyalty. Using an ERP inventory management
+  module to closely track
+  inventory levels, forecast demand and manage suppliers helps companies minimize stockouts.
+  
+  
+  ### Enhanced Order Processing Speed
+  
+  The better a company’s inventory management, the more efficient its order processing
+  is. Using an ERP inventory
+  management module enables a company to track inventory in real time, fine-tune its
+  replenishment processes in
+  harmony with supply and demand and maintain ideal inventory levels. As a result, the company
+  can more quickly and
+  effectively process, fulfill and ship orders.
+  
+  ### Accurate Forecasting
+  
+  Inventory modules with demand-based planning capabilities empower companies to make
+  purchasing decisions that align
+  with predicted customer demand. The system can analyze historical demand, sales forecasts,
+  expected seasonal changes
+  and other factors to help determine the right amount of stock to maintain. Inventory
+  management modules also offer
+  inventory forecasting capabilities to predict expected inventory levels for a given period
+  based on data, such as
+  historical sales trends, average lead times, customer demand and recommended safety stock.
+  
+  
+  ### Better Order Accuracy
+  
+  At the far end of the inventory management process is order fulfillment. Here, order accuracy
+  is an indication of how
+  efficient and reliable a company is in picking, packing and shipping the products it has in
+  stock to its customers.
+  Order accuracy is an important metric, impacting not only overall costs but also customer
+  satisfaction. Human error
+  is the main cause of order accuracy issues, so when companies digitize, streamline and
+  automate their inventory and
+  order management processes using an inventory management module, they’re more likely
+  to improve their order
+  accuracy rates.
+  
+  ### Faster Delivery
+  
+  One of the biggest factors impacting the ability of companies to fulfill customer orders and
+  deliver them quickly is
+  the availability of inventory. Therefore, when companies are better able to track and manage
+  their stock, they can
+  increase delivery speed. ERP inventory management modules enable companies to track
+  inventory across channels and
+  locations in real time so they can more quickly fulfill customer orders and avoid stockouts,
+  misplaced items and
+  other inventory issues that slow delivery times.
+  
+  ### Increased Profitability
+  
+  The companywide visibility into inventory that an ERP’s inventory management module
+  provides not only improves
+  efficiency and customer satisfaction, but also positively impacts the bottom line. The
+  better a company can manage
+  its inventory, the lower its costs of goods sold, which, in turn, increases its margins.
+  
+  ## Cloud-Based ERP and the Inventory Module
+  
+  The benefits of an inventory management module within an ERP system for both a company and
+  its customers are broad
+  and impactful. Adopting a cloud-based ERP system inventory module offers additional upsides
+  for inventory
+  management. Among them are:
+  
+  ### Remote Access to Inventory Data
+  
+  Cloud-based ERP essentially eliminates any physical restrictions on inventory management.
+  Migrating to a cloud-based
+  system provides visibility into inventory companywide without any investment in additional
+  technology
+  infrastructure. With real-time connectivity, employees can access the inventory management
+  module from anywhere to
+  manage multiple warehouses, track inventory levels, monitor sales, perform order management
+  and more. The resulting
+  data and insights contribute to better inventory management decisions in the moment.
+  
+  ### Real-Time Updates and Monitoring
+  
+  Managing inventory by spreadsheet in a siloed fashion creates all sorts of issues, including
+  inaccuracies and lag
+  time that make it difficult to track and manage inventory. The data captured by a
+  cloud-based ERP system, on the
+  other hand, is updated in real time, which increases both the efficiency and efficacy of
+  inventory management. The
+  inventory management module gives users across the business visibility into shared sales,
+  inventory and order
+  information with instant updates so they can confidently make decisions based on accurate
+  information and insight.
+  
+  
+  ### Scalability
+  
+  On-premises ERP and inventory modules require a company to invest in technology
+  infrastructure and management. As the
+  company and its needs grow or contract, those infrastructure needs will change accordingly,
+  potentially impacting
+  the technology investment. Cloud-based ERP and inventory management modules, on the other
+  hand, are hosted by the
+  software provider and can scale up or down as necessary without the need for the business
+  itself to make
+  infrastructure changes or investments. Cloud ERP vendors can reallocate resources as needed
+  to support changes in
+  company size or inventory management requirements.
+  
+  ### Customization of Inventory Processes
+  
+  Although a cloud ERP provider hosts and maintains ERP software and inventory modules for many
+  customers, leading
+  providers understand that each client has its own specific requirements when it comes to
+  inventory management.
+  Therefore, they offer the ability to customize capabilities and configure invoices, in many
+  cases with a no-code
+  approach that doesn’t require significant technical expertise.
+  
+  ### Seamless Integration with Other Business Systems
+  
+  One of the biggest benefits of using an inventory management module within an ERP system is
+  its built-in integration
+  with other modules in the same system. Unlike stand-alone inventory management software, a
+  modern ERP inventory
+  management module integrates seamlessly with sales, accounting, payroll, shipping, logistics
+  and more — all in
+  the cloud. This is particularly valuable because inventory management relies on and impacts
+  so many other
+  operational and financial business processes.
+  
+  ### API Functionalities for Extended Connectivity
+  
+  Users of an inventory management module within a cloud-based ERP system don’t have to
+  worry about integration
+  with other enterprise business systems within the same platform. However, they may wish to
+  enable their inventory
+  management module to communicate with other non-ERP systems and exchange data in a
+  standardized format. A cloud ERP
+  provider can offer a set of protocols, routines and tools, referred to as an application
+  programming interface
+  (API), to enable that extended connectivity with other services, such as an ecommerce
+  platform, or to allow users to
+  create custom reports or dashboards within the ERP system.
+  
+  ### Advanced Analytics for Inventory Optimization
+  
+  Manual analysis of inventory data can only get you so far. Without access to continually
+  updated data and advanced
+  analytics, business leaders must rely on intuition, experience and basic calculations to
+  make decisions. It’s
+  an error-prone approach that’s difficult to scale as a business grows. The advanced
+  data analytics
+  capabilities within a cloud-based ERP inventory management module (supported by the
+  provider’s high-throughput
+  computing infrastructure) enable more robust inventory management and optimization by
+  providing insight into
+  accurate and up-to-date inventory levels, sales trends, customer demand, supplier
+  performance and more. A
+  cloud-based ERP module has built-in reporting and analytics capabilities that companies can
+  use to achieve the right
+  balance between meeting market demand and minimizing inventory costs.
+  
+  ### Forecasting and Demand Planning
+  
+  In today’s market, marked by continually evolving customer demands and frequent supply
+  chain disruptions, a
+  cloud-based ERP inventory module can offer advanced forecasting and demand-planning
+  capabilities to help companies
+  stay ahead of unexpected shifts that could impact inventory decisions. Accurate forecasts
+  built on advanced analysis
+  of data from both inside and outside the company — such as current inventory levels,
+  outstanding purchase
+  orders, expected demand and historical and current sales trends — empower business
+  leaders to anticipate and
+  respond to changing market conditions more effectively and manage their inventory
+  accordingly. Some inventory
+  modules integrate machine learning to automate inventory and demand forecasting and improve
+  projections over time.
+  
+  
+  ## Minimize Stockouts and Excess Inventory with NetSuite Inventory Management
+  
+  Effective and efficient inventory management is table stakes in today’s dynamic market.
+  Companies that want to
+  get ahead of ongoing shifts in supply and demand will see greater returns by investing in
+  cloud-based ERP with an
+  inventory management module.
+  
+  [NetSuite Inventory\\
+  Management](https://www.netsuite.com/portal/products/erp/warehouse-fulfillment/inventory-management.shtml) provides a single, real-time view of
+  inventory levels, orders and sales throughout the inventory life cycle. This visibility
+  across locations enables
+  businesses to proactively address inventory issues, including excess or slow-moving stock,
+  and optimize inventory
+  for maximum effectiveness and profitability. Built-in reporting and analytics capabilities
+  make insight generation
+  and sharing easy. In addition, seamless integration with other ERP modules, such as
+  financial management, supply
+  chain management, CRM and sales, keeps everyone on the same page. The end result is a more
+  streamlined and effective
+  inventory management function that avoids overstocking or stockouts, as well as improves
+  customer service and
+  financial performance.
+  
+  What is NetSuite Advanced Inventory? - YouTube
+  
+  Tap to unmute
+  
+  1x
+  
+  [What is NetSuite Advanced Inventory?](https://www.youtube.com/watch?v=PbuiHOtZcyo) [NetSuite](https://www.youtube.com/channel/UCHOG3jDe_EGwC-Gc_6YXwOA)
+  
+  NetSuite50.8K subscribers
+  
+  [Watch on](https://www.youtube.com/watch?v=PbuiHOtZcyo)
+  
+  Managing the many moving parts that impact inventory decision-making is
+  essential to
+  maximizing efficiency,
+  profitability and customer satisfaction. But it requires fit-for-purpose tools. An ERP
+  system’s inventory
+  management module is designed to help companies track and analyze the multiple factors that
+  impact purchasing and
+  inventory management and produce reports and analysis to drive more informed, proactive
+  decision-making. The module
+  provides the real-time, companywide view into inventory that’s required to make the
+  tough calls necessary to
+  ensure product availability without overstocking and exceed customer expectations while
+  maintaining profitable
+  margins.
+  
+  ### Award-winning   cloud   inventory   software
+  
+  [Free Product Tour(opens in a new tab)](https://www.netsuite.com/app/site/backend/bridgedomainstoforms.nl?target=%2Fapp%2Fsite%2Fcrm%2Fexternalleadpage.nl%3Fcompid%3D6262239%26formid%3D1424%26h%3DAAFdikaIqP8lTczciVAVoPBiqMp1Rsjpe2P9kXdf4i8-Ybn4_04&branding=T&subsidiaryOverride=session)
+  
+  ## Inventory Module FAQs
+  
+  **What is the purpose of an inventory module?**
+  
+  The purpose of an inventory module within an enterprise resource planning (ERP) system is to
+  provide the data,
+  reporting and analytics necessary to optimize inventory levels and ensure enough product
+  availability to meet demand
+  while controlling costs.
+  
+  **What is an inventory module in ERP?**
+  
+  An inventory module is an application within a larger enterprise resource planning (ERP)
+  system dedicated to
+  inventory management. The module is integrated with the ERP system’s central database
+  so there’s a
+  single source of accurate company data. An inventory module provides capabilities to support
+  a company’s
+  management of its inventory — all the goods and materials it keeps in stock for the
+  goal of producing or
+  selling a product.
+  
+  **Is inventory part of the ERP module?**
+  
+  An enterprise resource planning (ERP) system can be configured with different modules, or
+  components, that address
+  the needs of a specific function necessary to run the business day-to-day. These may include
+  modules for financial
+  management, human resources management or supply chain management, for example. Inventory
+  management is a module
+  designed to help a company manage and optimize its inventory and related processes, such as
+  supplier management or
+  order management. The inventory management module may be offered as part of an ERP system or
+  as an add-on
+  capability.
+  
+  **What are the four types of inventory components?**
+  
+  [Inventory](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory.shtml) refers to any goods or
+  materials a company keeps on hand to either
+  sell directly to a customer or to manufacture products. Four main types of inventory are:
+  
+  
+  1. **Raw materials** are the base materials a company uses to
+      produce or finish
+      products, such
+      as the steel used to manufacture a car.
+  
+  2. **Components** are also used to create a finished product,
+      but, unlike raw
+      materials, they
+      have gone through some level of production and can be recognized as a product, such
+      as a lug nut used to
+      assemble a
+      car.
+  
+  3. **Work-in-progress (WIP)** are items in some stage of
+      production but not yet ready
+      for
+      sale, such as a car’s chassis.
+  
+  4. **Finished goods** are ready-to-sell products used to
+      fulfill customer orders, such
+      as a
+      fully assembled car.
+  
+  
+  **Review the demonstration below to see how NetSuite embeds artificial intelligence (AI) across the suite to help companies increase productivity, analyze data faster, and generate deeper insights.**
+  
+  [Start my demo](https://play2.goconsensus.com/ece404bef)
+  
+  You May Also Like…
+  
+  * * *
+  
+  [![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-bg-right-erp.jpg)\\
+  \\
+  Guide\\
+  \\
+  9 Steps to Finding the Perfect ERP for Your Business\\
+  \\
+  Learn More\\
+  \\
+  (opens in a new tab)](https://6262239.extforms.netsuite.com/app/site/crm/externalleadpage.nl/compid.6262239/.f?formid=2273&h=AAFdikaI-5Qe1thVDJV1EfWkRsxfz9FiV2DmjW_-FaHlRX1HMJU&redirect_count=1&did_javascript_redirect=T)
+  
+  [![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-bg-make-break-metrics.jpg)\\
+  \\
+  Business Guide\\
+  \\
+  Make or Break Metrics: 20 KPIs Every Growing Business Should Track\\
+  \\
+  Learn More\\
+  \\
+  (opens in a new tab)](https://6262239.extforms.netsuite.com/app/site/crm/externalleadpage.nl/compid.6262239/.f?formid=1860&h=AAFdikaI2JqWmoO8RHGwbZnLwlNZf4JVrpJpdr-lyogkWq_HLyQ&redirect_count=1&did_javascript_redirect=T)
+  
+  [![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-bg-7-strategies-for-growth.jpg)\\
+  \\
+  Guide\\
+  \\
+  7 Strategies for Growth: Seizing an Unparalleled Opportunity\\
+  \\
+  Learn More\\
+  \\
+  (opens in a new tab)](https://6262239.extforms.netsuite.com/app/site/crm/externalleadpage.nl/compid.6262239/.f?formid=1950&h=AAFdikaIuCFWa_fTTL0s31NwdJylEV0CdfWBpMRRsY_n9WXkuvs&redirect_count=1&did_javascript_redirect=T)
+  
+  [![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-bg-practical-guide-to-financial-modeling.jpg)\\
+  \\
+  Ebook\\
+  \\
+  A Practical Guide to Financial Modeling and Projections for Growing Businesses\\
+  \\
+  Learn More\\
+  \\
+  (opens in a new tab)](https://6262239.extforms.netsuite.com/app/site/crm/externalleadpage.nl/compid.6262239/.f?formid=2388&h=AAFdikaI-WpKwP3wzzxK_iMbEDPrWrG1sqWBoTsMYDRxyDla-t8&redirect_count=1&did_javascript_redirect=T)
+  
+  ERP
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-575x383-erp-inventory.jpg)
+  
+  [Essential Guide to ERP\\
+  Inventory Management](https://www.netsuite.com/portal/resource/articles/erp/erp-inventory.shtml)
+  
+  Companies that excel at inventory management drive the maximum amount of profit—and customer
+  satisfaction—from the least…
+  
+  **More On This**
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-64x64-inventory-management-system-features.jpg)[Must-Have\\
+  Inventory Management System Features, Requirements & Modules](https://www.netsuite.com/portal/resource/articles/inventory-management/inventory-management-system-features.shtml)
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-64x64-what-are-inventory-management-controls.jpg)[Inventory\\
+  Control Defined: Best Practices, Systems, & Management](https://www.netsuite.com/portal/resource/articles/inventory-management/what-are-inventory-management-controls.shtml)
+  
+  ![](https://www.netsuite.com/portal/assets/img/business-articles/thumbnails/thmb-64x64-periodic-inventory-system.jpg)[Periodic\\
+  Inventory System: Is It the Right Choice?](https://www.netsuite.com/portal/resource/articles/inventory-management/periodic-inventory-system.shtml)
+  
+  Solutions
+  
+  [![erp thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-planning-budgeting.png?v4)\\
+  \\
+  **ERP** \\
+  \\
+  Automate processes and get real-time visibility into operational and financial performance.](https://www.netsuite.com/portal/products/erp.shtml?mc=57633)
+  
+  [![planning budgeting thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-erp.png?v4)\\
+  \\
+  **Accounting Software** \\
+  \\
+  Simplify the process of recording transactions, managing AP and AR and closing the books.](https://www.netsuite.com/portal/products/erp/financial-management/finance-accounting.shtml?mc=57633)
+  
+  [![financial Management thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-accounting.png?v4)\\
+  \\
+  **Financial Management** \\
+  \\
+  Expedite daily financial transactions, accelerate the financial close and ensure compliance.](https://www.netsuite.com/portal/products/erp/warehouse-fulfillment/inventory-management.shtml?mc=57633)
+  
+  [![Inventory Management thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-crm.png?v4)\\
+  \\
+  **Inventory Management** \\
+  \\
+  Automate inventory management, reduce handling costs and optimize cash flow.](https://www.netsuite.com/portal/products/erp/warehouse-fulfillment/inventory-management.shtml?mc=57633)
+  
+  [![Warehouse Management thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-inventory-management.png?v4)\\
+  \\
+  **Warehouse Management** \\
+  \\
+  Optimize daily warehouse operations with item putaway, inventory tracking and cycle count plans.](https://www.netsuite.com/portal/products/erp/warehouse-fulfillment/wms.shtml?mc=57633)
+  
+  [![hcm thumbnail](https://www.netsuite.com/portal/assets/img/business-articles/grid-thmb-hcm.png?v4)\\
+  \\
+  **Supply Chain Management** \\
+  \\
+  Oversee the flow of goods from suppliers through manufacturing and into customers’ hands](https://www.netsuite.com/portal/products/erp/supply-chain-management.shtml?mc=57633)
+  
+  ## Learn How NetSuite Can Streamline Your Business
+  
+  NetSuite has packaged the experience gained from tens of thousands of worldwide deployments over two decades into a set of leading practices that pave a clear path to success and are proven to deliver rapid business value. With NetSuite, you go live in a predictable timeframe — smart, stepped implementations begin with sales and span the entire customer lifecycle, so there’s continuity from sales to services to support.
+  
+  [Free Product Tour](https://www.netsuite.com/app/site/backend/bridgedomainstoforms.nl?target=%2Fapp%2Fsite%2Fcrm%2Fexternalleadpage.nl%3Fcompid%3D6262239%26formid%3D1966%26h%3DAAFdikaIGSQ73IttYh9XJpKUyCwqlYXuIzu8j8THQpY_dCa5xvA%26redirect_count%3D1%26did_javascript_redirect%3DT&branding=F&subsidiaryOverride=default)
+  
+  - [Share on Facebook](https://www.facebook.com/sharer/sharer.php?u=https://www.netsuite.com/portal/resource/articles/erp/inventory-module.shtml "Share on Facebook")
+  - [Share on X](https://twitter.com/intent/tweet?url=https://www.netsuite.com/portal/resource/articles/erp/inventory-module.shtml "Share on X")
+  - [Share on LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https://www.netsuite.com/portal/resource/articles/erp/inventory-module.shtml "Share on LinkedIn")
+  - [Share on Flipboard](https://share.flipboard.com/bookmarklet/popout?v=2&url=https://www.netsuite.com/portal/resource/articles/erp/inventory-module.shtml "Share on Flipboard")
+  - [(opens in a new tab)](https://www.instagram.com/oraclenetsuite/ "Share on Instagram")
+  - Top
+  
+  NetSuite Sales Chatbot
+  
+  Disconnected
+  
+  - Close widget
+  - Select chat language
+  
+  
+  - Detect Language
+  - undefined
+  - Español
+  - Português
+  
+  ![up icon](https://www.netsuite.com/portal/assets/img/adobe-target/arrow-up.svg) To Top
+  
+  [No more wasted time in 2026. Automate with NetSuite ERP. (opens in new tab)](https://6262239.extforms.netsuite.com/app/site/crm/externalleadpage.nl/compid.6262239/.f?formid=1939&h=AAFdikaI3nNb_UDZVIiN7wXMlmq1lgQ7OL56VrlTGuCRoyxQhkg&redirect_count=1&did_javascript_redirect=T)
+  --- End Content ---
