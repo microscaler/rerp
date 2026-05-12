@@ -97,6 +97,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all chats
@@ -134,6 +136,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -170,6 +174,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all chats
@@ -202,6 +208,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get chats by ID
@@ -273,7 +281,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatMessage'
               examples:
-                default: &id002
+                default: &id004
                   id: 00000000-0000-0000-0000-000000000016
                   session_id: 00000000-0000-0000-0000-000000000013
                   sender_id: 00000000-0000-0000-0000-000000000015
@@ -316,9 +324,9 @@ paths:
           description: Chat closed
           content:
             application/json:
-              schema:
+              schema: &id002
                 $ref: '#/components/schemas/ChatSession'
-              examples:
+              examples: &id003
                 default: *id001
         '404':
           description: Not found
@@ -332,6 +340,12 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '201':
+          description: POST /chats/{id}/close - Created
+          content:
+            application/json:
+              schema: *id002
+              examples: *id003
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -376,6 +390,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get chat session transcript
@@ -433,6 +449,10 @@ paths:
                   chat_id: 00000000-0000-0000-0000-000000000009
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -472,7 +492,7 @@ paths:
               examples:
                 default:
                   items:
-                  - *id002
+                  - *id004
                   total: 1
                   page: 1
                   per_page: 20
@@ -482,6 +502,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all messages
@@ -509,11 +531,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ChatMessage'
               examples:
-                default: *id002
+                default: *id004
         '404':
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get messages by ID
@@ -543,7 +567,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id003
+                  - &id005
                     id: 00000000-0000-0000-0000-000000000015
                     name: Agent Smith
                     email: agent@example.com
@@ -559,6 +583,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all agents
@@ -577,7 +603,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateAgentRequest'
             examples:
-              default: &id004
+              default: &id006
                 name: Agent Smith
                 email: agent@example.com
         description: Create a new agent
@@ -589,7 +615,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Agent'
               examples:
-                default: *id003
+                default: *id005
         '400':
           description: Invalid request
         '500':
@@ -600,6 +626,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -628,11 +656,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Agent'
               examples:
-                default: *id003
+                default: *id005
         '404':
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get agents by ID
@@ -658,7 +688,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateAgentRequest'
             examples:
-              default: *id004
+              default: *id006
         description: Update an existing agent
       responses:
         '200':
@@ -668,7 +698,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Agent'
               examples:
-                default: *id003
+                default: *id005
         '400':
           description: Invalid request
         '404':
@@ -759,7 +789,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaginatedAgentStatusRequest'
             examples:
-              default: *id004
+              default: *id006
         description: Update agent online status
       responses:
         '200':
@@ -769,7 +799,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Agent'
               examples:
-                default: *id003
+                default: *id005
         '404':
           description: Not found
         '403':
@@ -831,6 +861,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get or update agent status
@@ -868,6 +900,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get agent performance metrics
@@ -917,6 +951,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all agents

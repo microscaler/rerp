@@ -76,6 +76,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all workflows
@@ -124,6 +126,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -157,6 +161,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get workflows by ID
@@ -295,6 +301,8 @@ paths:
           description: Workflow not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -408,6 +416,12 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -447,6 +461,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get workflow execution history
@@ -484,6 +500,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -523,6 +541,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -556,6 +576,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get workflow rules
@@ -706,6 +728,14 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -755,6 +785,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all triggers
@@ -803,6 +835,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -836,6 +870,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get triggers by ID
@@ -982,6 +1018,14 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1025,6 +1069,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1064,6 +1110,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1097,6 +1145,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all actions

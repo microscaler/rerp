@@ -181,6 +181,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -214,6 +216,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get leads by ID
@@ -448,6 +452,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '409':
+          description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -509,6 +515,10 @@ paths:
                     confidence: 0.95
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -580,6 +590,10 @@ paths:
                   merged_id: 00000000-0000-0000-0000-000000000004
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -626,6 +640,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all pipeline
@@ -683,6 +699,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all stages
@@ -722,6 +740,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -755,6 +775,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get stages by ID

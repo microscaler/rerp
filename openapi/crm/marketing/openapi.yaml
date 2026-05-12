@@ -87,6 +87,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all utm
@@ -132,6 +134,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -165,6 +169,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get utm by ID
@@ -298,6 +304,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all utm
@@ -342,6 +350,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -376,6 +386,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all utm
@@ -420,6 +432,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -512,6 +526,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get web form configuration
@@ -555,6 +571,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -601,6 +619,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all analytics
@@ -662,6 +682,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -706,6 +728,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get leads associated with a campaign
@@ -762,6 +786,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get revenue attributed to a campaign
@@ -809,6 +835,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -853,6 +881,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get event registrations
@@ -896,6 +926,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true

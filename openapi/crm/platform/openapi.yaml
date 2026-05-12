@@ -76,6 +76,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all custom-fields
@@ -121,6 +123,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -154,6 +158,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get custom-fields by ID
@@ -301,6 +307,8 @@ paths:
           description: Entity not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get entities by ID
@@ -348,6 +356,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all webhooks
@@ -392,6 +402,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -425,6 +437,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get webhooks by ID
@@ -572,6 +586,14 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -617,6 +639,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get webhook delivery logs
@@ -686,6 +710,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all audit-log
@@ -734,6 +760,8 @@ paths:
           description: Entity not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get audit-log by ID
@@ -771,6 +799,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all api-keys
@@ -829,6 +859,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -860,7 +892,7 @@ paths:
           description: Validation result
           content:
             application/json:
-              schema:
+              schema: &id005
                 type: object
                 properties:
                   valid:
@@ -869,7 +901,7 @@ paths:
                     type: object
                   rate_limit_remaining:
                     type: integer
-              examples:
+              examples: &id006
                 default:
                   valid: true
                   user_id: u001
@@ -886,6 +918,16 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '201':
+          description: POST /auth/validate - Created
+          content:
+            application/json:
+              schema: *id005
+              examples: *id006
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -909,7 +951,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id005
+                  - &id007
                     id: 00000000-0000-0000-0000-000000000024
                     name: Slack Integration
                     type: messaging
@@ -925,6 +967,8 @@ paths:
           description: Unauthorized
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all integrations
@@ -955,7 +999,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id005
+                default: *id007
         '400':
           description: Invalid request
         '500':
@@ -966,6 +1010,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1014,6 +1060,16 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or cannot complete action
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1042,11 +1098,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id005
+                default: *id007
         '404':
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get or update agent status

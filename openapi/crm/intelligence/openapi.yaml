@@ -101,6 +101,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -186,6 +188,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -223,6 +227,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Get leads by ID
@@ -267,6 +273,8 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: Explain scoring factors for a lead
@@ -311,6 +319,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all scoring
@@ -349,6 +359,14 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -379,6 +397,10 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '409':
+          description: Conflict - resource conflict or cannot complete action
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all scoring
@@ -471,6 +493,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all leads
@@ -506,6 +530,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all leads
@@ -541,6 +567,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all leads
@@ -579,6 +607,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '404':
           description: Resource not found
+        '500':
+          description: Internal server error
       security:
       - bearerAuth: []
       description: List all leads
@@ -641,6 +671,10 @@ paths:
                     title: CTO
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -697,6 +731,10 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -762,6 +800,10 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -826,6 +868,10 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -865,6 +911,10 @@ paths:
           description: Not found
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '500':
+          description: Internal server error
+        '409':
+          description: Conflict - resource conflict or operation cannot be completed
       security:
       - bearerAuth: []
       description: Get enrichment by ID
@@ -930,6 +980,8 @@ paths:
                   role_based: false
         '401':
           description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1003,6 +1055,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1067,6 +1121,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1137,6 +1193,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
@@ -1200,6 +1258,8 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
         '400':
           description: Bad request - Invalid request body or parameters
+        '404':
+          description: Not found
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
