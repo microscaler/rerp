@@ -615,7 +615,7 @@ jobs:
 
       - name: Extract metadata for ${{ matrix.service }}
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository_owner }}/rerp-accounting-${{ matrix.service }}
           tags: type=raw,value=${{ needs.download-copy-package-push-containers.outputs.tag }}
