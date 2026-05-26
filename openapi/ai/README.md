@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI capabilities and document processing.
+AI capabilities for intelligent processing across RERP modules.
 
 ## Services
 
@@ -11,12 +11,6 @@ AI capabilities and document processing.
 - **Description**: Core AI service providing AI capabilities across modules
 - **Documentation**: [Core README](./core/README.md)
 - **API Spec**: [Core OpenAPI](./core/openapi.yaml)
-
-### Document
-- **Path**: `ai/document/`
-- **Description**: Document AI service using machine learning for document extraction
-- **Documentation**: [Document README](./document/README.md)
-- **API Spec**: [Document OpenAPI](./document/openapi.yaml)
 
 ## API Gateway
 
@@ -31,3 +25,7 @@ This system provides a unified API gateway at `/api/v1/ai` that:
 The ai services services work together to provide complete functionality:
 
 *Integration patterns specific to ai services will be documented as services are implemented.*
+
+---
+
+> **Note:** Document processing (OCR, extraction, classification) has been moved to the [Documents suite](../documents/). The AI suite provides the ML inference and intelligence layer that other suites consume.

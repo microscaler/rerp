@@ -47,7 +47,7 @@ Track every EDI transaction, validate every document, monitor every exchange. Co
 - **EDI Formats**: Support for multiple EDI formats (PEPPOL, UBL, EDIFACT, X12, etc.)
 - **PEPPOL Compliance**: Full PEPPOL network integration for B2G and B2B invoicing
 - **Document Transformation**: Transform invoices and documents between different EDI formats
-- **AI Document Extraction**: AI-powered extraction of data from paper invoices and documents
+- **Document Integration**: Integration with the Documents suite for AI-powered extraction from paper invoices and documents
 - **Compliance Documents**: Generate compliance documents (e-invoices, tax invoices, credit notes) per country requirements
 - **Digital Signatures**: Support for digital signatures and electronic seals for document authenticity
 - **EDI Validation**: Validate EDI documents against schemas and business rules

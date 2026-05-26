@@ -243,20 +243,22 @@ Goal: reduce manual accounting entry and improve source-document traceability.
 
 Scaffold and implement:
 
-1. `documents-extraction`
-2. `invoice`
-3. `accounts-payable`
-4. `accounts-receivable`
-5. `edi`
+1. `invoice`
+2. `accounts-payable`
+3. `accounts-receivable`
+4. `edi`
+
+**Note:** Document ingestion, classification, OCR/extraction, confidence scoring, and review workflows are provided by the [Documents suite](../documents/). This slice consumes the Documents suite API for document processing and links reviewed data to accounting records.
 
 Deliver:
 
-- Accounting document upload, classification, OCR/extraction jobs, confidence scoring, review, approval, and linkage.
-- Conversion of reviewed documents into invoices, vendor bills, bank statement support, or EDI attachments.
+- Integrate with the Documents suite for document upload, classification, OCR/extraction, confidence scoring, and review workflows.
+- Link reviewed document data to invoices, vendor bills, bank statement support, and EDI records via the Documents suite API.
+- Conversion of reviewed document fields into accounting records.
 
 Visible value:
 
-- Users can turn documents into accounting records with review and audit traceability.
+- Users can turn documents into accounting records via the centralized Documents suite, with review and audit traceability.
 - This is a strong differentiator once core posting and reconciliation already work.
 
 ### Slice 6: Tax, Statutory, And Localization Foundation
