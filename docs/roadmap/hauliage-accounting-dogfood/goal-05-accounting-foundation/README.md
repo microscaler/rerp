@@ -1,5 +1,8 @@
 # Goal 5: Correct Minimum Accounting Foundation
 
+- **Status**: Active
+- **First implementation**: [`rerp-accounting-core`](../../../../accounting-core/README.md)
+
 ## Objective
 
 Create the smallest reusable model that can issue an accounting document and post a correct double-entry journal without blocking RERP's full product evolution.
@@ -54,3 +57,77 @@ The final model must come from accounting invariants and the Hauliage accounting
 
 - The accounting-policy ADR.
 - Goal 4 for non-null tenancy and RLS.
+
+## Phase 1: Controlled Invoicing And Ledger
+
+“Just beyond bean counter” means the first phase is useful for operating a real
+SaaS receivables flow, not merely capable of storing debits and credits.
+
+### Functional requirements
+
+| ID | Requirement | First delivery state |
+|---|---|---|
+| FR-ACCT-001 | Accept tenant and legal-entity context only from authenticated execution context. | Kernel contract delivered; HTTP/RLS wiring pending. |
+| FR-ACCT-002 | Validate ISO currency, positive quantity, non-negative unit price, discount and tax bounds. | Delivered and unit tested. |
+| FR-ACCT-003 | Calculate decimal line, discount and tax snapshots under an explicit rounding policy. | Delivered; midpoint-away-from-zero and configurable minor units. |
+| FR-ACCT-004 | Reject posting outside an open fiscal period. | Delivered and unit tested. |
+| FR-ACCT-005 | Produce one immutable customer invoice and balanced journal as one posting plan. | Delivered in the kernel; atomic persistence pending. |
+| FR-ACCT-006 | Debit receivables and credit line revenue plus optional tax liability using configured accounts. | Delivered without Hauliage-specific account assumptions. |
+| FR-ACCT-007 | Produce a full credit note which links to and exactly reverses a posted customer invoice. | Delivered and unit tested across fiscal periods. |
+| FR-ACCT-008 | Derive a tenant/legal-entity trial balance from validated posted journal lines. | Delivered and unit tested. |
+| FR-ACCT-009 | Detect retry conflicts using tenant-scoped idempotency key and deterministic request fingerprint. | Fingerprint delivered; uniqueness/lookup persistence pending. |
+| FR-ACCT-010 | Persist invoice, lines, journal, lines, source/idempotency and audit event in one RLS transaction. | Typed schema, controls and live RLS acceptance delivered; runtime repository pending. |
+| FR-ACCT-011 | Allocate tenant/legal-entity document sequences without gaps caused by rolled-back work being exposed. | Pending persistence slice. |
+| FR-ACCT-012 | Make posted documents and entries immutable; corrections use credit/reversal workflows. | Kernel and database enforcement delivered; API enforcement pending. |
+
+### Non-functional requirements
+
+| ID | Requirement | Acceptance criterion |
+|---|---|---|
+| NFR-ACCT-001 | Determinism | Identical authenticated context and payload produce the same totals, journal and fingerprint. |
+| NFR-ACCT-002 | Precision | No binary floating-point type enters core money or tax calculations. |
+| NFR-ACCT-003 | Tenant safety | Cross-tenant or cross-legal-entity reporting/reversal input fails closed before producing a result. |
+| NFR-ACCT-004 | Atomicity | A database failure at any persistence step leaves no invoice, journal, idempotency success or audit fragment. |
+| NFR-ACCT-005 | Bounded work | An instruction contains 1–1,000 lines; validation and posting are linear in line count. |
+| NFR-ACCT-006 | Auditability | Posted values retain line pricing, discount, tax code/rate, account mapping, source reference, actor and timestamp. |
+| NFR-ACCT-007 | Portability | The accounting kernel has no HTTP, database, cloud or Hauliage dependency. |
+| NFR-ACCT-008 | Failure semantics | Validation and policy failures are typed errors; generated example success responses are forbidden. |
+| NFR-ACCT-009 | Testability | Every accounting invariant has unit coverage and persistence receives live PostgreSQL/RLS integration coverage. |
+
+### Delivered persistence foundation
+
+The active foundation is deliberately separate from the 37 legacy
+schema-inventory entities:
+
+- nine `LifeModel + LifeRecord` models under
+  `entities/src/accounting/foundation/`;
+- generated base DDL plus an app-owned controls/RLS migration;
+- `tenant_id` and `legal_entity_id` carried directly on every accounting row;
+- composite foreign keys preventing cross-tenant references even when UUIDs are
+  known;
+- forced PostgreSQL RLS on all nine tables;
+- immutable posted document, journal, line and audit tables; and
+- a live non-superuser acceptance suite under
+  `tests/sql/accounting_foundation_acceptance.sql`.
+### Phase 1 acceptance scenario
+
+Given an authenticated tenant and legal entity, an open fiscal period, a
+customer, configured AR/revenue/tax accounts and a unique source instruction:
+
+1. posting returns one numbered customer invoice and one numbered journal;
+2. persisted invoice totals equal the sum of immutable line snapshots;
+3. journal debits equal credits and link back to the invoice;
+4. repeating the same key and payload returns the original result;
+5. repeating the key with changed commercial facts returns a conflict;
+6. a failure before commit makes the whole attempt invisible;
+7. a later full credit note posts in its own open period and nets the trial
+   balance effect of the original document to zero; and
+8. another tenant cannot read, report, credit or infer either document.
+
+## Explicit deferrals
+
+Phase 1 does not guess principal/agent status, carrier self-billing,
+pass-through treatment, jurisdiction tax rules, cash settlement, bank
+reconciliation, partial credit notes or foreign-currency revaluation. The core
+accepts configured posting accounts and tax snapshots so those policies can be
+added without rewriting its invariants.

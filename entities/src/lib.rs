@@ -6,11 +6,11 @@
 //! ## Usage
 //!
 //! ```rust
-//! use rerp_entities::accounting::general_ledger::ChartOfAccount;
-//! use lifeguard::LifeModelTrait;
+//! use lifeguard::LifeEntityName;
+//! use rerp_entities::accounting::general_ledger::chart_of_accounts;
 //!
 //! // Access entity metadata
-//! let entity = ChartOfAccount::Entity::default();
+//! let entity = chart_of_accounts::Entity::default();
 //! println!("Table: {}", entity.table_name());
 //! ```
 //!

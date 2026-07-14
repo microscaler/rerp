@@ -4,17 +4,18 @@
 //! in the accounting domain.
 
 // Import modules, not structs, so we can access Entity nested structs
-use accounting_entities::accounting::{
+use rerp_entities::accounting::{
     accounts_payable, accounts_receivable, asset, bank_sync, budget, edi, financial_reports,
     general_ledger, invoice,
 };
 
+use lifeguard::LifeEntityName;
 use lifeguard_migrate::sql_generator;
 use std::fs;
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let output_dir = PathBuf::from("../../migrations/generated");
+    let output_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../migrations/generated");
 
     // Create output directory if it doesn't exist
     if !output_dir.exists() {
@@ -42,7 +43,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("general_ledger".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -59,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("general_ledger".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -76,7 +77,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("general_ledger".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -93,7 +94,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("general_ledger".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -110,7 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("general_ledger".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -128,7 +129,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("invoice".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -145,7 +146,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("invoice".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -163,7 +164,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_receivable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -180,7 +181,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_receivable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -197,7 +198,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_receivable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -214,7 +215,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_receivable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -232,7 +233,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_payable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -249,7 +250,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_payable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -266,7 +267,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_payable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -283,7 +284,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("accounts_payable".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -301,7 +302,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("bank_sync".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -318,7 +319,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("bank_sync".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -335,7 +336,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("bank_sync".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -352,7 +353,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("bank_sync".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -370,7 +371,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("asset".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -387,7 +388,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("asset".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -404,7 +405,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("asset".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -421,7 +422,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("asset".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -439,7 +440,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("budget".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -456,7 +457,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("budget".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -473,7 +474,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("budget".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -490,7 +491,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("budget".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -507,7 +508,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("budget".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -525,7 +526,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("edi".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -542,7 +543,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("edi".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -559,7 +560,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("edi".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -576,7 +577,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("edi".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -594,7 +595,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("financial_reports".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -611,7 +612,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("financial_reports".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -628,7 +629,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("financial_reports".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }
@@ -645,7 +646,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(sql) => {
                 sql_by_service
                     .entry("financial_reports".to_string())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((table_name.to_string(), sql));
                 println!("   ✓ Generated SQL for {}", table_name);
             }

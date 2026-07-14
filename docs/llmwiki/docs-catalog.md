@@ -16,6 +16,8 @@ Inventory of source material that this wiki synthesizes. This is not a complete 
 ## Delivery Roadmaps
 
 - [`docs/roadmap/hauliage-accounting-dogfood/`](../roadmap/hauliage-accounting-dogfood/) — Current seven-goal execution overlay: recover RERP, prove the public invoice-to-GL core through Hauliage, then resume broader accounting runtime expansion.
+- [`docs/adrs/001-accounting-runtime-boundary.md`](../adrs/001-accounting-runtime-boundary.md) — First-slice decision to post invoice and GL atomically in the existing invoice runtime, with no new deployable or executor abstraction.
+- [`accounting-core/`](../../accounting-core/) — Pure tested accounting kernel for decimal invoice calculations, journals, credit notes, fingerprints and trial balance.
 - [`openapi/accounting/design/08-implementation-roadmap.md`](../../openapi/accounting/design/08-implementation-roadmap.md) — Full accounting product destination across ledger, operations, financial management, advanced accounting, and compliance.
 - [`docs/ACCOUNTING_BUILD_PLAN.md`](../ACCOUNTING_BUILD_PLAN.md) — Historical build inventory and breadth plan; its scaffold-all-services-first order is superseded by the Hauliage dog-food overlay.
 

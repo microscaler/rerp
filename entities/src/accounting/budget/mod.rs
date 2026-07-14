@@ -6,6 +6,8 @@
 //! - Budget versions
 //! - Budget actuals
 
+// Preserve the public entity path used by the registry and generated migrations.
+#[allow(clippy::module_inception)]
 pub mod budget;
 pub mod budget_actual;
 pub mod budget_line_item;

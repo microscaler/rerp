@@ -1,5 +1,8 @@
 # Goal 6: Public Invoice-To-GL Vertical Slice
 
+- **Status**: Kernel active; API and persistence pending
+- **Runtime decision**: [ADR 001](../../../adrs/001-accounting-runtime-boundary.md)
+
 ## Objective
 
 Deliver a reusable public API that turns an idempotent commercial instruction into an immutable invoice, balanced journal, and retrievable document.
@@ -50,3 +53,52 @@ The public API should describe accounting capabilities. It must not expose Hauli
 - Goal 2 for the public runtime boundary.
 - Goal 4 for authenticated tenant scope.
 - Goal 5 for accounting invariants.
+
+## First Vertical Slice
+
+The first runtime is the existing invoice implementation process. General
+ledger posting is an in-process accounting module and one database transaction,
+not a synchronous call to another generated microservice. The public contract
+does not expose that implementation choice.
+
+### Command boundary
+
+The initial public command must contain commercial facts only:
+
+- idempotency key and stable source-system reference;
+- customer, dates, ISO currency and line descriptions;
+- quantities and decimal unit prices; and
+- source tax facts only where permitted by configured accounting/tax policy.
+
+Tenant, legal entity, actor, period, numbering and GL account mappings are
+resolved inside RERP from validated identity and configuration. A caller may
+not choose its tenant or post directly to arbitrary accounts through this API.
+
+### Runtime transaction
+
+1. BRRTRouter validates the Sesame identity and passes its claims.
+2. The invoice runtime constructs Lifeguard `SessionContext`.
+3. `LifeguardPool::with_session_transaction` pins a primary connection and
+   establishes transaction-local RLS context.
+4. The runtime resolves legal entity, open period, accounts, numbering and the
+   existing idempotency record using typed Lifeguard APIs.
+5. `rerp-accounting-core` validates the instruction and returns one posting
+   plan containing invoice, journal and audit facts.
+6. The runtime persists all facts and the successful idempotency result.
+7. Commit makes the result visible; any error rolls the entire operation back.
+
+### Contract corrections required before generation
+
+The existing broad invoice OpenAPI is research input, not the accepted command
+contract. It currently uses `format: double` for money, permits caller supplied
+`company_id`, mixes sales and purchase types, and exposes generic CRUD mutation
+against posted documents. The Phase 1 API must instead use decimal string
+schemas, omit tenant/company selection, separate commands from retrieval, and
+return explicit validation, period-lock, idempotency-conflict and policy errors.
+
+### Definition of done
+
+Goal 6 is not complete when handlers compile. It is complete only when the
+public generated client posts a real invoice through HTTPS, retrieves the same
+invoice and journal, proves retry behavior, proves cross-tenant isolation in
+PostgreSQL, and contains no generated example response on an active route.

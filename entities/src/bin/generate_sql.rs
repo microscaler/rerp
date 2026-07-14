@@ -3,14 +3,14 @@
 //! This binary uses the compiled entity registry to generate SQL CREATE TABLE statements
 //! for all entities in the accounting domain.
 
-use accounting_entities::entity_registry;
 use chrono::Utc;
+use rerp_entities::{all_entity_metadata, generate_sql_for_all};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let output_dir = PathBuf::from("../../migrations/generated");
+    let output_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../migrations/generated");
 
     // Create output directory if it doesn't exist
     if !output_dir.exists() {
@@ -21,8 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🔨 Generating SQL migrations from entity registry...");
 
     // Generate SQL for all entities
-    let sql_results = entity_registry::generate_sql_for_all()
-        .map_err(|e| format!("Failed to generate SQL: {}", e))?;
+    let sql_results = generate_sql_for_all().map_err(|e| format!("Failed to generate SQL: {e}"))?;
 
     if sql_results.is_empty() {
         println!("⚠️  No SQL generated - no entities found in registry");
@@ -32,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("✅ Generated SQL for {} entities", sql_results.len());
 
     // Get metadata for service path lookup
-    let metadata = entity_registry::all_entity_metadata();
+    let metadata = all_entity_metadata();
 
     // Group SQL by service path
     let mut sql_by_service: HashMap<String, Vec<(String, String)>> = HashMap::new();
@@ -47,7 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         sql_by_service
             .entry(service_path)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push((table_name, sql));
     }
 
@@ -57,7 +56,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (service_path, entities) in &sql_by_service {
         // Determine output file path based on service
         let service_output_dir = if service_path != "default" && !service_path.is_empty() {
-            output_dir.join(&service_path)
+            output_dir.join(service_path)
         } else {
             output_dir.clone()
         };
@@ -85,7 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Add SQL for each entity
         for (table_name, sql) in entities {
             sql_content.push_str(&format!("-- Table: {}\n", table_name));
-            sql_content.push_str(&sql);
+            sql_content.push_str(sql);
             sql_content.push_str("\n\n");
         }
 

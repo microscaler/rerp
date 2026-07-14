@@ -1,5 +1,5 @@
 [workspace]
-members = ["entities"]
+members = ["accounting-core", "entities"]
 exclude = ["microservices"]
 resolver = "2"
 

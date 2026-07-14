@@ -21,6 +21,7 @@ pub mod bank_sync;
 pub mod budget;
 pub mod edi;
 pub mod financial_reports;
+pub mod foundation;
 pub mod general_ledger;
 pub mod invoice;
 

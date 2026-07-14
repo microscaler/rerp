@@ -208,3 +208,37 @@ Completed the first reproducible-development tranche after the restart checkpoin
 - Re-ran the broad workspace check and identified the next honest boundary:
   the obsolete BFF implementation has 728 stale example-stub errors and must
   be narrowed under Goal 2, not bulk-regenerated as apparent product behavior.
+
+## [2026-07-14] implementation | first accounting kernel
+
+Started Goal 5 with the first executable accounting behavior.
+
+- Added `rerp-accounting-core` as a root workspace library, not a deployable or
+  executor abstraction.
+- Implemented decimal customer-invoice calculation, explicit rounding, open
+  period enforcement, balanced invoice journals, full cross-period credit
+  notes, deterministic idempotency fingerprints and trial-balance derivation.
+- Added invariant coverage for calculation, invalid quantities/discounts,
+  closed/out-of-period posting, fingerprint drift, credit reversal and tenant
+  isolation.
+- Recorded ADR 001: invoice and GL persist atomically in the existing invoice
+  runtime through one Lifeguard RLS transaction.
+- Expanded Goals 5 and 6 with Phase 1 functional/non-functional requirements,
+  acceptance criteria, deferrals and required OpenAPI corrections.
+
+## [2026-07-14] implementation | typed accounting foundation and live RLS acceptance
+
+Extended the kernel with its first production-shaped persistence contract.
+
+- Added nine typed `LifeModel + LifeRecord` models under
+  `entities/src/accounting/foundation/`; the 37 broad legacy models remain
+  explicitly schema-only inventory.
+- Added generated base DDL and an app-owned control migration with composite
+  tenant foreign keys, amount/state constraints, immutable posted facts and
+  forced RLS on every tenant table.
+- Vendored the Sesame RLS v1 database contract and documented runtime role
+  grants as a deployment responsibility.
+- Added and executed a non-superuser PostgreSQL acceptance suite proving
+  context-free failure, tenant isolation, tenant-consistent foreign keys,
+  balance checks, immutability and rollback of partial posting.
+- Repaired stale entity generator imports/output paths and the entity doctest so

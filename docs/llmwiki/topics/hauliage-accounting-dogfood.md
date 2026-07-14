@@ -1,8 +1,8 @@
 # Hauliage Accounting Dog-Food Tranche
 
 - **Status**: partially-verified
-- **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, openapi/accounting/design/08-implementation-roadmap.md, docs/ACCOUNTING_BUILD_PLAN.md
-- **Code anchors**: Cargo.toml, microservices/Cargo.toml, entities/src/accounting/, Tiltfile, openapi/accounting/
+- **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, docs/adrs/001-accounting-runtime-boundary.md, openapi/accounting/design/08-implementation-roadmap.md, docs/ACCOUNTING_BUILD_PLAN.md
+- **Code anchors**: Cargo.toml, accounting-core/, microservices/Cargo.toml, entities/src/accounting/, Tiltfile, openapi/accounting/
 - **Last updated**: 2026-07-14
 
 ## Current Execution State
@@ -15,6 +15,10 @@
 - A full service-workspace check reaches the stale BFF implementation and fails with 728 obsolete example-stub errors. Do not repair those stubs as product code; Goal 2 must define the narrow public runtime and remove inactive implementations from build/deploy gates.
 - Current CI tests workspace libraries only and therefore misses stale binary implementations. An explicit active-binary gate remains open.
 - Tiltfile is intentionally empty at the restart checkpoint; runtime restoration belongs to Goals 2 and 3 after the build topology is trustworthy.
+- Goal 5 is active. The root workspace now includes `rerp-accounting-core`, a pure in-process accounting kernel with tested decimal calculation, period locks, balanced customer-invoice posting, full credit notes, idempotency fingerprints and trial balance derivation.
+- ADR 001 fixes the first runtime boundary: the existing invoice process owns the invoice-to-GL transaction; GL is an in-process module, not a synchronous generated-service call or a new orchestrator.
+- The 37 legacy entities remain schema-only inventory. Nine new `accounting::foundation` models are typed `LifeModel + LifeRecord` persistence surfaces for legal entities, periods, accounts, posted documents/lines, journals/lines, idempotency and audit.
+- Generated foundation DDL plus app-owned controls/RLS migrations pass a live PostgreSQL acceptance suite as a non-superuser. The remaining persistence blocker is wiring those typed records into one `with_session_transaction` invoice repository.
 
 ## What It Is
 
@@ -47,6 +51,8 @@ The first integration must use the same authenticated, versioned OpenAPI contrac
 > **Drift:** Current generated implementation surface is not evidence of delivered accounting behavior. Runtime activation must require tested controllers and must not expose generated example responses.
 
 > **Open:** Principal-versus-agent treatment, invoice parties, carrier self-billing, tax point, jurisdiction, and settlement journals require a joint Hauliage/RERP ADR before the accounting model and posting rules are frozen.
+
+> **Drift:** The existing invoice OpenAPI uses binary floating-point money, accepts caller-supplied company scope and exposes generic mutation. It is not the accepted Phase 1 command contract and must be corrected before regeneration.
 
 ## Gotchas
 
