@@ -1,5 +1,13 @@
 # Accounting Suite Build Plan
 
+> **Execution-order update (2026-07-14):**
+> The [Hauliage Accounting Dog-Food Roadmap](./roadmap/hauliage-accounting-dogfood/README.md)
+> supersedes this document's scaffold-all-services-first execution order.
+> This build plan remains valuable as an inventory and long-term breadth plan.
+> Runtime work now proves the development baseline, active core, tenancy, minimum
+> accounting model, and public invoice-to-GL path through Hauliage before
+> activating the remaining accounting services.
+
 > **Date:** 2026-04-25
 > **Status:** verified — ready to execute Phase 1
 > **Verified:** 2026-04-25 — all claims cross-checked against source

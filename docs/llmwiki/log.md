@@ -168,3 +168,17 @@ Fixed compilation across 7 accounting services after OpenAPI spec regeneration p
 - All 7 services verified passing via `cargo test -p rerp_accounting_* --no-run`.
 - Added wiki page [`topics/accounting-service-impl-controller-drift.md`](./topics/accounting-service-impl-controller-drift.md) documenting the problem, fix, and gotchas.
 - Updated [`index.md`](./index.md).
+
+## [2026-07-14] contribute | Hauliage accounting dog-food goals
+
+Captured the immediate seven-goal execution overlay for RERP accounting.
+
+- Preserved RERP's destination as a world-class open-source, API-first ERP with
+  full ledger, tax, treasury, reconciliation, reporting, and controls.
+- Defined Hauliage as the first ordinary SaaS consumer of RERP's public API,
+  not a privileged or freight-specific accounting path.
+- Broke the tranche into expandable goals covering development readiness,
+  active runtime, shared-cluster delivery, Sesame/RLS tenancy, accounting
+  foundations, invoice-to-GL, and Hauliage integration.
+- Marked the older scaffold-all-services-first build order as superseded while
+  retaining its long-term product inventory and research.

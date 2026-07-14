@@ -3,6 +3,14 @@
 > Part of RERP Accounting Suite Design
 > See [main DESIGN.md](../DESIGN.md) for complete reference
 
+> **Current execution overlay (2026-07-14):**
+> [Hauliage Accounting Dog-Food Roadmap](../../../docs/roadmap/hauliage-accounting-dogfood/README.md)
+> is the immediate delivery sequence. It establishes the development, runtime,
+> tenancy, accounting-core, and public API foundations through RERP's first real
+> SaaS consumer. The phases below remain the full product destination, but broad
+> service activation follows successful invoice-to-GL dog-food proof rather than
+> preceding it.
+
 ---
 
 ## Phased Delivery Plan

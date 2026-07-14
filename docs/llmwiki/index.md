@@ -1,13 +1,14 @@
 # LLM Wiki Index
 
 > Content catalog. Every wiki page listed under its type.
-> Last updated: 2026-04-28 | Total pages: 9
+> Last updated: 2026-07-14 | Total pages: 10
 
 ---
 
-## Topics (5 pages)
+## Topics (6 pages)
 
 ### Accounting
+- [[hauliage-accounting-dogfood.md]] — Immediate seven-goal execution overlay proving RERP's public invoice-to-GL accounting core through Hauliage
 - [[accounting-openapi-odoo-gap.md]] — RERP accounting maturity target vs Odoo Enterprise benchmark, generator coverage, remaining gaps, service boundary guidance
 - [[accounting-service-impl-controller-drift.md]] — Generator name drift between OpenAPI specs and impl controller stubs, orphaned file cleanup process
 - [[suite-aware-brrtrouter-wrapper.md]] — RERP wrapper contract for BRRTRouter, suite-nested layout, naming conventions, BFF path namespacing

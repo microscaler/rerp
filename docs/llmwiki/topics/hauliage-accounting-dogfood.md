@@ -1,0 +1,53 @@
+# Hauliage Accounting Dog-Food Tranche
+
+- **Status**: partially-verified
+- **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, openapi/accounting/design/08-implementation-roadmap.md, docs/ACCOUNTING_BUILD_PLAN.md
+- **Code anchors**: Cargo.toml, microservices/Cargo.toml, entities/src/accounting/, Tiltfile, openapi/accounting/
+- **Last updated**: 2026-07-14
+
+## What It Is
+
+The Hauliage dog-food tranche is the immediate execution overlay for RERP accounting. RERP remains a world-class open-source, API-first ERP target with full ledger, tax, treasury, reconciliation, reporting, and controls. The overlay changes delivery order: establish a trustworthy accounting core and prove it through Hauliage before activating broad generated runtime surface.
+
+Hauliage is an external SaaS consumer, not a privileged internal accounting path. It owns freight facts and delegates accounting consequences to RERP's public APIs.
+
+## Seven Goals
+
+1. Reproducible development baseline.
+2. Narrow and honest active runtime.
+3. Shared-cluster delivery.
+4. Sesame tenancy and PostgreSQL RLS.
+5. Correct minimum accounting foundation.
+6. Public invoice-to-GL vertical slice.
+7. Hauliage as the first ordinary consumer.
+
+Each goal has an expandable document under docs/roadmap/hauliage-accounting-dogfood/.
+
+## Important Boundary
+
+RERP must not absorb Hauliage-specific freight concepts into its accounting model. Hauliage supplies source references and commercial facts. RERP owns accounting documents, tax snapshots, journals, periods, audit, and reporting.
+
+The first integration must use the same authenticated, versioned OpenAPI contract intended for other SaaS products and self-hosted users.
+
+## Execution Drift
+
+> **Drift:** The older accounting build plan prioritizes scaffolding every contract-only service before implementing accounting behavior. The dog-food tranche supersedes that execution order while preserving the full product roadmap.
+
+> **Drift:** Current generated implementation surface is not evidence of delivered accounting behavior. Runtime activation must require tested controllers and must not expose generated example responses.
+
+> **Open:** Principal-versus-agent treatment, invoice parties, carrier self-billing, tax point, jurisdiction, and settlement journals require a joint Hauliage/RERP ADR before the accounting model and posting rules are frozen.
+
+## Gotchas
+
+- Do not treat quote acceptance as payment or escrow funding.
+- Do not treat an escrow status boolean as proof of a bank movement.
+- Do not let caller-provided company IDs choose tenant scope.
+- Do not create private Hauliage-only RERP endpoints.
+- Do not activate advanced services merely because contracts or generated crates exist.
+
+## Cross-References
+
+- [Roadmap overview](../../roadmap/hauliage-accounting-dogfood/README.md)
+- [Hauliage reference operating model](./hauliage-reference-operating-model.md)
+- [Accounting OpenAPI maturity target](./accounting-openapi-odoo-gap.md)
+- [Service implementation and database layout](./service-implementation-and-database-layout.md)

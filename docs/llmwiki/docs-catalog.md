@@ -13,6 +13,12 @@ Inventory of source material that this wiki synthesizes. This is not a complete 
 - [`docs/TOOLING_MIGRATION_PLAN.md`](../TOOLING_MIGRATION_PLAN.md) — Plan to move automation into `tooling/` and expose it through the `rerp` CLI.
 - [`tooling/README.md`](../../tooling/README.md) — User-facing `rerp` CLI command reference.
 
+## Delivery Roadmaps
+
+- [`docs/roadmap/hauliage-accounting-dogfood/`](../roadmap/hauliage-accounting-dogfood/) — Current seven-goal execution overlay: recover RERP, prove the public invoice-to-GL core through Hauliage, then resume broader accounting runtime expansion.
+- [`openapi/accounting/design/08-implementation-roadmap.md`](../../openapi/accounting/design/08-implementation-roadmap.md) — Full accounting product destination across ledger, operations, financial management, advanced accounting, and compliance.
+- [`docs/ACCOUNTING_BUILD_PLAN.md`](../ACCOUNTING_BUILD_PLAN.md) — Historical build inventory and breadth plan; its scaffold-all-services-first order is superseded by the Hauliage dog-food overlay.
+
 ## OpenAPI And BFF
 
 - [`docs/OPENAPI_SPEC_AUDIT.md`](../OPENAPI_SPEC_AUDIT.md) — Current maturity/gap analysis across suites.

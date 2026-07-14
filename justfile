@@ -4,6 +4,9 @@
 # Set shell for recipes
 set shell := ["bash", "-uc"]
 
+shared_k8s_root := "../shared-k8s-cluster"
+shared_k8s_kubeconfig := shared_k8s_root + "/kubeconfig/shared-k8s.yaml"
+
 # Default recipe to display help
 default:
     @just --list --unsorted
@@ -12,24 +15,29 @@ default:
 # Development Environment
 # ============================================================================
 
-# Start development environment (uses shared Kind cluster; owned by shared-kind-cluster).
+# Start development environment (uses shared-k8s cluster; owned by shared-k8s-cluster).
 dev-up:
     #!/usr/bin/env bash
     set -euo pipefail
+    export KUBECONFIG="$(realpath {{shared_k8s_kubeconfig}})"
     echo "🚀 Starting RERP development environment..."
 
-    # Verify shared Kind cluster exists (owned by shared-kind-cluster; DO NOT create/delete here)
-    echo "📦 Checking shared Kind cluster..."
-    if ! kind get clusters 2>/dev/null | grep -q '^kind$'; then
-        echo "[FAIL] Shared Kind cluster not found."
-        echo "  Create it: cd ../shared-kind-cluster && just dev-up"
+    echo "📦 Checking shared-k8s cluster..."
+    if [[ ! -f "${KUBECONFIG}" ]]; then
+        echo "[FAIL] shared-k8s kubeconfig missing."
+        echo "  Create it: cd {{shared_k8s_root}} && just cluster-create"
         exit 1
     fi
-    echo "[OK] Shared Kind cluster exists"
+    (cd "{{shared_k8s_root}}" && just check-ready) || exit 1
 
-    # Start local registry and connect to kind network (so docker push localhost:5001/... works)
-    echo "📦 Setting up local registry (localhost:5001)..."
-    tooling/.venv/bin/rerp tilt setup-kind-registry
+    echo "📦 Configuring local registry mirror (localhost:5001 → MetalLB)..."
+    (cd "{{shared_k8s_root}}" && just registry-configure-host) 2>/dev/null || \
+        tooling/.venv/bin/rerp tilt setup-kind-registry
+
+    if ! kubectl get svc -n data minio >/dev/null 2>&1; then
+        echo "Platform Tilt not up — starting shared-k8s platform..."
+        (cd "{{shared_k8s_root}}" && just systemd-tilt-up) || true
+    fi
 
     # Create rerp namespace (at cluster creation; Tilt does not manage it)
     echo "📁 Creating rerp namespace..."
@@ -55,7 +63,7 @@ dev-up:
     echo "WARNING: Tilt did not become ready within 2 minutes"
     exit 1
 
-# Stop development environment (Tilt via systemd only; Kind cluster owned by shared-kind-cluster)
+# Stop development environment (Tilt via systemd only; shared-k8s cluster owned by shared-k8s-cluster)
 dev-down:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -66,7 +74,7 @@ dev-down:
     systemctl --user stop tilt-rerp.service || true
 
     echo "✅ Development environment stopped"
-    echo "   (Kind cluster unchanged — owned by shared-kind-cluster. Registry kind-registry left running.)"
+    echo "   (shared-k8s cluster unchanged — owned by shared-k8s-cluster.)"
 
 # Stop development environment and remove the local registry
 dev-down-full: dev-down
@@ -377,8 +385,9 @@ logs-all:
 status:
     #!/usr/bin/env bash
     set -euo pipefail
+    export KUBECONFIG="$(realpath {{shared_k8s_kubeconfig}} 2>/dev/null || echo {{shared_k8s_kubeconfig}})"
     echo "Cluster Status:"
-    kind get clusters || echo "No Kind clusters found"
+    (cd "{{shared_k8s_root}}" && just check-ready) 2>/dev/null || echo "shared-k8s not ready — cd {{shared_k8s_root}} && just infra-up"
     echo ""
     echo "Pods Status:"
     kubectl get pods -n rerp 2>/dev/null || echo "No pods found"
