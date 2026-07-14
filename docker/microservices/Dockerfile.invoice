@@ -14,11 +14,11 @@ COPY ./build_artifacts/${TARGETARCH}/invoice /app/invoice
 RUN chmod +x /app/invoice
 
 RUN mkdir -p /app/config /app/doc /app/static_site && chmod -R 777 /app
-COPY ./microservices/accounting/invoice/config /app/config
-COPY ./microservices/accounting/invoice/doc /app/doc
-COPY ./microservices/accounting/invoice/static_site /app/static_site
+COPY ./microservices/accounting/invoice/gen/config /app/config
+COPY ./microservices/accounting/invoice/gen/doc /app/doc
+COPY ./microservices/accounting/invoice/gen/static_site /app/static_site
 
-EXPOSE 8002
+EXPOSE 8080
 ENV RUST_BACKTRACE=1
 ENV RUST_LOG=debug
 

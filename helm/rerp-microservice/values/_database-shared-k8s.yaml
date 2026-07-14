@@ -1,0 +1,15 @@
+# Database configuration for RERP — connects to shared-k8s Postgres.
+#
+# The shared cluster provides Postgres in namespace `data`; RERP workloads use
+# the stable in-cluster service DNS name.
+#
+# This file is merged into helm values AFTER the per-service values file,
+# so it overrides any database config in the base values.yaml.
+app:
+  config:
+    database:
+      host: "postgres.data.svc.cluster.local"
+      port: 5432
+      name: "rerp"
+      user: "rerp"
+      max_connections: 10

@@ -36,6 +36,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "get_customer_invoice_document",
+        crate::controllers::get_customer_invoice_document::GetCustomerInvoiceDocumentController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "get_customer_invoice_journal",
         crate::controllers::get_customer_invoice_journal::GetCustomerInvoiceJournalController,
         20480,
@@ -75,6 +81,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "credit_customer_invoice" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::credit_customer_invoice::CreditCustomerInvoiceController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_customer_invoice_document" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_customer_invoice_document::GetCustomerInvoiceDocumentController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

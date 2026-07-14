@@ -600,8 +600,7 @@ rerp/
 │   │   └── {service}/      # Service directories
 │   │       ├── openapi.yaml # Service OpenAPI spec
 │   │       └── README.md     # Service documentation
-├── port-registry.json       # Port registry (rerp ports)
-├── tooling/                 # rerp CLI: ports, openapi, ci, bff, build, docker, bootstrap, tilt
+├── tooling/                 # rerp CLI: openapi, ci, bff, build, docker, bootstrap, tilt
 └── .github/
     └── workflows/
         └── ci.yml  # CI: validate OpenAPI, validate ports, build, test, multi-arch

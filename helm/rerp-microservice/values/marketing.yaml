@@ -1,8 +1,5 @@
 service:
   name: marketing
-  port: 8014
-  containerPort: 8014
-  nodePort: 31014
 image:
   repository: localhost:5001
   name: rerp-marketing

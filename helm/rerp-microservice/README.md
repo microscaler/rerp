@@ -2,6 +2,12 @@
 
 Reusable Helm chart for RERP microservices (accounting, auth, etc.).
 
+Every workload listens on port `8080`, and every Kubernetes Service maps
+`8080` to container port `8080`. Services are internal `ClusterIP` resources;
+host exposure belongs to an ingress, BFF, or an explicit Tilt port-forward.
+Consequently, service-specific values only identify the workload and do not
+allocate ports or NodePorts.
+
 ## Usage
 
 ### Deploy a specific microservice
@@ -42,4 +48,7 @@ helm install general-ledger ./helm/rerp-microservice -f ./helm/rerp-microservice
 
 ## Configuration
 
-The chart creates ConfigMap, Deployment, and Service (NodePort for local dev). See `values.yaml` for defaults (database, redis, observability).
+The chart creates a ConfigMap, Deployment, and internal ClusterIP Service. The
+Deployment can import the shared database ConfigMap and Secret through
+`databaseEnv`, while service-specific credentials such as the invoice object
+store use `extraEnv` with Kubernetes `valueFrom` entries.

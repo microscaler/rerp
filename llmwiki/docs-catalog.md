@@ -70,7 +70,6 @@
 |------|-------------|
 | `openapi/accounting/bff-suite-config.yaml` | Accounting suite BFF config |
 | `microservices/Cargo.toml` | Workspace root + crate manifest |
-| `port-registry.json` | Port registry for dev services |
 | `helm/` | Helm chart templates |
 | `k8s/` | Kubernetes manifests |
 | `docker/` | Docker images (base, build, microservices, website) |

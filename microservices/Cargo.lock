@@ -3234,6 +3234,7 @@ version = "0.1.3"
 dependencies = [
  "chrono",
  "rust_decimal",
+ "rust_decimal_macros",
  "serde",
  "serde_json",
  "sha2 0.10.9",
@@ -3766,6 +3767,8 @@ dependencies = [
  "chrono",
  "clap",
  "config",
+ "hmac 0.12.1",
+ "http 0.2.12",
  "http 1.4.0",
  "lifeguard",
  "may",
@@ -3777,7 +3780,9 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "sha2 0.10.9",
  "tikv-jemallocator",
+ "url",
  "uuid",
 ]
 
@@ -4077,6 +4082,16 @@ dependencies = [
  "serde",
  "serde_json",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "rust_decimal_macros"
+version = "1.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74a5a6f027e892c7a035c6fddb50435a1fbf5a734ffc0c2a9fed4d0221440519"
+dependencies = [
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]

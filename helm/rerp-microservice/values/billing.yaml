@@ -1,8 +1,5 @@
 service:
   name: billing
-  port: 8015
-  containerPort: 8015
-  nodePort: 31015
 image:
   repository: localhost:5001
   name: rerp-billing

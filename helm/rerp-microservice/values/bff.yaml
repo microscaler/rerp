@@ -1,8 +1,5 @@
 service:
   name: bff
-  port: 8010
-  containerPort: 8010
-  nodePort: 31010
 image:
   repository: localhost:5001
   name: rerp-accounting-bff

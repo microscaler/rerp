@@ -12,7 +12,7 @@ Client → Tilt ingress → brrtrouter service → OpenAPI path match → impl h
 
 ## Steps
 
-1. **Ingress:** Request enters via Tilt-managed service (Tilt port from `port-registry.json`).
+1. **Ingress:** Request enters through an ingress/BFF or an explicit Tilt port-forward; every in-cluster application Service uses port 8080.
 2. **BRRTRouter dispatch:** The `brrtrouter` router matches `openapi/{suite}/{service}/openapi.yaml` paths against registered routes.
 3. **Route lookup:** `brrtrouter` uses `RouteMeta` (generated from OpenAPI) to find the handler.
 4. **Security middleware:** Auth/validation middleware runs if security schemes are defined in the OpenAPI spec. Draft endpoints have **no security schemes** in consignments suite.

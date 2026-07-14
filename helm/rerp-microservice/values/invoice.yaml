@@ -1,8 +1,5 @@
 service:
   name: invoice
-  port: 8002
-  containerPort: 8002
-  nodePort: 31002
 image:
   repository: localhost:5001
   name: rerp-accounting-invoice
@@ -14,3 +11,25 @@ deployment:
 app:
   binaryName: invoice
   serviceName: invoice
+
+extraEnv:
+  - name: RERP_OBJECT_STORE_ENDPOINT
+    value: http://minio.data.svc.cluster.local:9000
+  - name: RERP_OBJECT_STORE_PUBLIC_ENDPOINT
+    value: http://10.177.76.226:9000
+  - name: RERP_OBJECT_STORE_REGION
+    value: us-east-1
+  - name: RERP_OBJECT_STORE_BUCKET
+    value: rerp-accounting-documents
+  - name: RERP_OBJECT_STORE_PRESIGN_SECONDS
+    value: "300"
+  - name: RERP_OBJECT_STORE_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: rerp-object-store
+        key: access-key
+  - name: RERP_OBJECT_STORE_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: rerp-object-store
+        key: secret-key

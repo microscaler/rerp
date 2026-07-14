@@ -57,6 +57,7 @@ pub enum PostingError {
     Policy(String),
     Conflict,
     NotFound,
+    Unavailable(String),
     Database(String),
 }
 
@@ -71,6 +72,7 @@ impl std::fmt::Display for PostingError {
                 formatter.write_str("idempotency key conflicts with existing request")
             }
             Self::NotFound => formatter.write_str("accounting resource not found"),
+            Self::Unavailable(message) => write!(formatter, "dependency unavailable: {message}"),
             Self::Database(message) => write!(formatter, "database operation failed: {message}"),
         }
     }

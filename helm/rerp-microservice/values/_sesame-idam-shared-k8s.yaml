@@ -1,0 +1,16 @@
+# Sesame-IDAM JWT validation for RERP workloads in shared-k8s.
+# The map key must exactly match the OpenAPI security scheme name.
+app:
+  config:
+    security:
+      jwks:
+        bearerAuth:
+          jwks_url: http://identity-session-service.sesame-idam.svc.cluster.local:8080/idam/v1/.well-known/jwks.json
+          iss: https://idam.example.com
+          aud: sesame-idam
+          leeway_secs: 30
+          cache_ttl_secs: 300
+
+    # The application port remains explicit in the rendered config as well as
+    # the PORT environment variable.
+    port: 8080

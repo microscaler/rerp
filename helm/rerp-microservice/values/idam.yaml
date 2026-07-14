@@ -1,8 +1,5 @@
 service:
   name: idam
-  port: 8012
-  containerPort: 8012
-  nodePort: 31012
 image:
   repository: localhost:5001
   name: rerp-idam

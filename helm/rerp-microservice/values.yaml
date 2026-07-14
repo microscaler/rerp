@@ -1,37 +1,13 @@
 # Default values for rerp-microservice
 # This is a template - use service-specific values files instead
 
-# Service configuration
-# 
-# PORT MAPPING REFERENCE (for AI agents and developers):
-# ======================================================
-# Service ports are defined per-service in values/<service>.yaml files.
-# The PORT environment variable is automatically set from service.containerPort
-# and is read by the application at runtime.
-#
-# ⚠️ IMPORTANT: See docs/RERP_PREPARATION_PLAN.md for the canonical
-#    reference of ALL services, ports, and resource allocations.
-#    Always check that document before adding new services to prevent port conflicts.
-#
-# Current port assignments (30xxx NodePort range for microservices):
-#   - general-ledger:      8001 (NodePort: 30801) - General Ledger
-#   - invoice:             8002 (NodePort: 30802) - Invoice Management
-#   - accounts-receivable: 8003 (NodePort: 30803) - Accounts Receivable
-#   - accounts-payable:    8004 (NodePort: 30804) - Accounts Payable
-#   - bank-sync:          8005 (NodePort: 30805) - Bank Synchronization
-#   - asset:              8006 (NodePort: 30806) - Asset Management
-#   - budget:             8007 (NodePort: 30807) - Budget Management
-#   - edi:                8008 (NodePort: 30808) - EDI & Compliance
-#   - financial-reports:  8009 (NodePort: 30809) - Financial Reports
-#   - bff:                8010 (NodePort: 30810) - Accounting BFF
-#
-# See docs/RERP_PREPARATION_PLAN.md for the complete services and ports table.
-#
+# Kubernetes-native service convention: every app Service is ClusterIP
+# 8080 -> container 8080. Only an ingress/BFF or explicit Tilt port-forward is
+# exposed to the host, so per-service port allocation is unnecessary.
 service:
   name: ""  # e.g., general-ledger, invoice, accounts-receivable, accounts-payable
-  port: 8080  # Default - override in service-specific values files
-  containerPort: 8080  # Default - override in service-specific values files. This sets the PORT env var.
-  nodePort: null  # Set to specific port for NodePort type, null for ClusterIP
+  port: 8080
+  containerPort: 8080
 
 # Image configuration
 image:
@@ -50,10 +26,7 @@ app:
   binaryName: ""  # e.g., general_ledger_service_api
   serviceName: ""  # For OTEL service name, e.g., general-ledger
   config:
-    security:
-      api_keys:
-        ApiKeyHeader:
-          key: "test123"
+    security: {}
     http:
       keep_alive: true
       timeout_secs: 5
@@ -63,7 +36,6 @@ app:
       port: 5432
       name: "rerp"
       user: "rerp"
-      password: "dev_password_change_in_prod"
       max_connections: 10
     redis:
       host: "redis"
@@ -83,6 +55,15 @@ resources:
   limits:
     memory: "1Gi"
     cpu: "2000m"
+
+databaseEnv:
+  enabled: true
+  configMapName: rerp-database-config
+  secretName: rerp-db-credentials
+
+# Arbitrary Kubernetes EnvVar entries. Service values may use either `value`
+# or `valueFrom` (for Secret/ConfigMap keys).
+extraEnv: []
 
 # Health checks
 healthCheck:
@@ -107,12 +88,12 @@ env:
   BRRTR_LOG_INCLUDE_LOCATION: "false"
   BRRTR_STACK_SIZE: "0x10000"
 
-# Service type
-serviceType: NodePort  # NodePort, ClusterIP, or LoadBalancer
+# Internal service-to-service routing; expose only BFF/ingress where required.
+serviceType: ClusterIP
 
 # Prometheus scraping
 prometheus:
   enabled: true
-  port: 9090
+  port: 8080
   path: "/metrics"
 

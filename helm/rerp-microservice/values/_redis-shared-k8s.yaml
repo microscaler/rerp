@@ -1,0 +1,17 @@
+# Redis configuration for RERP — connects to shared-k8s Redis.
+#
+# The shared cluster provides Redis in namespace `data`; RERP workloads use the
+# stable in-cluster service DNS name.
+#
+# This file is merged into helm values AFTER the per-service values file.
+app:
+  config:
+    redis:
+      host: "redis.data.svc.cluster.local"
+      port: 6379
+      db: 0
+      max_connections: 10
+    observability:
+      metrics_enabled: true
+      tracing_enabled: true
+      otlp_endpoint: "http://otel-collector.observability.svc.cluster.local:4317"

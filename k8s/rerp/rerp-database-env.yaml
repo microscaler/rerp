@@ -1,9 +1,9 @@
-# RERP database environment — connects to shared-kind-cluster infrastructure
+# RERP database environment — connects to shared-k8s infrastructure.
 #
 # This ConfigMap + Secret is deployed into the `rerp` namespace and provides
 # the connection info that Helm microservices read at runtime.
 #
-# Infrastructure comes from microscaler/shared-kind-cluster:
+# Infrastructure comes from microscaler/shared-k8s-cluster:
 #   - Postgres:   postgres.data.svc.cluster.local:5432
 #   - Redis:      redis.data.svc.cluster.local:6379
 #   - MinIO:      minio.data.svc.cluster.local:9000

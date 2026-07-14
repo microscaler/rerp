@@ -1,8 +1,5 @@
 service:
   name: general-ledger
-  port: 8001
-  containerPort: 8001
-  nodePort: 31001
 image:
   repository: localhost:5001
   name: rerp-accounting-general-ledger

@@ -6,9 +6,10 @@ claims and commits the invoice and balanced journal in one Lifeguard RLS
 transaction.
 
 The source contract is
-[`../openapi/phase1.yaml`](../openapi/phase1.yaml). Only four operations are
-active: post a customer invoice, retrieve it, retrieve its journal and post a
-full credit note. The executable registers implementation controllers only;
+[`../openapi/phase1.yaml`](../openapi/phase1.yaml). Five operations are active:
+post a customer invoice, retrieve it, retrieve its journal, post a full credit
+note, and materialize/retrieve its immutable PDF artifact. The executable
+registers implementation controllers only;
 generated example controllers are not a runtime fallback.
 
 ## Runtime boundary
@@ -36,15 +37,25 @@ Phase 1 permits base-currency posting only and supports full credit notes only.
 | `DB_PASS` | `RERP_DB_PASSWORD`, then empty | Runtime role password |
 | `DB_NAME` | `rerp` | Database name |
 | `DB_POOL_MAX` | `10` | Primary Lifeguard worker slots |
+| `RERP_OBJECT_STORE_ENDPOINT` | none | Internal S3-compatible endpoint |
+| `RERP_OBJECT_STORE_PUBLIC_ENDPOINT` | object-store endpoint | Endpoint embedded in signed download URLs |
+| `RERP_OBJECT_STORE_REGION` | `us-east-1` | SigV4 region |
+| `RERP_OBJECT_STORE_BUCKET` | none | Private rendered-document bucket |
+| `RERP_OBJECT_STORE_ACCESS_KEY` | none | Application-scoped access key |
+| `RERP_OBJECT_STORE_SECRET_KEY` | none | Application-scoped secret key |
+| `RERP_OBJECT_STORE_PRESIGN_SECONDS` | `300` | Signed URL lifetime, capped at 900 seconds |
 
 Apply database resources in this order:
 
-1. `sql/rls/v1/install.sql`;
-2. `migrations/accounting/foundation/0001_generated_entities.sql`;
-3. `migrations/accounting/foundation/0002_controls_and_rls.sql`.
+1. `microservices/accounting/sql/rls/v1/install.sql`;
+2. `microservices/accounting/migrations/accounting/foundation/0001_generated_entities.sql`;
+3. `microservices/accounting/migrations/accounting/foundation/0002_controls_and_rls.sql`;
+4. `microservices/accounting/migrations/accounting/foundation/0003_document_artifacts.sql`.
 
-`scripts/setup-db.sh` enforces that order and grants the explicit Sesame RLS v1
-function set plus table DML to the `rerp` role.
+`microservices/accounting/scripts/setup-db.sh` enforces that order and grants
+the explicit Sesame RLS v1 function set plus table DML to the `rerp` role.
+`microservices/accounting/scripts/setup-object-store.sh` provisions the private
+MinIO bucket and least-privilege application credential used by Tilt.
 
 ## Verification
 
@@ -65,5 +76,4 @@ a persistent environment.
 ## Explicit remaining work
 
 - HTTPS execution through the generated consumer client;
-- immutable rendered-document storage and retrieval;
 - localization, settlement, partial credits and foreign currency.

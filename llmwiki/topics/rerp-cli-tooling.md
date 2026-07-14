@@ -15,7 +15,6 @@ tooling/.venv/bin/rerp  # Use this for all rerp commands
 
 - `rerp bff generate-system` — Generate system-level BFF specs
 - `rerp bff generate-suite` — Generate suite-level BFF (e.g. accounting)
-- `rerp ports` — Show/manage service ports from port-registry.json
 
 ## BFF Generation
 

@@ -31,23 +31,12 @@ dev-up:
     (cd "{{shared_k8s_root}}" && just check-ready) || exit 1
 
     echo "📦 Configuring local registry mirror (localhost:5001 → MetalLB)..."
-    (cd "{{shared_k8s_root}}" && just registry-configure-host) 2>/dev/null || \
-        tooling/.venv/bin/rerp tilt setup-kind-registry
+    (cd "{{shared_k8s_root}}" && just registry-configure-host)
 
     if ! kubectl get svc -n data minio >/dev/null 2>&1; then
         echo "Platform Tilt not up — starting shared-k8s platform..."
         (cd "{{shared_k8s_root}}" && just systemd-tilt-up) || true
     fi
-
-    # Create rerp namespace (at cluster creation; Tilt does not manage it)
-    echo "📁 Creating rerp namespace..."
-    kubectl apply -f k8s/microservices/namespace.yaml
-
-    # Create PersistentVolumes (outside of Tilt management)
-    echo "💾 Creating PersistentVolumes..."
-    tooling/.venv/bin/rerp tilt setup-persistent-volumes || {
-        echo "⚠️  Warning: Some PVs may already exist (this is OK)"
-    }
 
     # Start Tilt via systemd (port 10350, avoid clashing with Tiffany on 10350)
     echo "Starting RERP Tilt via systemd (port 10350)..."
@@ -76,13 +65,6 @@ dev-down:
     echo "✅ Development environment stopped"
     echo "   (shared-k8s cluster unchanged — owned by shared-k8s-cluster.)"
 
-# Stop development environment and remove the local registry
-dev-down-full: dev-down
-    @echo "🗑️ Removing local registry..."
-    @docker stop kind-registry 2>/dev/null || true
-    @docker rm kind-registry 2>/dev/null || true
-    @echo "✅ Registry removed"
-
 # Setup development environment (Tilt-based)
 setup:
     @tooling/.venv/bin/rerp tilt setup
@@ -91,16 +73,13 @@ setup:
 teardown:
     @tooling/.venv/bin/rerp tilt teardown
 
-# Start services with Tilt (local Docker mode)
+# Start services in shared-k8s.
 up:
-    @echo "Starting all services with Tilt (local Docker mode)..."
+    @echo "Starting RERP services with Tilt on shared-k8s..."
     @tilt up --host=0.0.0.0 --port=10350
 
-# Start with Kind cluster (cluster and rerp namespace must exist; see dev-up)
-up-k8s:
-    @kubectl apply -f k8s/microservices/namespace.yaml 2>/dev/null || true
-    @echo "Starting all services with Tilt (Kubernetes mode)..."
-    @tilt up --host=0.0.0.0 --port=10350 -- --use-kind
+# Compatibility alias: RERP now has one Kubernetes development target.
+up-k8s: up
 
 # Stop services
 down:
@@ -261,16 +240,6 @@ test-integration:
 validate:
     @echo "All validations passed!"
 
-# Scan port registry, helm, kind, Tiltfile, bff-suite-config; report conflicts
-# Run before dev-up to avoid "address already in use"
-validate-ports:
-    @tooling/.venv/bin/rerp ports validate
-
-# Resolve duplicate service.port in helm; accounting keeps, others get next free
-# Use after reconcile when validate reports duplicates
-fix-duplicate-ports:
-    @tooling/.venv/bin/rerp ports fix-duplicates
-
 # ============================================================================
 # Lint & Format
 # ============================================================================
@@ -426,7 +395,6 @@ check-deps:
     set -euo pipefail
     echo "Checking dependencies..."
     command -v docker >/dev/null 2>&1 || { echo "docker is required but not installed."; exit 1; }
-    command -v kind >/dev/null 2>&1 || { echo "kind is required but not installed."; exit 1; }
     command -v kubectl >/dev/null 2>&1 || { echo "kubectl is required but not installed."; exit 1; }
     command -v helm >/dev/null 2>&1 || { echo "helm is required but not installed."; exit 1; }
     command -v tilt >/dev/null 2>&1 || { echo "tilt is required but not installed."; exit 1; }
@@ -437,10 +405,6 @@ install-tools:
     #!/usr/bin/env bash
     set -euo pipefail
     echo "Installing development tools..."
-    echo "Installing Kind..."
-    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64
-    chmod +x ./kind
-    sudo mv ./kind /usr/local/bin/kind
     echo "Installing Tilt..."
     curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
     echo "Installing Helm..."
@@ -455,9 +419,9 @@ install-tools:
 # Usage: just generate-sql
 generate-sql:
     @echo "Generating SQL migrations from entities..."
-    @cd entities && cargo run --bin generate-sql
+    @cd microservices && cargo run -p rerp-entities --bin generate_sql
 
 # Check entity compilation
 check-entities:
     @echo "Checking entity compilation..."
-    @cd entities && cargo check --lib
+    @cd microservices && cargo check -p rerp-entities --lib

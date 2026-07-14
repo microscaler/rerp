@@ -1,8 +1,5 @@
 service:
   name: amd
-  port: 8013
-  containerPort: 8013
-  nodePort: 31013
 image:
   repository: localhost:5001
   name: rerp-amd

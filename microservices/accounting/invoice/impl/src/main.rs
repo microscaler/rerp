@@ -15,9 +15,12 @@ use rerp_accounting_invoice_gen::*;
 // Import implementation controllers (business logic)
 mod controllers;
 mod database;
+mod document;
 mod http_support;
 mod identity;
 mod impl_registry;
+mod object_store;
+mod pdf;
 mod posting;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;

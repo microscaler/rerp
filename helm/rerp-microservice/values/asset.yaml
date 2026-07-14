@@ -1,8 +1,5 @@
 service:
   name: asset
-  port: 8006
-  containerPort: 8006
-  nodePort: 31006
 image:
   repository: localhost:5001
   name: rerp-accounting-asset

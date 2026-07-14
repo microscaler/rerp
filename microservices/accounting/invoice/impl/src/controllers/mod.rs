@@ -3,5 +3,6 @@
 
 pub mod credit_customer_invoice;
 pub mod get_customer_invoice;
+pub mod get_customer_invoice_document;
 pub mod get_customer_invoice_journal;
 pub mod post_customer_invoice;

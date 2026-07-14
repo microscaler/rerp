@@ -90,6 +90,32 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /v1/customer-invoices/{id}/document:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
+    get:
+      operationId: get_customer_invoice_document
+      tags: [customer-invoices]
+      summary: Retrieve immutable PDF metadata and a short-lived download URL
+      description: >-
+        Materialises the deterministic PDF on first access, stores it in private
+        content-addressed object storage and returns a five-minute signed URL.
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: Immutable PDF artifact and temporary download capability
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderedDocument'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
   /v1/customer-invoices/{id}/credit-notes:
     parameters:
       - $ref: '#/components/parameters/DocumentId'
@@ -147,6 +173,12 @@ components:
   responses:
     BadRequest:
       description: Invalid request syntax or value
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unavailable:
+      description: Rendered-document storage is temporarily unavailable
       content:
         application/json:
           schema:
@@ -475,6 +507,45 @@ components:
           $ref: '#/components/schemas/PostedInvoice'
         journal:
           $ref: '#/components/schemas/PostedJournal'
+    RenderedDocument:
+      type: object
+      required:
+        - document_id
+        - media_type
+        - sha256
+        - size_bytes
+        - renderer
+        - renderer_version
+        - rendered_at
+        - download_url
+        - expires_at
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        media_type:
+          type: string
+          enum: [application/pdf]
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        renderer:
+          type: string
+        renderer_version:
+          type: string
+        rendered_at:
+          type: string
+          format: date-time
+        download_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
     ErrorResponse:
       type: object
       required: [code, message]

@@ -1,39 +1,35 @@
-# Port Registry and Tilt Configuration
+# Kubernetes-native Tilt and service ports
 
-> How dev services are configured and port-managed in RERP's Tilt-based dev environment.
+> The active RERP development deployment contract.
 
-**Status:** partially-verified
+**Status:** verified against shared-k8s on 2026-07-14
 
-## Tilt Configuration
+## Service networking
 
-- Tilt runs on port **10352**
-- Tilt host: `TILT_HOST=0.0.0.0`
-- Dev environment is managed via Tilt files (Tiltfile at project root)
+- Every application container listens on port `8080`.
+- Every application Service is `ClusterIP` and maps `8080` to `8080`.
+- Kubernetes DNS, namespaces and service names provide isolation; per-service
+  port allocation and `port-registry.json` are retired.
+- Only public entry points receive ingress or an explicit Tilt port-forward.
+  The current accounting slice forwards host `8080` to invoice `8080`.
 
-## Port Registry
+## Shared platform
 
-- File: `port-registry.json` at **project root**
-- Used by `rerp ports` command and all automation
-- All 9+ microservices register their ports here
+RERP uses the `shared-k8s` context and registry `10.177.76.220:5000`.
+PostgreSQL, Redis, MinIO and observability remain owned by the sibling
+`shared-k8s-cluster` repository. RERP owns its `rerp` namespace and application
+configuration.
 
-## Service Ports (Typical)
+## Active Tilt resources
 
-| Service | Suite | Typical Port |
-|---------|-------|-------------|
-| company/organizations | core | 8009 |
-| consignments | supply-chain | 8003 |
-| fleet | supply-chain | 8002 |
-| *(other services)* | *(their suite)* | *(assigned by Tilt)* |
+The root `Tiltfile` currently declares only delivered runtime components:
 
-## DB Configuration
+- `invoice`
+- `rerp-namespace`
+- `rerp-database-env`
+- `rerp-db-init` (manual migration/bootstrap action)
+- `rerp-object-store`
+- `invoice-contract-refresh` (manual)
+- `invoice-tests` (manual)
 
-- Single Postgres instance shared by all services
-- `DB_POOL_MAX` env var controls pool size (default 10 in dev)
-- Connection pool is shared across all 9 microservices
-- Replica routing: disabled
-
-## Frontend
-
-- Frontend dev server uses vite proxy to reach microservices directly
-- BFF layer is bypassed in dev (non-functional)
-- Proxy config: `frontend/vite.config.js`
+Placeholder accounting directories are not presented as runnable workloads.

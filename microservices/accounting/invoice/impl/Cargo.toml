@@ -16,7 +16,7 @@ jemalloc = ["tikv-jemallocator"]
 rerp_accounting_invoice_gen = { path = "../gen" }
 
 # Accounting domain and typed persistence
-rerp-accounting-core = { path = "../../../../accounting-core" }
+rerp-accounting-core = { path = "../../core" }
 rerp_entities = { workspace = true }
 lifeguard = { workspace = true }
 chrono = { workspace = true }
@@ -39,3 +39,7 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 arc-swap = { workspace = true }
 tikv-jemallocator = { workspace = true, optional = true }
+http_legacy = { workspace = true }
+hmac = "0.12"
+sha2 = "0.10"
+url = "2"

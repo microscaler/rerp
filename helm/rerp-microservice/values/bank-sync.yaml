@@ -1,8 +1,5 @@
 service:
   name: bank-sync
-  port: 8005
-  containerPort: 8005
-  nodePort: 31005
 image:
   repository: localhost:5001
   name: rerp-accounting-bank-sync

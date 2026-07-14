@@ -1,8 +1,5 @@
 service:
   name: ftebe
-  port: 8011
-  containerPort: 8011
-  nodePort: 31011
 image:
   repository: localhost:5001
   name: rerp-ftebe

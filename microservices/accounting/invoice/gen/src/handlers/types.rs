@@ -50,6 +50,27 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetCustomerInvoiceDocumentResponse {
+    pub document_id: String,
+
+    pub download_url: String,
+
+    pub expires_at: String,
+
+    pub media_type: String,
+
+    pub rendered_at: String,
+
+    pub renderer: String,
+
+    pub renderer_version: String,
+
+    pub sha256: String,
+
+    pub size_bytes: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetCustomerInvoiceJournalResponse {
     pub currency_code: String,
 
@@ -249,6 +270,27 @@ pub struct PostingResult {
     pub journal: PostedJournal,
 
     pub request_fingerprint: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RenderedDocument {
+    pub document_id: String,
+
+    pub download_url: String,
+
+    pub expires_at: String,
+
+    pub media_type: String,
+
+    pub rendered_at: String,
+
+    pub renderer: String,
+
+    pub renderer_version: String,
+
+    pub sha256: String,
+
+    pub size_bytes: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

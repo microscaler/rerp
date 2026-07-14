@@ -1,7 +1,7 @@
 # Goal 5: Correct Minimum Accounting Foundation
 
 - **Status**: Phase 1 runtime delivered; broader foundation active
-- **First implementation**: [`rerp-accounting-core`](../../../../accounting-core/README.md)
+- **First implementation**: [`rerp-accounting-core`](../../../../microservices/accounting/core/README.md)
 
 ## Objective
 
@@ -99,22 +99,24 @@ SaaS receivables flow, not merely capable of storing debits and credits.
 The active foundation is deliberately separate from the 37 legacy
 schema-inventory entities:
 
-- nine `LifeModel + LifeRecord` models under
-  `entities/src/accounting/foundation/`;
+- ten `LifeModel + LifeRecord` models under
+  `microservices/accounting/entities/src/accounting/foundation/`;
 - generated base DDL plus an app-owned controls/RLS migration;
 - `tenant_id` and `legal_entity_id` carried directly on every accounting row;
 - composite foreign keys preventing cross-tenant references even when UUIDs are
   known;
-- forced PostgreSQL RLS on all nine tables;
+- forced PostgreSQL RLS on all ten tables;
 - immutable posted document, journal, line and audit tables; and
 - a live non-superuser acceptance suite under
-  `tests/sql/accounting_foundation_acceptance.sql`.
+  `microservices/accounting/tests/sql/accounting_foundation_acceptance.sql`.
 
 ### Delivered runtime evidence
 
-The invoice process now exposes only four Phase 1 capabilities from
+The invoice process now exposes five Phase 1 capabilities from
 `microservices/accounting/invoice/openapi/phase1.yaml`: post and retrieve a
 customer invoice, retrieve its journal, and post a full credit note. The
+fifth lazily materializes an immutable PDF in private content-addressed MinIO
+storage and returns metadata plus a short-lived signed URL. The
 implementation resolves legal entity, open period and control accounts inside
 the RLS transaction and never accepts those internal choices from the caller.
 
@@ -125,10 +127,9 @@ same-payload retry, changed-payload conflict, retrieval and full credit. The SQL
 acceptance remains responsible for cross-tenant, constraint, immutability and
 forced-rollback failure paths.
 
-Remaining Phase 1 hardening is explicit: an HTTPS generated-client proof and
-immutable rendered-document storage. These are not hidden behind generated
-example responses. The live acceptance also proves that two simultaneous
-postings receive distinct document numbers.
+Remaining Phase 1 hardening is the HTTPS generated-client proof. It is not
+hidden behind generated example responses. The live acceptance also proves
+that two simultaneous postings receive distinct document numbers.
 
 ### Phase 1 acceptance scenario
 

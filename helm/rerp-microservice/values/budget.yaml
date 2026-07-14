@@ -1,8 +1,5 @@
 service:
   name: budget
-  port: 8007
-  containerPort: 8007
-  nodePort: 31007
 image:
   repository: localhost:5001
   name: rerp-accounting-budget
