@@ -476,7 +476,8 @@ fn fingerprint(context: &PostingContext, instruction: &CustomerInvoiceInstructio
     hash_part(&mut hasher, context.legal_entity_id.as_bytes());
     let encoded = serde_json::to_vec(instruction).unwrap_or_default();
     hash_part(&mut hasher, &encoded);
-    hex_digest(hasher.finalize().as_slice())
+    let digest = hasher.finalize();
+    hex_digest(&digest)
 }
 
 fn credit_fingerprint(
@@ -494,7 +495,8 @@ fn credit_fingerprint(
         invoice.original_document_id.unwrap_or_default().as_bytes(),
     );
     hash_part(&mut hasher, reason.as_bytes());
-    hex_digest(hasher.finalize().as_slice())
+    let digest = hasher.finalize();
+    hex_digest(&digest)
 }
 
 fn hash_part(hasher: &mut Sha256, value: &[u8]) {

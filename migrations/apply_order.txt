@@ -1,0 +1,4 @@
+# The Sesame RLS v1 contract is installed by scripts/setup-db.sh before this list.
+# Keep accounting controls after their generated table definitions.
+accounting/foundation/0001_generated_entities.sql
+accounting/foundation/0002_controls_and_rls.sql

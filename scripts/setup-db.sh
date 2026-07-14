@@ -72,6 +72,13 @@ apply_migrations_from_disk() {
       cat "${migration_file}" | kubectl exec -i -n "${NS}" "deployment/${DEPLOY}" -c postgres -- \
         sh -c 'env PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -p 5432 -U postgres -d rerp -v ON_ERROR_STOP=1'
     }
+    if [ -f ./sql/rls/v1/install.sql ]; then
+      echo "  -> Installing the vendored Sesame RLS v1 contract first..."
+      apply_one "./sql/rls/v1/install.sql"
+    else
+      echo "  ❌ Missing required Sesame RLS contract: ./sql/rls/v1/install.sql" >&2
+      return 1
+    fi
     if [ -f ./migrations/apply_order.txt ]; then
       while IFS= read -r rel || [ -n "${rel}" ]; do
         [[ -z "${rel}" || "${rel}" =~ ^# ]] && continue
@@ -136,6 +143,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA rerp TO rerp;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA rerp TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT USAGE, SELECT ON SEQUENCES TO rerp;
+
+GRANT EXECUTE ON FUNCTION public.sesame_rls_contract_version() TO rerp;
+GRANT EXECUTE ON FUNCTION public.rls_set_session(text, uuid, uuid, text, jsonb, jsonb, text, text) TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_tenant_id() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_subject_id() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_organization_id() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_session_id() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_roles() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_permissions() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_user_type() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_current_org_type() TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_has_role(text) TO rerp;
+GRANT EXECUTE ON FUNCTION public.sesame_has_permission(text) TO rerp;
 EOF
 }
 

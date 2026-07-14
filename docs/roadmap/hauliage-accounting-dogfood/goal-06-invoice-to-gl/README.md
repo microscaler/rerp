@@ -1,6 +1,6 @@
 # Goal 6: Public Invoice-To-GL Vertical Slice
 
-- **Status**: Kernel active; API and persistence pending
+- **Status**: Four-route API and persistence delivered; HTTPS/rendering pending
 - **Runtime decision**: [ADR 001](../../../adrs/001-accounting-runtime-boundary.md)
 
 ## Objective
@@ -87,14 +87,21 @@ not choose its tenant or post directly to arbitrary accounts through this API.
 6. The runtime persists all facts and the successful idempotency result.
 7. Commit makes the result visible; any error rolls the entire operation back.
 
-### Contract corrections required before generation
+### Delivered Phase 1 contract
 
-The existing broad invoice OpenAPI is research input, not the accepted command
-contract. It currently uses `format: double` for money, permits caller supplied
-`company_id`, mixes sales and purchase types, and exposes generic CRUD mutation
-against posted documents. The Phase 1 API must instead use decimal string
-schemas, omit tenant/company selection, separate commands from retrieval, and
-return explicit validation, period-lock, idempotency-conflict and policy errors.
+`microservices/accounting/invoice/openapi/phase1.yaml` replaces the broad
+research contract on the active invoice process. It uses decimal strings,
+omits tenant/company/account selection, separates commands from retrieval and
+defines explicit validation, policy, not-found and idempotency-conflict errors.
+Only these operations are registered:
+
+- `POST /v1/customer-invoices`;
+- `GET /v1/customer-invoices/{id}`;
+- `GET /v1/customer-invoices/{id}/journal`; and
+- `POST /v1/customer-invoices/{id}/credit-notes`.
+
+Generated example controllers are not registered by the executable. The four
+active controllers call the accounting kernel and typed Lifeguard repository.
 
 ### Definition of done
 
@@ -102,3 +109,8 @@ Goal 6 is not complete when handlers compile. It is complete only when the
 public generated client posts a real invoice through HTTPS, retrieves the same
 invoice and journal, proves retry behavior, proves cross-tenant isolation in
 PostgreSQL, and contains no generated example response on an active route.
+
+Current evidence satisfies the real invoice/journal, retry/conflict,
+PostgreSQL RLS and no-active-mock portions. HTTPS generated-client execution and
+rendered-document retrieval remain open, so Goal 6 is deliberately not marked
+complete.

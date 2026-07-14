@@ -59,7 +59,7 @@ pub struct AccountingPostedDocument {
     #[column_type = "VARCHAR(3)"]
     pub currency_code: String,
 
-    pub rounding_minor_units: i16,
+    pub rounding_minor_units: i32,
 
     #[column_type = "NUMERIC(19, 6)"]
     pub subtotal: rust_decimal::Decimal,

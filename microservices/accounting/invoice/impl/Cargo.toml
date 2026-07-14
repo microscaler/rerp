@@ -15,6 +15,13 @@ jemalloc = ["tikv-jemallocator"]
 # Generated crate
 rerp_accounting_invoice_gen = { path = "../gen" }
 
+# Accounting domain and typed persistence
+rerp-accounting-core = { path = "../../../../accounting-core" }
+rerp_entities = { workspace = true }
+lifeguard = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+
 # BRRTRouter (re-exported from gen crate, but may need direct access)
 brrtrouter = { workspace = true }
 brrtrouter_macros = { workspace = true }

@@ -242,3 +242,29 @@ Extended the kernel with its first production-shaped persistence contract.
   context-free failure, tenant isolation, tenant-consistent foreign keys,
   balance checks, immutability and rollback of partial posting.
 - Repaired stale entity generator imports/output paths and the entity doctest so
+  the root workspace and generated migration path build cleanly.
+
+## [2026-07-14] implementation | authenticated invoice-to-ledger runtime
+
+Delivered the first usable public accounting runtime on the existing invoice
+process.
+
+- Replaced the broad placeholder invoice surface with four Phase 1 operations:
+  post invoice, retrieve invoice, retrieve journal and post a full credit note.
+- Used decimal-string commercial facts and removed caller control over tenant,
+  legal entity, fiscal period and internal GL accounts.
+- Converted validated Sesame claims into the complete Lifeguard session context
+  and persisted the document, lines, balanced journal, audit and idempotency
+  result in one pinned RLS transaction.
+- Added sequential retry/conflict behavior and public responses that omit tenant
+  scope and internal account mapping.
+- Corrected the typed `rounding_minor_units`/PostgreSQL `INTEGER` mismatch and
+  made accounting persistence timestamps explicit.
+- Fixed database setup ordering and runtime grants for the complete vendored
+  Sesame RLS v1 contract.
+- Proved post, retry, conflict, retrieve and full credit against disposable
+  PostgreSQL as a non-superuser.
+- Added transaction-scoped legal-entity/year sequence locking and proved two
+  simultaneous postings receive distinct numbers without exposing rollbacks.
+- Kept Goal 6 open for HTTPS generated-client proof and immutable
+  rendered-document retrieval.

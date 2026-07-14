@@ -1,6 +1,6 @@
 # Goal 5: Correct Minimum Accounting Foundation
 
-- **Status**: Active
+- **Status**: Phase 1 runtime delivered; broader foundation active
 - **First implementation**: [`rerp-accounting-core`](../../../../accounting-core/README.md)
 
 ## Objective
@@ -67,18 +67,18 @@ SaaS receivables flow, not merely capable of storing debits and credits.
 
 | ID | Requirement | First delivery state |
 |---|---|---|
-| FR-ACCT-001 | Accept tenant and legal-entity context only from authenticated execution context. | Kernel contract delivered; HTTP/RLS wiring pending. |
+| FR-ACCT-001 | Accept tenant and legal-entity context only from authenticated execution context. | Delivered: validated Sesame claims become the complete Lifeguard session context; request bodies cannot select scope. |
 | FR-ACCT-002 | Validate ISO currency, positive quantity, non-negative unit price, discount and tax bounds. | Delivered and unit tested. |
 | FR-ACCT-003 | Calculate decimal line, discount and tax snapshots under an explicit rounding policy. | Delivered; midpoint-away-from-zero and configurable minor units. |
 | FR-ACCT-004 | Reject posting outside an open fiscal period. | Delivered and unit tested. |
-| FR-ACCT-005 | Produce one immutable customer invoice and balanced journal as one posting plan. | Delivered in the kernel; atomic persistence pending. |
+| FR-ACCT-005 | Produce one immutable customer invoice and balanced journal as one posting plan. | Delivered through the kernel and one atomic runtime transaction. |
 | FR-ACCT-006 | Debit receivables and credit line revenue plus optional tax liability using configured accounts. | Delivered without Hauliage-specific account assumptions. |
 | FR-ACCT-007 | Produce a full credit note which links to and exactly reverses a posted customer invoice. | Delivered and unit tested across fiscal periods. |
 | FR-ACCT-008 | Derive a tenant/legal-entity trial balance from validated posted journal lines. | Delivered and unit tested. |
-| FR-ACCT-009 | Detect retry conflicts using tenant-scoped idempotency key and deterministic request fingerprint. | Fingerprint delivered; uniqueness/lookup persistence pending. |
-| FR-ACCT-010 | Persist invoice, lines, journal, lines, source/idempotency and audit event in one RLS transaction. | Typed schema, controls and live RLS acceptance delivered; runtime repository pending. |
-| FR-ACCT-011 | Allocate tenant/legal-entity document sequences without gaps caused by rolled-back work being exposed. | Pending persistence slice. |
-| FR-ACCT-012 | Make posted documents and entries immutable; corrections use credit/reversal workflows. | Kernel and database enforcement delivered; API enforcement pending. |
+| FR-ACCT-009 | Detect retry conflicts using tenant-scoped idempotency key and deterministic request fingerprint. | Delivered and proven against live PostgreSQL for retry and changed-payload conflict. |
+| FR-ACCT-010 | Persist invoice, lines, journal, lines, source/idempotency and audit event in one RLS transaction. | Delivered through typed Lifeguard records and `with_session_transaction`; live rollback/RLS acceptance passes. |
+| FR-ACCT-011 | Allocate tenant/legal-entity document sequences without gaps caused by rolled-back work being exposed. | Delivered: transaction advisory locking serializes legal-entity/year allocation and rollback exposes no consumed row. |
+| FR-ACCT-012 | Make posted documents and entries immutable; corrections use credit/reversal workflows. | Delivered in the kernel, database controls and four-route public API. |
 
 ### Non-functional requirements
 
@@ -109,6 +109,27 @@ schema-inventory entities:
 - immutable posted document, journal, line and audit tables; and
 - a live non-superuser acceptance suite under
   `tests/sql/accounting_foundation_acceptance.sql`.
+
+### Delivered runtime evidence
+
+The invoice process now exposes only four Phase 1 capabilities from
+`microservices/accounting/invoice/openapi/phase1.yaml`: post and retrieve a
+customer invoice, retrieve its journal, and post a full credit note. The
+implementation resolves legal entity, open period and control accounts inside
+the RLS transaction and never accepts those internal choices from the caller.
+
+The ignored live Rust acceptance test
+`live_post_retry_conflict_retrieve_and_credit` runs as a non-superuser against
+a disposable PostgreSQL database. It proves initial posting, balanced journal,
+same-payload retry, changed-payload conflict, retrieval and full credit. The SQL
+acceptance remains responsible for cross-tenant, constraint, immutability and
+forced-rollback failure paths.
+
+Remaining Phase 1 hardening is explicit: an HTTPS generated-client proof and
+immutable rendered-document storage. These are not hidden behind generated
+example responses. The live acceptance also proves that two simultaneous
+postings receive distinct document numbers.
+
 ### Phase 1 acceptance scenario
 
 Given an authenticated tenant and legal entity, an open fiscal period, a

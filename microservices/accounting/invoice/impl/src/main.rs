@@ -14,6 +14,11 @@ use rerp_accounting_invoice_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
+mod database;
+mod http_support;
+mod identity;
+mod impl_registry;
+mod posting;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
@@ -204,6 +209,8 @@ fn main() -> io::Result<()> {
         }
     };
 
+    database::initialize().map_err(io::Error::other)?;
+
     let (routes, schemes, _slug) = brrtrouter::spec::load_spec_full(spec_path.to_str().unwrap())
         .expect("failed to load OpenAPI spec");
     let _router = Router::new(routes.clone());
@@ -311,10 +318,9 @@ fn main() -> io::Result<()> {
     if let Some(ref cors) = cors_middleware {
         dispatcher.add_middleware(cors.clone());
     }
-    // NOTE: This registers controllers from gen crate. We need to register impl controllers instead.
-    // TODO: Update to register impl controllers
+    // Production registers only user-owned implementations; generated examples are forbidden.
     unsafe {
-        registry::register_from_spec(&mut dispatcher, &routes);
+        impl_registry::register_impl(&mut dispatcher, &routes);
     }
 
     // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
