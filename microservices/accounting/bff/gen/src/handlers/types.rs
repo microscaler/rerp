@@ -6386,6 +6386,31 @@ pub struct EdiEdiProfile {
     pub trading_partner_id: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum EdiEdiStandard {
+    #[default]
+    #[serde(rename = "UBL")]
+    Ubl,
+
+    #[serde(rename = "PEPPOL")]
+    Peppol,
+
+    #[serde(rename = "FACTUR_X")]
+    FacturX,
+
+    #[serde(rename = "SAF_T")]
+    SafT,
+
+    #[serde(rename = "INTRASTAT")]
+    Intrastat,
+
+    #[serde(rename = "ISO20022")]
+    Iso20022,
+
+    #[serde(rename = "CUSTOM")]
+    Custom,
+}
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiEdiSubmission {
     pub document_id: String,
@@ -6399,6 +6424,34 @@ pub struct EdiEdiSubmission {
     pub status: EdiEdiSubmissionStatus,
 
     pub submitted_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum EdiEdiSubmissionStatus {
+    #[default]
+    #[serde(rename = "DRAFT")]
+    Draft,
+
+    #[serde(rename = "VALIDATING")]
+    Validating,
+
+    #[serde(rename = "READY")]
+    Ready,
+
+    #[serde(rename = "SUBMITTED")]
+    Submitted,
+
+    #[serde(rename = "ACCEPTED")]
+    Accepted,
+
+    #[serde(rename = "REJECTED")]
+    Rejected,
+
+    #[serde(rename = "RETRY_REQUIRED")]
+    RetryRequired,
+
+    #[serde(rename = "CANCELLED")]
+    Cancelled,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

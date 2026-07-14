@@ -1,6 +1,11 @@
 [workspace]
-workspace = "microservices/Cargo.toml"
+members = ["entities"]
+exclude = ["microservices"]
+resolver = "2"
 
 [workspace.package]
 version = "0.1.3"
 edition = "2021"
+
+# Deployable services remain in the intentional nested workspace at
+# microservices/Cargo.toml, which is also the generator and release boundary.

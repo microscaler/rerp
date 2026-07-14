@@ -380,6 +380,31 @@ pub struct EdiProfile {
     pub trading_partner_id: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum EdiStandard {
+    #[default]
+    #[serde(rename = "UBL")]
+    Ubl,
+
+    #[serde(rename = "PEPPOL")]
+    Peppol,
+
+    #[serde(rename = "FACTUR_X")]
+    FacturX,
+
+    #[serde(rename = "SAF_T")]
+    SafT,
+
+    #[serde(rename = "INTRASTAT")]
+    Intrastat,
+
+    #[serde(rename = "ISO20022")]
+    Iso20022,
+
+    #[serde(rename = "CUSTOM")]
+    Custom,
+}
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiSubmission {
     pub document_id: String,
@@ -395,6 +420,34 @@ pub struct EdiSubmission {
     pub submitted_at: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum EdiSubmissionStatus {
+    #[default]
+    #[serde(rename = "DRAFT")]
+    Draft,
+
+    #[serde(rename = "VALIDATING")]
+    Validating,
+
+    #[serde(rename = "READY")]
+    Ready,
+
+    #[serde(rename = "SUBMITTED")]
+    Submitted,
+
+    #[serde(rename = "ACCEPTED")]
+    Accepted,
+
+    #[serde(rename = "REJECTED")]
+    Rejected,
+
+    #[serde(rename = "RETRY_REQUIRED")]
+    RetryRequired,
+
+    #[serde(rename = "CANCELLED")]
+    Cancelled,
+}
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiValidationProfile {
     pub active: bool,
@@ -406,6 +459,15 @@ pub struct EdiValidationProfile {
     pub profile_id: String,
 
     pub rules: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ErrorResponse {
+    pub code: i32,
+
+    pub details: Vec<serde_json::Value>,
+
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -513,28 +575,6 @@ pub struct GetEdiSubmissionStatusResponse {
     pub status: EdiSubmissionStatus,
 
     pub submitted_at: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListEdiDocumentsResponse {
-    pub items: Vec<EdiDocument>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ListEdiMappingsResponse {
-    pub items: Vec<EdiMapping>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

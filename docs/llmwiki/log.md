@@ -182,3 +182,29 @@ Captured the immediate seven-goal execution overlay for RERP accounting.
   foundations, invoice-to-GL, and Hauliage integration.
 - Marked the older scaffold-all-services-first build order as superseded while
   retaining its long-term product inventory and research.
+
+## [2026-07-14] contribute | restart checkpoint and Goal 1 activation
+
+Recorded the pushed restart checkpoint and activated the development baseline.
+
+- Confirmed d0412f3 is the origin/main restart checkpoint.
+- Marked Goal 1 as active.
+- Captured the empty root workspace, blocked entities build, and
+  may_minihttp/BRRTRouter dependency mismatch as the first verified blockers.
+- Kept Tilt/runtime restoration sequenced behind a reproducible build topology.
+
+## [2026-07-14] contribute | Goal 1 build topology and enum-generation baseline
+
+Completed the first reproducible-development tranche after the restart checkpoint.
+
+- Made `rerp-entities` the explicit root workspace member; its 37-entity build passes.
+- Aligned the service workspace with the rustls-capable Microscaler
+  `may_minihttp` branch and removed stale crates.io/AWS-LC/Reqwest resolution
+  paths from the service graph.
+- Made `microservices/Cargo.lock` a committed application lockfile.
+- Fixed BRRTRouter's missing OpenAPI string-enum generation and regenerated
+  only the affected EDI/BFF type files; both generated crates now compile.
+- Verified the invoice implementation compiles.
+- Re-ran the broad workspace check and identified the next honest boundary:
+  the obsolete BFF implementation has 728 stale example-stub errors and must
+  be narrowed under Goal 2, not bulk-regenerated as apparent product behavior.

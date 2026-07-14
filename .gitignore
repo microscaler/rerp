@@ -13,6 +13,9 @@ BRRTRouter
 # Remove Cargo.lock from gitignore if creating an executable; leave for libraries
 # https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
 Cargo.lock
+# The deployable microservices workspace is an application workspace and must
+# resolve the same graph in CI, developer machines, and releases.
+!microservices/Cargo.lock
 
 # rustfmt backup files
 **/*.rs.bk

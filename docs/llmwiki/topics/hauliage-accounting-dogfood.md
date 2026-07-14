@@ -5,6 +5,17 @@
 - **Code anchors**: Cargo.toml, microservices/Cargo.toml, entities/src/accounting/, Tiltfile, openapi/accounting/
 - **Last updated**: 2026-07-14
 
+## Current Execution State
+
+- Restart checkpoint d0412f3 is pushed to origin/main.
+- Goal 1, the reproducible development baseline, is active on top of that checkpoint.
+- The root workspace now explicitly owns `rerp-entities`; metadata and its 37-entity build pass.
+- The deployable service workspace owns and commits its lockfile. Its `may_minihttp` source matches the Microscaler rustls-capable fork, and the invoice implementation compiles.
+- BRRTRouter's generator now emits OpenAPI string enums. The EDI and accounting BFF generated crates compile from the current contracts.
+- A full service-workspace check reaches the stale BFF implementation and fails with 728 obsolete example-stub errors. Do not repair those stubs as product code; Goal 2 must define the narrow public runtime and remove inactive implementations from build/deploy gates.
+- Current CI tests workspace libraries only and therefore misses stale binary implementations. An explicit active-binary gate remains open.
+- Tiltfile is intentionally empty at the restart checkpoint; runtime restoration belongs to Goals 2 and 3 after the build topology is trustworthy.
+
 ## What It Is
 
 The Hauliage dog-food tranche is the immediate execution overlay for RERP accounting. RERP remains a world-class open-source, API-first ERP target with full ledger, tax, treasury, reconciliation, reporting, and controls. The overlay changes delivery order: establish a trustworthy accounting core and prove it through Hauliage before activating broad generated runtime surface.
