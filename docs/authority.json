@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "id": "POL-001",
+      "scope": "repository.contributor-contract",
+      "path": "CONTRIBUTING.md",
+      "kind": "policy",
+      "status": "ACTIVE",
+      "authority": "normative",
+      "owner": "RERP maintainers",
+      "last_reviewed": "2026-07-15",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
+      "id": "POL-002",
+      "scope": "repository.documentation-governance",
+      "path": "docs/DOCUMENTATION_GOVERNANCE.md",
+      "kind": "policy",
+      "status": "ACTIVE",
+      "authority": "normative",
+      "owner": "RERP maintainers",
+      "last_reviewed": "2026-07-15",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
+      "id": "ADR-001",
+      "scope": "accounting.runtime-boundary",
+      "path": "docs/adrs/001-accounting-runtime-boundary.md",
+      "kind": "adr",
+      "status": "ACCEPTED",
+      "authority": "normative",
+      "owner": "RERP Accounting",
+      "last_reviewed": "2026-07-15",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
+      "id": "ADR-002",
+      "scope": "documents.generated-rendition-ownership",
+      "path": "docs/adrs/002-document-generation-ownership.md",
+      "kind": "adr",
+      "status": "ACCEPTED",
+      "authority": "normative",
+      "owner": "RERP Documents and Accounting",
+      "last_reviewed": "2026-07-15",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
+      "id": "PLAN-001",
+      "scope": "accounting.hauliage-dogfood-delivery",
+      "path": "docs/roadmap/hauliage-accounting-dogfood/README.md",
+      "kind": "roadmap",
+      "status": "PROPOSED",
+      "authority": "working",
+      "owner": "RERP Accounting",
+      "last_reviewed": "2026-07-15",
+      "supersedes": [],
+      "superseded_by": []
+    }
+  ]
+}

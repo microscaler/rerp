@@ -1,5 +1,9 @@
 # Entity Migration Complete
 
+> **Status: HISTORICAL_SNAPSHOT** — records the retired repository-root entity
+> migration. Current table/entity ownership is defined by
+> [`CONTRIBUTING.md`](../../../CONTRIBUTING.md).
+
 ## Summary
 
 All accounting entities have been successfully moved from `lifeguard/examples/entities/` to `rerp/entities/`.
@@ -136,8 +140,10 @@ use rerp_entities::accounting::bank_sync::BankAccount;
 
 ## 📚 References
 
-- **RERP Preparation Plan**: `docs/RERP_PREPARATION_PLAN.md`
-- **Implementation Status**: `docs/IMPLEMENTATION_COMPLETE.md`
+- **Historical RERP Preparation Plan**:
+  `docs/history/conceptual-bootstrap/RERP_PREPARATION_PLAN.md`
+- **Historical implementation snapshot**:
+  `docs/history/implementation-snapshots/IMPLEMENTATION_COMPLETE.md`
 - **Bank Account PRD**: `docs/BANK_ACCOUNT_IMPROVEMENT_PRD.md`
 
 ---

@@ -1,6 +1,6 @@
 # Goal 6: Public Invoice-To-GL Vertical Slice
 
-- **Status**: Four-route API and persistence delivered; HTTPS/rendering pending
+- **Status**: Five-route Phase 1 API and immutable basic PDF delivered; HTTPS consumer proof and rich templates pending
 - **Runtime decision**: [ADR 001](../../../adrs/001-accounting-runtime-boundary.md)
 
 ## Objective
@@ -24,7 +24,7 @@ The public API should describe accounting capabilities. It must not expose Hauli
 - Atomic posting engine.
 - Idempotency and payload-conflict detection.
 - Deterministic numbering and rounding.
-- Immutable document rendering and storage.
+- Immutable document rendering and storage, expanded by the [Documents generation and rendition PRD](../../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md).
 - Explainable error responses and audit events.
 - SDK-quality documentation for third-party SaaS consumers.
 
@@ -98,9 +98,10 @@ Only these operations are registered:
 - `POST /v1/customer-invoices`;
 - `GET /v1/customer-invoices/{id}`;
 - `GET /v1/customer-invoices/{id}/journal`; and
-- `POST /v1/customer-invoices/{id}/credit-notes`.
+- `POST /v1/customer-invoices/{id}/credit-notes`; and
+- `GET /v1/customer-invoices/{id}/document`.
 
-Generated example controllers are not registered by the executable. The four
+Generated example controllers are not registered by the executable. The five
 active controllers call the accounting kernel and typed Lifeguard repository.
 
 ### Definition of done
@@ -110,7 +111,9 @@ public generated client posts a real invoice through HTTPS, retrieves the same
 invoice and journal, proves retry behavior, proves cross-tenant isolation in
 PostgreSQL, and contains no generated example response on an active route.
 
-Current evidence satisfies the real invoice/journal, retry/conflict,
-PostgreSQL RLS and no-active-mock portions. HTTPS generated-client execution and
-rendered-document retrieval remain open, so Goal 6 is deliberately not marked
-complete.
+Current evidence also includes immutable content-addressed PDF materialization,
+private MinIO storage and short-lived download URLs. HTTPS generated-client
+execution and the rich, versioned template capability remain open, so Goal 6
+is deliberately not marked complete. The detailed rendering contract, copy
+semantics and post-MVP electronic sealing plan are defined in the
+[Documents generation and rendition PRD](../../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md).

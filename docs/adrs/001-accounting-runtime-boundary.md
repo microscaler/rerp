@@ -1,8 +1,14 @@
 # ADR 001: First Accounting Runtime Boundary
 
-- **Status**: Decided
+- **Status**: ACCEPTED
 - **Date**: 2026-07-14
+- **Decision owners**: RERP Accounting
 - **Group**: Accounting runtime and data consistency
+- **Authority**: Normative
+- **Scope**: accounting.runtime-boundary
+- **Last reviewed**: 2026-07-15
+- **Supersedes**: None
+- **Superseded by**: None
 
 ## Issue
 

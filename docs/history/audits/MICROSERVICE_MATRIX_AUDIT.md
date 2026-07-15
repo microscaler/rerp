@@ -1,5 +1,9 @@
 # RERP Microservice Matrix Audit
 
+> **Status: HISTORICAL_SNAPSHOT** — early Odoo-to-microservice breadth audit.
+> It does not establish current service activation, ownership, or delivery.
+> Use the [documentation authority index](../../README.md).
+
 **Purpose**: This document defines the microservice architecture for Rust ERP (RERP), mapping Odoo functionality to cloud-native microservices. Each service will have an OpenAPI specification for rapid implementation using BRRTRouter.
 
 **Generated**: 2025-01-27  

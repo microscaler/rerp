@@ -1,5 +1,11 @@
 # RERP Preparation Implementation - Complete
 
+> **Status: HISTORICAL_SNAPSHOT.** Historical checkpoint (2026-01-23).
+> Directory, port and Dockerfile statements
+> below describe the original bootstrap and are not current architecture. RERP
+> is now suite-nested, uses port 8080 for every in-cluster service, and builds all
+> runtime images from `docker/microservices/Dockerfile`.
+
 ## Summary
 
 All phases of the RERP Preparation Plan have been successfully implemented. The foundation is now in place and the first service (`general-ledger`) has been bootstrapped and is ready for business logic implementation.
@@ -227,8 +233,10 @@ rerp/
 
 ## 📚 References
 
-- **Preparation Plan**: `docs/RERP_PREPARATION_PLAN.md`
-- **Implementation Status**: `docs/IMPLEMENTATION_STATUS.md`
+- **Historical preparation plan**:
+  `docs/history/conceptual-bootstrap/RERP_PREPARATION_PLAN.md`
+- **Historical implementation status**:
+  `docs/history/implementation-snapshots/IMPLEMENTATION_STATUS.md`
 - **Accounting PRD**: `docs/ACCOUNTING_SUITE_ENRICHMENT_PRD.md`
 - **Bank Account PRD**: `docs/BANK_ACCOUNT_IMPROVEMENT_PRD.md`
 - **PriceWhisperer Reference**: `../PriceWhisperer/`

@@ -1,9 +1,9 @@
 # Hauliage Accounting Dog-Food Tranche
 
 - **Status**: partially-verified
-- **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, docs/adrs/001-accounting-runtime-boundary.md, openapi/accounting/design/08-implementation-roadmap.md, docs/ACCOUNTING_BUILD_PLAN.md
-- **Code anchors**: Cargo.toml, accounting-core/, microservices/Cargo.toml, entities/src/accounting/, Tiltfile, openapi/accounting/
-- **Last updated**: 2026-07-14
+- **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, docs/roadmap/hauliage-accounting-dogfood/service-readiness-plan/README.md, openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md, docs/adrs/001-accounting-runtime-boundary.md, docs/adrs/002-document-generation-ownership.md, openapi/accounting/design/08-implementation-roadmap.md, docs/history/plans/ACCOUNTING_BUILD_PLAN.md
+- **Code anchors**: microservices/migrator/, microservices/accounting/, microservices/documents/render/, Tiltfile, openapi/accounting/, openapi/documents/
+- **Last updated**: 2026-07-15
 
 ## Current Execution State
 
@@ -24,7 +24,10 @@
 - A live non-superuser Rust acceptance proves post, balanced journal, same-payload retry, changed-payload conflict, retrieve and full credit note.
 - Database setup now installs the vendored Sesame RLS contract before accounting controls and grants the complete explicit v1 helper set to the runtime role.
 - Legal-entity/year advisory locking serializes document and journal numbering; the live acceptance proves two simultaneous postings receive distinct numbers.
-- Goal 6 remains active for HTTPS generated-client proof and immutable rendered-document retrieval.
+- The fifth Phase 1 route materializes a deterministic basic PDF from the immutable invoice snapshot, stores it content-addressed in private MinIO, records immutable artifact metadata, and returns a short-lived authorized download URL.
+- The basic renderer is a delivery baseline, not the target template system: it has a hard-coded ASCII layout and incomplete issuer/customer presentation facts.
+- Documents PRD-008 defines externalized HTML/CSS templates, a constrained Jinja-compatible field language, immutable template versions, frozen render models, explicit copy artifacts, and post-MVP PAdES electronic sealing/timestamping. Accounting owns invoice facts and the frozen snapshot; `documents/render` owns rendition production and storage.
+- Goal 6 remains active for HTTPS generated-client proof and the rich template-driven document capability.
 
 ## What It Is
 
@@ -43,6 +46,11 @@ Hauliage is an external SaaS consumer, not a privileged internal accounting path
 7. Hauliage as the first ordinary consumer.
 
 Each goal has an expandable document under docs/roadmap/hauliage-accounting-dogfood/.
+
+The [service readiness work-through plan](../../roadmap/hauliage-accounting-dogfood/service-readiness-plan/README.md)
+is the active checklist across structural migration work, GL, Invoice, AR, AP,
+banking/connectors, reporting, Documents Render, BFF aggregation, and generated
+client dogfood proof.
 
 ## Important Boundary
 
@@ -74,6 +82,8 @@ The first integration must use the same authenticated, versioned OpenAPI contrac
 ## Cross-References
 
 - [Roadmap overview](../../roadmap/hauliage-accounting-dogfood/README.md)
+- [Service readiness work-through plan](../../roadmap/hauliage-accounting-dogfood/service-readiness-plan/README.md)
+- [Document generation and rendition PRD](../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md)
 - [Hauliage reference operating model](./hauliage-reference-operating-model.md)
 - [Accounting OpenAPI maturity target](./accounting-openapi-odoo-gap.md)
 - [Service implementation and database layout](./service-implementation-and-database-layout.md)

@@ -1,5 +1,9 @@
 # OpenAPI Examples Implementation Status
 
+> **Status: HISTORICAL_SNAPSHOT** — records example-generation coverage, not
+> delivered controller behaviour or current API maturity. Current public
+> contracts live under `openapi/<suite>/<service>/openapi.yaml`.
+
 ## Progress Summary
 
 ### ✅ Completed

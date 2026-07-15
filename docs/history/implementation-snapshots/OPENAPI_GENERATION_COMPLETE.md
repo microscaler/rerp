@@ -1,5 +1,9 @@
 # OpenAPI Generation Complete ✅
 
+> **Status: HISTORICAL_SNAPSHOT** — records an early breadth-generation pass.
+> Generated presence is not evidence that a service contract or implementation
+> remains current or delivered.
+
 ## Summary
 
 Successfully generated OpenAPI 3.1.0 specifications for all **71 RERP services**.

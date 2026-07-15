@@ -1,5 +1,11 @@
 # Entity Service Mapping
 
+> **Historical mapping:** The paths and `rerp_entities` imports below describe
+> the retired repository-root entity layout. Do not use them for new work.
+> Current ownership and placement are defined by
+> [`CONTRIBUTING.md`](../../../CONTRIBUTING.md): every effective table has one
+> owning service model or one suite-foundation model, never both.
+
 This document maps Lifeguard entities to service domains, demonstrating how a 3rd party project organizes entities.
 
 ## Service Structure

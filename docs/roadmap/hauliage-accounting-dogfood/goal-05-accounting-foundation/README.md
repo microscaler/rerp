@@ -78,7 +78,7 @@ SaaS receivables flow, not merely capable of storing debits and credits.
 | FR-ACCT-009 | Detect retry conflicts using tenant-scoped idempotency key and deterministic request fingerprint. | Delivered and proven against live PostgreSQL for retry and changed-payload conflict. |
 | FR-ACCT-010 | Persist invoice, lines, journal, lines, source/idempotency and audit event in one RLS transaction. | Delivered through typed Lifeguard records and `with_session_transaction`; live rollback/RLS acceptance passes. |
 | FR-ACCT-011 | Allocate tenant/legal-entity document sequences without gaps caused by rolled-back work being exposed. | Delivered: transaction advisory locking serializes legal-entity/year allocation and rollback exposes no consumed row. |
-| FR-ACCT-012 | Make posted documents and entries immutable; corrections use credit/reversal workflows. | Delivered in the kernel, database controls and four-route public API. |
+| FR-ACCT-012 | Make posted documents and entries immutable; corrections use credit/reversal workflows. | Delivered in the kernel, database controls and five-route Phase 1 public API. |
 
 ### Non-functional requirements
 

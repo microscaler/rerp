@@ -268,3 +268,98 @@ process.
   simultaneous postings receive distinct numbers without exposing rollbacks.
 - Kept Goal 6 open for HTTPS generated-client proof and immutable
   rendered-document retrieval.
+
+## [2026-07-15] contribute | Documents generation and rendition boundary
+
+Defined the product contract beyond the delivered basic PDF renderer.
+
+- Selected externalized HTML/CSS template bundles with one constrained,
+  Jinja-compatible expression contract as the MVP direction.
+- Defined immutable posted render snapshots, published template versions,
+  deterministic original materialization, explicit copy artifacts and lineage.
+- Added functional and non-functional requirements covering template APIs,
+  Unicode, pagination, sandboxing, RLS, idempotency, object storage,
+  observability, recovery and shared-cluster performance.
+- Kept qualified electronic seals, timestamps, PAdES long-term validation and
+  visible trust panels as a provider-neutral post-MVP phase.
+- Located the permanent capability in `documents/render`: source suites own
+  business facts and immutable snapshots; Documents owns templates, rendering,
+  artifacts, copies, and future trust services.
+- Added ADR 002, the first API contract and a generated Rust component scaffold
+  under the suite-nested Documents layout.
+- Cross-referenced the PRD from Documents, Goal 6, the roadmap and the LLM wiki
+  catalog.
+## [2026-07-15] contribute | Canonical suite and microservice ownership contract
+
+Reconciled RERP's contribution and agent guidance with Hauliage's complete
+service anatomy while preserving RERP's mandatory suite boundary.
+
+- Defined suite-owned `core`, foundation `entities`, migrations, SQL, scripts,
+  and cross-service tests as optional installation boundaries.
+- Defined every HTTP service's generated `gen/` and user-owned `impl/` anatomy,
+  including controllers, application services, models, validators, config,
+  seeds, tests, documentation, registry build, and executable composition.
+- Established one effective table/view → one `LifeModel` owner → one migration
+  provider, with service ownership as the default and suite entities reserved
+  for genuine foundations.
+- Required the single top-level migrator to use explicit `(suite, service)`
+  providers and produce/apply only suite-local migration and seed orders.
+- Flagged current Accounting duplicate models and flat migrator paths as drift
+  to reconcile rather than patterns to extend.
+## [2026-07-15] contribute | Hauliage Accounting service readiness plan
+
+Added the executable work-through plan for the RERP services required by
+Hauliage's first dogfood tranche.
+
+- Sequenced structural/entity/migrator reconciliation before domain expansion.
+- Added service-level tasks and acceptance criteria for General Ledger,
+  Invoice, AR, AP, banking/reconciliation, financial reporting, Documents
+  Render, Accounting BFF, and generated-client dogfood proof.
+- Defined connector-neutral banking delivery and the official documentation,
+  sandbox, security, and credentials gate for a first Stanbic or Standard
+  Chartered adapter in Zimbabwe/South Africa.
+- Added order-to-cash, procure-to-pay, retry/failure, tenant-isolation, and
+  cross-ledger reconciliation acceptance scenarios.
+- Recorded cross-cutting non-functional requirements and explicit deferrals so
+  broad generated Accounting surface is not mistaken for delivered behavior.
+
+## [2026-07-15] document | Accounting entity relationship inventory
+
+Enriched the Accounting suite README with Mermaid relationship diagrams
+derived from the reconciled `LifeModel` registries and delivered foundation
+migrations.
+
+- Covered all 47 effective Accounting entities across the foundation and nine
+  service providers.
+- Distinguished the 10-table delivered foundation schema from 37 registry
+  models whose migrations are not yet approved for activation.
+- Drew only declared or migration-enforced foreign keys and listed UUID-shaped
+  logical references that currently lack database constraints.
+- Exposed missing `customers` and `vendors` entity ownership and the unresolved
+  semantic boundary between legacy General Ledger tables and the authoritative
+  `accounting_*` posting foundation.
+
+## [2026-07-15] contribute | Documentation authority and supersession governance
+
+- Added `docs/README.md` as the human current-authority index, explicitly
+  separating normative product intent from delivered runtime truth.
+- Added controlled lifecycle, metadata, retirement, external-source, and ADR
+  supersession rules in `docs/DOCUMENTATION_GOVERNANCE.md`.
+- Added `docs/authority.json`, the ADR register, and a practical ADR template;
+  normalized ADR 001 and ADR 002 to `ACCEPTED` with stable scopes.
+- Added and tested a stdlib-only governance validator covering authority
+  clashes, paths, statuses, ADR registration, and reciprocal supersession.
+- Wired validation into the existing tooling CI job and documented the policy
+  in `CONTRIBUTING.md` and this wiki.
+
+## [2026-07-15] curate | First governed documentation history tranche
+
+- Created `docs/history/` with bootstrap, implementation-snapshot,
+  architecture-snapshot, audit, and superseded-plan classifications.
+- Archived January bootstrap/entity migration reports, early OpenAPI/BFF
+  completion reports, the retired service mapping, the service-matrix audit,
+  and the superseded Accounting build-order plan.
+- Added historical banners and repaired current roadmaps, contributor guidance,
+  entity documentation, catalogs, and wiki references.
+- Left active PRDs, ADRs, product gap analyses, and the Hauliage dogfood
+  readiness plan in their current authoritative locations.

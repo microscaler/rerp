@@ -84,6 +84,16 @@ The gate is accepted when one representative haul has approved source documents 
 | 6 | A public invoice-to-GL vertical slice | [Goal 6](./goal-06-invoice-to-gl/README.md) |
 | 7 | Hauliage integrated as the first ordinary consumer | [Goal 7](./goal-07-hauliage-integration/README.md) |
 
+## Working Delivery Plan
+
+The seven goals provide the strategic dependency shape. Day-to-day delivery of
+the Accounting and Documents services required by Hauliage is tracked in the
+[Hauliage Accounting Service Readiness Work-Through Plan](./service-readiness-plan/README.md).
+
+That plan is the checkable execution surface for structural reconciliation,
+General Ledger, Invoice, AR, AP, banking/connectors, reporting, Documents
+Render, the Accounting BFF, and generated-client dogfood acceptance.
+
 ## Dependency Shape
 
 Goals 1 through 4 establish development and trust foundations. Goal 5 establishes accounting invariants. Goal 6 proves RERP's public accounting API. Goal 7 proves that an external SaaS system can use that API reliably.
@@ -131,8 +141,11 @@ It also does not remove the broader accounting specifications. It changes execut
 
 ## Related Documents
 
+- [Hauliage Accounting service readiness work-through plan](./service-readiness-plan/README.md)
+- [Document generation and rendition PRD](../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md)
+- [Document generation ownership ADR](../../adrs/002-document-generation-ownership.md)
 - [Accounting implementation roadmap](../../../openapi/accounting/design/08-implementation-roadmap.md)
-- [Accounting suite build plan](../../ACCOUNTING_BUILD_PLAN.md)
+- [Historical Accounting suite build plan](../../history/plans/ACCOUNTING_BUILD_PLAN.md)
 - [Accounting BDD feature backlog](../../ACCOUNTING_BDD_FEATURE_BACKLOG.md)
 - [Enterprise ERP gap analysis](../../ACCOUNTING_ENTERPRISE_ERP_GAP_ANALYSIS.md)
 - [Hauliage reference operating model](../../llmwiki/topics/hauliage-reference-operating-model.md)

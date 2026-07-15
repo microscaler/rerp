@@ -1,5 +1,9 @@
 # System-Level BFF Generation - Complete ✅
 
+> **Status: HISTORICAL_SNAPSHOT** — completion report for the retired generation
+> path. Current suite BFF generation is configuration-driven through the RERP
+> tooling and fails on operation or final path/method clashes.
+
 ## Summary
 
 Successfully implemented automatic generation of system-level Backend for Frontend (BFF) OpenAPI specifications from sub-service specs, following the same pattern as PriceWhisperer.

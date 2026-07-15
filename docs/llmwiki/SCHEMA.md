@@ -6,14 +6,30 @@ This wiki is a persistent knowledge layer for RERP agents. It stores reconciled,
 
 ## Source of Truth Order
 
-When claims disagree, use this order:
+RERP distinguishes intended behaviour from delivered behaviour. Start at
+[`docs/README.md`](../README.md) for the current human authority map.
 
-1. Current code and runtime behavior: `tooling/`, `microservices/`, `openapi/`, `entities/`, `Tiltfile`, CI workflows.
-2. Generator inputs and generated artifacts: `openapi/**`, `microservices/**/gen`, BRRTRouter sibling tooling.
-3. Human-authored docs: `AGENTS.md`, `docs/`, ADRs, PRDs, design proposals.
-4. This wiki as the reconciled synthesis.
+For **normative truth**—what the product and architecture should do—use:
 
-If the wiki contradicts code or higher-ranked docs, update the wiki. Do not silently let the wiki override code.
+1. Accepted ADRs.
+2. Approved modes of operation and PRDs.
+3. Active suite/service designs.
+4. Authoritative OpenAPI contracts and acceptance criteria.
+
+For **delivered truth**—what the system does now—use:
+
+1. Deployed runtime behaviour and persisted schema.
+2. User-owned implementation and configuration under `tooling/`,
+   `microservices/`, `Tiltfile`, Helm, and CI.
+3. OpenAPI generator inputs and generated artifacts.
+4. Tests and dated verification records.
+
+When the two views disagree, preserve the normative authority and record
+implementation drift. Code is evidence of delivery, not an implicit repeal of
+an accepted decision. A design is evidence of intent, not proof of delivery.
+
+This wiki is derived synthesis in both views. If it contradicts an authority or
+current implementation evidence, update the wiki; it cannot override either.
 
 ## Layout
 

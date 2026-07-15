@@ -1,5 +1,14 @@
 # System-Level BFF Generation
 
+> **Status: HISTORICAL_SNAPSHOT.** The original script and paths below are
+> retired. The current contract remains that suite configuration is
+> authoritative. Services may keep
+> concise local paths such as `/payments`, while `gateway_path_style: prefixed`
+> publishes `/accounts-payable/payments` and `/accounts-receivable/payments`.
+> Every source `operationId` must nevertheless be unique across the suite. BFF
+> generation fails on duplicate operation IDs or duplicate final path/method
+> pairs so contract ambiguity is caught before Rust generation.
+
 ## Overview
 
 System-level Backend for Frontend (BFF) OpenAPI specifications are automatically generated from sub-service specs, following the same pattern as PriceWhisperer.

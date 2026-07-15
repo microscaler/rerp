@@ -1,5 +1,10 @@
 # RERP Preparation Plan
 
+> **Status: HISTORICAL_SNAPSHOT** — January 2026 bootstrap plan based on the
+> retired PriceWhisperer/root-entity layout. Current suite and service ownership
+> is defined by [`CONTRIBUTING.md`](../../../CONTRIBUTING.md) and the
+> [documentation authority index](../../README.md).
+
 ## Executive Summary
 
 This document outlines the preparation plan for setting up RERP's microservices architecture based on PriceWhisperer's proven structure. The plan covers BRRTRouter crate organization, database entity placement, business logic implementation, Kubernetes configurations, Helm charts, and supporting scripts.
@@ -832,7 +837,7 @@ lifeguard-migrate = { path = "../../lifeguard/lifeguard-migrate" }
 - **47 entity files** moved across **9 service domains**
 - **Bank Sync** entities include new `Bank` entity and updated `BankAccount` with `bank_id` FK
 - All entities verified and compiling in `rerp/entities/`
-- See `rerp/docs/ENTITY_MIGRATION_COMPLETE.md` for details
+- See `docs/history/implementation-snapshots/ENTITY_MIGRATION_COMPLETE.md` for details
 
 ### Phase 3: First Service Setup 🔄 **IN PROGRESS**
 
@@ -957,4 +962,4 @@ lifeguard-migrate = { path = "../../lifeguard/lifeguard-migrate" }
 **Review Required**: Yes
 
 **Recent Updates**:
-- ✅ **2026-01-23**: Entity migration completed. All 47 accounting entity files moved from `lifeguard/examples/entities/` to `rerp/entities/`. See `rerp/docs/ENTITY_MIGRATION_COMPLETE.md` for details.
+- ✅ **2026-01-23**: Entity migration completed. All 47 accounting entity files moved from `lifeguard/examples/entities/` to `rerp/entities/`. See `docs/history/implementation-snapshots/ENTITY_MIGRATION_COMPLETE.md` for the historical details.

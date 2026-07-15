@@ -1,9 +1,19 @@
 # RERP entities and entity-related docs
 
-Moved from `../Lifeguard/docs` (and subfolders). RERP entities live in `entities/src/accounting/` at repo root.
+> **Historical catalog:** This directory documents the earlier repository-root
+> entity migration and contains stale paths/import examples. It is not the
+> current layout authority. Follow [`CONTRIBUTING.md`](../../CONTRIBUTING.md):
+> service-owned models live in
+> `microservices/<suite>/<service>/impl/src/models/`, while genuinely shared
+> suite foundation models live in `microservices/<suite>/entities/`.
+
+The material was moved from historical Lifeguard examples. Preserve it as
+research/history rather than copying its repository-root entity paths.
 
 - **RERP_ODOO_ENTITY_ANALYSIS.md** — Gaps between RERP OpenAPI/entities and Odoo accounting models.
-- **SERVICE_MAPPING.md** — Entity-to-service mapping (general_ledger, invoice, AR, AP, etc.) and `rerp_entities` imports.
+- **Historical service mapping** — the retired root-entity mapping now lives at
+  [`../history/architecture-snapshots/SERVICE_MAPPING.md`](../history/architecture-snapshots/SERVICE_MAPPING.md).
+  Current ownership is defined by `CONTRIBUTING.md` and suite/service models.
 - **general_ledger/MIGRATION_GAPS.md** — Migration/codegen gaps for GL entities (FK, CHECK, etc.) when generating SQL from Lifeguard entities.
 
 See also:

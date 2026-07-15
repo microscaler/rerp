@@ -1,5 +1,10 @@
 # RERP Preparation Implementation Status
 
+> **Status: HISTORICAL_SNAPSHOT** — January 2026 bootstrap status. It is not
+> evidence of the current suite layout, delivered services, or runtime health.
+> Use the [documentation authority index](../../README.md) and current service
+> readiness plans.
+
 ## Summary
 
 Phase 1 and Phase 2 of the RERP Preparation Plan have been completed. The foundation is now in place for bootstrapping microservices.
@@ -178,7 +183,8 @@ rerp/
 
 ## 📚 References
 
-- **Preparation Plan**: `docs/RERP_PREPARATION_PLAN.md`
+- **Historical preparation plan**:
+  `docs/history/conceptual-bootstrap/RERP_PREPARATION_PLAN.md`
 - **Accounting PRD**: `docs/ACCOUNTING_SUITE_ENRICHMENT_PRD.md`
 - **Bank Account PRD**: `docs/BANK_ACCOUNT_IMPROVEMENT_PRD.md`
 - **PriceWhisperer Reference**: `../PriceWhisperer/`

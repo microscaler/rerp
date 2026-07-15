@@ -1,7 +1,11 @@
 # Accounting Suite Build Plan
 
+> **Status: HISTORICAL_SNAPSHOT** — retained as a breadth inventory. Its
+> scaffold-all-services-first execution order is superseded by the
+> [Hauliage Accounting Dog-Food Roadmap](../../roadmap/hauliage-accounting-dogfood/README.md).
+
 > **Execution-order update (2026-07-14):**
-> The [Hauliage Accounting Dog-Food Roadmap](./roadmap/hauliage-accounting-dogfood/README.md)
+> The [Hauliage Accounting Dog-Food Roadmap](../../roadmap/hauliage-accounting-dogfood/README.md)
 > supersedes this document's scaffold-all-services-first execution order.
 > This build plan remains valuable as an inventory and long-term breadth plan.
 > Runtime work now proves the development baseline, active core, tenancy, minimum
@@ -9,7 +13,7 @@
 > activating the remaining accounting services.
 
 > **Date:** 2026-04-25
-> **Status:** verified — ready to execute Phase 1
+> **Original status:** verified — ready to execute Phase 1
 > **Verified:** 2026-04-25 — all claims cross-checked against source
 > **Related docs:**
 > - `ACCOUNTING_BDD_FEATURE_BACKLOG.md` — BDD feature scenarios

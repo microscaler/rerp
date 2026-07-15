@@ -1,11 +1,11 @@
 # LLM Wiki Index
 
 > Content catalog. Every wiki page listed under its type.
-> Last updated: 2026-07-14 | Total pages: 10
+> Last updated: 2026-07-15 | Total pages: 11
 
 ---
 
-## Topics (6 pages)
+## Topics (7 pages)
 
 ### Accounting
 - [[hauliage-accounting-dogfood.md]] — Immediate seven-goal execution overlay proving RERP's public invoice-to-GL accounting core through Hauliage
@@ -14,6 +14,7 @@
 - [[suite-aware-brrtrouter-wrapper.md]] — RERP wrapper contract for BRRTRouter, suite-nested layout, naming conventions, BFF path namespacing
 - [[hauliage-reference-operating-model.md]] — Hauliage patterns translated to RERP's nested suites, build/deploy loop, database model lessons
 - [[service-implementation-and-database-layout.md]] — RERP service/entity/database responsibilities, gen/impl split, Lifeguard migration workflow
+- [[documentation-governance.md]] — Current-authority registry, normative-versus-delivered truth, controlled lifecycle, ADR supersession, and CI enforcement
 
 ### Other
 - [[hauliage-reference-operating-model.md]] — Hauliage reference patterns adapted for RERP

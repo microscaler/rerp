@@ -1,16 +1,18 @@
 # Scripts Consolidation and Docker Templating — Design
 
-**Status:** Draft for review  
+**Status:** Superseded in part by the implemented descriptor/staged-context design
 **Date:** 2025-01-24  
 **Implementation status:** §7.3 records what is **done** in `./tooling` vs **gaps** in `./scripts`, which callers (CI, Tiltfile, justfile) still use `./scripts`, and the distance to deprecating and deleting `./scripts`.  
-**Scope:** Replace shell scripts in `./scripts` with Python using shared metadata discovery; replace static `./docker/microservices/Dockerfile.*` with a Python templating tool that infers services and renders Dockerfiles as new suites are added; **externalise all embedded bash in the Tiltfile** into Python. **Transform `./scripts` into `./tooling`**: a pyproject-based, .venv-backed **holistic RERP tooling** package (not a flat dump of ad‑hoc scripts). This tooling is **RERP-specific** and does **not** replace Microscaler Farm.
+**Current decision (2026-07-15):** Service Dockerfile rendering was rejected. RERP now has one parameterized `docker/microservices/Dockerfile`; `rerp_tooling.runtime` discovers suite-scoped service metadata and stages narrow, verified development or multi-architecture release contexts. Sections describing rendered `Dockerfile.*` files are retained as historical analysis, not implementation guidance.
+
+**Scope:** Replace shell scripts in `./scripts` with Python using shared metadata discovery; use one parameterized microservice Dockerfile with staged contexts; **externalise embedded bash in the Tiltfile** into Python where practical. **Transform `./scripts` into `./tooling`**: a pyproject-based, .venv-backed **holistic RERP tooling** package (not a flat dump of ad‑hoc scripts). This tooling is **RERP-specific** and does **not** replace Microscaler Farm.
 
 ---
 
 ## 1. Objectives
 
 1. **Replace shell scripts with Python** that use the same metadata discovery logic as `assign-port.py`, so adding a new suite does not require editing tooling.
-2. **Replace static Dockerfiles** in `docker/microservices/` with a Python templating tool that discovers services and renders `Dockerfile.{service}` from a template.
+2. **Replace static Dockerfiles** with one parameterized Dockerfile and tooling-staged, service-specific build contexts.
 3. **Single source of truth for “what is a service”**: discovery is driven by repo layout (`openapi/`, `microservices/`, `bff-suite-config.yaml`) and Cargo/port-registry, not hardcoded lists.
 4. **Transform `./scripts` → `./tooling`**: a proper Python package with `pyproject.toml` and `.venv`, shared reusable libraries, a coherent CLI, and room to grow as RERP’s development workflows evolve.
 

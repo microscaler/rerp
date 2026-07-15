@@ -2,8 +2,8 @@
 
 - **Status**: `partially-verified`
 - **Source docs**: [`docs/TOOLS_ALIGNMENT_FINDINGS.md`](../../TOOLS_ALIGNMENT_FINDINGS.md), [`tooling/README.md`](../../../tooling/README.md), Hauliage [`docs/llmwiki/topics/scaffolding-lifecycle.md`](../../../../hauliage/docs/llmwiki/topics/scaffolding-lifecycle.md), Hauliage [`docs/llmwiki/topics/database-architecture.md`](../../../../hauliage/docs/llmwiki/topics/database-architecture.md)
-- **Code anchors**: `tooling/src/rerp_tooling/cli/main.py`, `tooling/tests/test_rerp_cli_translations.py`, `Tiltfile`, `microservices/Cargo.toml`, `entities/src/`
-- **Last updated**: 2026-04-25
+- **Code anchors**: `tooling/src/rerp_tooling/cli/main.py`, `tooling/tests/test_rerp_cli_translations.py`, `Tiltfile`, `microservices/Cargo.toml`, `microservices/<suite>/<service>/impl/`, `microservices/<suite>/entities/`, `microservices/<suite>/migrations/`
+- **Last updated**: 2026-07-15
 
 ## What It Is
 
@@ -45,7 +45,11 @@ Future agents should not hand-edit `gen/src` to fix business logic. Change the O
 
 ### `impl/`: service behavior crate
 
-The `impl` crate is the deployable service binary and the home of business logic. It owns controllers, service modules, local config, and tests. It depends on the sibling `gen` crate.
+The `impl` crate is the deployable service library/binary and the home of real
+behavior. It owns controllers, application services, service-specific
+Lifeguard models, validators, local config, seeds, and tests. Its `build.rs`
+exports the entity registry used by the migration tool, and it depends on the
+sibling `gen` contract crate.
 
 The desired RERP naming convention is:
 
@@ -82,12 +86,14 @@ RERP follows the same sequence, but all paths must include `{suite}`. The wrappe
 
 ## Database Model From Hauliage
 
-Hauliage uses a shared PostgreSQL server in the `data` namespace and an application database/schema for the product. RERP follows the same shared-kind idea but with RERP names:
+Hauliage uses a shared PostgreSQL server in the `data` namespace and an application database/schema for the product. RERP follows the same shared-cluster idea but with RERP names:
 
 - Shared Postgres service: `postgres.data.svc.cluster.local:5432`.
 - RERP database/env config: `k8s/rerp/rerp-database-env.yaml`.
-- Helm DB override: `helm/rerp-microservice/values/_database-shared-kind.yaml`.
-- Lifeguard entities: `entities/src/`.
+- Helm DB override: `helm/rerp-microservice/values/_database-shared-k8s.yaml`.
+- Service Lifeguard entities: `microservices/<suite>/<service>/impl/src/models/`.
+- Suite foundation entities: `microservices/<suite>/entities/src/`.
+- Suite migration products: `microservices/<suite>/migrations/`.
 
 Hauliage's important operational lessons carry over:
 
@@ -99,7 +105,17 @@ Hauliage's important operational lessons carry over:
 
 ## RERP-Specific Differences
 
-RERP currently centralizes accounting entities in the top-level `entities` crate (`rerp_entities`) rather than placing service-local `models/` under each impl crate as Hauliage often does. That means RERP service implementations should import shared entity modules and keep database schema ownership clear at the suite/domain level.
+RERP retains Hauliage's service-owned implementation anatomy but nests it under
+a suite. Service-specific entities belong to the owning service's
+`impl/src/models/`. Only a genuinely suite-wide foundation concept without a
+natural service owner belongs in `microservices/<suite>/entities/`. The same
+effective table/view must never be declared in both places or by multiple
+services.
+
+RERP also has one top-level migrator. Unlike Hauliage's valid single-suite flat
+migrator, RERP providers, generation, seed discovery, ordering, application,
+and output must include the suite identity. Migration products stay under
+`microservices/<suite>/migrations/`; a repository-root migration set is invalid.
 
 RERP also has many planned suites, but currently only accounting has a mature BFF config. Do not hardcode the assumption that every future suite uses `bff` as the service name; read `bff_service_name` from `openapi/{suite}/bff-suite-config.yaml`.
 
