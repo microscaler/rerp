@@ -1,0 +1,33 @@
+
+[package]
+name = "rerp_documents_render"
+version = "0.1.3"
+edition = "2021"
+
+[[bin]]
+name = "render"
+path = "src/main.rs"
+
+[features]
+default = []
+# jemalloc is opt-in (--features jemalloc). On armv7-unknown-linux-musleabihf and other musl
+# targets, tikv-jemallocator can pull in compiler-rt symbols (e.g. __ffsdi2) that are not
+# provided by musl, causing link errors. Use default = [] and enable jemalloc only for
+# amd64/arm64 glibc builds where it is supported. See: https://github.com/rust-lang/compiler-builtins
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+rerp_documents_render_gen = { path = "../gen" }
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }
+clap = { workspace = true }
+may = { workspace = true }
+
+# Add your additional dependencies here
+
+[build-dependencies]
+lifeguard-migrate = { path = "../../../../../lifeguard/lifeguard-migrate" }

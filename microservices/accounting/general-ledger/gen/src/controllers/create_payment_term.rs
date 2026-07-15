@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_payment_term'.
 
 use crate::handlers::create_payment_term::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreatePaymentTermController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         code: "example".to_string(),
         company_id: "example".to_string(),
         created_at: Some("example".to_string()),
@@ -17,5 +18,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         name: "example".to_string(),
         r#type: "example".to_string(),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

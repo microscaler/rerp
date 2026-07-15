@@ -2,6 +2,11 @@
 
 > Purpose: Full extraction and documentation of every function, resource, and pattern in Hauliage's Tiltfile, justfile, and Docker setup — so it can be replicated for RERP's accounting suite.
 
+> Historical reference: RERP adopted Hauliage's build-chain semantics, not its
+> flat service inventory or rendered Dockerfiles. The authoritative RERP path is
+> the descriptor-driven `Tiltfile`, `rerp_tooling.runtime`, and the single
+> `docker/microservices/Dockerfile`.
+
 ---
 
 ## 1. Python Helper Functions (Full Source Code)

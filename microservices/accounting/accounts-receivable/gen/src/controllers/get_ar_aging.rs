@@ -1,12 +1,13 @@
 // User-owned controller for handler 'get_ar_aging'.
 
 use crate::handlers::get_ar_aging::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(GetArAgingController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         as_of_date: "example".to_string(),
         bucket_1_30: 3.14,
         bucket_31_60: 3.14,
@@ -20,5 +21,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         id: "example".to_string(),
         invoice_count: Some(42),
         total_outstanding: Some(3.14),
-    }
+    })
 }

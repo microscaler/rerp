@@ -2,7 +2,7 @@
 
 > Overview of all 71 RERP microservices organized by implementation phase and suite.
 
-**Status:** partially-verified (check docs/ai/MICROSERVICE_MATRIX_AUDIT.md for latest)
+**Status:** historical synthesis (source audit moved to `docs/history/audits/MICROSERVICE_MATRIX_AUDIT.md`)
 
 ## Phase 1: Core Foundation (7 services)
 - auth/identity
@@ -68,5 +68,5 @@
 
 ## Code Anchors
 - Full spec list: `openapi/*/openapi.yaml`
-- Audit doc: `docs/ai/MICROSERVICE_MATRIX_AUDIT.md`
+- Historical audit: `docs/history/audits/MICROSERVICE_MATRIX_AUDIT.md`
 - Workspace: `microservices/Cargo.toml`

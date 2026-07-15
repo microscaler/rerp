@@ -1,12 +1,13 @@
 // User-owned controller for handler 'generate_income_statement'.
 
 use crate::handlers::generate_income_statement::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(GenerateIncomeStatementController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         account_details: Some(vec![]),
         company_id: "example".to_string(),
         cost_of_goods_sold: Some(3.14),
@@ -23,5 +24,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         period_start: "example".to_string(),
         revenue: Some(Default::default()),
         tax_expense: Some(3.14),
-    }
+    })
 }

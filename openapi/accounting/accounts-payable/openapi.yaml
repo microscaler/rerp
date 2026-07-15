@@ -292,7 +292,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
-      operationId: list_payments
+      operationId: list_vendor_payments
       summary: List payments
       description: Paginated list of all vendor payments with filtering by status, date range, and vendor.
       parameters:
@@ -378,7 +378,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_payment
+      operationId: create_vendor_payment
       summary: Create payment
       description: Schedule a new vendor payment. Optionally auto-disburse if auto_disburse is true.
       x-brrtrouter-impl: true
@@ -422,7 +422,7 @@ paths:
           content: *id003
   /payments/{id}:
     get:
-      operationId: get_payment
+      operationId: get_vendor_payment
       summary: Get payment by id
       description: Retrieve payment details.
       x-brrtrouter-impl: true
@@ -447,7 +447,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
-      operationId: update_payment
+      operationId: update_vendor_payment
       summary: Update payment
       description: Update a payment's details. Only scheduled or pending payments can be modified.
       x-brrtrouter-impl: true
@@ -499,7 +499,7 @@ paths:
           description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
-      operationId: delete_payment
+      operationId: delete_vendor_payment
       summary: Delete payment
       description: Delete a payment. Only scheduled or pending payments can be deleted.
       x-brrtrouter-impl: true

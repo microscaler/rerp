@@ -1,12 +1,13 @@
 // User-owned controller for handler 'update_fiscal_position'.
 
 use crate::handlers::update_fiscal_position::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(UpdateFiscalPositionController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         auto_apply: Some(true),
         code: "example".to_string(),
         company_id: "example".to_string(),
@@ -18,5 +19,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         name: "example".to_string(),
         state_ids: Some(vec![]),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

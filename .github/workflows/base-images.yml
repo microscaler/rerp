@@ -1,6 +1,6 @@
 # Build and publish rerp-base to GHCR (and optionally Docker Hub).
 # Uses registry cache and change detection to reduce build time.
-# Local build: `rerp docker build-base` (or --push with GHCR_OWNER set).
+# Local build: `rerp docker build-base`. Registry publication is owned here.
 
 name: Build Base Images
 
@@ -103,7 +103,7 @@ jobs:
           tags: ${{ env.IMAGE_GHCR }}:${{ steps.version.outputs.version }},${{ env.IMAGE_GHCR }}:latest${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-base:{1},docker.io/{0}/rerp-base:latest', vars.DOCKERHUB_ORG, steps.version.outputs.version) || '' }}
           cache-from: type=registry,ref=${{ env.IMAGE_GHCR }}:buildcache
           cache-to: type=registry,ref=${{ env.IMAGE_GHCR }}:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Build summary
         if: always()

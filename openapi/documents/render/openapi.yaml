@@ -1,0 +1,949 @@
+openapi: 3.1.0
+info:
+  title: Documents Render
+  version: 0.1.0
+  description: >-
+    Generic template management and immutable document-rendition API for RERP.
+    Source suites own business facts and submit frozen typed render models after
+    committing their domain transaction. Tenant and actor scope are derived from
+    validated Sesame identity and are never selected by request fields.
+  contact:
+    name: RERP Documents API Support
+    email: documents-api@rerp.ai
+servers:
+  - url: /api/v1/documents/render
+    description: Documents Render API
+tags:
+  - name: templates
+    description: Versioned external HTML/CSS templates and publication lifecycle
+  - name: renditions
+    description: Idempotent immutable generated documents
+  - name: copies
+    description: Explicit derivative copies that never replace an original
+security:
+  - bearerAuth: []
+paths:
+  /templates:
+    get:
+      operationId: list_document_templates
+      summary: List document templates visible in the authenticated tenant scope
+      tags: [templates]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: document_kind
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TemplateStatus'
+      responses:
+        '200':
+          description: Paginated templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_document_template
+      summary: Create a stable document-template identity
+      tags: [templates]
+      x-required-permission: documents.templates.manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /templates/{template_id}:
+    get:
+      operationId: get_document_template
+      summary: Retrieve a document template and its published-version summary
+      tags: [templates]
+      parameters:
+        - $ref: '#/components/parameters/TemplateId'
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /templates/{template_id}/versions:
+    get:
+      operationId: list_document_template_versions
+      summary: List versions of a document template
+      tags: [templates]
+      parameters:
+        - $ref: '#/components/parameters/TemplateId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated template versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateVersionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: create_document_template_version
+      summary: Create a mutable draft template version
+      tags: [templates]
+      x-required-permission: documents.templates.manage
+      parameters:
+        - $ref: '#/components/parameters/TemplateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateVersionRequest'
+      responses:
+        '201':
+          description: Draft version created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateVersion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /template-versions/{version_id}:
+    get:
+      operationId: get_document_template_version
+      summary: Retrieve one template version
+      tags: [templates]
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Template version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /template-versions/{version_id}/validate:
+    post:
+      operationId: validate_document_template_version
+      summary: Validate syntax, schema compatibility, assets, security, and boundary fixtures
+      tags: [templates]
+      x-required-permission: documents.templates.manage
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Validation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateValidationResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /template-versions/{version_id}/preview:
+    post:
+      operationId: preview_document_template_version
+      summary: Render a non-authoritative preview without creating an original rendition
+      tags: [templates]
+      x-required-permission: documents.templates.manage
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewTemplateRequest'
+      responses:
+        '200':
+          description: Preview generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /template-versions/{version_id}/publish:
+    post:
+      operationId: publish_document_template_version
+      summary: Publish and permanently freeze a validated template version
+      tags: [templates]
+      x-required-permission: documents.templates.publish
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Version published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /template-versions/{version_id}/retire:
+    post:
+      operationId: retire_document_template_version
+      summary: Retire a published version from future selection without changing existing renditions
+      tags: [templates]
+      x-required-permission: documents.templates.publish
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Version retired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /renditions:
+    post:
+      operationId: create_document_rendition
+      summary: Idempotently accept a frozen model for one immutable original rendition
+      description: >-
+        Intended for a source-suite post-commit worker. Reusing the same
+        idempotency key and request fingerprint returns the existing operation;
+        reusing it with different content returns 409.
+      tags: [renditions]
+      x-required-permission: documents.renditions.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRenditionRequest'
+      responses:
+        '200':
+          description: Existing idempotent rendition operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRendition'
+        '202':
+          description: Rendition accepted for materialization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRendition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /renditions/{rendition_id}:
+    get:
+      operationId: get_document_rendition
+      summary: Retrieve rendition state and immutable lineage
+      tags: [renditions]
+      parameters:
+        - $ref: '#/components/parameters/RenditionId'
+      responses:
+        '200':
+          description: Rendition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRendition'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /renditions/{rendition_id}/download:
+    post:
+      operationId: create_document_rendition_download
+      summary: Create a short-lived authorized download URL for a ready rendition
+      tags: [renditions]
+      x-required-permission: documents.renditions.read
+      parameters:
+        - $ref: '#/components/parameters/RenditionId'
+      responses:
+        '200':
+          description: Short-lived download authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedDownload'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /renditions/{rendition_id}/copies:
+    post:
+      operationId: create_document_rendition_copy
+      summary: Idempotently create a visibly marked immutable derivative copy
+      tags: [copies]
+      x-required-permission: documents.copies.create
+      parameters:
+        - $ref: '#/components/parameters/RenditionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCopyRequest'
+      responses:
+        '200':
+          description: Existing idempotent copy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRendition'
+        '202':
+          description: Copy accepted for materialization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentRendition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /sources/{source_suite}/{source_type}/{source_id}/renditions:
+    get:
+      operationId: list_source_document_renditions
+      summary: List originals and copies linked to one source resource
+      tags: [renditions]
+      parameters:
+        - name: source_suite
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{0,62}$'
+        - name: source_type
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{0,126}$'
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 200
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated source renditions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenditionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sesame-issued bearer token validated by BRRTRouter
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    TemplateId:
+      name: template_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VersionId:
+      name: version_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RenditionId:
+      name: rendition_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid Sesame identity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated identity lacks permission in the derived tenant scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found in the authenticated tenant scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: State or idempotency conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Template, render-model, or policy validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    TemplateStatus:
+      type: string
+      enum: [DRAFT, PUBLISHED, RETIRED]
+    RenditionStatus:
+      type: string
+      enum: [PENDING, RENDERING, READY, FAILED]
+    RenditionRole:
+      type: string
+      enum: [ORIGINAL, COPY]
+    DocumentOrigin:
+      type: string
+      enum: [GENERATED]
+    DocumentMutability:
+      type: string
+      enum: [IMMUTABLE]
+    CreateTemplateRequest:
+      type: object
+      additionalProperties: false
+      required: [key, name, document_kind]
+      properties:
+        key:
+          type: string
+          pattern: '^[a-z][a-z0-9._-]{0,126}$'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        document_kind:
+          type: string
+          minLength: 1
+          maxLength: 100
+          examples: [accounting.customer-invoice]
+        description:
+          type: string
+          maxLength: 2000
+    DocumentTemplate:
+      type: object
+      required: [id, key, name, document_kind, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+        name:
+          type: string
+        document_kind:
+          type: string
+        description:
+          type: string
+        published_version_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    TemplateAssetReference:
+      type: object
+      additionalProperties: false
+      required: [path, document_id, version_id, sha256]
+      properties:
+        path:
+          type: string
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._/-]{0,254}$'
+        document_id:
+          type: string
+          format: uuid
+          description: Asset document in Documents core
+        version_id:
+          type: string
+          format: uuid
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+    CreateTemplateVersionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - template_contract
+        - render_schema
+        - engine
+        - template_html
+        - stylesheet_css
+      properties:
+        template_contract:
+          type: string
+          const: rerp-document-template/v1
+        render_schema:
+          type: string
+          minLength: 1
+          maxLength: 200
+          examples: [accounting.customer-invoice-render-model/v1]
+        engine:
+          type: string
+          const: minijinja/v1
+        template_html:
+          type: string
+          minLength: 1
+          maxLength: 524288
+        stylesheet_css:
+          type: string
+          maxLength: 262144
+        assets:
+          type: array
+          maxItems: 64
+          items:
+            $ref: '#/components/schemas/TemplateAssetReference'
+        supported_locales:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+            pattern: '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$'
+        page_size:
+          type: string
+          enum: [A4, LETTER]
+          default: A4
+        orientation:
+          type: string
+          enum: [PORTRAIT, LANDSCAPE]
+          default: PORTRAIT
+    DocumentTemplateVersion:
+      type: object
+      required:
+        - id
+        - template_id
+        - version_number
+        - template_contract
+        - render_schema
+        - engine
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        version_number:
+          type: integer
+          minimum: 1
+        template_contract:
+          type: string
+        render_schema:
+          type: string
+        engine:
+          type: string
+        status:
+          $ref: '#/components/schemas/TemplateStatus'
+        bundle_sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        created_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+        retired_at:
+          type: string
+          format: date-time
+    ValidationIssue:
+      type: object
+      required: [code, message, severity]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        severity:
+          type: string
+          enum: [ERROR, WARNING]
+        path:
+          type: string
+    TemplateValidationResult:
+      type: object
+      required: [valid, checked_at, issues]
+      properties:
+        valid:
+          type: boolean
+        checked_at:
+          type: string
+          format: date-time
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationIssue'
+    PreviewTemplateRequest:
+      type: object
+      additionalProperties: false
+      required: [render_schema, locale, render_model]
+      properties:
+        render_schema:
+          type: string
+        locale:
+          type: string
+        render_model:
+          type: object
+          additionalProperties: true
+    PreviewResult:
+      type: object
+      required: [media_type, sha256, size_bytes, download_url, expires_at]
+      properties:
+        media_type:
+          type: string
+          const: application/pdf
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        download_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+    SourceReference:
+      type: object
+      additionalProperties: false
+      required: [suite, resource_type, resource_id, source_version, snapshot_sha256]
+      properties:
+        suite:
+          type: string
+          pattern: '^[a-z][a-z0-9-]{0,62}$'
+        resource_type:
+          type: string
+          pattern: '^[a-z][a-z0-9-]{0,126}$'
+        resource_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source_version:
+          type: string
+          minLength: 1
+          maxLength: 100
+        snapshot_sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+    TemplateSelector:
+      type: object
+      additionalProperties: false
+      properties:
+        template_key:
+          type: string
+          pattern: '^[a-z][a-z0-9._-]{0,126}$'
+        template_version_id:
+          type: string
+          format: uuid
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: Domain policy selector, not tenant scope
+        jurisdiction:
+          type: string
+          maxLength: 32
+    CreateRenditionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - idempotency_key
+        - source
+        - document_kind
+        - issued_at
+        - locale
+        - render_schema
+        - render_model
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        document_kind:
+          type: string
+          minLength: 1
+          maxLength: 100
+        issued_at:
+          type: string
+          format: date-time
+        locale:
+          type: string
+          pattern: '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$'
+        template_selector:
+          $ref: '#/components/schemas/TemplateSelector'
+        render_schema:
+          type: string
+          minLength: 1
+          maxLength: 200
+        render_model:
+          type: object
+          additionalProperties: true
+    AuthorizedDownload:
+      type: object
+      required: [url, expires_at]
+      properties:
+        url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+    DocumentRendition:
+      type: object
+      required:
+        - id
+        - source
+        - origin
+        - mutability
+        - role
+        - status
+        - media_type
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          description: Canonical Documents core record when materialized
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        origin:
+          $ref: '#/components/schemas/DocumentOrigin'
+        mutability:
+          $ref: '#/components/schemas/DocumentMutability'
+        role:
+          $ref: '#/components/schemas/RenditionRole'
+        source_rendition_id:
+          type: string
+          format: uuid
+          description: Original rendition for COPY artifacts
+        status:
+          $ref: '#/components/schemas/RenditionStatus'
+        media_type:
+          type: string
+          const: application/pdf
+        template_version_id:
+          type: string
+          format: uuid
+        renderer:
+          type: string
+        renderer_version:
+          type: string
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+        ready_at:
+          type: string
+          format: date-time
+        failure_code:
+          type: string
+        failure_message:
+          type: string
+    CreateCopyRequest:
+      type: object
+      additionalProperties: false
+      required: [idempotency_key, reason_code]
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+        reason_code:
+          type: string
+          enum: [CUSTOMER_REQUEST, INTERNAL_RECORD, LEGAL_REQUEST, REPLACEMENT_DELIVERY]
+        locale:
+          type: string
+          pattern: '^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$'
+    TemplatePage:
+      type: object
+      required: [items, page, limit, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentTemplate'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    TemplateVersionPage:
+      type: object
+      required: [items, page, limit, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentTemplateVersion'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    RenditionPage:
+      type: object
+      required: [items, page, limit, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentRendition'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        correlation_id:
+          type: string
+          format: uuid
+        details:
+          type: object
+          additionalProperties: true

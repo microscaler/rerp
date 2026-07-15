@@ -48,9 +48,9 @@ Phase 1 permits base-currency posting only and supports full credit notes only.
 Apply database resources in this order:
 
 1. `microservices/accounting/sql/rls/v1/install.sql`;
-2. `microservices/accounting/migrations/accounting/foundation/0001_generated_entities.sql`;
-3. `microservices/accounting/migrations/accounting/foundation/0002_controls_and_rls.sql`;
-4. `microservices/accounting/migrations/accounting/foundation/0003_document_artifacts.sql`.
+2. `microservices/accounting/migrations/foundation/0001_generated_entities.sql`;
+3. `microservices/accounting/migrations/foundation/0002_controls_and_rls.sql`;
+4. `microservices/accounting/migrations/foundation/0003_document_artifacts.sql`.
 
 `microservices/accounting/scripts/setup-db.sh` enforces that order and grants
 the explicit Sesame RLS v1 function set plus table DML to the `rerp` role.

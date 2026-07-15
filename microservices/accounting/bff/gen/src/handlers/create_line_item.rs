@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -59,21 +60,17 @@ pub struct Response {
     #[serde(rename = "description")]
     pub description: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_amount")]
-    pub discount_amount: Option<f64>,
+    pub discount_amount: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "discount_percent")]
-    pub discount_percent: Option<f64>,
+    pub discount_percent: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gl_account_credit")]
-    pub gl_account_credit: Option<String>,
+    pub gl_account_credit: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gl_account_debit")]
-    pub gl_account_debit: Option<String>,
+    pub gl_account_debit: String,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -81,32 +78,26 @@ pub struct Response {
     #[serde(rename = "invoice_id")]
     pub invoice_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "product_code")]
-    pub product_code: Option<String>,
+    pub product_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "product_id")]
-    pub product_id: Option<String>,
+    pub product_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "product_name")]
-    pub product_name: Option<String>,
+    pub product_name: String,
 
     #[serde(rename = "quantity")]
     pub quantity: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_amount")]
-    pub tax_amount: Option<f64>,
+    pub tax_amount: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_code")]
-    pub tax_code: Option<String>,
+    pub tax_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_rate")]
-    pub tax_rate: Option<f64>,
+    pub tax_rate: f64,
 
     #[serde(rename = "unit_price")]
     pub unit_price: f64,

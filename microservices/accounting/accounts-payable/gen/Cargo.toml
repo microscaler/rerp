@@ -33,8 +33,7 @@ serde_yaml = { workspace = true }
 config = { workspace = true }
 http = { workspace = true }
 may = { workspace = true }
-may_minihttp = { workspace = true }
-may_http = { workspace = true }
+may_minihttp = { workspace = true, features = ["client"] }
 http_legacy = { workspace = true }
 anyhow = { workspace = true }
 # Same pin as workspace `brrtrouter` — generated `main.rs` uses `arc_swap::ArcSwap` (Phase 1).

@@ -19,13 +19,10 @@ tooling/.venv
 .mypy_cache
 .ruff_cache
 
-# Build outputs are excluded by default. Runtime-only service Dockerfiles copy
-# an explicitly allow-listed artifact produced by Tilt; do not send the large
-# collection of historical/cross-architecture binaries as build context.
-build_artifacts/*
-!build_artifacts/amd64/
-build_artifacts/amd64/*
-!build_artifacts/amd64/invoice
+# Service images use a narrow temporary context staged by `rerp docker`; never
+# send repository build outputs in base-image or unrelated Docker contexts.
+build_artifacts
+.docker-context
 
 # Website / frontend (avoid copying into build context)
 ui/website/node_modules
@@ -36,4 +33,3 @@ ui/website/dist
 .env
 .env.*
 *.log
-

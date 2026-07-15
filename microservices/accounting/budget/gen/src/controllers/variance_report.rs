@@ -1,12 +1,13 @@
 // User-owned controller for handler 'variance_report'.
 
 use crate::handlers::variance_report::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(VarianceReportController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         breach_threshold: Some(3.14),
         budget_id: "example".to_string(),
         budget_name: Some("example".to_string()),
@@ -22,5 +23,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         total_variance: Some(3.14),
         total_variance_percent: Some(3.14),
         warning_threshold: Some(3.14),
-    }
+    })
 }

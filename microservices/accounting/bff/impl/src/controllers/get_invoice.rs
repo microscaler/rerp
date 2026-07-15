@@ -66,7 +66,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         status: "POSTED".to_string(), // TODO: Set from your business logic
 
-        subtotal: 0, // TODO: Set from your business logic
+        subtotal: Some(0), // TODO: Set from your business logic
 
         tax_amount: String::new(), // TODO: Set from your business logic
 

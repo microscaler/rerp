@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -57,9 +58,8 @@ pub struct Response {
     #[serde(rename = "default_values")]
     pub default_values: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
-    pub description: Option<String>,
+    pub description: String,
 
     #[serde(rename = "document_type")]
     pub document_type: String,

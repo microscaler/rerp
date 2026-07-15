@@ -36,9 +36,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         line_number: String::new(), // TODO: Set from your business logic
 
-        line_subtotal: 0, // TODO: Set from your business logic
+        line_subtotal: Some(0), // TODO: Set from your business logic
 
-        line_total: 0, // TODO: Set from your business logic
+        line_total: Some(0), // TODO: Set from your business logic
 
         metadata: String::new(), // TODO: Set from your business logic
 

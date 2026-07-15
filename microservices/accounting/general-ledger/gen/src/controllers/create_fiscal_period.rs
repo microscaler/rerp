@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_fiscal_period'.
 
 use crate::handlers::create_fiscal_period::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateFiscalPeriodController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         company_id: "example".to_string(),
         created_at: Some("example".to_string()),
         end_date: "example".to_string(),
@@ -18,5 +19,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         start_date: "example".to_string(),
         updated_at: Some("example".to_string()),
         year: 42,
-    }
+    })
 }

@@ -14,7 +14,8 @@ pub struct Account {
 
     pub created_at: String,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
     pub currency_code: String,
 
@@ -34,7 +35,8 @@ pub struct Account {
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -43,69 +45,97 @@ pub struct AccountBalance {
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
     pub as_of_date: String,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub period_credits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_credits: Option<f64>,
 
-    pub period_debits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_debits: Option<f64>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AccountBalancesReport {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub lines: Vec<AccountBalance>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<AccountBalance>>,
 
-    pub net_income: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub net_income: Option<f64>,
 
-    pub report_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_date: Option<String>,
 
-    pub total_assets: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_assets: Option<f64>,
 
-    pub total_equity: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_equity: Option<f64>,
 
-    pub total_expenses: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_expenses: Option<f64>,
 
-    pub total_liabilities: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_liabilities: Option<f64>,
 
-    pub total_revenue: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_revenue: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AccountBalancesReportResponse {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub lines: Vec<AccountBalance>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<AccountBalance>>,
 
-    pub net_income: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub net_income: Option<f64>,
 
-    pub report_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_date: Option<String>,
 
-    pub total_assets: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_assets: Option<f64>,
 
-    pub total_equity: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_equity: Option<f64>,
 
-    pub total_expenses: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_expenses: Option<f64>,
 
-    pub total_liabilities: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_liabilities: Option<f64>,
 
-    pub total_revenue: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_revenue: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -134,13 +164,15 @@ pub struct ApproveJournalEntryResponse {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -148,9 +180,11 @@ pub struct ApproveJournalEntryResponse {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -212,7 +246,8 @@ pub struct ChartOfAccount {
 
     pub code: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub description: String,
 
@@ -224,9 +259,11 @@ pub struct ChartOfAccount {
 
     pub name: String,
 
-    pub parent_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -235,21 +272,28 @@ pub struct ChartTemplate {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub fiscal_day: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_day: Option<i32>,
 
-    pub fiscal_month: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_month: Option<i32>,
 
     pub id: String,
 
-    pub include_subperiods: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_subperiods: Option<bool>,
 
     pub is_active: bool,
 
@@ -259,13 +303,16 @@ pub struct ChartTemplate {
 
     pub name: String,
 
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
     pub version: String,
 }
@@ -274,21 +321,27 @@ pub struct ChartTemplate {
 pub struct ChartTemplateAccountNode {
     pub account_code: String,
 
-    pub account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
 
     pub account_name: String,
 
     pub account_type: String,
 
-    pub child_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub child_count: Option<i32>,
 
-    pub is_parent: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_parent: Option<bool>,
 
-    pub level: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub level: Option<i32>,
 
-    pub parent_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_account_id: Option<String>,
 
-    pub tags: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -297,35 +350,45 @@ pub struct ChartTemplateDeployment {
 
     pub chart_of_account_id: String,
 
-    pub chart_template_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chart_template_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_periods: Option<i32>,
 
     pub fiscal_year_id: String,
 
-    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CloseFiscalYearRequest {
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CloseFiscalYearResponse {
-    pub closed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
 
-    pub closed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
@@ -339,7 +402,8 @@ pub struct CloseFiscalYearResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
@@ -354,9 +418,11 @@ pub struct CreateAccountRequest {
 
     pub currency_code: String,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
     pub name: String,
 
@@ -373,7 +439,8 @@ pub struct CreateAccountResponse {
 
     pub created_at: String,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
     pub currency_code: String,
 
@@ -393,7 +460,8 @@ pub struct CreateAccountResponse {
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -402,13 +470,16 @@ pub struct CreateChartOfAccountRequest {
 
     pub code: String,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
     pub name: String,
 
-    pub parent_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -417,7 +488,8 @@ pub struct CreateChartOfAccountResponse {
 
     pub code: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub description: String,
 
@@ -429,32 +501,41 @@ pub struct CreateChartOfAccountResponse {
 
     pub name: String,
 
-    pub parent_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateChartTemplateRequest {
     pub code: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub fiscal_day: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_day: Option<i32>,
 
-    pub fiscal_month: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_month: Option<i32>,
 
-    pub include_subperiods: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_subperiods: Option<bool>,
 
     pub jurisdiction_code: String,
 
     pub name: String,
 
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
-    pub version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -463,21 +544,28 @@ pub struct CreateChartTemplateResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub fiscal_day: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_day: Option<i32>,
 
-    pub fiscal_month: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_month: Option<i32>,
 
     pub id: String,
 
-    pub include_subperiods: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_subperiods: Option<bool>,
 
     pub is_active: bool,
 
@@ -487,20 +575,24 @@ pub struct CreateChartTemplateResponse {
 
     pub name: String,
 
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
     pub version: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateCurrencyRevaluationRequest {
-    pub account_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
 
     pub company_id: String,
 
@@ -517,7 +609,8 @@ pub struct CreateCurrencyRevaluationResponse {
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
     pub status: String,
 }
@@ -528,7 +621,8 @@ pub struct CreateFiscalPeriodRequest {
 
     pub end_date: String,
 
-    pub month: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub month: Option<i32>,
 
     pub name: String,
 
@@ -541,7 +635,8 @@ pub struct CreateFiscalPeriodRequest {
 pub struct CreateFiscalPeriodResponse {
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub end_date: String,
 
@@ -549,7 +644,8 @@ pub struct CreateFiscalPeriodResponse {
 
     pub is_locked: bool,
 
-    pub is_open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_open: Option<bool>,
 
     pub month: i32,
 
@@ -557,45 +653,56 @@ pub struct CreateFiscalPeriodResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPositionRequest {
-    pub account_mappings: Vec<FiscalPositionAccountMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_mappings: Option<Vec<FiscalPositionAccountMappingRequest>>,
 
-    pub auto_apply: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_apply: Option<bool>,
 
     pub code: String,
 
     pub company_id: String,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_id: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub name: String,
 
-    pub state_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_ids: Option<Vec<String>>,
 
-    pub tax_mappings: Vec<FiscalPositionTaxMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_mappings: Option<Vec<FiscalPositionTaxMappingRequest>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPositionResponse {
-    pub auto_apply: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_apply: Option<bool>,
 
     pub code: String,
 
     pub company_id: String,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -603,20 +710,24 @@ pub struct CreateFiscalPositionResponse {
 
     pub name: String,
 
-    pub state_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_ids: Option<Vec<String>>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalYearRequest {
     pub company_id: String,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub period_type: String,
 
@@ -627,17 +738,22 @@ pub struct CreateFiscalYearRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalYearResponse {
-    pub closed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
 
-    pub closed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
@@ -651,14 +767,16 @@ pub struct CreateFiscalYearResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateJournalEntryRequest {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
     pub currency_code: String,
 
@@ -666,17 +784,21 @@ pub struct CreateJournalEntryRequest {
 
     pub entry_date: String,
 
-    pub entry_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_number: Option<String>,
 
-    pub exchange_rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exchange_rate: Option<f64>,
 
-    pub fiscal_period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_period_id: Option<String>,
 
     pub journal_id: String,
 
     pub lines: Vec<LineItemRequest>,
 
-    pub reference_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference_number: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -705,13 +827,15 @@ pub struct CreateJournalEntryResponse {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -719,9 +843,11 @@ pub struct CreateJournalEntryResponse {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -730,15 +856,19 @@ pub struct CreateJournalRequest {
 
     pub company_id: String,
 
-    pub currency_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_id: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
     pub name: String,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 
     #[serde(rename = "type")]
     pub r#type: String,
@@ -748,15 +878,19 @@ pub struct CreateJournalRequest {
 pub struct CreateJournalResponse {
     pub code: String,
 
-    pub company_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_code: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_id: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
     pub id: String,
 
@@ -764,18 +898,23 @@ pub struct CreateJournalResponse {
 
     pub name: String,
 
-    pub restrict_mode_hash_table: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restrict_mode_hash_table: Option<bool>,
 
-    pub sequence_number_next: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_number_next: Option<i32>,
 
-    pub sequence_prefix: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_prefix: Option<String>,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -786,7 +925,8 @@ pub struct CreateLockDateRequest {
 
     pub locked_through_date: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -799,7 +939,8 @@ pub struct CreateLockDateResponse {
 
     pub locked_through_date: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -808,15 +949,20 @@ pub struct CreatePaymentMethodRequest {
 
     pub company_id: String,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub is_payable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_payable: Option<bool>,
 
-    pub is_receivable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_receivable: Option<bool>,
 
-    pub journal_mappings: Vec<PaymentMethodJournalMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_mappings: Option<Vec<PaymentMethodJournalMappingRequest>>,
 
     pub name: String,
 
@@ -829,23 +975,28 @@ pub struct CreatePaymentMethodResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
     pub is_active: bool,
 
-    pub is_payable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_payable: Option<bool>,
 
-    pub is_receivable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_receivable: Option<bool>,
 
     pub name: String,
 
     pub payment_method_type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -854,11 +1005,14 @@ pub struct CreatePaymentTermRequest {
 
     pub company_id: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub installment_lines: Vec<PaymentTermLineRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub installment_lines: Option<Vec<PaymentTermLineRequest>>,
 
     pub name: String,
 
@@ -872,11 +1026,14 @@ pub struct CreatePaymentTermResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -887,33 +1044,39 @@ pub struct CreatePaymentTermResponse {
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateTaxRepartitionLineRequest {
     pub account_id: String,
 
-    pub percentage: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub percentage: Option<f64>,
 
     pub ratio: f64,
 
     pub repartition_type: String,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 
     pub tax_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateTaxRepartitionLineResponse {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
@@ -923,13 +1086,16 @@ pub struct CreateTaxRepartitionLineResponse {
 
     pub repartition_type: String,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 
     pub tax_id: String,
 
-    pub tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_name: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -940,7 +1106,8 @@ pub struct CurrencyRevaluation {
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
     pub status: String,
 }
@@ -949,7 +1116,8 @@ pub struct CurrencyRevaluation {
 pub struct DeleteAccountResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -958,7 +1126,8 @@ pub struct DeleteAccountResponse {
 pub struct DeleteChartOfAccountResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -967,7 +1136,8 @@ pub struct DeleteChartOfAccountResponse {
 pub struct DeleteChartTemplateResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -976,7 +1146,8 @@ pub struct DeleteChartTemplateResponse {
 pub struct DeleteFiscalPeriodResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -985,7 +1156,8 @@ pub struct DeleteFiscalPeriodResponse {
 pub struct DeleteFiscalPositionResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -994,7 +1166,8 @@ pub struct DeleteFiscalPositionResponse {
 pub struct DeleteFiscalYearResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -1003,7 +1176,8 @@ pub struct DeleteFiscalYearResponse {
 pub struct DeleteJournalEntryResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -1012,7 +1186,8 @@ pub struct DeleteJournalEntryResponse {
 pub struct DeleteJournalResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -1021,7 +1196,8 @@ pub struct DeleteJournalResponse {
 pub struct DeletePaymentMethodResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -1030,7 +1206,8 @@ pub struct DeletePaymentMethodResponse {
 pub struct DeletePaymentTermResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -1039,18 +1216,21 @@ pub struct DeletePaymentTermResponse {
 pub struct DeleteTaxRepartitionLineResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DeployChartTemplateRequest {
-    pub chart_of_account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chart_of_account_code: Option<String>,
 
     pub company_id: String,
 
-    pub year: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub year: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1059,29 +1239,35 @@ pub struct DeployChartTemplateResponse {
 
     pub chart_of_account_id: String,
 
-    pub chart_template_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chart_template_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_periods: Option<i32>,
 
     pub fiscal_year_id: String,
 
-    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FieldError {
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub field: String,
 
@@ -1092,7 +1278,8 @@ pub struct FieldError {
 pub struct FiscalPeriod {
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub end_date: String,
 
@@ -1100,7 +1287,8 @@ pub struct FiscalPeriod {
 
     pub is_locked: bool,
 
-    pub is_open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_open: Option<bool>,
 
     pub month: i32,
 
@@ -1108,24 +1296,29 @@ pub struct FiscalPeriod {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FiscalPosition {
-    pub auto_apply: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_apply: Option<bool>,
 
     pub code: String,
 
     pub company_id: String,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -1133,30 +1326,38 @@ pub struct FiscalPosition {
 
     pub name: String,
 
-    pub state_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_ids: Option<Vec<String>>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FiscalPositionAccountMapping {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub destination_account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub destination_account_code: Option<String>,
 
     pub destination_account_id: String,
 
-    pub destination_account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub destination_account_name: Option<String>,
 
-    pub fiscal_position_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_position_id: Option<String>,
 
     pub id: String,
 
-    pub source_account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_account_code: Option<String>,
 
     pub source_account_id: String,
 
-    pub source_account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_account_name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1168,19 +1369,23 @@ pub struct FiscalPositionAccountMappingRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FiscalPositionTaxMapping {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub destination_tax_id: String,
 
-    pub destination_tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub destination_tax_name: Option<String>,
 
-    pub fiscal_position_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_position_id: Option<String>,
 
     pub id: String,
 
     pub source_tax_id: String,
 
-    pub source_tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_tax_name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1192,17 +1397,22 @@ pub struct FiscalPositionTaxMappingRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FiscalYear {
-    pub closed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
 
-    pub closed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
@@ -1216,35 +1426,40 @@ pub struct FiscalYear {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GenerateFiscalYearPeriodsRequest {
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub period_type: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GenerateFiscalYearPeriodsResponse {
-    pub periods: Vec<FiscalPeriod>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub periods: Option<Vec<FiscalPeriod>>,
 
     pub periods_created: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GeneratePeriodsRequest {
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub period_type: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GeneratePeriodsResult {
-    pub periods: Vec<FiscalPeriod>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub periods: Option<Vec<FiscalPeriod>>,
 
     pub periods_created: i32,
 }
@@ -1255,23 +1470,31 @@ pub struct GetAccountBalanceResponse {
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
     pub as_of_date: String,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub period_credits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_credits: Option<f64>,
 
-    pub period_debits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_debits: Option<f64>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1280,7 +1503,8 @@ pub struct GetChartOfAccountResponse {
 
     pub code: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub description: String,
 
@@ -1292,16 +1516,19 @@ pub struct GetChartOfAccountResponse {
 
     pub name: String,
 
-    pub parent_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetFiscalPeriodResponse {
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub end_date: String,
 
@@ -1309,7 +1536,8 @@ pub struct GetFiscalPeriodResponse {
 
     pub is_locked: bool,
 
-    pub is_open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_open: Option<bool>,
 
     pub month: i32,
 
@@ -1317,7 +1545,8 @@ pub struct GetFiscalPeriodResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
@@ -1326,15 +1555,19 @@ pub struct GetFiscalPeriodResponse {
 pub struct GetJournalResponse {
     pub code: String,
 
-    pub company_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_code: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_id: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
     pub id: String,
 
@@ -1342,29 +1575,37 @@ pub struct GetJournalResponse {
 
     pub name: String,
 
-    pub restrict_mode_hash_table: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restrict_mode_hash_table: Option<bool>,
 
-    pub sequence_number_next: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_number_next: Option<i32>,
 
-    pub sequence_prefix: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_prefix: Option<String>,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetTaxRepartitionLineResponse {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
@@ -1374,28 +1615,35 @@ pub struct GetTaxRepartitionLineResponse {
 
     pub repartition_type: String,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 
     pub tax_id: String,
 
-    pub tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_name: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Journal {
     pub code: String,
 
-    pub company_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_code: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_id: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
     pub id: String,
 
@@ -1403,18 +1651,23 @@ pub struct Journal {
 
     pub name: String,
 
-    pub restrict_mode_hash_table: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restrict_mode_hash_table: Option<bool>,
 
-    pub sequence_number_next: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_number_next: Option<i32>,
 
-    pub sequence_prefix: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_prefix: Option<String>,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1443,13 +1696,15 @@ pub struct JournalEntry {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -1457,9 +1712,11 @@ pub struct JournalEntry {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1468,11 +1725,14 @@ pub struct JournalEntryLine {
 
     pub amount_currency: f64,
 
-    pub analytic_distribution: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub analytic_distribution: Option<serde_json::Value>,
 
-    pub balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub credit: f64,
 
@@ -1480,7 +1740,8 @@ pub struct JournalEntryLine {
 
     pub date: String,
 
-    pub date_maturity: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_maturity: Option<String>,
 
     pub debit: f64,
 
@@ -1496,7 +1757,8 @@ pub struct JournalEntryLine {
 
     pub tax_ids: Vec<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1511,9 +1773,11 @@ pub struct JournalItem {
 
     pub journal_entry_id: String,
 
-    pub reconciled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled: Option<bool>,
 
-    pub reconciliation_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciliation_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1527,69 +1791,98 @@ pub struct JournalItemReconciliation {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LedgerReport {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub date_from: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_from: Option<String>,
 
-    pub date_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_to: Option<String>,
 
-    pub lines: Vec<LedgerReportLine>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<LedgerReportLine>>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 
-    pub report_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_date: Option<String>,
 
-    pub total_lines: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_lines: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LedgerReportLine {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub balance: Option<f64>,
 
-    pub credit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub credit: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub debit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub debit: Option<f64>,
 
-    pub entry_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_date: Option<String>,
 
-    pub entry_description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_description: Option<String>,
 
-    pub entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_id: Option<String>,
 
-    pub entry_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_number: Option<String>,
 
-    pub journal_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_code: Option<String>,
 
-    pub line_number: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_number: Option<i32>,
 
-    pub reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LedgerReportResponse {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub date_from: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_from: Option<String>,
 
-    pub date_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_to: Option<String>,
 
-    pub lines: Vec<LedgerReportLine>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<LedgerReportLine>>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 
-    pub report_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_date: Option<String>,
 
-    pub total_lines: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_lines: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1605,28 +1898,38 @@ pub struct LineError {
 pub struct LineItemRequest {
     pub account_id: String,
 
-    pub amount_currency: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub amount_currency: Option<f64>,
 
-    pub analytic_distribution: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub analytic_distribution: Option<serde_json::Value>,
 
-    pub credit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub credit: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub debit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub debit: Option<f64>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub partner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub partner_id: Option<String>,
 
-    pub reference_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference_number: Option<String>,
 
-    pub tax_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListAccountsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<Account>,
 
@@ -1639,7 +1942,8 @@ pub struct ListAccountsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListChartOfAccountsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<ChartOfAccount>,
 
@@ -1652,7 +1956,8 @@ pub struct ListChartOfAccountsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListChartTemplatesResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<ChartTemplate>,
 
@@ -1665,7 +1970,8 @@ pub struct ListChartTemplatesResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListFiscalPeriodsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPeriod>,
 
@@ -1678,7 +1984,8 @@ pub struct ListFiscalPeriodsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListFiscalPositionsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPosition>,
 
@@ -1691,7 +1998,8 @@ pub struct ListFiscalPositionsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListFiscalYearPeriodsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPeriod>,
 
@@ -1704,7 +2012,8 @@ pub struct ListFiscalYearPeriodsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListFiscalYearsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalYear>,
 
@@ -1717,7 +2026,8 @@ pub struct ListFiscalYearsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListJournalEntriesByJournalResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<JournalEntry>,
 
@@ -1730,7 +2040,8 @@ pub struct ListJournalEntriesByJournalResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListJournalEntriesResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<JournalEntry>,
 
@@ -1755,7 +2066,8 @@ pub struct ListJournalItemsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListJournalsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<Journal>,
 
@@ -1780,7 +2092,8 @@ pub struct ListPaymentMethodJournalMappingsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListPaymentMethodsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<PaymentMethod>,
 
@@ -1793,7 +2106,8 @@ pub struct ListPaymentMethodsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListPaymentTermsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<PaymentTerm>,
 
@@ -1806,7 +2120,8 @@ pub struct ListPaymentTermsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListTaxRepartitionLinesResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<TaxRepartitionLine>,
 
@@ -1827,12 +2142,14 @@ pub struct LockDate {
 
     pub locked_through_date: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedAccounts {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<Account>,
 
@@ -1845,7 +2162,8 @@ pub struct PaginatedAccounts {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedChartOfAccounts {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<ChartOfAccount>,
 
@@ -1858,7 +2176,8 @@ pub struct PaginatedChartOfAccounts {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedChartTemplates {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<ChartTemplate>,
 
@@ -1871,7 +2190,8 @@ pub struct PaginatedChartTemplates {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedFiscalPeriods {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPeriod>,
 
@@ -1884,7 +2204,8 @@ pub struct PaginatedFiscalPeriods {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedFiscalPositions {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPosition>,
 
@@ -1897,7 +2218,8 @@ pub struct PaginatedFiscalPositions {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedFiscalYearPeriods {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalPeriod>,
 
@@ -1910,7 +2232,8 @@ pub struct PaginatedFiscalYearPeriods {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedFiscalYears {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<FiscalYear>,
 
@@ -1923,7 +2246,8 @@ pub struct PaginatedFiscalYears {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedJournalEntries {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<JournalEntry>,
 
@@ -1943,7 +2267,8 @@ pub struct PaginatedJournalItems {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedJournals {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<Journal>,
 
@@ -1963,7 +2288,8 @@ pub struct PaginatedLockDates {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedPaymentMethods {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<PaymentMethod>,
 
@@ -1976,7 +2302,8 @@ pub struct PaginatedPaymentMethods {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedPaymentTerms {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<PaymentTerm>,
 
@@ -1988,8 +2315,18 @@ pub struct PaginatedPaymentTerms {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedResponse {
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedTaxRepartitionLines {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<TaxRepartitionLine>,
 
@@ -2006,40 +2343,50 @@ pub struct PaymentMethod {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
     pub is_active: bool,
 
-    pub is_payable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_payable: Option<bool>,
 
-    pub is_receivable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_receivable: Option<bool>,
 
     pub name: String,
 
     pub payment_method_type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaymentMethodJournalMapping {
-    pub account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
-    pub is_default: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_default: Option<bool>,
 
-    pub journal_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_code: Option<String>,
 
     pub journal_id: String,
 
-    pub journal_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_name: Option<String>,
 
     pub payment_direction: String,
 
@@ -2048,9 +2395,11 @@ pub struct PaymentMethodJournalMapping {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaymentMethodJournalMappingRequest {
-    pub account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
 
-    pub is_default: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_default: Option<bool>,
 
     pub journal_id: String,
 
@@ -2063,11 +2412,14 @@ pub struct PaymentTerm {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -2078,26 +2430,32 @@ pub struct PaymentTerm {
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaymentTermLine {
     pub amount_percentage: f64,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub date_percentage: f64,
 
-    pub discount_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_amount: Option<f64>,
 
-    pub discount_days: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_days: Option<i32>,
 
-    pub discount_percentage: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_percentage: Option<f64>,
 
     pub id: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
     pub payment_term_id: String,
 }
@@ -2108,13 +2466,17 @@ pub struct PaymentTermLineRequest {
 
     pub date_percentage: f64,
 
-    pub discount_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_amount: Option<f64>,
 
-    pub discount_days: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_days: Option<i32>,
 
-    pub discount_percentage: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_percentage: Option<f64>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2143,13 +2505,15 @@ pub struct PostJournalEntryResponse {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -2157,16 +2521,19 @@ pub struct PostJournalEntryResponse {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReconcileJournalItemsRequest {
     pub journal_item_ids: Vec<String>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2180,17 +2547,22 @@ pub struct ReconcileJournalItemsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReopenFiscalYearResponse {
-    pub closed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
 
-    pub closed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
@@ -2204,16 +2576,19 @@ pub struct ReopenFiscalYearResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReverseJournalEntryRequest {
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub use_original_date: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub use_original_date: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2242,13 +2617,15 @@ pub struct ReverseJournalEntryResponse {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -2256,20 +2633,25 @@ pub struct ReverseJournalEntryResponse {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TaxRepartitionLine {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
@@ -2279,47 +2661,63 @@ pub struct TaxRepartitionLine {
 
     pub repartition_type: String,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 
     pub tax_id: String,
 
-    pub tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_name: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrialBalanceLine {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
-    pub account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub period_credits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_credits: Option<f64>,
 
-    pub period_debits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_debits: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrialBalanceReport {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub lines: Vec<TrialBalanceLine>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 
     pub report_date: String,
 
@@ -2330,15 +2728,19 @@ pub struct TrialBalanceReport {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrialBalanceResponse {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub lines: Vec<TrialBalanceLine>,
 
-    pub period_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub period_id: Option<String>,
 
     pub report_date: String,
 
@@ -2349,20 +2751,35 @@ pub struct TrialBalanceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UnreconcileJournalItemsRequest {
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 
     pub reconciliation_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UnreconcileJournalItemsResponse {
+    pub code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
+
+    pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAccountRequest {
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2375,7 +2792,8 @@ pub struct UpdateAccountResponse {
 
     pub created_at: String,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
     pub currency_code: String,
 
@@ -2395,18 +2813,23 @@ pub struct UpdateAccountResponse {
 
     pub updated_at: String,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateChartOfAccountRequest {
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2415,7 +2838,8 @@ pub struct UpdateChartOfAccountResponse {
 
     pub code: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub description: String,
 
@@ -2427,22 +2851,29 @@ pub struct UpdateChartOfAccountResponse {
 
     pub name: String,
 
-    pub parent_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateChartTemplateRequest {
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub is_default: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_default: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2451,21 +2882,28 @@ pub struct UpdateChartTemplateResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub fiscal_day: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_day: Option<i32>,
 
-    pub fiscal_month: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_month: Option<i32>,
 
     pub id: String,
 
-    pub include_subperiods: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_subperiods: Option<bool>,
 
     pub is_active: bool,
 
@@ -2475,35 +2913,44 @@ pub struct UpdateChartTemplateResponse {
 
     pub name: String,
 
-    pub number_of_periods: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub number_of_periods: Option<i32>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
     pub version: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalPeriodRequest {
-    pub end_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<String>,
 
-    pub is_locked: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_locked: Option<bool>,
 
-    pub is_open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_open: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalPeriodResponse {
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub end_date: String,
 
@@ -2511,7 +2958,8 @@ pub struct UpdateFiscalPeriodResponse {
 
     pub is_locked: bool,
 
-    pub is_open: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_open: Option<bool>,
 
     pub month: i32,
 
@@ -2519,43 +2967,56 @@ pub struct UpdateFiscalPeriodResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalPositionRequest {
-    pub account_mappings: Vec<FiscalPositionAccountMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_mappings: Option<Vec<FiscalPositionAccountMappingRequest>>,
 
-    pub auto_apply: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_apply: Option<bool>,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_id: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub state_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_ids: Option<Vec<String>>,
 
-    pub tax_mappings: Vec<FiscalPositionTaxMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_mappings: Option<Vec<FiscalPositionTaxMappingRequest>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalPositionResponse {
-    pub auto_apply: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_apply: Option<bool>,
 
     pub code: String,
 
     pub company_id: String,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -2563,31 +3024,40 @@ pub struct UpdateFiscalPositionResponse {
 
     pub name: String,
 
-    pub state_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_ids: Option<Vec<String>>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalYearRequest {
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateFiscalYearResponse {
-    pub closed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
 
-    pub closed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
-    pub closing_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_date: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub end_date: String,
 
@@ -2601,20 +3071,25 @@ pub struct UpdateFiscalYearResponse {
 
     pub start_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
     pub year: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateJournalEntryRequest {
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub entry_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_date: Option<String>,
 
-    pub lines: Vec<LineItemRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<LineItemRequest>>,
 
-    pub reference_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference_number: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2643,13 +3118,15 @@ pub struct UpdateJournalEntryResponse {
 
     pub posted_at: String,
 
-    pub posted_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_by: Option<String>,
 
     pub reference_number: String,
 
     pub reversed_at: String,
 
-    pub reversed_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reversed_by: Option<String>,
 
     pub status: String,
 
@@ -2657,37 +3134,48 @@ pub struct UpdateJournalEntryResponse {
 
     pub total_debit: f64,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateJournalRequest {
-    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateJournalResponse {
     pub code: String,
 
-    pub company_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_code: Option<String>,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_id: Option<String>,
 
-    pub default_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_account_id: Option<String>,
 
     pub id: String,
 
@@ -2695,33 +3183,44 @@ pub struct UpdateJournalResponse {
 
     pub name: String,
 
-    pub restrict_mode_hash_table: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restrict_mode_hash_table: Option<bool>,
 
-    pub sequence_number_next: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_number_next: Option<i32>,
 
-    pub sequence_prefix: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence_prefix: Option<String>,
 
-    pub suspense_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suspense_account_id: Option<String>,
 
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentMethodRequest {
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub is_payable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_payable: Option<bool>,
 
-    pub is_receivable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_receivable: Option<bool>,
 
-    pub journal_mappings: Vec<PaymentMethodJournalMappingRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_mappings: Option<Vec<PaymentMethodJournalMappingRequest>>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2730,34 +3229,43 @@ pub struct UpdatePaymentMethodResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
     pub is_active: bool,
 
-    pub is_payable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_payable: Option<bool>,
 
-    pub is_receivable: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_receivable: Option<bool>,
 
     pub name: String,
 
     pub payment_method_type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdatePaymentTermRequest {
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub installment_lines: Vec<PaymentTermLineRequest>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub installment_lines: Option<Vec<PaymentTermLineRequest>>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2766,11 +3274,14 @@ pub struct UpdatePaymentTermResponse {
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub id: String,
 
@@ -2781,27 +3292,34 @@ pub struct UpdatePaymentTermResponse {
     #[serde(rename = "type")]
     pub r#type: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateTaxRepartitionLineRequest {
-    pub account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_id: Option<String>,
 
-    pub ratio: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ratio: Option<f64>,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateTaxRepartitionLineResponse {
-    pub account_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_code: Option<String>,
 
     pub account_id: String,
 
-    pub account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
@@ -2811,30 +3329,38 @@ pub struct UpdateTaxRepartitionLineResponse {
 
     pub repartition_type: String,
 
-    pub tag_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
 
     pub tax_id: String,
 
-    pub tax_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_name: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ValidationError {
     pub code: String,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub errors: Vec<FieldError>,
 
-    pub line_errors: Vec<LineError>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_errors: Option<Vec<LineError>>,
 
     pub message: String,
 
-    pub tolerance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tolerance: Option<f64>,
 
-    pub total_credit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_credit: Option<f64>,
 
-    pub total_debit: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_debit: Option<f64>,
 }

@@ -40,4 +40,5 @@ Uses `tooling/.venv/bin/rerp` after `just init`.
 ## Code Anchors
 - Config: `openapi/accounting/bff-suite-config.yaml`
 - Output: `openapi/accounting/openapi_bff.yaml`
-- Arch doc: `docs/ai/SYSTEM_BFF_GENERATION.md`
+- Historical architecture snapshot:
+  `docs/history/architecture-snapshots/SYSTEM_BFF_GENERATION.md`

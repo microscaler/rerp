@@ -1,12 +1,13 @@
 // User-owned controller for handler 'generate_cash_flow'.
 
 use crate::handlers::generate_cash_flow::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(GenerateCashFlowController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         account_details: Some(vec![]),
         beginning_cash: Some(3.14),
         company_id: "example".to_string(),
@@ -20,5 +21,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         operating_activities: Some(3.14),
         period_end: "example".to_string(),
         period_start: "example".to_string(),
-    }
+    })
 }

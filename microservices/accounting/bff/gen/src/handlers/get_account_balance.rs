@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -24,13 +25,11 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "account_code")]
-    pub account_code: Option<String>,
+    pub account_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "account_id")]
-    pub account_id: Option<String>,
+    pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "account_name")]
@@ -40,9 +39,8 @@ pub struct Response {
     #[serde(rename = "account_type")]
     pub account_type: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "as_of_date")]
-    pub as_of_date: Option<String>,
+    pub as_of_date: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closing_balance")]

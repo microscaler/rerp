@@ -9,5 +9,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: asset_service_api
+  binaryName: asset
   serviceName: asset

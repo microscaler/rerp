@@ -26,7 +26,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         created_at: None, // TODO: Set from your business logic
 
-        credit_limit: 0, // TODO: Set from your business logic
+        credit_limit: Some(0), // TODO: Set from your business logic
 
         credit_used: String::new(), // TODO: Set from your business logic
 

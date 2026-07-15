@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -32,16 +33,14 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "actual_payment_date")]
-    pub actual_payment_date: Option<String>,
+    pub actual_payment_date: String,
 
     #[serde(rename = "amount")]
     pub amount: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -50,16 +49,14 @@ pub struct Response {
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gl_entry_id")]
-    pub gl_entry_id: Option<String>,
+    pub gl_entry_id: String,
 
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
-    pub notes: Option<String>,
+    pub notes: String,
 
     #[serde(rename = "payment_date")]
     pub payment_date: String,
@@ -67,13 +64,11 @@ pub struct Response {
     #[serde(rename = "payment_method")]
     pub payment_method: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_to_gl")]
-    pub posted_to_gl: Option<bool>,
+    pub posted_to_gl: bool,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reference_number")]
-    pub reference_number: Option<String>,
+    pub reference_number: String,
 
     #[serde(rename = "status")]
     pub status: String,
@@ -82,9 +77,8 @@ pub struct Response {
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "vendor_id")]
-    pub vendor_id: Option<String>,
+    pub vendor_id: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {

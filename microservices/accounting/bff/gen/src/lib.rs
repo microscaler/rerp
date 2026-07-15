@@ -8,7 +8,8 @@ pub mod controllers;
 /// Handlers contain the business logic for each API endpoint.
 pub mod handlers;
 
-/// Handler registry for registering handlers with the dispatcher.
+/// Handler registry for **gen mock controllers** (`register_from_spec`).
+/// Impl overrides live in the sibling impl crate: `impl_registry.rs`.
 pub mod registry;
 
 /// Re-export brrtrouter crate for convenience.

@@ -35,16 +35,6 @@ spec:
             - name: http
               containerPort: {{ .Values.service.containerPort }}
               protocol: TCP
-          command: ["/app/{{ .Values.app.binaryName }}"]
-          args:
-            - "--spec"
-            - "/app/doc/openapi.yaml"
-            - "--doc-dir"
-            - "/app/doc"
-            - "--static-dir"
-            - "/app/static_site"
-            - "--config"
-            - "/app/config/config.yaml"
           env:
             # All services use the same in-pod port; Kubernetes provides DNS isolation.
             - name: PORT
@@ -130,4 +120,3 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 128Mi
-

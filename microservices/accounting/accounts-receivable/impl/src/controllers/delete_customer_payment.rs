@@ -1,0 +1,27 @@
+// Implementation stub for handler 'delete_payment'
+// This file is a starting point for your implementation.
+// You can modify this file freely - it will NOT be auto-regenerated.
+// To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_payment --force
+
+use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter_macros::handler;
+use rerp_accounting_accounts_receivable_gen::handlers::delete_customer_payment::{Request, Response};
+
+#[handler(DeletePaymentController)]
+pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
+    Response {
+        code: "example".to_string(),    // TODO: Set from your business logic
+        details: None,                  // TODO: Set from your business logic
+        message: "example".to_string(), // TODO: Set from your business logic
+    }
+}

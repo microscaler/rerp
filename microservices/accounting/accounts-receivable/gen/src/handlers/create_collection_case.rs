@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -24,9 +25,8 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "assigned_to")]
-    pub assigned_to: Option<String>,
+    pub assigned_to: String,
 
     #[serde(rename = "customer_id")]
     pub customer_id: String,
@@ -37,9 +37,8 @@ pub struct Response {
     #[serde(rename = "status")]
     pub status: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_due")]
-    pub total_due: Option<f64>,
+    pub total_due: f64,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -68,6 +67,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::create_collection_case::handle(req)
 }

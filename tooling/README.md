@@ -69,7 +69,7 @@ want fresh impl scaffolding.
 rerp gen stubs accounting general-ledger --force
 ```
 
-### `build microservice <name>`
+### `build microservice <name> [--suite <suite>] [--release]`
 
 Build a single microservice impl crate via Cargo.
 
@@ -77,7 +77,11 @@ Build a single microservice impl crate via Cargo.
 rerp build microservice general-ledger
 ```
 
-Translates to:
+Builds the implementation package named by its Cargo manifest for the current
+host architecture. Development builds are debug by default so Tilt watches the
+same artifact the command produces. `--release` is explicit.
+
+Conceptually this runs:
 
 ```bash
 cargo build -p rerp_accounting_general_ledger
@@ -91,39 +95,49 @@ targeting the generated crate when a checkout is mid-migration.
 Use `--suite <name>` or `RERP_SUITE=<name>` when the same service name exists in
 more than one suite.
 
-### `docker build-image-simple <image> <template> <hash> <artifact>`
+### `docker build-image-simple <image> <dockerfile> <hash> <artifact>`
 
 Build a Docker image for a microservice.
 
 ```bash
 rerp docker build-image-simple \
     my-image \
-    Dockerfile.accounting_general-ledger \
+    docker/microservices/Dockerfile \
     /path/to/hash \
     /path/to/artifact \
-    --service general-ledger \
-    --port 8001
+    --suite accounting \
+    --service general-ledger
 ```
 
-Translates the `--service` flag to `--module` (with `-` → `_` conversion) and
-adds system/module metadata for the underlying brrtrouter docker tool.
+Verifies the copied artifact against its SHA-256 file, discovers the service's
+actual Cargo binary and runtime directories, then stages a narrow temporary
+Docker context. The command always uses the shared parameterized Dockerfile and
+builds `<image>:tilt`; Tilt is responsible for assigning and pushing its expected
+immutable image reference.
 
 **Flags**
 
 | Flag | Description |
 |------|-------------|
-| `--system <suite>` | Override suite (default: from --service context) |
-| `--service <name>` | Service name (converted to module with - → _) |
-| `--module <name>` | Module name (alternative to --service) |
-| `--port <n>` | Container port |
-| `--binary-name <name>` | Custom binary name |
+| `--suite <suite>` | Required suite owning the service |
+| `--service <name>` | Required service name |
 | `--no-cache` | Disable Docker cache |
-| `--prune-dangling` | Prune dangling images after build |
-| `--dev-sync-only` | Only sync files, don't build image |
+
+### `docker stage-image-context <destination> <artifacts-root>`
+
+Stage one service's verified `amd64`, `arm64`, and `arm` release binaries plus
+runtime assets for Buildx. CI uses this command so release images use the same
+parameterized Dockerfile without exposing the repository as Docker context.
+
+```bash
+rerp docker stage-image-context .docker-context/invoice build_artifacts \
+    --suite accounting --service invoice
+```
 
 ### `docker build-base`
 
-Build the base Docker image shared across all service images.
+Build the local `rerp-base:latest` image shared across all service images.
+Registry publication is owned by `.github/workflows/base-images.yml`.
 
 ```bash
 rerp docker build-base

@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -41,9 +42,8 @@ pub struct Response {
     #[serde(rename = "code")]
     pub code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_by")]
@@ -52,9 +52,8 @@ pub struct Response {
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
-    pub description: Option<String>,
+    pub description: String,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -65,9 +64,8 @@ pub struct Response {
     #[serde(rename = "is_system_account")]
     pub is_system_account: bool,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "metadata")]
-    pub metadata: Option<serde_json::Value>,
+    pub metadata: serde_json::Value,
 
     #[serde(rename = "name")]
     pub name: String,
@@ -75,9 +73,8 @@ pub struct Response {
     #[serde(rename = "normal_balance")]
     pub normal_balance: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
+    pub updated_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_by")]
@@ -124,6 +121,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::update_account::handle(req)
 }

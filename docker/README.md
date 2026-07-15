@@ -9,9 +9,8 @@ docker/
 ├── base/                    # Base runtime image for all services
 │   ├── Dockerfile          # Base Alpine-based image
 │   └── README.md
-├── microservices/          # Service-specific Dockerfiles
-│   ├── Dockerfile.template # Template for generating service Dockerfiles
-│   └── Dockerfile.*        # Generated service-specific Dockerfiles
+├── microservices/
+│   └── Dockerfile          # One parameterized runtime image definition
 └── website/                # Website Docker configuration
     ├── Dockerfile          # Multi-stage build for SolidJS website
     └── nginx.conf         # Nginx configuration for serving website
@@ -19,7 +18,7 @@ docker/
 
 ## Base Image
 
-The base image (`rerp/base:latest`) provides a minimal runtime environment:
+The base image (`rerp-base:latest`) provides a minimal runtime environment:
 - Alpine Linux 3.19
 - Runtime dependencies (ca-certificates, libgcc, tzdata)
 - Standard directory structure
@@ -27,26 +26,26 @@ The base image (`rerp/base:latest`) provides a minimal runtime environment:
 
 Build the base image:
 ```bash
-docker build -t rerp/base:latest -f docker/base/Dockerfile .
+rerp docker build-base
 ```
 
 ## Service Images
 
-Service-specific Dockerfiles are generated from the template using:
-```bash
-rerp docker generate-dockerfile <system> <module> [--port N]
-```
+Every suite uses `docker/microservices/Dockerfile`. Suite, service and artifact
+identity are supplied as build arguments by `rerp docker build-image-simple`.
+The builder creates a temporary context containing exactly one verified binary,
+its config, OpenAPI document and static documentation. It does not send the RERP
+repository or binaries belonging to other suites to Docker.
 
-Example:
-```bash
-rerp docker generate-dockerfile auth idam --port 8000
-```
-
-This generates `docker/microservices/Dockerfile.auth_idam`. Run from repo root after `just init`.
+For releases, `rerp docker stage-image-context` creates the equivalent narrow
+context with verified `amd64`, `arm64`, and `arm` binaries. BuildKit supplies
+`TARGETARCH`, so the same Dockerfile selects the correct `/app/service` binary.
 
 ## Build Process
 
-**Tilt flow (single-arch, local/Kind):** Tilt runs `rerp docker copy-binary` and `rerp docker build-image-simple`; see `Tiltfile` and `tooling/README.md`.
+**Tilt flow:** Tilt builds the debug microservice, copies and hashes the exact
+binary, invokes one custom service-image build, pushes Tilt's immutable image
+reference to the shared registry, and deploys it with Helm.
 
 **Manual / multi-arch (components, e.g. auth_idam):**
 1. **Build Rust binaries**: `tooling/.venv/bin/rerp build <system>_<module> [arch]` (run `just init` first). Use `all` for amd64+arm64+arm7.
@@ -56,9 +55,8 @@ This generates `docker/microservices/Dockerfile.auth_idam`. Run from repo root a
 The build process:
 - Cross-compiles Rust binaries to `x86_64-unknown-linux-musl`
 - Copies binaries to `build_artifacts/`
-- Generates service-specific Dockerfiles from template
-- Builds Docker images using the base image
-- Pushes images to the local registry for Tilt
+- Builds service images from the single parameterized Dockerfile
+- Pushes Tilt image references to the shared registry
 
 ## Website Docker Image
 
@@ -84,7 +82,6 @@ The nginx configuration:
 Tilt orchestrates the entire build process:
 - Watches source files for changes
 - Rebuilds binaries when code changes
-- Regenerates Dockerfiles when needed
 - Builds and pushes Docker images
 - Deploys to Kubernetes
 

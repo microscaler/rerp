@@ -8,133 +8,177 @@ use serde::{Deserialize, Serialize};
 pub struct AutoMatchTransactionsRequest {
     pub bank_account_id: String,
 
-    pub date_range_from: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_range_from: Option<String>,
 
-    pub date_range_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_range_to: Option<String>,
 
-    pub description_similarity_threshold: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description_similarity_threshold: Option<f64>,
 
-    pub match_tolerance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AutoMatchTransactionsResponse {
-    pub matched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_count: Option<i32>,
 
-    pub matches: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matches: Option<Vec<serde_json::Value>>,
 
-    pub remaining_unmatched: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remaining_unmatched: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankAccount {
     pub account_number: String,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_id: Option<String>,
 
     pub bank_name: String,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
     pub id: String,
 
-    pub last_sync_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_sync_date: Option<String>,
 
     pub name: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub opening_balance_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance_date: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 
     pub status: String,
 
-    pub sync_enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_enabled: Option<bool>,
 
-    pub sync_frequency: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_frequency: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankReconciliation {
-    pub adjusted_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub adjusted_balance: Option<f64>,
 
     pub bank_account_id: String,
 
-    pub book_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub book_balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub id: String,
 
-    pub matched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_transactions: Option<i32>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reconciled_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_at: Option<String>,
 
-    pub reconciled_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_by: Option<String>,
 
     pub reconciliation_date: String,
 
-    pub statement_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statement_balance: Option<f64>,
 
     pub statement_id: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub total_matched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_matched: Option<f64>,
 
-    pub total_unmatched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_unmatched: Option<f64>,
 
-    pub unmatched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_transactions: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankReconciliationReport {
     pub bank_account_id: String,
 
-    pub bank_account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_account_name: Option<String>,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
     pub period_end: String,
 
     pub period_start: String,
 
-    pub reconciled_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_amount: Option<f64>,
 
-    pub reconciliation_percentage: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciliation_percentage: Option<f64>,
 
-    pub total_deposits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_deposits: Option<f64>,
 
-    pub total_withdrawals: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_withdrawals: Option<f64>,
 
-    pub unreconciled_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unreconciled_amount: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -143,78 +187,102 @@ pub struct BankStatement {
 
     pub closing_balance: f64,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub file_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_reference: Option<String>,
 
     pub id: String,
 
-    pub imported_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_at: Option<String>,
 
-    pub imported_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_by: Option<String>,
 
-    pub matched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_count: Option<i32>,
 
     pub opening_balance: f64,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub statement_date: String,
 
     pub statement_number: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub transaction_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_count: Option<i32>,
 
-    pub unmatched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_count: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BankTransaction {
     pub amount: f64,
 
-    pub bank_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_account_id: Option<String>,
 
-    pub counterparty_account: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_account: Option<String>,
 
-    pub counterparty_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
     pub description: String,
 
-    pub dispute_reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dispute_reason: Option<String>,
 
     pub id: String,
 
-    pub matched_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_by: Option<String>,
 
-    pub matched_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_date: Option<String>,
 
-    pub matched_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_entry_id: Option<String>,
 
-    pub matched_entry_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_entry_type: Option<String>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
 
     pub statement_id: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub transaction_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub value_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -223,13 +291,16 @@ pub struct CashPosition {
 
     pub available_balance: f64,
 
-    pub by_account: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_account: Option<Vec<serde_json::Value>>,
 
     pub company_id: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub pending_transactions: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_transactions: Option<f64>,
 
     pub total_cash: f64,
 }
@@ -240,129 +311,167 @@ pub struct CashPositionResponse {
 
     pub available_balance: f64,
 
-    pub by_account: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_account: Option<Vec<serde_json::Value>>,
 
     pub company_id: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub pending_transactions: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_transactions: Option<f64>,
 
     pub total_cash: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CompleteReconciliationResponse {
-    pub adjusted_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub adjusted_balance: Option<f64>,
 
     pub bank_account_id: String,
 
-    pub book_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub book_balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub id: String,
 
-    pub matched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_transactions: Option<i32>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reconciled_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_at: Option<String>,
 
-    pub reconciled_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_by: Option<String>,
 
     pub reconciliation_date: String,
 
-    pub statement_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statement_balance: Option<f64>,
 
     pub statement_id: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub total_matched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_matched: Option<f64>,
 
-    pub total_unmatched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_unmatched: Option<f64>,
 
-    pub unmatched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_transactions: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankAccountRequest {
     pub account_number: String,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_name: Option<String>,
 
     pub company_id: String,
 
     pub currency_code: String,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
     pub name: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub opening_balance_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance_date: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankAccountResponse {
     pub account_number: String,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_id: Option<String>,
 
     pub bank_name: String,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
     pub id: String,
 
-    pub last_sync_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_sync_date: Option<String>,
 
     pub name: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub opening_balance_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance_date: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 
     pub status: String,
 
-    pub sync_enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_enabled: Option<bool>,
 
-    pub sync_frequency: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_frequency: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBankReconciliationRequest {
     pub bank_account_id: String,
 
-    pub book_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub book_balance: Option<f64>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
     pub reconciliation_date: String,
 
@@ -373,19 +482,25 @@ pub struct CreateBankReconciliationRequest {
 pub struct CreateBankStatementRequest {
     pub bank_account_id: String,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub file_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_reference: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub statement_date: String,
 
-    pub statement_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statement_number: Option<String>,
 
     pub transactions: Vec<CreateBankTransactionRequest>,
 }
@@ -396,35 +511,45 @@ pub struct CreateBankStatementResponse {
 
     pub closing_balance: f64,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub file_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_reference: Option<String>,
 
     pub id: String,
 
-    pub imported_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_at: Option<String>,
 
-    pub imported_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_by: Option<String>,
 
-    pub matched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_count: Option<i32>,
 
     pub opening_balance: f64,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub statement_date: String,
 
     pub statement_number: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub transaction_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_count: Option<i32>,
 
-    pub unmatched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_count: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -433,7 +558,8 @@ pub struct CreateBankTransactionMatchingRequest {
 
     pub matched_entry_type: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
     pub transaction_id: String,
 }
@@ -442,21 +568,27 @@ pub struct CreateBankTransactionMatchingRequest {
 pub struct CreateBankTransactionRequest {
     pub amount: f64,
 
-    pub counterparty_account: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_account: Option<String>,
 
-    pub counterparty_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_name: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub description: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
 
     pub transaction_date: String,
 
-    pub value_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -467,52 +599,64 @@ pub struct CreateExchangeDifferenceRequest {
 
     pub currency_code: String,
 
-    pub exchange_rate_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exchange_rate_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationModelRequest {
-    pub active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active: Option<bool>,
 
-    pub match_tolerance_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_amount: Option<f64>,
 
-    pub match_tolerance_days: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_days: Option<i32>,
 
     pub name: String,
 
     pub rule_type: String,
 
-    pub sequence: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationModelResponse {
     pub active: bool,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
-    pub match_tolerance_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_amount: Option<f64>,
 
-    pub match_tolerance_days: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_days: Option<i32>,
 
     pub name: String,
 
     pub rule_type: String,
 
-    pub sequence: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationRequest {
     pub bank_account_id: String,
 
-    pub book_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub book_balance: Option<f64>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
     pub reconciliation_date: String,
 
@@ -521,41 +665,55 @@ pub struct CreateReconciliationRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateReconciliationResponse {
-    pub adjusted_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub adjusted_balance: Option<f64>,
 
     pub bank_account_id: String,
 
-    pub book_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub book_balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub difference: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub difference: Option<f64>,
 
     pub id: String,
 
-    pub matched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_transactions: Option<i32>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reconciled_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_at: Option<String>,
 
-    pub reconciled_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_by: Option<String>,
 
     pub reconciliation_date: String,
 
-    pub statement_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statement_balance: Option<f64>,
 
     pub statement_id: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub total_matched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_matched: Option<f64>,
 
-    pub total_unmatched: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_unmatched: Option<f64>,
 
-    pub unmatched_transactions: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_transactions: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -566,7 +724,8 @@ pub struct CreateTransactionExchangeDifferenceRequest {
 
     pub currency_code: String,
 
-    pub exchange_rate_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exchange_rate_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -577,7 +736,8 @@ pub struct CreateTransactionExchangeDifferenceResponse {
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
     pub transaction_id: String,
 }
@@ -590,7 +750,8 @@ pub struct CreateTransactionWriteOffRequest {
 
     pub reason: String,
 
-    pub tax_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_code: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -601,7 +762,8 @@ pub struct CreateTransactionWriteOffResponse {
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
     pub transaction_id: String,
 }
@@ -610,7 +772,8 @@ pub struct CreateTransactionWriteOffResponse {
 pub struct DeleteBankAccountResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -619,7 +782,8 @@ pub struct DeleteBankAccountResponse {
 pub struct ErrorResponse {
     pub code: String,
 
-    pub details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 
     pub message: String,
 }
@@ -628,41 +792,53 @@ pub struct ErrorResponse {
 pub struct GetBankAccountResponse {
     pub account_number: String,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_id: Option<String>,
 
     pub bank_name: String,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
     pub id: String,
 
-    pub last_sync_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_sync_date: Option<String>,
 
     pub name: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub opening_balance_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance_date: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 
     pub status: String,
 
-    pub sync_enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_enabled: Option<bool>,
 
-    pub sync_frequency: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_frequency: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -671,35 +847,45 @@ pub struct GetBankStatementResponse {
 
     pub closing_balance: f64,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub file_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_reference: Option<String>,
 
     pub id: String,
 
-    pub imported_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_at: Option<String>,
 
-    pub imported_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub imported_by: Option<String>,
 
-    pub matched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_count: Option<i32>,
 
     pub opening_balance: f64,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub statement_date: String,
 
     pub statement_number: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub transaction_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transaction_count: Option<i32>,
 
-    pub unmatched_count: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unmatched_count: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -711,7 +897,8 @@ pub struct GetTransactionReconciliationSuggestionsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBankAccountsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankAccount>,
 
@@ -724,7 +911,8 @@ pub struct ListBankAccountsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBankStatementsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankStatement>,
 
@@ -737,7 +925,8 @@ pub struct ListBankStatementsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBankTransactionsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankTransaction>,
 
@@ -757,7 +946,8 @@ pub struct ListReconciliationModelsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListReconciliationsResponse {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankReconciliation>,
 
@@ -774,7 +964,8 @@ pub struct MatchTransactionRequest {
 
     pub matched_entry_type: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
     pub transaction_id: String,
 }
@@ -783,48 +974,63 @@ pub struct MatchTransactionRequest {
 pub struct MatchTransactionResponse {
     pub amount: f64,
 
-    pub bank_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_account_id: Option<String>,
 
-    pub counterparty_account: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_account: Option<String>,
 
-    pub counterparty_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counterparty_name: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
     pub description: String,
 
-    pub dispute_reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dispute_reason: Option<String>,
 
     pub id: String,
 
-    pub matched_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_by: Option<String>,
 
-    pub matched_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_date: Option<String>,
 
-    pub matched_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_entry_id: Option<String>,
 
-    pub matched_entry_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_entry_type: Option<String>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reference: Option<String>,
 
     pub statement_id: String,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub transaction_date: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub value_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedBankAccounts {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankAccount>,
 
@@ -837,7 +1043,8 @@ pub struct PaginatedBankAccounts {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedBankStatements {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankStatement>,
 
@@ -850,7 +1057,8 @@ pub struct PaginatedBankStatements {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedBankTransactions {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankTransaction>,
 
@@ -870,10 +1078,20 @@ pub struct PaginatedReconciliationModels {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedReconciliations {
-    pub has_more: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
 
     pub items: Vec<BankReconciliation>,
 
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedResponse {
     pub limit: i32,
 
     pub page: i32,
@@ -887,16 +1105,20 @@ pub struct ReconcileTransactionRequest {
 
     pub matched_entry_type: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub write_off_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub write_off_amount: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReconcileTransactionResponse {
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
-    pub reconciliation_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciliation_id: Option<String>,
 
     pub status: String,
 
@@ -911,7 +1133,8 @@ pub struct ReconciliationAdjustment {
 
     pub id: String,
 
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
     pub transaction_id: String,
 }
@@ -920,59 +1143,77 @@ pub struct ReconciliationAdjustment {
 pub struct ReconciliationModel {
     pub active: bool,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub id: String,
 
-    pub match_tolerance_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_amount: Option<f64>,
 
-    pub match_tolerance_days: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_tolerance_days: Option<i32>,
 
     pub name: String,
 
     pub rule_type: String,
 
-    pub sequence: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReconciliationReportResponse {
     pub bank_account_id: String,
 
-    pub bank_account_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_account_name: Option<String>,
 
-    pub closing_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closing_balance: Option<f64>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
     pub period_end: String,
 
     pub period_start: String,
 
-    pub reconciled_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciled_amount: Option<f64>,
 
-    pub reconciliation_percentage: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciliation_percentage: Option<f64>,
 
-    pub total_deposits: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_deposits: Option<f64>,
 
-    pub total_withdrawals: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_withdrawals: Option<f64>,
 
-    pub unreconciled_amount: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unreconciled_amount: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReconciliationResult {
-    pub journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub journal_entry_id: Option<String>,
 
-    pub reconciliation_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reconciliation_id: Option<String>,
 
     pub status: String,
 
@@ -987,9 +1228,11 @@ pub struct ReconciliationSuggestion {
 
     pub confidence: f64,
 
-    pub model_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub model_id: Option<String>,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1001,73 +1244,107 @@ pub struct ReconciliationSuggestions {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TriggerStatementSyncResponse {
-    pub statements_found: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub statements_found: Option<i32>,
 
-    pub sync_status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_status: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UnreconcileTransactionResponse {
+    pub code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
+
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBankAccountRequest {
-    pub account_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_number: Option<String>,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_name: Option<String>,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
-    pub sync_enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_enabled: Option<bool>,
 
-    pub sync_frequency: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_frequency: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBankAccountResponse {
     pub account_number: String,
 
-    pub account_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
 
-    pub bank_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bank_id: Option<String>,
 
     pub bank_name: String,
 
     pub company_id: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub currency_code: String,
 
-    pub gl_account_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gl_account_id: Option<String>,
 
     pub id: String,
 
-    pub last_sync_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_sync_date: Option<String>,
 
     pub name: String,
 
-    pub notes: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
 
-    pub opening_balance: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance: Option<f64>,
 
-    pub opening_balance_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_balance_date: Option<String>,
 
-    pub routing_number: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub routing_number: Option<String>,
 
     pub status: String,
 
-    pub sync_enabled: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_enabled: Option<bool>,
 
-    pub sync_frequency: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sync_frequency: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

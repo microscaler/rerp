@@ -8,7 +8,7 @@
 
 ## 1. System Architecture
 
-The Documents suite is split into **8 microservices**. All services share a single PostgreSQL database (for relational metadata and JSONB extraction results) and a shared object storage bucket (S3/MinIO) for raw document files.
+The Documents suite has **9 product/API components**. Components may share a Documents deployment initially, while retaining independent API and scaling boundaries. They share PostgreSQL for RLS-scoped relational metadata and S3/MinIO for source files, template assets, and generated renditions.
 
 ```mermaid
 graph LR
@@ -37,6 +37,9 @@ graph LR
         confirmation["confirmation/
         User verification
         & approval"]
+        render["render/
+        Templates and immutable
+        generated renditions"]
     end
 
     intake --> core
@@ -46,6 +49,7 @@ graph LR
     classify --> routes
     routes --> pipeline
     pipeline --> confirmation
+    render --> core
 
     subgraph shared_infra["Shared Infrastructure"]
         postgres["PostgreSQL
@@ -62,13 +66,15 @@ graph LR
     routes --- postgres
     pipeline --- postgres
     confirmation --- postgres
+    render --- postgres
+    render --- s3
 
     style core fill:#f96,stroke:#333,stroke-width:3px
     style postgres fill:#b00,stroke:#fff,stroke-width:2px,color:#fff
     style s3 fill:#ffa500,stroke:#333,stroke-width:2px
 ```
 
-**Core principle**: `core/` is the **canonical store**. Every other service reads from `core/`, processes, and writes results back as metadata or JSONB. No service stores raw files.
+**Core principle**: `core/` is the **canonical store**. Input components read from `core/`, process, and write results back as metadata. `render/` creates output artifacts but registers their file, lineage and version identity in `core/`; it does not create a second document store.
 
 ---
 
@@ -414,6 +420,14 @@ Each service gets its own `openapi/{service}/openapi.yaml`. Below are the endpoi
 `split` and `merge` are now asynchronous — returns `202` with the new document IDs. The documents are created as new versions in `core/`.
 
 `confirm_extraction` and `correct_extraction` have been removed from `pipeline/` (see §3.7 note) — they are now managed via the `confirmation/` service.
+
+### 3.9 `render` — Document Generation and Rendition
+
+**Base Path**: `/api/v1/documents/render`
+
+`render/` owns versioned HTML/CSS templates, validation and preview, idempotent asynchronous rendition creation, immutable lineage, explicit derivative copies and download grants. A source suite owns the business facts and frozen render snapshot and submits it only after committing its domain transaction. Tenant and actor scope are derived from validated Sesame identity, never from request fields.
+
+The authoritative API is [render/openapi.yaml](render/openapi.yaml); requirements and acceptance criteria are in [PRD-008](DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md). The cross-suite ownership boundary is fixed by [ADR 002](../../docs/adrs/002-document-generation-ownership.md).
 
 ---
 

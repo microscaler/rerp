@@ -10,7 +10,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         created_at: Some("example".to_string()),
         created_by: Some("example".to_string()),
         default_values: Some(Default::default()),
-        description: Some("example".to_string()),
+        description: "example".to_string(),
         document_type: "example".to_string(),
         field_mappings: Default::default(),
         format_id: "example".to_string(),

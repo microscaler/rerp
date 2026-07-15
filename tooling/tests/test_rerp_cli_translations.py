@@ -12,8 +12,10 @@ crates are ``rerp_{suite}_{service}_gen``.
 """
 
 import importlib
+import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 cli = importlib.import_module("rerp_tooling.cli.main")
@@ -34,6 +36,46 @@ def test_gen_package_name_uses_suite_prefixed_gen_suffix() -> None:
     assert cli._rerp_gen_package_name("accounting", "general-ledger") == (
         "rerp_accounting_general_ledger_gen"
     )
+
+
+def test_gen_stubs_forwards_full_gen_command(monkeypatch) -> None:
+    forwarded = []
+    monkeypatch.setattr(
+        cli.gen_cmd,
+        "run_gen_argv",
+        lambda: forwarded.append(list(sys.argv)),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["rerp", "gen", "stubs", "documents", "render", "--force"],
+    )
+
+    cli.main()
+
+    assert forwarded == [
+        ["brrtrouter", "gen", "stubs", "documents", "render", "--force"]
+    ]
+
+
+def test_microservice_build_is_debug_by_default(monkeypatch, tmp_path: Path) -> None:
+    observed = []
+    monkeypatch.setattr(
+        cli,
+        "build_microservice",
+        lambda root, suite, service, release: observed.append(
+            (root, suite, service, release)
+        )
+        or 0,
+    )
+
+    result = cli._run_microservice_build(
+        ["microservice", "render", "--suite", "documents"],
+        project_root=tmp_path,
+    )
+
+    assert result == 0
+    assert observed == [(tmp_path, "documents", "render", False)]
 
 
 def test_build_microservice_targets_impl_manifest_package(tmp_path: Path) -> None:
@@ -141,6 +183,46 @@ services:
         if method in {"get", "post", "put", "patch", "delete"}
     }
     assert {"approve_invoice", "auto_match_transactions"} <= operation_ids
+
+
+def test_bff_generate_system_rejects_duplicate_operation_ids(tmp_path: Path) -> None:
+    accounting = tmp_path / "openapi" / "accounting"
+    for service_name in ("accounts-payable", "accounts-receivable"):
+        service_dir = accounting / service_name
+        service_dir.mkdir(parents=True, exist_ok=True)
+        (service_dir / "openapi.yaml").write_text(
+            f"""openapi: 3.1.0
+info:
+  title: {service_name}
+  version: "1.0"
+paths:
+  /payments:
+    get:
+      operationId: list_payments
+      responses:
+        "200":
+          description: OK
+""",
+        )
+
+    (accounting / "bff-suite-config.yaml").write_text(
+        """suite: accounting
+openapi_base_dir: openapi/accounting
+output_path: openapi/accounting/openapi_bff.yaml
+services:
+  accounts-payable:
+    base_path: /api/accounts-payable
+    gateway_path_style: prefixed
+    spec_path: accounts-payable/openapi.yaml
+  accounts-receivable:
+    base_path: /api/accounts-receivable
+    gateway_path_style: prefixed
+    spec_path: accounts-receivable/openapi.yaml
+""",
+    )
+
+    with pytest.raises(ValueError, match="Operation ID conflict"):
+        cli._run_bff_generate_system(["--suite", "accounting"], project_root=tmp_path)
 
 
 def test_bff_generate_suite_shorthand_uses_suite_config(tmp_path: Path) -> None:

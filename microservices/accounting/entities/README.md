@@ -212,7 +212,8 @@ The registry is automatically included via `include!()` in `src/lib.rs`.
 
 ## See Also
 
-- **RERP Preparation Plan**: `../docs/RERP_PREPARATION_PLAN.md`
+- **Historical RERP Preparation Plan**:
+  `../../../docs/history/conceptual-bootstrap/RERP_PREPARATION_PLAN.md`
 - **Accounting PRD**: `../docs/ACCOUNTING_SUITE_ENRICHMENT_PRD.md`
 - **Bank Account PRD**: `../docs/BANK_ACCOUNT_IMPROVEMENT_PRD.md`
 - **Lifeguard ORM**: `../../lifeguard/`

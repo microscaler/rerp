@@ -19,12 +19,13 @@ accidentally targeting generated crates.
 Command mapping (Tiltfile -> raw CLI):
     rerp gen suite <suite> --service <name>   -> brrtrouter gen suite <suite> --service <name>
     rerp gen stubs <suite> <name> --force     -> brrtrouter gen stubs <suite> <name> --force
-    rerp build microservice <name> [--suite]  -> brrtrouter build <suite>_<name> --package <impl-package>
-    rerp docker copy-binary <src> <dest> <bn> -> brrtrouter docker copy-binary <src> <dest> <bn>
-    rerp docker build-image-simple ...        -> brrtrouter docker build-image-simple ... --system <suite> --module <name>
+    rerp build microservice <name> [--suite]  -> debug host build of the impl package
+    rerp docker copy-binary <src> <dest> <bn> -> copy one verified runtime artifact
+    rerp docker build-image-simple ...        -> stage one service and use the shared Dockerfile
     rerp bff generate-system [--system]       -> writes openapi/{suite}/openapi_bff.yaml
 """
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -40,6 +41,13 @@ if _brrtrouter_tooling not in sys.path:
 from brrtrouter_tooling.cli import gen_cmd, build, docker_cmd, bff  # noqa: E402,I001
 from brrtrouter_tooling.bff.config import load_suite_config  # noqa: E402
 from brrtrouter_tooling.bff.generate import generate_bff_spec  # noqa: E402
+from rerp_tooling.runtime import (  # noqa: E402
+    build_base_image,
+    build_microservice,
+    build_service_image,
+    discover_services,
+    stage_multiarch_context,
+)
 
 
 DEFAULT_SUITE = "accounting"
@@ -181,6 +189,24 @@ def _translate_build(argv, project_root=None):
     return argv
 
 
+def _run_microservice_build(argv, project_root=None):
+    """Build one suite-nested implementation crate; debug is the Tilt default."""
+    root = Path(project_root or _project_root())
+    service = argv[1] if len(argv) > 1 else ""
+    if not service:
+        print("Usage: rerp build microservice <service> [--suite SUITE] [--release]", file=sys.stderr)
+        return 2
+
+    suite, remaining = _strip_option(argv[2:], "--suite")
+    release = "--release" in remaining
+    remaining = [item for item in remaining if item not in {"--release", "--no-release"}]
+    if remaining:
+        print(f"Unknown build option(s): {' '.join(remaining)}", file=sys.stderr)
+        return 2
+    suite = _suite_for_service(service, project_root=root, explicit_suite=suite)
+    return build_microservice(root, suite, service, release=release)
+
+
 def _translate_docker(argv: list[str]) -> list[str]:
     """Translate ``docker build-image-simple ... --service <name>`` to suite/module flags."""
     if not argv:
@@ -255,6 +281,87 @@ def _translate_docker(argv: list[str]) -> list[str]:
                 new_argv.append("--no-cache")
             return new_argv
     return argv
+
+
+def _run_rerp_docker(argv, project_root=None):
+    """Run RERP's runtime-only Docker path with explicit suite semantics."""
+    root = Path(project_root or _project_root())
+    if not argv:
+        print("rerp docker: missing subcommand", file=sys.stderr)
+        return 2
+
+    subcommand = argv[0]
+    rest = argv[1:]
+    if subcommand == "build-base":
+        unknown = [item for item in rest if item != "--dry-run"]
+        if unknown:
+            print("build-base only supports --dry-run; service images are pushed by Tilt", file=sys.stderr)
+            return 2
+        return build_base_image(root, dry_run="--dry-run" in rest)
+
+    if subcommand == "copy-binary":
+        if len(rest) != 3:
+            print("Usage: rerp docker copy-binary <source> <destination> <binary-name>", file=sys.stderr)
+            return 2
+        from brrtrouter_tooling.docker.copy_binary import run as run_copy_binary
+
+        return run_copy_binary(Path(rest[0]), Path(rest[1]), rest[2], root)
+
+    if subcommand == "stage-image-context":
+        if len(rest) < 2:
+            print(
+                "Usage: rerp docker stage-image-context <destination> <artifacts-root> "
+                "--suite <suite> --service <service>",
+                file=sys.stderr,
+            )
+            return 2
+        destination, artifacts_root = rest[:2]
+        suite, options = _strip_option(rest[2:], "--suite")
+        service, options = _strip_option(options, "--service")
+        if not suite or not service or options:
+            print("stage-image-context requires --suite and --service", file=sys.stderr)
+            return 2
+        return stage_multiarch_context(root, destination, artifacts_root, suite, service)
+
+    if subcommand == "build-image-simple":
+        if len(rest) < 4:
+            print(
+                "Usage: rerp docker build-image-simple <image> <Dockerfile> <hash> <artifact> "
+                "--suite <suite> --service <service> [--no-cache]",
+                file=sys.stderr,
+            )
+            return 2
+        image_name, dockerfile, hash_path, artifact_path = rest[:4]
+        options = rest[4:]
+        suite, options = _strip_option(options, "--suite")
+        system, options = _strip_option(options, "--system")
+        service, options = _strip_option(options, "--service")
+        _binary_name, options = _strip_option(options, "--binary-name")
+        no_cache = "--no-cache" in options
+        options = [item for item in options if item != "--no-cache"]
+        suite = suite or system
+        if not suite or not service or options:
+            print("build-image-simple requires --suite and --service", file=sys.stderr)
+            if options:
+                print(f"Unknown Docker option(s): {' '.join(options)}", file=sys.stderr)
+            return 2
+        return build_service_image(
+            root,
+            image_name,
+            dockerfile,
+            hash_path,
+            artifact_path,
+            suite,
+            service,
+            no_cache=no_cache,
+        )
+
+    # Preserve non-runtime legacy commands while the release path is migrated.
+    try:
+        docker_cmd.run_docker_argv(argv)
+    except SystemExit as error:
+        return int(error.code or 0)
+    return 0
 
 
 def _bff_generate_system_plans(argv, project_root=None):
@@ -476,14 +583,17 @@ def main():
             sync = "--sync" in rest
 
             # Rebuild args
-            new_rest = ["stubs", suite]
+            # run_gen_argv() dispatches from sys.argv[2], exactly as it does
+            # for `gen suite` above. Keep the full command prefix here;
+            # omitting `gen` makes the requested suite look like a subcommand.
+            new_rest = ["brrtrouter", "gen", "stubs", suite]
             if service:
                 new_rest.append(service)
             if force:
                 new_rest.append("--force")
             if sync:
                 new_rest.append("--sync")
-            sys.argv = ["brrtrouter"] + new_rest
+            sys.argv = new_rest
             gen_cmd.run_gen_argv()
         else:
             print("rerp gen: unknown subcommand", file=sys.stderr)
@@ -491,19 +601,17 @@ def main():
 
     elif cmd == "build":
         if rest and rest[0] == "microservice":
-            sys.argv = ["brrtrouter"] + _translate_build(rest)
-            build.run_build_argv()
+            sys.exit(_run_microservice_build(rest))
         else:
             sys.argv = ["brrtrouter"] + ["build"] + rest
             build.run_build_argv()
 
     elif cmd == "docker":
-        if rest:
-            sys.argv = ["brrtrouter"] + _translate_docker(["docker"] + rest)
-            docker_cmd.run_docker_argv()
-        else:
-            print("rerp docker: missing subcommand", file=sys.stderr)
-            sys.exit(1)
+        sys.exit(_run_rerp_docker(rest))
+
+    elif cmd == "services":
+        include_all = "--all" in rest
+        print(json.dumps(discover_services(_project_root(), require_helm=not include_all), sort_keys=True))
 
     elif cmd == "bff":
         if rest and rest[0] == "generate-system":

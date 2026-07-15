@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_edi_document'.
 
 use crate::handlers::create_edi_document::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateEdiDocumentController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         acknowledgment_sent: true,
         acknowledgment_sent_at: Some("example".to_string()),
         company_id: Some("example".to_string()),
@@ -36,5 +37,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         updated_at: Some("example".to_string()),
         updated_by: Some("example".to_string()),
         validated_at: Some("example".to_string()),
-    }
+    })
 }

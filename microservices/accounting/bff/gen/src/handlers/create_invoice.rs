@@ -4,6 +4,7 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 use crate::handlers::types::InvoiceCreateInvoiceLineItemRequest;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -63,9 +64,8 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "billing_address_id")]
-    pub billing_address_id: Option<String>,
+    pub billing_address_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "billing_entity_id")]
@@ -75,13 +75,11 @@ pub struct Response {
     #[serde(rename = "company_currency_code")]
     pub company_currency_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_total_amount")]
-    pub company_total_amount: Option<f64>,
+    pub company_total_amount: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -94,28 +92,23 @@ pub struct Response {
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "due_date")]
-    pub due_date: Option<String>,
+    pub due_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "entity_id")]
-    pub entity_id: Option<String>,
+    pub entity_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "entity_name")]
-    pub entity_name: Option<String>,
+    pub entity_name: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exchange_rate")]
-    pub exchange_rate: Option<f64>,
+    pub exchange_rate: f64,
 
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "internal_notes")]
-    pub internal_notes: Option<String>,
+    pub internal_notes: String,
 
     #[serde(rename = "invoice_number")]
     pub invoice_number: String,
@@ -127,32 +120,26 @@ pub struct Response {
     #[serde(rename = "issued_date")]
     pub issued_date: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
-    pub notes: Option<String>,
+    pub notes: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_at")]
-    pub posted_at: Option<String>,
+    pub posted_at: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_by")]
-    pub posted_by: Option<String>,
+    pub posted_by: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "shipping_address_id")]
-    pub shipping_address_id: Option<String>,
+    pub shipping_address_id: String,
 
     #[serde(rename = "status")]
     pub status: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subtotal_amount")]
-    pub subtotal_amount: Option<f64>,
+    pub subtotal_amount: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_amount")]
-    pub tax_amount: Option<f64>,
+    pub tax_amount: f64,
 
     #[serde(rename = "total_amount")]
     pub total_amount: f64,

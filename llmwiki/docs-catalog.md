@@ -46,14 +46,14 @@
 
 | Path | Category | Description |
 |------|----------|-------------|
-| `docs/ai/OPENAPI_GENERATION_COMPLETE.md` | status | 71 services OpenAPI generation complete |
-| `docs/ai/BFF_GENERATION_COMPLETE.md` | status | Suite-level BFF generation status |
+| `docs/history/implementation-snapshots/OPENAPI_GENERATION_COMPLETE.md` | status | Historical 71-service OpenAPI generation snapshot |
+| `docs/history/implementation-snapshots/BFF_GENERATION_COMPLETE.md` | status | Historical suite-level BFF generation snapshot |
 | `docs/ai/FIRST_CI_AUTOMATION.md` | status | CI automation implementation |
-| `docs/ai/SYSTEM_BFF_GENERATION.md` | architecture | System BFF architecture |
+| `docs/history/architecture-snapshots/SYSTEM_BFF_GENERATION.md` | architecture | Historical system BFF architecture |
 | `docs/ai/TOP_LEVEL_SPECS_PLAN.md` | planning | Top-level OpenAPI specs plan |
 | `docs/ai/CI_AUTOMATION_SETUP.md` | setup | CI setup and configuration |
 | `docs/ai/ODOO_MODULES_ANALYSIS.md` | analysis | Odoo module analysis |
-| `docs/ai/MICROSERVICE_MATRIX_AUDIT.md` | analysis | 71-service matrix audit |
+| `docs/history/audits/MICROSERVICE_MATRIX_AUDIT.md` | analysis | Historical 71-service matrix audit |
 | `docs/EXECUTIVE_SUMMARY.md` | overview | Project overview |
 | `docs/adrs/` | ADRs | Architecture Decision Records |
 | `docs/mermaid/` | diagrams | Architecture diagrams |

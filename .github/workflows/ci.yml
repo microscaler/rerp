@@ -134,6 +134,9 @@ jobs:
         run: |
           tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
 
+      - name: Validate documentation authority and ADR lifecycle
+        run: tooling/.venv/bin/python tooling/scripts/check_doc_governance.py
+
       - name: Run tooling tests with coverage
         run: cd tooling && .venv/bin/pytest tests/ -v --cov=rerp_tooling --cov-report=term-missing --cov-fail-under=65
 
@@ -628,19 +631,25 @@ jobs:
       - run: tooling/.venv/bin/pip install --upgrade pip && tooling/.venv/bin/pip install -e ./tooling
       - run: tooling/.venv/bin/pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
 
-      - name: Render Dockerfile for ${{ matrix.service }}
+      - name: Stage verified image context for ${{ matrix.service }}
         run: |
-          tooling/.venv/bin/rerp docker render-dockerfile \
-            --template docker/microservices/Dockerfile.template \
-            --service ${{ matrix.service }} \
-            -o docker/microservices/Dockerfile.${{ matrix.service }}
+          tooling/.venv/bin/rerp docker stage-image-context \
+            .docker-context/${{ matrix.service }} \
+            build_artifacts \
+            --suite accounting \
+            --service ${{ matrix.service }}
 
       - name: Build and push ${{ matrix.service }}
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: docker/microservices/Dockerfile.${{ matrix.service }}
+          context: .docker-context/${{ matrix.service }}
+          file: .docker-context/${{ matrix.service }}/Dockerfile
+          build-args: |
+            BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/rerp-base:latest
+            RERP_SUITE=accounting
+            RERP_SERVICE=${{ matrix.service }}
+            RERP_ARTIFACT_SHA256=multiarch-release
           push: true
           tags: ${{ format('ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.tag) }}${{ needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',ghcr.io/{0}/rerp-accounting-{1}:{2}', github.repository_owner, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.tag) || '' }}${{ vars.DOCKERHUB_ORG != '' && vars.DOCKERHUB_ORG != 'null' && needs.download-copy-package-push-containers.outputs.extra_tag != '' && format(',docker.io/{0}/rerp-accounting-{1}:{2}', vars.DOCKERHUB_ORG, matrix.service, needs.download-copy-package-push-containers.outputs.extra_tag) || '' }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -694,4 +703,3 @@ jobs:
             echo "✅ $name: linux/amd64, linux/arm64, linux/arm/v7"
           done
           echo "🎉 All 10 microservice images verified (linux/amd64, linux/arm64, linux/arm/v7)."
-

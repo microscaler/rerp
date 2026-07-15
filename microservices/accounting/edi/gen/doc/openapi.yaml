@@ -30,31 +30,31 @@ paths:
       - $ref: '#/components/parameters/Search'
       responses:
         '200':
-          description: List of edi-documents
+          description: Paginated list of EDI documents
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EdiDocument'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedEdiDocuments'
     post:
       operationId: create_edi_document
       summary: Create edi-document
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEdiDocumentRequest'
+            example:
+              document_number: 1
+              document_type: standard
+              format_id: sample value
+              sender_id: 550e8400-e29b-41d4-a716-446655440000
+              receiver_id: 550e8400-e29b-41d4-a716-446655440000
+              document_total_amount: 1000.0
+              currency_code: USD
+              raw_content: <EDI>0123456789</EDI>
+              company_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: EdiDocument created
@@ -64,6 +64,28 @@ paths:
                 $ref: '#/components/schemas/EdiDocument'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /edi-documents/{id}:
     get:
       operationId: get_edi_document
@@ -87,6 +109,7 @@ paths:
     put:
       operationId: update_edi_document
       summary: Update edi-document
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -100,6 +123,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateEdiDocumentRequest'
+            example:
+              status: active
+              parsed_data: &id006
+                type: invoice
+                amount: 10000.0
+              related_invoice_id: 1000.0
+              related_purchase_order_id: 550e8400-e29b-41d4-a716-446655440000
+              document_total_amount: 1000.0
+              currency_code: USD
+              error_message: 'Failed to generate report: database timeout'
+              acknowledgment_sent: true
       responses:
         '200':
           description: EdiDocument updated
@@ -109,6 +143,21 @@ paths:
                 $ref: '#/components/schemas/EdiDocument'
         '404':
           description: Not found
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
     delete:
       operationId: delete_edi_document
       summary: Delete edi-document
@@ -134,31 +183,40 @@ paths:
       - $ref: '#/components/parameters/Search'
       responses:
         '200':
-          description: List of edi-mappings
+          description: Paginated list of EDI mappings
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/EdiMapping'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  limit:
-                    type: integer
+                $ref: '#/components/schemas/PaginatedEdiMappings'
     post:
       operationId: create_edi_mapping
       summary: Create edi-mapping
+      x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEdiMappingRequest'
+            example:
+              format_id: sample value
+              document_type: standard
+              mapping_name: Acme Corporation
+              field_mappings: &id007
+                name: vendor_name
+                amount: total_amount
+              transformation_rules: &id008
+              - normalize
+              - validate
+              - transform
+              validation_rules: &id009
+              - required
+              - max_length:255
+              default_values: &id010
+                status: pending
+                type: standard
+              description: Primary operating company
+              is_active: true
       responses:
         '201':
           description: EdiMapping created
@@ -168,6 +226,19 @@ paths:
                 $ref: '#/components/schemas/EdiMapping'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-mappings/{id}:
     get:
       operationId: get_edi_mapping
@@ -191,6 +262,7 @@ paths:
     put:
       operationId: update_edi_mapping
       summary: Update edi-mapping
+      x-brrtrouter-impl: true
       parameters:
       - name: id
         in: path
@@ -204,6 +276,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateEdiMappingRequest'
+            example:
+              mapping_name: Acme Corporation
+              field_mappings: &id011
+                name: vendor_name
+                amount: total_amount
+              transformation_rules: &id012
+              - normalize
+              - validate
+              - transform
+              validation_rules: &id013
+              - required
+              - max_length:255
+              default_values: &id014
+                status: pending
+                type: standard
+              is_active: true
+              description: Primary operating company
       responses:
         '200':
           description: EdiMapping updated
@@ -213,6 +302,18 @@ paths:
                 $ref: '#/components/schemas/EdiMapping'
         '404':
           description: Not found
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
     delete:
       operationId: delete_edi_mapping
       summary: Delete edi-mapping
@@ -253,6 +354,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEdiProfileRequest'
+            example:
+              name: Acme Corporation
+              standard: EDIFACT
+              jurisdiction_code: US-CA
+              trading_partner_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: EDI profile created
@@ -260,6 +366,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiProfile'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-validation-profiles:
     get:
       operationId: list_edi_validation_profiles
@@ -284,6 +402,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEdiValidationProfileRequest'
+            example:
+              profile_id: 550e8400-e29b-41d4-a716-446655440000
+              name: Acme Corporation
+              rules: &id005
+              - rule_1
+              - rule_2
       responses:
         '201':
           description: EDI validation profile created
@@ -291,6 +415,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiValidationProfile'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-submissions:
     get:
       operationId: list_edi_submissions
@@ -319,6 +455,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEdiSubmissionRequest'
+            example:
+              document_id: 550e8400-e29b-41d4-a716-446655440000
+              profile_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: EDI submission created
@@ -326,6 +465,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-submissions/{id}/submit:
     post:
       operationId: submit_edi_submission
@@ -345,6 +496,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-submissions/{id}/status:
     get:
       operationId: get_edi_submission_status
@@ -382,6 +545,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdiSubmission'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /edi-acknowledgments:
     get:
       operationId: list_edi_acknowledgments
@@ -417,26 +592,48 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
     Page:
       name: page
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         default: 1
+      description: Page number (1-indexed)
     Limit:
       name: limit
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 20
+      description: Page size (1-100)
     Search:
       name: search
       in: query
+      required: false
       schema:
         type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   schemas:
     EdiStandard:
       type: string
@@ -462,25 +659,31 @@ components:
     EdiProfile:
       type: object
       required:
+      - active
       - id
       - name
       - standard
-      - active
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         standard:
           $ref: '#/components/schemas/EdiStandard'
+          example: EDIFACT
         jurisdiction_code:
           type: string
+          example: US-CA
         trading_partner_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         active:
           type: boolean
+          example: true
     CreateEdiProfileRequest:
       type: object
       required:
@@ -489,33 +692,44 @@ components:
       properties:
         name:
           type: string
+          example: Acme Corporation
         standard:
           $ref: '#/components/schemas/EdiStandard'
+          example: EDIFACT
         jurisdiction_code:
           type: string
+          example: US-CA
         trading_partner_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     EdiValidationProfile:
       type: object
       required:
-      - id
-      - profile_id
-      - name
       - active
+      - id
+      - name
+      - profile_id
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         rules:
           type: object
+          example:
+          - rule_1
+          - rule_2
         active:
           type: boolean
+          example: true
     CreateEdiValidationProfileRequest:
       type: object
       required:
@@ -525,34 +739,43 @@ components:
         profile_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         rules:
           type: object
+          example: *id005
     EdiSubmission:
       type: object
       required:
-      - id
       - document_id
+      - id
       - profile_id
       - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           $ref: '#/components/schemas/EdiSubmissionStatus'
+          example: active
         external_reference:
           type: string
+          example: EXT-2026-0001
         submitted_at:
           type: string
           format: date-time
+          example: sample value
     CreateEdiSubmissionRequest:
       type: object
       required:
@@ -562,9 +785,11 @@ components:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     EdiError:
       type: object
       required:
@@ -575,33 +800,40 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         submission_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         code:
           type: string
+          example: '001'
         message:
           type: string
+          example: sample value
         field_path:
           type: string
+          example: sample value
     EdiDocument:
       type: object
       required:
-      - id
+      - acknowledgment_sent
       - document_number
       - document_type
       - format_id
-      - status
+      - id
       - received_at
       - retry_count
-      - acknowledgment_sent
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_number:
           type: string
           maxLength: 100
+          example: 1
         document_type:
           type: string
           enum:
@@ -610,9 +842,11 @@ components:
           - ACKNOWLEDGMENT
           - SHIPPING_NOTICE
           - PAYMENT_ORDER
+          example: standard
         format_id:
           type: string
           format: uuid
+          example: sample value
         status:
           type: string
           enum:
@@ -622,93 +856,124 @@ components:
           - VALIDATED
           - PROCESSED
           - ERROR
+          example: active
         received_at:
           type: string
           format: date-time
+          example: sample value
         parsed_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         validated_at:
           type: string
           format: date-time
           nullable: true
+          example: '2026-01-15'
         processed_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         sender_id:
           type: string
           maxLength: 255
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         receiver_id:
           type: string
           maxLength: 255
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         raw_content:
           type: string
           nullable: true
+          example: <EDI>0123456789</EDI>
         parsed_data:
           type: object
           nullable: true
+          example:
+            type: invoice
+            amount: 10000.0
         related_invoice_id:
           type: string
           format: uuid
           nullable: true
+          example: 1000.0
         related_purchase_order_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_total_amount:
           type: number
           format: decimal
           description: Total amount when document is an invoice or payment order.
           nullable: true
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: ISO 4217 currency when document has monetary amount.
           nullable: true
+          example: USD
         error_message:
           type: string
           nullable: true
+          example: 'Failed to generate report: database timeout'
         error_details:
           type: object
           nullable: true
+          example:
+            code: VALIDATION_ERROR
+            message: Invalid format
         retry_count:
           type: integer
+          example: 0
         last_retry_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         acknowledgment_sent:
           type: boolean
+          example: true
         acknowledgment_sent_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         metadata:
           type: object
           nullable: true
+          example:
+            version: '1.0'
+            source: system
         company_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         created_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
     EdiFormat:
       type: object
       required:
@@ -720,50 +985,68 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         code:
           type: string
           maxLength: 50
+          example: '001'
         name:
           type: string
           maxLength: 255
+          example: Acme Corporation
         description:
           type: string
           nullable: true
+          example: Primary operating company
         version:
           type: string
           maxLength: 50
           nullable: true
+          example: '1.0'
         supported_document_types:
           type: string
           maxLength: 255
           nullable: true
+          example:
+          - invoice
+          - purchase_order
+          - credit_memo
         format_config:
           type: object
           nullable: true
+          example:
+            delimiter: ','
+            encoding: utf-8
         is_active:
           type: boolean
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     EdiMapping:
       type: object
       required:
-      - id
-      - format_id
+      - description
       - document_type
-      - mapping_name
       - field_mappings
+      - format_id
+      - id
       - is_active
+      - mapping_name
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         format_id:
           type: string
           format: uuid
+          example: sample value
         document_type:
           type: string
           enum:
@@ -772,105 +1055,145 @@ components:
           - ACKNOWLEDGMENT
           - SHIPPING_NOTICE
           - PAYMENT_ORDER
+          example: standard
         mapping_name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         field_mappings:
           type: object
+          example:
+            name: vendor_name
+            amount: total_amount
         transformation_rules:
           type: object
           nullable: true
+          example:
+          - normalize
+          - validate
+          - transform
         validation_rules:
           type: object
           nullable: true
+          example:
+          - required
+          - max_length:255
         default_values:
           type: object
           nullable: true
+          example:
+            status: pending
+            type: standard
         is_active:
           type: boolean
+          example: true
         description:
           type: string
           nullable: true
+          example: Primary operating company
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         created_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440004
     EdiAcknowledgment:
       type: object
       required:
-      - id
-      - document_id
       - acknowledgment_type
+      - document_id
+      - id
+      - received_at
       - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         acknowledgment_type:
           type: string
           enum:
           - FUNCTIONAL
           - TECHNICAL
           - RECEIPT
+          example: standard
         status:
           type: string
           enum:
           - ACCEPTED
           - REJECTED
           - PARTIAL
+          example: active
         acknowledgment_content:
           type: string
           nullable: true
+          example: sample value
         acknowledgment_data:
           type: object
           nullable: true
+          example:
+            key: value
         sent_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         received_at:
           type: string
           format: date-time
           nullable: true
+          example: sample value
         error_codes:
           type: object
           nullable: true
+          example:
+          - VALIDATION_ERROR
         error_messages:
           type: string
           nullable: true
+          example:
+          - 'Required field missing: amount'
         metadata:
           type: object
           nullable: true
+          example:
+            version: '1.0'
+            source: system
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateEdiDocumentRequest:
       type: object
       required:
       - document_number
       - document_type
       - format_id
-      - status
       properties:
         document_number:
           type: string
           maxLength: 100
+          example: 1
         document_type:
           type: string
           enum:
@@ -879,29 +1202,37 @@ components:
           - ACKNOWLEDGMENT
           - SHIPPING_NOTICE
           - PAYMENT_ORDER
+          example: standard
         format_id:
           type: string
           format: uuid
+          example: sample value
         sender_id:
           type: string
           maxLength: 255
+          example: 550e8400-e29b-41d4-a716-446655440000
         receiver_id:
           type: string
           maxLength: 255
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_total_amount:
           type: number
           format: decimal
           description: Total amount when document is an invoice or payment order.
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: ISO 4217 currency when document has monetary amount.
+          example: USD
         raw_content:
           type: string
+          example: <EDI>0123456789</EDI>
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     UpdateEdiDocumentRequest:
       type: object
       properties:
@@ -914,27 +1245,35 @@ components:
           - VALIDATED
           - PROCESSED
           - ERROR
+          example: active
         parsed_data:
           type: object
+          example: *id006
         related_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         related_purchase_order_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_total_amount:
           type: number
           format: decimal
           description: Total amount when document is an invoice or payment order.
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: ISO 4217 currency when document has monetary amount.
+          example: USD
         error_message:
           type: string
+          example: 'Failed to generate report: database timeout'
         acknowledgment_sent:
           type: boolean
+          example: true
     CreateEdiMappingRequest:
       type: object
       required:
@@ -946,6 +1285,7 @@ components:
         format_id:
           type: string
           format: uuid
+          example: sample value
         document_type:
           type: string
           enum:
@@ -954,39 +1294,54 @@ components:
           - ACKNOWLEDGMENT
           - SHIPPING_NOTICE
           - PAYMENT_ORDER
+          example: standard
         mapping_name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         field_mappings:
           type: object
+          example: *id007
         transformation_rules:
           type: object
+          example: *id008
         validation_rules:
           type: object
+          example: *id009
         default_values:
           type: object
+          example: *id010
         description:
           type: string
+          example: Primary operating company
         is_active:
           type: boolean
+          example: true
     UpdateEdiMappingRequest:
       type: object
       properties:
         mapping_name:
           type: string
           maxLength: 100
+          example: Acme Corporation
         field_mappings:
           type: object
+          example: *id011
         transformation_rules:
           type: object
+          example: *id012
         validation_rules:
           type: object
+          example: *id013
         default_values:
           type: object
+          example: *id014
         is_active:
           type: boolean
+          example: true
         description:
           type: string
+          example: Primary operating company
     PaginatedEdiProfiles:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -1032,6 +1387,24 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/EdiError'
+    PaginatedEdiDocuments:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiDocument'
+    PaginatedEdiMappings:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/EdiMapping'
     PaginatedResponse:
       type: object
       required:
@@ -1041,9 +1414,34 @@ components:
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          example: '001'
+        message:
+          type: string
+          example: sample value
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+          example: sample value
 security:
 - bearerAuth: []

@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -24,9 +25,8 @@ pub struct Response {
     #[serde(rename = "as_of_date")]
     pub as_of_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "available_balance")]
-    pub available_balance: Option<f64>,
+    pub available_balance: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "by_account")]
@@ -103,6 +103,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::cash_position::handle(req)
 }

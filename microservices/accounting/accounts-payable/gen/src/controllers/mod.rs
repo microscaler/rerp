@@ -17,15 +17,15 @@ pub mod approve_payment_batch;
 
 pub mod export_payment_batch_file;
 
-pub mod list_payments;
+pub mod list_vendor_payments;
 
-pub mod create_payment;
+pub mod create_vendor_payment;
 
-pub mod get_payment;
+pub mod get_vendor_payment;
 
-pub mod update_payment;
+pub mod update_vendor_payment;
 
-pub mod delete_payment;
+pub mod delete_vendor_payment;
 
 pub mod cash_flow_forecast;
 

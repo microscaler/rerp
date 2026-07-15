@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -38,21 +39,17 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "aging_bucket")]
-    pub aging_bucket: Option<String>,
+    pub aging_bucket: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
+    pub created_at: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "credit_limit_check")]
-    pub credit_limit_check: Option<bool>,
+    pub credit_limit_check: bool,
 
     #[serde(rename = "currency_code")]
     pub currency_code: String,
@@ -60,9 +57,8 @@ pub struct Response {
     #[serde(rename = "customer_id")]
     pub customer_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "due_date")]
-    pub due_date: Option<String>,
+    pub due_date: String,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -70,24 +66,20 @@ pub struct Response {
     #[serde(rename = "invoice_id")]
     pub invoice_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "original_amount")]
-    pub original_amount: Option<f64>,
+    pub original_amount: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: Option<f64>,
+    pub outstanding_amount: f64,
 
     #[serde(rename = "status")]
     pub status: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "terms")]
-    pub terms: Option<String>,
+    pub terms: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
+    pub updated_at: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -116,6 +108,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::create_customer_invoice::handle(req)
 }

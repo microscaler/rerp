@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_budget_line'.
 
 use crate::handlers::create_budget_line::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateBudgetLineController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         actual_amount: Some(3.14),
         amount: 3.14,
         budget_id: "example".to_string(),
@@ -24,5 +25,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         updated_at: Some("example".to_string()),
         variance: Some(3.14),
         variance_percent: Some(3.14),
-    }
+    })
 }

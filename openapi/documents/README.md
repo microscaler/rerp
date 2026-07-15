@@ -1,10 +1,10 @@
-# Document Intelligence Platform
+# Documents Platform
 
 ## Overview
 
-The Documents suite is **RERP's primary input layer** — not just a document store, but an active ingestion engine that receives documents from anywhere (email, camera, upload, webhook), extracts structured data, and automatically creates or updates records across every RERP module.
+The Documents suite is RERP's document boundary in both directions. It is the primary input layer for ingestion and intelligence, and it is also the output layer for producing governed, immutable renditions from facts owned by other suites.
 
-At its heart is the **core service** — the canonical, authoritative store for every document that enters RERP. All other services (intake, extraction, classification, analysis, routing) read from and annotate documents stored in `core/`. Documents are stored first, processed second.
+At its heart is the **core service** — the canonical, authoritative store for every ingested or generated document and every version. Input services read from and annotate documents stored in `core/`; `render/` creates immutable renditions and registers their files and lineage in `core/`. Documents are stored or generated first, then processed or delivered.
 
 The user workflow is simple:
 
@@ -20,7 +20,7 @@ No navigation. No manual data entry. No form-filling. Just send the document.
 
 ## Architecture
 
-The Documents suite is split into **8 microservices**. All services share a single PostgreSQL database for relational metadata and a shared object storage bucket (S3/MinIO) for raw document files.
+The Documents suite has **9 product/API components**. They may initially share Documents runtime infrastructure and are split into independently scalable deployments only when workload and failure isolation justify it. Components share a PostgreSQL database for RLS-scoped metadata and S3/MinIO for source files, assets, and generated renditions.
 
 ```mermaid
 graph TD
@@ -58,10 +58,14 @@ graph TD
             User Verification
             Approve / Reject / Correct
             Batch Actions]
+        render[render/
+            Document Generation
+            HTML/CSS Templates
+            Immutable Renditions · Copies]
     end
 ```
 
-Each service is independently deployable, independently scalable, and independently documented in its own `openapi.yaml`. All services reference documents by their UUID in `core/`.
+Each component has an independent API contract and scaling boundary, even when components initially share one deployment. All components reference documents by their UUID in `core/`.
 
 ### Document Data Flow
 
@@ -151,8 +155,15 @@ Each service has its own design document with detailed API surface, capabilities
 | **routes/** | Routing rules engine, document-type-to-module mapping | [docs/routes.md](docs/routes.md) |
 | **pipeline/** | Workflow orchestration, state machine, retry logic | [docs/pipeline.md](docs/pipeline.md) |
 | **confirmation/** | User verification and approval workflows | [docs/confirmation.md](docs/confirmation.md) |
+| **render/** | Versioned templates and immutable generated renditions | [render/openapi.yaml](render/openapi.yaml) |
 
 See also: [DESIGN.md](DESIGN.md) — full system design (DB schema, API contracts, data flow, RLS).
+
+### Output flow and ownership
+
+Source suites own business state and legal decisions. For example, Accounting owns invoice posting, numbering, totals, tax and the immutable invoice render snapshot. After committing that state, it submits an idempotent render request. Documents selects a published template version, renders and stores the artifact, records its source/snapshot/template lineage, and returns a rendition identity. A source-suite endpoint may remain as a consumer-facing facade, but rich rendering does not live in that suite.
+
+See [PRD-008](DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md) and [ADR 002](../../docs/adrs/002-document-generation-ownership.md).
 
 ## Competitive Positioning
 

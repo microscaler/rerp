@@ -1,12 +1,13 @@
 // User-owned controller for handler 'complete_reconciliation'.
 
 use crate::handlers::complete_reconciliation::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CompleteReconciliationController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         adjusted_balance: Some(3.14),
         bank_account_id: "example".to_string(),
         book_balance: Some(3.14),
@@ -25,5 +26,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         total_unmatched: Some(3.14),
         unmatched_transactions: Some(42),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

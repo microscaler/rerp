@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_journal'.
 
 use crate::handlers::create_journal::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateJournalController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         code: "example".to_string(),
         company_code: Some("example".to_string()),
         company_id: "example".to_string(),
@@ -22,5 +23,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         suspense_account_id: Some("example".to_string()),
         r#type: "example".to_string(),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

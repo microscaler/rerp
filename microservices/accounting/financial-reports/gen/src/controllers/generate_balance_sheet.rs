@@ -1,12 +1,13 @@
 // User-owned controller for handler 'generate_balance_sheet'.
 
 use crate::handlers::generate_balance_sheet::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(GenerateBalanceSheetController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         account_details: Some(vec![]),
         assets: Some(Default::default()),
         company_id: "example".to_string(),
@@ -17,5 +18,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         liabilities: Some(Default::default()),
         period_end: "example".to_string(),
         period_start: Some("example".to_string()),
-    }
+    })
 }

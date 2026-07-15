@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -41,9 +42,8 @@ pub struct Response {
     #[serde(rename = "acquisition_cost")]
     pub acquisition_cost: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "acquisition_date")]
-    pub acquisition_date: Option<String>,
+    pub acquisition_date: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "acquisition_gl_entry_id")]
@@ -74,9 +74,8 @@ pub struct Response {
     #[serde(rename = "department_id")]
     pub department_id: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
-    pub description: Option<String>,
+    pub description: String,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -85,9 +84,8 @@ pub struct Response {
     #[serde(rename = "insurance_policy")]
     pub insurance_policy: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "location")]
-    pub location: Option<String>,
+    pub location: String,
 
     #[serde(rename = "name")]
     pub name: String,
@@ -164,6 +162,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::modify_asset::handle(req)
 }

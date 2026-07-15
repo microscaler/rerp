@@ -5,6 +5,7 @@
 use crate::handlers::types::GeneralLedgerFiscalPositionAccountMappingRequest;
 use crate::handlers::types::GeneralLedgerFiscalPositionTaxMappingRequest;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;

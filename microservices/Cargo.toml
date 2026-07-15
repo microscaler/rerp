@@ -39,6 +39,13 @@ members = [
     "accounting/lease-accounting/impl",
     "accounting/audit-controls/gen",
     "accounting/audit-controls/impl",
+
+    # Documents suite
+    "documents/render/gen",
+    "documents/render/impl",
+
+    # Centralized migration generation
+    "migrator",
 ]
 resolver = "2"
 
@@ -58,6 +65,7 @@ http_legacy = { package = "http", version = "0.2" }
 # Lifeguard ORM
 lifeguard = { path = "../../lifeguard" }
 lifeguard-derive = { path = "../../lifeguard/lifeguard-derive" }
+lifeguard-migrate = { path = "../../lifeguard/lifeguard-migrate" }
 rerp_entities = { package = "rerp-entities", path = "accounting/entities" }
 
 # Standard dependencies

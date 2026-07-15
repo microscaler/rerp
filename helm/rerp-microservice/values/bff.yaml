@@ -9,5 +9,5 @@ deployment:
   replicas: 1
   namespace: rerp
 app:
-  binaryName: bff_service_api
+  binaryName: bff
   serviceName: bff

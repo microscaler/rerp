@@ -1,12 +1,13 @@
 // User-owned controller for handler 'asset_summary'.
 
 use crate::handlers::asset_summary::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(AssetSummaryController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         as_of_date: Some("example".to_string()),
         by_category: Some(vec![]),
         by_status: Some(Default::default()),
@@ -18,5 +19,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         total_acquisition_cost: 3.14,
         total_assets: Some(42),
         total_net_book_value: 3.14,
-    }
+    })
 }

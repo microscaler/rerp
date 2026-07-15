@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -33,9 +34,8 @@ pub struct Response {
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reason")]
-    pub reason: Option<String>,
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "requested_by")]
@@ -74,6 +74,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::create_budget_revision::handle(req)
 }

@@ -28,13 +28,13 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         bank_code: String::new(), // TODO: Set from your business logic
 
-        bank_name: String::new(), // TODO: Set from your business logic
+        bank_name: Some(String::new()), // TODO: Set from your business logic
 
         company_id: String::new(), // TODO: Set from your business logic
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: String::new(), // TODO: Set from your business logic
+        created_by: Some(String::new()), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
@@ -58,6 +58,6 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: String::new(), // TODO: Set from your business logic
+        updated_by: Some(String::new()), // TODO: Set from your business logic
     }
 }

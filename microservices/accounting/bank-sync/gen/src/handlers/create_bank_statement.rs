@@ -4,6 +4,7 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 use crate::handlers::types::CreateBankTransactionRequest;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -50,9 +51,8 @@ pub struct Response {
     #[serde(rename = "bank_account_id")]
     pub bank_account_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closing_balance")]
-    pub closing_balance: Option<f64>,
+    pub closing_balance: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -80,9 +80,8 @@ pub struct Response {
     #[serde(rename = "matched_count")]
     pub matched_count: Option<i32>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opening_balance")]
-    pub opening_balance: Option<f64>,
+    pub opening_balance: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "start_date")]
@@ -91,9 +90,8 @@ pub struct Response {
     #[serde(rename = "statement_date")]
     pub statement_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "statement_number")]
-    pub statement_number: Option<String>,
+    pub statement_number: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
@@ -138,6 +136,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::create_bank_statement::handle(req)
 }

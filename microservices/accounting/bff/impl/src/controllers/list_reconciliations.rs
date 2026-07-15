@@ -25,10 +25,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         items: vec![], // TODO: Set from your business logic
 
-        limit: 0, // TODO: Set from your business logic
+        limit: Some(0), // TODO: Set from your business logic
 
-        page: 0, // TODO: Set from your business logic
+        page: Some(0), // TODO: Set from your business logic
 
-        total: 0, // TODO: Set from your business logic
+        total: Some(0), // TODO: Set from your business logic
     }
 }

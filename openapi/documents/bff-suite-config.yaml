@@ -1,0 +1,57 @@
+suite: documents
+bff_service_name: documents-bff
+architecture: multi-suite
+openapi_base_dir: openapi/documents
+output_path: openapi/documents/openapi_bff.yaml
+services:
+  core:
+    base_path: /api/documents/core
+    port: 8080
+    spec_path: core/openapi.yaml
+  intake:
+    base_path: /api/documents/intake
+    port: 8080
+    spec_path: intake/openapi.yaml
+  extract:
+    base_path: /api/documents/extract
+    port: 8080
+    spec_path: extract/openapi.yaml
+  classify:
+    base_path: /api/documents/classify
+    port: 8080
+    spec_path: classify/openapi.yaml
+  analyze:
+    base_path: /api/documents/analyze
+    port: 8080
+    spec_path: analyze/openapi.yaml
+  routes:
+    base_path: /api/documents/routes
+    port: 8080
+    spec_path: routes/openapi.yaml
+  pipeline:
+    base_path: /api/documents/pipeline
+    port: 8080
+    spec_path: pipeline/openapi.yaml
+  confirmation:
+    base_path: /api/documents/confirmation
+    port: 8080
+    spec_path: confirmation/openapi.yaml
+  render:
+    base_path: /api/documents/render
+    port: 8080
+    spec_path: render/openapi.yaml
+metadata:
+  title: RERP Documents Backend for Frontend API
+  version: 0.1.0
+  description: >-
+    Aggregated API for canonical document storage, ingestion, intelligence,
+    workflows, and generated document renditions. All services derive tenant
+    scope from validated Sesame identity. Service containers listen on 8080.
+  contact:
+    name: RERP Documents API Support
+    email: documents-api@rerp.ai
+  servers:
+    - url: https://api.rerp.ai
+      description: Production server
+    - url: http://localhost:8080
+      description: Local suite BFF

@@ -6,91 +6,120 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateEdiDocumentRequest {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub document_number: String,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     pub document_type: String,
 
     pub format_id: String,
 
-    pub raw_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
 
-    pub receiver_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receiver_id: Option<String>,
 
-    pub sender_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateEdiDocumentResponse {
     pub acknowledgment_sent: bool,
 
-    pub acknowledgment_sent_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_sent_at: Option<String>,
 
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub document_number: String,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     pub document_type: String,
 
-    pub error_details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_details: Option<serde_json::Value>,
 
-    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
 
     pub format_id: String,
 
     pub id: String,
 
-    pub last_retry_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_retry_at: Option<String>,
 
-    pub metadata: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
 
-    pub parsed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_at: Option<String>,
 
-    pub parsed_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_data: Option<serde_json::Value>,
 
-    pub processed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub processed_at: Option<String>,
 
-    pub raw_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
 
     pub received_at: String,
 
-    pub receiver_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receiver_id: Option<String>,
 
-    pub related_invoice_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_invoice_id: Option<String>,
 
-    pub related_purchase_order_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_purchase_order_id: Option<String>,
 
     pub retry_count: i32,
 
-    pub sender_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_id: Option<String>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateEdiMappingRequest {
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub document_type: String,
 
@@ -98,22 +127,28 @@ pub struct CreateEdiMappingRequest {
 
     pub format_id: String,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
     pub mapping_name: String,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateEdiMappingResponse {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
     pub description: String,
 
@@ -129,24 +164,30 @@ pub struct CreateEdiMappingResponse {
 
     pub mapping_name: String,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateEdiProfileRequest {
-    pub jurisdiction_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jurisdiction_code: Option<String>,
 
     pub name: String,
 
     pub standard: EdiStandard,
 
-    pub trading_partner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trading_partner_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -155,13 +196,15 @@ pub struct CreateEdiProfileResponse {
 
     pub id: String,
 
-    pub jurisdiction_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jurisdiction_code: Option<String>,
 
     pub name: String,
 
     pub standard: EdiStandard,
 
-    pub trading_partner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trading_partner_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -175,7 +218,8 @@ pub struct CreateEdiSubmissionRequest {
 pub struct CreateEdiSubmissionResponse {
     pub document_id: String,
 
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -183,7 +227,8 @@ pub struct CreateEdiSubmissionResponse {
 
     pub status: EdiSubmissionStatus,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -192,7 +237,8 @@ pub struct CreateEdiValidationProfileRequest {
 
     pub profile_id: String,
 
-    pub rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -205,104 +251,136 @@ pub struct CreateEdiValidationProfileResponse {
 
     pub profile_id: String,
 
-    pub rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiAcknowledgment {
-    pub acknowledgment_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_content: Option<String>,
 
-    pub acknowledgment_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_data: Option<serde_json::Value>,
 
     pub acknowledgment_type: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
     pub document_id: String,
 
-    pub error_codes: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_codes: Option<serde_json::Value>,
 
-    pub error_messages: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_messages: Option<String>,
 
     pub id: String,
 
-    pub metadata: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
 
     pub received_at: String,
 
-    pub sent_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sent_at: Option<String>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiDocument {
     pub acknowledgment_sent: bool,
 
-    pub acknowledgment_sent_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_sent_at: Option<String>,
 
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub document_number: String,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     pub document_type: String,
 
-    pub error_details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_details: Option<serde_json::Value>,
 
-    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
 
     pub format_id: String,
 
     pub id: String,
 
-    pub last_retry_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_retry_at: Option<String>,
 
-    pub metadata: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
 
-    pub parsed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_at: Option<String>,
 
-    pub parsed_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_data: Option<serde_json::Value>,
 
-    pub processed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub processed_at: Option<String>,
 
-    pub raw_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
 
     pub received_at: String,
 
-    pub receiver_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receiver_id: Option<String>,
 
-    pub related_invoice_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_invoice_id: Option<String>,
 
-    pub related_purchase_order_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_purchase_order_id: Option<String>,
 
     pub retry_count: i32,
 
-    pub sender_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_id: Option<String>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiError {
-    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
 
-    pub field_path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub field_path: Option<String>,
 
     pub id: String,
 
@@ -315,11 +393,14 @@ pub struct EdiError {
 pub struct EdiFormat {
     pub code: String,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub format_config: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format_config: Option<serde_json::Value>,
 
     pub id: String,
 
@@ -327,20 +408,26 @@ pub struct EdiFormat {
 
     pub name: String,
 
-    pub supported_document_types: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub supported_document_types: Option<String>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiMapping {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
     pub description: String,
 
@@ -356,13 +443,17 @@ pub struct EdiMapping {
 
     pub mapping_name: String,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -371,13 +462,15 @@ pub struct EdiProfile {
 
     pub id: String,
 
-    pub jurisdiction_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jurisdiction_code: Option<String>,
 
     pub name: String,
 
     pub standard: EdiStandard,
 
-    pub trading_partner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trading_partner_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -409,7 +502,8 @@ pub enum EdiStandard {
 pub struct EdiSubmission {
     pub document_id: String,
 
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -417,7 +511,8 @@ pub struct EdiSubmission {
 
     pub status: EdiSubmissionStatus,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -458,14 +553,16 @@ pub struct EdiValidationProfile {
 
     pub profile_id: String,
 
-    pub rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: i32,
 
-    pub details: Vec<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<Vec<serde_json::Value>>,
 
     pub message: String,
 }
@@ -474,70 +571,94 @@ pub struct ErrorResponse {
 pub struct GetEdiDocumentResponse {
     pub acknowledgment_sent: bool,
 
-    pub acknowledgment_sent_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_sent_at: Option<String>,
 
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub document_number: String,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     pub document_type: String,
 
-    pub error_details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_details: Option<serde_json::Value>,
 
-    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
 
     pub format_id: String,
 
     pub id: String,
 
-    pub last_retry_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_retry_at: Option<String>,
 
-    pub metadata: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
 
-    pub parsed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_at: Option<String>,
 
-    pub parsed_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_data: Option<serde_json::Value>,
 
-    pub processed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub processed_at: Option<String>,
 
-    pub raw_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
 
     pub received_at: String,
 
-    pub receiver_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receiver_id: Option<String>,
 
-    pub related_invoice_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_invoice_id: Option<String>,
 
-    pub related_purchase_order_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_purchase_order_id: Option<String>,
 
     pub retry_count: i32,
 
-    pub sender_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_id: Option<String>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetEdiMappingResponse {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
     pub description: String,
 
@@ -553,20 +674,25 @@ pub struct GetEdiMappingResponse {
 
     pub mapping_name: String,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetEdiSubmissionStatusResponse {
     pub document_id: String,
 
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -574,7 +700,8 @@ pub struct GetEdiSubmissionStatusResponse {
 
     pub status: EdiSubmissionStatus,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -590,7 +717,8 @@ pub struct PaginatedResponse {
 pub struct RetryEdiSubmissionResponse {
     pub document_id: String,
 
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -598,14 +726,16 @@ pub struct RetryEdiSubmissionResponse {
 
     pub status: EdiSubmissionStatus,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SubmitEdiSubmissionResponse {
     pub document_id: String,
 
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -613,113 +743,153 @@ pub struct SubmitEdiSubmissionResponse {
 
     pub status: EdiSubmissionStatus,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateEdiDocumentRequest {
-    pub acknowledgment_sent: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_sent: Option<bool>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
-    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
 
-    pub parsed_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_data: Option<serde_json::Value>,
 
-    pub related_invoice_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_invoice_id: Option<String>,
 
-    pub related_purchase_order_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_purchase_order_id: Option<String>,
 
-    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateEdiDocumentResponse {
     pub acknowledgment_sent: bool,
 
-    pub acknowledgment_sent_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledgment_sent_at: Option<String>,
 
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub document_number: String,
 
-    pub document_total_amount: rust_decimal::Decimal,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_total_amount: Option<rust_decimal::Decimal>,
 
     pub document_type: String,
 
-    pub error_details: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_details: Option<serde_json::Value>,
 
-    pub error_message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_message: Option<String>,
 
     pub format_id: String,
 
     pub id: String,
 
-    pub last_retry_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_retry_at: Option<String>,
 
-    pub metadata: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Value>,
 
-    pub parsed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_at: Option<String>,
 
-    pub parsed_data: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parsed_data: Option<serde_json::Value>,
 
-    pub processed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub processed_at: Option<String>,
 
-    pub raw_content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raw_content: Option<String>,
 
     pub received_at: String,
 
-    pub receiver_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receiver_id: Option<String>,
 
-    pub related_invoice_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_invoice_id: Option<String>,
 
-    pub related_purchase_order_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub related_purchase_order_id: Option<String>,
 
     pub retry_count: i32,
 
-    pub sender_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_id: Option<String>,
 
     pub status: String,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateEdiMappingRequest {
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    pub field_mappings: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub field_mappings: Option<serde_json::Value>,
 
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 
-    pub mapping_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mapping_name: Option<String>,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateEdiMappingResponse {
-    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
 
-    pub created_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
 
-    pub default_values: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_values: Option<serde_json::Value>,
 
     pub description: String,
 
@@ -735,11 +905,15 @@ pub struct UpdateEdiMappingResponse {
 
     pub mapping_name: String,
 
-    pub transformation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transformation_rules: Option<serde_json::Value>,
 
-    pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 
-    pub updated_by: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_by: Option<String>,
 
-    pub validation_rules: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub validation_rules: Option<serde_json::Value>,
 }

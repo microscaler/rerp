@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Setup script for RERP PostgreSQL database + schema (in-cluster; PostgreSQL listens on 127.0.0.1:5432 in the pod).
-# Connects to shared-k8s managed by microscaler/shared-k8s-cluster.
 #
 # Layout:
 #   - Database `rerp` — app data only.
 #   - Schema `rerp` — all RERP tables (search_path default for this database).
 #   - Role `rerp` — login role matching helm app.config.database (password from env below).
-#   - After ./migrations (apply_order.txt), optional microservices/*/impl/seeds/*.sql.
+#   - After suite-local migrations (apply_order.txt), optional
+#     microservices/accounting/*/impl/seeds/*.sql.
 #
 # Shared infrastructure namespace: `data` (postgres, redis, minio, observability).
 # RERP deploys to namespace `rerp`.
@@ -14,6 +14,12 @@
 # Optional:
 #   RERP_DB_INIT_TIMEOUT (default 600s), RERP_DB_PASSWORD (must match helm dev password).
 #   RERP_APPLY_MIGRATIONS_ONLY=1 — skip role/DB creation; only wait for postgres, apply ./migrations, then GRANTs.
+#
+# NOTE: setup-db.sh has no apply ledger — every rollout re-applies every migration.
+# This works because every DDL statement in migrations/**/*.sql must be strictly
+# idempotent (safe to run against a fresh DB and against a DB where it already ran).
+# See ADR 0015 (idempotent schema retrofit pattern) for the canonical pattern.
+#
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -107,7 +113,7 @@ apply_migrations_from_disk() {
 
 apply_seeds_from_disk() {
   local count
-  count="$(find ./microservices -path '*/impl/seeds/*.sql' 2>/dev/null | wc -l | tr -d ' ')"
+  count="$(find "${SUITE_DIR}" -path '*/impl/seeds/*.sql' 2>/dev/null | wc -l | tr -d ' ')"
   if [ -z "${count}" ] || [ "${count}" = "0" ]; then
     return 0
   fi
@@ -117,22 +123,22 @@ apply_seeds_from_disk() {
     cat "${seed_file}" | kubectl exec -i -n "${NS}" "deployment/${DEPLOY}" -c postgres -- \
       sh -c 'env PGPASSWORD="${POSTGRESQL_PASSWORD:-${POSTGRES_PASSWORD:-}}" psql -h 127.0.0.1 -p 5432 -U "${POSTGRESQL_USERNAME:-postgres}" -d rerp -v ON_ERROR_STOP=1'
   }
-  if [ -f ./microservices/seed_order.txt ]; then
-    echo "📥 Applying per-microservice seed SQL (microservices/seed_order.txt, FK-ordered)..."
+  if [ -f "${SUITE_DIR}/seed_order.txt" ]; then
+    echo "📥 Applying Accounting seed SQL (accounting/seed_order.txt, FK-ordered)..."
     while IFS= read -r rel || [ -n "${rel}" ]; do
       [[ -z "${rel}" || "${rel}" =~ ^# ]] && continue
-      seed_file="./microservices/${rel}"
+      seed_file="${SUITE_DIR}/${rel}"
       if [ -f "${seed_file}" ]; then
         apply_one_seed "${seed_file}"
       else
         echo "  ⚠️  seed_order.txt lists missing file: ${seed_file}" >&2
       fi
-    done < ./microservices/seed_order.txt
+    done < "${SUITE_DIR}/seed_order.txt"
   else
-    echo "📥 Applying per-microservice seed SQL (microservices/*/impl/seeds/*.sql, alphabetical)..."
+    echo "📥 Applying Accounting seed SQL (accounting/*/impl/seeds/*.sql, alphabetical)..."
     while IFS= read -r -d '' seed_file; do
       apply_one_seed "${seed_file}"
-    done < <(find ./microservices -path '*/impl/seeds/*.sql' -print0 2>/dev/null | sort -z)
+    done < <(find "${SUITE_DIR}" -path '*/impl/seeds/*.sql' -print0 2>/dev/null | sort -z)
   fi
 }
 
@@ -148,19 +154,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA rerp TO rerp;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA rerp TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT USAGE, SELECT ON SEQUENCES TO rerp;
-
-GRANT EXECUTE ON FUNCTION public.sesame_rls_contract_version() TO rerp;
-GRANT EXECUTE ON FUNCTION public.rls_set_session(text, uuid, uuid, text, jsonb, jsonb, text, text) TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_tenant_id() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_subject_id() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_organization_id() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_session_id() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_roles() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_permissions() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_user_type() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_current_org_type() TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_has_role(text) TO rerp;
-GRANT EXECUTE ON FUNCTION public.sesame_has_permission(text) TO rerp;
 EOF
 }
 

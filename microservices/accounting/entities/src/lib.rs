@@ -1,26 +1,20 @@
-//! Accounting Domain Entities
+//! Accounting suite foundation entities.
 //!
-//! This library provides Lifeguard entity definitions for an accounting system,
-//! organized by service domain (General Ledger, Invoice, Accounts Receivable, Accounts Payable).
+//! This crate owns only shared Accounting invariants that must participate in one
+//! transaction across service boundaries (legal entities, fiscal periods, posting,
+//! idempotency, audit, and document-artifact linkage). Service-specific entities
+//! live under `microservices/accounting/<service>/impl/src/models/`.
 //!
 //! ## Usage
 //!
 //! ```rust
 //! use lifeguard::LifeEntityName;
-//! use rerp_entities::accounting::general_ledger::chart_of_accounts;
+//! use rerp_entities::accounting::foundation::account;
 //!
 //! // Access entity metadata
-//! let entity = chart_of_accounts::Entity::default();
+//! let entity = account::Entity::default();
 //! println!("Table: {}", entity.table_name());
 //! ```
-//!
-//! ## Entity Organization
-//!
-//! Entities are organized by service domain:
-//! - `accounting::general_ledger` - Core accounting entities
-//! - `accounting::invoice` - Invoice management
-//! - `accounting::accounts_receivable` - AR management
-//! - `accounting::accounts_payable` - AP management
 
 pub mod accounting;
 
@@ -28,5 +22,4 @@ pub mod accounting;
 // Must be after module declarations so it can reference them
 include!(concat!(env!("OUT_DIR"), "/entity_registry.rs"));
 
-// Re-export for convenience
-pub use accounting::*;
+pub use accounting::foundation;

@@ -281,7 +281,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
-      operationId: list_payments
+      operationId: list_customer_payments
       summary: List payments
       description: Paginated list of all customer payments with filtering by status, date range, customer, and payment method.
       parameters:
@@ -368,7 +368,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_payment
+      operationId: create_customer_payment
       summary: Create payment
       description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is true.
       x-brrtrouter-impl: true
@@ -412,7 +412,7 @@ paths:
           content: *id003
   /payments/{id}:
     get:
-      operationId: get_payment
+      operationId: get_customer_payment
       summary: Get payment by id
       description: Retrieve payment details with full application history.
       x-brrtrouter-impl: true
@@ -437,7 +437,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
-      operationId: update_payment
+      operationId: update_customer_payment
       summary: Update payment
       description: Update a payment's details. Only pending or partially applied payments can be modified.
       x-brrtrouter-impl: true
@@ -489,7 +489,7 @@ paths:
           description: "Forbidden \u2014 insufficient permissions"
           content: *id002
     delete:
-      operationId: delete_payment
+      operationId: delete_customer_payment
       summary: Delete payment
       description: Delete a payment. Only pending payments can be deleted. Applied payments must be voided instead.
       x-brrtrouter-impl: true

@@ -1,0 +1,39 @@
+[package]
+name = "rerp_migrator"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+accounting = [
+    "dep:rerp_entities",
+    "dep:rerp_accounting_general_ledger",
+    "dep:rerp_accounting_invoice",
+    "dep:rerp_accounting_accounts_receivable",
+    "dep:rerp_accounting_accounts_payable",
+    "dep:rerp_accounting_bank_sync",
+    "dep:rerp_accounting_asset",
+    "dep:rerp_accounting_budget",
+    "dep:rerp_accounting_edi",
+    "dep:rerp_accounting_financial_reports",
+]
+documents = ["dep:rerp_documents_render"]
+
+[dependencies]
+chrono = { workspace = true }
+clap = { workspace = true }
+lifeguard-migrate = { workspace = true }
+
+# Provider crates are feature-gated by suite. Runtime suite selection is still
+# mandatory; features only decide which providers are compiled into this binary.
+rerp_entities = { workspace = true, optional = true }
+rerp_accounting_general_ledger = { path = "../accounting/general-ledger/impl", optional = true }
+rerp_accounting_invoice = { path = "../accounting/invoice/impl", optional = true }
+rerp_accounting_accounts_receivable = { path = "../accounting/accounts-receivable/impl", optional = true }
+rerp_accounting_accounts_payable = { path = "../accounting/accounts-payable/impl", optional = true }
+rerp_accounting_bank_sync = { path = "../accounting/bank-sync/impl", optional = true }
+rerp_accounting_asset = { path = "../accounting/asset/impl", optional = true }
+rerp_accounting_budget = { path = "../accounting/budget/impl", optional = true }
+rerp_accounting_edi = { path = "../accounting/edi/impl", optional = true }
+rerp_accounting_financial_reports = { path = "../accounting/financial-reports/impl", optional = true }
+rerp_documents_render = { path = "../documents/render/impl", optional = true }

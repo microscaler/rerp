@@ -7,68 +7,40 @@ output_path: openapi/accounting/openapi_bff.yaml
 services:
   general-ledger:
     base_path: /api/general-ledger
-    port: 8001
+    gateway_path_style: prefixed
     spec_path: general-ledger/openapi.yaml
   invoice:
     base_path: /api/invoice
-    port: 8002
+    gateway_path_style: prefixed
     spec_path: invoice/openapi.yaml
   accounts-receivable:
     base_path: /api/accounts-receivable
-    port: 8003
+    gateway_path_style: prefixed
     spec_path: accounts-receivable/openapi.yaml
   accounts-payable:
     base_path: /api/accounts-payable
-    port: 8004
+    gateway_path_style: prefixed
     spec_path: accounts-payable/openapi.yaml
   bank-sync:
     base_path: /api/bank-sync
-    port: 8005
+    gateway_path_style: prefixed
     spec_path: bank-sync/openapi.yaml
   asset:
     base_path: /api/asset
-    port: 8006
+    gateway_path_style: prefixed
     spec_path: asset/openapi.yaml
   budget:
     base_path: /api/budget
-    port: 8007
+    gateway_path_style: prefixed
     spec_path: budget/openapi.yaml
   edi:
     base_path: /api/edi
-    port: 8008
+    gateway_path_style: prefixed
     spec_path: edi/openapi.yaml
   financial-reports:
     base_path: /api/financial-reports
-    port: 8009
+    gateway_path_style: prefixed
     spec_path: financial-reports/openapi.yaml
-  tax-compliance:
-    base_path: /api/tax-compliance
-    port: 8016
-    spec_path: tax-compliance/openapi.yaml
-  documents-extraction:
-    base_path: /api/documents-extraction
-    port: 8017
-    spec_path: documents-extraction/openapi.yaml
-  treasury:
-    base_path: /api/treasury
-    port: 8018
-    spec_path: treasury/openapi.yaml
-  consolidation:
-    base_path: /api/consolidation
-    port: 8019
-    spec_path: consolidation/openapi.yaml
-  revenue-recognition:
-    base_path: /api/revenue-recognition
-    port: 8020
-    spec_path: revenue-recognition/openapi.yaml
-  lease-accounting:
-    base_path: /api/lease-accounting
-    port: 8021
-    spec_path: lease-accounting/openapi.yaml
-  audit-controls:
-    base_path: /api/audit-controls
-    port: 8022
-    spec_path: audit-controls/openapi.yaml
 metadata:
   title: RERP Accounting Backend for Frontend API
   version: 1.0.0

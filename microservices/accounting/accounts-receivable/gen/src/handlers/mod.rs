@@ -43,17 +43,17 @@ pub mod create_follow_up_run;
 
 pub mod create_payment_promise;
 
-pub mod list_payments;
+pub mod list_customer_payments;
 
-pub mod create_payment;
+pub mod create_customer_payment;
 
 pub mod create_payment_application;
 
-pub mod get_payment;
+pub mod get_customer_payment;
 
-pub mod update_payment;
+pub mod update_customer_payment;
 
-pub mod delete_payment;
+pub mod delete_customer_payment;
 
 pub mod list_payment_applications;
 

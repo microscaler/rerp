@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -41,13 +42,11 @@ pub struct Response {
     #[serde(rename = "activity_type")]
     pub activity_type: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "assigned_to")]
-    pub assigned_to: Option<String>,
+    pub assigned_to: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -62,17 +61,14 @@ pub struct Response {
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "next_follow_up_date")]
-    pub next_follow_up_date: Option<String>,
+    pub next_follow_up_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
-    pub notes: Option<String>,
+    pub notes: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
-    pub updated_at: Option<String>,
+    pub updated_at: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {

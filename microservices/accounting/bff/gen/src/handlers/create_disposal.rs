@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -63,9 +64,8 @@ pub struct Response {
     #[serde(rename = "disposal_type")]
     pub disposal_type: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gain_loss")]
-    pub gain_loss: Option<f64>,
+    pub gain_loss: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gl_entry_id")]

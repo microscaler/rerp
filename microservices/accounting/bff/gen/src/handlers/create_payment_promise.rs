@@ -3,6 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -38,9 +39,8 @@ pub struct Response {
     #[serde(rename = "promised_date")]
     pub promised_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
-    pub status: Option<String>,
+    pub status: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {

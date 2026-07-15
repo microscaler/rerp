@@ -22,7 +22,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     Response {
         created_at: None, // TODO: Set from your business logic
 
-        created_by: String::new(), // TODO: Set from your business logic
+        created_by: Some(String::new()), // TODO: Set from your business logic
 
         default_values: String::new(), // TODO: Set from your business logic
 
@@ -44,7 +44,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: String::new(), // TODO: Set from your business logic
+        updated_by: Some(String::new()), // TODO: Set from your business logic
 
         validation_rules: String::new(), // TODO: Set from your business logic
     }

@@ -28,7 +28,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         created_at: None, // TODO: Set from your business logic
 
-        created_by: String::new(), // TODO: Set from your business logic
+        created_by: Some(String::new()), // TODO: Set from your business logic
 
         currency_code: "USD".to_string(), // TODO: Set from your business logic
 
@@ -68,6 +68,6 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
         updated_at: String::new(), // TODO: Set from your business logic
 
-        updated_by: String::new(), // TODO: Set from your business logic
+        updated_by: Some(String::new()), // TODO: Set from your business logic
     }
 }

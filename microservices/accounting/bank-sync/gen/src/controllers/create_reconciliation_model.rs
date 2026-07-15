@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_reconciliation_model'.
 
 use crate::handlers::create_reconciliation_model::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateReconciliationModelController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         active: true,
         created_at: Some("example".to_string()),
         id: "example".to_string(),
@@ -16,5 +17,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         rule_type: "example".to_string(),
         sequence: Some(42),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

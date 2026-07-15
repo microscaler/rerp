@@ -37,6 +37,7 @@ This directory contains the product requirement documents (PRDs) that address th
 | No graceful degradation | PRD-007 | ✅ Draft |
 | No monitoring/observability | PRD-007 | ✅ Draft |
 | No schema evolution strategy | PRD-007 | ✅ Draft |
+| No governed document output or rendition boundary | PRD-008 | ✅ Draft |
 
 ## PRD List (Implementation Order)
 
@@ -130,6 +131,19 @@ This directory contains the product requirement documents (PRDs) that address th
 - Replaces 7 unverifiable performance claims with accurate Rust benefit statements
 - Rewrites all 10 "Where RERP Wins" sections with component-specific positioning
 
+### Phase 5: Document Output (P0 for invoice delivery)
+
+#### PRD-008: Document Generation and Rendition
+**What:** A suite-owned API for external HTML/CSS templates, immutable generated renditions, explicit copies, and future trust services
+**Why:** Rich document production is a cross-suite Documents capability; placing it in Accounting would create a migration and duplicate the platform boundary
+**Impact:** Gives Accounting and every later RERP suite one governed output path while preserving source-suite ownership of business facts
+**Changes:**
+- Adds the `documents/render` product and API component
+- Defines post-commit, idempotent handoff of frozen typed render models
+- Defines published template versions and immutable source/template/snapshot lineage
+- Defines original-versus-copy semantics and post-MVP PAdES sealing/timestamping
+- Prohibits tenant selectors in requests; tenant and actor context come from Sesame
+
 ## Implementation Sequence
 
 ```
@@ -162,6 +176,7 @@ Each PRD produces concrete changes to the DOCUMENTS_ANALYSIS:
 | PRD-005 | Document lifecycle diagram, `DocumentEventLog` entity, component README updates |
 | PRD-006 | Updated entity definitions in `ENTITY_REGISTRY.md`, enum registry |
 | PRD-007 | Operational standards document, migration templates, seed scripts |
+| PRD-008 | `render/openapi.yaml`, Documents render scaffold, ADR 002, and this generation/rendition PRD |
 
 ## How to Use This Index
 

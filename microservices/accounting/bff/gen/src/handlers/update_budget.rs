@@ -4,6 +4,7 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 use crate::handlers::types::BudgetCreateBudgetLineRequest;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -76,9 +77,8 @@ pub struct Response {
     #[serde(rename = "department_id")]
     pub department_id: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
-    pub description: Option<String>,
+    pub description: String,
 
     #[serde(rename = "fiscal_year")]
     pub fiscal_year: i32,

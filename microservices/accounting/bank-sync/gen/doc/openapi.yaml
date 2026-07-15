@@ -2,7 +2,8 @@ openapi: 3.1.0
 info:
   title: Bank Sync
   version: 1.0.0
-  description: Bank synchronization service managing bank account connections, statement imports, reconciliations, and cash management. Supports multiple bank integrations, automated reconciliation, and bank feed monitoring.
+  description: Bank synchronization service managing bank account connections, statement imports, reconciliations, and cash
+    management. Supports multiple bank integrations, automated reconciliation, and bank feed monitoring.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -115,6 +116,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankAccountRequest'
+            example:
+              name: Acme Corporation
+              account_number: 1
+              routing_number: 1
+              currency_code: USD
+              bank_name: Acme Corporation
+              account_type: Asset
+              gl_account_id: 950e8400-e29b-41d4-a716-446655440024
+              opening_balance: 50000.0
+              opening_balance_date: true
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              notes: Approved by CFO on 2026-01-15
       responses:
         '201':
           description: BankAccount created
@@ -127,7 +140,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /bank-accounts/{id}:
     get:
       operationId: get_bank_account
@@ -172,6 +203,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateBankAccountRequest'
+            example:
+              name: Acme Corporation
+              account_number: 1
+              routing_number: 1
+              bank_name: Acme Corporation
+              account_type: Asset
+              gl_account_id: 950e8400-e29b-41d4-a716-446655440024
+              status: active
+              sync_enabled: true
+              sync_frequency: true
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: BankAccount updated
@@ -185,6 +227,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
     delete:
       operationId: delete_bank_account
       summary: Delete bank account
@@ -291,6 +348,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankStatementRequest'
+            example:
+              bank_account_id: 0
+              statement_number: 1
+              start_date: '2026-01-15'
+              statement_date: 1000.0
+              opening_balance: 50000.0
+              closing_balance: 55000.0
+              currency_code: USD
+              transactions: &id005 []
+              file_reference: FILE-2026-0001
       responses:
         '201':
           description: BankStatement created
@@ -303,7 +370,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /statements/{id}:
     get:
       operationId: get_bank_statement
@@ -361,6 +437,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /transactions:
     get:
       operationId: list_bank_transactions
@@ -463,6 +551,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankTransactionMatchingRequest'
+            example:
+              transaction_id: 550e8400-e29b-41d4-a716-446655440000
+              matched_entry_id: 550e8400-e29b-41d4-a716-446655440000
+              matched_entry_type: standard
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Transaction matched successfully
@@ -475,7 +568,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Transaction or matched entry not found
           content:
@@ -488,6 +581,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
   /transactions/auto-match:
     post:
       operationId: auto_match_transactions
@@ -541,7 +640,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /reconciliations:
     get:
       operationId: list_reconciliations
@@ -619,6 +727,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankReconciliationRequest'
+            example:
+              bank_account_id: 0
+              statement_id: 1000.0
+              reconciliation_date: '2026-01-15'
+              book_balance: 1000.0
+              notes: Approved by CFO on 2026-01-15
       responses:
         '201':
           description: Reconciliation created
@@ -631,13 +745,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Reconciliation already exists for this account and date
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
   /reconciliations/{id}/complete:
     post:
       operationId: complete_reconciliation
@@ -663,7 +783,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Not found
           content:
@@ -676,6 +796,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
   /reports/reconciliation:
     get:
       operationId: reconciliation_report
@@ -779,6 +905,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateReconciliationModelRequest'
+            example:
+              name: Acme Corporation
+              rule_type: standard
+              sequence: 1
+              active: true
+              match_tolerance_amount: 1000.0
+              match_tolerance_days: 0
       responses:
         '201':
           description: Reconciliation model created
@@ -786,6 +919,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationModel'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /transactions/{id}/suggestions:
     get:
       operationId: get_transaction_reconciliation_suggestions
@@ -822,6 +967,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReconcileTransactionRequest'
+            example:
+              matched_entry_id: 550e8400-e29b-41d4-a716-446655440000
+              matched_entry_type: standard
+              write_off_amount: 1000.0
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Transaction reconciled
@@ -829,6 +979,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationResult'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /transactions/{id}/unreconcile:
     post:
       operationId: unreconcile_transaction
@@ -844,6 +1006,18 @@ paths:
       responses:
         '200':
           description: Transaction unreconciled
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /transactions/{id}/write-off:
     post:
       operationId: create_transaction_write_off
@@ -862,6 +1036,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTransactionWriteOffRequest'
+            example:
+              amount: 10000.0
+              account_id: 750e8400-e29b-41d4-a716-446655440002
+              reason: Reclassification of asset category
+              tax_code: VAT-2026
       responses:
         '201':
           description: Write-off created
@@ -869,6 +1048,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationAdjustment'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /transactions/{id}/exchange-difference:
     post:
       operationId: create_transaction_exchange_difference
@@ -887,6 +1078,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateExchangeDifferenceRequest'
+            example:
+              amount: 10000.0
+              currency_code: USD
+              account_id: 750e8400-e29b-41d4-a716-446655440002
+              exchange_rate_id: 1000.0
       responses:
         '201':
           description: Exchange-difference entry created
@@ -894,7 +1090,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReconciliationAdjustment'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
@@ -902,47 +1153,74 @@ components:
       bearerFormat: JWT
       description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+          example: 1
+        page:
+          type: integer
+          description: Current page number
+          example: 1
+        limit:
+          type: integer
+          description: Page size limit
+          example: 1
     BankAccount:
       type: object
       required:
+      - account_number
+      - bank_name
+      - company_id
+      - currency_code
       - id
       - name
-      - account_number
-      - currency_code
-      - company_id
       - status
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for this bank account
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 200
           description: Bank account name/label
+          example: Acme Corporation
         account_number:
           type: string
           maxLength: 50
           description: Bank account number
+          example: 1
         routing_number:
           type: string
           maxLength: 20
           nullable: true
           description: Bank routing/SWIFT/IBAN code
+          example: 1
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Account currency
+          example: USD
         bank_name:
           type: string
           maxLength: 200
           description: Name of the banking institution
+          example: Acme Corporation
         bank_id:
           type: string
           format: uuid
           nullable: true
           description: Linked bank institution record
+          example: 850e8400-e29b-41d4-a716-446655440003
         account_type:
           type: string
           enum:
@@ -954,19 +1232,23 @@ components:
           - CASH
           - OTHER
           description: Type of bank account
+          example: Asset
         gl_account_id:
           type: string
           format: uuid
           nullable: true
           description: Linked GL account for reconciliation
+          example: 950e8400-e29b-41d4-a716-446655440024
         opening_balance:
           type: number
           format: double
           description: Opening balance at account setup
+          example: 50000.0
         opening_balance_date:
           type: string
           format: date
           description: Date of the opening balance
+          example: true
         status:
           type: string
           enum:
@@ -976,15 +1258,18 @@ components:
           - SYNCING
           - ERROR
           description: Bank account status
+          example: active
         sync_enabled:
           type: boolean
           default: true
           description: Whether automatic sync is enabled
+          example: true
         last_sync_date:
           type: string
           format: date-time
           nullable: true
           description: Last successful sync date
+          example: true
         sync_frequency:
           type: string
           enum:
@@ -993,20 +1278,25 @@ components:
           - MANUAL
           default: DAILY
           description: Sync frequency
+          example: true
         company_id:
           type: string
           format: uuid
           description: Company this account belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateBankAccountRequest:
       type: object
       required:
@@ -1018,20 +1308,25 @@ components:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         account_number:
           type: string
           maxLength: 50
+          example: 1
         routing_number:
           type: string
           maxLength: 20
           nullable: true
+          example: 1
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         bank_name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -1042,40 +1337,50 @@ components:
           - MONEY_MARKET
           - CASH
           - OTHER
+          example: Asset
         gl_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440024
         opening_balance:
           type: number
           format: double
           default: 0
+          example: 50000.0
         opening_balance_date:
           type: string
           format: date
+          example: true
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     UpdateBankAccountRequest:
       type: object
       properties:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         account_number:
           type: string
           maxLength: 50
+          example: 1
         routing_number:
           type: string
           maxLength: 20
           nullable: true
+          example: 1
         bank_name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         account_type:
           type: string
           enum:
@@ -1086,10 +1391,12 @@ components:
           - MONEY_MARKET
           - CASH
           - OTHER
+          example: Asset
         gl_account_id:
           type: string
           format: uuid
           nullable: true
+          example: 950e8400-e29b-41d4-a716-446655440024
         status:
           type: string
           enum:
@@ -1098,59 +1405,74 @@ components:
           - CLOSED
           - SYNCING
           - ERROR
+          example: active
         sync_enabled:
           type: boolean
+          example: true
         sync_frequency:
           type: string
           enum:
           - DAILY
           - HOURLY
           - MANUAL
+          example: true
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     BankStatement:
       type: object
       required:
-      - id
       - bank_account_id
-      - statement_date
+      - closing_balance
       - currency_code
+      - id
+      - opening_balance
+      - statement_date
+      - statement_number
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for this statement
+          example: 550e8400-e29b-41d4-a716-446655440000
         bank_account_id:
           type: string
           format: uuid
           description: Bank account this statement belongs to
+          example: 0
         statement_number:
           type: string
           maxLength: 100
           nullable: true
           description: External statement reference number
+          example: 1
         statement_date:
           type: string
           format: date
           description: End date of the statement period
+          example: 1000.0
         start_date:
           type: string
           format: date
           description: Start date of the statement period
+          example: '2026-01-15'
         opening_balance:
           type: number
           format: double
           description: Balance at start of period
+          example: 50000.0
         closing_balance:
           type: number
           format: double
           description: Balance at end of period
+          example: 55000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         status:
           type: string
           enum:
@@ -1162,35 +1484,44 @@ components:
           - RECONCILED
           - ERROR
           description: Statement processing status
+          example: active
         transaction_count:
           type: integer
           description: Number of transactions in the statement
+          example: 0
         matched_count:
           type: integer
           description: Number of transactions successfully matched
+          example: 0
         unmatched_count:
           type: integer
           description: Number of transactions not yet matched
+          example: 0
         file_reference:
           type: string
           maxLength: 500
           nullable: true
           description: Reference to the uploaded file
+          example: FILE-2026-0001
         imported_at:
           type: string
           format: date-time
           description: When the statement was imported
+          example: sample value
         imported_by:
           type: string
           format: uuid
           nullable: true
           description: User who imported the statement
+          example: sample value
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateBankStatementRequest:
       type: object
       required:
@@ -1201,97 +1532,118 @@ components:
         bank_account_id:
           type: string
           format: uuid
+          example: 0
         statement_number:
           type: string
           maxLength: 100
           nullable: true
+          example: 1
         start_date:
           type: string
           format: date
           description: Statement period start. Auto-derived from transactions if not provided.
+          example: '2026-01-15'
         statement_date:
           type: string
           format: date
           description: Statement end date
+          example: 1000.0
         opening_balance:
           type: number
           format: double
           description: Opening balance
+          example: 50000.0
         closing_balance:
           type: number
           format: double
           description: Closing balance
+          example: 55000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         transactions:
           type: array
           items:
             $ref: '#/components/schemas/CreateBankTransactionRequest'
           description: Transactions in this statement
+          example: *id005
         file_reference:
           type: string
           maxLength: 500
           nullable: true
           description: Reference to uploaded statement file
+          example: FILE-2026-0001
     BankTransaction:
       type: object
       required:
+      - amount
+      - currency_code
+      - description
       - id
       - statement_id
       - transaction_date
-      - amount
-      - currency_code
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for this transaction
+          example: 550e8400-e29b-41d4-a716-446655440000
         statement_id:
           type: string
           format: uuid
           description: Statement this transaction belongs to
+          example: 1000.0
         bank_account_id:
           type: string
           format: uuid
           description: Bank account this transaction is on
+          example: 0
         transaction_date:
           type: string
           format: date
           description: Transaction date
+          example: '2026-01-15'
         value_date:
           type: string
           format: date
           nullable: true
           description: Value/settlement date
+          example: 1000.0
         amount:
           type: number
           format: double
           description: Transaction amount (positive = credit, negative = debit)
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         description:
           type: string
           maxLength: 500
           description: Transaction description/narrative
+          example: Primary operating company
         reference:
           type: string
           maxLength: 100
           nullable: true
           description: Transaction reference number
+          example: REF-2026-0001
         counterparty_name:
           type: string
           maxLength: 200
           nullable: true
           description: Counterparty name
+          example: 0
         counterparty_account:
           type: string
           maxLength: 50
           nullable: true
           description: Counterparty account number
+          example: 0
         status:
           type: string
           enum:
@@ -1301,11 +1653,13 @@ components:
           - DISPUTED
           - FILTERED
           description: Transaction reconciliation status
+          example: active
         matched_entry_id:
           type: string
           format: uuid
           nullable: true
           description: Linked GL entry or invoice
+          example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_type:
           type: string
           enum:
@@ -1316,32 +1670,39 @@ components:
           - OTHER
           nullable: true
           description: Type of matched entry
+          example: standard
         matched_date:
           type: string
           format: date-time
           nullable: true
           description: When the transaction was matched
+          example: '2026-01-15'
         matched_by:
           type: string
           format: uuid
           nullable: true
           description: User who matched the transaction
+          example: sample value
         notes:
           type: string
           maxLength: 1000
           nullable: true
           description: Notes about this transaction
+          example: Approved by CFO on 2026-01-15
         dispute_reason:
           type: string
           maxLength: 1000
           nullable: true
           description: Reason for dispute if applicable
+          example: sample value
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateBankTransactionRequest:
       type: object
       required:
@@ -1352,36 +1713,45 @@ components:
         transaction_date:
           type: string
           format: date
+          example: '2026-01-15'
         value_date:
           type: string
           format: date
           nullable: true
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         description:
           type: string
           maxLength: 500
+          example: Primary operating company
         reference:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         counterparty_name:
           type: string
           maxLength: 200
           nullable: true
+          example: 0
         counterparty_account:
           type: string
           maxLength: 50
           nullable: true
+          example: 0
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     CreateBankTransactionMatchingRequest:
       type: object
       required:
@@ -1393,10 +1763,12 @@ components:
           type: string
           format: uuid
           description: Bank transaction to match
+          example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_id:
           type: string
           format: uuid
           description: GL entry, invoice, or payment to match against
+          example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_type:
           type: string
           enum:
@@ -1405,51 +1777,61 @@ components:
           - JOURNAL_ENTRY
           - TRANSFER
           - OTHER
+          example: standard
         notes:
           type: string
           maxLength: 1000
           nullable: true
           description: Matching notes
+          example: Approved by CFO on 2026-01-15
     BankReconciliation:
       type: object
       required:
-      - id
       - bank_account_id
-      - statement_id
+      - id
       - reconciliation_date
+      - statement_id
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for this reconciliation
+          example: 550e8400-e29b-41d4-a716-446655440000
         bank_account_id:
           type: string
           format: uuid
           description: Bank account being reconciled
+          example: 0
         statement_id:
           type: string
           format: uuid
           description: Statement used for reconciliation
+          example: 1000.0
         reconciliation_date:
           type: string
           format: date
           description: Date the reconciliation was performed
+          example: '2026-01-15'
         statement_balance:
           type: number
           format: double
           description: Closing balance from the bank statement
+          example: 1000.0
         book_balance:
           type: number
           format: double
           description: Balance per books before reconciliation
+          example: 1000.0
         adjusted_balance:
           type: number
           format: double
           description: Adjusted book balance after reconciliation
+          example: 1000.0
         difference:
           type: number
           format: double
           description: Difference (should be zero for a balanced reconciliation)
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1459,41 +1841,51 @@ components:
           - IMBALANCED
           - COMPLETED
           description: Reconciliation status
+          example: active
         total_matched:
           type: number
           format: double
           description: Total matched amount
+          example: 1000.0
         total_unmatched:
           type: number
           format: double
           description: Total unmatched amount
+          example: 1000.0
         matched_transactions:
           type: integer
           description: Number of matched transactions
+          example: 1
         unmatched_transactions:
           type: integer
           description: Number of unmatched transactions
+          example: 1
         reconciled_by:
           type: string
           format: uuid
           nullable: true
           description: User who completed the reconciliation
+          example: true
         reconciled_at:
           type: string
           format: date-time
           nullable: true
           description: When reconciliation was completed
+          example: true
         notes:
           type: string
           maxLength: 2000
           nullable: true
           description: Reconciliation notes
+          example: Approved by CFO on 2026-01-15
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateBankReconciliationRequest:
       type: object
       required:
@@ -1504,20 +1896,25 @@ components:
         bank_account_id:
           type: string
           format: uuid
+          example: 0
         statement_id:
           type: string
           format: uuid
+          example: 1000.0
         reconciliation_date:
           type: string
           format: date
+          example: '2026-01-15'
         book_balance:
           type: number
           format: double
           description: Balance per books before reconciliation
+          example: 1000.0
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     PaginatedBankAccounts:
       type: object
       required:
@@ -1530,14 +1927,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BankAccount'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedBankStatements:
       type: object
       required:
@@ -1550,14 +1952,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BankStatement'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedBankTransactions:
       type: object
       required:
@@ -1570,14 +1977,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BankTransaction'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedReconciliations:
       type: object
       required:
@@ -1590,14 +2002,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BankReconciliation'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     BankReconciliationReport:
       type: object
       required:
@@ -1608,67 +2025,86 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         bank_account_id:
           type: string
           format: uuid
+          example: 0
         bank_account_name:
           type: string
+          example: 0
         period_start:
           type: string
           format: date
+          example: '2026-01-01'
         period_end:
           type: string
           format: date
+          example: '2026-01-31'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         opening_balance:
           type: number
           format: double
+          example: 50000.0
         closing_balance:
           type: number
           format: double
+          example: 55000.0
         total_deposits:
           type: number
           format: double
+          example: 50000.0
         total_withdrawals:
           type: number
           format: double
+          example: 45000.0
         reconciled_amount:
           type: number
           format: double
+          example: 95000.0
         unreconciled_amount:
           type: number
           format: double
+          example: 5000.0
         reconciliation_percentage:
           type: number
           format: double
           description: Percentage of transactions reconciled
+          example: 95.0
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CashPosition:
       type: object
       required:
-      - company_id
       - as_of_date
+      - available_balance
+      - company_id
       - total_cash
       properties:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_cash:
           type: number
           format: double
           description: Total cash across all bank accounts
+          example: 55000.0
         by_account:
           type: array
           items:
@@ -1685,14 +2121,19 @@ components:
               currency_code:
                 type: string
           description: Cash position by account
+          example:
+          - account_id: 550e8400-e29b-41d4-a716-446655440000
+            balance: 50000.0
         pending_transactions:
           type: number
           format: double
           description: Total pending/uncleared transactions
+          example: 5000.0
         available_balance:
           type: number
           format: double
           description: Available balance (total - pending)
+          example: 50000.0
     ReconciliationModel:
       type: object
       required:
@@ -1704,9 +2145,11 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         rule_type:
           type: string
           enum:
@@ -1716,24 +2159,31 @@ components:
           - COUNTERPARTY_MATCH
           - WRITE_OFF
           - TRANSFER
+          example: standard
         sequence:
           type: integer
           minimum: 1
+          example: 1
         active:
           type: boolean
+          example: true
         match_tolerance_amount:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         match_tolerance_days:
           type: integer
           nullable: true
+          example: 0
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateReconciliationModelRequest:
       type: object
       required:
@@ -1743,6 +2193,7 @@ components:
         name:
           type: string
           maxLength: 200
+          example: Acme Corporation
         rule_type:
           type: string
           enum:
@@ -1752,19 +2203,24 @@ components:
           - COUNTERPARTY_MATCH
           - WRITE_OFF
           - TRANSFER
+          example: standard
         sequence:
           type: integer
           minimum: 1
+          example: 1
         active:
           type: boolean
           default: true
+          example: true
         match_tolerance_amount:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         match_tolerance_days:
           type: integer
           nullable: true
+          example: 0
     ReconciliationSuggestion:
       type: object
       required:
@@ -1775,6 +2231,7 @@ components:
         candidate_id:
           type: string
           format: uuid
+          example: '2026-01-15'
         candidate_type:
           type: string
           enum:
@@ -1783,17 +2240,21 @@ components:
           - JOURNAL_ENTRY
           - TRANSFER
           - WRITE_OFF
+          example: '2026-01-15'
         confidence:
           type: number
           format: double
           minimum: 0
           maximum: 1
+          example: 0.85
         model_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440040
         reason:
           type: string
+          example: Reclassification of asset category
     ReconciliationSuggestions:
       type: object
       required:
@@ -1803,10 +2264,14 @@ components:
         transaction_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         suggestions:
           type: array
           items:
             $ref: '#/components/schemas/ReconciliationSuggestion'
+          example:
+          - suggestion_id: 750e8400-e29b-41d4-a716-446655440002
+            confidence: 0.85
     ReconcileTransactionRequest:
       type: object
       required:
@@ -1816,6 +2281,7 @@ components:
         matched_entry_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_type:
           type: string
           enum:
@@ -1824,14 +2290,17 @@ components:
           - JOURNAL_ENTRY
           - TRANSFER
           - OTHER
+          example: standard
         write_off_amount:
           type: number
           format: double
           nullable: true
+          example: 1000.0
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     ReconciliationResult:
       type: object
       required:
@@ -1841,20 +2310,24 @@ components:
         transaction_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         reconciliation_id:
           type: string
           format: uuid
           nullable: true
+          example: 650e8400-e29b-41d4-a716-446655440036
         status:
           type: string
           enum:
           - MATCHED
           - RECONCILED
           - PARTIALLY_RECONCILED
+          example: active
         journal_entry_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
     CreateTransactionWriteOffRequest:
       type: object
       required:
@@ -1865,15 +2338,19 @@ components:
         amount:
           type: number
           format: double
+          example: 10000.0
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         reason:
           type: string
           maxLength: 500
+          example: Reclassification of asset category
         tax_code:
           type: string
           nullable: true
+          example: VAT-2026
     CreateExchangeDifferenceRequest:
       type: object
       required:
@@ -1884,17 +2361,21 @@ components:
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         account_id:
           type: string
           format: uuid
+          example: 750e8400-e29b-41d4-a716-446655440002
         exchange_rate_id:
           type: string
           format: uuid
           nullable: true
+          example: 1000.0
     ReconciliationAdjustment:
       type: object
       required:
@@ -1906,21 +2387,26 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         transaction_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         adjustment_type:
           type: string
           enum:
           - WRITE_OFF
           - EXCHANGE_DIFFERENCE
+          example: standard
         amount:
           type: number
           format: double
+          example: 10000.0
         journal_entry_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
     PaginatedReconciliationModels:
       type: object
       required:
@@ -1931,8 +2417,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ReconciliationModel'
+          example: []
         total:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
       required:
@@ -1955,6 +2443,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -1984,5 +2473,6 @@ components:
               message:
                 type: string
                 example: Statement closing balance does not match expected
+          example: []
 security:
 - bearerAuth: []

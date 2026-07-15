@@ -4,6 +4,7 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 use crate::handlers::types::LineItemRequest;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -49,17 +50,14 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
+    pub company_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
-    pub created_at: Option<String>,
+    pub created_at: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_by")]
-    pub created_by: Option<String>,
+    pub created_by: String,
 
     #[serde(rename = "currency_code")]
     pub currency_code: String,
@@ -73,36 +71,30 @@ pub struct Response {
     #[serde(rename = "entry_number")]
     pub entry_number: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "exchange_rate")]
-    pub exchange_rate: Option<f64>,
+    pub exchange_rate: f64,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "fiscal_period_id")]
-    pub fiscal_period_id: Option<String>,
+    pub fiscal_period_id: String,
 
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "journal_id")]
-    pub journal_id: Option<String>,
+    pub journal_id: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_at")]
-    pub posted_at: Option<String>,
+    pub posted_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "posted_by")]
     pub posted_by: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reference_number")]
-    pub reference_number: Option<String>,
+    pub reference_number: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reversed_at")]
-    pub reversed_at: Option<String>,
+    pub reversed_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reversed_by")]
@@ -152,6 +144,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::create_journal_entry::handle(req)
 }

@@ -1,12 +1,13 @@
 // User-owned controller for handler 'create_credit_memo'.
 
 use crate::handlers::create_credit_memo::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(CreateCreditMemoController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         amount: 3.14,
         company_id: Some("example".to_string()),
         created_at: Some("example".to_string()),
@@ -20,5 +21,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         remaining_amount: Some(3.14),
         status: Some("example".to_string()),
         updated_at: Some("example".to_string()),
-    }
+    })
 }

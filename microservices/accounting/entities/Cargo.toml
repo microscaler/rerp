@@ -27,11 +27,3 @@ sea-query = { version = "1.0.0-rc.29", features = ["with-json"] }
 [lib]
 name = "rerp_entities"
 path = "src/lib.rs"
-
-[[bin]]
-name = "generate-migrations"
-path = "src/bin/generate_migrations.rs"
-
-[[bin]]
-name = "generate-sql"
-path = "src/bin/generate_sql.rs"

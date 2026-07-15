@@ -1,12 +1,13 @@
 // User-owned controller for handler 'update_chart_template'.
 
 use crate::handlers::update_chart_template::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[handler(UpdateChartTemplateController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         code: "example".to_string(),
         company_id: "example".to_string(),
         created_at: Some("example".to_string()),
@@ -26,5 +27,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         updated_at: Some("example".to_string()),
         updated_by: Some("example".to_string()),
         version: "example".to_string(),
-    }
+    })
 }

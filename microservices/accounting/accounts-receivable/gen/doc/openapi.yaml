@@ -2,7 +2,9 @@ openapi: 3.1.0
 info:
   title: Accounts Receivable
   version: 1.0.0
-  description: 'Accounts receivable management service handling customer invoices, payments, collections, and aging analysis. Supports the full AR lifecycle: invoice creation, payment application, credit memos, dispute management, and aging reporting. Integrates with the general ledger for account posting.'
+  description: 'Accounts receivable management service handling customer invoices, payments, collections, and aging analysis.
+    Supports the full AR lifecycle: invoice creation, payment application, credit memos, dispute management, and aging reporting.
+    Integrates with the general ledger for account posting.'
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -29,7 +31,8 @@ paths:
     get:
       operationId: list_customer_invoices
       summary: List customer invoices
-      description: Paginated list of all customer invoices with AR-specific fields including aging bucket and outstanding amounts.
+      description: Paginated list of all customer invoices with AR-specific fields including aging bucket and outstanding
+        amounts.
       parameters:
       - name: page
         in: query
@@ -119,7 +122,8 @@ paths:
     post:
       operationId: create_customer_invoice
       summary: Create customer invoice
-      description: Create a new AR record for an invoice. Links the invoice to the customer and initializes the outstanding amount tracking.
+      description: Create a new AR record for an invoice. Links the invoice to the customer and initializes the outstanding
+        amount tracking.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -127,6 +131,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
+            example:
+              invoice_id: 1000.0
+              customer_id: 650e8400-e29b-41d4-a716-446655440001
+              currency_code: USD
+              due_date: '2026-01-15'
+              terms: sample value
+              credit_limit_check: true
+              company_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: CustomerInvoice created
@@ -139,10 +151,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Credit limit exceeded for customer
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id002
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
@@ -150,7 +174,8 @@ paths:
     get:
       operationId: get_customer_invoice
       summary: Get customer invoice by id
-      description: Retrieve a single customer invoice with its full AR details including aging, payment history, and credit memo history.
+      description: Retrieve a single customer invoice with its full AR details including aging, payment history, and credit
+        memo history.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -190,6 +215,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
+            example:
+              status: active
+              aging_bucket: sample value
+              due_date: '2026-01-15'
+              terms: sample value
+              credit_limit_check: true
       responses:
         '200':
           description: CustomerInvoice updated
@@ -200,6 +231,24 @@ paths:
         '404':
           description: Not found
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id003
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
@@ -232,7 +281,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /payments:
     get:
-      operationId: list_payments
+      operationId: list_customer_payments
       summary: List payments
       description: Paginated list of all customer payments with filtering by status, date range, customer, and payment method.
       parameters:
@@ -319,7 +368,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
-      operationId: create_payment
+      operationId: create_customer_payment
       summary: Create payment
       description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is true.
       x-brrtrouter-impl: true
@@ -329,6 +378,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentRequest'
+            example:
+              reference_number: REF-2026-0001
+              amount: 10000.0
+              currency_code: USD
+              payment_method: 1000.0
+              payment_date: 1000.0
+              customer_id: 650e8400-e29b-41d4-a716-446655440001
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              notes: Approved by CFO on 2026-01-15
+              auto_apply: true
       responses:
         '201':
           description: Payment created
@@ -341,10 +400,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /payments/{id}:
     get:
-      operationId: get_payment
+      operationId: get_customer_payment
       summary: Get payment by id
       description: Retrieve payment details with full application history.
       x-brrtrouter-impl: true
@@ -369,7 +437,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
-      operationId: update_payment
+      operationId: update_customer_payment
       summary: Update payment
       description: Update a payment's details. Only pending or partially applied payments can be modified.
       x-brrtrouter-impl: true
@@ -386,6 +454,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePaymentRequest'
+            example:
+              amount: 10000.0
+              payment_method: 1000.0
+              payment_date: 1000.0
+              status: active
+              notes: Approved by CFO on 2026-01-15
       responses:
         '200':
           description: Payment updated
@@ -405,8 +479,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
     delete:
-      operationId: delete_payment
+      operationId: delete_customer_payment
       summary: Delete payment
       description: Delete a payment. Only pending payments can be deleted. Applied payments must be voided instead.
       x-brrtrouter-impl: true
@@ -472,6 +555,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentApplicationRequest'
+            example:
+              payment_id: 1000.0
+              customer_invoice_id: 1000.0
+              applied_amount: 1000.0
       responses:
         '201':
           description: Payment application created
@@ -484,7 +571,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Payment or invoice not found
           content:
@@ -497,6 +584,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
   /payments/{id}/auto-apply:
     post:
       operationId: auto_apply_payment
@@ -523,6 +616,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /credit-memos:
     get:
       operationId: list_credit_memos
@@ -597,6 +702,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCreditMemoRequest'
+            example:
+              reference_id: REF-2026-0001
+              customer_invoice_id: 1000.0
+              amount: 10000.0
+              currency_code: USD
+              reason: Reclassification of asset category
+              description: Primary operating company
+              company_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: CreditMemo created
@@ -609,7 +722,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /collections:
     get:
       operationId: list_collection_activities
@@ -693,6 +815,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCollectionActivityRequest'
+            example:
+              customer_invoice_id: 1000.0
+              activity_type: standard
+              date: '2026-01-15'
+              notes: Approved by CFO on 2026-01-15
+              next_follow_up_date: '2026-01-15'
+              assigned_to: sample value
+              company_id: 550e8400-e29b-41d4-a716-446655440000
       responses:
         '201':
           description: CollectionActivity created
@@ -705,7 +835,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /ar-agings:
     get:
       operationId: list_ar_agings
@@ -765,6 +904,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateArAgingRequest'
+            example:
+              customer_id: 650e8400-e29b-41d4-a716-446655440001
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              as_of_date: '2026-01-15'
       responses:
         '201':
           description: ArAging created
@@ -777,7 +920,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /ar-agings/{id}:
     get:
       operationId: get_ar_aging
@@ -918,6 +1070,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFollowUpLevelRequest'
+            example:
+              name: Acme Corporation
+              sequence: 1
+              days_overdue: 0
+              action_type: standard
+              active: true
       responses:
         '201':
           description: Follow-up level created
@@ -925,6 +1083,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FollowUpLevel'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /follow-up-runs:
     post:
       operationId: create_follow_up_run
@@ -936,6 +1106,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateFollowUpRunRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              as_of_date: '2026-01-15'
+              dry_run: true
       responses:
         '202':
           description: Follow-up run accepted
@@ -943,6 +1117,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FollowUpRun'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /collection-cases:
     get:
       operationId: list_collection_cases
@@ -964,6 +1150,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCollectionCaseRequest'
+            example:
+              customer_id: 650e8400-e29b-41d4-a716-446655440001
+              invoice_ids: 1000.0
+              assigned_to: sample value
       responses:
         '201':
           description: Collection case created
@@ -971,6 +1161,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CollectionCase'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /payment-promises:
     post:
       operationId: create_payment_promise
@@ -982,6 +1184,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreatePaymentPromiseRequest'
+            example:
+              customer_id: 650e8400-e29b-41d4-a716-446655440001
+              invoice_ids: 1000.0
+              promised_amount: 1000.0
+              promised_date: '2026-01-15'
       responses:
         '201':
           description: Payment promise created
@@ -989,6 +1196,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentPromise'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /customer-statements/send:
     post:
       operationId: send_customer_statements
@@ -1000,6 +1219,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SendCustomerStatementsRequest'
+            example:
+              customer_ids: 550e8400-e29b-41d4-a716-446655440000
+              statement_date: 1000.0
+              delivery_method: bank_transfer
       responses:
         '202':
           description: Customer statement job accepted
@@ -1007,7 +1230,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatementSendJob'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
+    CompanyId:
+      name: company_id
+      in: query
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Filter by company UUID
   securitySchemes:
     bearerAuth:
       type: http
@@ -1015,27 +1293,58 @@ components:
       bearerFormat: JWT
       description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
   schemas:
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          description: Total number of records
+          example: 1
+        page:
+          type: integer
+          description: Current page number
+          example: 1
+        limit:
+          type: integer
+          description: Page size limit
+          example: 1
     CustomerInvoice:
       type: object
       required:
+      - aging_bucket
+      - company_id
+      - created_at
+      - credit_limit_check
+      - currency_code
+      - customer_id
+      - due_date
       - id
       - invoice_id
-      - customer_id
-      - currency_code
+      - original_amount
+      - outstanding_amount
       - status
+      - terms
+      - updated_at
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for this AR record
+          example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
           description: Reference to the base Invoice entity in the Invoice service
+          example: 1000.0
         customer_id:
           type: string
           format: uuid
           description: Customer/partner this invoice is for
+          example: 650e8400-e29b-41d4-a716-446655440001
         original_amount:
           type: number
           format: double
@@ -1052,6 +1361,7 @@ components:
           maxLength: 3
           pattern: ^[A-Z]{3}$
           description: ISO 4217 currency code
+          example: USD
         status:
           type: string
           enum:
@@ -1062,6 +1372,7 @@ components:
           - WRITTEN_OFF
           - DISPUTED
           description: AR status of this invoice
+          example: active
         aging_bucket:
           type: string
           enum:
@@ -1072,15 +1383,18 @@ components:
           - 90+
           - INVALID
           description: Aging bucket calculated from due date and current date
+          example: sample value
         company_id:
           type: string
           format: uuid
           description: Company this invoice belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         due_date:
           type: string
           format: date
           nullable: true
           description: Payment due date
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1091,16 +1405,20 @@ components:
           - DUE_ON_RECEIPT
           - CUSTOM
           description: Payment terms
+          example: sample value
         credit_limit_check:
           type: boolean
           nullable: true
           description: Whether this invoice passed credit limit validation
+          example: true
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CustomerInvoiceWithDetails:
       allOf:
       - $ref: '#/components/schemas/CustomerInvoice'
@@ -1131,20 +1449,24 @@ components:
           type: string
           format: uuid
           description: Base Invoice entity reference
+          example: 1000.0
         customer_id:
           type: string
           format: uuid
           description: Customer/partner
+          example: 650e8400-e29b-41d4-a716-446655440001
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
+          example: USD
         due_date:
           type: string
           format: date
           nullable: true
           description: Payment due date. Defaults to invoice date + terms if not provided.
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1154,14 +1476,17 @@ components:
           - NET_60
           - DUE_ON_RECEIPT
           - CUSTOM
+          example: sample value
         credit_limit_check:
           type: boolean
           default: true
           description: Whether to check customer credit limit
+          example: true
         company_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
     UpdateCustomerInvoiceRequest:
       type: object
       properties:
@@ -1174,6 +1499,7 @@ components:
           - PAID
           - WRITTEN_OFF
           - DISPUTED
+          example: active
         aging_bucket:
           type: string
           enum:
@@ -1183,9 +1509,11 @@ components:
           - 61-90
           - 90+
           - INVALID
+          example: sample value
         due_date:
           type: string
           format: date
+          example: '2026-01-15'
         terms:
           type: string
           enum:
@@ -1195,37 +1523,50 @@ components:
           - NET_60
           - DUE_ON_RECEIPT
           - CUSTOM
+          example: sample value
         credit_limit_check:
           type: boolean
+          example: true
     Payment:
       type: object
       required:
-      - id
       - amount
+      - applied_at
+      - company_id
       - currency_code
-      - payment_method
+      - customer_id
+      - gl_entry_id
+      - id
+      - notes
       - payment_date
+      - payment_method
+      - posted_to_gl
+      - reference_number
       - status
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for the payment
+          example: 550e8400-e29b-41d4-a716-446655440000
         reference_number:
           type: string
           maxLength: 100
           nullable: true
           description: External reference (check number, wire reference, etc.)
+          example: REF-2026-0001
         amount:
           type: number
           format: double
           minimum: 0
           description: Payment amount
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           pattern: ^[A-Z]{3}$
+          example: USD
         payment_method:
           type: string
           enum:
@@ -1237,10 +1578,12 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
           description: Date the payment was received
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1249,39 +1592,48 @@ components:
           - APPLIED_PARTIAL
           - REFUNDED
           - FAILED
+          example: active
         customer_id:
           type: string
           format: uuid
           description: Customer who made the payment
+          example: 650e8400-e29b-41d4-a716-446655440001
         company_id:
           type: string
           format: uuid
           description: Company this payment belongs to
+          example: 550e8400-e29b-41d4-a716-446655440000
         posted_to_gl:
           type: boolean
           default: false
           description: Whether payment has been posted to general ledger
+          example: true
         gl_entry_id:
           type: string
           format: uuid
           nullable: true
           description: GL journal entry created for this payment
+          example: 650e8400-e29b-41d4-a716-446655440001
         notes:
           type: string
           maxLength: 1000
           nullable: true
           description: Payment notes
+          example: Approved by CFO on 2026-01-15
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         applied_at:
           type: string
           format: date-time
           nullable: true
           description: When payment was applied to invoices
+          example: sample value
     CreatePaymentRequest:
       type: object
       required:
@@ -1295,14 +1647,17 @@ components:
           type: string
           maxLength: 100
           nullable: true
+          example: REF-2026-0001
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         payment_method:
           type: string
           enum:
@@ -1314,23 +1669,29 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
+          example: 1000.0
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         auto_apply:
           type: boolean
           default: false
           description: Automatically apply this payment to oldest outstanding invoices
+          example: true
     UpdatePaymentRequest:
       type: object
       properties:
@@ -1338,6 +1699,7 @@ components:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         payment_method:
           type: string
           enum:
@@ -1349,9 +1711,11 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
+          example: 1000.0
         payment_date:
           type: string
           format: date
+          example: 1000.0
         status:
           type: string
           enum:
@@ -1360,43 +1724,51 @@ components:
           - APPLIED_PARTIAL
           - REFUNDED
           - FAILED
+          example: active
         notes:
           type: string
           maxLength: 1000
           nullable: true
+          example: Approved by CFO on 2026-01-15
     PaymentApplication:
       type: object
       required:
+      - applied_amount
+      - customer_invoice_id
       - id
       - payment_id
-      - customer_invoice_id
-      - applied_amount
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for the application record
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_id:
           type: string
           format: uuid
           description: Payment being applied
+          example: 1000.0
         customer_invoice_id:
           type: string
           format: uuid
           description: Customer invoice being paid
+          example: 1000.0
         applied_amount:
           type: number
           format: double
           minimum: 0
           description: Amount applied from payment to this invoice
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency of the applied amount
+          example: USD
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreatePaymentApplicationRequest:
       type: object
       required:
@@ -1407,13 +1779,16 @@ components:
         payment_id:
           type: string
           format: uuid
+          example: 1000.0
         customer_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         applied_amount:
           type: number
           format: double
           minimum: 0
+          example: 1000.0
     CreditMemo:
       type: object
       required:
@@ -1427,32 +1802,39 @@ components:
           type: string
           format: uuid
           description: Unique identifier for this credit memo
+          example: 550e8400-e29b-41d4-a716-446655440000
         reference_id:
           type: string
           format: uuid
           nullable: true
           description: Optional external reference (RMA number, etc.)
+          example: REF-2026-0001
         customer_invoice_id:
           type: string
           format: uuid
           description: Invoice this credit memo relates to
+          example: 1000.0
         customer_id:
           type: string
           format: uuid
           description: Customer this credit memo is for
+          example: 650e8400-e29b-41d4-a716-446655440001
         amount:
           type: number
           format: double
           minimum: 0
           description: Credit memo amount
+          example: 10000.0
         remaining_amount:
           type: number
           format: double
           description: Remaining unapplied credit
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         reason:
           type: string
           enum:
@@ -1463,25 +1845,31 @@ components:
           - DISPUTE
           - ADJUSTMENT
           - OTHER
+          example: Reclassification of asset category
         status:
           type: string
           enum:
           - DRAFT
           - APPLIED
           - AVAILABLE
+          example: active
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateCreditMemoRequest:
       type: object
       required:
@@ -1494,17 +1882,21 @@ components:
           type: string
           format: uuid
           nullable: true
+          example: REF-2026-0001
         customer_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         amount:
           type: number
           format: double
           minimum: 0
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         reason:
           type: string
           enum:
@@ -1515,28 +1907,38 @@ components:
           - DISPUTE
           - ADJUSTMENT
           - OTHER
+          example: Reclassification of asset category
         description:
           type: string
           maxLength: 1000
           nullable: true
+          example: Primary operating company
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     CollectionActivity:
       type: object
       required:
-      - id
-      - customer_invoice_id
       - activity_type
+      - assigned_to
+      - company_id
+      - customer_invoice_id
       - date
+      - id
+      - next_follow_up_date
+      - notes
+      - updated_at
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_invoice_id:
           type: string
           format: uuid
           description: Invoice this activity relates to
+          example: 1000.0
         activity_type:
           type: string
           enum:
@@ -1548,30 +1950,38 @@ components:
           - DUNNING
           - DISPUTE
           - PAYMENT_PLAN
+          example: standard
         date:
           type: string
           format: date
+          example: '2026-01-15'
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         next_follow_up_date:
           type: string
           format: date
           nullable: true
+          example: '2026-01-15'
         assigned_to:
           type: string
           format: uuid
           nullable: true
+          example: sample value
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateCollectionActivityRequest:
       type: object
       required:
@@ -1582,6 +1992,7 @@ components:
         customer_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         activity_type:
           type: string
           enum:
@@ -1593,24 +2004,30 @@ components:
           - DUNNING
           - DISPUTE
           - PAYMENT_PLAN
+          example: standard
         date:
           type: string
           format: date
+          example: '2026-01-15'
         notes:
           type: string
           maxLength: 2000
           nullable: true
+          example: Approved by CFO on 2026-01-15
         next_follow_up_date:
           type: string
           format: date
           nullable: true
+          example: '2026-01-15'
         assigned_to:
           type: string
           format: uuid
           nullable: true
+          example: sample value
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     ArAging:
       type: object
       required:
@@ -1627,53 +2044,66 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_id:
           type: string
           format: uuid
           description: Customer this aging report is for
+          example: 650e8400-e29b-41d4-a716-446655440001
         company_id:
           type: string
           format: uuid
           description: Company this aging report is for
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
           description: Date as of which aging is calculated
+          example: '2026-01-15'
         current:
           type: number
           format: double
           description: Total outstanding in CURRENT bucket
+          example: 1000.0
         bucket_1_30:
           type: number
           format: double
           description: Total outstanding in 1-30 days bucket
+          example: 1000.0
         bucket_31_60:
           type: number
           format: double
           description: Total outstanding in 31-60 days bucket
+          example: 1000.0
         bucket_61_90:
           type: number
           format: double
           description: Total outstanding in 61-90 days bucket
+          example: 1000.0
         bucket_90_plus:
           type: number
           format: double
           description: Total outstanding in 90+ days bucket
+          example: 1000.0
         total_outstanding:
           type: number
           format: double
           description: Sum of all buckets
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
           description: Currency of the aging amounts
+          example: USD
         invoice_count:
           type: integer
           description: Number of invoices in aging
+          example: 0
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     CreateArAgingRequest:
       type: object
       required:
@@ -1684,12 +2114,15 @@ components:
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
     UpdateArAgingRequest:
       type: object
       properties: {}
@@ -1703,39 +2136,50 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         credit_limit:
           type: number
           format: double
           minimum: 0
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         current_exposure:
           type: number
           format: double
+          example: 1000.0
         available_credit:
           type: number
           format: double
+          example: 1000.0
         allow_over_limit:
           type: boolean
           default: false
+          example: true
         review_date:
           type: string
           format: date
           nullable: true
+          example: '2026-01-15'
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     FollowUpLevel:
       type: object
       required:
@@ -1747,12 +2191,16 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         sequence:
           type: integer
+          example: 1
         days_overdue:
           type: integer
+          example: 0
         action_type:
           type: string
           enum:
@@ -1761,8 +2209,10 @@ components:
           - LETTER
           - ACTIVITY
           - HOLD
+          example: standard
         active:
           type: boolean
+          example: true
     CreateFollowUpLevelRequest:
       type: object
       required:
@@ -1772,10 +2222,13 @@ components:
       properties:
         name:
           type: string
+          example: Acme Corporation
         sequence:
           type: integer
+          example: 1
         days_overdue:
           type: integer
+          example: 0
         action_type:
           type: string
           enum:
@@ -1784,9 +2237,11 @@ components:
           - LETTER
           - ACTIVITY
           - HOLD
+          example: standard
         active:
           type: boolean
           default: true
+          example: true
     FollowUpRun:
       type: object
       required:
@@ -1796,6 +2251,7 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
@@ -1803,12 +2259,15 @@ components:
           - RUNNING
           - COMPLETED
           - FAILED
+          example: active
         company_id:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_count:
           type: integer
+          example: 0
     CreateFollowUpRunRequest:
       type: object
       properties:
@@ -1816,25 +2275,32 @@ components:
           type: string
           format: uuid
           nullable: true
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
         dry_run:
           type: boolean
           default: false
+          example: true
     CollectionCase:
       type: object
       required:
-      - id
+      - assigned_to
       - customer_id
+      - id
       - status
+      - total_due
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         status:
           type: string
           enum:
@@ -1843,13 +2309,16 @@ components:
           - PROMISED
           - ESCALATED
           - CLOSED
+          example: active
         assigned_to:
           type: string
           format: uuid
           nullable: true
+          example: sample value
         total_due:
           type: number
           format: double
+          example: 1000.0
     CreateCollectionCaseRequest:
       type: object
       required:
@@ -1858,35 +2327,43 @@ components:
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         invoice_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: 1000.0
         assigned_to:
           type: string
           format: uuid
           nullable: true
+          example: sample value
     PaymentPromise:
       type: object
       required:
-      - id
       - customer_id
+      - id
       - promised_amount
       - promised_date
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         promised_amount:
           type: number
           format: double
+          example: 1000.0
         promised_date:
           type: string
           format: date
+          example: '2026-01-15'
         status:
           type: string
           enum:
@@ -1894,6 +2371,7 @@ components:
           - KEPT
           - BROKEN
           - CANCELLED
+          example: active
     CreatePaymentPromiseRequest:
       type: object
       required:
@@ -1904,17 +2382,21 @@ components:
         customer_id:
           type: string
           format: uuid
+          example: 650e8400-e29b-41d4-a716-446655440001
         invoice_ids:
           type: array
           items:
             type: string
             format: uuid
+          example: 1000.0
         promised_amount:
           type: number
           format: double
+          example: 1000.0
         promised_date:
           type: string
           format: date
+          example: '2026-01-15'
     SendCustomerStatementsRequest:
       type: object
       required:
@@ -1926,15 +2408,18 @@ components:
           items:
             type: string
             format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         statement_date:
           type: string
           format: date
+          example: 1000.0
         delivery_method:
           type: string
           enum:
           - EMAIL
           - LETTER
           - PORTAL
+          example: bank_transfer
     StatementSendJob:
       type: object
       required:
@@ -1944,6 +2429,7 @@ components:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
           enum:
@@ -1951,8 +2437,10 @@ components:
           - SENDING
           - COMPLETED
           - FAILED
+          example: active
         statement_count:
           type: integer
+          example: 0
     PaginatedFollowUpLevels:
       type: object
       required:
@@ -1963,8 +2451,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FollowUpLevel'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedCollectionCases:
       type: object
       required:
@@ -1975,8 +2465,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CollectionCase'
+          example: []
         total:
           type: integer
+          example: 1
     PaginatedCustomerInvoices:
       type: object
       required:
@@ -1989,14 +2481,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomerInvoice'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedPayments:
       type: object
       required:
@@ -2009,14 +2506,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Payment'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedCreditMemos:
       type: object
       required:
@@ -2029,14 +2531,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditMemo'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedCollections:
       type: object
       required:
@@ -2049,14 +2556,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CollectionActivity'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     PaginatedArAgings:
       type: object
       required:
@@ -2069,14 +2581,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ArAging'
+          example: []
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
         has_more:
           type: boolean
+          example: true
     ErrorResponse:
       type: object
       required:
@@ -2099,6 +2616,7 @@ components:
         details:
           type: object
           nullable: true
+          example: sample value
     ValidationError:
       type: object
       required:
@@ -2128,58 +2646,71 @@ components:
               message:
                 type: string
                 example: Payment amount exceeds outstanding invoice balance
+          example: []
     AgingSummary:
       type: object
       required:
-      - company_id
       - as_of_date
-      - total_outstanding
-      - current
       - bucket_1_30
       - bucket_31_60
       - bucket_61_90
       - bucket_90_plus
+      - company_id
+      - current
+      - total_outstanding
       properties:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         total_outstanding:
           type: number
           format: double
+          example: 1000.0
         current:
           type: number
           format: double
+          example: 1000.0
         bucket_1_30:
           type: number
           format: double
+          example: 1000.0
         bucket_31_60:
           type: number
           format: double
+          example: 1000.0
         bucket_61_90:
           type: number
           format: double
+          example: 1000.0
         bucket_90_plus:
           type: number
           format: double
+          example: 1000.0
         days_sales_outstanding:
           type: number
           format: double
           description: DSO metric
+          example: 45
         collection_efficiency_index:
           type: number
           format: double
           description: CEI metric
+          example: 92.5
         bad_debt_reserves:
           type: number
           format: double
           description: Estimated bad debt (90+ bucket * reserve_rate)
+          example: 5000.0
     PaymentApplicationResult:
       type: object
       required:
@@ -2191,14 +2722,17 @@ components:
         payment_id:
           type: string
           format: uuid
+          example: 1000.0
         total_applied:
           type: number
           format: double
           description: Total amount applied across all invoices
+          example: 1000.0
         unapplied_amount:
           type: number
           format: double
           description: Remaining unapplied amount
+          example: 1000.0
         applications:
           type: array
           items:
@@ -2216,5 +2750,6 @@ components:
               invoice_outstanding_after:
                 type: number
                 format: double
+          example: []
 security:
 - bearerAuth: []

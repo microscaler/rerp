@@ -19,15 +19,15 @@ pub mod approve_payment_batch;
 
 pub mod export_payment_batch_file;
 
-pub mod list_payments;
+pub mod list_vendor_payments;
 
-pub mod create_payment;
+pub mod create_vendor_payment;
 
-pub mod get_payment;
+pub mod get_vendor_payment;
 
-pub mod update_payment;
+pub mod update_vendor_payment;
 
-pub mod delete_payment;
+pub mod delete_vendor_payment;
 
 pub mod cash_flow_forecast;
 
@@ -83,17 +83,17 @@ pub mod create_follow_up_run;
 
 pub mod create_payment_promise;
 
-pub mod list_payments_1;
+pub mod list_customer_payments;
 
-pub mod create_payment_1;
+pub mod create_customer_payment;
 
 pub mod create_payment_application;
 
-pub mod get_payment_1;
+pub mod get_customer_payment;
 
-pub mod update_payment_1;
+pub mod update_customer_payment;
 
-pub mod delete_payment_1;
+pub mod delete_customer_payment;
 
 pub mod list_payment_applications;
 
@@ -144,26 +144,6 @@ pub mod asset_summary;
 pub mod list_revaluations;
 
 pub mod create_revaluation;
-
-pub mod list_approval_policies;
-
-pub mod create_approval_policy;
-
-pub mod list_audit_events;
-
-pub mod list_control_exceptions;
-
-pub mod create_control_exception;
-
-pub mod list_segregation_rules;
-
-pub mod create_segregation_rule;
-
-pub mod list_signature_requests;
-
-pub mod create_signature_request;
-
-pub mod sign_signature_request;
 
 pub mod list_bank_accounts;
 
@@ -246,44 +226,6 @@ pub mod list_forecasts;
 pub mod create_forecast;
 
 pub mod variance_report;
-
-pub mod list_consolidation_groups;
-
-pub mod create_consolidation_group;
-
-pub mod list_consolidation_runs;
-
-pub mod create_consolidation_run;
-
-pub mod execute_consolidation_run;
-
-pub mod list_elimination_entries;
-
-pub mod list_elimination_rules;
-
-pub mod create_elimination_rule;
-
-pub mod list_group_reporting_packs;
-
-pub mod create_group_reporting_pack;
-
-pub mod list_accounting_documents;
-
-pub mod create_accounting_document;
-
-pub mod classify_accounting_document;
-
-pub mod approve_document_extraction;
-
-pub mod link_document_to_bank_statement;
-
-pub mod link_document_to_invoice;
-
-pub mod list_extraction_jobs;
-
-pub mod create_extraction_job;
-
-pub mod list_extraction_results;
 
 pub mod list_edi_acknowledgments;
 
@@ -562,85 +504,3 @@ pub mod invoice_summary;
 pub mod calculate_tax;
 
 pub mod list_tax_rates;
-
-pub mod list_lease_liabilities;
-
-pub mod list_lease_modifications;
-
-pub mod create_lease_modification;
-
-pub mod approve_lease_modification;
-
-pub mod list_lease_payment_schedules;
-
-pub mod create_lease_payment_schedule;
-
-pub mod list_leases;
-
-pub mod create_lease;
-
-pub mod list_right_of_use_assets;
-
-pub mod list_deferred_expenses;
-
-pub mod create_deferred_expense;
-
-pub mod list_deferred_revenues;
-
-pub mod create_deferred_revenue;
-
-pub mod list_recognition_rules;
-
-pub mod create_recognition_rule;
-
-pub mod list_recognition_runs;
-
-pub mod create_recognition_run;
-
-pub mod post_recognition_run;
-
-pub mod list_recognition_schedules;
-
-pub mod create_recognition_schedule;
-
-pub mod list_tax_audit_packs;
-
-pub mod create_tax_audit_pack;
-
-pub mod list_tax_payments;
-
-pub mod create_tax_payment;
-
-pub mod list_tax_periods;
-
-pub mod create_tax_period;
-
-pub mod list_tax_returns;
-
-pub mod create_tax_return;
-
-pub mod submit_tax_return;
-
-pub mod validate_tax_return;
-
-pub mod list_tax_rules;
-
-pub mod create_tax_rule;
-
-pub mod list_bank_relationships;
-
-pub mod create_bank_relationship;
-
-pub mod list_cash_forecasts;
-
-pub mod create_cash_forecast;
-
-pub mod list_cash_positions;
-
-pub mod list_cash_transfers;
-
-pub mod create_cash_transfer;
-
-pub mod list_liquidity_plans;
-
-pub mod create_liquidity_plan;
