@@ -63,6 +63,50 @@ def test_deployment_readiness_requires_current_available_generation() -> None:
         acceptance.require_deployment_ready(resource, "invoice")
 
 
+def test_metrics_endpoint_requires_brrtrouter_samples(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    options = acceptance.Options(Path("kubeconfig"), 1, 0.1, "rerp", "data", "flux-system", False)
+    monkeypatch.setattr(
+        acceptance,
+        "kubectl",
+        lambda *_args, **_kwargs: "# HELP request count\nbrrtrouter_requests_total 1\n",
+    )
+    acceptance.require_http_metrics(options, "invoice")
+
+    monkeypatch.setattr(acceptance, "kubectl", lambda *_args, **_kwargs: "# no samples\n")
+    with pytest.raises(acceptance.Pending, match="no BRRTRouter metric samples"):
+        acceptance.require_http_metrics(options, "invoice")
+
+
+def test_observability_requires_json_logs_and_cluster_otlp() -> None:
+    resource = {
+        "spec": {
+            "template": {
+                "spec": {
+                    "containers": [
+                        {
+                            "env": [
+                                {"name": "BRRTR_LOG_FORMAT", "value": "json"},
+                                {"name": "OTEL_SERVICE_NAME", "value": "invoice"},
+                                {
+                                    "name": "OTEL_EXPORTER_OTLP_ENDPOINT",
+                                    "value": "http://otel-collector.observability.svc.cluster.local:4317",
+                                },
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+    acceptance.require_observability_configuration(resource, "invoice")
+
+    resource["spec"]["template"]["spec"]["containers"][0]["env"][0]["value"] = "text"
+    with pytest.raises(acceptance.Pending, match="structured JSON logs"):
+        acceptance.require_observability_configuration(resource, "invoice")
+
+
 def test_catalog_requires_suspension_and_no_deployment(monkeypatch: pytest.MonkeyPatch) -> None:
     release = {
         "metadata": {"labels": {"delivery.rerp.io/status": "scaffold-only"}},

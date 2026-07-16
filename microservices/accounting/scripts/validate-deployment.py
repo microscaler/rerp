@@ -159,6 +159,42 @@ def require_http_health(options: Options, service: str) -> None:
     kubectl(options, "get", "--raw", path)
 
 
+def require_http_metrics(options: Options, service: str) -> None:
+    path = (
+        f"/api/v1/namespaces/{options.app_namespace}/services/"
+        f"http:{service}:8080/proxy/metrics"
+    )
+    payload = kubectl(options, "get", "--raw", path)
+    samples = [
+        line
+        for line in payload.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if not samples or not any(line.startswith("brrtrouter_") for line in samples):
+        raise Pending(f"Service {service} exposes no BRRTRouter metric samples")
+
+
+def require_observability_configuration(resource: dict[str, Any], name: str) -> None:
+    containers = (
+        resource.get("spec", {})
+        .get("template", {})
+        .get("spec", {})
+        .get("containers", [])
+    )
+    if len(containers) != 1:
+        raise Pending(f"Deployment {name} does not have exactly one container")
+    environment = {
+        item.get("name"): item.get("value") for item in containers[0].get("env", [])
+    }
+    if environment.get("BRRTR_LOG_FORMAT") != "json":
+        raise Pending(f"Deployment {name} does not emit structured JSON logs")
+    if not environment.get("OTEL_SERVICE_NAME"):
+        raise Pending(f"Deployment {name} has no OpenTelemetry service name")
+    endpoint = environment.get("OTEL_EXPORTER_OTLP_ENDPOINT", "")
+    if "otel-collector.observability.svc.cluster.local" not in endpoint:
+        raise Pending(f"Deployment {name} does not target the cluster OTLP collector")
+
+
 def require_catalog_suspended(options: Options) -> None:
     for service in SUSPENDED_SERVICES:
         release = get_object(options, options.app_namespace, "helmrelease", service)
@@ -211,8 +247,10 @@ def validate_once(options: Options) -> None:
                 f"deployed={actual_image}, selected={expected_image}"
             )
         require_deployment_ready(deployment, service)
+        require_observability_configuration(deployment, service)
         if not options.skip_http_health:
             require_http_health(options, service)
+            require_http_metrics(options, service)
 
     require_catalog_suspended(options)
 

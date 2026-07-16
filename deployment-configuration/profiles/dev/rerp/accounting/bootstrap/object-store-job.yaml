@@ -11,6 +11,8 @@ spec:
   activeDeadlineSeconds: 600
   template:
     metadata:
+      annotations:
+        deployment.rerp.io/object-store-bootstrap-revision: "2"
       labels:
         app.kubernetes.io/name: rerp-accounting-object-store-init
         app.kubernetes.io/part-of: rerp
@@ -37,6 +39,7 @@ spec:
                 sleep 2
               done
               mc mb --ignore-existing "${alias_name}/${RERP_OBJECT_STORE_BUCKET}" >/dev/null
+              mc version enable "${alias_name}/${RERP_OBJECT_STORE_BUCKET}" >/dev/null
               cat >"${policy_file}" <<POLICY
               {
                 "Version": "2012-10-17",
@@ -60,7 +63,8 @@ spec:
               mc admin policy attach "${alias_name}" "${policy_name}" \
                 --user "${RERP_OBJECT_STORE_ACCESS_KEY}" >/dev/null
               mc stat "${alias_name}/${RERP_OBJECT_STORE_BUCKET}" >/dev/null
-              echo "RERP Accounting object store bootstrap complete"
+              mc version info "${alias_name}/${RERP_OBJECT_STORE_BUCKET}"
+              echo "RERP Accounting versioned object store bootstrap complete"
           env:
             - name: MINIO_ENDPOINT
               value: http://minio.data.svc.cluster.local:9000

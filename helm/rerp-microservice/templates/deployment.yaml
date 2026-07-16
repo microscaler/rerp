@@ -43,7 +43,7 @@ spec:
               value: {{ .Values.env.RUST_LOG | quote }}
             - name: RUST_BACKTRACE
               value: {{ .Values.env.RUST_BACKTRACE | quote }}
-            # Structured logging configuration for Loki/Promtail ingestion
+            # Structured logging configuration for the cluster telemetry pipeline
             - name: BRRTR_LOG_FORMAT
               value: {{ .Values.env.BRRTR_LOG_FORMAT | quote }}
             - name: BRRTR_LOG_SAMPLING_MODE

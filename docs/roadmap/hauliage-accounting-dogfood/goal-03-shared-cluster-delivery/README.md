@@ -33,12 +33,41 @@ build and passive acceptance inner loop; it is not a second deployer.
 - No plaintext production credential is committed or rendered.
 - Metrics and logs identify tenant-safe request traces without leaking financial data.
 
+The dev acceptance gate now proves that each active service publishes
+BRRTRouter metric samples, emits structured JSON logs, and targets the shared
+OpenTelemetry collector. The cluster does not yet install a Prometheus-compatible
+scraper/rule evaluator, so alert evaluation, dashboards, and retention policy
+remain a shared-platform dependency rather than an RERP-local monitoring stack.
+
 ## Questions To Thrash Out
 
 - What is the production-grade replacement for the dev-only Git image update flow?
 - What is the supported local development topology outside Microscaler's cluster?
 - What are the minimum observability and backup requirements for the dog-food gate?
-- How will release images be built and signed for public consumption?
+- What off-cluster target will hold PostgreSQL and Accounting-document backups
+  before pilot data is accepted?
+
+## Deferred Infrastructure Work
+
+- [ ] **INFRA-DEFERRED-001 — Signed release images, SBOM/provenance, and public
+  release pipeline.** RERP will consume the organisation's Octopilot platform
+  rather than create a parallel release pipeline. This remains deferred until
+  Octopilot supports multi-binary suite builds, per-service packaging, and a
+  release manifest covering all selected suite binaries. The enabling work
+  belongs in the Octopilot workspace at
+  `/Users/casibbald/Workspace/remote/octopilot`; see
+  <https://octopilot.app/docs/github-actions>.
+
+The current Flux `dev-*` image path is deliberately a rapid-development path,
+not the public release mechanism.
+
+- [ ] **INFRA-PLATFORM-001 — Metrics collection and alert evaluation.** Add a
+  shared-cluster metrics backend, RERP service discovery/scraping, tenant-safe
+  dashboards, retention policy, and alerts for availability, error rate,
+  latency, saturation, backup failure, and restore-drill freshness.
+- [ ] **INFRA-PLATFORM-002 — Off-cluster recovery target.** Replicate encrypted
+  PostgreSQL backups and versioned Accounting documents outside the shared
+  cluster's MinIO failure domain before accepting pilot financial data.
 
 ## Dependencies
 

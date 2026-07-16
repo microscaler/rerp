@@ -53,10 +53,11 @@ migrations, Sesame RLS contract, seeds, and post-migration grants. Its manual
 `accept-accounting-deployment` resource
 passively checks Flux readiness, bootstrap completion, selected/deployed image
 identity, rollout availability, service health, and that all catalog releases
-remain suspended with no Deployment; it never deploys or forces
-reconciliation. Flux owns configuration, bootstrap, Helm releases, rollout and
-drift correction. ImageRepository/ImagePolicy objects discover the
-monotonic `dev-<nanoseconds>` tags. Automated Git writes remain deliberately
+remain suspended with no Deployment. It also verifies BRRTRouter metric samples,
+structured JSON logging, and the cluster OpenTelemetry collector target; it
+never deploys or forces reconciliation. Flux owns configuration, bootstrap,
+Helm releases, rollout and drift correction. ImageRepository/ImagePolicy
+objects discover the monotonic `dev-<nanoseconds>` tags. Automated Git writes remain deliberately
 disabled until a scoped RERP write deploy key is provisioned; see the shared
 cluster's `docs/product-image-automation.md`.
 
