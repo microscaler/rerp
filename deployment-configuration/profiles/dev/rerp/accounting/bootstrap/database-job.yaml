@@ -11,6 +11,10 @@ spec:
   activeDeadlineSeconds: 900
   template:
     metadata:
+      annotations:
+        # Increment only when a failed/completed immutable Job must be replaced
+        # after bootstrap logic or platform prerequisites change.
+        deployment.rerp.io/bootstrap-revision: "2"
       labels:
         app.kubernetes.io/name: rerp-accounting-db-init
         app.kubernetes.io/part-of: rerp

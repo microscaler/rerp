@@ -1,0 +1,13 @@
+service:
+  name: consolidation
+image:
+  repository: localhost:5001
+  name: rerp-accounting-consolidation
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_consolidation
+  serviceName: consolidation

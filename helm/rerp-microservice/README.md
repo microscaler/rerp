@@ -40,7 +40,10 @@ helm uninstall general-ledger
 
 Service-specific values in `values/`:
 
-- **Accounting**: `general-ledger`, `invoice`, `accounts-receivable`, `accounts-payable`, `bank-sync`, `asset`, `budget`, `edi`, `financial-reports`, `bff`
+- **Accounting**: all seventeen current source components. Only General Ledger
+  and Invoice are active in the dev Flux profile; the other fifteen are
+  represented by suspended catalog HelmReleases until their activation gates
+  pass.
 - **Other**: `idam`, `marketing`, `amd`, `billing`, `ftebe`
 
 ## Customization

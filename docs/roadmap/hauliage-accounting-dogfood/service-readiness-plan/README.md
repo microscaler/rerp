@@ -126,6 +126,12 @@ worktree before implementation.
 | Documents Render | Contract scaffold | Deliver permanent entities, migrations, templates, rendering, MinIO, copies, and recovery. |
 | Bank-specific adapter | Blocked externally | Requires official institution API/sandbox agreement and credentials. |
 
+Operational deployment ownership is not the same as functional readiness.
+General Ledger and Invoice are the only active Accounting Helm releases. The
+remaining fifteen source components are represented in the Flux-owned catalog
+as suspended `scaffold-only` releases, so future activation is explicit and
+cannot accidentally publish generated example behavior.
+
 ## Dependency And Delivery Order
 
 ```text

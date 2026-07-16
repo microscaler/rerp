@@ -1,0 +1,13 @@
+service:
+  name: documents-extraction
+image:
+  repository: localhost:5001
+  name: rerp-accounting-documents-extraction
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_documents_extraction
+  serviceName: documents-extraction

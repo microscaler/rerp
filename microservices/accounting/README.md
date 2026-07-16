@@ -15,6 +15,11 @@ builds the delivered code and publishes images; it applies no Kubernetes
 resources. Generated-era services are not deployable merely because a runtime
 descriptor or Helm values file exists.
 
+All other Accounting source components now have Flux-owned HelmRelease
+declarations in the profile's `catalog/` boundary. They are explicitly
+suspended and labelled `scaffold-only`; no catalog image or Deployment is
+created. This separates operational ownership from functional delivery.
+
 After Flux reconciliation, trigger `accept-accounting-deployment` in Tilt. The
 suite-local Python watcher verifies the two ordered Flux Kustomizations, both
 bootstrap Jobs, ImagePolicy-to-pod image convergence, Deployment availability,

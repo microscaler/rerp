@@ -14,7 +14,8 @@ reconciliation boundaries:
 accounting/
 ├── runtime/       # namespace-local ConfigMap and application Secrets
 ├── bootstrap/     # rerunnable database and object-store Jobs in data
-└── services/      # delivered Accounting Helm releases only
+├── services/      # delivered Accounting Helm releases only
+└── catalog/       # Flux-owned, suspended scaffold Helm releases
 ```
 
 Non-secret settings live in `runtime/application.properties`; secrets are
@@ -38,10 +39,16 @@ waits for both bootstrap Jobs to complete. Only then may the dependent
 Helm releases. `force: true` is limited to foundation so changed immutable Job
 templates are safely recreated in dev.
 
+The independent `rerp-accounting-catalog` Kustomization applies and prunes the
+other fifteen Accounting HelmRelease declarations with `spec.suspend: true`.
+It does not wait on suspended release health or gate active services. This
+moves lifecycle ownership to Flux without installing placeholder APIs.
+
 Tilt builds and publishes only the three delivered images: database init,
 General Ledger, and Invoice. Its manual `accept-accounting-deployment` resource
 passively checks Flux readiness, bootstrap completion, selected/deployed image
-identity, rollout availability, and service health; it never deploys or forces
+identity, rollout availability, service health, and that all catalog releases
+remain suspended with no Deployment; it never deploys or forces
 reconciliation. Flux owns configuration, bootstrap, Helm releases, rollout and
 drift correction. ImageRepository/ImagePolicy objects discover the
 monotonic `dev-<nanoseconds>` tags. Automated Git writes remain deliberately

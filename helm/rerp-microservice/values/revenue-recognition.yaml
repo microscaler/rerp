@@ -1,0 +1,13 @@
+service:
+  name: revenue-recognition
+image:
+  repository: localhost:5001
+  name: rerp-accounting-revenue-recognition
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_revenue_recognition
+  serviceName: revenue-recognition

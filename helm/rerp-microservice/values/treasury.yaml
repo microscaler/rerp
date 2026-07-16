@@ -1,0 +1,13 @@
+service:
+  name: treasury
+image:
+  repository: localhost:5001
+  name: rerp-accounting-treasury
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_treasury
+  serviceName: treasury

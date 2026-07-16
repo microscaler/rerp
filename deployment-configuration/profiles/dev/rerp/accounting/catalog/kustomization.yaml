@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: rerp
+
+# These HelmRelease objects transfer declaration and lifecycle ownership to
+# Flux without installing generated-example accounting APIs.
+resources:
+  - releases.yaml

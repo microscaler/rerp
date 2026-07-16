@@ -1,0 +1,301 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: accounts-payable
+  labels:
+    delivery.rerp.io/status: scaffold-only
+  annotations:
+    delivery.rerp.io/activation-gates: real-implementation,tests,published-image,image-policy
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: accounts-payable}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-accounts-payable, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: accounts_payable, serviceName: accounts-payable}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: accounts-receivable
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: accounts-receivable}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-accounts-receivable, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: accounts_receivable, serviceName: accounts-receivable}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: asset
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: asset}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-asset, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: asset, serviceName: asset}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: audit-controls
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: audit-controls}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-audit-controls, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_audit_controls, serviceName: audit-controls}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bank-sync
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: bank-sync}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-bank-sync, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: bank_sync, serviceName: bank-sync}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bff
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: bff}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-bff, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: bff, serviceName: accounting-bff}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: budget
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: budget}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-budget, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: budget, serviceName: budget}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: consolidation
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: consolidation}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-consolidation, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_consolidation, serviceName: consolidation}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: documents-extraction
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: documents-extraction}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-documents-extraction, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_documents_extraction, serviceName: documents-extraction}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: edi
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: edi}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-edi, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: edi, serviceName: edi}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: financial-reports
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: financial-reports}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-financial-reports, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: financial_reports, serviceName: financial-reports}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lease-accounting
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: lease-accounting}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-lease-accounting, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_lease_accounting, serviceName: lease-accounting}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: revenue-recognition
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: revenue-recognition}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-revenue-recognition, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_revenue_recognition, serviceName: revenue-recognition}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tax-compliance
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: tax-compliance}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-tax-compliance, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_tax_compliance, serviceName: tax-compliance}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: treasury
+  labels: {delivery.rerp.io/status: scaffold-only}
+  annotations: {delivery.rerp.io/activation-gates: "real-implementation,tests,published-image,image-policy"}
+spec:
+  suspend: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef: {kind: GitRepository, name: product-rerp, namespace: flux-system}
+  values:
+    service: {name: treasury}
+    image: {repository: 10.177.76.220:5000, name: rerp-accounting-treasury, tag: not-published}
+    deployment: {namespace: rerp}
+    app: {binaryName: rerp_accounting_treasury, serviceName: treasury}

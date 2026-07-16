@@ -1,0 +1,13 @@
+service:
+  name: tax-compliance
+image:
+  repository: localhost:5001
+  name: rerp-accounting-tax-compliance
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_tax_compliance
+  serviceName: tax-compliance

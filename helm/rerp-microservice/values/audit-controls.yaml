@@ -1,0 +1,13 @@
+service:
+  name: audit-controls
+image:
+  repository: localhost:5001
+  name: rerp-accounting-audit-controls
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_audit_controls
+  serviceName: audit-controls

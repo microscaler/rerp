@@ -25,6 +25,23 @@ SERVICES = {
     "general-ledger": "rerp-accounting-general-ledger",
     "invoice": "rerp-accounting-invoice",
 }
+SUSPENDED_SERVICES = (
+    "accounts-payable",
+    "accounts-receivable",
+    "asset",
+    "audit-controls",
+    "bank-sync",
+    "bff",
+    "budget",
+    "consolidation",
+    "documents-extraction",
+    "edi",
+    "financial-reports",
+    "lease-accounting",
+    "revenue-recognition",
+    "tax-compliance",
+    "treasury",
+)
 
 
 class Pending(RuntimeError):
@@ -56,7 +73,9 @@ def kubectl(options: Options, *arguments: str, json_output: bool = False) -> Any
         raise Pending(f"kubectl returned invalid JSON: {error}") from error
 
 
-def get_object(options: Options, namespace: str, kind: str, name: str) -> dict[str, Any]:
+def get_object(
+    options: Options, namespace: str, kind: str, name: str
+) -> dict[str, Any]:
     return kubectl(
         options,
         "--namespace",
@@ -105,7 +124,12 @@ def selected_image(options: Options, policy: str) -> str:
 
 
 def pod_template_image(resource: dict[str, Any]) -> str:
-    containers = resource.get("spec", {}).get("template", {}).get("spec", {}).get("containers", [])
+    containers = (
+        resource.get("spec", {})
+        .get("template", {})
+        .get("spec", {})
+        .get("containers", [])
+    )
     if len(containers) != 1 or not containers[0].get("image"):
         raise Pending("expected exactly one pod-template container image")
     return containers[0]["image"]
@@ -118,8 +142,13 @@ def require_deployment_ready(resource: dict[str, Any], name: str) -> None:
     desired = spec.get("replicas", 1)
     if status.get("observedGeneration", 0) < metadata.get("generation", 0):
         raise Pending(f"Deployment {name} has not observed its latest generation")
-    if status.get("updatedReplicas", 0) != desired or status.get("availableReplicas", 0) != desired:
-        raise Pending(f"Deployment {name} rollout is not available ({status.get('availableReplicas', 0)}/{desired})")
+    if (
+        status.get("updatedReplicas", 0) != desired
+        or status.get("availableReplicas", 0) != desired
+    ):
+        raise Pending(
+            f"Deployment {name} rollout is not available ({status.get('availableReplicas', 0)}/{desired})"
+        )
 
 
 def require_http_health(options: Options, service: str) -> None:
@@ -130,9 +159,37 @@ def require_http_health(options: Options, service: str) -> None:
     kubectl(options, "get", "--raw", path)
 
 
+def require_catalog_suspended(options: Options) -> None:
+    for service in SUSPENDED_SERVICES:
+        release = get_object(options, options.app_namespace, "helmrelease", service)
+        if release.get("spec", {}).get("suspend") is not True:
+            raise Pending(f"catalog HelmRelease {service} is not suspended")
+        status = (
+            release.get("metadata", {}).get("labels", {}).get("delivery.rerp.io/status")
+        )
+        if status != "scaffold-only":
+            raise Pending(f"catalog HelmRelease {service} lacks scaffold-only status")
+        deployment = kubectl(
+            options,
+            "--namespace",
+            options.app_namespace,
+            "get",
+            "deployment",
+            service,
+            "--ignore-not-found",
+            "--output",
+            "name",
+        )
+        if deployment.strip():
+            raise Pending(
+                f"suspended catalog service {service} unexpectedly has a Deployment"
+            )
+
+
 def validate_once(options: Options) -> None:
     require_flux_ready(options, "rerp-accounting")
     require_flux_ready(options, "rerp-accounting-services")
+    require_flux_ready(options, "rerp-accounting-catalog")
 
     database_job = require_job_complete(options, "rerp-accounting-db-init")
     require_job_complete(options, "rerp-accounting-object-store-init")
@@ -156,6 +213,8 @@ def validate_once(options: Options) -> None:
         require_deployment_ready(deployment, service)
         if not options.skip_http_health:
             require_http_health(options, service)
+
+    require_catalog_suspended(options)
 
 
 def wait_for_acceptance(options: Options) -> None:

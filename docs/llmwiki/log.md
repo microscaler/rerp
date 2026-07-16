@@ -438,3 +438,21 @@ migrations.
   behavior in the supplied Skaffold shell helper. The Python checker passively
   verifies Flux gates, bootstrap completion, image convergence, rollout, and
   HTTP health without applying or reconciling resources.
+
+## [2026-07-16] operate | Move the complete Accounting component catalog to Flux ownership
+
+- Added Helm runtime descriptors for all seventeen Accounting source
+  components, while keeping Tilt image publication restricted to the two
+  functionally delivered services.
+- Added a separate Flux catalog component containing fifteen explicitly
+  suspended, `scaffold-only` HelmRelease declarations. This transfers lifecycle
+  and pruning ownership without deploying generated example APIs.
+- Recorded compile evidence: eight suspended components compile but have no
+  real behavior tests; seven have generated contract/controller drift and do
+  not compile. Compilation is not an activation criterion.
+- Extended passive deployment acceptance to prove the catalog Kustomization is
+  reconciled, every catalog release remains suspended, and no corresponding
+  Deployment exists.
+- Bumped the immutable database-bootstrap pod template after its initial
+  one-shot failure; the same image subsequently completed the full idempotent
+  migration sequence successfully in a diagnostic pod.

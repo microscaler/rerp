@@ -1,0 +1,13 @@
+service:
+  name: lease-accounting
+image:
+  repository: localhost:5001
+  name: rerp-accounting-lease-accounting
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: rerp_accounting_lease_accounting
+  serviceName: lease-accounting
