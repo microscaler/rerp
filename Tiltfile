@@ -1,8 +1,9 @@
 # RERP Accounting image development.
 #
-# Flux owns namespaces, SOPS profiles, bootstrap Jobs, Helm releases and runtime
-# reconciliation. Tilt owns only local code generation/builds and publishing
-# monotonically tagged development images to the shared registry.
+# Flux owns namespaces, SOPS profiles, role/database bootstrap Jobs, Helm
+# releases and runtime reconciliation. Tilt owns local code generation/builds,
+# development image publication, and explicitly triggered application
+# migrations.
 #
 
 SHARED_K8S_REGISTRY = '10.177.76.220:5000'
@@ -324,8 +325,9 @@ for service in DELIVERED_SERVICES:
     create_microservice_build_resource(service, ['rerp-all-gens'])
     create_microservice_image(service)
 
-# Database migration image. Flux runs this as a gated Job before reconciling
-# the service Helm releases; Tilt only publishes the content-addressed image.
+# Role/database bootstrap image. Flux runs this as a gated Job before
+# reconciling service Helm releases. It deliberately contains no application
+# migrations; Tilt only publishes the content-addressed bootstrap image.
 DB_INIT_IMAGE = 'rerp-accounting-db-init'
 DB_INIT_DOCKERFILE = 'docker/jobs/Dockerfile'
 DB_INIT_REF = '%s/%s' % (SHARED_K8S_REGISTRY, DB_INIT_IMAGE)
@@ -342,11 +344,28 @@ local_resource(
     deps=[
         DB_INIT_DOCKERFILE,
         'microservices/accounting/scripts/db-init-job.sh',
-        'microservices/accounting/migrations',
-        'microservices/accounting/sql',
     ],
     labels=['database', 'images'],
     allow_parallel=True,
+)
+
+# Rapid-development application migration cycle. Trigger this after the Flux
+# rerp-accounting foundation is Ready and whenever Lifeguard-generated or
+# hand-authored SQL changes. It applies only migrations/RLS/seeds/grants; role,
+# database and schema creation remain the Flux bootstrap Job's responsibility.
+local_resource(
+    'accounting-apply-migrations',
+    ('KUBECONFIG="%s" RERP_APPLY_MIGRATIONS_ONLY=1 '
+     + './microservices/accounting/scripts/setup-db.sh') % SHARED_K8S_KUBECONFIG,
+    deps=[
+        'microservices/accounting/scripts/setup-db.sh',
+        'microservices/accounting/migrations',
+        'microservices/accounting/sql',
+    ],
+    labels=['database', 'migrations'],
+    trigger_mode=TRIGGER_MODE_MANUAL,
+    auto_init=False,
+    allow_parallel=False,
 )
 
 # Passive post-deploy acceptance. This extracts the useful watch/rollout cycle

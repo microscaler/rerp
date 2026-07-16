@@ -11,9 +11,10 @@ The delivered Flux slice is deliberately narrower than the source inventory:
 General Ledger and Invoice only. The RERP profile owns runtime configuration,
 completion-gated PostgreSQL/MinIO bootstrap, and those two Helm releases under
 `deployment-configuration/profiles/dev/rerp/accounting/`. Tilt generates and
-builds the delivered code and publishes images; it applies no Kubernetes
-resources. Generated-era services are not deployable merely because a runtime
-descriptor or Helm values file exists.
+builds the delivered code, publishes images, and exposes a manual application
+migration cycle; it applies no Kubernetes manifests. Generated-era services
+are not deployable merely because a runtime descriptor or Helm values file
+exists.
 
 All other Accounting source components now have Flux-owned HelmRelease
 declarations in the profile's `catalog/` boundary. They are explicitly
@@ -738,16 +739,20 @@ Database setup uses the shared cluster's PostgreSQL HA primary. Reconcile the
 SOPS profiles `deployment-configuration/profiles/dev/rerp/accounting` in RERP
 and `dev/postgres-ha` in `shared-gitops-k8s-cluster` first; the former owns
 RERP's ConfigMap and least-privilege Secrets, while the latter supplies the
-matching Pgpool custom user. The initializer discovers the elected primary, creates/updates the role,
-database and schema, applies the Accounting migration order, seeds, and grants:
+matching Pgpool custom user. Flux's initializer creates/updates the role,
+database, schema and default privileges, then verifies the application login.
+It deliberately contains no application migration SQL.
+
+During rapid development, apply the ordered Accounting migrations, vendored
+Sesame RLS contract, seeds, and post-migration grants with the manual Tilt
+resource:
 
 ```bash
 export KUBECONFIG=../shared-k8s-cluster/kubeconfig/shared-k8s.yaml
-./microservices/accounting/scripts/setup-db.sh
+tilt trigger accounting-apply-migrations
 ```
 
-Tilt runs this initializer once after the GitOps profile is present and makes
-all Accounting workloads depend on its success. Re-trigger `rerp-db-init`
-after migration changes. The final gate authenticates through Pgpool and runs
-`SELECT 1`; source-Secret presence alone is not treated as readiness. No
-database password is stored in RERP source.
+Trigger it after the Flux `rerp-accounting` foundation becomes Ready and again
+after migration changes. The Flux bootstrap gate authenticates through Pgpool
+and runs `SELECT 1`; source-Secret presence alone is not treated as readiness.
+No database password is stored in RERP source.

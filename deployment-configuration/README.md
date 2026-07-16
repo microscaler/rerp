@@ -37,15 +37,20 @@ inventory and creates one Flux `GitRepository` for `microscaler/rerp`. The
 waits for both bootstrap Jobs to complete. Only then may the dependent
 `rerp-accounting-services` Kustomization reconcile General Ledger and Invoice
 Helm releases. `force: true` is limited to foundation so changed immutable Job
-templates are safely recreated in dev.
+templates are safely recreated in dev. The database Job owns only the Pgpool
+credential contract, application role, database, schema, default privileges,
+and login verification; it never applies application migrations or seeds.
 
 The independent `rerp-accounting-catalog` Kustomization applies and prunes the
 other fifteen Accounting HelmRelease declarations with `spec.suspend: true`.
 It does not wait on suspended release health or gate active services. This
 moves lifecycle ownership to Flux without installing placeholder APIs.
 
-Tilt builds and publishes only the three delivered images: database init,
-General Ledger, and Invoice. Its manual `accept-accounting-deployment` resource
+Tilt builds and publishes only the three delivered images: database bootstrap,
+General Ledger, and Invoice. During rapid development, its manual
+`accounting-apply-migrations` resource applies the ordered Accounting
+migrations, Sesame RLS contract, seeds, and post-migration grants. Its manual
+`accept-accounting-deployment` resource
 passively checks Flux readiness, bootstrap completion, selected/deployed image
 identity, rollout availability, service health, and that all catalog releases
 remain suspended with no Deployment; it never deploys or forces

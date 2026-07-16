@@ -11,7 +11,8 @@ build and passive acceptance inner loop; it is not a second deployer.
 
 - A valid, minimal Tilt graph for active RERP image builds and deployment acceptance.
 - Flux-owned product source, ordered foundation/services reconciliation, and drift correction.
-- RERP namespace, database bootstrap, migrations, secrets, and service discovery.
+- RERP namespace, role/database bootstrap, Tilt-owned dev migrations, secrets,
+  and service discovery.
 - Reusable Helm values without stale shared-Kind assumptions.
 - Health, readiness, metrics, logs, traces, and resource limits.
 - Deployment conventions suitable for both dog-food and external open-source operators.
@@ -22,7 +23,9 @@ build and passive acceptance inner loop; it is not a second deployer.
 
 - Restarting Tilt produces the delivered image-build resources and no Kubernetes manifests.
 - Flux creates the RERP namespace/profile/bootstrap and active services declaratively.
-- Migrations and object-store provisioning complete before services become Ready.
+- The Flux role/database and object-store bootstrap completes before services
+  reconcile; the manual Tilt migration gate completes before accepting those
+  services as development-ready.
 - Invoice and GL pods become Ready and survive restart.
 - Every other Accounting HelmRelease is Flux-owned, suspended, labelled
   `scaffold-only`, and has no Deployment.

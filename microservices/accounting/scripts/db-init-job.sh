@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Flux database bootstrap entrypoint. Unlike setup-db.sh (the local break-glass
-# helper), this runs inside the cluster and needs no kubectl or Kubernetes RBAC.
+# Flux database bootstrap entrypoint. This owns only the cluster-level database
+# contract: Pgpool credentials, role, database, schema, privileges, and login
+# verification. Application migrations and seeds remain a Tilt development
+# concern and must never be added to this Job.
 set -euo pipefail
 
-SUITE_DIR="${RERP_SUITE_DIR:-/opt/rerp/suite}"
 PGHOST="${PGHOST:-postgres-ha-pgpool.data.svc.cluster.local}"
 PGPORT="${PGPORT:-5432}"
 PGUSER="${PGUSER:-postgres}"
@@ -81,34 +82,6 @@ ALTER DATABASE rerp SET search_path TO rerp, public;
 SQL
 }
 
-apply_sql_file() {
-  local file="$1"
-  echo "Applying ${file#${SUITE_DIR}/}"
-  admin_psql rerp <"${file}"
-}
-
-apply_migrations() {
-  local relative file
-  file="${SUITE_DIR}/sql/rls/v1/install.sql"
-  [ -f "${file}" ] || { echo "Missing Sesame RLS contract: ${file}" >&2; return 1; }
-  apply_sql_file "${file}"
-
-  while IFS= read -r relative || [ -n "${relative}" ]; do
-    [[ -z "${relative}" || "${relative}" =~ ^# ]] && continue
-    file="${SUITE_DIR}/migrations/${relative}"
-    [ -f "${file}" ] || { echo "Migration order lists missing file: ${file}" >&2; return 1; }
-    apply_sql_file "${file}"
-  done <"${SUITE_DIR}/migrations/apply_order.txt"
-}
-
-apply_seeds() {
-  local seed
-  [ -d "${SUITE_DIR}/seeds" ] || return 0
-  while IFS= read -r -d '' seed; do
-    apply_sql_file "${seed}"
-  done < <(find "${SUITE_DIR}/seeds" -type f -name '*.sql' -print0 | sort -z)
-}
-
 grant_application_access() {
   admin_psql rerp <<'SQL'
 SET search_path TO rerp;
@@ -131,8 +104,6 @@ verify_application_login() {
 validate_pgpool_contract
 wait_for_postgres
 bootstrap_database
-apply_migrations
-apply_seeds
 grant_application_access
 verify_application_login
-echo "RERP Accounting database bootstrap complete"
+echo "RERP Accounting role/database bootstrap complete; application migrations remain Tilt-owned"

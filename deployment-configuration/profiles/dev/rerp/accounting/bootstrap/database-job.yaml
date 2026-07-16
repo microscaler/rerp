@@ -14,7 +14,7 @@ spec:
       annotations:
         # Increment only when a failed/completed immutable Job must be replaced
         # after bootstrap logic or platform prerequisites change.
-        deployment.rerp.io/bootstrap-revision: "2"
+        deployment.rerp.io/bootstrap-revision: "3"
       labels:
         app.kubernetes.io/name: rerp-accounting-db-init
         app.kubernetes.io/part-of: rerp
@@ -22,7 +22,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: db-init
-          image: 10.177.76.220:5000/rerp-accounting-db-init:dev-1784194011278956251 # {"$imagepolicy": "flux-system:rerp-accounting-db-init"}
+          image: 10.177.76.220:5000/rerp-accounting-db-init:dev-1784199811806072490 # {"$imagepolicy": "flux-system:rerp-accounting-db-init"}
           imagePullPolicy: IfNotPresent
           env:
             - name: PGHOST

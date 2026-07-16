@@ -421,9 +421,9 @@ migrations.
 
 - Split the RERP-owned dev profile into runtime configuration, gated
   database/object-store bootstrap, and delivered-service reconciliation.
-- Added an in-cluster, kubectl-free database initializer image which consumes
-  the suite-owned ordered migrations and verifies the Pgpool application
-  login before the foundation Kustomization can become Ready.
+- Added an in-cluster, kubectl-free database initializer image which verifies
+  the Pgpool application login before the foundation Kustomization can become
+  Ready.
 - Added idempotent MinIO bucket/user/policy provisioning beside the
   platform-owned administrator Secret without copying platform credentials to
   the RERP namespace.
@@ -438,6 +438,16 @@ migrations.
   behavior in the supplied Skaffold shell helper. The Python checker passively
   verifies Flux gates, bootstrap completion, image convergence, rollout, and
   HTTP health without applying or reconciling resources.
+
+## [2026-07-16] operate | Separate database bootstrap from application migrations
+
+- Restricted the Flux database Job to Pgpool credential validation, role,
+  database, schema, default privileges, and application-login verification.
+- Removed Accounting migration and RLS content from the bootstrap image so a
+  Flux reconciliation cannot mutate application schema.
+- Added the manual Tilt `accounting-apply-migrations` cycle for ordered
+  migrations, the vendored Sesame RLS contract, seeds, and post-migration
+  grants during rapid development.
 
 ## [2026-07-16] operate | Move the complete Accounting component catalog to Flux ownership
 

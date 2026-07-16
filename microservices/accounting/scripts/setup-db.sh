@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Setup RERP's PostgreSQL role, database, schema, migrations, seeds, and grants.
+# Local/Tilt database administration helper. Flux does not run this script.
+# Its migration-only mode is the rapid-development path for application
+# migrations, RLS, seeds, and post-migration grants.
 #
 # The shared dev cluster runs Bitnami PostgreSQL HA. This script discovers the
 # elected primary and connects directly to it for privileged bootstrap work;
