@@ -3,7 +3,7 @@
 - **Status**: `partially-verified`
 - **Source docs**: [`AGENTS.md`](../../../AGENTS.md), [`CONTRIBUTING.md`](../../../CONTRIBUTING.md), [`microservices/accounting/README.md`](../../../microservices/accounting/README.md), Hauliage `AGENTS.md`
 - **Code anchors**: `microservices/Cargo.toml`, `microservices/migrator/`, `microservices/accounting/`, `microservices/documents/`, `tooling/src/rerp_tooling/runtime.py`
-- **Last updated**: 2026-07-15
+- **Last updated**: 2026-07-16
 
 ## What It Is
 
@@ -146,18 +146,17 @@ seed discovery, installation, and deployment must all include the suite.
 
 ## Open Questions
 
-> **Reconciled:** Accounting's effective inventory now has 47 table models with
-> 47 unique `(suite, service)` owners. The suite entity crate contains only the
+> **Reconciled:** Accounting's effective inventory now has 42 table models with
+> 42 unique `(suite, service)` owners. The suite entity crate contains only the
 > 10-model posting foundation, the top-level migrator requires explicit suite
 > selection, and migration/seed output is suite-local. The current relationship
 > diagrams and unenforced logical references are maintained in the
 > [Accounting suite README](../../../microservices/accounting/README.md).
 
-> **Open:** General Ledger's `accounts`/`journal_entries` models remain
-> physically distinct from the delivered `accounting_accounts`/
-> `accounting_journal_entries` foundation. Decide whether they are legitimate
-> pre-posting workflow records or obsolete parallel-ledger scaffolding before
-> activating those service migrations.
+> **Resolved:** General Ledger uses the suite-owned `accounting_accounts`,
+> `accounting_journal_entries`, and `accounting_journal_lines` foundation. Its
+> five undelivered predecessor models were retired, and migrator coverage
+> prevents a second ledger schema from returning.
 
 > **Open:** RERP's final database bootstrap/apply flow should be documented once
 > the top-level migrator owns `generate`, `validate`, `plan`, `apply`, and

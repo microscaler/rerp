@@ -2,8 +2,8 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::JournalLine;
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -12,23 +12,37 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(rename = "id")]
     pub id: String,
-
-    #[serde(rename = "line_id")]
-    pub line_id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "code")]
-    pub code: String,
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "details")]
-    pub details: Option<serde_json::Value>,
+    #[serde(rename = "entry_date")]
+    pub entry_date: String,
 
-    #[serde(rename = "message")]
-    pub message: String,
+    #[serde(rename = "entry_number")]
+    pub entry_number: String,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<JournalLine>,
+
+    #[serde(rename = "posted_at")]
+    pub posted_at: String,
+
+    #[serde(rename = "source_document_id")]
+    pub source_document_id: String,
+
+    #[serde(rename = "total_credit")]
+    pub total_credit: String,
+
+    #[serde(rename = "total_debit")]
+    pub total_debit: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -53,20 +67,6 @@ impl TryFrom<HandlerRequest> for Request {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));
         }
 
-        if let Some(v) = req.get_path_param("line_id") {
-            data_map.insert(
-                "line_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-            return Err(anyhow::anyhow!("Missing required parameter 'line_id'"));
-        }
-
         if let Some(body) = req.body {
             match body {
                 Value::Object(map) => {
@@ -85,6 +85,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::delete_line_item::handle(req)
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+    crate::controllers::get_customer_invoice_journal::handle(req)
 }

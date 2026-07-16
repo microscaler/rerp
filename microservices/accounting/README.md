@@ -8,12 +8,13 @@ must not be added at the repository root.
 ## Current persistence status
 
 This README and its diagrams were reconciled against the effective
-`LifeModel` sources and Accounting foundation migrations on **2026-07-15**.
+`LifeModel` sources and Accounting foundation migrations on **2026-07-16**.
 
-- The effective model inventory contains **47 table models with 47 unique
+- The effective model inventory contains **42 table models with 42 unique
   owners**.
 - The suite-wide `accounting/foundation` provider owns 10 models.
-- Nine service providers own the remaining 37 models.
+- Eight service providers own the remaining 32 models; the General Ledger
+  provider intentionally owns no parallel ledger tables.
 - Only the 10-table foundation currently has a delivered, ordered migration
   set and app-owned Accounting/RLS controls.
 - The service models describe the current registries. Their presence does not
@@ -30,7 +31,7 @@ in
 | Provider | Model count | Tables |
 |---|---:|---|
 | `accounting/foundation` | 10 | legal entities, fiscal periods, posting accounts, immutable posted documents/lines, journals/lines, idempotency, audit, document artifacts |
-| `accounting/general-ledger` | 5 | chart of accounts, accounts, journal entries/lines, balances |
+| `accounting/general-ledger` | 0 | consumes the suite foundation; no second ledger schema |
 | `accounting/invoice` | 2 | invoices and invoice lines |
 | `accounting/accounts-receivable` | 4 | customer invoices, receipts, allocations, aging |
 | `accounting/accounts-payable` | 4 | vendor invoices, payments, allocations, aging |
@@ -203,65 +204,17 @@ erDiagram
     accounting_accounts o|--o{ accounting_posted_document_lines : tax_account
 ```
 
-### General Ledger, Invoice, AR, and AP registries
+### Invoice, AR, and AP registries
 
-These are current service-owned models. The diagram exposes an important
-semantic decision still to be completed: `accounts`/`journal_entries` are
-distinct physical tables from the delivered `accounting_accounts`/
-`accounting_journal_entries` foundation. RERP must decide whether the former
-are pre-posting workflow records or obsolete parallel-ledger scaffolding before
-activating their migrations.
+These are current service-owned workflow/subledger models. General Ledger no
+longer owns `accounts`, `chart_of_accounts`, `journal_entries`,
+`journal_entry_lines`, or mutable `account_balances`: all posting and future GL
+queries use the delivered `accounting_*` foundation shown above. The remaining
+semantic gate is to keep Invoice workflow and AR/AP open-item records from
+becoming competing sources of posted-document truth.
 
 ```mermaid
 erDiagram
-    chart_of_accounts {
-        uuid id PK
-        uuid parent_id FK
-        string code
-        string account_type
-        int level
-        boolean is_active
-    }
-
-    accounts {
-        uuid id PK
-        uuid chart_of_account_id FK
-        string code
-        string account_type
-        string normal_balance
-        string currency_code
-        boolean is_active
-    }
-
-    journal_entries {
-        uuid id PK
-        string entry_number
-        date entry_date
-        string status
-        decimal total_debit
-        decimal total_credit
-        string currency_code
-    }
-
-    journal_entry_lines {
-        uuid id PK
-        uuid journal_entry_id FK
-        uuid account_id FK
-        int line_number
-        decimal debit_amount
-        decimal credit_amount
-    }
-
-    account_balances {
-        uuid id PK
-        uuid account_id FK
-        uuid fiscal_period_id
-        date balance_date
-        decimal debit_balance
-        decimal credit_balance
-        string currency_code
-    }
-
     invoices {
         uuid id PK
         string invoice_number
@@ -367,11 +320,6 @@ erDiagram
         string currency_code
     }
 
-    chart_of_accounts o|--o{ chart_of_accounts : parent_of
-    chart_of_accounts ||--o{ accounts : contains
-    accounts ||--o{ journal_entry_lines : classifies
-    accounts ||--o{ account_balances : summarizes
-    journal_entries ||--o{ journal_entry_lines : contains
     invoices ||--o{ invoice_lines : contains
     invoices ||--o| customer_invoices : extends_for_AR
     invoices ||--o| vendor_invoices : extends_for_AP
@@ -749,9 +697,9 @@ cargo run -p rerp_migrator --features accounting -- \
   validate --suite accounting --migration-history
 ```
 
-Full generation remains gated by the semantic parallel-ledger decisions noted
-above; unique SQL table names are necessary but not sufficient accounting
-architecture.
+Full generation remains gated by the Invoice/AR posted-document boundary and
+other service-model reviews noted above; unique SQL table names are necessary
+but not sufficient accounting architecture.
 
 ## Verification
 

@@ -3,46 +3,12 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_invoices;
+pub mod post_customer_invoice;
 
-pub mod create_invoice;
+pub mod get_customer_invoice;
 
-pub mod get_invoice;
+pub mod credit_customer_invoice;
 
-pub mod update_invoice;
+pub mod get_customer_invoice_document;
 
-pub mod delete_invoice;
-
-pub mod approve_invoice;
-
-pub mod cancel_invoice;
-
-pub mod create_invoice_credit_note;
-
-pub mod handoff_invoice_to_deferral;
-
-pub mod handoff_invoice_to_einvoice;
-
-pub mod list_invoice_line_items;
-
-pub mod create_line_item;
-
-pub mod update_line_item;
-
-pub mod delete_line_item;
-
-pub mod list_invoice_payment_matches;
-
-pub mod post_invoice;
-
-pub mod register_invoice_payment;
-
-pub mod void_invoice;
-
-pub mod get_invoice_workflow_history;
-
-pub mod invoice_summary;
-
-pub mod calculate_tax;
-
-pub mod list_tax_rates;
+pub mod get_customer_invoice_journal;

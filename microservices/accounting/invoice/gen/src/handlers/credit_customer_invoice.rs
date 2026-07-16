@@ -2,14 +2,25 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::PostedInvoice;
+use crate::handlers::types::PostedJournal;
+use crate::handlers::types::SourceReference;
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
+    #[serde(rename = "idempotency_key")]
+    pub idempotency_key: String,
+
+    #[serde(rename = "reason")]
+    pub reason: String,
+
+    #[serde(rename = "source")]
+    pub source: SourceReference,
+
     #[serde(rename = "id")]
     pub id: String,
 }
@@ -17,15 +28,17 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "code")]
-    pub code: String,
+    #[serde(rename = "idempotency_key")]
+    pub idempotency_key: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "details")]
-    pub details: Option<serde_json::Value>,
+    #[serde(rename = "invoice")]
+    pub invoice: PostedInvoice,
 
-    #[serde(rename = "message")]
-    pub message: String,
+    #[serde(rename = "journal")]
+    pub journal: PostedJournal,
+
+    #[serde(rename = "request_fingerprint")]
+    pub request_fingerprint: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -68,6 +81,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::delete_invoice::handle(req)
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+    crate::controllers::credit_customer_invoice::handle(req)
 }

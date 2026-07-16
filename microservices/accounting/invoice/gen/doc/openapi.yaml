@@ -1,2099 +1,558 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
-  title: Invoice
-  version: 1.0.0
-  description: Core invoice management service providing the shared invoice entity and operations used by both Accounts Receivable
-    and Accounts Payable. Manages invoice creation, lifecycle, line items, tax calculation, and the AR/AP split. All invoices
-    flow through this service before being claimed by AR or AP sub-services.
-  contact:
-    name: RERP Accounting API Support
-    email: accounting-api@rerp.ai
+  title: RERP Customer Invoicing API
+  version: 0.2.0
+  description: >-
+    Canonical Phase 1 customer invoicing contract. Commands accept commercial facts only;
+    authenticated tenant, legal entity, fiscal period, numbering, and GL account
+    policy are resolved inside RERP.
 servers:
-- url: http://localhost:8005/api/v1/accounting/invoice
-  description: Local development (direct to service, port from port-registry)
-- url: /api/v1/accounting/invoice
-  description: Invoice API
+  - url: /
+security:
+  - bearerAuth: []
 tags:
-- name: invoices
-  description: Core invoice entity and CRUD operations
-- name: line-items
-  description: Invoice line items with product/tax/GL details
-- name: tax-calculation
-  description: Tax computation and validation
-- name: workflow
-  description: Invoice approval and posting workflow
-- name: reports
-  description: Invoice reporting and analytics
+  - name: customer-invoices
 paths:
-  /invoices:
-    get:
-      operationId: list_invoices
-      summary: List invoices
-      description: Paginated list of all invoices across both AR and AP with filtering by type, status, date range, entity,
-        and currency.
-      parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-      - name: search
-        in: query
-        schema:
-          type: string
-        description: Search by invoice number, entity name, or notes
-      - name: invoice_type
-        in: query
-        schema:
-          type: string
-          enum:
-          - SALES
-          - PURCHASE
-          - CREDIT_MEMO
-          - DEBIT_MEMO
-          - STANDARD
-      - name: status
-        in: query
-        schema:
-          type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - POSTED
-          - CANCELLED
-          - VOIDED
-      - name: entity_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-        description: Filter by customer (SALES) or vendor (PURCHASE)
-      - name: billing_entity_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-        description: Filter by billing organization
-      - name: company_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      - name: currency_code
-        in: query
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 3
-      - name: date_from
-        in: query
-        schema:
-          type: string
-          format: date
-        description: Issued date from (inclusive)
-      - name: date_to
-        in: query
-        schema:
-          type: string
-          format: date
-        description: Issued date to (inclusive)
-      - name: amount_min
-        in: query
-        schema:
-          type: number
-          format: double
-        description: Minimum total amount
-      - name: amount_max
-        in: query
-        schema:
-          type: number
-          format: double
-        description: Maximum total amount
-      responses:
-        '200':
-          description: Paginated list of invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedInvoices'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+  /v1/customer-invoices:
     post:
-      operationId: create_invoice
-      summary: Create invoice
-      description: Create a new invoice. Supports both sales and purchase invoice types. Line items are optional; total is
-        auto-calculated if provided.
+      operationId: post_customer_invoice
+      tags: [customer-invoices]
+      summary: Issue and post a customer invoice atomically
       x-brrtrouter-impl: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateInvoiceRequest'
-            example:
-              invoice_type: 1000.0
-              entity_id: 550e8400-e29b-41d4-a716-446655440020
-              currency_code: USD
-              exchange_rate: 1.05
-              issued_date: '2026-01-15'
-              due_date: '2026-01-15'
-              billing_address_id: 750e8400-e29b-41d4-a716-446655440022
-              shipping_address_id: 850e8400-e29b-41d4-a716-446655440023
-              notes: Approved by CFO on 2026-01-15
-              internal_notes: Internal review required
-              company_id: 550e8400-e29b-41d4-a716-446655440000
-              line_items: &id005 []
-              auto_confirm: true
+              $ref: '#/components/schemas/PostCustomerInvoiceRequest'
       responses:
         '201':
-          description: Invoice created
+          description: A new invoice and balanced journal were committed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Invoice'
+                $ref: '#/components/schemas/PostingResult'
+        '200':
+          description: An identical idempotent request returned the committed result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingResult'
         '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: &id001
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: &id002
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: &id004
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /invoices/{id}:
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/customer-invoices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
     get:
-      operationId: get_invoice
-      summary: Get invoice by id
-      description: Retrieve a single invoice with its full details including line items, tax breakdown, and workflow history.
+      operationId: get_customer_invoice
+      tags: [customer-invoices]
+      summary: Retrieve a posted customer invoice
       x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
       responses:
         '200':
-          description: Invoice details with all context
+          description: Posted invoice with immutable line snapshots
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvoiceWithDetails'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      operationId: update_invoice
-      summary: Update invoice
-      description: Update a draft or confirmed invoice. Cannot modify posted, cancelled, or voided invoices. Use workflow
-        actions for state transitions.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateInvoiceRequest'
-            example:
-              due_date: '2026-01-15'
-              notes: Approved by CFO on 2026-01-15
-              internal_notes: Internal review required
-              billing_address_id: 750e8400-e29b-41d4-a716-446655440022
-              shipping_address_id: 850e8400-e29b-41d4-a716-446655440023
-              line_items: &id006 []
-              issued_date: '2026-01-15'
-              currency_code: USD
-      responses:
-        '200':
-          description: Invoice updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot modify posted, cancelled, or voided invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: &id003
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/PostedInvoice'
         '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-    delete:
-      operationId: delete_invoice
-      summary: Delete invoice
-      description: Delete a draft invoice. Only invoices in DRAFT status can be deleted.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Invoice deleted
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot delete non-draft invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /invoices/{id}/line-items:
+          $ref: '#/components/responses/NotFound'
+  /v1/customer-invoices/{id}/journal:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
     get:
-      operationId: list_invoice_line_items
-      summary: List line items
-      description: Get all line items for a specific invoice.
+      operationId: get_customer_invoice_journal
+      tags: [customer-invoices]
+      summary: Retrieve the balanced journal produced for an invoice
       x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
       responses:
         '200':
-          description: List of line items
+          description: Balanced journal and immutable lines
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedLineItems'
+                $ref: '#/components/schemas/PostedJournal'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Invoice not found
+          $ref: '#/components/responses/NotFound'
+  /v1/customer-invoices/{id}/document:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
+    get:
+      operationId: get_customer_invoice_document
+      tags: [customer-invoices]
+      summary: Retrieve immutable PDF metadata and a short-lived download URL
+      description: >-
+        Materialises the deterministic PDF on first access, stores it in private
+        content-addressed object storage and returns a five-minute signed URL.
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: Immutable PDF artifact and temporary download capability
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/RenderedDocument'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /v1/customer-invoices/{id}/credit-notes:
+    parameters:
+      - $ref: '#/components/parameters/DocumentId'
     post:
-      operationId: create_line_item
-      summary: Add line item
-      description: Add a line item to an invoice. Only allowed for invoices in DRAFT status.
+      operationId: credit_customer_invoice
+      tags: [customer-invoices]
+      summary: Post a full credit note which reverses a customer invoice
       x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
-            example:
-              product_id: 850e8400-e29b-41d4-a716-446655440028
-              description: Primary operating company
-              quantity: 10
-              unit_price: 500.0
-              discount_percent: 5.0
-              discount_amount: 500.0
-              tax_code: VAT-2026
-              gl_account_debit: GL-DEBIT-2026
-              gl_account_credit: GL-CREDIT-2026
+              $ref: '#/components/schemas/CreditCustomerInvoiceRequest'
       responses:
         '201':
-          description: Line item created
+          description: Credit note and reversal journal committed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvoiceLineItem'
+                $ref: '#/components/schemas/PostingResult'
+        '200':
+          description: Identical idempotent retry returned the committed result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingResult'
         '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Invoice not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Cannot modify non-draft invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-  /invoices/{id}/line-items/{line_id}:
-    put:
-      operationId: update_line_item
-      summary: Update line item
-      description: Update a specific line item. Only allowed for invoices in DRAFT status.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: line_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateInvoiceLineItemRequest'
-            example:
-              quantity: 10
-              unit_price: 500.0
-              discount_percent: 5.0
-              discount_amount: 500.0
-              tax_code: VAT-2026
-              description: Primary operating company
-              gl_account_debit: GL-DEBIT-2026
-              gl_account_credit: GL-CREDIT-2026
-      responses:
-        '200':
-          description: Line item updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvoiceLineItem'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot modify non-draft invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-    delete:
-      operationId: delete_line_item
-      summary: Delete line item
-      description: Delete a line item from an invoice. Only allowed for invoices in DRAFT status.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: line_id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Line item deleted
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot modify non-draft invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /tax-rates:
-    get:
-      operationId: list_tax_rates
-      summary: List tax rates
-      description: List all configured tax rates with filtering by country, code, and effective date.
-      parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-      - name: code
-        in: query
-        schema:
-          type: string
-        description: Filter by tax code
-      - name: country_code
-        in: query
-        schema:
-          type: string
-          maxLength: 2
-        description: Filter by ISO country code
-      - name: type
-        in: query
-        schema:
-          type: string
-          enum:
-          - PERCENTAGE
-          - FIXED
-      - name: as_of_date
-        in: query
-        schema:
-          type: string
-          format: date
-        description: Get rates effective on this date
-      responses:
-        '200':
-          description: Paginated list of tax rates
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedTaxRates'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /tax-calculate:
-    get:
-      operationId: calculate_tax
-      summary: Calculate tax for line items
-      description: Calculate tax for a set of line items using the configured tax rates and codes.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: company_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-        description: Company for tax configuration
-      - name: country_code
-        in: query
-        schema:
-          type: string
-          maxLength: 2
-        description: Tax jurisdiction country code
-      - name: line_items
-        in: query
-        schema:
-          type: string
-        description: JSON array of line items with tax_codes
-      responses:
-        '200':
-          description: Tax calculation results with breakdown
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  total_tax:
-                    type: number
-                  subtotal:
-                    type: number
-                  total:
-                    type: number
-                  breakdown:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/TaxBreakdown'
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-  /invoices/{id}/approve:
-    post:
-      operationId: approve_invoice
-      summary: Approve invoice
-      description: Approve a purchase invoice for payment. Transitions status from PENDING_APPROVAL to APPROVED and creates
-        an approval record.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Invoice approved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '403':
-          description: Forbidden - user not authorized to approve
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id004
-  /invoices/{id}/post:
-    post:
-      operationId: post_invoice
-      summary: Post invoice to GL
-      description: Post a confirmed invoice to the general ledger. Creates GL entries and transitions status to POSTED.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Invoice posted to GL
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Invoice cannot be posted (not confirmed)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-  /invoices/{id}/cancel:
-    post:
-      operationId: cancel_invoice
-      summary: Cancel invoice
-      description: Cancel a draft or confirmed invoice. Creates a cancellation record.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Invoice cancelled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot cancel posted or voided invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-  /invoices/{id}/void:
-    post:
-      operationId: void_invoice
-      summary: Void invoice
-      description: Void a posted invoice. Creates a voided record and reverses GL entries.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Invoice voided
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot void non-posted invoices
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-  /invoices/{id}/workflow-history:
-    get:
-      operationId: get_invoice_workflow_history
-      summary: Get workflow history
-      description: Get the full workflow history (approvals, posts, cancellations) for an invoice.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Workflow history
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedApprovals'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /reports/invoice-summary:
-    get:
-      operationId: invoice_summary
-      summary: Invoice summary report
-      description: Generate an invoice summary report for a period with breakdowns by status and type.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: company_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-        description: Filter by company
-      - name: period_start
-        in: query
-        schema:
-          type: string
-          format: date
-        description: Period start date
-      - name: period_end
-        in: query
-        schema:
-          type: string
-          format: date
-        description: Period end date
-      - name: currency_code
-        in: query
-        schema:
-          type: string
-          minLength: 3
-          maxLength: 3
-        description: Currency for the report
-      responses:
-        '200':
-          description: Invoice summary report
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvoiceSummary'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /invoices/{id}/register-payment:
-    post:
-      operationId: register_invoice_payment
-      summary: Register invoice payment
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterInvoicePaymentRequest'
-            example:
-              amount: 10000.0
-              currency_code: USD
-              payment_date: 1000.0
-              payment_method: 1000.0
-              external_reference: EXT-2026-0001
-      responses:
-        '201':
-          description: Invoice payment registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvoicePayment'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id004
-  /invoices/{id}/payment-matches:
-    get:
-      operationId: list_invoice_payment_matches
-      summary: List invoice payment matches
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Invoice payment matches
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedInvoicePaymentMatches'
-  /invoices/{id}/credit-note:
-    post:
-      operationId: create_invoice_credit_note
-      summary: Create invoice credit note
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateInvoiceCreditNoteRequest'
-            example:
-              reason: Reclassification of asset category
-              amount: 10000.0
-      responses:
-        '201':
-          description: Credit note created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id004
-  /invoices/{id}/e-invoice-handoff:
-    post:
-      operationId: handoff_invoice_to_einvoice
-      summary: Handoff invoice to e-invoicing
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '202':
-          description: E-invoice handoff accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvoiceHandoff'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id004
-  /invoices/{id}/deferral-handoff:
-    post:
-      operationId: handoff_invoice_to_deferral
-      summary: Handoff invoice to revenue recognition deferral
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '202':
-          description: Deferral handoff accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InvoiceHandoff'
-        '400':
-          description: Validation error
-          content: *id003
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id004
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sesame access token validated by BRRTRouter
   parameters:
-    Id:
+    DocumentId:
       name: id
       in: path
       required: true
       schema:
         type: string
         format: uuid
-      description: Resource UUID
-    Page:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        default: 1
-      description: Page number (1-indexed)
-    Limit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: Page size (1-100)
-    Search:
-      name: search
-      in: query
-      required: false
-      schema:
-        type: string
-      description: Full-text search across name and description fields
-    CompanyId:
-      name: company_id
-      in: query
-      required: false
-      schema:
-        type: string
-        format: uuid
-      description: Filter by company UUID
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+  responses:
+    BadRequest:
+      description: Invalid request syntax or value
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unavailable:
+      description: Rendered-document storage is temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication is required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated identity context is incomplete or inconsistent
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource does not exist in the authenticated tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Idempotency key or source reference conflicts with existing facts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Accounting policy rejected the otherwise valid command
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    PaginatedResponse:
+    SourceReference:
       type: object
-      required:
-      - total
-      - page
-      - limit
+      required: [system, resource_type, resource_id]
       properties:
-        total:
-          type: integer
-          description: Total number of records
-          example: 1
-        page:
-          type: integer
-          description: Current page number
-          example: 1
-        limit:
-          type: integer
-          description: Page size limit
-          example: 1
-    Invoice:
+        system:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: hauliage
+        resource_type:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: delivery
+        resource_id:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: delivery-123
+    TaxFact:
+      type: object
+      required: [code, rate_percent]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 100
+        rate_percent:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+    CustomerInvoiceLine:
+      type: object
+      required: [description, quantity, unit_price]
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        quantity:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        unit_price:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        discount_percent:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          default: '0'
+        tax:
+          allOf:
+            - $ref: '#/components/schemas/TaxFact'
+          nullable: true
+    PostCustomerInvoiceRequest:
       type: object
       required:
-      - billing_address_id
-      - company_id
-      - company_total_amount
-      - currency_code
-      - due_date
-      - entity_id
-      - entity_name
-      - exchange_rate
-      - id
-      - internal_notes
-      - invoice_number
-      - invoice_type
-      - notes
-      - posted_at
-      - posted_by
-      - shipping_address_id
-      - status
-      - subtotal_amount
-      - tax_amount
-      - total_amount
+        - idempotency_key
+        - source
+        - customer_id
+        - invoice_date
+        - due_date
+        - currency_code
+        - lines
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        customer_id:
+          type: string
+          format: uuid
+        invoice_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        rounding_minor_units:
+          type: integer
+          minimum: 0
+          maximum: 6
+          default: 2
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/CustomerInvoiceLine'
+    CreditCustomerInvoiceRequest:
+      type: object
+      required: [idempotency_key, source, reason]
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    PostedInvoiceLine:
+      type: object
+      required:
+        - line_number
+        - description
+        - quantity
+        - unit_price
+        - discount_percent
+        - gross_amount
+        - discount_amount
+        - net_amount
+        - tax_amount
+        - total_amount
+      properties:
+        line_number:
+          type: integer
+        description:
+          type: string
+        quantity:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        unit_price:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        discount_percent:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        gross_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        discount_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        net_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        tax_code:
+          type: string
+          nullable: true
+        tax_rate_percent:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          nullable: true
+        tax_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        total_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+    PostedInvoice:
+      type: object
+      required:
+        - id
+        - document_number
+        - document_type
+        - status
+        - customer_id
+        - source
+        - invoice_date
+        - due_date
+        - currency_code
+        - rounding_minor_units
+        - subtotal
+        - discount_amount
+        - tax_amount
+        - total_amount
+        - posted_at
+        - lines
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for this invoice
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_number:
+        document_number:
           type: string
-          maxLength: 100
-          description: Sequential invoice number (auto-generated)
-          example: INV-2026-0001
-        invoice_type:
+        document_type:
           type: string
-          enum:
-          - SALES
-          - PURCHASE
-          - CREDIT_MEMO
-          - DEBIT_MEMO
-          - STANDARD
-          description: Type of invoice
-          example: 1000.0
+          enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
         status:
           type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - POSTED
-          - CANCELLED
-          - VOIDED
-          description: Invoice lifecycle status
-          example: active
-        total_amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Grand total including tax
-          example: 11000.0
-        subtotal_amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Total before tax
-          example: 10000.0
-        tax_amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Total tax across all line items
-          example: 1000.0
-        currency_code:
+          enum: [POSTED]
+        original_document_id:
           type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Z]{3}$
-          description: ISO 4217 currency code
-          example: USD
-        exchange_rate:
-          type: number
-          format: double
-          description: Exchange rate to company currency
-          example: 1.05
-        company_currency_code:
+          format: uuid
+          nullable: true
+        customer_id:
           type: string
-          minLength: 3
-          maxLength: 3
-          description: Company's base currency
-          example: USD
-        company_total_amount:
-          type: number
-          format: double
-          description: Total in company currency (total_amount * exchange_rate)
-          example: 11000.0
-        issued_date:
+          format: uuid
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        invoice_date:
           type: string
           format: date
-          description: Date the invoice was issued
-          example: '2026-01-15'
         due_date:
           type: string
           format: date
-          nullable: true
-          description: Payment due date
-          example: '2026-01-15'
-        billing_entity_id:
+        currency_code:
           type: string
-          format: uuid
-          description: Organization issuing this invoice
-          example: 650e8400-e29b-41d4-a716-446655440021
-        entity_id:
+        rounding_minor_units:
+          type: integer
+        subtotal:
           type: string
-          format: uuid
-          description: Customer (SALES) or Vendor (PURCHASE)
-          example: 550e8400-e29b-41d4-a716-446655440020
-        entity_name:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        discount_amount:
           type: string
-          maxLength: 200
-          description: Human-readable entity name
-          example: Acme Corp
-        billing_address_id:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        tax_amount:
           type: string
-          format: uuid
-          nullable: true
-          description: Billing address reference
-          example: 750e8400-e29b-41d4-a716-446655440022
-        shipping_address_id:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        total_amount:
           type: string
-          format: uuid
-          nullable: true
-          description: Shipping address reference
-          example: 850e8400-e29b-41d4-a716-446655440023
-        notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          description: General notes on the invoice
-          example: Approved by CFO on 2026-01-15
-        internal_notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          description: Internal notes not shared with entity
-          example: Internal review required
-        company_id:
-          type: string
-          format: uuid
-          description: Company this invoice belongs to
-          example: 550e8400-e29b-41d4-a716-446655440000
-        created_by:
-          type: string
-          format: uuid
-          description: User who created the invoice
-          example: 950e8400-e29b-41d4-a716-446655440004
-        created_at:
-          type: string
-          format: date-time
-          example: '2026-01-15T10:30:00Z'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2026-01-15T10:30:00Z'
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
         posted_at:
           type: string
           format: date-time
-          nullable: true
-          description: When invoice was posted to GL
-          example: '2026-01-15T14:30:00Z'
-        posted_by:
-          type: string
-          format: uuid
-          nullable: true
-          description: User who posted the invoice
-          example: 950e8400-e29b-41d4-a716-446655440004
-    InvoiceWithDetails:
-      allOf:
-      - $ref: '#/components/schemas/Invoice'
-      - type: object
-        properties:
-          line_items:
-            type: array
-            items:
-              $ref: '#/components/schemas/InvoiceLineItem'
-            description: All line items on this invoice
-          tax_breakdown:
-            type: array
-            items:
-              $ref: '#/components/schemas/TaxBreakdown'
-            description: Tax calculation breakdown by rate and code
-          payment_applications:
-            type: array
-            items:
-              type: object
-            description: Payment applications (for AR invoices)
-          approved_by:
-            type: string
-            format: uuid
-            nullable: true
-            description: Approver for purchase invoices
-          approved_at:
-            type: string
-            format: date-time
-            nullable: true
-      required: []
-    CreateInvoiceRequest:
-      type: object
-      required:
-      - invoice_type
-      - entity_id
-      - currency_code
-      properties:
-        invoice_type:
-          type: string
-          enum:
-          - SALES
-          - PURCHASE
-          - CREDIT_MEMO
-          - DEBIT_MEMO
-          - STANDARD
-          example: 1000.0
-        entity_id:
-          type: string
-          format: uuid
-          description: Customer for SALES, Vendor for PURCHASE
-          example: 550e8400-e29b-41d4-a716-446655440020
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        exchange_rate:
-          type: number
-          format: double
-          description: Exchange rate to company currency. Defaults to today's rate.
-          example: 1.05
-        issued_date:
-          type: string
-          format: date
-          description: Invoice date. Defaults to today.
-          example: '2026-01-15'
-        due_date:
-          type: string
-          format: date
-          nullable: true
-          description: Payment due date
-          example: '2026-01-15'
-        billing_address_id:
-          type: string
-          format: uuid
-          nullable: true
-          example: 750e8400-e29b-41d4-a716-446655440022
-        shipping_address_id:
-          type: string
-          format: uuid
-          nullable: true
-          example: 850e8400-e29b-41d4-a716-446655440023
-        notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          example: Approved by CFO on 2026-01-15
-        internal_notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          example: Internal review required
-        company_id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        line_items:
+        lines:
           type: array
           items:
-            $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
-          description: Invoice line items
-          example: *id005
-        auto_confirm:
-          type: boolean
-          default: false
-          description: Skip DRAFT and auto-confirm on creation
-          example: true
-    UpdateInvoiceRequest:
+            $ref: '#/components/schemas/PostedInvoiceLine'
+    JournalLine:
       type: object
+      required: [line_number, account_id, description, side, amount]
       properties:
-        due_date:
-          type: string
-          format: date
-          example: '2026-01-15'
-        notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          example: Approved by CFO on 2026-01-15
-        internal_notes:
-          type: string
-          maxLength: 2000
-          nullable: true
-          example: Internal review required
-        billing_address_id:
+        line_number:
+          type: integer
+        account_id:
           type: string
           format: uuid
-          nullable: true
-          example: 750e8400-e29b-41d4-a716-446655440022
-        shipping_address_id:
+        description:
           type: string
-          format: uuid
-          nullable: true
-          example: 850e8400-e29b-41d4-a716-446655440023
-        line_items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateInvoiceLineItemRequest'
-          description: Replace all line items
-          example: *id006
-        issued_date:
+        side:
           type: string
-          format: date
-          example: '2026-01-15'
-        currency_code:
+          enum: [DEBIT, CREDIT]
+        amount:
           type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-    InvoiceLineItem:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+    PostedJournal:
       type: object
       required:
-      - amount
-      - description
-      - discount_amount
-      - discount_percent
-      - gl_account_credit
-      - gl_account_debit
-      - id
-      - invoice_id
-      - product_code
-      - product_id
-      - product_name
-      - quantity
-      - tax_amount
-      - tax_code
-      - tax_rate
-      - unit_price
+        - id
+        - entry_number
+        - entry_date
+        - source_document_id
+        - currency_code
+        - total_debit
+        - total_credit
+        - posted_at
+        - lines
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for this line item
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_id:
+        entry_number:
+          type: string
+        entry_date:
+          type: string
+          format: date
+        source_document_id:
           type: string
           format: uuid
-          description: Parent invoice
-          example: 1000.0
-        product_id:
+        currency_code:
           type: string
-          format: uuid
-          nullable: true
-          description: Product/service this line relates to
-          example: 850e8400-e29b-41d4-a716-446655440028
-        product_code:
+        total_debit:
           type: string
-          maxLength: 100
-          nullable: true
-          description: Product SKU/code
-          example: PROD-2026-001
-        product_name:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        total_credit:
           type: string
-          maxLength: 200
-          nullable: true
-          description: Product name
-          example: Enterprise License
-        description:
-          type: string
-          maxLength: 1000
-          description: Line item description
-          example: Primary operating company
-        quantity:
-          type: number
-          format: double
-          minimum: 0
-          description: Quantity
-          example: 10
-        unit_price:
-          type: number
-          format: double
-          minimum: 0
-          description: Price per unit before tax
-          example: 500.0
-        discount_percent:
-          type: number
-          format: double
-          minimum: 0
-          maximum: 100
-          default: 0
-          description: Line-level discount percentage
-          example: 5.0
-        discount_amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Line-level discount amount
-          example: 500.0
-        amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Line total (quantity * unit_price - discount)
-          example: 10000.0
-        tax_code:
-          type: string
-          maxLength: 50
-          nullable: true
-          description: Tax code applied to this line
-          example: VAT-2026
-        tax_rate:
-          type: number
-          format: double
-          minimum: 0
-          nullable: true
-          description: Applied tax rate
-          example: 10.0
-        tax_amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Tax amount for this line
-          example: 1000.0
-        gl_account_debit:
-          type: string
-          format: uuid
-          nullable: true
-          description: Debit GL account for posting
-          example: GL-DEBIT-2026
-        gl_account_credit:
-          type: string
-          format: uuid
-          nullable: true
-          description: Credit GL account for posting
-          example: GL-CREDIT-2026
-        created_at:
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        posted_at:
           type: string
           format: date-time
-          example: '2026-01-15T10:30:00Z'
-        updated_at:
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalLine'
+    PostingResult:
+      type: object
+      required: [idempotency_key, request_fingerprint, invoice, journal]
+      properties:
+        idempotency_key:
+          type: string
+        request_fingerprint:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        invoice:
+          $ref: '#/components/schemas/PostedInvoice'
+        journal:
+          $ref: '#/components/schemas/PostedJournal'
+    RenderedDocument:
+      type: object
+      required:
+        - document_id
+        - media_type
+        - sha256
+        - size_bytes
+        - renderer
+        - renderer_version
+        - rendered_at
+        - download_url
+        - expires_at
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        media_type:
+          type: string
+          enum: [application/pdf]
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        renderer:
+          type: string
+        renderer_version:
+          type: string
+        rendered_at:
           type: string
           format: date-time
-          example: '2026-01-15T10:30:00Z'
-    CreateInvoiceLineItemRequest:
-      type: object
-      required:
-      - description
-      - quantity
-      - unit_price
-      properties:
-        product_id:
+        download_url:
           type: string
-          format: uuid
-          nullable: true
-          example: 850e8400-e29b-41d4-a716-446655440028
-        description:
-          type: string
-          maxLength: 1000
-          example: Primary operating company
-        quantity:
-          type: number
-          format: double
-          minimum: 0
-          example: 10
-        unit_price:
-          type: number
-          format: double
-          minimum: 0
-          example: 500.0
-        discount_percent:
-          type: number
-          format: double
-          minimum: 0
-          maximum: 100
-          default: 0
-          example: 5.0
-        discount_amount:
-          type: number
-          format: double
-          minimum: 0
-          example: 500.0
-        tax_code:
-          type: string
-          maxLength: 50
-          nullable: true
-          example: VAT-2026
-        gl_account_debit:
-          type: string
-          format: uuid
-          nullable: true
-          example: GL-DEBIT-2026
-        gl_account_credit:
-          type: string
-          format: uuid
-          nullable: true
-          example: GL-CREDIT-2026
-    UpdateInvoiceLineItemRequest:
-      type: object
-      properties:
-        quantity:
-          type: number
-          format: double
-          minimum: 0
-          example: 10
-        unit_price:
-          type: number
-          format: double
-          minimum: 0
-          example: 500.0
-        discount_percent:
-          type: number
-          format: double
-          minimum: 0
-          maximum: 100
-          example: 5.0
-        discount_amount:
-          type: number
-          format: double
-          minimum: 0
-          example: 500.0
-        tax_code:
-          type: string
-          maxLength: 50
-          nullable: true
-          example: VAT-2026
-        description:
-          type: string
-          maxLength: 1000
-          example: Primary operating company
-        gl_account_debit:
-          type: string
-          format: uuid
-          nullable: true
-          example: GL-DEBIT-2026
-        gl_account_credit:
-          type: string
-          format: uuid
-          nullable: true
-          example: GL-CREDIT-2026
-    TaxBreakdown:
-      type: object
-      required:
-      - tax_code
-      - rate
-      - taxable_amount
-      - tax_amount
-      properties:
-        tax_code:
-          type: string
-          maxLength: 50
-          description: Tax code
-          example: VAT-2026
-        rate:
-          type: number
-          format: double
-          description: Applied tax rate (e.g., 0.20 for 20%)
-          example: 1000.0
-        taxable_amount:
-          type: number
-          format: double
-          description: Amount subject to tax
-          example: 1000.0
-        tax_amount:
-          type: number
-          format: double
-          description: Calculated tax amount
-          example: 1000.0
-    TaxRate:
-      type: object
-      required:
-      - id
-      - code
-      - rate
-      - type
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        code:
-          type: string
-          maxLength: 50
-          description: Tax code (e.g., VAT-STD, TAX-EXEMPT)
-          example: '001'
-        rate:
-          type: number
-          format: double
-          description: Tax rate (e.g., 0.20 for 20%)
-          example: 1000.0
-        type:
-          type: string
-          enum:
-          - PERCENTAGE
-          - FIXED
-          example: general
-        name:
-          type: string
-          maxLength: 200
-          description: Human-readable name
-          example: Acme Corporation
-        effective_date:
-          type: string
-          format: date
-          nullable: true
-          description: Date this rate becomes effective
-          example: '2026-01-15'
-        expiry_date:
-          type: string
-          format: date
-          nullable: true
-          description: Date this rate expires
-          example: '2026-01-15'
-        country_code:
-          type: string
-          maxLength: 2
-          nullable: true
-          description: ISO 3166-1 alpha-2 country code
-          example: 0
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-          example: Primary operating company
-    InvoiceApprovalAction:
-      type: object
-      required:
-      - action
-      - id
-      - invoice_id
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_id:
-          type: string
-          format: uuid
-          description: Invoice being approved
-          example: 1000.0
-        action:
-          type: string
-          enum:
-          - APPROVE
-          - REJECT
-          - REQUEST_INFO
-          - POST
-          - CANCEL
-          - VOID
-          example: sample value
-        by_user:
-          type: string
-          format: uuid
-          description: User who performed the action
-          example: sample value
-        date:
+          format: uri
+        expires_at:
           type: string
           format: date-time
-          description: When the action was performed
-          example: '2026-01-15'
-        notes:
-          type: string
-          maxLength: 1000
-          nullable: true
-          description: Action notes
-          example: Approved by CFO on 2026-01-15
-    RegisterInvoicePaymentRequest:
-      type: object
-      required:
-      - amount
-      - currency_code
-      - payment_date
-      - payment_method
-      properties:
-        amount:
-          type: number
-          format: double
-          example: 10000.0
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        payment_date:
-          type: string
-          format: date
-          example: 1000.0
-        payment_method:
-          type: string
-          example: 1000.0
-        external_reference:
-          type: string
-          nullable: true
-          example: EXT-2026-0001
-    InvoicePayment:
-      type: object
-      required:
-      - amount
-      - currency_code
-      - id
-      - invoice_id
-      - status
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_id:
-          type: string
-          format: uuid
-          example: 1000.0
-        amount:
-          type: number
-          format: double
-          example: 10000.0
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        status:
-          type: string
-          enum:
-          - REGISTERED
-          - MATCHED
-          - POSTED
-          - REVERSED
-          example: active
-    InvoicePaymentMatch:
-      type: object
-      required:
-      - id
-      - invoice_id
-      - payment_id
-      - amount
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_id:
-          type: string
-          format: uuid
-          example: 1000.0
-        payment_id:
-          type: string
-          format: uuid
-          example: 1000.0
-        amount:
-          type: number
-          format: double
-          example: 10000.0
-    CreateInvoiceCreditNoteRequest:
-      type: object
-      required:
-      - reason
-      properties:
-        reason:
-          type: string
-          example: Reclassification of asset category
-        amount:
-          type: number
-          format: double
-          nullable: true
-          example: 10000.0
-    InvoiceHandoff:
-      type: object
-      required:
-      - id
-      - invoice_id
-      - status
-      - target_service
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        invoice_id:
-          type: string
-          format: uuid
-          example: 1000.0
-        target_service:
-          type: string
-          enum:
-          - EDI
-          - REVENUE_RECOGNITION
-          example: 1000.0
-        status:
-          type: string
-          enum:
-          - QUEUED
-          - ACCEPTED
-          - FAILED
-          example: active
-        external_reference:
-          type: string
-          nullable: true
-          example: EXT-2026-0001
-    PaginatedInvoicePaymentMatches:
-      type: object
-      required:
-      - items
-      - total
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoicePaymentMatch'
-          example: []
-        total:
-          type: integer
-          example: 1
-    PaginatedInvoices:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Invoice'
-          example: []
-        total:
-          type: integer
-          example: 1
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 1
-        has_more:
-          type: boolean
-          example: true
-    PaginatedLineItems:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoiceLineItem'
-          example: []
-        total:
-          type: integer
-          example: 1
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 1
-        has_more:
-          type: boolean
-          example: true
-    PaginatedTaxRates:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TaxRate'
-          example: []
-        total:
-          type: integer
-          example: 1
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 1
-        has_more:
-          type: boolean
-          example: true
-    PaginatedApprovals:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoiceApprovalAction'
-          example: []
-        total:
-          type: integer
-          example: 1
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 1
-        has_more:
-          type: boolean
-          example: true
-    InvoiceSummary:
-      type: object
-      required:
-      - by_status
-      - by_type
-      - total_amount
-      - total_invoices
-      properties:
-        period_start:
-          type: string
-          format: date
-          example: '2026-01-01'
-        period_end:
-          type: string
-          format: date
-          example: '2026-01-31'
-        company_id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        total_invoices:
-          type: integer
-          example: 1
-        total_amount:
-          type: number
-          format: double
-          example: 11000.0
-        by_status:
-          type: object
-          description: Count and total by invoice status
-          example:
-          - status: active
-            count: 45
-          - status: maintenance
-            count: 5
-        by_type:
-          type: object
-          description: Count and total by invoice type
-          example: standard
-        average_invoice_amount:
-          type: number
-          format: double
-          example: 1000.0
-        tax_collected:
-          type: number
-          format: double
-          description: Total tax collected
-          example: 1000.0
     ErrorResponse:
       type: object
-      required:
-      - code
-      - message
+      required: [code, message]
       properties:
         code:
           type: string
-          enum:
-          - NOT_FOUND
-          - UNAUTHORIZED
-          - FORBIDDEN
-          - CONFLICT
-          - SERVER_ERROR
-          - UNKNOWN
-          example: NOT_FOUND
         message:
           type: string
-          example: Invoice not found
-        details:
-          type: object
-          nullable: true
-          example: sample value
-    ValidationError:
-      type: object
-      required:
-      - code
-      - message
-      - errors
-      properties:
-        code:
+        request_id:
           type: string
-          enum:
-          - VALIDATION_ERROR
-          example: VALIDATION_ERROR
-        message:
-          type: string
-          example: Line items exceed invoice total
-        errors:
-          type: array
-          items:
-            type: object
-            required:
-            - field
-            - message
-            properties:
-              field:
-                type: string
-                example: amount
-              message:
-                type: string
-                example: Line item amount exceeds validation threshold
-          example: []
-security:
-- bearerAuth: []

@@ -3,7 +3,7 @@
 - **Status**: partially-verified
 - **Source docs**: docs/roadmap/hauliage-accounting-dogfood/README.md, docs/roadmap/hauliage-accounting-dogfood/service-readiness-plan/README.md, openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md, docs/adrs/001-accounting-runtime-boundary.md, docs/adrs/002-document-generation-ownership.md, openapi/accounting/design/08-implementation-roadmap.md, docs/history/plans/ACCOUNTING_BUILD_PLAN.md
 - **Code anchors**: microservices/migrator/, microservices/accounting/, microservices/documents/render/, Tiltfile, openapi/accounting/, openapi/documents/
-- **Last updated**: 2026-07-15
+- **Last updated**: 2026-07-16
 
 ## Current Execution State
 
@@ -12,14 +12,18 @@
 - The root workspace now explicitly owns `rerp-entities`; metadata and its 37-entity build pass.
 - The deployable service workspace owns and commits its lockfile. Its `may_minihttp` source matches the Microscaler rustls-capable fork, and the invoice implementation compiles.
 - BRRTRouter's generator now emits OpenAPI string enums. The EDI and accounting BFF generated crates compile from the current contracts.
-- A full service-workspace check reaches the stale BFF implementation and fails with 728 obsolete example-stub errors. Do not repair those stubs as product code; Goal 2 must define the narrow public runtime and remove inactive implementations from build/deploy gates.
+- A full service-workspace check still fails in broad inactive AP, banking, GL,
+  EDI, and BFF example stubs whose response shapes drifted during generation.
+  Do not repair those stubs as product code; each owning work package must
+  narrow its public runtime and remove inactive implementations from
+  build/deploy gates.
 - Current CI tests workspace libraries only and therefore misses stale binary implementations. An explicit active-binary gate remains open.
 - Tiltfile is intentionally empty at the restart checkpoint; runtime restoration belongs to Goals 2 and 3 after the build topology is trustworthy.
 - Goal 5 Phase 1 runtime is delivered. The root workspace includes `rerp-accounting-core`, a pure in-process accounting kernel with tested decimal calculation, period locks, balanced customer-invoice posting, full credit notes, idempotency fingerprints and trial balance derivation.
 - ADR 001 fixes the first runtime boundary: the existing invoice process owns the invoice-to-GL transaction; GL is an in-process module, not a synchronous generated-service call or a new orchestrator.
 - The 37 legacy entities remain schema-only inventory. Nine new `accounting::foundation` models are typed `LifeModel + LifeRecord` persistence surfaces for legal entities, periods, accounts, posted documents/lines, journals/lines, idempotency and audit.
 - Generated foundation DDL plus app-owned controls/RLS migrations pass a live PostgreSQL acceptance suite as a non-superuser.
-- The invoice executable now registers four honest Phase 1 routes from `accounting/invoice/openapi/phase1.yaml`; generated examples are not active.
+- The invoice executable registers five honest Phase 1 routes generated from canonical `openapi/accounting/invoice/openapi.yaml`; generated examples are not active.
 - Validated Sesame claims become the complete Lifeguard context. Legal entity, period and control accounts are resolved inside one pinned RLS transaction.
 - A live non-superuser Rust acceptance proves post, balanced journal, same-payload retry, changed-payload conflict, retrieve and full credit note.
 - Database setup now installs the vendored Sesame RLS contract before accounting controls and grants the complete explicit v1 helper set to the runtime role.
@@ -28,6 +32,12 @@
 - The basic renderer is a delivery baseline, not the target template system: it has a hard-coded ASCII layout and incomplete issuer/customer presentation facts.
 - Documents PRD-008 defines externalized HTML/CSS templates, a constrained Jinja-compatible field language, immutable template versions, frozen render models, explicit copy artifacts, and post-MVP PAdES electronic sealing/timestamping. Accounting owns invoice facts and the frozen snapshot; `documents/render` owns rendition production and storage.
 - Goal 6 remains active for HTTPS generated-client proof and the rich template-driven document capability.
+- The canonical Invoice OpenAPI was restored after suite restructuring had
+  accidentally regenerated the broad research contract over the five-route
+  runtime. Regeneration is now deterministic and targeted tests compile again.
+- General Ledger no longer owns the five undelivered predecessor tables. The
+  RLS-protected `accounting_*` foundation is the only authoritative ledger; the
+  broad GL HTTP surface remains scaffold until narrowed and implemented.
 
 ## What It Is
 

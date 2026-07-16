@@ -685,7 +685,7 @@ The following require ADRs or implementation spikes before Slice 3:
 - [Hauliage accounting dog-food roadmap](../../../../docs/roadmap/hauliage-accounting-dogfood/README.md)
 - [Accounting runtime boundary ADR](../../../../docs/adrs/001-accounting-runtime-boundary.md)
 - [Document generation ownership ADR](../../../../docs/adrs/002-document-generation-ownership.md)
-- `microservices/accounting/invoice/openapi/phase1.yaml`
+- `openapi/accounting/invoice/openapi.yaml`
 - `microservices/accounting/invoice/impl/src/pdf.rs`
 - `microservices/accounting/invoice/impl/src/document.rs`
 - `microservices/accounting/invoice/impl/src/object_store.rs`

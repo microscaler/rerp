@@ -89,8 +89,8 @@ not choose its tenant or post directly to arbitrary accounts through this API.
 
 ### Delivered Phase 1 contract
 
-`microservices/accounting/invoice/openapi/phase1.yaml` replaces the broad
-research contract on the active invoice process. It uses decimal strings,
+`openapi/accounting/invoice/openapi.yaml` is now the canonical narrow contract
+for the active invoice process. It replaces the broad research surface, uses decimal strings,
 omits tenant/company/account selection, separates commands from retrieval and
 defines explicit validation, policy, not-found and idempotency-conflict errors.
 Only these operations are registered:

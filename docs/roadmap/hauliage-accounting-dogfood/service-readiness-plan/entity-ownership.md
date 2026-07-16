@@ -1,8 +1,8 @@
 # WP0 Entity Ownership Inventory
 
-**Audited:** 2026-07-15  
-**Scope:** Accounting and Documents Render `LifeModel` definitions  
-**Status:** effective table-name ownership reconciled; semantic model review remains
+**Audited:** 2026-07-16
+**Scope:** Accounting and Documents Render `LifeModel` definitions
+**Status:** effective ownership and the authoritative ledger boundary reconciled; other semantic model review remains
 
 ## Result
 
@@ -18,16 +18,18 @@ The non-foundation suite copies and the service-local foundation copies have
 been removed. The obsolete `rerp-entities` migration binaries have also been
 retired in favour of the top-level suite-aware migrator.
 
-The effective inventory now contains **47 table names, 47 definitions, and no
+The effective inventory now contains **42 table names, 42 definitions, and no
 duplicate table-name owners**. The Accounting foundation registry contains 10
-models instead of the previous 47.
+models instead of the previous 47. Five undelivered General Ledger predecessor
+models were retired after ADR 001 confirmed that the Accounting foundation is
+the one authoritative ledger.
 
 ## Authoritative Providers
 
 | Provider | Tables | Effective table names |
 |---|---:|---|
 | `accounting/foundation` | 10 | `accounting_accounts`, `accounting_audit_events`, `accounting_document_artifacts`, `accounting_fiscal_periods`, `accounting_idempotency_records`, `accounting_journal_entries`, `accounting_journal_lines`, `accounting_legal_entities`, `accounting_posted_document_lines`, `accounting_posted_documents` |
-| `accounting/general-ledger` | 5 | `account_balances`, `accounts`, `chart_of_accounts`, `journal_entries`, `journal_entry_lines` |
+| `accounting/general-ledger` | 0 | Uses `accounting/foundation`; owns no second ledger tables. |
 | `accounting/invoice` | 2 | `invoice_lines`, `invoices` |
 | `accounting/accounts-receivable` | 4 | `ar_agings`, `ar_payment_applications`, `ar_payments`, `customer_invoices` |
 | `accounting/accounts-payable` | 4 | `ap_agings`, `ap_payment_applications`, `ap_payments`, `vendor_invoices` |
@@ -58,13 +60,11 @@ Unique SQL names do not prove unique domain concepts. These groups require an
 explicit decision before their owning work package generates or installs new
 schema:
 
-- **WP1 General Ledger:** decide whether `accounts`, `journal_entries`, and
-  `journal_entry_lines` are genuine pre-posting workflow aggregates or obsolete
-  predecessors of `accounting_accounts`, `accounting_journal_entries`, and
-  `accounting_journal_lines`. RERP must not operate two authoritative ledgers.
-- **WP1 General Ledger:** decide whether mutable `account_balances` is a valid
-  projection/cache or should be a derived view/read model over immutable journal
-  lines.
+- **Resolved — WP1 General Ledger:** the delivered `accounting_accounts`,
+  `accounting_journal_entries`, and `accounting_journal_lines` foundation is the
+  only authoritative ledger. The undelivered predecessor tables and mutable
+  `account_balances` model were removed. Balances are derived from immutable
+  posted lines; a future cache/projection requires its own explicit design.
 - **WP2/WP3 Invoice and AR:** document the boundary among Invoice workflow
   `invoices`, immutable `accounting_posted_documents`, and AR
   `customer_invoices`. They may be distinct lifecycle records, but must not
@@ -75,10 +75,12 @@ full Accounting migration generation should not be treated as schema approval.
 
 ## Verification Evidence
 
-- Static inventory: 47 effective tables, 0 duplicate definitions.
+- Static inventory: 42 effective tables, 0 duplicate definitions.
 - `rerp-entities` build: 10 discovered foundation entities.
 - Migrator tests with the Accounting provider feature: 8 passed, including
   aggregate-baseline no-drift and fail-closed change coverage.
-- Accounting provider validation: 47 tables with one owner each.
+- Accounting provider validation: 42 tables with one owner each.
+- Migrator regression test: required `accounting_*` ledger tables exist and the
+  five retired parallel-ledger table names are absent.
 - Accounting setup script syntax: `bash -n` passed and seed discovery is scoped
   to `microservices/accounting`.

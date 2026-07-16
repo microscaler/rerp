@@ -363,3 +363,22 @@ migrations.
   entity documentation, catalogs, and wiki references.
 - Left active PRDs, ADRs, product gap analyses, and the Hauliage dogfood
   readiness plan in their current authoritative locations.
+
+## [2026-07-16] fix | Restore canonical Invoice runtime and converge the ledger schema
+
+- Promoted the five-route Phase 1 Invoice contract to canonical
+  `openapi/accounting/invoice/openapi.yaml` and regenerated disposable server
+  artifacts deterministically.
+- Restored dependencies lost during the suite-layout move; Accounting core,
+  Invoice, and migrator tests compile and pass again.
+- Retired the five undelivered General Ledger predecessor models. The
+  RLS-protected `accounting_accounts`, `accounting_journal_entries`, and
+  `accounting_journal_lines` foundation is now the only ledger schema.
+- Added migrator regression coverage preventing the parallel-ledger table names
+  from returning; Accounting validation now reports 42 uniquely owned tables.
+- Kept the broad General Ledger HTTP surface classified as scaffold pending a
+  narrow, authenticated implementation over the foundation records.
+- Confirmed the targeted delivered crates pass while the full workspace still
+  fails in inactive generated-era AP, banking, GL, EDI, and BFF implementation
+  stubs; those are to be removed by service narrowing, not patched into fake
+  success handlers.

@@ -2,7 +2,7 @@ use lifeguard_migrate::build_script::{discover_entities, generate_registry_modul
 use std::env;
 use std::path::PathBuf;
 
-fn main() {{
+fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let src_dir = PathBuf::from("src");
 
@@ -12,4 +12,4 @@ fn main() {{
 
     let registry_path = out_dir.join("entity_registry.rs");
     generate_registry_module(&entities, &registry_path).expect("Failed to generate registry");
-}}
+}

@@ -757,4 +757,36 @@ mod tests {
             "the documents provider is not compiled; rerun with --features documents"
         );
     }
+
+    #[cfg(feature = "accounting")]
+    #[test]
+    fn accounting_has_one_authoritative_ledger_schema() {
+        let rows = load_rows(&accounting_providers()).expect("load Accounting providers");
+        let tables: std::collections::BTreeSet<&str> =
+            rows.iter().map(|row| row.table.as_str()).collect();
+
+        for required in [
+            "accounting_accounts",
+            "accounting_journal_entries",
+            "accounting_journal_lines",
+        ] {
+            assert!(
+                tables.contains(required),
+                "missing foundation table {required}"
+            );
+        }
+
+        for retired in [
+            "accounts",
+            "account_balances",
+            "chart_of_accounts",
+            "journal_entries",
+            "journal_entry_lines",
+        ] {
+            assert!(
+                !tables.contains(retired),
+                "parallel General Ledger table {retired} must not return"
+            );
+        }
+    }
 }

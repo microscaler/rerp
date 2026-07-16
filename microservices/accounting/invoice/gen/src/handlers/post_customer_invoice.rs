@@ -2,37 +2,57 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::InvoiceApprovalAction;
+use crate::handlers::types::CustomerInvoiceLine;
+use crate::handlers::types::PostedInvoice;
+use crate::handlers::types::PostedJournal;
+use crate::handlers::types::SourceReference;
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(rename = "id")]
-    pub id: String,
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "customer_id")]
+    pub customer_id: String,
+
+    #[serde(rename = "due_date")]
+    pub due_date: String,
+
+    #[serde(rename = "idempotency_key")]
+    pub idempotency_key: String,
+
+    #[serde(rename = "invoice_date")]
+    pub invoice_date: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<CustomerInvoiceLine>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "rounding_minor_units")]
+    pub rounding_minor_units: Option<i32>,
+
+    #[serde(rename = "source")]
+    pub source: SourceReference,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "has_more")]
-    pub has_more: Option<bool>,
+    #[serde(rename = "idempotency_key")]
+    pub idempotency_key: String,
 
-    #[serde(rename = "items")]
-    pub items: Vec<InvoiceApprovalAction>,
+    #[serde(rename = "invoice")]
+    pub invoice: PostedInvoice,
 
-    #[serde(rename = "limit")]
-    pub limit: i32,
+    #[serde(rename = "journal")]
+    pub journal: PostedJournal,
 
-    #[serde(rename = "page")]
-    pub page: i32,
-
-    #[serde(rename = "total")]
-    pub total: i32,
+    #[serde(rename = "request_fingerprint")]
+    pub request_fingerprint: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -42,20 +62,6 @@ impl TryFrom<HandlerRequest> for Request {
         use serde_json::{Map, Value};
 
         let mut data_map = Map::new();
-
-        if let Some(v) = req.get_path_param("id") {
-            data_map.insert(
-                "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-            return Err(anyhow::anyhow!("Missing required parameter 'id'"));
-        }
 
         if let Some(body) = req.body {
             match body {
@@ -75,6 +81,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::get_invoice_workflow_history::handle(req)
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+    crate::controllers::post_customer_invoice::handle(req)
 }

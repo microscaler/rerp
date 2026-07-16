@@ -3,7 +3,6 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -17,21 +16,32 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "external_reference")]
-    pub external_reference: Option<String>,
+    #[serde(rename = "document_id")]
+    pub document_id: String,
 
-    #[serde(rename = "id")]
-    pub id: String,
+    #[serde(rename = "download_url")]
+    pub download_url: String,
 
-    #[serde(rename = "invoice_id")]
-    pub invoice_id: String,
+    #[serde(rename = "expires_at")]
+    pub expires_at: String,
 
-    #[serde(rename = "status")]
-    pub status: String,
+    #[serde(rename = "media_type")]
+    pub media_type: String,
 
-    #[serde(rename = "target_service")]
-    pub target_service: String,
+    #[serde(rename = "rendered_at")]
+    pub rendered_at: String,
+
+    #[serde(rename = "renderer")]
+    pub renderer: String,
+
+    #[serde(rename = "renderer_version")]
+    pub renderer_version: String,
+
+    #[serde(rename = "sha256")]
+    pub sha256: String,
+
+    #[serde(rename = "size_bytes")]
+    pub size_bytes: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -74,6 +84,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::handoff_invoice_to_einvoice::handle(req)
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+    crate::controllers::get_customer_invoice_document::handle(req)
 }

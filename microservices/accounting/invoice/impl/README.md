@@ -5,8 +5,9 @@ accepts commercial facts, derives accounting scope from validated Sesame
 claims and commits the invoice and balanced journal in one Lifeguard RLS
 transaction.
 
-The source contract is
-[`../openapi/phase1.yaml`](../openapi/phase1.yaml). Five operations are active:
+The canonical source contract is
+[`../../../../../openapi/accounting/invoice/openapi.yaml`](../../../../../openapi/accounting/invoice/openapi.yaml).
+Five operations are active:
 post a customer invoice, retrieve it, retrieve its journal, post a full credit
 note, and materialize/retrieve its immutable PDF artifact. The executable
 registers implementation controllers only;

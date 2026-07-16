@@ -113,7 +113,7 @@ schema-inventory entities:
 ### Delivered runtime evidence
 
 The invoice process now exposes five Phase 1 capabilities from
-`microservices/accounting/invoice/openapi/phase1.yaml`: post and retrieve a
+`openapi/accounting/invoice/openapi.yaml`: post and retrieve a
 customer invoice, retrieve its journal, and post a full credit note. The
 fifth lazily materializes an immutable PDF in private content-addressed MinIO
 storage and returns metadata plus a short-lived signed URL. The

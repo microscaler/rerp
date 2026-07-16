@@ -117,7 +117,7 @@ worktree before implementation.
 | Entity ownership | Structural drift | Duplicate Accounting models and suite/service overlap must be reconciled. |
 | Top-level migrator | Structural drift | It compiles but retains flat Hauliage paths, all-suite coupling, and repository-root output. |
 | Invoice | Partial | Re-audit the corrected worktree; prove generated HTTPS client and handoff to Documents Render. |
-| General Ledger | Partial/scaffold mixture | Establish canonical table ownership and deliver public/internal ledger behavior and controls. |
+| General Ledger | Partial/scaffold mixture | One authoritative foundation ledger is established; narrow the broad HTTP scaffold and deliver tenant-safe account, period, journal, reversal, and trial-balance behavior. |
 | Accounts Receivable | Scaffold only | Deliver customer ledger, receipts, allocations, aging, and statements. |
 | Accounts Payable | Scaffold only | Deliver supplier bills, approvals, payments, allocations, and aging. |
 | Bank Sync | Scaffold only | Deliver bank accounts, statement ingestion, matching, reconciliation, and connector contract. |
@@ -224,7 +224,7 @@ all Accounting subledgers post through without bypassing controls.
 - [ ] Reversal links to the original and preserves both audit histories.
 - [ ] Another tenant cannot read, post, reverse, or infer ledger facts.
 - [ ] Trial balance is derived from posted lines and agrees with source journals.
-- [ ] No service owns a second copy of the canonical account/journal models.
+- [x] No service owns a second copy of the canonical account/journal models.
 
 ## WP2 — Customer Invoice Hardening
 
@@ -235,11 +235,11 @@ render immutable customer accounting documents through a stable public API.
 
 ### Required capabilities
 
-- [ ] Re-audit the existing posting, retrieval, journal, credit-note, and basic
+- [x] Re-audit the existing posting, retrieval, journal, credit-note, and basic
       document routes after structural reconciliation.
-- [ ] Promote the active OpenAPI contract to the canonical
+- [x] Promote the active OpenAPI contract to the canonical
       `openapi/accounting/invoice/openapi.yaml` path.
-- [ ] Preserve decimal calculation, explicit rounding, tax snapshots, account
+- [x] Preserve decimal calculation, explicit rounding, tax snapshots, account
       mapping, period checks, numbering, audit, and idempotency.
 - [ ] Add partial credit/debit-note behavior only through explicit workflows.
 - [ ] Store the immutable render model and durable Documents Render outbox
@@ -251,15 +251,15 @@ render immutable customer accounting documents through a stable public API.
 
 ### Acceptance criteria
 
-- [ ] One valid instruction creates exactly one immutable invoice and balanced
+- [x] One valid instruction creates exactly one immutable invoice and balanced
       journal atomically.
-- [ ] Same key/same payload returns the original result; changed payload
+- [x] Same key/same payload returns the original result; changed payload
       conflicts.
-- [ ] Failed persistence leaves no partial document, journal, audit, or success
+- [x] Failed persistence leaves no partial document, journal, audit, or success
       record.
-- [ ] Credit/debit notes never mutate the original invoice.
-- [ ] Rendered totals and presentation facts match the frozen posted snapshot.
-- [ ] No active route returns generated example data.
+- [x] Credit/debit notes never mutate the original invoice.
+- [x] Rendered totals and presentation facts match the frozen posted snapshot.
+- [x] No active route returns generated example data.
 
 ## WP3 — Accounts Receivable
 

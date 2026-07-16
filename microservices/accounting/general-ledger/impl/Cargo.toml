@@ -23,6 +23,7 @@ rerp_accounting_general_ledger_gen = { path = "../gen" }
 # Lifeguard ORM
 lifeguard = { workspace = true }
 lifeguard-derive = { workspace = true }
+rerp_entities = { workspace = true }
 
 # lifeguard-migrate used by generated entity_registry.rs
 lifeguard-migrate = { path = "../../../../../lifeguard/lifeguard-migrate" }

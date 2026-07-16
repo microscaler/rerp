@@ -1,5 +1,12 @@
 # Migration Generation Gaps Identified
 
+> **Status: HISTORICAL_SNAPSHOT**
+>
+> This analysis described retired General Ledger predecessor entities. The
+> current authoritative ledger is the Accounting foundation documented in
+> [`microservices/accounting/README.md`](../../../microservices/accounting/README.md).
+> Retained for Lifeguard migration-tooling history only.
+
 This document summarizes the gaps identified when building Lifeguard entities to generate SQL migrations.
 
 ## Summary

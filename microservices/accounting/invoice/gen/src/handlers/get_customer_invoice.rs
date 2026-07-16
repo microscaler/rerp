@@ -2,8 +2,9 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::PostedInvoiceLine;
+use crate::handlers::types::SourceReference;
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -17,21 +18,57 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "external_reference")]
-    pub external_reference: Option<String>,
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "customer_id")]
+    pub customer_id: String,
+
+    #[serde(rename = "discount_amount")]
+    pub discount_amount: String,
+
+    #[serde(rename = "document_number")]
+    pub document_number: String,
+
+    #[serde(rename = "document_type")]
+    pub document_type: String,
+
+    #[serde(rename = "due_date")]
+    pub due_date: String,
 
     #[serde(rename = "id")]
     pub id: String,
 
-    #[serde(rename = "invoice_id")]
-    pub invoice_id: String,
+    #[serde(rename = "invoice_date")]
+    pub invoice_date: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<PostedInvoiceLine>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "original_document_id")]
+    pub original_document_id: Option<String>,
+
+    #[serde(rename = "posted_at")]
+    pub posted_at: String,
+
+    #[serde(rename = "rounding_minor_units")]
+    pub rounding_minor_units: i32,
+
+    #[serde(rename = "source")]
+    pub source: SourceReference,
 
     #[serde(rename = "status")]
     pub status: String,
 
-    #[serde(rename = "target_service")]
-    pub target_service: String,
+    #[serde(rename = "subtotal")]
+    pub subtotal: String,
+
+    #[serde(rename = "tax_amount")]
+    pub tax_amount: String,
+
+    #[serde(rename = "total_amount")]
+    pub total_amount: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -74,6 +111,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::handoff_invoice_to_deferral::handle(req)
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+    crate::controllers::get_customer_invoice::handle(req)
 }
