@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Foundation only. Workloads live in ./services and are reconciled by a
+# separate Flux Kustomization which depends on this one becoming Ready.
+resources:
+  - runtime
+  - bootstrap

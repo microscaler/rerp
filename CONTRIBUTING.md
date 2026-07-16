@@ -269,6 +269,7 @@ The same shape applies to every suite:
 openapi/<suite>/<service>/openapi.yaml
 microservices/<suite>/<service>/gen/
 microservices/<suite>/<service>/impl/
+deployment-configuration/profiles/<environment>/rerp/<suite>/
 ```
 
 Do not flatten a RERP service to `microservices/<service>`. Do not put
@@ -289,10 +290,25 @@ Each suite owns its complete optional installation boundary:
 | `microservices/<suite>/sql/` | Suite-owned database contracts that are not entity-generated |
 | `microservices/<suite>/scripts/` | Suite-specific development and operational wrappers |
 | `microservices/<suite>/tests/` | Cross-service acceptance and suite installation-isolation tests |
+| `deployment-configuration/profiles/<environment>/rerp/<suite>/` | Suite-owned non-secret properties and SOPS-encrypted runtime credentials |
 
 The presence of all suites in one Cargo workspace is a development convenience;
 it is not permission to install every suite. Build, Helm/Tilt selection, and
 migration application must all select the intended suites explicitly.
+
+Environment profiles preserve the same installation boundary. Product and
+suite configuration belongs in RERP, not in
+`shared-gitops-k8s-cluster/deployment-configuration/`. Following the SAM Flux
+pattern, the platform repository composes a Flux `GitRepository` and
+`Kustomization` which source and reconcile the product-owned path. Tilt must
+not apply the same resources or render/apply Helm workloads. The RERP Tiltfile
+is an image-development loop: it may generate/build code and publish ordered
+dev images, while Flux owns bootstrap Jobs, Helm releases, rollout, and drift
+correction. The platform repository also owns the other side
+of shared infrastructure contracts—for example, Pgpool's custom-user source
+must carry the same rotated database credential as the owning RERP suite
+profile. Never commit plaintext secrets or duplicate environment-specific
+values in Helm defaults.
 
 ### Complete HTTP microservice anatomy
 
@@ -512,6 +528,8 @@ rerp/
 ├── tooling/                         # suite-aware RERP CLI and build tooling
 ├── helm/                            # generic chart plus suite/service values
 ├── docker/                          # parameterized runtime image definitions
+├── deployment-configuration/
+│   └── profiles/<env>/rerp/<suite>/ # product config + SOPS credentials
 ├── docs/
 │   ├── ai/
 │   ├── adrs/

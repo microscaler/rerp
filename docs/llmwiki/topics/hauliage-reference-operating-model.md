@@ -2,8 +2,8 @@
 
 - **Status**: `partially-verified`
 - **Source docs**: [`docs/TOOLS_ALIGNMENT_FINDINGS.md`](../../TOOLS_ALIGNMENT_FINDINGS.md), [`tooling/README.md`](../../../tooling/README.md), Hauliage [`docs/llmwiki/topics/scaffolding-lifecycle.md`](../../../../hauliage/docs/llmwiki/topics/scaffolding-lifecycle.md), Hauliage [`docs/llmwiki/topics/database-architecture.md`](../../../../hauliage/docs/llmwiki/topics/database-architecture.md)
-- **Code anchors**: `tooling/src/rerp_tooling/cli/main.py`, `tooling/tests/test_rerp_cli_translations.py`, `Tiltfile`, `microservices/Cargo.toml`, `microservices/<suite>/<service>/impl/`, `microservices/<suite>/entities/`, `microservices/<suite>/migrations/`
-- **Last updated**: 2026-07-15
+- **Code anchors**: `tooling/src/rerp_tooling/cli/main.py`, `tooling/tests/test_rerp_cli_translations.py`, `Tiltfile`, `microservices/Cargo.toml`, `microservices/<suite>/<service>/impl/`, `microservices/<suite>/entities/`, `microservices/<suite>/migrations/`, `microservices/accounting/scripts/setup-db.sh`
+- **Last updated**: 2026-07-16
 
 ## What It Is
 
@@ -89,7 +89,8 @@ RERP follows the same sequence, but all paths must include `{suite}`. The wrappe
 Hauliage uses a shared PostgreSQL server in the `data` namespace and an application database/schema for the product. RERP follows the same shared-cluster idea but with RERP names:
 
 - Shared Postgres service: `postgres.data.svc.cluster.local:5432`.
-- RERP database/env config: `k8s/rerp/rerp-database-env.yaml`.
+- RERP Accounting database/runtime config: the suite-owned SOPS profile at
+  `deployment-configuration/profiles/dev/rerp/accounting/` in RERP.
 - Helm DB override: `helm/rerp-microservice/values/_database-shared-k8s.yaml`.
 - Service Lifeguard entities: `microservices/<suite>/<service>/impl/src/models/`.
 - Suite foundation entities: `microservices/<suite>/entities/src/`.
@@ -99,6 +100,16 @@ Hauliage's important operational lessons carry over:
 
 - Keep application data isolated by database/schema naming.
 - Treat grants and default privileges as part of DB bootstrap, not an afterthought.
+- PostgreSQL HA has two authentication planes: bootstrap the application role
+  on the elected primary and configure the same custom user in Pgpool's
+  SOPS-managed `pool_passwd` source.
+- Tilt waits for Flux-owned profile objects and makes workloads depend on the
+  successful role/database/schema/migration initializer; it does not apply a
+  competing plaintext Secret.
+- The shared-cluster product-component inventory generates one RERP Git source
+  and the `rerp-accounting` Flux Kustomization for the suite-owned profile. This
+  is the migration seam toward Tilt building images while Flux owns Helm
+  releases and rollout.
 - `DB_POOL_MAX` controls service pool pressure; don't accidentally multiply too-large pools across every microservice.
 - Replica routing should be considered disabled unless code proves otherwise.
 - Schema changes should originate from Lifeguard entities and migration tooling, not hand edits to generated SQL.

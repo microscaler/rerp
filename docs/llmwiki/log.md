@@ -399,3 +399,42 @@ migrations.
 - Confirmed OpenAPI lint, deterministic regeneration, and nine focused runtime
   tests. Mutation, posting/reversal, opening-balance, dimension, and scale gates
   remain in WP1.
+
+## [2026-07-16] operate | Make RERP database bootstrap HA- and SOPS-native
+
+- Replaced the Tilt-owned plaintext database Secret with the RERP-owned
+  `dev/rerp/accounting` SOPS profile and separate database/object-store credentials.
+- Adopted the SAM Flux ownership model: shared-cluster composition sources the
+  profile from RERP, Flux decrypts/reconciles it, and Tilt only gates on the
+  resulting Ready Kustomization during workload-ownership migration.
+- Made Tilt validate the profile, initialize the database automatically, and
+  gate Accounting workloads on successful role, schema, migration, seed, and
+  grant setup.
+- Updated the initializer to discover the elected Bitnami PostgreSQL HA primary
+  and verify that Pgpool's SOPS custom-user credential matches the application
+  Secret before applying SQL, then prove the loaded Pgpool contract with an
+  authenticated query before workloads may start.
+- Made the two hand-authored foundation control migrations safely re-runnable
+  using transactional completion markers.
+
+## [2026-07-16] operate | Complete the Accounting Flux ownership split
+
+- Split the RERP-owned dev profile into runtime configuration, gated
+  database/object-store bootstrap, and delivered-service reconciliation.
+- Added an in-cluster, kubectl-free database initializer image which consumes
+  the suite-owned ordered migrations and verifies the Pgpool application
+  login before the foundation Kustomization can become Ready.
+- Added idempotent MinIO bucket/user/policy provisioning beside the
+  platform-owned administrator Secret without copying platform credentials to
+  the RERP namespace.
+- Added Flux Helm releases for only the honestly delivered General Ledger and
+  Invoice services; the broader generated Accounting surface remains absent.
+- Narrowed Tilt to code/image work and clean registry repositories. It now
+  publishes monotonic `dev-<nanoseconds>` tags for Flux discovery and applies
+  no Kubernetes resources.
+- Kept Git-writing image automation credential-gated; ImageRepository and
+  ImagePolicy discovery may operate before a scoped RERP deploy key exists.
+- Added a manual Tilt acceptance cycle derived from the useful deployment-watch
+  behavior in the supplied Skaffold shell helper. The Python checker passively
+  verifies Flux gates, bootstrap completion, image convergence, rollout, and
+  HTTP health without applying or reconciling resources.

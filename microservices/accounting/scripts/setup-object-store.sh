@@ -1,16 +1,32 @@
 #!/usr/bin/env bash
 # Provision RERP's private accounting-document bucket in shared-k8s MinIO.
-# The application receives a namespace-local, least-privilege credential; MinIO
-# root credentials remain in the platform-owned `data` namespace.
+# The application receives a namespace-local, least-privilege credential from
+# the RERP-owned SOPS Accounting dev profile; MinIO root credentials remain in the
+# platform-owned `data` namespace. This script provisions MinIO resources but
+# never creates or rotates Kubernetes Secrets.
 set -euo pipefail
 
 DATA_NAMESPACE="${RERP_OBJECT_STORE_DATA_NAMESPACE:-data}"
 APP_NAMESPACE="${RERP_OBJECT_STORE_APP_NAMESPACE:-rerp}"
 MINIO_DEPLOYMENT="${RERP_OBJECT_STORE_MINIO_DEPLOYMENT:-minio}"
-BUCKET="${RERP_OBJECT_STORE_BUCKET:-rerp-accounting-documents}"
-ACCESS_KEY="${RERP_OBJECT_STORE_ACCESS_KEY:-rerp-accounting}"
-POLICY_NAME="${RERP_OBJECT_STORE_POLICY:-rerp-accounting-documents}"
+CONFIG_NAME="${RERP_OBJECT_STORE_CONFIG_NAME:-rerp-database-config}"
 SECRET_NAME="${RERP_OBJECT_STORE_SECRET_NAME:-rerp-object-store}"
+BUCKET="${RERP_OBJECT_STORE_BUCKET:-}"
+ACCESS_KEY="${RERP_OBJECT_STORE_ACCESS_KEY:-}"
+POLICY_NAME="${RERP_OBJECT_STORE_POLICY:-rerp-accounting-documents}"
+
+if [ -z "${BUCKET}" ]; then
+  BUCKET="$(kubectl get configmap "${CONFIG_NAME}" --namespace "${APP_NAMESPACE}" --output jsonpath='{.data.RERP_OBJECT_STORE_BUCKET}')"
+fi
+if [ -z "${ACCESS_KEY}" ]; then
+  ACCESS_KEY="$(kubectl get secret "${SECRET_NAME}" --namespace "${APP_NAMESPACE}" --output jsonpath='{.data.access-key}' | base64 --decode)"
+fi
+SECRET_KEY="$(kubectl get secret "${SECRET_NAME}" --namespace "${APP_NAMESPACE}" --output jsonpath='{.data.secret-key}' | base64 --decode)"
+
+if [ -z "${ACCESS_KEY}" ] || [ -z "${SECRET_KEY}" ]; then
+  echo "RERP object-store credentials are missing from ${APP_NAMESPACE}/${SECRET_NAME}; reconcile Flux Kustomization rerp-accounting." >&2
+  exit 1
+fi
 
 if [[ ! "${BUCKET}" =~ ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$ ]]; then
   echo "Invalid S3 bucket name: ${BUCKET}" >&2
@@ -31,13 +47,6 @@ kubectl rollout status \
   "deployment/${MINIO_DEPLOYMENT}" \
   --namespace "${DATA_NAMESPACE}" \
   --timeout "${RERP_OBJECT_STORE_TIMEOUT:-180s}"
-
-if kubectl get secret "${SECRET_NAME}" --namespace "${APP_NAMESPACE}" >/dev/null 2>&1; then
-  ACCESS_KEY="$(kubectl get secret "${SECRET_NAME}" --namespace "${APP_NAMESPACE}" --output jsonpath='{.data.access-key}' | base64 --decode)"
-  SECRET_KEY="$(kubectl get secret "${SECRET_NAME}" --namespace "${APP_NAMESPACE}" --output jsonpath='{.data.secret-key}' | base64 --decode)"
-else
-  SECRET_KEY="$(openssl rand -hex 24)"
-fi
 
 # Pass application credentials over stdin, rather than exposing them in the
 # kubectl command line. The MinIO container already receives its own root
@@ -83,12 +92,5 @@ POLICY
       --user "${app_access_key}" >/dev/null
     rm -f "${policy_file}"
   '
-
-kubectl create secret generic "${SECRET_NAME}" \
-  --namespace "${APP_NAMESPACE}" \
-  --from-literal=access-key="${ACCESS_KEY}" \
-  --from-literal=secret-key="${SECRET_KEY}" \
-  --dry-run=client \
-  --output yaml | kubectl apply --filename - >/dev/null
 
 echo "RERP object store ready: ${BUCKET} (private, application-scoped credentials)."

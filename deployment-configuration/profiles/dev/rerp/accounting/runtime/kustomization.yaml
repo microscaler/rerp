@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: rerp
+
+configMapGenerator:
+  - name: rerp-database-config
+    envs:
+      - application.properties
+
+secretGenerator:
+  - name: rerp-db-credentials
+    envs:
+      - application.secrets.env
+  - name: rerp-object-store
+    envs:
+      - object-store.secrets.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+  immutable: false

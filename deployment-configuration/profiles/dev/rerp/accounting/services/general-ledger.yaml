@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: general-ledger
+spec:
+  interval: 5m
+  timeout: 5m
+  releaseName: general-ledger
+  targetNamespace: rerp
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: product-rerp
+        namespace: flux-system
+      interval: 1m
+  valuesFrom:
+    - kind: ConfigMap
+      name: rerp-accounting-common-helm-values
+      valuesKey: values.yaml
+  values:
+    service:
+      name: general-ledger
+    image:
+      name: rerp-accounting-general-ledger
+      tag: dev-1784194020502724396 # {"$imagepolicy": "flux-system:rerp-accounting-general-ledger:tag"}
+    app:
+      binaryName: general_ledger
+      serviceName: general-ledger

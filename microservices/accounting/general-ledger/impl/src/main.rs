@@ -154,15 +154,18 @@ fn main() -> io::Result<()> {
         eprintln!("[logging][error] failed to init tracing subscriber: {e}");
     }
 
+    // Apply the Helm/runtime coroutine stack before Lifeguard initializes its
+    // May-backed connection pool. Configuring this after database startup can
+    // overflow a default-sized coroutine and terminate the process with 139.
+    let config = RuntimeConfig::from_env();
+    may::config().set_stack_size(config.stack_size);
+
     if let Err(error) = database::initialize() {
         eprintln!("[database][error] {error}");
         return Err(io::Error::other(error));
     }
 
     let args = Args::parse();
-    // configure coroutine stack size
-    let config = RuntimeConfig::from_env();
-    may::config().set_stack_size(config.stack_size);
     // Load OpenAPI spec and create router
     // Resolve relative specs against the crate directory so launches from other CWDs work
     let spec_path = if args.spec.is_relative() {

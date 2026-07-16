@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: invoice
+spec:
+  interval: 5m
+  timeout: 5m
+  releaseName: invoice
+  targetNamespace: rerp
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: product-rerp
+        namespace: flux-system
+      interval: 1m
+  valuesFrom:
+    - kind: ConfigMap
+      name: rerp-accounting-common-helm-values
+      valuesKey: values.yaml
+  values:
+    service:
+      name: invoice
+    image:
+      name: rerp-accounting-invoice
+      tag: dev-1784194020656608828 # {"$imagepolicy": "flux-system:rerp-accounting-invoice:tag"}
+    app:
+      binaryName: invoice
+      serviceName: invoice
+    extraEnv:
+      - name: RERP_OBJECT_STORE_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: rerp-object-store
+            key: access-key
+      - name: RERP_OBJECT_STORE_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: rerp-object-store
+            key: secret-key

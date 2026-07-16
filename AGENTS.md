@@ -41,6 +41,15 @@ The following rules are non-negotiable summaries of `CONTRIBUTING.md`:
    suite's entity crate or database tables merely because both are present in
    the source workspace. Cross-suite integration is API/event based unless an
    accepted ADR says otherwise.
+7. **Product deployment profiles stay suite-qualified in RERP.** Use
+   `deployment-configuration/profiles/<environment>/rerp/<suite>/`. Store
+   non-secret environment configuration in `application.properties`, encrypt
+   credentials with SOPS, and never place a product profile in the shared
+   platform GitOps repository. Flux sources and reconciles the profile from
+   RERP; Tilt must not independently apply it. Tilt publishes development
+   images only; Flux owns bootstrap Jobs, Helm releases, rollout, and drift
+   correction. Platform-side dependencies such
+   as Pgpool retain their own matching configuration there.
 
 ## Desktop development environment
 

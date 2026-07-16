@@ -1,30 +1,18 @@
-# RERP Accounting Development Environment
+# RERP Accounting image development.
 #
-# RERP uses the shared-k8s cluster and registry. Platform services such as
-# PostgreSQL, Redis, MinIO and observability are owned by shared-k8s-cluster;
-# this Tiltfile only declares RERP-owned configuration and workloads.
-#
-# All services run on port 8080 (no NodePort).
-#
-# Pattern: each service follows the hauliage chain — lint → gen → build → copy → docker → deploy.
-# The BFF is dynamically generated: spec-gen → lint → gen → build → deploy.
+# Flux owns namespaces, SOPS profiles, bootstrap Jobs, Helm releases and runtime
+# reconciliation. Tilt owns only local code generation/builds and publishing
+# monotonically tagged development images to the shared registry.
 #
 
-SHARED_K8S_KUBECONFIG = os.path.abspath('../shared-k8s-cluster/kubeconfig/shared-k8s.yaml')
 SHARED_K8S_REGISTRY = '10.177.76.220:5000'
-SERVICE_HTTP_PORT = '8080'
+SHARED_K8S_KUBECONFIG = os.path.abspath('../shared-k8s-cluster/kubeconfig/shared-k8s.yaml')
 RUST_ENV_PREFIX = 'export PATH="$HOME/.cargo/bin:/usr/local/bin:$PATH" && '
 
-# ====================
-# Shared platform cluster
-# ====================
-if not os.path.exists(SHARED_K8S_KUBECONFIG):
-    fail('shared-k8s kubeconfig not found: %s' % SHARED_K8S_KUBECONFIG)
-
+# Tilt still evaluates the current kube context before allowing any local()
+# command, even when the file declares no Kubernetes resources.
 allow_k8s_contexts(['shared-k8s'])
-os.putenv('KUBECONFIG', SHARED_K8S_KUBECONFIG)
 default_registry(SHARED_K8S_REGISTRY)
-update_settings(k8s_upsert_timeout_secs=60)
 
 docker_prune_settings(
     disable=False,
@@ -115,57 +103,6 @@ local_resource(
 )
 
 # ====================
-# Kubernetes Namespace
-# ====================
-k8s_yaml('k8s/rerp/namespace.yaml')
-k8s_resource(
-    new_name='rerp-namespace',
-    objects=['rerp:namespace'],
-    labels=['data'],
-)
-
-# ====================
-# Database Infrastructure
-# ====================
-k8s_yaml('k8s/rerp/rerp-database-env.yaml')
-k8s_resource(
-    new_name='rerp-database-env',
-    objects=[
-        'rerp-database-config:configmap:rerp',
-        'rerp-db-credentials:secret:rerp',
-    ],
-    resource_deps=['rerp-namespace'],
-    labels=['data'],
-)
-
-# Database bootstrap is deliberately visible and manual.
-local_resource(
-    'rerp-db-init',
-    './microservices/accounting/scripts/setup-db.sh',
-    deps=[
-        './microservices/accounting/scripts/setup-db.sh',
-        './microservices/accounting/migrations',
-        './microservices/accounting/sql',
-    ],
-    labels=['data'],
-    trigger_mode=TRIGGER_MODE_MANUAL,
-    auto_init=False,
-    allow_parallel=False,
-)
-
-# Provision a private MinIO bucket and a least-privilege RERP application user.
-local_resource(
-    'rerp-object-store',
-    './microservices/accounting/scripts/setup-object-store.sh',
-    deps=['./microservices/accounting/scripts/setup-object-store.sh'],
-    resource_deps=['rerp-namespace'],
-    labels=['data'],
-    trigger_mode=TRIGGER_MODE_AUTO,
-    auto_init=True,
-    allow_parallel=False,
-)
-
-# ====================
 # Suite-aware runtime discovery
 # ====================
 # Runtime descriptors are derived from checked-in contracts, Cargo manifests,
@@ -175,8 +112,13 @@ RUNTIME_SERVICES = decode_json(str(local(
     'PYTHONPATH=tooling/src python3 -m rerp_tooling.runtime descriptors --root .',
     quiet=True,
 )))
-REGULAR_SERVICES = [service for service in RUNTIME_SERVICES if service['service'] != 'bff']
-BFF_SERVICES = [service for service in RUNTIME_SERVICES if service['service'] == 'bff']
+DELIVERED_SERVICE_NAMES = ['general-ledger', 'invoice']
+DELIVERED_SERVICES = [
+    service for service in RUNTIME_SERVICES
+    if service['suite'] == 'accounting' and service['service'] in DELIVERED_SERVICE_NAMES
+]
+if sorted([service['service'] for service in DELIVERED_SERVICES]) != sorted(DELIVERED_SERVICE_NAMES):
+    fail('Accounting delivered-service descriptors are incomplete')
 
 # ====================
 # Code Generation & Lint Helpers
@@ -280,11 +222,12 @@ def create_microservice_test_resource(service):
     """Manual test resource for a microservice."""
     name = service['resource_name']
     package_name = service['package_name']
-    db_pass = os.environ.get('RERP_DB_PASSWORD', 'dev_password_change_in_prod')
+    db_pass = os.environ.get('RERP_DB_PASSWORD', '')
+    test_env = {'RERP_DB_PASSWORD': db_pass} if db_pass else {}
     local_resource(
         'test-%s' % name,
         'cd microservices && cargo test -p %s' % package_name,
-        env={'RERP_DB_PASSWORD': db_pass},
+        env=test_env,
         deps=[
             '%s/src' % service['impl_dir'],
             '%s/tests' % service['impl_dir'],
@@ -310,17 +253,17 @@ else:
     TARGET_RUST_TRIPLE = 'x86_64-unknown-linux-musl'
 
 # ====================
-# Deployment Chain for Each Regular Service
+# Image Chain for Each Delivered Service
 # ====================
-def create_microservice_deployment(service):
-    """Full chain: copy binary → one custom image build → Helm deploy."""
+def create_microservice_image(service):
+    """Copy one binary and publish a monotonically tagged dev image."""
     name = service['resource_name']
     binary_name = service['binary_name']
     target_path = 'microservices/target/%s/debug/%s' % (TARGET_RUST_TRIPLE, binary_name)
     artifact_path = 'build_artifacts/%s/%s/%s' % (TARGET_ARCH_NAME, service['suite'], binary_name)
     hash_path = artifact_path + '.sha256'
     dockerfile = 'docker/microservices/Dockerfile'
-    image_name = 'localhost:5001/%s' % service['image_name']
+    image_name = service['image_name']
 
     # 1. Copy binary from workspace build to artifacts (also creates SHA256 hash)
     local_resource(
@@ -332,55 +275,37 @@ def create_microservice_deployment(service):
         allow_parallel=True,
     )
 
-    # 2. Tilt owns the only service-image build. The RERP builder stages a
-    # narrow context containing only this service's binary and runtime assets.
-    _push_cmd = 'docker tag %s:tilt $EXPECTED_REF && docker push $EXPECTED_REF' % image_name
-    custom_build(
+    # 2. A local resource is deliberate: Tilt discards custom_build targets
+    # which are not referenced by a Kubernetes manifest. Flux, not Tilt,
+    # consumes these pushed images.
+    registry_image = '%s/%s' % (SHARED_K8S_REGISTRY, image_name)
+    _build_and_push = '''set -eu
+%s docker build-image-simple %s %s %s %s --suite %s --service %s
+DEV_REF="%s:dev-$(date +%%s%%N)"
+docker tag %s:tilt "$DEV_REF"
+docker push "$DEV_REF"
+echo "Published $DEV_REF for Flux image discovery"
+''' % (
+        rerp_bin,
         image_name,
-        ('%s docker build-image-simple %s %s %s %s --suite %s --service %s' % (rerp_bin, image_name, dockerfile, hash_path, artifact_path, service['suite'], service['service'])
-         + ' && ' + _push_cmd),
+        dockerfile,
+        hash_path,
+        artifact_path,
+        service['suite'],
+        service['service'],
+        registry_image,
+        image_name,
+    )
+    local_resource(
+        'image-%s' % name,
+        _build_and_push,
         deps=[artifact_path, hash_path, dockerfile, service['config_dir'], service['doc_dir'], service['static_dir'], 'tooling/pyproject.toml'],
-        tag='tilt',
-        live_update=[
-            sync(artifact_path, '/app/service'),
-            sync(service['doc_dir'] + '/', '/app/doc/'),
-            sync(service['static_dir'] + '/', '/app/static_site/'),
-            run('kill -HUP 1', trigger=[artifact_path]),
-        ],
+        resource_deps=['build-base-image', 'copy-%s' % name],
+        labels=[name, 'images'],
+        allow_parallel=True,
     )
 
-    # 3. Deploy using Helm. Configuration is immutable image content; changing
-    # it rebuilds the image instead of attempting to write a ConfigMap mount.
-    _helm_values = [
-        service['helm_values'],
-        './helm/rerp-microservice/values/_database-shared-k8s.yaml',
-        './helm/rerp-microservice/values/_redis-shared-k8s.yaml',
-        './helm/rerp-microservice/values/_sesame-idam-shared-k8s.yaml',
-    ]
-    k8s_yaml(helm(
-        './helm/rerp-microservice',
-        name=name,
-        namespace='rerp',
-        values=_helm_values,
-    ))
-
-    # 5. Kubernetes resource configuration
-    # Only BFF is reachable from the host (8080). Other microservices are ClusterIP.
-    _port_forwards = ['8080:%s' % SERVICE_HTTP_PORT] if name == 'bff' else []
-    k8s_resource(
-        name,
-        port_forwards=_port_forwards,
-        resource_deps=['rerp-database-env', 'build-base-image', 'copy-%s' % name],
-        labels=[name],
-        auto_init=True,
-        trigger_mode=TRIGGER_MODE_AUTO,
-    )
-
-
-# ====================
-# Regular Services: lint → gen → build → deploy chain
-# ====================
-for service in REGULAR_SERVICES:
+for service in DELIVERED_SERVICES:
     create_microservice_lint(service)
     create_microservice_gen(service)
     create_microservice_stubs_resource(service)
@@ -389,75 +314,53 @@ for service in REGULAR_SERVICES:
 # All gens must complete before any build (so workspace members exist)
 local_resource(
     'rerp-all-gens',
-    'echo "✅ All RERP accounting codegen complete"',
-    resource_deps=['%s-service-gen' % service['resource_name'] for service in REGULAR_SERVICES],
+    'echo "✅ Delivered RERP Accounting codegen complete"',
+    resource_deps=['%s-service-gen' % service['resource_name'] for service in DELIVERED_SERVICES],
     labels=['all_gens'],
     allow_parallel=False,
 )
 
-for service in REGULAR_SERVICES:
+for service in DELIVERED_SERVICES:
     create_microservice_build_resource(service, ['rerp-all-gens'])
-    create_microservice_deployment(service)
+    create_microservice_image(service)
 
-
-# ====================
-# Backend for Frontend (BFF) — Dynamically Generated
-# ====================
-# The BFF spec aggregates all accounting microservice paths and is automatically
-# regenerated whenever any sub-service OpenAPI spec changes.
-# Chain: bff-spec-gen → bff-lint → bff-gen → bff-build → bff-deploy
-
-# 1. BFF spec generation: reads all bff-suite-config.yaml + sub-service specs → openapi_bff.yaml
-#    Uses rerp bff generate-system which reads openapi/accounting/bff-suite-config.yaml
-#    and merges every sub-service spec into openapi/accounting/openapi_bff.yaml
+# Database migration image. Flux runs this as a gated Job before reconciling
+# the service Helm releases; Tilt only publishes the content-addressed image.
+DB_INIT_IMAGE = 'rerp-accounting-db-init'
+DB_INIT_DOCKERFILE = 'docker/jobs/Dockerfile'
+DB_INIT_REF = '%s/%s' % (SHARED_K8S_REGISTRY, DB_INIT_IMAGE)
+DB_INIT_BUILD = '''set -eu
+docker build --build-arg RERP_SUITE=accounting -f %s -t %s:tilt .
+DEV_REF="%s:dev-$(date +%%s%%N)"
+docker tag %s:tilt "$DEV_REF"
+docker push "$DEV_REF"
+echo "Published $DEV_REF for Flux image discovery"
+''' % (DB_INIT_DOCKERFILE, DB_INIT_IMAGE, DB_INIT_REF, DB_INIT_IMAGE)
 local_resource(
-    'bff-spec-gen',
-    cmd='''
-        set -e
-        echo "🔄 Regenerating RERP Accounting BFF OpenAPI spec..."
-        %s bff generate-system --suite accounting
-        echo "✅ RERP Accounting BFF spec regeneration complete"
-    ''' % (rerp_bin,),
+    'image-%s' % DB_INIT_IMAGE,
+    DB_INIT_BUILD,
     deps=[
-        './openapi/accounting/bff-suite-config.yaml',
-    ] + [service['spec_path'] for service in REGULAR_SERVICES if service['suite'] == 'accounting'],
-    ignore=[
-        './openapi/accounting/openapi_bff.yaml',  # Don't watch the generated file
+        DB_INIT_DOCKERFILE,
+        'microservices/accounting/scripts/db-init-job.sh',
+        'microservices/accounting/migrations',
+        'microservices/accounting/sql',
     ],
-    resource_deps=['build-tooling'],
-    labels=['bff'],
+    labels=['database', 'images'],
     allow_parallel=True,
 )
 
-# 2. BFF lint
+# Passive post-deploy acceptance. This extracts the useful watch/rollout cycle
+# from the Skaffold-era script without giving Tilt deployment ownership.
 local_resource(
-    'bff-lint',
-    cmd='''
-        set -e
-        echo "🔍 Linting BFF OpenAPI spec..."
-        %s/target/debug/brrtrouter-gen lint \
-            --spec ./openapi/accounting/openapi_bff.yaml \
-            --fail-on-error || \
-        cargo run --manifest-path %s/Cargo.toml --bin brrtrouter-gen -- \
-            lint \
-            --spec ./openapi/accounting/openapi_bff.yaml \
-            --fail-on-error
-        echo "✅ BFF OpenAPI spec linting passed"
-    ''' % (brrtrouter_root, brrtrouter_root),
-    deps=['./openapi/accounting/openapi_bff.yaml'],
-    resource_deps=['bff-spec-gen'],
-    labels=['bff'],
-    allow_parallel=True,
+    'accept-accounting-deployment',
+    ('python3 microservices/accounting/scripts/validate-deployment.py '
+     + '--kubeconfig "%s" --timeout 600' % SHARED_K8S_KUBECONFIG),
+    deps=[
+        'microservices/accounting/scripts/validate-deployment.py',
+        'deployment-configuration/profiles/dev/rerp/accounting',
+    ],
+    labels=['acceptance', 'deploy'],
+    trigger_mode=TRIGGER_MODE_MANUAL,
+    auto_init=False,
+    allow_parallel=False,
 )
-
-# 3. BFF gen → 4. build → 5. deploy (uses the same descriptor-driven chain)
-for service in BFF_SERVICES:
-    create_microservice_gen(service)
-    create_microservice_stubs_resource(service)
-    create_microservice_build_resource(service, ['%s-service-gen' % service['resource_name']])
-    create_microservice_deployment(service)
-
-
-# ====================
-# Frontend (nginx) is managed externally (not part of this Tiltfile)
-# To deploy the frontend, manage it in its own workspace or add the k8s manifests here.

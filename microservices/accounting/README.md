@@ -5,6 +5,23 @@ runtime code, persistence models, migrations, SQL controls, tests, and
 operational assets. RERP hosts multiple suites, so Accounting-specific assets
 must not be added at the repository root.
 
+## Dev deployment boundary
+
+The delivered Flux slice is deliberately narrower than the source inventory:
+General Ledger and Invoice only. The RERP profile owns runtime configuration,
+completion-gated PostgreSQL/MinIO bootstrap, and those two Helm releases under
+`deployment-configuration/profiles/dev/rerp/accounting/`. Tilt generates and
+builds the delivered code and publishes images; it applies no Kubernetes
+resources. Generated-era services are not deployable merely because a runtime
+descriptor or Helm values file exists.
+
+After Flux reconciliation, trigger `accept-accounting-deployment` in Tilt. The
+suite-local Python watcher verifies the two ordered Flux Kustomizations, both
+bootstrap Jobs, ImagePolicy-to-pod image convergence, Deployment availability,
+and `/health` through the Kubernetes service proxy. It is deliberately passive:
+a failed check reports controller drift without turning Tilt back into a
+deployer.
+
 ## Current persistence status
 
 This README and its diagrams were reconciled against the effective
@@ -712,8 +729,20 @@ cargo run -p rerp_migrator --features accounting -- \
   validate --suite accounting --migration-history
 ```
 
-Database setup is location-independent:
+Database setup uses the shared cluster's PostgreSQL HA primary. Reconcile the
+SOPS profiles `deployment-configuration/profiles/dev/rerp/accounting` in RERP
+and `dev/postgres-ha` in `shared-gitops-k8s-cluster` first; the former owns
+RERP's ConfigMap and least-privilege Secrets, while the latter supplies the
+matching Pgpool custom user. The initializer discovers the elected primary, creates/updates the role,
+database and schema, applies the Accounting migration order, seeds, and grants:
 
 ```bash
+export KUBECONFIG=../shared-k8s-cluster/kubeconfig/shared-k8s.yaml
 ./microservices/accounting/scripts/setup-db.sh
 ```
+
+Tilt runs this initializer once after the GitOps profile is present and makes
+all Accounting workloads depend on its success. Re-trigger `rerp-db-init`
+after migration changes. The final gate authenticates through Pgpool and runs
+`SELECT 1`; source-Secret presence alone is not treated as readiness. No
+database password is stored in RERP source.

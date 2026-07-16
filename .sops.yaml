@@ -1,0 +1,12 @@
+# RERP product deployment profiles. The dev recipient is the shared-k8s Flux
+# age identity; private key material remains on ms02 and in flux-system.
+creation_rules:
+  - path_regex: deployment-configuration/profiles/.*/.*\.secrets\.env$
+    key_groups:
+      - age:
+          - age1lh3s2uyxrqu0u7hqgulnd43q3v0xvktukq3fcxuu6gw97uye59rqgjsd07
+  - path_regex: deployment-configuration/profiles/.*/.*\.secret\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    key_groups:
+      - age:
+          - age1lh3s2uyxrqu0u7hqgulnd43q3v0xvktukq3fcxuu6gw97uye59rqgjsd07

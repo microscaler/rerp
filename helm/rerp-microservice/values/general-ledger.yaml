@@ -11,3 +11,8 @@ deployment:
 app:
   binaryName: general_ledger
   serviceName: general-ledger
+
+# Typed Lifeguard queries, RLS transaction setup, journal validation, and trial
+# balance serialization require more than the shared coroutine-stack baseline.
+env:
+  BRRTR_STACK_SIZE: "0x40000"

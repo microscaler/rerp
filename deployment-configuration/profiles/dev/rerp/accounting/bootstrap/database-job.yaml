@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rerp-accounting-db-init
+  labels:
+    app.kubernetes.io/name: rerp-accounting-db-init
+    app.kubernetes.io/part-of: rerp
+    app.kubernetes.io/component: database-bootstrap
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rerp-accounting-db-init
+        app.kubernetes.io/part-of: rerp
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-init
+          image: 10.177.76.220:5000/rerp-accounting-db-init:dev-1784194011278956251 # {"$imagepolicy": "flux-system:rerp-accounting-db-init"}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PGHOST
+              value: postgres-ha-pgpool.data.svc.cluster.local
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres-password
+            - name: PGPOOL_CUSTOM_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: usernames
+            - name: PGPOOL_CUSTOM_PASSWORDS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: passwords
+            - name: RERP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rerp-accounting-bootstrap-db
+                  key: RERP_DB_PASSWORD
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

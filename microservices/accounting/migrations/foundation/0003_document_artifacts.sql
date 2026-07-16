@@ -1,6 +1,21 @@
 -- Immutable metadata for rendered Accounting documents held in private,
 -- content-addressed object storage. Object bytes never live in PostgreSQL.
 
+-- The tenant policy is the completion marker for this pre-ledger migration.
+-- A fresh application is transactional; a completed application is skipped.
+SELECT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = current_schema()
+      AND tablename = 'accounting_document_artifacts'
+      AND policyname = 'accounting_document_artifacts_tenant'
+) AS accounting_document_artifacts_installed \gset
+
+\if :accounting_document_artifacts_installed
+\echo 'Accounting document artifacts already installed; skipping 0003.'
+\else
+BEGIN;
+
 CREATE TABLE accounting_document_artifacts (
     id UUID PRIMARY KEY,
     tenant_id VARCHAR(200) NOT NULL,
@@ -54,3 +69,6 @@ CREATE POLICY accounting_document_artifacts_tenant ON accounting_document_artifa
 FOR ALL TO PUBLIC
 USING (tenant_id = public.sesame_current_tenant_id())
 WITH CHECK (tenant_id = public.sesame_current_tenant_id());
+
+COMMIT;
+\endif

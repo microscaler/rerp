@@ -1,0 +1,46 @@
+deployment:
+  replicas: 1
+  namespace: rerp
+
+image:
+  repository: 10.177.76.220:5000
+  pullPolicy: IfNotPresent
+
+app:
+  config:
+    security:
+      jwks:
+        bearerAuth:
+          jwks_url: http://identity-session-service.sesame-idam.svc.cluster.local:8080/idam/v1/.well-known/jwks.json
+          iss: https://idam.example.com
+          aud: sesame-idam
+          leeway_secs: 30
+          cache_ttl_secs: 300
+    http:
+      keep_alive: true
+      timeout_secs: 5
+      max_requests: 50000
+    database:
+      host: postgres.data.svc.cluster.local
+      port: 5432
+      name: rerp
+      user: rerp
+      max_connections: 10
+    redis:
+      host: redis.data.svc.cluster.local
+      port: 6379
+      db: 0
+      max_connections: 10
+    observability:
+      metrics_enabled: true
+      tracing_enabled: true
+      otlp_endpoint: http://otel-collector.observability.svc.cluster.local:4317
+
+env:
+  RUST_LOG: debug
+  RUST_BACKTRACE: "1"
+  BRRTR_LOG_FORMAT: json
+  BRRTR_LOG_SAMPLING_MODE: all
+  BRRTR_LOG_ASYNC: "true"
+  BRRTR_LOG_INCLUDE_LOCATION: "false"
+  BRRTR_STACK_SIZE: "0x40000"

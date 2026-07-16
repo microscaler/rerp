@@ -56,7 +56,8 @@ spec:
               value: {{ .Values.app.config.observability.otlp_endpoint | quote }}
             - name: OTEL_SERVICE_NAME
               value: {{ .Values.app.serviceName | quote }}
-            # Increase stack size for serving large static assets (64KB instead of 16KB default)
+            # May coroutine stack. This is a correctness setting, not a thread
+            # stack: undersizing terminates the process with SIGSEGV/code 139.
             - name: BRRTR_STACK_SIZE
               value: {{ .Values.env.BRRTR_STACK_SIZE | quote }}
 {{- with .Values.extraEnv }}

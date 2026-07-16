@@ -18,7 +18,10 @@
   narrow its public runtime and remove inactive implementations from
   build/deploy gates.
 - Current CI tests workspace libraries only and therefore misses stale binary implementations. An explicit active-binary gate remains open.
-- Tiltfile is intentionally empty at the restart checkpoint; runtime restoration belongs to Goals 2 and 3 after the build topology is trustworthy.
+- Tilt now discovers and deploys the delivered Accounting runtimes, waits for
+  the RERP-owned SOPS Accounting dev profile, initializes the database through
+  the elected PostgreSQL HA primary, and prevents services from starting before
+  database bootstrap succeeds.
 - Goal 5 Phase 1 runtime is delivered. The root workspace includes `rerp-accounting-core`, a pure in-process accounting kernel with tested decimal calculation, period locks, balanced customer-invoice posting, full credit notes, idempotency fingerprints and trial balance derivation.
 - ADR 001 fixes the first runtime boundary: the existing invoice process owns the invoice-to-GL transaction; GL is an in-process module, not a synchronous generated-service call or a new orchestrator.
 - The 37 legacy entities remain schema-only inventory. Nine new `accounting::foundation` models are typed `LifeModel + LifeRecord` persistence surfaces for legal entities, periods, accounts, posted documents/lines, journals/lines, idempotency and audit.
@@ -27,6 +30,9 @@
 - Validated Sesame claims become the complete Lifeguard context. Legal entity, period and control accounts are resolved inside one pinned RLS transaction.
 - A live non-superuser Rust acceptance proves post, balanced journal, same-payload retry, changed-payload conflict, retrieve and full credit note.
 - Database setup now installs the vendored Sesame RLS contract before accounting controls and grants the complete explicit v1 helper set to the runtime role.
+- Database and object-store credentials have moved out of RERP manifests into
+  separate least-privilege SOPS Secrets. Pgpool consumes the matching RERP
+  custom-user credential from the platform PostgreSQL HA profile.
 - Legal-entity/year advisory locking serializes document and journal numbering; the live acceptance proves two simultaneous postings receive distinct numbers.
 - The fifth Phase 1 route materializes a deterministic basic PDF from the immutable invoice snapshot, stores it content-addressed in private MinIO, records immutable artifact metadata, and returns a short-lived authorized download URL.
 - The basic renderer is a delivery baseline, not the target template system: it has a hard-coded ASCII layout and incomplete issuer/customer presentation facts.

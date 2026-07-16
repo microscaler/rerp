@@ -5,6 +5,22 @@
 -- Prerequisite: apply sql/rls/v1/install.sql and grant its functions to the
 -- runtime database role before application traffic is enabled.
 
+-- This hand-authored migration predates the migration ledger. Treat the final
+-- RLS policy as its completion marker so Tilt/database bootstrap can safely
+-- re-run it. The transaction ensures a new application is all-or-nothing.
+SELECT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = current_schema()
+      AND tablename = 'accounting_audit_events'
+      AND policyname = 'accounting_audit_events_tenant'
+) AS accounting_controls_installed \gset
+
+\if :accounting_controls_installed
+\echo 'Accounting controls and RLS already installed; skipping 0002.'
+\else
+BEGIN;
+
 ALTER TABLE accounting_accounts
     ADD CONSTRAINT accounting_accounts_legal_entity_scope_fk
     FOREIGN KEY (tenant_id, legal_entity_id)
@@ -246,3 +262,6 @@ CREATE POLICY accounting_audit_events_tenant ON accounting_audit_events
 FOR ALL TO PUBLIC
 USING (tenant_id = public.sesame_current_tenant_id())
 WITH CHECK (tenant_id = public.sesame_current_tenant_id());
+
+COMMIT;
+\endif

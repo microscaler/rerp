@@ -86,7 +86,10 @@ env:
   BRRTR_LOG_SAMPLING_MODE: "all"
   BRRTR_LOG_ASYNC: "true"
   BRRTR_LOG_INCLUDE_LOCATION: "false"
-  BRRTR_STACK_SIZE: "0x10000"
+  # May coroutine stack in bytes. 128 KiB is the safe shared baseline for
+  # BRRTRouter services which perform typed validation and database work.
+  # Heavier services override this to BRRTRouter's 256 KiB default maximum.
+  BRRTR_STACK_SIZE: "0x20000"
 
 # Internal service-to-service routing; expose only BFF/ingress where required.
 serviceType: ClusterIP
@@ -96,4 +99,3 @@ prometheus:
   enabled: true
   port: 8080
   path: "/metrics"
-

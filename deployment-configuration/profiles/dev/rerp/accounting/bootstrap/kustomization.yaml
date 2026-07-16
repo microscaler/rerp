@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Bootstrap runs beside the platform-owned PostgreSQL and MinIO administrator
+# Secrets. This avoids cross-namespace Secret access and any Kubernetes RBAC in
+# the jobs. The duplicated product credentials remain SOPS-encrypted at rest.
+namespace: data
+
+resources:
+  - database-job.yaml
+  - object-store-job.yaml
+
+configMapGenerator:
+  - name: rerp-accounting-bootstrap-config
+    envs:
+      - application.properties
+
+secretGenerator:
+  - name: rerp-accounting-bootstrap-db
+    envs:
+      - application.secrets.env
+  - name: rerp-accounting-bootstrap-object-store
+    envs:
+      - object-store.secrets.env
+
+generatorOptions:
+  disableNameSuffixHash: true
+  immutable: false

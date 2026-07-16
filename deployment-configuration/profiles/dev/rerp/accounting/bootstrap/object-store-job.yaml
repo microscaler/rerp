@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rerp-accounting-object-store-init
+  labels:
+    app.kubernetes.io/name: rerp-accounting-object-store-init
+    app.kubernetes.io/part-of: rerp
+    app.kubernetes.io/component: object-store-bootstrap
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rerp-accounting-object-store-init
+        app.kubernetes.io/part-of: rerp
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: object-store-init
+          image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+          imagePullPolicy: IfNotPresent
+          command: [/bin/sh, -c]
+          args:
+            - |
+              set -eu
+              alias_name=rerp-bootstrap
+              policy_name=rerp-accounting-documents
+              policy_file=/tmp/policy.json
+              deadline=$(( $(date +%s) + 300 ))
+              until mc alias set "${alias_name}" "${MINIO_ENDPOINT}" \
+                "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}" >/dev/null 2>&1; do
+                if [ "$(date +%s)" -ge "${deadline}" ]; then
+                  echo "MinIO did not become ready within 300s" >&2
+                  exit 1
+                fi
+                sleep 2
+              done
+              mc mb --ignore-existing "${alias_name}/${RERP_OBJECT_STORE_BUCKET}" >/dev/null
+              cat >"${policy_file}" <<POLICY
+              {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                    "Resource": ["arn:aws:s3:::${RERP_OBJECT_STORE_BUCKET}"]
+                  },
+                  {
+                    "Effect": "Allow",
+                    "Action": ["s3:GetObject", "s3:PutObject"],
+                    "Resource": ["arn:aws:s3:::${RERP_OBJECT_STORE_BUCKET}/*"]
+                  }
+                ]
+              }
+              POLICY
+              mc admin policy create "${alias_name}" "${policy_name}" "${policy_file}" >/dev/null
+              mc admin user add "${alias_name}" \
+                "${RERP_OBJECT_STORE_ACCESS_KEY}" "${RERP_OBJECT_STORE_SECRET_KEY}" >/dev/null
+              mc admin policy attach "${alias_name}" "${policy_name}" \
+                --user "${RERP_OBJECT_STORE_ACCESS_KEY}" >/dev/null
+              mc stat "${alias_name}/${RERP_OBJECT_STORE_BUCKET}" >/dev/null
+              echo "RERP Accounting object store bootstrap complete"
+          env:
+            - name: MINIO_ENDPOINT
+              value: http://minio.data.svc.cluster.local:9000
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: rootUser
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: rootPassword
+            - name: RERP_OBJECT_STORE_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: rerp-accounting-bootstrap-config
+                  key: RERP_OBJECT_STORE_BUCKET
+            - name: RERP_OBJECT_STORE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rerp-accounting-bootstrap-object-store
+                  key: access-key
+            - name: RERP_OBJECT_STORE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rerp-accounting-bootstrap-object-store
+                  key: secret-key
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi

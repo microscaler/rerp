@@ -12,17 +12,14 @@ app:
   binaryName: invoice
   serviceName: invoice
 
+# Invoice posting combines typed request validation, Lifeguard/RLS persistence,
+# journal construction, and document/object-store work in handler coroutines.
+env:
+  BRRTR_STACK_SIZE: "0x40000"
+
 extraEnv:
-  - name: RERP_OBJECT_STORE_ENDPOINT
-    value: http://minio.data.svc.cluster.local:9000
-  - name: RERP_OBJECT_STORE_PUBLIC_ENDPOINT
-    value: http://10.177.76.226:9000
-  - name: RERP_OBJECT_STORE_REGION
-    value: us-east-1
-  - name: RERP_OBJECT_STORE_BUCKET
-    value: rerp-accounting-documents
-  - name: RERP_OBJECT_STORE_PRESIGN_SECONDS
-    value: "300"
+  # Non-secret object-store settings come from the GitOps-owned
+  # rerp-database-config ConfigMap loaded through envFrom.
   - name: RERP_OBJECT_STORE_ACCESS_KEY
     valueFrom:
       secretKeyRef:
