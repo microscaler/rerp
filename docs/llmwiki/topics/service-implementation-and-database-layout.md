@@ -158,6 +158,12 @@ seed discovery, installation, and deployment must all include the suite.
 > five undelivered predecessor models were retired, and migrator coverage
 > prevents a second ledger schema from returning.
 
+> **Delivered narrow slice:** General Ledger publishes only four read operations
+> over that foundation. BRRTRouter-validated Sesame claims plus the exact
+> `accounting:ledger:read` permission establish a Lifeguard RLS transaction;
+> generated mock controllers are not registered. Trial balance is derived from
+> immutable lines rather than a stored balance table.
+
 > **Open:** RERP's final database bootstrap/apply flow should be documented once
 > the top-level migrator owns `generate`, `validate`, `plan`, `apply`, and
 > `status` for explicitly selected suites.

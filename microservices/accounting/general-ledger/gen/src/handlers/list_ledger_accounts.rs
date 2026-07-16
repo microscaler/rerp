@@ -2,7 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::FiscalPeriod;
+use crate::handlers::types::LedgerAccount;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
@@ -11,16 +11,16 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "state")]
-    pub state: Option<String>,
+    #[serde(rename = "account_type")]
+    pub account_type: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "from_date")]
-    pub from_date: Option<String>,
+    #[serde(rename = "currency_code")]
+    pub currency_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "to_date")]
-    pub to_date: Option<String>,
+    #[serde(rename = "active")]
+    pub active: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
@@ -31,7 +31,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "items")]
-    pub items: Vec<FiscalPeriod>,
+    pub items: Vec<LedgerAccount>,
 
     #[serde(rename = "limit")]
     pub limit: i32,
@@ -45,11 +45,11 @@ impl TryFrom<HandlerRequest> for Request {
 
         let mut data_map = Map::new();
 
-        if let Some(v) = req.get_query_param("state") {
+        if let Some(v) = req.get_query_param("account_type") {
             data_map.insert(
-                "state".to_string(),
+                "account_type".to_string(),
                 brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["OPEN","CLOSED","HARD_LOCKED"],"type":"string"})),None,None,
+                    v,Some(&serde_json::json!({"enum":["ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE"],"type":"string"})),None,None,
                 ),
             );
         } else {
@@ -57,12 +57,12 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("from_date") {
+        if let Some(v) = req.get_query_param("currency_code") {
             data_map.insert(
-                "from_date".to_string(),
+                "currency_code".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    Some(&serde_json::json!({"pattern":"^[A-Z]{3}$","type":"string"})),
                     None,
                     None,
                 ),
@@ -72,12 +72,12 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("to_date") {
+        if let Some(v) = req.get_query_param("active") {
             data_map.insert(
-                "to_date".to_string(),
+                "active".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    Some(&serde_json::json!({"default":true,"type":"boolean"})),
                     None,
                     None,
                 ),
@@ -118,5 +118,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::list_fiscal_periods::handle(req)
+    crate::controllers::list_ledger_accounts::handle(req)
 }

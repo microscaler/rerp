@@ -24,19 +24,41 @@ against by a migrator test.
 
 ## Runtime status
 
-The broad OpenAPI and generated controller tree remain research/scaffold
-surface. Their example handlers are not a delivered General Ledger runtime and
-must not be enabled in Tilt, Helm, or the Accounting BFF.
+The first read-only General Ledger runtime slice is delivered through the
+canonical `openapi/accounting/general-ledger/openapi.yaml` contract:
 
-The next runtime slice will narrow the canonical General Ledger contract to
-authenticated, tenant-safe account, journal, fiscal-period, and trial-balance
-capabilities backed by the Accounting foundation. Posted entries will remain
-immutable; corrections use reversal workflows.
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/v1/accounts` | List configured posting accounts with bounded filters. |
+| `GET` | `/v1/fiscal-periods` | List periods overlapping an optional date range. |
+| `GET` | `/v1/journal-entries/{id}` | Retrieve one immutable journal and its ordered lines. |
+| `GET` | `/v1/trial-balance` | Derive an as-of-date, single-currency trial balance from posted lines. |
+
+BRRTRouter validates the Sesame bearer token. The implementation requires the
+exact `accounting:ledger:read` permission, converts the validated tenant,
+organization, subject, and session claims into a Lifeguard `SessionContext`,
+and installs that context in a pinned PostgreSQL transaction. Queries apply an
+explicit tenant and legal-entity predicate in addition to database RLS.
+
+The trial balance is not another stored balance. It validates every selected
+journal independently, rejects unknown sides, non-positive lines, header/line
+total drift, and account/currency-book inconsistencies, then derives balances
+from immutable lines. Zero-balance accounts are opt-in.
+
+The retired broad contract remains product research only. Generic raw journal
+posting, mutable balances, period close/reopen, reversal, opening balances, and
+multi-dimensional reporting are not delivered by this slice and are not
+published as active handlers. Generated artifacts remain disposable; business
+logic lives only in `impl/`.
 
 ## Verification
 
 ```bash
+~/Workspace/microscaler/BRRTRouter/target/debug/brrtrouter-gen lint \
+  --spec openapi/accounting/general-ledger/openapi.yaml
+
 cd microservices
+cargo test -p rerp_accounting_general_ledger --no-default-features
 cargo test -p rerp_migrator --features accounting
 cargo run -p rerp_migrator --features accounting -- \
   validate --suite accounting --migration-history

@@ -117,7 +117,7 @@ worktree before implementation.
 | Entity ownership | Structural drift | Duplicate Accounting models and suite/service overlap must be reconciled. |
 | Top-level migrator | Structural drift | It compiles but retains flat Hauliage paths, all-suite coupling, and repository-root output. |
 | Invoice | Partial | Re-audit the corrected worktree; prove generated HTTPS client and handoff to Documents Render. |
-| General Ledger | Partial/scaffold mixture | One authoritative foundation ledger is established; narrow the broad HTTP scaffold and deliver tenant-safe account, period, journal, reversal, and trial-balance behavior. |
+| General Ledger | Partial | One authoritative foundation ledger and a four-route tenant-safe read API are delivered; account/period mutation, posting, reversal, opening balances, and scale acceptance remain. |
 | Accounts Receivable | Scaffold only | Deliver customer ledger, receipts, allocations, aging, and statements. |
 | Accounts Payable | Scaffold only | Deliver supplier bills, approvals, payments, allocations, and aging. |
 | Bank Sync | Scaffold only | Deliver bank accounts, statement ingestion, matching, reconciliation, and connector contract. |
@@ -205,7 +205,24 @@ all Accounting subledgers post through without bypassing controls.
 
 ### Required capabilities
 
-- [ ] Legal entity and accounting configuration resolution.
+Delivered Phase 1 inspection slice:
+
+- [x] Canonical OpenAPI is narrowed to four honest read operations; broad
+      generated-era CRUD and report mocks are not registered.
+- [x] Sesame identity and the exact `accounting:ledger:read` permission establish
+      tenant, organization, and legal-entity scope for a Lifeguard RLS
+      transaction.
+- [x] Account and fiscal-period inspection use typed foundation entities and
+      bounded filters.
+- [x] Immutable journal retrieval validates ordered lines against header totals.
+- [x] As-of-date, single-currency trial balance is derived from journal lines and
+      validates every source journal before aggregation.
+- [x] Canonical regeneration is deterministic and the implementation test suite
+      covers identity and accounting-integrity boundaries.
+
+Remaining capability breadth:
+
+- [x] Legal entity and accounting configuration resolution.
 - [ ] Chart of accounts and account lifecycle, type, currency, and posting
       controls.
 - [ ] Fiscal periods with open, close, reopen, and hard-lock semantics.
@@ -223,7 +240,8 @@ all Accounting subledgers post through without bypassing controls.
 - [ ] Closed/hard-locked periods reject new posting under concurrency.
 - [ ] Reversal links to the original and preserves both audit histories.
 - [ ] Another tenant cannot read, post, reverse, or infer ledger facts.
-- [ ] Trial balance is derived from posted lines and agrees with source journals.
+- [x] The delivered as-of-date, single-currency trial balance is derived from
+      posted lines and rejects independently invalid source journals.
 - [x] No service owns a second copy of the canonical account/journal models.
 
 ## WP2 — Customer Invoice Hardening

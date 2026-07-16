@@ -1,13 +1,13 @@
-// User-owned controller for handler 'list_fiscal_periods'.
+// User-owned controller for handler 'list_ledger_accounts'.
 
-use crate::handlers::list_fiscal_periods::{Request, Response};
+use crate::handlers::list_ledger_accounts::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
-use crate::handlers::types::FiscalPeriod;
+use crate::handlers::types::LedgerAccount;
 
-#[handler(ListFiscalPeriodsController)]
+#[handler(ListLedgerAccountsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     Response {
         items: vec![],

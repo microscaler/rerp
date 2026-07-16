@@ -2,8 +2,8 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::JournalLine;
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -16,7 +16,37 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "entry_date")]
+    pub entry_date: String,
+
+    #[serde(rename = "entry_number")]
+    pub entry_number: String,
+
+    #[serde(rename = "fiscal_period_id")]
+    pub fiscal_period_id: String,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<JournalLine>,
+
+    #[serde(rename = "posted_at")]
+    pub posted_at: String,
+
+    #[serde(rename = "source_document_id")]
+    pub source_document_id: String,
+
+    #[serde(rename = "total_credit")]
+    pub total_credit: String,
+
+    #[serde(rename = "total_debit")]
+    pub total_debit: String,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -58,6 +88,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
     crate::controllers::get_journal_entry::handle(req)
 }

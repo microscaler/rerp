@@ -2,7 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::FiscalPeriod;
+use crate::handlers::types::TrialBalanceLine;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
@@ -10,31 +10,40 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "state")]
-    pub state: Option<String>,
+    #[serde(rename = "as_of_date")]
+    pub as_of_date: String,
+
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "from_date")]
-    pub from_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "to_date")]
-    pub to_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "limit")]
-    pub limit: Option<i32>,
+    #[serde(rename = "include_zero_balance")]
+    pub include_zero_balance: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "items")]
-    pub items: Vec<FiscalPeriod>,
+    #[serde(rename = "as_of_date")]
+    pub as_of_date: String,
 
-    #[serde(rename = "limit")]
-    pub limit: i32,
+    #[serde(rename = "balanced")]
+    pub balanced: bool,
+
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "difference")]
+    pub difference: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<TrialBalanceLine>,
+
+    #[serde(rename = "total_credit")]
+    pub total_credit: String,
+
+    #[serde(rename = "total_debit")]
+    pub total_debit: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -45,21 +54,9 @@ impl TryFrom<HandlerRequest> for Request {
 
         let mut data_map = Map::new();
 
-        if let Some(v) = req.get_query_param("state") {
+        if let Some(v) = req.get_query_param("as_of_date") {
             data_map.insert(
-                "state".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["OPEN","CLOSED","HARD_LOCKED"],"type":"string"})),None,None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("from_date") {
-            data_map.insert(
-                "from_date".to_string(),
+                "as_of_date".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
                     Some(&serde_json::json!({"format":"date","type":"string"})),
@@ -68,30 +65,33 @@ impl TryFrom<HandlerRequest> for Request {
                 ),
             );
         } else {
-
-            // optional parameter
+            return Err(anyhow::anyhow!("Missing required parameter 'as_of_date'"));
         }
 
-        if let Some(v) = req.get_query_param("to_date") {
+        if let Some(v) = req.get_query_param("currency_code") {
             data_map.insert(
-                "to_date".to_string(),
+                "currency_code".to_string(),
                 brrtrouter::server::request::decode_param_value(
                     v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    Some(&serde_json::json!({"pattern":"^[A-Z]{3}$","type":"string"})),
                     None,
                     None,
                 ),
             );
         } else {
-
-            // optional parameter
+            return Err(anyhow::anyhow!(
+                "Missing required parameter 'currency_code'"
+            ));
         }
 
-        if let Some(v) = req.get_query_param("limit") {
+        if let Some(v) = req.get_query_param("include_zero_balance") {
             data_map.insert(
-                "limit".to_string(),
+                "include_zero_balance".to_string(),
                 brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"default":50,"maximum":100,"minimum":1,"type":"integer"})),None,None,
+                    v,
+                    Some(&serde_json::json!({"default":false,"type":"boolean"})),
+                    None,
+                    None,
                 ),
             );
         } else {
@@ -118,5 +118,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
-    crate::controllers::list_fiscal_periods::handle(req)
+    crate::controllers::get_trial_balance::handle(req)
 }

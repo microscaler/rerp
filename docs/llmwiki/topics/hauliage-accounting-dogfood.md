@@ -36,8 +36,16 @@
   accidentally regenerated the broad research contract over the five-route
   runtime. Regeneration is now deterministic and targeted tests compile again.
 - General Ledger no longer owns the five undelivered predecessor tables. The
-  RLS-protected `accounting_*` foundation is the only authoritative ledger; the
-  broad GL HTTP surface remains scaffold until narrowed and implemented.
+  RLS-protected `accounting_*` foundation is the only authoritative ledger.
+- The canonical General Ledger API is now a four-route read-only slice for
+  accounts, fiscal periods, immutable journal retrieval, and an as-of-date
+  single-currency trial balance. The runtime requires
+  `accounting:ledger:read`, installs the Sesame identity as Lifeguard RLS
+  context, and never registers generated mocks.
+- Trial balance is computed from immutable lines after every selected journal
+  passes independent header/line and debit/credit integrity checks. Account and
+  period mutation, generic posting/reversal, opening balances, dimensions, and
+  scale acceptance remain WP1 work.
 
 ## What It Is
 

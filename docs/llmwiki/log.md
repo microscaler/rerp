@@ -382,3 +382,20 @@ migrations.
   fails in inactive generated-era AP, banking, GL, EDI, and BFF implementation
   stubs; those are to be removed by service narrowing, not patched into fake
   success handlers.
+
+## [2026-07-16] implement | Deliver narrow General Ledger inspection runtime
+
+- Replaced the 72-operation generated-era General Ledger contract with four
+  canonical read operations for accounts, fiscal periods, immutable journal
+  retrieval, and as-of-date single-currency trial balance.
+- Removed the inactive impl-controller tree and registered only protected,
+  human-owned controllers; generated mock handlers are not part of the runtime.
+- Added Sesame-to-Lifeguard identity handling, exact
+  `accounting:ledger:read` authorization, transaction-scoped RLS, and explicit
+  tenant/legal-entity query predicates.
+- Derived trial balance from authoritative immutable lines and added integrity
+  checks preventing invalid individual journals from cancelling out only at
+  aggregate level.
+- Confirmed OpenAPI lint, deterministic regeneration, and nine focused runtime
+  tests. Mutation, posting/reversal, opening-balance, dimension, and scale gates
+  remain in WP1.

@@ -6,6 +6,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
+#![allow(unused_imports)]
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
@@ -18,11 +19,15 @@ use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRe
 use clap::Parser;
 // Use generated code from gen crate
 use rerp_accounting_general_ledger_gen::handlers::*;
-use rerp_accounting_general_ledger_gen::registry;
 use rerp_accounting_general_ledger_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
+mod database;
+mod http_support;
+mod identity;
+mod impl_registry;
+mod ledger;
 use controllers::*;
 use std::fs;
 use std::io;
@@ -147,6 +152,11 @@ fn main() -> io::Result<()> {
         brrtrouter::otel::init_logging_with_config(&brrtrouter::otel::LogConfig::from_env())
     {
         eprintln!("[logging][error] failed to init tracing subscriber: {e}");
+    }
+
+    if let Err(error) = database::initialize() {
+        eprintln!("[database][error] {error}");
+        return Err(io::Error::other(error));
     }
 
     let args = Args::parse();
@@ -310,16 +320,10 @@ fn main() -> io::Result<()> {
     if let Some(ref cors) = cors_middleware {
         dispatcher.add_middleware(cors.clone());
     }
-    // NOTE: This registers controllers from gen crate. We need to register impl controllers instead.
-    // TODO: Update to register impl controllers
-    // TODO: Register impl controllers instead of gen controllers
-    // The registry::register_from_spec uses gen controllers (crate::controllers in gen crate)
-    // We need to register impl controllers. Options:
-    // 1. Create a local register_impl_controllers function
-    // 2. Modify registry to accept controllers as parameter
-    // For now, using gen registry (will use gen controller stubs, not impl business logic)
+    // Register only protected implementation controllers. Generated mock handlers
+    // are deliberately not part of the delivered General Ledger runtime.
     unsafe {
-        registry::register_from_spec(&mut dispatcher, &routes);
+        impl_registry::register_impl(&mut dispatcher, &routes);
     }
 
     // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is
