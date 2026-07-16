@@ -18,6 +18,8 @@ build and passive acceptance inner loop; it is not a second deployer.
 - Deployment conventions suitable for both dog-food and external open-source operators.
 - A Flux-owned suspended catalog for source components that have not passed
   functional delivery gates.
+- Scoped Flux image automation that promotes discovered RERP dev tags through
+  auditable commits to the product-owned deployment profile.
 
 ## Initial Acceptance Gates
 

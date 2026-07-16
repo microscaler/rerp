@@ -57,9 +57,11 @@ remain suspended with no Deployment. It also verifies BRRTRouter metric samples,
 structured JSON logging, and the cluster OpenTelemetry collector target; it
 never deploys or forces reconciliation. Flux owns configuration, bootstrap,
 Helm releases, rollout and drift correction. ImageRepository/ImagePolicy
-objects discover the monotonic `dev-<nanoseconds>` tags. Automated Git writes remain deliberately
-disabled until a scoped RERP write deploy key is provisioned; see the shared
-cluster's `docs/product-image-automation.md`.
+objects discover the monotonic `dev-<nanoseconds>` tags. Automated Git writes
+are enabled only for image-policy markers under this RERP dev profile. The
+automation uses the Flux-owned `gitops-auth` machine credential and cannot
+update paths outside `deployment-configuration/profiles/dev/rerp`; see the
+shared cluster's `docs/product-image-automation.md`.
 
 Encrypt and inspect secrets only on ms02:
 
