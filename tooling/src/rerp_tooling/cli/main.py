@@ -194,7 +194,9 @@ def _run_microservice_build(argv, project_root=None):
     root = Path(project_root or _project_root())
     service = argv[1] if len(argv) > 1 else ""
     if not service:
-        print("Usage: rerp build microservice <service> [--suite SUITE] [--release]", file=sys.stderr)
+        print(
+            "Usage: rerp build microservice <service> [--suite SUITE] [--release]", file=sys.stderr
+        )
         return 2
 
     suite, remaining = _strip_option(argv[2:], "--suite")
@@ -295,13 +297,19 @@ def _run_rerp_docker(argv, project_root=None):
     if subcommand == "build-base":
         unknown = [item for item in rest if item != "--dry-run"]
         if unknown:
-            print("build-base only supports --dry-run; service images are pushed by Tilt", file=sys.stderr)
+            print(
+                "build-base only supports --dry-run; service images are pushed by Tilt",
+                file=sys.stderr,
+            )
             return 2
         return build_base_image(root, dry_run="--dry-run" in rest)
 
     if subcommand == "copy-binary":
         if len(rest) != 3:
-            print("Usage: rerp docker copy-binary <source> <destination> <binary-name>", file=sys.stderr)
+            print(
+                "Usage: rerp docker copy-binary <source> <destination> <binary-name>",
+                file=sys.stderr,
+            )
             return 2
         from brrtrouter_tooling.docker.copy_binary import run as run_copy_binary
 
@@ -611,7 +619,11 @@ def main():
 
     elif cmd == "services":
         include_all = "--all" in rest
-        print(json.dumps(discover_services(_project_root(), require_helm=not include_all), sort_keys=True))
+        print(
+            json.dumps(
+                discover_services(_project_root(), require_helm=not include_all), sort_keys=True
+            )
+        )
 
     elif cmd == "bff":
         if rest and rest[0] == "generate-system":

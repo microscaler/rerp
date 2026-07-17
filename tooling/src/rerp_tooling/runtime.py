@@ -219,9 +219,14 @@ def stage_multiarch_context(
         architecture: artifacts / architecture / binary
         for architecture in ("amd64", "arm64", "arm")
     }
-    missing = [path for path in inputs.values() if not path.exists() or not Path(f"{path}.sha256").exists()]
+    missing = [
+        path for path in inputs.values() if not path.exists() or not Path(f"{path}.sha256").exists()
+    ]
     if missing:
-        print("missing multi-architecture image input: " + ", ".join(map(str, missing)), file=os.sys.stderr)
+        print(
+            "missing multi-architecture image input: " + ", ".join(map(str, missing)),
+            file=os.sys.stderr,
+        )
         return 1
 
     if destination_path.exists():
@@ -244,7 +249,9 @@ def stage_multiarch_context(
     _copy_tree_or_empty(_resolve(root, descriptor["doc_dir"]), destination_path / "doc")
     _copy_tree_or_empty(_resolve(root, descriptor["static_dir"]), destination_path / "static_site")
     shutil.copy2(root / "docker" / "microservices" / "Dockerfile", destination_path / "Dockerfile")
-    (destination_path / "artifact-sha256.json").write_text(json.dumps(digests, sort_keys=True) + "\n")
+    (destination_path / "artifact-sha256.json").write_text(
+        json.dumps(digests, sort_keys=True) + "\n"
+    )
     return 0
 
 

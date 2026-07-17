@@ -53,9 +53,7 @@ def test_gen_stubs_forwards_full_gen_command(monkeypatch) -> None:
 
     cli.main()
 
-    assert forwarded == [
-        ["brrtrouter", "gen", "stubs", "documents", "render", "--force"]
-    ]
+    assert forwarded == [["brrtrouter", "gen", "stubs", "documents", "render", "--force"]]
 
 
 def test_microservice_build_is_debug_by_default(monkeypatch, tmp_path: Path) -> None:
@@ -63,10 +61,7 @@ def test_microservice_build_is_debug_by_default(monkeypatch, tmp_path: Path) -> 
     monkeypatch.setattr(
         cli,
         "build_microservice",
-        lambda root, suite, service, release: observed.append(
-            (root, suite, service, release)
-        )
-        or 0,
+        lambda root, suite, service, release: observed.append((root, suite, service, release)) or 0,
     )
 
     result = cli._run_microservice_build(

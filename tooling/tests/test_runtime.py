@@ -12,9 +12,7 @@ def _service(root: Path, suite: str, service: str, package: str, binary: str) ->
     (gen / "doc").mkdir(parents=True)
     (gen / "static_site").mkdir()
     (gen / "config").mkdir()
-    (gen / "Cargo.toml").write_text(
-        f'[package]\nname = "{package}_gen"\nversion = "0.1.0"\n'
-    )
+    (gen / "Cargo.toml").write_text(f'[package]\nname = "{package}_gen"\nversion = "0.1.0"\n')
     impl = root / "microservices" / suite / service / "impl"
     impl.mkdir(parents=True)
     (impl / "Cargo.toml").write_text(
@@ -136,9 +134,12 @@ def test_stage_multiarch_context_selects_each_architecture_binary(tmp_path: Path
         artifact.write_bytes(architecture.encode())
         Path(f"{artifact}.sha256").write_text(hashlib.sha256(artifact.read_bytes()).hexdigest())
 
-    assert runtime.stage_multiarch_context(
-        tmp_path, ".docker-context/invoice", artifacts, "accounting", "invoice"
-    ) == 0
+    assert (
+        runtime.stage_multiarch_context(
+            tmp_path, ".docker-context/invoice", artifacts, "accounting", "invoice"
+        )
+        == 0
+    )
 
     context = tmp_path / ".docker-context" / "invoice"
     assert (context / "amd64" / "service").read_bytes() == b"amd64"
