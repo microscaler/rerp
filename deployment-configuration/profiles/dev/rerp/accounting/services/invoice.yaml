@@ -32,7 +32,7 @@ spec:
       name: invoice
     image:
       name: rerp-accounting-invoice
-      tag: dev-1784245632630534792 # {"$imagepolicy": "flux-system:rerp-accounting-invoice:tag"}
+      tag: dev-1784246722213265751 # {"$imagepolicy": "flux-system:rerp-accounting-invoice:tag"}
     app:
       binaryName: invoice
       serviceName: invoice
