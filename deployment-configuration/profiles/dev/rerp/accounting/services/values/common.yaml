@@ -25,7 +25,7 @@ app:
       port: 5432
       name: rerp
       user: rerp
-      max_connections: 10
+      max_connections: 2
     redis:
       host: redis.data.svc.cluster.local
       port: 6379

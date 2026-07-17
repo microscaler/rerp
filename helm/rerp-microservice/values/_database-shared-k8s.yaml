@@ -12,4 +12,4 @@ app:
       port: 5432
       name: "rerp"
       user: "rerp"
-      max_connections: 10
+      max_connections: 2

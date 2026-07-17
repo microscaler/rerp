@@ -35,7 +35,7 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
             .ok()
             .and_then(|value| value.parse().ok())
             .filter(|value| *value >= 1)
-            .unwrap_or(10),
+            .unwrap_or(2),
         ..Default::default()
     };
     let pool = LifeguardPool::from_database_config(&config, Vec::new(), 0)
