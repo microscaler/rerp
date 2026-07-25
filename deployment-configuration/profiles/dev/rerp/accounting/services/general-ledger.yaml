@@ -32,7 +32,7 @@ spec:
       name: general-ledger
     image:
       name: rerp-accounting-general-ledger
-      tag: dev-1784990170792593743 # {"$imagepolicy": "flux-system:rerp-accounting-general-ledger:tag"}
+      tag: dev-1784996542179033201 # {"$imagepolicy": "flux-system:rerp-accounting-general-ledger:tag"}
     app:
       binaryName: general_ledger
       serviceName: general-ledger
