@@ -76,7 +76,7 @@ jobs:
         run: yarn build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: website-dist
           path: ui/website/dist
