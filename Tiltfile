@@ -7,7 +7,7 @@
 #
 
 SHARED_K8S_REGISTRY = '10.177.76.220:5000'
-SHARED_K8S_KUBECONFIG = os.path.abspath('../shared-k8s-cluster/kubeconfig/shared-k8s.yaml')
+SHARED_K8S_KUBECONFIG = os.path.abspath('../shared-gitops-k8s-cluster/kubeconfig/shared-k8s.yaml')
 RUST_ENV_PREFIX = 'export PATH="$HOME/.cargo/bin:/usr/local/bin:$PATH" && '
 
 # Tilt still evaluates the current kube context before allowing any local()
@@ -113,13 +113,18 @@ RUNTIME_SERVICES = decode_json(str(local(
     'PYTHONPATH=tooling/src python3 -m rerp_tooling.runtime descriptors --root .',
     quiet=True,
 )))
-DELIVERED_SERVICE_NAMES = ['general-ledger', 'invoice']
+DELIVERED_COMPONENTS = [
+    ('accounting', 'general-ledger'),
+    ('accounting', 'invoice'),
+    # Just-enough CRM: pipeline backs the PriceWhisperer platform portal.
+    ('crm', 'pipeline'),
+]
 DELIVERED_SERVICES = [
     service for service in RUNTIME_SERVICES
-    if service['suite'] == 'accounting' and service['service'] in DELIVERED_SERVICE_NAMES
+    if (service['suite'], service['service']) in DELIVERED_COMPONENTS
 ]
-if sorted([service['service'] for service in DELIVERED_SERVICES]) != sorted(DELIVERED_SERVICE_NAMES):
-    fail('Accounting delivered-service descriptors are incomplete')
+if len(DELIVERED_SERVICES) != len(DELIVERED_COMPONENTS):
+    fail('Delivered-service descriptors are incomplete')
 
 # ====================
 # Code Generation & Lint Helpers

@@ -1,0 +1,34 @@
+# Tilt/local values for the CRM pipeline service. The dev cluster deployment
+# is Flux-owned (deployment-configuration/profiles/dev/rerp/crm/services);
+# this file also marks the service runtime-ready for rerp_tooling discovery.
+service:
+  name: crm-pipeline
+image:
+  repository: localhost:5001
+  name: rerp-crm-pipeline
+  tag: tilt
+  pullPolicy: IfNotPresent
+deployment:
+  replicas: 1
+  namespace: rerp
+app:
+  binaryName: pipeline
+  serviceName: crm-pipeline
+databaseEnv:
+  enabled: false
+extraEnv:
+  - name: SUPABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: supabase-marketing
+        key: url
+  - name: SUPABASE_SERVICE_ROLE_KEY
+    valueFrom:
+      secretKeyRef:
+        name: supabase-marketing
+        key: service-role-key
+  - name: BRRTR_BEARER_SIGNATURE
+    valueFrom:
+      secretKeyRef:
+        name: supabase-marketing
+        key: portal-bearer-signature

@@ -1,0 +1,16 @@
+# Allow the PriceWhisperer platform portal's HTTPRoute (pw namespace) to
+# target the crm-pipeline Service here in rerp. The portal owns the CRM UI;
+# RERP owns the CRM backend — this grant is the seam between the two.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-pw-httproutes
+  namespace: rerp
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: pw
+  to:
+    - group: ""
+      kind: Service

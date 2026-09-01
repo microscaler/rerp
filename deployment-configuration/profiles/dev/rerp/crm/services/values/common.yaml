@@ -1,0 +1,65 @@
+# Common helm values for CRM suite services (dev profile).
+# Unlike accounting, CRM services have no cluster database or redis today —
+# the pipeline service reads the Supabase marketing DB over PostgREST. The
+# database/redis blocks below only feed chart template defaults (DB_POOL_MAX
+# env); databaseEnv is disabled per-service.
+deployment:
+  replicas: 1
+  namespace: rerp
+image:
+  repository: 10.177.76.220:5000
+  pullPolicy: IfNotPresent
+app:
+  config:
+    # bearerAuth falls back to BRRTRouter's static-signature provider; the
+    # signature arrives via BRRTR_BEARER_SIGNATURE from the supabase-marketing
+    # Secret. Swap this for the sesame-idam jwks block (see accounting
+    # common.yaml) when the portal gets real login.
+    security: {}
+    http:
+      keep_alive: true
+      timeout_secs: 30
+      max_requests: 5000
+    cors:
+      # The portal reaches this service same-origin via the pw-platform
+      # gateway route; these origins cover direct/dev calls.
+      origins:
+        - https://pw-platform.dev.microscaler.local
+        - https://pw-trader.dev.microscaler.local
+        - http://localhost:5173
+        - http://localhost:3000
+      allowed_headers:
+        - Content-Type
+        - Authorization
+      allowed_methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allow_credentials: false
+      expose_headers: []
+      max_age: 600
+    database:
+      host: postgres.data.svc.cluster.local
+      port: 5432
+      name: rerp
+      user: rerp
+      max_connections: 2
+    redis:
+      host: redis.data.svc.cluster.local
+      port: 6379
+      db: 0
+      max_connections: 10
+    observability:
+      metrics_enabled: true
+      tracing_enabled: true
+      otlp_endpoint: http://otel-collector.observability.svc.cluster.local:4317
+env:
+  RUST_LOG: debug
+  RUST_BACKTRACE: "1"
+  BRRTR_LOG_FORMAT: json
+  BRRTR_LOG_SAMPLING_MODE: all
+  BRRTR_LOG_ASYNC: "true"
+  BRRTR_LOG_INCLUDE_LOCATION: "false"
+  BRRTR_STACK_SIZE: "0x40000"

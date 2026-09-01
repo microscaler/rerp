@@ -1,0 +1,75 @@
+# CRM pipeline — the first live RERP CRM service. Backs the PriceWhisperer
+# platform portal's just-enough CRM (waiting-list signups + contact messages
+# as leads, triage stages, funnel summary) against the Supabase marketing DB.
+#
+# Requires the manually created Secret `supabase-marketing` in the rerp
+# namespace (never committed — the service_role key is a live credential):
+#   kubectl -n rerp create secret generic supabase-marketing \
+#     --from-literal=url=https://kjsmijajepyedbrakifh.supabase.co \
+#     --from-literal=service-role-key=<service_role key from the dashboard> \
+#     --from-literal=portal-bearer-signature=<any long random string>
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crm-pipeline
+spec:
+  suspend: false
+  interval: 5m
+  timeout: 5m
+  releaseName: crm-pipeline
+  targetNamespace: rerp
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  chart:
+    spec:
+      chart: ./helm/rerp-microservice
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: product-rerp
+        namespace: flux-system
+      interval: 1m
+  valuesFrom:
+    - kind: ConfigMap
+      name: rerp-crm-common-helm-values
+      valuesKey: values.yaml
+  values:
+    service:
+      name: crm-pipeline
+    image:
+      name: rerp-crm-pipeline
+      tag: dev-1788274052971760737 # {"$imagepolicy": "flux-system:rerp-crm-pipeline:tag"}
+    app:
+      binaryName: pipeline
+      serviceName: crm-pipeline
+    # No cluster database: leads live in Supabase, reached over PostgREST.
+    databaseEnv:
+      enabled: false
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 500m
+    extraEnv:
+      - name: SUPABASE_URL
+        valueFrom:
+          secretKeyRef:
+            name: supabase-marketing
+            key: url
+      - name: SUPABASE_SERVICE_ROLE_KEY
+        valueFrom:
+          secretKeyRef:
+            name: supabase-marketing
+            key: service-role-key
+      - name: BRRTR_BEARER_SIGNATURE
+        valueFrom:
+          secretKeyRef:
+            name: supabase-marketing
+            key: portal-bearer-signature
