@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "adler2"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
+
+[[package]]
 name = "ahash"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -87,7 +93,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -98,7 +104,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -385,6 +391,8 @@ dependencies = [
  "base64 0.22.1",
  "clap",
  "dashmap",
+ "flate2",
+ "hmac 0.13.0",
  "http 0.2.12",
  "http 1.4.0",
  "jsonschema",
@@ -403,6 +411,10 @@ dependencies = [
  "opentelemetry_sdk",
  "prost",
  "regex",
+ "rustls",
+ "rustls-native-certs",
+ "rustls-pemfile",
+ "rustls-platform-verifier",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -720,6 +732,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b2a41393f66f16b0823bb79094d54ac5fbd34ab292ddafb9a0456ac9f87d201"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "crc32fast"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8498c871161e1742aaa9d52551b2d6ebdd4c3d45a3be423e3728f33b955be550"
+dependencies = [
+ "cfg-if",
 ]
 
 [[package]]
@@ -1193,7 +1214,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1246,6 +1267,17 @@ name = "find-msvc-tools"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
+
+[[package]]
+name = "flate2"
+version = "1.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
+dependencies = [
+ "crc32fast",
+ "miniz_oxide",
+ "zlib-rs",
+]
 
 [[package]]
 name = "fluent-uri"
@@ -2196,7 +2228,7 @@ dependencies = [
 [[package]]
 name = "may_minihttp"
 version = "0.1.11"
-source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#fbf23621d789ec477703aa2f54908013e0ff826d"
+source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#7f91f65b03afe4d2c50352d6b1434aa8433b0344"
 dependencies = [
  "bytes 1.11.0",
  "http 0.2.12",
@@ -2214,7 +2246,6 @@ dependencies = [
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?rev=6c92ef8b1e756741f3726fb94cc49af54f0f8596#6c92ef8b1e756741f3726fb94cc49af54f0f8596"
 dependencies = [
  "byteorder",
  "bytes 1.11.0",
@@ -2314,6 +2345,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
+name = "miniz_oxide"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b63fbc4a50860e98e7b2aa7804ded1db5cbc3aff9193adaff57a6931bf7c4b4c"
+dependencies = [
+ "adler2",
+ "simd-adler32",
+]
+
+[[package]]
 name = "mio"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2381,7 +2422,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3775,13 +3816,14 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "sesame-idam-client",
  "tikv-jemallocator",
  "uuid",
 ]
 
 [[package]]
 name = "rerp_accounting_general_ledger_gen"
-version = "0.1.3"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3826,6 +3868,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml",
+ "sesame-idam-client",
  "sha2 0.10.9",
  "tikv-jemallocator",
  "url",
@@ -3834,7 +3877,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_invoice_gen"
-version = "0.1.3"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4009,6 +4052,49 @@ dependencies = [
  "http 1.4.0",
  "may",
  "may_http",
+ "may_minihttp",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tikv-jemallocator",
+]
+
+[[package]]
+name = "rerp_crm_pipeline"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "config",
+ "http 0.2.12",
+ "http 1.4.0",
+ "may",
+ "may_minihttp",
+ "rerp_crm_pipeline_gen",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
+name = "rerp_crm_pipeline_gen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "brrtrouter",
+ "brrtrouter_macros",
+ "clap",
+ "config",
+ "http 0.2.12",
+ "http 1.4.0",
+ "may",
  "may_minihttp",
  "serde",
  "serde_json",
@@ -4234,14 +4320,23 @@ dependencies = [
 
 [[package]]
 name = "rustls-native-certs"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "612460d5f7bea540c490b2b6395d8e34a953e52b491accd6c86c8164c5932a63"
+checksum = "dab5152771c58876a2146916e53e35057e1a4dfa2b9df0f0305b07f611fdea4d"
 dependencies = [
  "openssl-probe",
  "rustls-pki-types",
  "schannel",
  "security-framework",
+]
+
+[[package]]
+name = "rustls-pemfile"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dce314e5fee3f39953d46bb63bb8a46d40c2f8fb7cc5a3b6cab2bde9721d6e50"
+dependencies = [
+ "rustls-pki-types",
 ]
 
 [[package]]
@@ -4271,7 +4366,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4329,9 +4424,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "sea-query"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d190cfb3bcceb8a8d7d04dee5a0c77f60c7627979cdcb47fdcb8934f009badf"
+checksum = "546040c653a705e60ec65ecd3191a809603734bebbc225775916dea9ae409b31"
 dependencies = [
  "chrono",
  "itoa",
@@ -4494,6 +4589,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sesame-idam-client"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "serde",
+ "serde_json",
+ "urlencoding",
+ "uuid",
+]
+
+[[package]]
 name = "sha1"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4576,6 +4682,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "simd-adler32"
+version = "0.3.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a219298ac11a56ea9a6d2120044824d6f01aeb034955e7af7bc16858527deea"
+
+[[package]]
 name = "simd_cesu8"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4641,7 +4753,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a766e1110788c36f4fa1c2b71b387a7815aa65f88ce0229841826633d93723e"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5589,7 +5701,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -6001,6 +6113,12 @@ dependencies = [
  "quote",
  "syn 2.0.117",
 ]
+
+[[package]]
+name = "zlib-rs"
+version = "0.6.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34b31d188d9d685a4f9c7b46d6e36631b07058d2cfe190267adce54dc230bf12"
 
 [[package]]
 name = "zmij"

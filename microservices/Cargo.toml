@@ -44,6 +44,11 @@ members = [
     "documents/render/gen",
     "documents/render/impl",
 
+    # CRM suite (pipeline is the first live service — backs the PriceWhisperer
+    # platform portal's just-enough CRM against the Supabase marketing DB)
+    "crm/pipeline/gen",
+    "crm/pipeline/impl",
+
     # Centralized migration generation
     "migrator",
 ]
@@ -57,6 +62,7 @@ edition = "2021"
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
 brrtrouter = { path = "../../BRRTRouter", default-features = false }
 brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
+sesame-idam-client = { path = "../../sesame-idam-client" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }

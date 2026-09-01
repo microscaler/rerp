@@ -1,0 +1,48 @@
+# RERP CRM pipeline service — the first live CRM service.
+#
+# Just-enough CRM (2026-09): backs the PriceWhisperer platform portal's signup
+# triage against the Supabase marketing database over PostgREST (HTTPS via the
+# coroutine-native may_minihttp client — no tokio in a may service). Leads are
+# a live view of website waiting-list signups (email_captures) and contact-form
+# messages (contact_messages); triage state (stage + note) lives in the
+# crm_lead_state table, owned by this service.
+#
+# Configuration (env):
+#   SUPABASE_URL               e.g. https://<ref>.supabase.co (no trailing slash)
+#   SUPABASE_SERVICE_ROLE_KEY  service_role key, mounted from a k8s Secret
+[package]
+name = "rerp_crm_pipeline"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "pipeline"
+path = "src/main.rs"
+
+[features]
+default = []
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+rerp_crm_pipeline_gen = { path = "../gen" }
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+# NOTE: plain workspace dep — the workspace definition already carries the
+# "client" feature. Do NOT add feature flags here: enabling e.g. "json" shifts
+# may_minihttp's feature unification and breaks the vendored BRRTRouter build.
+may_minihttp = { workspace = true }
+http_legacy = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+config = { workspace = true }
+http = { workspace = true }
+may = { workspace = true }
+anyhow = { workspace = true }
+arc-swap = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+tikv-jemallocator = { workspace = true, optional = true }
