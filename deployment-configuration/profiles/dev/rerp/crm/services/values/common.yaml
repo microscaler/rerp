@@ -11,11 +11,21 @@ image:
   pullPolicy: IfNotPresent
 app:
   config:
-    # bearerAuth falls back to BRRTRouter's static-signature provider; the
-    # signature arrives via BRRTR_BEARER_SIGNATURE from the supabase-marketing
-    # Secret. Swap this for the sesame-idam jwks block (see accounting
-    # common.yaml) when the portal gets real login.
-    security: {}
+    # bearerAuth verifies Supabase Auth session JWTs against the marketing
+    # project's public JWKS (asymmetric ES256 signing keys - Supabase's
+    # recommended model, 2026-09-01). The portal signs in via Supabase Auth
+    # and sends its session access_token; NOTE: the project's signing keys
+    # must be ROTATED so the ES256 key is CURRENT, and public sign-ups must
+    # stay disabled in the project's Auth settings, or any self-served
+    # account could mint a CRM-valid JWT.
+    security:
+      jwks:
+        bearerAuth:
+          jwks_url: https://kjsmijajepyedbrakifh.supabase.co/auth/v1/.well-known/jwks.json
+          iss: https://kjsmijajepyedbrakifh.supabase.co/auth/v1
+          aud: authenticated
+          leeway_secs: 30
+          cache_ttl_secs: 600
     http:
       keep_alive: true
       timeout_secs: 30
