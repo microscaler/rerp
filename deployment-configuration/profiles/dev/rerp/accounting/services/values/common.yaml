@@ -12,7 +12,7 @@ app:
       jwks:
         bearerAuth:
           jwks_url: http://identity-session-service.sesame-idam.svc.cluster.local:8080/idam/v1/.well-known/jwks.json
-          iss: https://idam.example.com
+          iss: https://id.sesameidentity.dev.local
           aud: sesame-idam
           leeway_secs: 30
           cache_ttl_secs: 300

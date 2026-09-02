@@ -11,21 +11,19 @@ image:
   pullPolicy: IfNotPresent
 app:
   config:
-    # bearerAuth verifies Supabase Auth session JWTs against the marketing
-    # project's public JWKS (asymmetric ES256 signing keys - Supabase's
-    # recommended model, 2026-09-01). The portal signs in via Supabase Auth
-    # and sends its session access_token; NOTE: the project's signing keys
-    # must be ROTATED so the ES256 key is CURRENT, and public sign-ups must
-    # stay disabled in the project's Auth settings, or any self-served
-    # account could mint a CRM-valid JWT.
+    # bearerAuth verifies sesame-idam access tokens (EdDSA/Ed25519) against
+    # the identity-session-service JWKS (D1/D2: sesame-idam is the sole
+    # issuer; Supabase is a data store only - US_31_01, issue #132). The
+    # portal signs in at /idam/v1/auth/login and sends the sesame session
+    # access_token as its bearer.
     security:
       jwks:
         bearerAuth:
-          jwks_url: https://kjsmijajepyedbrakifh.supabase.co/auth/v1/.well-known/jwks.json
-          iss: https://kjsmijajepyedbrakifh.supabase.co/auth/v1
-          aud: authenticated
+          jwks_url: http://identity-session-service.sesame-idam.svc.cluster.local:8080/idam/v1/.well-known/jwks.json
+          iss: https://id.sesameidentity.dev.local
+          aud: sesame-idam
           leeway_secs: 30
-          cache_ttl_secs: 600
+          cache_ttl_secs: 300
     http:
       keep_alive: true
       timeout_secs: 30
