@@ -10,7 +10,10 @@ use rerp_crm_pipeline_gen::handlers::pipeline_summary::Request;
 use serde_json::{json, Value};
 
 #[handler(PipelineSummaryController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
+        return denied;
+    }
     let leads = match crate::supabase::fetch_leads() {
         Ok(leads) => leads,
         Err(error) => {

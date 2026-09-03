@@ -6,7 +6,10 @@ use rerp_crm_pipeline_gen::handlers::list_stages::Request;
 use serde_json::{json, Value};
 
 #[handler(ListStagesController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
+        return denied;
+    }
     let items: Vec<Value> = crate::supabase::STAGES
         .iter()
         .map(|s| {

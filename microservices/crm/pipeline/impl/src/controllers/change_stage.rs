@@ -7,6 +7,9 @@ use serde_json::{json, Value};
 
 #[handler(ChangeStageController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    if let Err(denied) = crate::auth::require_editor(req.jwt_claims.as_ref()) {
+        return denied;
+    }
     let data = req.data;
     let def = match crate::supabase::stage_by_id(&data.stage_id) {
         Some(def) => def,

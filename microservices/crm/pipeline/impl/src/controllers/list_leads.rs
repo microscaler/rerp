@@ -23,6 +23,9 @@ fn matches_search(lead: &Lead, needle: &str) -> bool {
 
 #[handler(ListLeadsController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
+        return denied;
+    }
     let leads = match crate::supabase::fetch_leads() {
         Ok(leads) => leads,
         Err(error) => {

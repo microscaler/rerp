@@ -13,6 +13,9 @@ use serde_json::{json, Value};
 
 #[handler(UpdateLeadController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    if let Err(denied) = crate::auth::require_editor(req.jwt_claims.as_ref()) {
+        return denied;
+    }
     let data = req.data;
     let stage_code = match data.stage_id.as_deref() {
         Some(id) => match crate::supabase::stage_by_id(id) {

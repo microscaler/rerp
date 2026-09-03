@@ -24,6 +24,7 @@ use rerp_crm_pipeline_gen::*;
 // Import implementation controllers (business logic)
 mod controllers;
 mod impl_registry;
+mod auth;
 mod supabase;
 use controllers::*;
 use std::fs;
