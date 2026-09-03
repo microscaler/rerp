@@ -43,7 +43,7 @@ spec:
       name: crm-pipeline
     image:
       name: rerp-crm-pipeline
-      tag: dev-1788274052971760737 # {"$imagepolicy": "flux-system:rerp-crm-pipeline:tag"}
+      tag: dev-1788408355718209770 # {"$imagepolicy": "flux-system:rerp-crm-pipeline:tag"}
     app:
       binaryName: pipeline
       serviceName: crm-pipeline
