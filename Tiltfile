@@ -288,19 +288,42 @@ def create_microservice_image(service):
     _build_and_push = '''set -eu
 %s docker build-image-simple %s %s %s %s --suite %s --service %s
 DEV_REF="%s:dev-$(date +%%s%%N)"
-docker tag %s:tilt "$DEV_REF"
-docker push "$DEV_REF"
+# Prefer docker tag+push, then buildx imagetools, then buildx build FROM
+# :tilt, with a 3-attempt retry. Matches PriceWhisperer's publish flow.
+publish_dev() {
+  if docker image inspect "%s:tilt" >/dev/null 2>&1; then
+    docker tag "%s:tilt" "$DEV_REF" && docker push "$DEV_REF" && return 0
+  fi
+  if docker buildx imagetools create -t "$DEV_REF" "%s:tilt" 2>/dev/null; then
+    return 0
+  fi
+  docker buildx build --provenance=false --sbom=false \
+    --output "type=image,name=$DEV_REF,push=true,oci-mediatypes=true" \
+    -f - . <<EOF
+FROM %s:tilt
+EOF
+}
+n=0
+until publish_dev; do
+  n=$((n+1))
+  if [ "$n" -ge 3 ]; then exit 1; fi
+  echo "zot publish failed for $DEV_REF (attempt $n/3); retrying"
+  sleep $((2*n))
+done
 echo "Published $DEV_REF for Flux image discovery"
 ''' % (
         rerp_bin,
-        image_name,
+        registry_image,
         dockerfile,
         hash_path,
         artifact_path,
         service['suite'],
         service['service'],
         registry_image,
-        image_name,
+        registry_image,
+        registry_image,
+        registry_image,
+        registry_image,
     )
     local_resource(
         'image-%s' % name,
