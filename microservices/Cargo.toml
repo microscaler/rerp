@@ -93,5 +93,10 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [patch.crates-io]
+# sea-query 1.0.2 emits a bounded window-frame offset with no separator
+# ("$1PRECEDING") that Postgres rejects; the fix + regression tests live on
+# the microscaler fork (still version 1.0.2; PR to SeaQL pending). Aligns
+# this workspace with lifeguard + PriceWhisperer.
+sea-query = { git = "https://github.com/microscaler/sea-query.git", branch = "master" }
 # Keep Lifeguard and other transitive users on the same rustls-capable client.
 may_minihttp = { git = "https://github.com/microscaler/may_minihttp.git", branch = "integration/microscaler-fork" }
