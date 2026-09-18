@@ -60,6 +60,30 @@
       "last_reviewed": "2026-07-15",
       "supersedes": [],
       "superseded_by": []
+    },
+    {
+      "id": "ADR-003",
+      "scope": "workplace.suite-boundary",
+      "path": "docs/adrs/003-workplace-booking-suite-boundary.md",
+      "kind": "adr",
+      "status": "PROPOSED",
+      "authority": "normative",
+      "owner": "RERP maintainers",
+      "last_reviewed": "2026-09-18",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
+      "id": "PRD-WORKPLACE-001",
+      "scope": "workplace.booking-product",
+      "path": "docs/workplace/WORKPLACE_BOOKING_PRD.md",
+      "kind": "prd",
+      "status": "DRAFT",
+      "authority": "working",
+      "owner": "RERP maintainers",
+      "last_reviewed": "2026-09-18",
+      "supersedes": [],
+      "superseded_by": []
     }
   ]
 }

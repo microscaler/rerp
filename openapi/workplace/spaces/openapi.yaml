@@ -1,0 +1,1920 @@
+openapi: 3.1.0
+info:
+  title: RERP Workplace Spaces API
+  version: 0.1.0
+  description: 'PROPOSED contract (see ADR 003). Owns the physical model of bookable space: sites, buildings,
+    floors with calibrated background plans, wall-graph floor geometry with derived rooms, zones, and
+    bookable resources. Tenant and caller identity are resolved from the bearer token. Coordinates are
+    millimetres in each floor''s own coordinate system.'
+servers:
+- url: /
+security:
+- bearerAuth: []
+tags:
+- name: sites
+- name: buildings
+- name: floors
+- name: floor-plans
+- name: zones
+- name: resources
+paths:
+  /v1/sites:
+    get:
+      operationId: list_sites
+      tags:
+      - sites
+      summary: List sites
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Page of sites
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Site'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_site
+      tags:
+      - sites
+      summary: Create a site
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSiteRequest'
+      responses:
+        '201':
+          description: The site was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/sites/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_site
+      tags:
+      - sites
+      summary: Retrieve a site
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_site
+      tags:
+      - sites
+      summary: Update a site
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSiteRequest'
+      responses:
+        '200':
+          description: The updated site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Site'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_site
+      tags:
+      - sites
+      summary: Archive a site
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/buildings:
+    get:
+      operationId: list_buildings
+      tags:
+      - buildings
+      summary: List buildings
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: site_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by site
+      responses:
+        '200':
+          description: Page of buildings
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Building'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_building
+      tags:
+      - buildings
+      summary: Create a building
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBuildingRequest'
+      responses:
+        '201':
+          description: The building was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/buildings/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_building
+      tags:
+      - buildings
+      summary: Retrieve a building
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The building
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_building
+      tags:
+      - buildings
+      summary: Update a building
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBuildingRequest'
+      responses:
+        '200':
+          description: The updated building
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_building
+      tags:
+      - buildings
+      summary: Archive a building
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/floors:
+    get:
+      operationId: list_floors
+      tags:
+      - floors
+      summary: List floors
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: building_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by building
+      responses:
+        '200':
+          description: Page of floors
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Floor'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_floor
+      tags:
+      - floors
+      summary: Create a floor
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFloorRequest'
+      responses:
+        '201':
+          description: The floor was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/floors/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_floor
+      tags:
+      - floors
+      summary: Retrieve a floor
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The floor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_floor
+      tags:
+      - floors
+      summary: Update a floor
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFloorRequest'
+      responses:
+        '200':
+          description: The updated floor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Floor'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_floor
+      tags:
+      - floors
+      summary: Archive a floor
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/floors/{id}/plan:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_floor_plan
+      tags:
+      - floor-plans
+      summary: Retrieve the editable geometry of a floor
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: Current floor plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FloorPlan'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: save_floor_plan
+      tags:
+      - floor-plans
+      summary: Replace the floor geometry
+      x-brrtrouter-impl: true
+      description: Saves corners, walls and openings as one revision. Rooms are recomputed from closed
+        wall loops. Existing room identities are preserved where a loop is unchanged. Resources left outside
+        every room are reported as warnings, never deleted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveFloorPlanRequest'
+      responses:
+        '200':
+          description: Saved; rooms were recomputed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveFloorPlanResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/floors/{id}/rooms:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: list_floor_rooms
+      tags:
+      - floor-plans
+      summary: List rooms derived from the floor plan
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: Rooms on this floor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/rooms/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    patch:
+      operationId: update_room
+      tags:
+      - floor-plans
+      summary: Name or classify a derived room
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoomRequest'
+      responses:
+        '200':
+          description: The updated room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/zones:
+    get:
+      operationId: list_zones
+      tags:
+      - zones
+      summary: List zones
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: floor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by floor
+      responses:
+        '200':
+          description: Page of zones
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Zone'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_zone
+      tags:
+      - zones
+      summary: Create a zone
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateZoneRequest'
+      responses:
+        '201':
+          description: The zone was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/zones/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_zone
+      tags:
+      - zones
+      summary: Retrieve a zone
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The zone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_zone
+      tags:
+      - zones
+      summary: Update a zone
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateZoneRequest'
+      responses:
+        '200':
+          description: The updated zone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Zone'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_zone
+      tags:
+      - zones
+      summary: Archive a zone
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/resources:
+    get:
+      operationId: list_resources
+      tags:
+      - resources
+      summary: List resources
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: floor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by floor
+      - name: zone_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by zone
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/ResourceKind'
+        description: Filter by resource kind
+      - name: attribute
+        in: query
+        schema:
+          type: string
+        description: Require this attribute tag
+      responses:
+        '200':
+          description: Page of resources
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Resource'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_resource
+      tags:
+      - resources
+      summary: Create a resource
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceRequest'
+      responses:
+        '201':
+          description: The resource was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/resources/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_resource
+      tags:
+      - resources
+      summary: Retrieve a resource
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_resource
+      tags:
+      - resources
+      summary: Update a resource
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceRequest'
+      responses:
+        '200':
+          description: The updated resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_resource
+      tags:
+      - resources
+      summary: Archive a resource
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/resources/{id}/check-in-credential:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_resource_check_in_credential
+      tags:
+      - resources
+      summary: Retrieve the printable check-in credential
+      x-brrtrouter-impl: true
+      description: Facility-administrator operation. The credential is deliberately excluded from
+        ordinary resource list and detail responses so it cannot be used for remote check-in.
+      responses:
+        '200':
+          description: Credential to encode in the resource QR or NFC label
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInCredential'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: rotate_resource_check_in_credential
+      tags:
+      - resources
+      summary: Rotate the resource check-in credential
+      x-brrtrouter-impl: true
+      description: Facility-administrator operation. Rotation immediately invalidates the previous
+        QR or NFC credential.
+      responses:
+        '200':
+          description: Newly rotated credential
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInCredential'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/floors/{id}/resource-batches:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    post:
+      operationId: place_resource_batch
+      tags:
+      - resources
+      summary: Place a grid of resources on a floor
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceBatchRequest'
+      responses:
+        '201':
+          description: Resources created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBatchResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+  responses:
+    BadRequest:
+      description: The request is malformed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The caller lacks permission for this operation or resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The resource does not exist for this tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: The request conflicts with current state (stale revision or overlapping booking)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unprocessable:
+      description: The request is well formed but violates a domain rule
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      description: Standard error response
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Additional error details
+    Point:
+      type: object
+      description: A point in the floor coordinate system, in millimetres from the floor origin.
+      required:
+      - x_mm
+      - y_mm
+      properties:
+        x_mm:
+          type: number
+        y_mm:
+          type: number
+    Polygon:
+      type: array
+      description: Closed polygon; the last point implicitly connects to the first. Minimum three points.
+      minItems: 3
+      items:
+        $ref: '#/components/schemas/Point'
+    Site:
+      type: object
+      required:
+      - id
+      - name
+      - time_zone
+      - active
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        name:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+          nullable: true
+        time_zone:
+          type: string
+          description: IANA time zone used for booking windows, e.g. Europe/Berlin
+        active:
+          type: boolean
+    Building:
+      type: object
+      required:
+      - id
+      - site_id
+      - name
+      - active
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        site_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        code:
+          type: string
+          nullable: true
+          maxLength: 32
+        active:
+          type: boolean
+    BackgroundCalibration:
+      type: object
+      description: Maps the uploaded plan image onto floor coordinates. The user marks two points on the
+        image and enters the real distance between them; rotation and origin align the image to the floor
+        axes.
+      required:
+      - document_id
+      - image_point_a
+      - image_point_b
+      - real_distance_mm
+      properties:
+        document_id:
+          type: string
+          format: uuid
+          description: Plan image or PDF page stored in the Documents suite
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        image_point_a:
+          $ref: '#/components/schemas/ImagePoint'
+        image_point_b:
+          $ref: '#/components/schemas/ImagePoint'
+        real_distance_mm:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+        rotation_deg:
+          type: number
+          default: 0
+        origin_offset:
+          $ref: '#/components/schemas/Point'
+        opacity:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.5
+    ImagePoint:
+      type: object
+      required:
+      - px
+      - py
+      properties:
+        px:
+          type: number
+        py:
+          type: number
+    Floor:
+      type: object
+      required:
+      - id
+      - building_id
+      - name
+      - level
+      - plan_revision
+      - published
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        building_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        level:
+          type: integer
+          description: Ordinal level; 0 is ground, negative below ground
+        background:
+          allOf:
+          - $ref: '#/components/schemas/BackgroundCalibration'
+          nullable: true
+        plan_revision:
+          type: integer
+          minimum: 0
+          description: Current revision of the floor plan geometry
+        published:
+          type: boolean
+          description: Only published floors are visible to booking users
+    Corner:
+      type: object
+      description: Shared wall endpoint. Moving a corner moves every wall attached to it.
+      required:
+      - id
+      - position
+      properties:
+        id:
+          type: string
+          format: uuid
+        position:
+          $ref: '#/components/schemas/Point'
+    Wall:
+      type: object
+      description: Straight wall between two corners. Walls form a graph; closed loops define rooms.
+      required:
+      - id
+      - start_corner_id
+      - end_corner_id
+      - thickness_mm
+      properties:
+        id:
+          type: string
+          format: uuid
+        start_corner_id:
+          type: string
+          format: uuid
+        end_corner_id:
+          type: string
+          format: uuid
+        thickness_mm:
+          type: number
+          minimum: 1
+          default: 120
+        kind:
+          type: string
+          enum:
+          - structural
+          - partition
+          - glass
+          - virtual
+          default: partition
+          description: virtual walls split open-plan space into rooms without a physical wall
+    Opening:
+      type: object
+      description: Door or window hosted on a wall, positioned by distance along the wall from its start
+        corner.
+      required:
+      - id
+      - wall_id
+      - kind
+      - offset_mm
+      - width_mm
+      properties:
+        id:
+          type: string
+          format: uuid
+        wall_id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - door
+          - double_door
+          - sliding_door
+          - window
+          - opening
+        offset_mm:
+          type: number
+          minimum: 0
+        width_mm:
+          type: number
+          minimum: 1
+        swing:
+          type: string
+          enum:
+          - left
+          - right
+          - none
+          default: none
+    FloorPlan:
+      type: object
+      description: 'Complete editable geometry of one floor. Saved as a whole document with optimistic
+        concurrency: the client sends the revision it edited and receives 409 if another editor saved
+        first.'
+      required:
+      - floor_id
+      - revision
+      - corners
+      - walls
+      - openings
+      properties:
+        floor_id:
+          type: string
+          format: uuid
+        revision:
+          type: integer
+          minimum: 0
+        corners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Corner'
+        walls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Wall'
+        openings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opening'
+    SaveFloorPlanRequest:
+      type: object
+      required:
+      - base_revision
+      - corners
+      - walls
+      - openings
+      properties:
+        base_revision:
+          type: integer
+          minimum: 0
+          description: Revision the client edited; must equal the current revision
+        corners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Corner'
+        walls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Wall'
+        openings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opening'
+    SaveFloorPlanResult:
+      type: object
+      required:
+      - plan
+      - rooms
+      - warnings
+      properties:
+        plan:
+          $ref: '#/components/schemas/FloorPlan'
+        rooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
+          description: Rooms recomputed from closed wall loops after the save
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanWarning'
+    PlanWarning:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - resource_outside_room
+          - room_removed_with_resources
+          - unclosed_wall_loop
+          - overlapping_walls
+          - opening_exceeds_wall
+        message:
+          type: string
+        entity_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    Room:
+      type: object
+      required:
+      - id
+      - floor_id
+      - outline
+      - area_m2
+      - kind
+      - wall_ids
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        floor_id:
+          type: string
+          format: uuid
+        outline:
+          $ref: '#/components/schemas/Polygon'
+        area_m2:
+          type: number
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 200
+        kind:
+          type: string
+          enum:
+          - office
+          - open_plan
+          - meeting
+          - corridor
+          - kitchen
+          - restroom
+          - storage
+          - other
+          default: other
+        wall_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+          description: Walls forming the loop; geometry is derived and not directly editable
+    UpdateRoomRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          nullable: true
+          maxLength: 200
+        kind:
+          type: string
+          enum:
+          - office
+          - open_plan
+          - meeting
+          - corridor
+          - kitchen
+          - restroom
+          - storage
+          - other
+          default: other
+    Zone:
+      type: object
+      required:
+      - id
+      - floor_id
+      - name
+      - outline
+      - access
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        floor_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        outline:
+          $ref: '#/components/schemas/Polygon'
+        access:
+          $ref: '#/components/schemas/AccessRule'
+        colour:
+          type: string
+          pattern: ^#[0-9a-fA-F]{6}$
+          nullable: true
+    AccessRule:
+      type: object
+      description: Who may book resources in this scope. Empty lists mean everyone in the tenant. Group
+        and role identifiers are resolved by the Auth suite (RBAC); this service stores references only.
+      properties:
+        allowed_group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          default: []
+        allowed_role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          default: []
+    ResourceKind:
+      type: string
+      enum:
+      - desk
+      - meeting_room
+      - parking_space
+      - vehicle
+      - locker
+      - other
+    ResourceGeometry:
+      type: object
+      description: Placement on the floor. Desks and parking spaces use a rotated rectangle; rooms may
+        use a polygon.
+      properties:
+        center:
+          $ref: '#/components/schemas/Point'
+        width_mm:
+          type: number
+          minimum: 1
+        depth_mm:
+          type: number
+          minimum: 1
+        rotation_deg:
+          type: number
+          default: 0
+        outline:
+          allOf:
+          - $ref: '#/components/schemas/Polygon'
+          nullable: true
+    Resource:
+      type: object
+      required:
+      - id
+      - kind
+      - label
+      - capacity
+      - assignment
+      - active
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        kind:
+          $ref: '#/components/schemas/ResourceKind'
+        label:
+          type: string
+          maxLength: 64
+          description: Human label, e.g. 3.14-A
+        floor_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null for off-plan resources such as pool vehicles
+        room_id:
+          type: string
+          format: uuid
+          nullable: true
+        zone_id:
+          type: string
+          format: uuid
+          nullable: true
+        geometry:
+          allOf:
+          - $ref: '#/components/schemas/ResourceGeometry'
+          nullable: true
+        capacity:
+          type: integer
+          minimum: 1
+          default: 1
+        attributes:
+          type: array
+          items:
+            type: string
+          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
+        assignment:
+          type: string
+          enum:
+          - bookable
+          - assigned
+          - not_bookable
+          default: bookable
+        assigned_user_id:
+          type: string
+          format: uuid
+          nullable: true
+        access:
+          allOf:
+          - $ref: '#/components/schemas/AccessRule'
+          nullable: true
+          description: Overrides the zone rule when present
+        check_in_supported:
+          type: boolean
+          readOnly: true
+          description: Whether this resource has an active QR or NFC check-in credential
+        active:
+          type: boolean
+    CreateResourceRequest:
+      type: object
+      required:
+      - kind
+      - label
+      properties:
+        kind:
+          $ref: '#/components/schemas/ResourceKind'
+        label:
+          type: string
+          maxLength: 64
+          description: Human label, e.g. 3.14-A
+        floor_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null for off-plan resources such as pool vehicles
+        room_id:
+          type: string
+          format: uuid
+          nullable: true
+        zone_id:
+          type: string
+          format: uuid
+          nullable: true
+        geometry:
+          allOf:
+          - $ref: '#/components/schemas/ResourceGeometry'
+          nullable: true
+        capacity:
+          type: integer
+          minimum: 1
+          default: 1
+        attributes:
+          type: array
+          items:
+            type: string
+          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
+        assignment:
+          type: string
+          enum:
+          - bookable
+          - assigned
+          - not_bookable
+          default: bookable
+        assigned_user_id:
+          type: string
+          format: uuid
+          nullable: true
+        access:
+          allOf:
+          - $ref: '#/components/schemas/AccessRule'
+          nullable: true
+          description: Overrides the zone rule when present
+        active:
+          type: boolean
+    UpdateResourceRequest:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/ResourceKind'
+        label:
+          type: string
+          maxLength: 64
+          description: Human label, e.g. 3.14-A
+        floor_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null for off-plan resources such as pool vehicles
+        room_id:
+          type: string
+          format: uuid
+          nullable: true
+        zone_id:
+          type: string
+          format: uuid
+          nullable: true
+        geometry:
+          allOf:
+          - $ref: '#/components/schemas/ResourceGeometry'
+          nullable: true
+        capacity:
+          type: integer
+          minimum: 1
+          default: 1
+        attributes:
+          type: array
+          items:
+            type: string
+          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
+        assignment:
+          type: string
+          enum:
+          - bookable
+          - assigned
+          - not_bookable
+          default: bookable
+        assigned_user_id:
+          type: string
+          format: uuid
+          nullable: true
+        access:
+          allOf:
+          - $ref: '#/components/schemas/AccessRule'
+          nullable: true
+          description: Overrides the zone rule when present
+        active:
+          type: boolean
+      minProperties: 1
+    CheckInCredential:
+      type: object
+      description: Secret proof-of-presence credential available only to facility administrators.
+      required:
+      - resource_id
+      - credential
+      - rotated_at
+      properties:
+        resource_id:
+          type: string
+          format: uuid
+        credential:
+          type: string
+          description: Opaque value to encode in the physical QR or NFC label
+        rotated_at:
+          type: string
+          format: date-time
+    ResourceBatchRequest:
+      type: object
+      description: Place a grid of identical resources in one operation (rows x columns).
+      required:
+      - kind
+      - origin
+      - rows
+      - columns
+      - pitch_x_mm
+      - pitch_y_mm
+      - label_pattern
+      properties:
+        kind:
+          $ref: '#/components/schemas/ResourceKind'
+        origin:
+          $ref: '#/components/schemas/Point'
+        rows:
+          type: integer
+          minimum: 1
+          maximum: 50
+        columns:
+          type: integer
+          minimum: 1
+          maximum: 50
+        pitch_x_mm:
+          type: number
+          minimum: 1
+        pitch_y_mm:
+          type: number
+          minimum: 1
+        rotation_deg:
+          type: number
+          default: 0
+        width_mm:
+          type: number
+          minimum: 1
+          default: 1600
+        depth_mm:
+          type: number
+          minimum: 1
+          default: 800
+        zone_id:
+          type: string
+          format: uuid
+          nullable: true
+        attributes:
+          type: array
+          items:
+            type: string
+        label_pattern:
+          type: string
+          description: Label template with {row}, {col} and {n} placeholders, e.g. 3-{n:02}
+    ResourceBatchResult:
+      type: object
+      required:
+      - created
+      properties:
+        created:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resource'
+        warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanWarning'
+    CreateSiteRequest:
+      type: object
+      required:
+      - name
+      - time_zone
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+          nullable: true
+        time_zone:
+          type: string
+          description: IANA time zone used for booking windows, e.g. Europe/Berlin
+        active:
+          type: boolean
+    UpdateSiteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+          nullable: true
+        time_zone:
+          type: string
+          description: IANA time zone used for booking windows, e.g. Europe/Berlin
+        active:
+          type: boolean
+      minProperties: 1
+    CreateBuildingRequest:
+      type: object
+      required:
+      - site_id
+      - name
+      properties:
+        site_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        code:
+          type: string
+          nullable: true
+          maxLength: 32
+        active:
+          type: boolean
+    UpdateBuildingRequest:
+      type: object
+      properties:
+        site_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        code:
+          type: string
+          nullable: true
+          maxLength: 32
+        active:
+          type: boolean
+      minProperties: 1
+    CreateFloorRequest:
+      type: object
+      required:
+      - building_id
+      - name
+      - level
+      properties:
+        building_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        level:
+          type: integer
+          description: Ordinal level; 0 is ground, negative below ground
+        background:
+          allOf:
+          - $ref: '#/components/schemas/BackgroundCalibration'
+          nullable: true
+        published:
+          type: boolean
+          description: Only published floors are visible to booking users
+    UpdateFloorRequest:
+      type: object
+      properties:
+        building_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        level:
+          type: integer
+          description: Ordinal level; 0 is ground, negative below ground
+        background:
+          allOf:
+          - $ref: '#/components/schemas/BackgroundCalibration'
+          nullable: true
+        published:
+          type: boolean
+          description: Only published floors are visible to booking users
+      minProperties: 1
+    CreateZoneRequest:
+      type: object
+      required:
+      - floor_id
+      - name
+      - outline
+      properties:
+        floor_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        outline:
+          $ref: '#/components/schemas/Polygon'
+        access:
+          $ref: '#/components/schemas/AccessRule'
+        colour:
+          type: string
+          pattern: ^#[0-9a-fA-F]{6}$
+          nullable: true
+    UpdateZoneRequest:
+      type: object
+      properties:
+        floor_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        outline:
+          $ref: '#/components/schemas/Polygon'
+        access:
+          $ref: '#/components/schemas/AccessRule'
+        colour:
+          type: string
+          pattern: ^#[0-9a-fA-F]{6}$
+          nullable: true
+      minProperties: 1
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token issued by the RERP identity service (Sesame IDAM)

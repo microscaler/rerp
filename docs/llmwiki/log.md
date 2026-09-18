@@ -474,3 +474,25 @@ migrations.
 - Replaced duplicate Invoice and General Ledger claim parsers with the shared
   strict parser while retaining RERP's Lifeguard `SessionContext` mapping.
 - Verified both binary identity test suites on ms02 (three tests each).
+
+## [2026-09-18] propose | Workplace booking suite
+
+- Proposed ADR 003: a new `workplace` suite with `spaces` (sites, floors,
+  calibrated plans, wall-graph geometry with derived rooms, zones, resources)
+  and `bookings` (bookings, recurrence, check-in and no-show release, policies,
+  blocks, availability, utilisation facts).
+- Added DRAFT PRD `docs/workplace/WORKPLACE_BOOKING_PRD.md` derived from the
+  public Stadt Chemnitz desk-sharing notice (TED 595241-2026); the full tender
+  specification is not yet reviewed.
+- Added proposed OpenAPI contracts under `openapi/workplace/`. No crates,
+  ports, Helm, Tilt, or deployment profiles yet; scaffold after acceptance.
+
+## [2026-09-18] contribute | Harden Workplace proposal contracts
+
+- Kept QR/NFC check-in credentials out of ordinary resource responses and
+  added administrator-only retrieval and rotation operations.
+- Made booking-policy scope deterministic, tightened working-hours validation,
+  and added off-plan availability queries.
+- Clarified Notifications event ownership and deferred the CSV import/export
+  contract pending review of the full tender documents.
+- Aligned the proposed Workplace contracts with OpenAPI 3.1.0.
