@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: RERP Workplace Bookings API
   version: 0.1.0
@@ -282,12 +282,13 @@ paths:
           $ref: '#/components/responses/Unprocessable'
   /v1/availability:
     get:
-      operationId: get_floor_availability
+      operationId: get_resource_availability
       tags:
       - availability
-      summary: Availability of every resource on a floor
+      summary: Availability of resources on a floor or by identifier
       x-brrtrouter-impl: true
-      description: Drives both the interactive map and the accessible list view.
+      description: Drives the interactive map and accessible list view. Supply either floor_id or
+        one or more resource_ids; resource_ids supports off-plan resources such as pool vehicles.
       parameters:
       - name: floor_id
         in: query
@@ -295,7 +296,18 @@ paths:
           type: string
           format: uuid
         description: Floor to render
-        required: true
+      - name: resource_ids
+        in: query
+        schema:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        style: form
+        explode: false
+        description: Explicit resources to query, including off-plan resources
       - name: from
         in: query
         schema:
@@ -1013,39 +1025,41 @@ components:
           type: string
           format: date-time
     PolicyScope:
+      oneOf:
+      - $ref: '#/components/schemas/TenantPolicyScope'
+      - $ref: '#/components/schemas/EntityPolicyScope'
+      discriminator:
+        propertyName: type
+      description: Exactly one scope is selected. Precedence is resource, zone, floor, building,
+        site, resource kind, then tenant. At the same scope, conflicting active policies are rejected.
+    TenantPolicyScope:
       type: object
-      description: 'Most specific scope wins: resource, zone, floor, building, site, tenant default.'
+      additionalProperties: false
+      required:
+      - type
       properties:
-        site_id:
+        type:
           type: string
-          format: uuid
-          nullable: true
-        building_id:
+          const: tenant
+    EntityPolicyScope:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
           type: string
-          format: uuid
-          nullable: true
-        floor_id:
-          type: string
-          format: uuid
-          nullable: true
-        zone_id:
-          type: string
-          format: uuid
-          nullable: true
-        resource_id:
-          type: string
-          format: uuid
-          nullable: true
-        resource_kind:
-          type: string
-          nullable: true
           enum:
-          - desk
-          - meeting_room
-          - parking_space
-          - vehicle
-          - locker
-          - other
+          - site
+          - building
+          - floor
+          - zone
+          - resource
+          - resource_kind
+        id:
+          type: string
+          description: UUID for entity scopes; ResourceKind enum value for resource_kind
     BookingPolicy:
       type: object
       required:
@@ -1099,13 +1113,17 @@ components:
         working_hours:
           type: object
           nullable: true
+          required:
+          - opens
+          - closes
           properties:
             opens:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
             closes:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
+          description: Local wall-clock hours in the resource site's IANA time zone
     CreateBookingPolicyRequest:
       type: object
       required:
@@ -1147,13 +1165,17 @@ components:
         working_hours:
           type: object
           nullable: true
+          required:
+          - opens
+          - closes
           properties:
             opens:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
             closes:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
+          description: Local wall-clock hours in the resource site's IANA time zone
     UpdateBookingPolicyRequest:
       type: object
       properties:
@@ -1188,13 +1210,17 @@ components:
         working_hours:
           type: object
           nullable: true
+          required:
+          - opens
+          - closes
           properties:
             opens:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
             closes:
               type: string
-              pattern: ^[0-2][0-9]:[0-5][0-9]$
+              pattern: ^(?:[01][0-9]|2[0-3]):[0-5][0-9]$
+          description: Local wall-clock hours in the resource site's IANA time zone
       minProperties: 1
     ResourceBlock:
       type: object

@@ -54,7 +54,13 @@ reads resource and access data from Spaces through its API, never through its
 tables. Identity and group or role membership come from the Auth suite. Plan
 images are stored in the Documents suite and referenced by document identifier.
 Utilisation facts are exposed for the Analytics suite to consume; Workplace does
-not depend on Analytics.
+not depend on Analytics. Bookings publishes lifecycle events for the Notifications
+suite to consume; it does not send email directly.
+
+QR and NFC check-in credentials are proof-of-presence secrets. Spaces owns and
+rotates them through a facility-administrator-only endpoint. Ordinary resource
+list and detail responses expose only whether check-in is supported, never the
+credential itself.
 
 Floor geometry is stored in real units (millimetres) in each floor's coordinate
 system, not as image-relative percentages, so plans survive a replaced
@@ -73,6 +79,8 @@ planners is copied.
   within a request.
 - Documents can store images and PDF pages that the UI renders as plan
   backgrounds.
+- Notifications can consume booking lifecycle events without a synchronous
+  dependency from Workplace.
 
 ## Alternatives considered
 

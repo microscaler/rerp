@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: RERP Workplace Spaces API
   version: 0.1.0
@@ -848,6 +848,51 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+  /v1/resources/{id}/check-in-credential:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_resource_check_in_credential
+      tags:
+      - resources
+      summary: Retrieve the printable check-in credential
+      x-brrtrouter-impl: true
+      description: Facility-administrator operation. The credential is deliberately excluded from
+        ordinary resource list and detail responses so it cannot be used for remote check-in.
+      responses:
+        '200':
+          description: Credential to encode in the resource QR or NFC label
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInCredential'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: rotate_resource_check_in_credential
+      tags:
+      - resources
+      summary: Rotate the resource check-in credential
+      x-brrtrouter-impl: true
+      description: Facility-administrator operation. Rotation immediately invalidates the previous
+        QR or NFC credential.
+      responses:
+        '200':
+          description: Newly rotated credential
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInCredential'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /v1/floors/{id}/resource-batches:
     parameters:
     - $ref: '#/components/parameters/Id'
@@ -1521,10 +1566,10 @@ components:
           - $ref: '#/components/schemas/AccessRule'
           nullable: true
           description: Overrides the zone rule when present
-        check_in_code:
-          type: string
+        check_in_supported:
+          type: boolean
           readOnly: true
-          description: Opaque value encoded in the QR label at the resource
+          description: Whether this resource has an active QR or NFC check-in credential
         active:
           type: boolean
     CreateResourceRequest:
@@ -1637,6 +1682,23 @@ components:
         active:
           type: boolean
       minProperties: 1
+    CheckInCredential:
+      type: object
+      description: Secret proof-of-presence credential available only to facility administrators.
+      required:
+      - resource_id
+      - credential
+      - rotated_at
+      properties:
+        resource_id:
+          type: string
+          format: uuid
+        credential:
+          type: string
+          description: Opaque value to encode in the physical QR or NFC label
+        rotated_at:
+          type: string
+          format: date-time
     ResourceBatchRequest:
       type: object
       description: Place a grid of identical resources in one operation (rows x columns).

@@ -91,16 +91,21 @@ confirmed or removed once they are.
 4. **FR-B4** Book on behalf of another person with a delegate permission.
 5. **FR-B5** Check-in by web, QR code at the resource, NFC, or kiosk; automatic
    release of bookings not checked in within the policy window; early
-   check-out.
+   check-out. QR and NFC credentials are proof-of-presence secrets: only a
+   facility administrator may retrieve or rotate them, and ordinary resource
+   responses never expose them.
 6. **FR-B6** Booking policies scoped to tenant, site, building, floor, zone,
    resource, or resource kind: booking horizon, maximum duration, maximum
    active bookings, check-in requirement, working hours, recurrence allowed.
-   The most specific scope wins.
+   Each policy selects exactly one scope. Precedence is resource, zone, floor,
+   building, site, resource kind, then tenant; conflicting active policies at
+   the same scope are rejected.
 7. **FR-B7** Administrative blocks (maintenance, events) with optional
    cancellation and notification of affected bookings.
 8. **FR-B8** Private bookings hide the occupant's name from other users.
-9. **FR-B9** Floor availability for a time window drives both the map and an
-   equivalent list view.
+9. **FR-B9** Availability for a time window can be queried by floor or explicit
+   resource identifiers. It drives both the map and an equivalent list view,
+   and supports off-plan resources such as pool vehicles.
 
 ### Analytics
 
@@ -116,10 +121,12 @@ confirmed or removed once they are.
    *Assumed*: Microsoft Entra ID or Active Directory for Chemnitz.
 2. **FR-I2** *Assumed*: meeting-room bookings synchronised with Outlook/Teams
    calendars through Microsoft Graph.
-3. **FR-I3** Email notifications for confirmations, reminders, releases, and
-   block cancellations.
-4. **FR-I4** Import and export of resources (CSV) for initial rollout at the
-   Chemnitz scale.
+3. **FR-I3** Bookings publishes confirmation, reminder, release, and block-
+   cancellation lifecycle events. The Notifications suite owns email delivery;
+   Workplace has no synchronous dependency on it.
+4. **FR-I4** Resource import and export for the Chemnitz-scale rollout is a
+   post-MVP contract. CSV shape, validation reporting, and asynchronous job
+   semantics must be specified after the full tender documents are reviewed.
 
 ## Non-functional requirements
 
@@ -145,6 +152,8 @@ confirmed or removed once they are.
 - Native mobile apps.
 - Sensor-based occupancy (IoT suite may add this later).
 - Visitor management and catering.
+- Bulk resource import/export; the first release supports API-driven bulk
+  placement, while the CSV contract remains pending tender review.
 
 ## Acceptance criteria (first release)
 
@@ -161,6 +170,9 @@ confirmed or removed once they are.
    cannot book them.
 7. The utilisation heatmap for the floor reflects bookings and check-ins from
    the previous day.
+8. A normal employee cannot retrieve a QR or NFC check-in credential through
+   resource list or detail APIs; a facility administrator can rotate it and the
+   previous credential stops working immediately.
 
 ## Open decisions
 
