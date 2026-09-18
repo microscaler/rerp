@@ -1,6 +1,7 @@
 // User-owned controller for handler 'get_customer_invoice'.
 
 use crate::handlers::get_customer_invoice::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
@@ -10,8 +11,8 @@ use crate::handlers::types::PostedInvoiceLine;
 use crate::handlers::types::SourceReference;
 
 #[handler(GetCustomerInvoiceController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         currency_code: "example".to_string(),
         customer_id: "example".to_string(),
         discount_amount: "example".to_string(),
@@ -29,5 +30,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         subtotal: "example".to_string(),
         tax_amount: "example".to_string(),
         total_amount: "example".to_string(),
-    }
+    })
 }

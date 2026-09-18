@@ -28,6 +28,10 @@
 - Generated foundation DDL plus app-owned controls/RLS migrations pass a live PostgreSQL acceptance suite as a non-superuser.
 - The invoice executable registers five honest Phase 1 routes generated from canonical `openapi/accounting/invoice/openapi.yaml`; generated examples are not active.
 - Validated Sesame claims become the complete Lifeguard context. Legal entity, period and control accounts are resolved inside one pinned RLS transaction.
+- General Ledger and Invoice consume the sibling `sesame-idam-client` crate for
+  strict conversion of BRRTRouter-validated claims. RERP still owns the mapping
+  into Lifeguard's `SessionContext`; the shared client does not become an RERP
+  executor or accounting abstraction.
 - A live non-superuser Rust acceptance proves post, balanced journal, same-payload retry, changed-payload conflict, retrieve and full credit note.
 - Database setup now installs the vendored Sesame RLS contract before accounting controls and grants the complete explicit v1 helper set to the runtime role.
 - Database and object-store credentials have moved out of RERP manifests into

@@ -1,5 +1,5 @@
 -- Vendored Sesame RLS contract v1.
--- Canonical source: seasame-idam/sql/rls/v1/install.sql
+-- Canonical source: sesame-idam/sql/rls/v1/install.sql
 --
 -- Applications validate the JWT before calling this function. No token, key,
 -- or unvalidated request value is accepted by the database. Lifeguard calls

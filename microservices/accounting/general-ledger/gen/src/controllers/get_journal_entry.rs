@@ -1,6 +1,7 @@
 // User-owned controller for handler 'get_journal_entry'.
 
 use crate::handlers::get_journal_entry::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
@@ -8,8 +9,8 @@ use brrtrouter_macros::handler;
 use crate::handlers::types::JournalLine;
 
 #[handler(GetJournalEntryController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         currency_code: "example".to_string(),
         entry_date: "example".to_string(),
         entry_number: "example".to_string(),
@@ -20,5 +21,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         source_document_id: "example".to_string(),
         total_credit: "example".to_string(),
         total_debit: "example".to_string(),
-    }
+    })
 }

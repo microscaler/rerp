@@ -2,6 +2,13 @@
 
 This directory contains OpenAPI specifications for all RERP microservices, organized by suite and service.
 
+## OpenAPI version policy
+
+Keep specs at **`openapi: 3.1.0`** (migrate remaining `3.0.3` holdouts separately).
+Do **not** fleet-bump to `3.2.0` until BRRTRouter documents the 3.2 subset you
+need. RFC 10008 **QUERY** uses path-item `query:` on 3.1.0 — see
+[BRRTRouter OPENAPI_VERSION_SUPPORT.md](../../BRRTRouter/docs/OPENAPI_VERSION_SUPPORT.md).
+
 ## Directory Structure
 
 ```

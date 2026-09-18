@@ -3,6 +3,7 @@ kind: HelmRelease
 metadata:
   name: invoice
 spec:
+  suspend: true
   interval: 5m
   timeout: 5m
   releaseName: invoice

@@ -466,3 +466,11 @@ migrations.
 - Bumped the immutable database-bootstrap pod template after its initial
   one-shot failure; the same image subsequently completed the full idempotent
   migration sequence successfully in a diagnostic pod.
+
+## [2026-07-16] integrate | Consume standalone Sesame-IDAM client
+
+- Added the sibling `microscaler/sesame-idam-client` development dependency to
+  the Accounting workspace.
+- Replaced duplicate Invoice and General Ledger claim parsers with the shared
+  strict parser while retaining RERP's Lifeguard `SessionContext` mapping.
+- Verified both binary identity test suites on ms02 (three tests each).

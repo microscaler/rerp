@@ -3,6 +3,7 @@ kind: HelmRelease
 metadata:
   name: general-ledger
 spec:
+  suspend: true
   interval: 5m
   timeout: 5m
   releaseName: general-ledger

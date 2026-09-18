@@ -1,0 +1,3750 @@
+From 4bd777d9384fa98a657433d19814df2b1f28bda7 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 18 Sep 2026 16:40:23 +0000
+Subject: [PATCH] feat(workplace): propose workplace booking suite (ADR 003,
+ PRD, contracts)
+
+Propose a new `workplace` suite for desk, room, parking and pool-vehicle
+booking, grounded in the public Stadt Chemnitz desk-sharing tender
+(TED 595241-2026).
+
+- ADR 003 (PROPOSED): separate suite with `spaces` and `bookings`
+  services; rejected extending appointments/core or accounting/asset.
+- PRD (DRAFT): functional, non-functional and acceptance criteria;
+  assumptions flagged pending review of the full tender documents.
+- OpenAPI 0.1.0 contracts for spaces (sites, floors, calibrated plans,
+  wall-graph geometry with derived rooms, zones, resources, bulk
+  placement) and bookings (recurrence, group bookings, check-in and
+  no-show release, policies, blocks, availability, utilisation).
+- Register ADR 003 and the PRD in docs/authority.json; wiki log entry.
+
+No crates, ports, Helm, Tilt or deployment profiles are added; these
+follow CONTRIBUTING.md once ADR 003 is accepted.
+---
+ .../003-workplace-booking-suite-boundary.md   |  144 ++
+ docs/adrs/README.md                           |    3 +-
+ docs/authority.json                           |   24 +
+ docs/llmwiki/log.md                           |   12 +
+ docs/workplace/WORKPLACE_BOOKING_PRD.md       |  177 ++
+ openapi/workplace/README.md                   |   36 +
+ openapi/workplace/bookings/README.md          |   22 +
+ openapi/workplace/bookings/openapi.yaml       | 1319 ++++++++++++
+ openapi/workplace/spaces/README.md            |   31 +
+ openapi/workplace/spaces/openapi.yaml         | 1858 +++++++++++++++++
+ 10 files changed, 3625 insertions(+), 1 deletion(-)
+ create mode 100644 docs/adrs/003-workplace-booking-suite-boundary.md
+ create mode 100644 docs/workplace/WORKPLACE_BOOKING_PRD.md
+ create mode 100644 openapi/workplace/README.md
+ create mode 100644 openapi/workplace/bookings/README.md
+ create mode 100644 openapi/workplace/bookings/openapi.yaml
+ create mode 100644 openapi/workplace/spaces/README.md
+ create mode 100644 openapi/workplace/spaces/openapi.yaml
+
+diff --git a/docs/adrs/003-workplace-booking-suite-boundary.md b/docs/adrs/003-workplace-booking-suite-boundary.md
+new file mode 100644
+index 0000000..0e21968
+--- /dev/null
++++ b/docs/adrs/003-workplace-booking-suite-boundary.md
+@@ -0,0 +1,144 @@
++# ADR 003: Workplace booking is a separate suite with Spaces and Bookings services
++
++- **Status**: PROPOSED
++- **Date**: 2026-09-18
++- **Decision owners**: RERP maintainers
++- **Group**: Suite and service boundaries
++- **Authority**: Normative
++- **Scope**: workplace.suite-boundary
++- **Last reviewed**: 2026-09-18
++- **Supersedes**: None
++- **Superseded by**: None
++
++## Context
++
++RERP needs a first customer-facing capability that is small enough to deliver
++end to end, is driven by real procurement requirements rather than invented
++ones, and exercises identity (Sesame IDAM), RBAC, Documents, and Analytics
++together. Desk and room booking for shared offices meets those conditions.
++
++A concrete public requirement exists: the City of Chemnitz tender
++"Raumbuchungsprogramm für Desksharing" (TED notice 595241-2026, published
++2026-08-28, deadline 2026-09-30). It asks for configurable bookable resources
++(workstations, meeting rooms, possibly vehicles), space-utilisation analysis,
++roughly 1,800 resource licences shared by about 5,000 users, hosting, support,
++training, and an annual development budget. The full specification documents
++had not been reviewed when this ADR was drafted; see the PRD for what is known
++and what is assumed.
++
++Desk booking is spatial. Users choose a desk on a floor plan, and
++administrators maintain plans made of walls, rooms, zones, and resources. No
++existing RERP service owns that model:
++
++- `appointments/core` models customer appointments against abstract resources
++  and time slots. It has no spatial model, check-in, or occupancy policy.
++- `accounting/asset` owns fixed assets for depreciation and accounting. A desk
++  is not an accounting asset, and coupling bookings to the ledger would violate
++  the suite-selective installation rule.
++
++## Decision
++
++Create a new `workplace` suite with two services:
++
++1. `workplace/spaces` owns the physical model: sites, buildings, floors with a
++   calibrated background plan, floor geometry as a graph of corners and walls
++   with hosted openings, rooms derived from closed wall loops, zones with access
++   rules, and bookable resources with geometry.
++2. `workplace/bookings` owns reservations of those resources: bookings,
++   recurrence, group bookings, check-in and no-show release, booking policies,
++   administrative blocks, availability for map rendering, and daily utilisation
++   facts.
++
++Each service owns its own tables. Bookings refers to resources by identifier and
++reads resource and access data from Spaces through its API, never through its
++tables. Identity and group or role membership come from the Auth suite. Plan
++images are stored in the Documents suite and referenced by document identifier.
++Utilisation facts are exposed for the Analytics suite to consume; Workplace does
++not depend on Analytics.
++
++Floor geometry is stored in real units (millimetres) in each floor's coordinate
++system, not as image-relative percentages, so plans survive a replaced
++background image and support true-scale bulk placement.
++
++The editor design (wall graph, derived rooms, hosted openings, snapping) is
++implemented clean-room from published concepts. No code from third-party floor
++planners is copied.
++
++## Assumptions
++
++- The Chemnitz specification does not require capabilities that would change
++  this boundary (for example, integration with a building-automation system as
++  a system of record).
++- Auth can resolve a caller's groups and roles for access-rule evaluation
++  within a request.
++- Documents can store images and PDF pages that the UI renders as plan
++  backgrounds.
++
++## Alternatives considered
++
++### Extend `appointments/core`
++
++Adding floors, geometry, and check-in to Appointments would make one service
++model both customer appointments and internal space use. The concepts share
++only "a resource is reserved for a time window". The spatial model, access
++rules, and occupancy analytics would dominate the service and distort its
++customer-appointment contract. Rejected.
++
++### One `workplace` service
++
++Simpler to deploy, but editing geometry and serving high-volume availability
++queries have different change rates, scaling profiles, and permissions. Two
++services keep plan editing isolated from booking traffic. A single service
++could be revisited if the second service adds operational cost without benefit
++in practice.
++
++### Model desks as `accounting/asset` records
++
++Rejected: wrong semantics and a forbidden cross-suite table dependency.
++
++## Consequences
++
++### Positive
++
++- A self-contained, demonstrable product slice that exercises the platform
++  services RERP needs to prove.
++- Contracts are grounded in a real public requirement and can be checked
++  against it.
++- Room polygons and resource geometry serve booking, heatmaps, and reporting
++  from one source.
++
++### Costs and risks
++
++- A new suite adds port assignments, Helm descriptors, Tilt wiring, and
++  deployment profiles.
++- Bookings depends on Spaces availability at booking time; a Spaces outage
++  blocks new bookings.
++- The floor-plan editor is significant UI work and is the component
++  evaluators judge first.
++- Public-sector buyers may require the delivered application to be open
++  source. The licence of the Workplace application relative to the RERP
++  platform licence is an open business decision recorded in the PRD.
++
++## Implementation and verification
++
++- Contracts: `openapi/workplace/spaces/openapi.yaml` and
++  `openapi/workplace/bookings/openapi.yaml` (version 0.1.0, proposed).
++- Scaffolding (ports, `gen/` and `impl/` crates, Helm, Tilt, deployment
++  profiles) follows `CONTRIBUTING.md` after this ADR is accepted.
++- Acceptance: the PRD acceptance criteria, verified by service tests in each
++  `impl/` crate and an end-to-end booking scenario on a published floor.
++
++## Related requirements
++
++- [Workplace booking PRD](../workplace/WORKPLACE_BOOKING_PRD.md) (DRAFT)
++
++## Related decisions and artifacts
++
++- [ADR 002](./002-document-generation-ownership.md): Documents ownership of
++  stored renditions.
++- External requirement source: TED notice 595241-2026 (Stadt Chemnitz),
++  reviewed 2026-09-18 from the public notice only.
++
++## Notes
++
++None.
+diff --git a/docs/adrs/README.md b/docs/adrs/README.md
+index 79b8ea6..56fecbe 100644
+--- a/docs/adrs/README.md
++++ b/docs/adrs/README.md
+@@ -4,7 +4,7 @@ This register is the authoritative inventory of RERP ADRs. See
+ [`DOCUMENTATION_GOVERNANCE.md`](../DOCUMENTATION_GOVERNANCE.md) for lifecycle,
+ authority, and supersession rules.
+ 
+-**Next ADR number:** `003`
++**Next ADR number:** `004`
+ 
+ ## Status vocabulary
+ 
+@@ -19,6 +19,7 @@ authority, and supersession rules.
+ |---|---|---|---|
+ | [001](./001-accounting-runtime-boundary.md) | Accepted | `accounting.runtime-boundary` | First invoice-to-GL slice remains atomic within the invoice implementation runtime |
+ | [002](./002-document-generation-ownership.md) | Accepted | `documents.generated-rendition-ownership` | Documents owns generic generated renditions; source suites own business facts |
++| [003](./003-workplace-booking-suite-boundary.md) | Proposed | `workplace.suite-boundary` | Workplace booking is a separate suite with Spaces and Bookings services |
+ 
+ ## Creating an ADR
+ 
+diff --git a/docs/authority.json b/docs/authority.json
+index 0372df8..a373a4e 100644
+--- a/docs/authority.json
++++ b/docs/authority.json
+@@ -60,6 +60,30 @@
+       "last_reviewed": "2026-07-15",
+       "supersedes": [],
+       "superseded_by": []
++    },
++    {
++      "id": "ADR-003",
++      "scope": "workplace.suite-boundary",
++      "path": "docs/adrs/003-workplace-booking-suite-boundary.md",
++      "kind": "adr",
++      "status": "PROPOSED",
++      "authority": "normative",
++      "owner": "RERP maintainers",
++      "last_reviewed": "2026-09-18",
++      "supersedes": [],
++      "superseded_by": []
++    },
++    {
++      "id": "PRD-WORKPLACE-001",
++      "scope": "workplace.booking-product",
++      "path": "docs/workplace/WORKPLACE_BOOKING_PRD.md",
++      "kind": "prd",
++      "status": "DRAFT",
++      "authority": "working",
++      "owner": "RERP maintainers",
++      "last_reviewed": "2026-09-18",
++      "supersedes": [],
++      "superseded_by": []
+     }
+   ]
+ }
+diff --git a/docs/llmwiki/log.md b/docs/llmwiki/log.md
+index 582c26f..b455305 100644
+--- a/docs/llmwiki/log.md
++++ b/docs/llmwiki/log.md
+@@ -466,3 +466,15 @@ migrations.
+ - Bumped the immutable database-bootstrap pod template after its initial
+   one-shot failure; the same image subsequently completed the full idempotent
+   migration sequence successfully in a diagnostic pod.
++
++## [2026-09-18] propose | Workplace booking suite
++
++- Proposed ADR 003: a new `workplace` suite with `spaces` (sites, floors,
++  calibrated plans, wall-graph geometry with derived rooms, zones, resources)
++  and `bookings` (bookings, recurrence, check-in and no-show release, policies,
++  blocks, availability, utilisation facts).
++- Added DRAFT PRD `docs/workplace/WORKPLACE_BOOKING_PRD.md` derived from the
++  public Stadt Chemnitz desk-sharing notice (TED 595241-2026); the full tender
++  specification is not yet reviewed.
++- Added proposed OpenAPI 3.0.3 contracts under `openapi/workplace/`. No crates,
++  ports, Helm, Tilt, or deployment profiles yet; scaffold after acceptance.
+diff --git a/docs/workplace/WORKPLACE_BOOKING_PRD.md b/docs/workplace/WORKPLACE_BOOKING_PRD.md
+new file mode 100644
+index 0000000..ab08425
+--- /dev/null
++++ b/docs/workplace/WORKPLACE_BOOKING_PRD.md
+@@ -0,0 +1,177 @@
++# Workplace Desk and Room Booking PRD
++
++- **Status**: DRAFT
++- **Authority**: Working
++- **Owner**: RERP maintainers
++- **Scope**: workplace.booking-product
++- **Last reviewed**: 2026-09-18
++- **Supersedes**: None
++- **Superseded by**: None
++
++## Purpose
++
++Deliver a desk, room, parking, and pool-vehicle booking product on RERP that a
++public administration can adopt for desk sharing. It is RERP's first
++end-to-end showcase: a real requirement, a real UI, and real use of Sesame
++IDAM, RBAC, Documents, and Analytics.
++
++Architecture boundary: [ADR 003](../adrs/003-workplace-booking-suite-boundary.md).
++
++## Requirement sources
++
++| Source | Reference | Reviewed | Use |
++|---|---|---|---|
++| Stadt Chemnitz, "Raumbuchungsprogramm für Desksharing" | TED 595241-2026, internal ID 17/26/0122 | 2026-09-18, public notice only | Primary external requirement |
++| Established desk-booking products | Public product descriptions | 2026-09-18 | Market baseline evaluators will compare against |
++| Clean-room study of open-source floor planners | Published concepts only; no code copied | 2026-09-18 | Floor-plan editor design |
++
++The Chemnitz specification documents (Leistungsbeschreibung, evaluation
++catalogue, price sheet) are published on evergabe.de behind free registration
++and have **not yet been reviewed**. Requirements marked *Assumed* must be
++confirmed or removed once they are.
++
++### Known from the Chemnitz notice
++
++- Configurable bookable resources: workstations, meeting rooms, possibly
++  vehicles.
++- Not only booking: an analysis function for optimising office space.
++- About 1,800 resource-based licences used by about 5,000 users; about 420 at
++  initial rollout, the rest by about 2030.
++- Hosting, setup, support, training, and an annual budget for custom
++  development.
++- Open-ended cloud contract (EVB-IT Cloud), renewing annually.
++- Award: 50% technical value, 50% price. Documents and bids in German.
++- Selection: at least three comparable references with contact, scope, value,
++  and period.
++
++## Users and roles
++
++- **Employee**: finds and books a resource, checks in, cancels, sees colleagues
++  where privacy allows.
++- **Team lead / delegate**: books for others and for a team.
++- **Facility administrator**: maintains sites, floors, plans, zones, resources,
++  policies, and blocks; reads utilisation reports.
++- **Tenant administrator**: identity-provider connection, roles, and access
++  rules.
++
++## Functional requirements
++
++### Space model and floor-plan editor (Spaces)
++
++1. **FR-S1** Sites, buildings, and floors with IANA time zones and ordinal
++   levels.
++2. **FR-S2** Upload a plan (image or PDF page) to Documents and calibrate it by
++   marking two points and entering the real distance; set rotation, origin, and
++   opacity.
++3. **FR-S3** Trace walls over the background as a graph of shared corners;
++   moving a corner moves every attached wall. Wall kinds: structural,
++   partition, glass, virtual.
++4. **FR-S4** Doors and windows are hosted on walls by offset and width.
++5. **FR-S5** Rooms are derived automatically from closed wall loops, with
++   computed area; administrators name and classify rooms but do not draw them.
++6. **FR-S6** Snapping to grid, endpoints, and 0/45/90 degrees, with live
++   dimension labels.
++7. **FR-S7** Zones as polygons with access rules by group or role.
++8. **FR-S8** Resources (desk, meeting room, parking space, vehicle, locker)
++   with geometry, capacity, attribute tags, and assignment mode (bookable,
++   permanently assigned, not bookable). Vehicles may be off-plan.
++9. **FR-S9** Bulk placement of a grid of resources with a label pattern.
++10. **FR-S10** Saving a plan uses optimistic concurrency; geometry changes never
++    silently delete resources and report resources left outside rooms.
++11. **FR-S11** Draft and published floors; only published floors are bookable.
++
++### Booking (Bookings)
++
++1. **FR-B1** Book a resource for a time window; overlapping bookings are
++   rejected.
++2. **FR-B2** Weekly recurring bookings for fixed office days; conflicting
++   occurrences are skipped and reported, not failed as a whole.
++3. **FR-B3** Group bookings for several people and resources, created
++   atomically.
++4. **FR-B4** Book on behalf of another person with a delegate permission.
++5. **FR-B5** Check-in by web, QR code at the resource, NFC, or kiosk; automatic
++   release of bookings not checked in within the policy window; early
++   check-out.
++6. **FR-B6** Booking policies scoped to tenant, site, building, floor, zone,
++   resource, or resource kind: booking horizon, maximum duration, maximum
++   active bookings, check-in requirement, working hours, recurrence allowed.
++   The most specific scope wins.
++7. **FR-B7** Administrative blocks (maintenance, events) with optional
++   cancellation and notification of affected bookings.
++8. **FR-B8** Private bookings hide the occupant's name from other users.
++9. **FR-B9** Floor availability for a time window drives both the map and an
++   equivalent list view.
++
++### Analytics
++
++1. **FR-A1** Daily utilisation facts per resource: available, booked, and
++   occupied (checked-in) minutes, and no-show count.
++2. **FR-A2** Heatmap on the floor plan using the same geometry as booking.
++3. **FR-A3** Space-optimisation reports by zone, floor, and weekday
++   (delivered through the Analytics suite).
++
++### Integration
++
++1. **FR-I1** Sign-in through the tenant's identity provider via Sesame IDAM.
++   *Assumed*: Microsoft Entra ID or Active Directory for Chemnitz.
++2. **FR-I2** *Assumed*: meeting-room bookings synchronised with Outlook/Teams
++   calendars through Microsoft Graph.
++3. **FR-I3** Email notifications for confirmations, reminders, releases, and
++   block cancellations.
++4. **FR-I4** Import and export of resources (CSV) for initial rollout at the
++   Chemnitz scale.
++
++## Non-functional requirements
++
++1. **NFR-1 Accessibility**: conformance with BITV 2.0 / WCAG 2.1 AA. The map is
++   never the only way to book: every map action has a list or table
++   equivalent, and the map is keyboard navigable with labelled elements (SVG
++   rendering is preferred over raster canvas for this reason).
++2. **NFR-2 Language**: German and English UI; German documentation.
++3. **NFR-3 Data protection**: GDPR compliant; hosting in the EU; configurable
++   retention for booking history; utilisation reports aggregate and do not
++   profile individuals.
++4. **NFR-4 Scale**: at least 5,000 users and 2,000 resources per tenant;
++   availability for one floor returns in under 300 ms at the 95th percentile.
++5. **NFR-5 Security**: tenant isolation, least-privilege roles, audit trail of
++   administrative changes. *Assumed*: ISO 27001 or BSI C5 evidence requested
++   under EVB-IT Cloud.
++6. **NFR-6 Mobile**: responsive web that works on phones for booking and QR
++   check-in; a native app is out of scope for the first release.
++
++## Out of scope for the first release
++
++- 3D views and full CAD drafting; plans are traced over uploaded drawings.
++- Native mobile apps.
++- Sensor-based occupancy (IoT suite may add this later).
++- Visitor management and catering.
++
++## Acceptance criteria (first release)
++
++1. An administrator uploads a plan, calibrates it, traces walls, and sees rooms
++   derived automatically with correct areas (±1%).
++2. An administrator places a grid of 40 desks in one operation and publishes
++   the floor.
++3. An employee signed in through the identity provider books a desk on the map
++   and, independently, through the list view using only the keyboard.
++4. A second booking for an overlapping window on the same desk is rejected.
++5. A booking not checked in within the policy window is released and the desk
++   becomes free on the map.
++6. A user outside a zone's allowed groups sees its desks as restricted and
++   cannot book them.
++7. The utilisation heatmap for the floor reflects bookings and check-ins from
++   the previous day.
++
++## Open decisions
++
++1. **Licence of the Workplace application.** German and Bulgarian public buyers
++   may require delivered software to be open source. Options: release the
++   Workplace suite under an open licence such as EUPL-1.2 while the RERP
++   platform keeps PolyForm Shield, or keep a single licence. Requires a
++   business decision before the first public release.
++2. **Calendar integration depth** (FR-I2): confirm against the Chemnitz
++   specification.
++3. **Licence metric**: Chemnitz prices per resource, not per user. Pricing and
++   metering design is pending.
++4. **Service count**: ADR 003 proposes two services; confirm after the first
++   implementation spike.
+diff --git a/openapi/workplace/README.md b/openapi/workplace/README.md
+new file mode 100644
+index 0000000..f5bd274
+--- /dev/null
++++ b/openapi/workplace/README.md
+@@ -0,0 +1,36 @@
++# Workplace
++
++> **Status: PROPOSED** — see [ADR 003](../../docs/adrs/003-workplace-booking-suite-boundary.md)
++> and the [Workplace booking PRD](../../docs/workplace/WORKPLACE_BOOKING_PRD.md) (DRAFT).
++> No service crates, ports, or deployment profiles exist yet.
++
++## Overview
++
++Desk, meeting-room, parking, and pool-vehicle booking for shared offices,
++driven by floor plans.
++
++## Services
++
++### Spaces
++- **Path**: `workplace/spaces/`
++- **Description**: Sites, buildings, floors with calibrated background plans,
++  wall-graph floor geometry with derived rooms, zones with access rules, and
++  bookable resources.
++- **Documentation**: [Spaces README](./spaces/README.md)
++- **API Spec**: [Spaces OpenAPI](./spaces/openapi.yaml)
++
++### Bookings
++- **Path**: `workplace/bookings/`
++- **Description**: Bookings, recurrence, group bookings, check-in and no-show
++  release, policies, administrative blocks, availability, and utilisation
++  facts.
++- **Documentation**: [Bookings README](./bookings/README.md)
++- **API Spec**: [Bookings OpenAPI](./bookings/openapi.yaml)
++
++## Integration Patterns
++
++- Identity, groups, and roles: Auth suite (Sesame IDAM, RBAC), by API.
++- Plan images: Documents suite, referenced by document ID.
++- Utilisation reporting: Analytics consumes `GET /v1/utilisation`; Workplace
++  does not depend on Analytics.
++- Bookings reads resources and access rules from Spaces by API, never by table.
+diff --git a/openapi/workplace/bookings/README.md b/openapi/workplace/bookings/README.md
+new file mode 100644
+index 0000000..67aed5e
+--- /dev/null
++++ b/openapi/workplace/bookings/README.md
+@@ -0,0 +1,22 @@
++# Workplace Bookings
++
++> **Status: PROPOSED** contract, version 0.1.0. See
++> [ADR 003](../../../docs/adrs/003-workplace-booking-suite-boundary.md).
++
++## Responsibility
++
++Owns reservations of resources defined by Workplace Spaces:
++
++- **Bookings** with overlap rejection (`409`), weekly recurrence (conflicting
++  occurrences are skipped and reported), atomic group bookings, and booking on
++  behalf of others.
++- **Check-in** by web, QR, NFC, or kiosk; automatic release of no-shows; early
++  check-out.
++- **Policies** scoped from tenant down to a single resource; the most specific
++  scope wins.
++- **Administrative blocks** with optional cancellation of affected bookings.
++- **Availability** for one floor and time window. It feeds both the map and the
++  accessible list view and never reveals names on private bookings.
++- **Utilisation facts** per resource and day for heatmaps and reports.
++
++Resource identity and access rules are read from Spaces over its API.
+diff --git a/openapi/workplace/bookings/openapi.yaml b/openapi/workplace/bookings/openapi.yaml
+new file mode 100644
+index 0000000..232907a
+--- /dev/null
++++ b/openapi/workplace/bookings/openapi.yaml
+@@ -0,0 +1,1319 @@
++openapi: 3.0.3
++info:
++  title: RERP Workplace Bookings API
++  version: 0.1.0
++  description: 'PROPOSED contract (see ADR 003). Owns reservations of resources defined by the Workplace
++    Spaces service: bookings, recurrence, group bookings, check-in and no-show release, booking policies,
++    administrative blocks, availability for map rendering, and utilisation facts. Resource identity and
++    access rules are read from Spaces over its API.'
++servers:
++- url: /
++security:
++- bearerAuth: []
++tags:
++- name: bookings
++- name: availability
++- name: policies
++- name: blocks
++- name: utilisation
++paths:
++  /v1/bookings:
++    get:
++      operationId: list_bookings
++      tags:
++      - bookings
++      summary: List bookings
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: mine
++        in: query
++        schema:
++          type: boolean
++          default: true
++        description: Only the caller's bookings
++      - name: resource_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by resource
++      - name: floor_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by floor
++      - name: from
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window start
++      - name: to
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window end
++      - name: status
++        in: query
++        schema:
++          $ref: '#/components/schemas/BookingStatus'
++        description: Filter by status
++      responses:
++        '200':
++          description: Page of bookings
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Booking'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_booking
++      tags:
++      - bookings
++      summary: Book a resource, optionally recurring
++      x-brrtrouter-impl: true
++      description: Rejects overlapping bookings with 409. Policy and access checks return 403 or 422.
++        Recurring requests create every permitted occurrence and report the rest as skipped.
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateBookingRequest'
++      responses:
++        '201':
++          description: Booking(s) created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/CreateBookingResult'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/bookings/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_booking
++      tags:
++      - bookings
++      summary: Retrieve a booking
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The booking
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Booking'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_booking
++      tags:
++      - bookings
++      summary: Move or edit a booking
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateBookingRequest'
++      responses:
++        '200':
++          description: The updated booking
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Booking'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: cancel_booking
++      tags:
++      - bookings
++      summary: Cancel a booking
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Cancelled
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/bookings/{id}/check-in:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    post:
++      operationId: check_in_booking
++      tags:
++      - bookings
++      summary: Confirm presence at the booked resource
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CheckInRequest'
++      responses:
++        '200':
++          description: Checked in
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Booking'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/bookings/{id}/check-out:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    post:
++      operationId: check_out_booking
++      tags:
++      - bookings
++      summary: End a booking early and free the resource
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: Checked out
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Booking'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/group-bookings:
++    post:
++      operationId: create_group_booking
++      tags:
++      - bookings
++      summary: Book several resources for a team atomically
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/GroupBookingRequest'
++      responses:
++        '201':
++          description: All bookings created
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/Booking'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/availability:
++    get:
++      operationId: get_floor_availability
++      tags:
++      - availability
++      summary: Availability of every resource on a floor
++      x-brrtrouter-impl: true
++      description: Drives both the interactive map and the accessible list view.
++      parameters:
++      - name: floor_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Floor to render
++        required: true
++      - name: from
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window start
++        required: true
++      - name: to
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window end
++        required: true
++      responses:
++        '200':
++          description: Per-resource availability for the requested window, filtered to what the caller
++            may see
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/ResourceAvailability'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++  /v1/booking-policies:
++    get:
++      operationId: list_booking_policies
++      tags:
++      - policies
++      summary: List booking policies
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      responses:
++        '200':
++          description: Page of booking policies
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/BookingPolicy'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_booking_policy
++      tags:
++      - policies
++      summary: Create a booking policy
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateBookingPolicyRequest'
++      responses:
++        '201':
++          description: The booking policy was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/BookingPolicy'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/booking-policies/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_booking_policy
++      tags:
++      - policies
++      summary: Retrieve a booking policy
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The booking policy
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/BookingPolicy'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_booking_policy
++      tags:
++      - policies
++      summary: Update a booking policy
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateBookingPolicyRequest'
++      responses:
++        '200':
++          description: The updated booking policy
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/BookingPolicy'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_booking_policy
++      tags:
++      - policies
++      summary: Archive a booking policy
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/resource-blocks:
++    get:
++      operationId: list_resource_blocks
++      tags:
++      - blocks
++      summary: List resource blocks
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: resource_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by resource
++      - name: from
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window start
++      - name: to
++        in: query
++        schema:
++          type: string
++          format: date-time
++        description: Window end
++      responses:
++        '200':
++          description: Page of resource blocks
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/ResourceBlock'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_resource_block
++      tags:
++      - blocks
++      summary: Create a resource block
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateResourceBlockRequest'
++      responses:
++        '201':
++          description: The resource block was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ResourceBlock'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/resource-blocks/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_resource_block
++      tags:
++      - blocks
++      summary: Retrieve a resource block
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The resource block
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ResourceBlock'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_resource_block
++      tags:
++      - blocks
++      summary: Update a resource block
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateResourceBlockRequest'
++      responses:
++        '200':
++          description: The updated resource block
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ResourceBlock'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_resource_block
++      tags:
++      - blocks
++      summary: Archive a resource block
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/utilisation:
++    get:
++      operationId: list_utilisation
++      tags:
++      - utilisation
++      summary: Daily utilisation facts
++      x-brrtrouter-impl: true
++      description: Source data for heatmaps and space-optimisation reports in the Analytics suite.
++      parameters:
++      - name: floor_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Floor
++      - name: zone_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Zone
++      - name: from
++        in: query
++        schema:
++          type: string
++          format: date
++        description: First day
++        required: true
++      - name: to
++        in: query
++        schema:
++          type: string
++          format: date
++        description: Last day
++        required: true
++      responses:
++        '200':
++          description: Utilisation buckets
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/UtilisationBucket'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++components:
++  parameters:
++    Id:
++      name: id
++      in: path
++      required: true
++      schema:
++        type: string
++        format: uuid
++    Page:
++      name: page
++      in: query
++      schema:
++        type: integer
++        minimum: 1
++        default: 1
++    Limit:
++      name: limit
++      in: query
++      schema:
++        type: integer
++        minimum: 1
++        maximum: 200
++        default: 50
++  responses:
++    BadRequest:
++      description: The request is malformed
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Unauthorized:
++      description: Missing or invalid bearer token
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Forbidden:
++      description: The caller lacks permission for this operation or resource
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    NotFound:
++      description: The resource does not exist for this tenant
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Conflict:
++      description: The request conflicts with current state (stale revision or overlapping booking)
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Unprocessable:
++      description: The request is well formed but violates a domain rule
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++  schemas:
++    Error:
++      type: object
++      description: Standard error response
++      required:
++      - error
++      - message
++      properties:
++        error:
++          type: string
++          description: Machine-readable error code
++        message:
++          type: string
++          description: Human-readable error message
++        details:
++          type: object
++          nullable: true
++          additionalProperties: true
++          description: Additional error details
++    BookingStatus:
++      type: string
++      enum:
++      - confirmed
++      - checked_in
++      - completed
++      - cancelled
++      - released_no_show
++    Recurrence:
++      type: object
++      description: Weekly recurrence for fixed office days.
++      required:
++      - weekdays
++      - until
++      properties:
++        weekdays:
++          type: array
++          minItems: 1
++          uniqueItems: true
++          items:
++            type: string
++            enum:
++            - MO
++            - TU
++            - WE
++            - TH
++            - FR
++            - SA
++            - SU
++        until:
++          type: string
++          format: date
++    Booking:
++      type: object
++      required:
++      - id
++      - resource_id
++      - user_id
++      - booked_by_user_id
++      - starts_at
++      - ends_at
++      - status
++      - private
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        resource_id:
++          type: string
++          format: uuid
++        user_id:
++          type: string
++          format: uuid
++          description: Person the booking is for
++        booked_by_user_id:
++          type: string
++          format: uuid
++          description: Differs from user_id when booked on someone's behalf
++        series_id:
++          type: string
++          format: uuid
++          nullable: true
++        group_id:
++          type: string
++          format: uuid
++          nullable: true
++          description: Shared by bookings created together for a team
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        status:
++          $ref: '#/components/schemas/BookingStatus'
++        checked_in_at:
++          type: string
++          format: date-time
++          nullable: true
++        title:
++          type: string
++          nullable: true
++          maxLength: 200
++        private:
++          type: boolean
++          default: false
++          description: Hide the occupant's name from other users on the map
++    CreateBookingRequest:
++      type: object
++      required:
++      - resource_id
++      - starts_at
++      - ends_at
++      properties:
++        resource_id:
++          type: string
++          format: uuid
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        on_behalf_of_user_id:
++          type: string
++          format: uuid
++          nullable: true
++          description: Requires the booking-delegate permission
++        recurrence:
++          allOf:
++          - $ref: '#/components/schemas/Recurrence'
++          nullable: true
++        title:
++          type: string
++          nullable: true
++          maxLength: 200
++        private:
++          type: boolean
++          default: false
++    CreateBookingResult:
++      type: object
++      required:
++      - bookings
++      - skipped
++      properties:
++        bookings:
++          type: array
++          items:
++            $ref: '#/components/schemas/Booking'
++        skipped:
++          type: array
++          items:
++            $ref: '#/components/schemas/SkippedOccurrence'
++          description: Recurring occurrences not created because of conflicts or policy
++    SkippedOccurrence:
++      type: object
++      required:
++      - starts_at
++      - reason
++      properties:
++        starts_at:
++          type: string
++          format: date-time
++        reason:
++          type: string
++          enum:
++          - resource_booked
++          - resource_blocked
++          - outside_booking_horizon
++          - policy_violation
++    GroupBookingRequest:
++      type: object
++      description: Book several resources for several people in one atomic operation.
++      required:
++      - starts_at
++      - ends_at
++      - allocations
++      properties:
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        allocations:
++          type: array
++          minItems: 2
++          items:
++            type: object
++            required:
++            - resource_id
++            - user_id
++            properties:
++              resource_id:
++                type: string
++                format: uuid
++              user_id:
++                type: string
++                format: uuid
++        title:
++          type: string
++          nullable: true
++    UpdateBookingRequest:
++      type: object
++      minProperties: 1
++      properties:
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        resource_id:
++          type: string
++          format: uuid
++        title:
++          type: string
++          nullable: true
++        private:
++          type: boolean
++    CheckInRequest:
++      type: object
++      required:
++      - method
++      properties:
++        method:
++          type: string
++          enum:
++          - web
++          - qr
++          - nfc
++          - kiosk
++        check_in_code:
++          type: string
++          nullable: true
++          description: Required for qr and nfc; must match the resource's code
++    AvailabilityState:
++      type: string
++      enum:
++      - free
++      - booked
++      - occupied
++      - blocked
++      - assigned
++      - restricted
++      description: restricted means the caller may not book it; booked/occupied never reveal private names
++    ResourceAvailability:
++      type: object
++      required:
++      - resource_id
++      - state
++      properties:
++        resource_id:
++          type: string
++          format: uuid
++        state:
++          $ref: '#/components/schemas/AvailabilityState'
++        free_intervals:
++          type: array
++          items:
++            $ref: '#/components/schemas/Interval'
++        occupant_display_name:
++          type: string
++          nullable: true
++    Interval:
++      type: object
++      required:
++      - starts_at
++      - ends_at
++      properties:
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++    PolicyScope:
++      type: object
++      description: 'Most specific scope wins: resource, zone, floor, building, site, tenant default.'
++      properties:
++        site_id:
++          type: string
++          format: uuid
++          nullable: true
++        building_id:
++          type: string
++          format: uuid
++          nullable: true
++        floor_id:
++          type: string
++          format: uuid
++          nullable: true
++        zone_id:
++          type: string
++          format: uuid
++          nullable: true
++        resource_id:
++          type: string
++          format: uuid
++          nullable: true
++        resource_kind:
++          type: string
++          nullable: true
++          enum:
++          - desk
++          - meeting_room
++          - parking_space
++          - vehicle
++          - locker
++          - other
++    BookingPolicy:
++      type: object
++      required:
++      - id
++      - name
++      - scope
++      - horizon_days
++      - max_duration_minutes
++      - check_in_required
++      - allow_recurrence
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        name:
++          type: string
++        scope:
++          $ref: '#/components/schemas/PolicyScope'
++        horizon_days:
++          type: integer
++          minimum: 0
++          description: How far ahead bookings are allowed
++        max_duration_minutes:
++          type: integer
++          minimum: 15
++        max_active_bookings_per_user:
++          type: integer
++          minimum: 1
++          nullable: true
++        check_in_required:
++          type: boolean
++        check_in_opens_minutes_before:
++          type: integer
++          minimum: 0
++          default: 15
++        auto_release_after_minutes:
++          type: integer
++          minimum: 1
++          nullable: true
++          description: Release a booking not checked in within this time
++        allow_recurrence:
++          type: boolean
++        working_hours:
++          type: object
++          nullable: true
++          properties:
++            opens:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++            closes:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++    CreateBookingPolicyRequest:
++      type: object
++      required:
++      - name
++      - scope
++      - horizon_days
++      - max_duration_minutes
++      - check_in_required
++      - allow_recurrence
++      properties:
++        name:
++          type: string
++        scope:
++          $ref: '#/components/schemas/PolicyScope'
++        horizon_days:
++          type: integer
++          minimum: 0
++          description: How far ahead bookings are allowed
++        max_duration_minutes:
++          type: integer
++          minimum: 15
++        max_active_bookings_per_user:
++          type: integer
++          minimum: 1
++          nullable: true
++        check_in_required:
++          type: boolean
++        check_in_opens_minutes_before:
++          type: integer
++          minimum: 0
++          default: 15
++        auto_release_after_minutes:
++          type: integer
++          minimum: 1
++          nullable: true
++          description: Release a booking not checked in within this time
++        allow_recurrence:
++          type: boolean
++        working_hours:
++          type: object
++          nullable: true
++          properties:
++            opens:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++            closes:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++    UpdateBookingPolicyRequest:
++      type: object
++      properties:
++        name:
++          type: string
++        scope:
++          $ref: '#/components/schemas/PolicyScope'
++        horizon_days:
++          type: integer
++          minimum: 0
++          description: How far ahead bookings are allowed
++        max_duration_minutes:
++          type: integer
++          minimum: 15
++        max_active_bookings_per_user:
++          type: integer
++          minimum: 1
++          nullable: true
++        check_in_required:
++          type: boolean
++        check_in_opens_minutes_before:
++          type: integer
++          minimum: 0
++          default: 15
++        auto_release_after_minutes:
++          type: integer
++          minimum: 1
++          nullable: true
++          description: Release a booking not checked in within this time
++        allow_recurrence:
++          type: boolean
++        working_hours:
++          type: object
++          nullable: true
++          properties:
++            opens:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++            closes:
++              type: string
++              pattern: ^[0-2][0-9]:[0-5][0-9]$
++      minProperties: 1
++    ResourceBlock:
++      type: object
++      required:
++      - id
++      - resource_ids
++      - starts_at
++      - ends_at
++      - reason
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        resource_ids:
++          type: array
++          minItems: 1
++          items:
++            type: string
++            format: uuid
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        reason:
++          type: string
++          maxLength: 500
++        cancel_existing:
++          type: boolean
++          default: false
++          description: Cancel and notify affected bookings; otherwise 409 on overlap
++    CreateResourceBlockRequest:
++      type: object
++      required:
++      - resource_ids
++      - starts_at
++      - ends_at
++      - reason
++      properties:
++        resource_ids:
++          type: array
++          minItems: 1
++          items:
++            type: string
++            format: uuid
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        reason:
++          type: string
++          maxLength: 500
++        cancel_existing:
++          type: boolean
++          default: false
++          description: Cancel and notify affected bookings; otherwise 409 on overlap
++    UpdateResourceBlockRequest:
++      type: object
++      properties:
++        resource_ids:
++          type: array
++          minItems: 1
++          items:
++            type: string
++            format: uuid
++        starts_at:
++          type: string
++          format: date-time
++        ends_at:
++          type: string
++          format: date-time
++        reason:
++          type: string
++          maxLength: 500
++        cancel_existing:
++          type: boolean
++          default: false
++          description: Cancel and notify affected bookings; otherwise 409 on overlap
++      minProperties: 1
++    UtilisationBucket:
++      type: object
++      description: Aggregated occupancy facts for heatmaps and space-optimisation reports.
++      required:
++      - resource_id
++      - date
++      - available_minutes
++      - booked_minutes
++      - occupied_minutes
++      - no_show_count
++      properties:
++        resource_id:
++          type: string
++          format: uuid
++        date:
++          type: string
++          format: date
++        available_minutes:
++          type: integer
++        booked_minutes:
++          type: integer
++        occupied_minutes:
++          type: integer
++          description: Minutes covered by checked-in bookings
++        no_show_count:
++          type: integer
++  securitySchemes:
++    bearerAuth:
++      type: http
++      scheme: bearer
++      bearerFormat: JWT
++      description: Access token issued by the RERP identity service (Sesame IDAM)
+diff --git a/openapi/workplace/spaces/README.md b/openapi/workplace/spaces/README.md
+new file mode 100644
+index 0000000..970b553
+--- /dev/null
++++ b/openapi/workplace/spaces/README.md
+@@ -0,0 +1,31 @@
++# Workplace Spaces
++
++> **Status: PROPOSED** contract, version 0.1.0. See
++> [ADR 003](../../../docs/adrs/003-workplace-booking-suite-boundary.md).
++
++## Responsibility
++
++Owns the physical model of bookable space:
++
++- **Sites, buildings, floors** with IANA time zones and ordinal levels.
++- **Background plans**: an image or PDF page stored in Documents, calibrated by
++  two image points and a real distance.
++- **Floor geometry** as one versioned document: corners, walls between corners,
++  and openings hosted on walls. Saved with optimistic concurrency
++  (`base_revision`; `409` if stale).
++- **Rooms** derived from closed wall loops after each save. Rooms can be named
++  and classified but not drawn.
++- **Zones**: polygons with group/role access rules.
++- **Resources**: desks, meeting rooms, parking spaces, vehicles, and lockers
++  with geometry, attributes, assignment mode, and a QR check-in code.
++
++Coordinates are millimetres in each floor's own coordinate system.
++
++## Design notes
++
++- Moving a corner moves every wall that shares it; this is what makes tracing
++  feel like CAD rather than drawing.
++- A plan save never deletes resources. Resources left outside every room are
++  returned as `PlanWarning` entries.
++- `POST /v1/floors/{id}/resource-batches` places a grid of desks in one call,
++  which matters at the scale of hundreds of desks per floor.
+diff --git a/openapi/workplace/spaces/openapi.yaml b/openapi/workplace/spaces/openapi.yaml
+new file mode 100644
+index 0000000..5f28485
+--- /dev/null
++++ b/openapi/workplace/spaces/openapi.yaml
+@@ -0,0 +1,1858 @@
++openapi: 3.0.3
++info:
++  title: RERP Workplace Spaces API
++  version: 0.1.0
++  description: 'PROPOSED contract (see ADR 003). Owns the physical model of bookable space: sites, buildings,
++    floors with calibrated background plans, wall-graph floor geometry with derived rooms, zones, and
++    bookable resources. Tenant and caller identity are resolved from the bearer token. Coordinates are
++    millimetres in each floor''s own coordinate system.'
++servers:
++- url: /
++security:
++- bearerAuth: []
++tags:
++- name: sites
++- name: buildings
++- name: floors
++- name: floor-plans
++- name: zones
++- name: resources
++paths:
++  /v1/sites:
++    get:
++      operationId: list_sites
++      tags:
++      - sites
++      summary: List sites
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      responses:
++        '200':
++          description: Page of sites
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Site'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_site
++      tags:
++      - sites
++      summary: Create a site
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateSiteRequest'
++      responses:
++        '201':
++          description: The site was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Site'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/sites/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_site
++      tags:
++      - sites
++      summary: Retrieve a site
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The site
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Site'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_site
++      tags:
++      - sites
++      summary: Update a site
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateSiteRequest'
++      responses:
++        '200':
++          description: The updated site
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Site'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_site
++      tags:
++      - sites
++      summary: Archive a site
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/buildings:
++    get:
++      operationId: list_buildings
++      tags:
++      - buildings
++      summary: List buildings
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: site_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by site
++      responses:
++        '200':
++          description: Page of buildings
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Building'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_building
++      tags:
++      - buildings
++      summary: Create a building
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateBuildingRequest'
++      responses:
++        '201':
++          description: The building was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Building'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/buildings/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_building
++      tags:
++      - buildings
++      summary: Retrieve a building
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The building
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Building'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_building
++      tags:
++      - buildings
++      summary: Update a building
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateBuildingRequest'
++      responses:
++        '200':
++          description: The updated building
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Building'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_building
++      tags:
++      - buildings
++      summary: Archive a building
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/floors:
++    get:
++      operationId: list_floors
++      tags:
++      - floors
++      summary: List floors
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: building_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by building
++      responses:
++        '200':
++          description: Page of floors
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Floor'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_floor
++      tags:
++      - floors
++      summary: Create a floor
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateFloorRequest'
++      responses:
++        '201':
++          description: The floor was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Floor'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/floors/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_floor
++      tags:
++      - floors
++      summary: Retrieve a floor
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The floor
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Floor'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_floor
++      tags:
++      - floors
++      summary: Update a floor
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateFloorRequest'
++      responses:
++        '200':
++          description: The updated floor
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Floor'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_floor
++      tags:
++      - floors
++      summary: Archive a floor
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/floors/{id}/plan:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_floor_plan
++      tags:
++      - floor-plans
++      summary: Retrieve the editable geometry of a floor
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: Current floor plan
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/FloorPlan'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    put:
++      operationId: save_floor_plan
++      tags:
++      - floor-plans
++      summary: Replace the floor geometry
++      x-brrtrouter-impl: true
++      description: Saves corners, walls and openings as one revision. Rooms are recomputed from closed
++        wall loops. Existing room identities are preserved where a loop is unchanged. Resources left outside
++        every room are reported as warnings, never deleted.
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/SaveFloorPlanRequest'
++      responses:
++        '200':
++          description: Saved; rooms were recomputed
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/SaveFloorPlanResult'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/floors/{id}/rooms:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: list_floor_rooms
++      tags:
++      - floor-plans
++      summary: List rooms derived from the floor plan
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: Rooms on this floor
++          content:
++            application/json:
++              schema:
++                type: array
++                items:
++                  $ref: '#/components/schemas/Room'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++  /v1/rooms/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    patch:
++      operationId: update_room
++      tags:
++      - floor-plans
++      summary: Name or classify a derived room
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateRoomRequest'
++      responses:
++        '200':
++          description: The updated room
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Room'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++  /v1/zones:
++    get:
++      operationId: list_zones
++      tags:
++      - zones
++      summary: List zones
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: floor_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by floor
++      responses:
++        '200':
++          description: Page of zones
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Zone'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_zone
++      tags:
++      - zones
++      summary: Create a zone
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateZoneRequest'
++      responses:
++        '201':
++          description: The zone was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Zone'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/zones/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_zone
++      tags:
++      - zones
++      summary: Retrieve a zone
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The zone
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Zone'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_zone
++      tags:
++      - zones
++      summary: Update a zone
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateZoneRequest'
++      responses:
++        '200':
++          description: The updated zone
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Zone'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_zone
++      tags:
++      - zones
++      summary: Archive a zone
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/resources:
++    get:
++      operationId: list_resources
++      tags:
++      - resources
++      summary: List resources
++      x-brrtrouter-impl: true
++      parameters:
++      - $ref: '#/components/parameters/Page'
++      - $ref: '#/components/parameters/Limit'
++      - name: floor_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by floor
++      - name: zone_id
++        in: query
++        schema:
++          type: string
++          format: uuid
++        description: Filter by zone
++      - name: kind
++        in: query
++        schema:
++          $ref: '#/components/schemas/ResourceKind'
++        description: Filter by resource kind
++      - name: attribute
++        in: query
++        schema:
++          type: string
++        description: Require this attribute tag
++      responses:
++        '200':
++          description: Page of resources
++          content:
++            application/json:
++              schema:
++                type: object
++                required:
++                - items
++                - total
++                - page
++                - limit
++                properties:
++                  items:
++                    type: array
++                    items:
++                      $ref: '#/components/schemas/Resource'
++                  total:
++                    type: integer
++                  page:
++                    type: integer
++                  limit:
++                    type: integer
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++    post:
++      operationId: create_resource
++      tags:
++      - resources
++      summary: Create a resource
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/CreateResourceRequest'
++      responses:
++        '201':
++          description: The resource was created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Resource'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++  /v1/resources/{id}:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    get:
++      operationId: get_resource
++      tags:
++      - resources
++      summary: Retrieve a resource
++      x-brrtrouter-impl: true
++      responses:
++        '200':
++          description: The resource
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Resource'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++    patch:
++      operationId: update_resource
++      tags:
++      - resources
++      summary: Update a resource
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/UpdateResourceRequest'
++      responses:
++        '200':
++          description: The updated resource
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/Resource'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++    delete:
++      operationId: archive_resource
++      tags:
++      - resources
++      summary: Archive a resource
++      x-brrtrouter-impl: true
++      responses:
++        '204':
++          description: Archived; historical bookings and utilisation remain intact
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '409':
++          $ref: '#/components/responses/Conflict'
++  /v1/floors/{id}/resource-batches:
++    parameters:
++    - $ref: '#/components/parameters/Id'
++    post:
++      operationId: place_resource_batch
++      tags:
++      - resources
++      summary: Place a grid of resources on a floor
++      x-brrtrouter-impl: true
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema:
++              $ref: '#/components/schemas/ResourceBatchRequest'
++      responses:
++        '201':
++          description: Resources created
++          content:
++            application/json:
++              schema:
++                $ref: '#/components/schemas/ResourceBatchResult'
++        '400':
++          $ref: '#/components/responses/BadRequest'
++        '401':
++          $ref: '#/components/responses/Unauthorized'
++        '403':
++          $ref: '#/components/responses/Forbidden'
++        '404':
++          $ref: '#/components/responses/NotFound'
++        '422':
++          $ref: '#/components/responses/Unprocessable'
++components:
++  parameters:
++    Id:
++      name: id
++      in: path
++      required: true
++      schema:
++        type: string
++        format: uuid
++    Page:
++      name: page
++      in: query
++      schema:
++        type: integer
++        minimum: 1
++        default: 1
++    Limit:
++      name: limit
++      in: query
++      schema:
++        type: integer
++        minimum: 1
++        maximum: 200
++        default: 50
++  responses:
++    BadRequest:
++      description: The request is malformed
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Unauthorized:
++      description: Missing or invalid bearer token
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Forbidden:
++      description: The caller lacks permission for this operation or resource
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    NotFound:
++      description: The resource does not exist for this tenant
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Conflict:
++      description: The request conflicts with current state (stale revision or overlapping booking)
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++    Unprocessable:
++      description: The request is well formed but violates a domain rule
++      content:
++        application/json:
++          schema:
++            $ref: '#/components/schemas/Error'
++  schemas:
++    Error:
++      type: object
++      description: Standard error response
++      required:
++      - error
++      - message
++      properties:
++        error:
++          type: string
++          description: Machine-readable error code
++        message:
++          type: string
++          description: Human-readable error message
++        details:
++          type: object
++          nullable: true
++          additionalProperties: true
++          description: Additional error details
++    Point:
++      type: object
++      description: A point in the floor coordinate system, in millimetres from the floor origin.
++      required:
++      - x_mm
++      - y_mm
++      properties:
++        x_mm:
++          type: number
++        y_mm:
++          type: number
++    Polygon:
++      type: array
++      description: Closed polygon; the last point implicitly connects to the first. Minimum three points.
++      minItems: 3
++      items:
++        $ref: '#/components/schemas/Point'
++    Site:
++      type: object
++      required:
++      - id
++      - name
++      - time_zone
++      - active
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        name:
++          type: string
++          maxLength: 200
++        address:
++          type: string
++          nullable: true
++        time_zone:
++          type: string
++          description: IANA time zone used for booking windows, e.g. Europe/Berlin
++        active:
++          type: boolean
++    Building:
++      type: object
++      required:
++      - id
++      - site_id
++      - name
++      - active
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        site_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        code:
++          type: string
++          nullable: true
++          maxLength: 32
++        active:
++          type: boolean
++    BackgroundCalibration:
++      type: object
++      description: Maps the uploaded plan image onto floor coordinates. The user marks two points on the
++        image and enters the real distance between them; rotation and origin align the image to the floor
++        axes.
++      required:
++      - document_id
++      - image_point_a
++      - image_point_b
++      - real_distance_mm
++      properties:
++        document_id:
++          type: string
++          format: uuid
++          description: Plan image or PDF page stored in the Documents suite
++        page:
++          type: integer
++          minimum: 1
++          default: 1
++        image_point_a:
++          $ref: '#/components/schemas/ImagePoint'
++        image_point_b:
++          $ref: '#/components/schemas/ImagePoint'
++        real_distance_mm:
++          type: number
++          exclusiveMinimum: true
++          minimum: 0
++        rotation_deg:
++          type: number
++          default: 0
++        origin_offset:
++          $ref: '#/components/schemas/Point'
++        opacity:
++          type: number
++          minimum: 0
++          maximum: 1
++          default: 0.5
++    ImagePoint:
++      type: object
++      required:
++      - px
++      - py
++      properties:
++        px:
++          type: number
++        py:
++          type: number
++    Floor:
++      type: object
++      required:
++      - id
++      - building_id
++      - name
++      - level
++      - plan_revision
++      - published
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        building_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        level:
++          type: integer
++          description: Ordinal level; 0 is ground, negative below ground
++        background:
++          allOf:
++          - $ref: '#/components/schemas/BackgroundCalibration'
++          nullable: true
++        plan_revision:
++          type: integer
++          minimum: 0
++          description: Current revision of the floor plan geometry
++        published:
++          type: boolean
++          description: Only published floors are visible to booking users
++    Corner:
++      type: object
++      description: Shared wall endpoint. Moving a corner moves every wall attached to it.
++      required:
++      - id
++      - position
++      properties:
++        id:
++          type: string
++          format: uuid
++        position:
++          $ref: '#/components/schemas/Point'
++    Wall:
++      type: object
++      description: Straight wall between two corners. Walls form a graph; closed loops define rooms.
++      required:
++      - id
++      - start_corner_id
++      - end_corner_id
++      - thickness_mm
++      properties:
++        id:
++          type: string
++          format: uuid
++        start_corner_id:
++          type: string
++          format: uuid
++        end_corner_id:
++          type: string
++          format: uuid
++        thickness_mm:
++          type: number
++          minimum: 1
++          default: 120
++        kind:
++          type: string
++          enum:
++          - structural
++          - partition
++          - glass
++          - virtual
++          default: partition
++          description: virtual walls split open-plan space into rooms without a physical wall
++    Opening:
++      type: object
++      description: Door or window hosted on a wall, positioned by distance along the wall from its start
++        corner.
++      required:
++      - id
++      - wall_id
++      - kind
++      - offset_mm
++      - width_mm
++      properties:
++        id:
++          type: string
++          format: uuid
++        wall_id:
++          type: string
++          format: uuid
++        kind:
++          type: string
++          enum:
++          - door
++          - double_door
++          - sliding_door
++          - window
++          - opening
++        offset_mm:
++          type: number
++          minimum: 0
++        width_mm:
++          type: number
++          minimum: 1
++        swing:
++          type: string
++          enum:
++          - left
++          - right
++          - none
++          default: none
++    FloorPlan:
++      type: object
++      description: 'Complete editable geometry of one floor. Saved as a whole document with optimistic
++        concurrency: the client sends the revision it edited and receives 409 if another editor saved
++        first.'
++      required:
++      - floor_id
++      - revision
++      - corners
++      - walls
++      - openings
++      properties:
++        floor_id:
++          type: string
++          format: uuid
++        revision:
++          type: integer
++          minimum: 0
++        corners:
++          type: array
++          items:
++            $ref: '#/components/schemas/Corner'
++        walls:
++          type: array
++          items:
++            $ref: '#/components/schemas/Wall'
++        openings:
++          type: array
++          items:
++            $ref: '#/components/schemas/Opening'
++    SaveFloorPlanRequest:
++      type: object
++      required:
++      - base_revision
++      - corners
++      - walls
++      - openings
++      properties:
++        base_revision:
++          type: integer
++          minimum: 0
++          description: Revision the client edited; must equal the current revision
++        corners:
++          type: array
++          items:
++            $ref: '#/components/schemas/Corner'
++        walls:
++          type: array
++          items:
++            $ref: '#/components/schemas/Wall'
++        openings:
++          type: array
++          items:
++            $ref: '#/components/schemas/Opening'
++    SaveFloorPlanResult:
++      type: object
++      required:
++      - plan
++      - rooms
++      - warnings
++      properties:
++        plan:
++          $ref: '#/components/schemas/FloorPlan'
++        rooms:
++          type: array
++          items:
++            $ref: '#/components/schemas/Room'
++          description: Rooms recomputed from closed wall loops after the save
++        warnings:
++          type: array
++          items:
++            $ref: '#/components/schemas/PlanWarning'
++    PlanWarning:
++      type: object
++      required:
++      - code
++      - message
++      properties:
++        code:
++          type: string
++          enum:
++          - resource_outside_room
++          - room_removed_with_resources
++          - unclosed_wall_loop
++          - overlapping_walls
++          - opening_exceeds_wall
++        message:
++          type: string
++        entity_ids:
++          type: array
++          items:
++            type: string
++            format: uuid
++    Room:
++      type: object
++      required:
++      - id
++      - floor_id
++      - outline
++      - area_m2
++      - kind
++      - wall_ids
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        floor_id:
++          type: string
++          format: uuid
++        outline:
++          $ref: '#/components/schemas/Polygon'
++        area_m2:
++          type: number
++          readOnly: true
++        name:
++          type: string
++          nullable: true
++          maxLength: 200
++        kind:
++          type: string
++          enum:
++          - office
++          - open_plan
++          - meeting
++          - corridor
++          - kitchen
++          - restroom
++          - storage
++          - other
++          default: other
++        wall_ids:
++          type: array
++          items:
++            type: string
++            format: uuid
++          readOnly: true
++          description: Walls forming the loop; geometry is derived and not directly editable
++    UpdateRoomRequest:
++      type: object
++      minProperties: 1
++      properties:
++        name:
++          type: string
++          nullable: true
++          maxLength: 200
++        kind:
++          type: string
++          enum:
++          - office
++          - open_plan
++          - meeting
++          - corridor
++          - kitchen
++          - restroom
++          - storage
++          - other
++          default: other
++    Zone:
++      type: object
++      required:
++      - id
++      - floor_id
++      - name
++      - outline
++      - access
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        floor_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        outline:
++          $ref: '#/components/schemas/Polygon'
++        access:
++          $ref: '#/components/schemas/AccessRule'
++        colour:
++          type: string
++          pattern: ^#[0-9a-fA-F]{6}$
++          nullable: true
++    AccessRule:
++      type: object
++      description: Who may book resources in this scope. Empty lists mean everyone in the tenant. Group
++        and role identifiers are resolved by the Auth suite (RBAC); this service stores references only.
++      properties:
++        allowed_group_ids:
++          type: array
++          items:
++            type: string
++            format: uuid
++          default: []
++        allowed_role_ids:
++          type: array
++          items:
++            type: string
++            format: uuid
++          default: []
++    ResourceKind:
++      type: string
++      enum:
++      - desk
++      - meeting_room
++      - parking_space
++      - vehicle
++      - locker
++      - other
++    ResourceGeometry:
++      type: object
++      description: Placement on the floor. Desks and parking spaces use a rotated rectangle; rooms may
++        use a polygon.
++      properties:
++        center:
++          $ref: '#/components/schemas/Point'
++        width_mm:
++          type: number
++          minimum: 1
++        depth_mm:
++          type: number
++          minimum: 1
++        rotation_deg:
++          type: number
++          default: 0
++        outline:
++          allOf:
++          - $ref: '#/components/schemas/Polygon'
++          nullable: true
++    Resource:
++      type: object
++      required:
++      - id
++      - kind
++      - label
++      - capacity
++      - assignment
++      - active
++      - created_at
++      - updated_at
++      properties:
++        id:
++          type: string
++          format: uuid
++        created_at:
++          type: string
++          format: date-time
++        updated_at:
++          type: string
++          format: date-time
++        kind:
++          $ref: '#/components/schemas/ResourceKind'
++        label:
++          type: string
++          maxLength: 64
++          description: Human label, e.g. 3.14-A
++        floor_id:
++          type: string
++          format: uuid
++          nullable: true
++          description: Null for off-plan resources such as pool vehicles
++        room_id:
++          type: string
++          format: uuid
++          nullable: true
++        zone_id:
++          type: string
++          format: uuid
++          nullable: true
++        geometry:
++          allOf:
++          - $ref: '#/components/schemas/ResourceGeometry'
++          nullable: true
++        capacity:
++          type: integer
++          minimum: 1
++          default: 1
++        attributes:
++          type: array
++          items:
++            type: string
++          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
++        assignment:
++          type: string
++          enum:
++          - bookable
++          - assigned
++          - not_bookable
++          default: bookable
++        assigned_user_id:
++          type: string
++          format: uuid
++          nullable: true
++        access:
++          allOf:
++          - $ref: '#/components/schemas/AccessRule'
++          nullable: true
++          description: Overrides the zone rule when present
++        check_in_code:
++          type: string
++          readOnly: true
++          description: Opaque value encoded in the QR label at the resource
++        active:
++          type: boolean
++    CreateResourceRequest:
++      type: object
++      required:
++      - kind
++      - label
++      properties:
++        kind:
++          $ref: '#/components/schemas/ResourceKind'
++        label:
++          type: string
++          maxLength: 64
++          description: Human label, e.g. 3.14-A
++        floor_id:
++          type: string
++          format: uuid
++          nullable: true
++          description: Null for off-plan resources such as pool vehicles
++        room_id:
++          type: string
++          format: uuid
++          nullable: true
++        zone_id:
++          type: string
++          format: uuid
++          nullable: true
++        geometry:
++          allOf:
++          - $ref: '#/components/schemas/ResourceGeometry'
++          nullable: true
++        capacity:
++          type: integer
++          minimum: 1
++          default: 1
++        attributes:
++          type: array
++          items:
++            type: string
++          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
++        assignment:
++          type: string
++          enum:
++          - bookable
++          - assigned
++          - not_bookable
++          default: bookable
++        assigned_user_id:
++          type: string
++          format: uuid
++          nullable: true
++        access:
++          allOf:
++          - $ref: '#/components/schemas/AccessRule'
++          nullable: true
++          description: Overrides the zone rule when present
++        active:
++          type: boolean
++    UpdateResourceRequest:
++      type: object
++      properties:
++        kind:
++          $ref: '#/components/schemas/ResourceKind'
++        label:
++          type: string
++          maxLength: 64
++          description: Human label, e.g. 3.14-A
++        floor_id:
++          type: string
++          format: uuid
++          nullable: true
++          description: Null for off-plan resources such as pool vehicles
++        room_id:
++          type: string
++          format: uuid
++          nullable: true
++        zone_id:
++          type: string
++          format: uuid
++          nullable: true
++        geometry:
++          allOf:
++          - $ref: '#/components/schemas/ResourceGeometry'
++          nullable: true
++        capacity:
++          type: integer
++          minimum: 1
++          default: 1
++        attributes:
++          type: array
++          items:
++            type: string
++          description: Free tags such as dual_monitor, standing_desk, wheelchair_accessible
++        assignment:
++          type: string
++          enum:
++          - bookable
++          - assigned
++          - not_bookable
++          default: bookable
++        assigned_user_id:
++          type: string
++          format: uuid
++          nullable: true
++        access:
++          allOf:
++          - $ref: '#/components/schemas/AccessRule'
++          nullable: true
++          description: Overrides the zone rule when present
++        active:
++          type: boolean
++      minProperties: 1
++    ResourceBatchRequest:
++      type: object
++      description: Place a grid of identical resources in one operation (rows x columns).
++      required:
++      - kind
++      - origin
++      - rows
++      - columns
++      - pitch_x_mm
++      - pitch_y_mm
++      - label_pattern
++      properties:
++        kind:
++          $ref: '#/components/schemas/ResourceKind'
++        origin:
++          $ref: '#/components/schemas/Point'
++        rows:
++          type: integer
++          minimum: 1
++          maximum: 50
++        columns:
++          type: integer
++          minimum: 1
++          maximum: 50
++        pitch_x_mm:
++          type: number
++          minimum: 1
++        pitch_y_mm:
++          type: number
++          minimum: 1
++        rotation_deg:
++          type: number
++          default: 0
++        width_mm:
++          type: number
++          minimum: 1
++          default: 1600
++        depth_mm:
++          type: number
++          minimum: 1
++          default: 800
++        zone_id:
++          type: string
++          format: uuid
++          nullable: true
++        attributes:
++          type: array
++          items:
++            type: string
++        label_pattern:
++          type: string
++          description: Label template with {row}, {col} and {n} placeholders, e.g. 3-{n:02}
++    ResourceBatchResult:
++      type: object
++      required:
++      - created
++      properties:
++        created:
++          type: array
++          items:
++            $ref: '#/components/schemas/Resource'
++        warnings:
++          type: array
++          items:
++            $ref: '#/components/schemas/PlanWarning'
++    CreateSiteRequest:
++      type: object
++      required:
++      - name
++      - time_zone
++      properties:
++        name:
++          type: string
++          maxLength: 200
++        address:
++          type: string
++          nullable: true
++        time_zone:
++          type: string
++          description: IANA time zone used for booking windows, e.g. Europe/Berlin
++        active:
++          type: boolean
++    UpdateSiteRequest:
++      type: object
++      properties:
++        name:
++          type: string
++          maxLength: 200
++        address:
++          type: string
++          nullable: true
++        time_zone:
++          type: string
++          description: IANA time zone used for booking windows, e.g. Europe/Berlin
++        active:
++          type: boolean
++      minProperties: 1
++    CreateBuildingRequest:
++      type: object
++      required:
++      - site_id
++      - name
++      properties:
++        site_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        code:
++          type: string
++          nullable: true
++          maxLength: 32
++        active:
++          type: boolean
++    UpdateBuildingRequest:
++      type: object
++      properties:
++        site_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        code:
++          type: string
++          nullable: true
++          maxLength: 32
++        active:
++          type: boolean
++      minProperties: 1
++    CreateFloorRequest:
++      type: object
++      required:
++      - building_id
++      - name
++      - level
++      properties:
++        building_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        level:
++          type: integer
++          description: Ordinal level; 0 is ground, negative below ground
++        background:
++          allOf:
++          - $ref: '#/components/schemas/BackgroundCalibration'
++          nullable: true
++        published:
++          type: boolean
++          description: Only published floors are visible to booking users
++    UpdateFloorRequest:
++      type: object
++      properties:
++        building_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        level:
++          type: integer
++          description: Ordinal level; 0 is ground, negative below ground
++        background:
++          allOf:
++          - $ref: '#/components/schemas/BackgroundCalibration'
++          nullable: true
++        published:
++          type: boolean
++          description: Only published floors are visible to booking users
++      minProperties: 1
++    CreateZoneRequest:
++      type: object
++      required:
++      - floor_id
++      - name
++      - outline
++      properties:
++        floor_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        outline:
++          $ref: '#/components/schemas/Polygon'
++        access:
++          $ref: '#/components/schemas/AccessRule'
++        colour:
++          type: string
++          pattern: ^#[0-9a-fA-F]{6}$
++          nullable: true
++    UpdateZoneRequest:
++      type: object
++      properties:
++        floor_id:
++          type: string
++          format: uuid
++        name:
++          type: string
++          maxLength: 200
++        outline:
++          $ref: '#/components/schemas/Polygon'
++        access:
++          $ref: '#/components/schemas/AccessRule'
++        colour:
++          type: string
++          pattern: ^#[0-9a-fA-F]{6}$
++          nullable: true
++      minProperties: 1
++  securitySchemes:
++    bearerAuth:
++      type: http
++      scheme: bearer
++      bearerFormat: JWT
++      description: Access token issued by the RERP identity service (Sesame IDAM)
+-- 
+2.43.0
+

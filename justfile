@@ -4,7 +4,7 @@
 # Set shell for recipes
 set shell := ["bash", "-uc"]
 
-shared_k8s_root := "../shared-k8s-cluster"
+shared_k8s_root := "../shared-gitops-k8s-cluster"
 shared_k8s_kubeconfig := shared_k8s_root + "/kubeconfig/shared-k8s.yaml"
 
 # Default recipe to display help
@@ -15,7 +15,7 @@ default:
 # Development Environment
 # ============================================================================
 
-# Start development environment (uses shared-k8s cluster; owned by shared-k8s-cluster).
+# Start development environment (uses shared-k8s cluster; owned by shared-gitops-k8s-cluster).
 dev-up:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -52,7 +52,7 @@ dev-up:
     echo "WARNING: Tilt did not become ready within 2 minutes"
     exit 1
 
-# Stop development environment (Tilt via systemd only; shared-k8s cluster owned by shared-k8s-cluster)
+# Stop development environment (Tilt via systemd only; shared-k8s cluster owned by shared-gitops-k8s-cluster)
 dev-down:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -63,7 +63,7 @@ dev-down:
     systemctl --user stop tilt-rerp.service || true
 
     echo "✅ Development environment stopped"
-    echo "   (shared-k8s cluster unchanged — owned by shared-k8s-cluster.)"
+    echo "   (shared-k8s cluster unchanged — owned by shared-gitops-k8s-cluster.)"
 
 # Setup development environment (Tilt-based)
 setup:

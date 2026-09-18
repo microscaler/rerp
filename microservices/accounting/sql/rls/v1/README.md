@@ -1,7 +1,7 @@
 # Sesame RLS Contract v1
 
 `install.sql` is the application-vendored Sesame/Lifeguard RLS protocol. Its
-canonical source is `seasame-idam/sql/rls/v1/install.sql`; RERP keeps a copy so
+canonical source is `sesame-idam/sql/rls/v1/install.sql`; RERP keeps a copy so
 a self-hosted database can be bootstrapped without a runtime dependency on the
 Sesame repository.
 
