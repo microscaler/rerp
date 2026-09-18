@@ -22,7 +22,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: db-init
-          image: 10.177.76.220:5000/rerp-accounting-db-init:dev-1784199811806072490 # {"$imagepolicy": "flux-system:rerp-accounting-db-init"}
+          image: 10.177.76.220:5000/rerp-accounting-db-init:dev-1789753885632837390 # {"$imagepolicy": "flux-system:rerp-accounting-db-init"}
           imagePullPolicy: IfNotPresent
           env:
             - name: PGHOST
