@@ -4,7 +4,7 @@ This register is the authoritative inventory of RERP ADRs. See
 [`DOCUMENTATION_GOVERNANCE.md`](../DOCUMENTATION_GOVERNANCE.md) for lifecycle,
 authority, and supersession rules.
 
-**Next ADR number:** `003`
+**Next ADR number:** `004`
 
 ## Status vocabulary
 
@@ -19,6 +19,7 @@ authority, and supersession rules.
 |---|---|---|---|
 | [001](./001-accounting-runtime-boundary.md) | Accepted | `accounting.runtime-boundary` | First invoice-to-GL slice remains atomic within the invoice implementation runtime |
 | [002](./002-document-generation-ownership.md) | Accepted | `documents.generated-rendition-ownership` | Documents owns generic generated renditions; source suites own business facts |
+| [003](./003-workplace-booking-suite-boundary.md) | Proposed | `workplace.suite-boundary` | Workplace booking is a separate suite with Spaces and Bookings services |
 
 ## Creating an ADR
 

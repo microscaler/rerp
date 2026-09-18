@@ -1,0 +1,1319 @@
+openapi: 3.0.3
+info:
+  title: RERP Workplace Bookings API
+  version: 0.1.0
+  description: 'PROPOSED contract (see ADR 003). Owns reservations of resources defined by the Workplace
+    Spaces service: bookings, recurrence, group bookings, check-in and no-show release, booking policies,
+    administrative blocks, availability for map rendering, and utilisation facts. Resource identity and
+    access rules are read from Spaces over its API.'
+servers:
+- url: /
+security:
+- bearerAuth: []
+tags:
+- name: bookings
+- name: availability
+- name: policies
+- name: blocks
+- name: utilisation
+paths:
+  /v1/bookings:
+    get:
+      operationId: list_bookings
+      tags:
+      - bookings
+      summary: List bookings
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: mine
+        in: query
+        schema:
+          type: boolean
+          default: true
+        description: Only the caller's bookings
+      - name: resource_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by resource
+      - name: floor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by floor
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window start
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window end
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/BookingStatus'
+        description: Filter by status
+      responses:
+        '200':
+          description: Page of bookings
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_booking
+      tags:
+      - bookings
+      summary: Book a resource, optionally recurring
+      x-brrtrouter-impl: true
+      description: Rejects overlapping bookings with 409. Policy and access checks return 403 or 422.
+        Recurring requests create every permitted occurrence and report the rest as skipped.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Booking(s) created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBookingResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/bookings/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_booking
+      tags:
+      - bookings
+      summary: Retrieve a booking
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_booking
+      tags:
+      - bookings
+      summary: Move or edit a booking
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingRequest'
+      responses:
+        '200':
+          description: The updated booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: cancel_booking
+      tags:
+      - bookings
+      summary: Cancel a booking
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Cancelled
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/bookings/{id}/check-in:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    post:
+      operationId: check_in_booking
+      tags:
+      - bookings
+      summary: Confirm presence at the booked resource
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckInRequest'
+      responses:
+        '200':
+          description: Checked in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/bookings/{id}/check-out:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    post:
+      operationId: check_out_booking
+      tags:
+      - bookings
+      summary: End a booking early and free the resource
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: Checked out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/group-bookings:
+    post:
+      operationId: create_group_booking
+      tags:
+      - bookings
+      summary: Book several resources for a team atomically
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupBookingRequest'
+      responses:
+        '201':
+          description: All bookings created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/availability:
+    get:
+      operationId: get_floor_availability
+      tags:
+      - availability
+      summary: Availability of every resource on a floor
+      x-brrtrouter-impl: true
+      description: Drives both the interactive map and the accessible list view.
+      parameters:
+      - name: floor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Floor to render
+        required: true
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window start
+        required: true
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window end
+        required: true
+      responses:
+        '200':
+          description: Per-resource availability for the requested window, filtered to what the caller
+            may see
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceAvailability'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/booking-policies:
+    get:
+      operationId: list_booking_policies
+      tags:
+      - policies
+      summary: List booking policies
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Page of booking policies
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookingPolicy'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_booking_policy
+      tags:
+      - policies
+      summary: Create a booking policy
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingPolicyRequest'
+      responses:
+        '201':
+          description: The booking policy was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPolicy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/booking-policies/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_booking_policy
+      tags:
+      - policies
+      summary: Retrieve a booking policy
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The booking policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPolicy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_booking_policy
+      tags:
+      - policies
+      summary: Update a booking policy
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingPolicyRequest'
+      responses:
+        '200':
+          description: The updated booking policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingPolicy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_booking_policy
+      tags:
+      - policies
+      summary: Archive a booking policy
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/resource-blocks:
+    get:
+      operationId: list_resource_blocks
+      tags:
+      - blocks
+      summary: List resource blocks
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: resource_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Filter by resource
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window start
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: Window end
+      responses:
+        '200':
+          description: Page of resource blocks
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                - total
+                - page
+                - limit
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ResourceBlock'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: create_resource_block
+      tags:
+      - blocks
+      summary: Create a resource block
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceBlockRequest'
+      responses:
+        '201':
+          description: The resource block was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBlock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+  /v1/resource-blocks/{id}:
+    parameters:
+    - $ref: '#/components/parameters/Id'
+    get:
+      operationId: get_resource_block
+      tags:
+      - blocks
+      summary: Retrieve a resource block
+      x-brrtrouter-impl: true
+      responses:
+        '200':
+          description: The resource block
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBlock'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: update_resource_block
+      tags:
+      - blocks
+      summary: Update a resource block
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateResourceBlockRequest'
+      responses:
+        '200':
+          description: The updated resource block
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBlock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+    delete:
+      operationId: archive_resource_block
+      tags:
+      - blocks
+      summary: Archive a resource block
+      x-brrtrouter-impl: true
+      responses:
+        '204':
+          description: Archived; historical bookings and utilisation remain intact
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/utilisation:
+    get:
+      operationId: list_utilisation
+      tags:
+      - utilisation
+      summary: Daily utilisation facts
+      x-brrtrouter-impl: true
+      description: Source data for heatmaps and space-optimisation reports in the Analytics suite.
+      parameters:
+      - name: floor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Floor
+      - name: zone_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Zone
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: First day
+        required: true
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Last day
+        required: true
+      responses:
+        '200':
+          description: Utilisation buckets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UtilisationBucket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+  responses:
+    BadRequest:
+      description: The request is malformed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: The caller lacks permission for this operation or resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The resource does not exist for this tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: The request conflicts with current state (stale revision or overlapping booking)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unprocessable:
+      description: The request is well formed but violates a domain rule
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      description: Standard error response
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Additional error details
+    BookingStatus:
+      type: string
+      enum:
+      - confirmed
+      - checked_in
+      - completed
+      - cancelled
+      - released_no_show
+    Recurrence:
+      type: object
+      description: Weekly recurrence for fixed office days.
+      required:
+      - weekdays
+      - until
+      properties:
+        weekdays:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - MO
+            - TU
+            - WE
+            - TH
+            - FR
+            - SA
+            - SU
+        until:
+          type: string
+          format: date
+    Booking:
+      type: object
+      required:
+      - id
+      - resource_id
+      - user_id
+      - booked_by_user_id
+      - starts_at
+      - ends_at
+      - status
+      - private
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        resource_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          description: Person the booking is for
+        booked_by_user_id:
+          type: string
+          format: uuid
+          description: Differs from user_id when booked on someone's behalf
+        series_id:
+          type: string
+          format: uuid
+          nullable: true
+        group_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Shared by bookings created together for a team
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        checked_in_at:
+          type: string
+          format: date-time
+          nullable: true
+        title:
+          type: string
+          nullable: true
+          maxLength: 200
+        private:
+          type: boolean
+          default: false
+          description: Hide the occupant's name from other users on the map
+    CreateBookingRequest:
+      type: object
+      required:
+      - resource_id
+      - starts_at
+      - ends_at
+      properties:
+        resource_id:
+          type: string
+          format: uuid
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        on_behalf_of_user_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Requires the booking-delegate permission
+        recurrence:
+          allOf:
+          - $ref: '#/components/schemas/Recurrence'
+          nullable: true
+        title:
+          type: string
+          nullable: true
+          maxLength: 200
+        private:
+          type: boolean
+          default: false
+    CreateBookingResult:
+      type: object
+      required:
+      - bookings
+      - skipped
+      properties:
+        bookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        skipped:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkippedOccurrence'
+          description: Recurring occurrences not created because of conflicts or policy
+    SkippedOccurrence:
+      type: object
+      required:
+      - starts_at
+      - reason
+      properties:
+        starts_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          enum:
+          - resource_booked
+          - resource_blocked
+          - outside_booking_horizon
+          - policy_violation
+    GroupBookingRequest:
+      type: object
+      description: Book several resources for several people in one atomic operation.
+      required:
+      - starts_at
+      - ends_at
+      - allocations
+      properties:
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        allocations:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required:
+            - resource_id
+            - user_id
+            properties:
+              resource_id:
+                type: string
+                format: uuid
+              user_id:
+                type: string
+                format: uuid
+        title:
+          type: string
+          nullable: true
+    UpdateBookingRequest:
+      type: object
+      minProperties: 1
+      properties:
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        resource_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        private:
+          type: boolean
+    CheckInRequest:
+      type: object
+      required:
+      - method
+      properties:
+        method:
+          type: string
+          enum:
+          - web
+          - qr
+          - nfc
+          - kiosk
+        check_in_code:
+          type: string
+          nullable: true
+          description: Required for qr and nfc; must match the resource's code
+    AvailabilityState:
+      type: string
+      enum:
+      - free
+      - booked
+      - occupied
+      - blocked
+      - assigned
+      - restricted
+      description: restricted means the caller may not book it; booked/occupied never reveal private names
+    ResourceAvailability:
+      type: object
+      required:
+      - resource_id
+      - state
+      properties:
+        resource_id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/AvailabilityState'
+        free_intervals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interval'
+        occupant_display_name:
+          type: string
+          nullable: true
+    Interval:
+      type: object
+      required:
+      - starts_at
+      - ends_at
+      properties:
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+    PolicyScope:
+      type: object
+      description: 'Most specific scope wins: resource, zone, floor, building, site, tenant default.'
+      properties:
+        site_id:
+          type: string
+          format: uuid
+          nullable: true
+        building_id:
+          type: string
+          format: uuid
+          nullable: true
+        floor_id:
+          type: string
+          format: uuid
+          nullable: true
+        zone_id:
+          type: string
+          format: uuid
+          nullable: true
+        resource_id:
+          type: string
+          format: uuid
+          nullable: true
+        resource_kind:
+          type: string
+          nullable: true
+          enum:
+          - desk
+          - meeting_room
+          - parking_space
+          - vehicle
+          - locker
+          - other
+    BookingPolicy:
+      type: object
+      required:
+      - id
+      - name
+      - scope
+      - horizon_days
+      - max_duration_minutes
+      - check_in_required
+      - allow_recurrence
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        name:
+          type: string
+        scope:
+          $ref: '#/components/schemas/PolicyScope'
+        horizon_days:
+          type: integer
+          minimum: 0
+          description: How far ahead bookings are allowed
+        max_duration_minutes:
+          type: integer
+          minimum: 15
+        max_active_bookings_per_user:
+          type: integer
+          minimum: 1
+          nullable: true
+        check_in_required:
+          type: boolean
+        check_in_opens_minutes_before:
+          type: integer
+          minimum: 0
+          default: 15
+        auto_release_after_minutes:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Release a booking not checked in within this time
+        allow_recurrence:
+          type: boolean
+        working_hours:
+          type: object
+          nullable: true
+          properties:
+            opens:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+            closes:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+    CreateBookingPolicyRequest:
+      type: object
+      required:
+      - name
+      - scope
+      - horizon_days
+      - max_duration_minutes
+      - check_in_required
+      - allow_recurrence
+      properties:
+        name:
+          type: string
+        scope:
+          $ref: '#/components/schemas/PolicyScope'
+        horizon_days:
+          type: integer
+          minimum: 0
+          description: How far ahead bookings are allowed
+        max_duration_minutes:
+          type: integer
+          minimum: 15
+        max_active_bookings_per_user:
+          type: integer
+          minimum: 1
+          nullable: true
+        check_in_required:
+          type: boolean
+        check_in_opens_minutes_before:
+          type: integer
+          minimum: 0
+          default: 15
+        auto_release_after_minutes:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Release a booking not checked in within this time
+        allow_recurrence:
+          type: boolean
+        working_hours:
+          type: object
+          nullable: true
+          properties:
+            opens:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+            closes:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+    UpdateBookingPolicyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        scope:
+          $ref: '#/components/schemas/PolicyScope'
+        horizon_days:
+          type: integer
+          minimum: 0
+          description: How far ahead bookings are allowed
+        max_duration_minutes:
+          type: integer
+          minimum: 15
+        max_active_bookings_per_user:
+          type: integer
+          minimum: 1
+          nullable: true
+        check_in_required:
+          type: boolean
+        check_in_opens_minutes_before:
+          type: integer
+          minimum: 0
+          default: 15
+        auto_release_after_minutes:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Release a booking not checked in within this time
+        allow_recurrence:
+          type: boolean
+        working_hours:
+          type: object
+          nullable: true
+          properties:
+            opens:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+            closes:
+              type: string
+              pattern: ^[0-2][0-9]:[0-5][0-9]$
+      minProperties: 1
+    ResourceBlock:
+      type: object
+      required:
+      - id
+      - resource_ids
+      - starts_at
+      - ends_at
+      - reason
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        resource_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          maxLength: 500
+        cancel_existing:
+          type: boolean
+          default: false
+          description: Cancel and notify affected bookings; otherwise 409 on overlap
+    CreateResourceBlockRequest:
+      type: object
+      required:
+      - resource_ids
+      - starts_at
+      - ends_at
+      - reason
+      properties:
+        resource_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          maxLength: 500
+        cancel_existing:
+          type: boolean
+          default: false
+          description: Cancel and notify affected bookings; otherwise 409 on overlap
+    UpdateResourceBlockRequest:
+      type: object
+      properties:
+        resource_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          maxLength: 500
+        cancel_existing:
+          type: boolean
+          default: false
+          description: Cancel and notify affected bookings; otherwise 409 on overlap
+      minProperties: 1
+    UtilisationBucket:
+      type: object
+      description: Aggregated occupancy facts for heatmaps and space-optimisation reports.
+      required:
+      - resource_id
+      - date
+      - available_minutes
+      - booked_minutes
+      - occupied_minutes
+      - no_show_count
+      properties:
+        resource_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        available_minutes:
+          type: integer
+        booked_minutes:
+          type: integer
+        occupied_minutes:
+          type: integer
+          description: Minutes covered by checked-in bookings
+        no_show_count:
+          type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token issued by the RERP identity service (Sesame IDAM)
