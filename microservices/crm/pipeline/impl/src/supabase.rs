@@ -2,8 +2,9 @@
 //!
 //! The just-enough CRM reads the PriceWhisperer marketing database (Supabase
 //! project `marketing`) directly over its REST API. Leads are a live view of
-//! two website tables — `email_captures` (waiting-list signups) and
-//! `contact_messages` (contact form) — joined with `email_addresses`,
+//! three website tables — `email_captures` (waiting-list signups),
+//! `contact_messages` (contact form) and `job_applications` (careers) —
+//! joined with `email_addresses`,
 //! `companies` and `plans`. Triage state (stage + note) is the one thing the
 //! CRM owns: the `crm_lead_state` table, keyed by the source row's UUID.
 //!
@@ -85,6 +86,9 @@ pub const STAGES: [StageDef; 5] = [
 /// Deterministic source ids so the portal can distinguish lead origins.
 pub const SOURCE_WAITING_LIST: &str = "00000000-0000-0000-0000-000000000201";
 pub const SOURCE_CONTACT_FORM: &str = "00000000-0000-0000-0000-000000000202";
+pub const SOURCE_CAREERS: &str = "00000000-0000-0000-0000-000000000203";
+
+const APPLICATION_SELECT: &str = "id,first_name,last_name,job_short_id,job_title,location,linkedin,github,technologies,interest,created_at,email_addresses(email,verified)";
 /// Tag applied to leads whose email address is verified.
 pub const TAG_EMAIL_VERIFIED: &str = "00000000-0000-0000-0000-000000000301";
 
@@ -382,6 +386,47 @@ fn message_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     lead
 }
 
+fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
+    let id = s(row, "id").unwrap_or_default();
+    let email = nested_s(row, "email_addresses", "email").unwrap_or_default();
+    let who = format!(
+        "{} {}",
+        s(row, "first_name").unwrap_or_default(),
+        s(row, "last_name").unwrap_or_default()
+    )
+    .trim()
+    .to_string();
+    let name = if who.is_empty() { email.clone() } else { who.clone() };
+    let created = s(row, "created_at").unwrap_or_default();
+    let mut lead = empty_lead(id, name, created);
+    lead.contact_name = Some(who);
+    lead.email_from = Some(email.clone());
+    lead.email_normalized = Some(email.to_lowercase());
+    lead.source_id = Some(SOURCE_CAREERS.to_string());
+    // The role applied for (job short id), like referred_by carries the form placement.
+    lead.referred_by = s(row, "job_short_id").or_else(|| Some("careers".to_string()));
+    lead.title = s(row, "job_title");
+    lead.website = s(row, "linkedin").or_else(|| s(row, "github"));
+    if nested_b(row, "email_addresses", "verified").unwrap_or(false) {
+        lead.tag_ids = Some(vec![TAG_EMAIL_VERIFIED.to_string()]);
+    }
+    let role = s(row, "job_title").unwrap_or_else(|| "General application".to_string());
+    let mut desc = format!("Careers application: {role}");
+    if let Some(loc) = s(row, "location").filter(|l| !l.is_empty()) {
+        desc.push_str(&format!(" ({loc})"));
+    }
+    if let Some(tech) = row.get("technologies").and_then(Value::as_array).filter(|t| !t.is_empty()) {
+        let t: Vec<&str> = tech.iter().filter_map(Value::as_str).take(12).collect();
+        desc.push_str(&format!("\nTechnologies: {}", t.join(", ")));
+    }
+    if let Some(why) = s(row, "interest").filter(|w| !w.is_empty()) {
+        desc.push_str(&format!("\n\n{why}"));
+    }
+    lead.description = Some(desc);
+    apply_state(&mut lead, state);
+    lead
+}
+
 /// Fetch every lead (both sources), newest first. Volumes are private-beta
 /// sized; when signups outgrow one page this becomes a proper pushdown query.
 pub fn fetch_leads() -> Result<Vec<Lead>, String> {
@@ -392,6 +437,9 @@ pub fn fetch_leads() -> Result<Vec<Lead>, String> {
     let messages = sb.get(
         "/rest/v1/contact_messages?select=id,name,message,created_at,company_id,email_addresses(email,verified),companies(name)&order=created_at.desc&limit=1000",
     )?;
+    let applications = sb.get(&format!(
+        "/rest/v1/job_applications?select={APPLICATION_SELECT}&order=created_at.desc&limit=1000"
+    ))?;
     let states =
         sb.get("/rest/v1/crm_lead_state?select=lead_id,stage,note,updated_at&limit=10000")?;
 
@@ -411,6 +459,10 @@ pub fn fetch_leads() -> Result<Vec<Lead>, String> {
     for row in messages.as_array().unwrap_or(&empty) {
         let id = s(row, "id").unwrap_or_default();
         leads.push(message_to_lead(row, state_for(&id)));
+    }
+    for row in applications.as_array().unwrap_or(&empty) {
+        let id = s(row, "id").unwrap_or_default();
+        leads.push(application_to_lead(row, state_for(&id)));
     }
     leads.sort_by(|a, b| b.create_date.cmp(&a.create_date));
     Ok(leads)
@@ -441,6 +493,12 @@ pub fn fetch_lead(id: &str) -> Result<Option<Lead>, String> {
     ))?;
     if let Some(row) = messages.as_array().and_then(|a| a.first()) {
         return Ok(Some(message_to_lead(row, state_row.as_ref())));
+    }
+    let applications = sb.get(&format!(
+        "/rest/v1/job_applications?select={APPLICATION_SELECT}&id=eq.{enc}"
+    ))?;
+    if let Some(row) = applications.as_array().and_then(|a| a.first()) {
+        return Ok(Some(application_to_lead(row, state_row.as_ref())));
     }
     Ok(None)
 }
