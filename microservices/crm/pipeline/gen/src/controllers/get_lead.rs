@@ -4,10 +4,16 @@ use crate::handlers::get_lead::{Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
+#[allow(unused_imports)]
+use crate::handlers::types::LeadAttribution;
+#[allow(unused_imports)]
+use crate::handlers::types::LeadFormField;
+
 #[handler(GetLeadController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     Response {
         active: true,
+        attribution: Some(Default::default()),
         automated_probability: Some(1.5),
         campaign_id: Some("example".to_string()),
         color: Some(42),
@@ -27,6 +33,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         email_from: Some("example".to_string()),
         email_normalized: Some("example".to_string()),
         expected_revenue: Some(1.5),
+        form: Some("example".to_string()),
+        form_fields: Some(vec![]),
         function: Some("example".to_string()),
         id: "example".to_string(),
         is_automated_probability: Some(true),

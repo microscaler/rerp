@@ -1089,8 +1089,95 @@ components:
         is_rotting:
           type: boolean
           readOnly: true
+        form:
+          type: string
+          maxLength: 64
+          readOnly: true
+          description: The website form that created the lead (hero, exit_intent,
+            free_trial, launch_waitlist, contact, careers)
+        form_fields:
+          type: array
+          readOnly: true
+          description: Everything the submitter entered, in form order, for display.
+            The submission is immutable; the triage note lives in `description`.
+          items:
+            $ref: '#/components/schemas/LeadFormField'
+        attribution:
+          $ref: '#/components/schemas/LeadAttribution'
       description: A potential customer who has shown interest in our products or
         services
+    LeadFormField:
+      type: object
+      required:
+      - key
+      - label
+      - kind
+      properties:
+        key:
+          type: string
+          maxLength: 64
+        label:
+          type: string
+          maxLength: 128
+        kind:
+          type: string
+          enum:
+          - text
+          - longtext
+          - email
+          - phone
+          - url
+          - list
+          - date
+          - money
+          - experience
+        value:
+          type: string
+          description: Display value (absent for list and experience kinds)
+        values:
+          type: array
+          description: Items for the list kind
+          items:
+            type: string
+        entries:
+          type: array
+          description: Work-experience entries for the experience kind
+          items:
+            type: object
+            additionalProperties: true
+      description: One field of a website form submission
+    LeadAttribution:
+      type: object
+      readOnly: true
+      properties:
+        channel:
+          type: string
+          description: 'One-line summary: "x / social", "FirstPromoter: ref", "news.ycombinator.com
+            (referral)", "direct"'
+        utm_source:
+          type: string
+        utm_medium:
+          type: string
+        utm_campaign:
+          type: string
+        utm_content:
+          type: string
+        utm_term:
+          type: string
+        link_code:
+          type: string
+          description: pricewhisperer.ai/go/ short-link code
+        referrer:
+          type: string
+        landing_path:
+          type: string
+        first_touch_at:
+          type: string
+        affiliate_ref:
+          type: string
+          description: FirstPromoter referral (the _fprom_ref cookie)
+      description: First-touch traffic source of the submitter, as the website
+        recorded it
     CreateLeadRequest:
       type: object
       required:

@@ -5,8 +5,10 @@
 //! three website tables — `email_captures` (waiting-list signups),
 //! `contact_messages` (contact form) and `job_applications` (careers) —
 //! joined with `email_addresses`,
-//! `companies` and `plans`. Triage state (stage + note) is the one thing the
-//! CRM owns: the `crm_lead_state` table, keyed by the source row's UUID.
+//! `companies` and `plans`. Triage state (stage, priority, note) is the one
+//! thing the CRM owns: the `crm_lead_state` table, keyed by the source row's
+//! UUID. Each lead also carries what the submitter entered (`form_fields`) and
+//! their first-touch traffic source (`attribution`), both read-only.
 //!
 //! All HTTP goes through the coroutine-native `may_minihttp` client (rustls);
 //! tokio-based clients cannot run inside a `may` service. The service_role
@@ -14,73 +16,78 @@
 
 use http_legacy::Method;
 use may_minihttp::client::{Client, RedirectPolicy};
-use rerp_crm_pipeline_gen::handlers::types::Lead;
+use rerp_crm_pipeline_gen::handlers::types::{Lead, LeadAttribution, LeadFormField};
 use serde_json::{json, Value};
 use std::sync::OnceLock;
 use std::time::Duration;
 
+
 // ---------------------------------------------------------------------------
-// Stage model — fixed, deterministic definitions for the just-enough CRM.
-// The portal receives these from list_stages; ids are stable constants so the
-// client can hard-map them and crm_lead_state stores the short code.
+// Pipelines and stages — fixed, deterministic definitions (Odoo-style: a
+// stage belongs to a team, and each team is a pipeline on the Kanban).
+// Ids are stable constants so the portal can hard-map them; crm_lead_state
+// stores the short code (its CHECK lists every code, migration 29).
 // ---------------------------------------------------------------------------
+
+/// Sales pipeline: waiting list, launch waitlist and contact-form leads.
+pub const TEAM_SALES: &str = "00000000-0000-0000-0000-000000000401";
+/// Recruitment pipeline: careers applications.
+pub const TEAM_RECRUITMENT: &str = "00000000-0000-0000-0000-000000000402";
 
 pub struct StageDef {
     pub code: &'static str,
     pub id: &'static str,
     pub name: &'static str,
+    pub team: &'static str,
     pub sequence: i32,
     pub probability: i32,
     pub is_won: bool,
     pub is_lost: bool,
+    /// Folded (collapsed) on the Kanban: the closed-out lane.
+    pub fold: bool,
+    /// Odoo colour index (1-16) for the column header.
+    pub color: i32,
+    pub requirements: &'static str,
 }
 
-pub const STAGES: [StageDef; 5] = [
-    StageDef {
-        code: "new",
-        id: "00000000-0000-0000-0000-000000000101",
-        name: "New",
-        sequence: 1,
-        probability: 10,
-        is_won: false,
-        is_lost: false,
-    },
-    StageDef {
-        code: "contacted",
-        id: "00000000-0000-0000-0000-000000000102",
-        name: "Contacted",
-        sequence: 2,
-        probability: 30,
-        is_won: false,
-        is_lost: false,
-    },
-    StageDef {
-        code: "invited",
-        id: "00000000-0000-0000-0000-000000000103",
-        name: "Invited",
-        sequence: 3,
-        probability: 60,
-        is_won: false,
-        is_lost: false,
-    },
-    StageDef {
-        code: "converted",
-        id: "00000000-0000-0000-0000-000000000104",
-        name: "Converted",
-        sequence: 4,
-        probability: 100,
-        is_won: true,
-        is_lost: false,
-    },
-    StageDef {
-        code: "lost",
-        id: "00000000-0000-0000-0000-000000000105",
-        name: "Lost",
-        sequence: 5,
-        probability: 0,
-        is_won: false,
-        is_lost: true,
-    },
+const fn stage(
+    code: &'static str,
+    id: &'static str,
+    name: &'static str,
+    team: &'static str,
+    sequence: i32,
+    probability: i32,
+    is_won: bool,
+    is_lost: bool,
+    color: i32,
+    requirements: &'static str,
+) -> StageDef {
+    StageDef { code, id, name, team, sequence, probability, is_won, is_lost, fold: is_lost, color, requirements }
+}
+
+pub const STAGES: [StageDef; 11] = [
+    stage("new", "00000000-0000-0000-0000-000000000101", "New", TEAM_SALES, 1, 10, false, false, 4,
+        "Signed up or wrote in; nobody has replied yet"),
+    stage("contacted", "00000000-0000-0000-0000-000000000102", "Contacted", TEAM_SALES, 2, 30, false, false, 3,
+        "We replied; waiting on them"),
+    stage("invited", "00000000-0000-0000-0000-000000000103", "Invited", TEAM_SALES, 3, 60, false, false, 7,
+        "Sent an invitation to the beta"),
+    stage("converted", "00000000-0000-0000-0000-000000000104", "Converted", TEAM_SALES, 4, 100, true, false, 10,
+        "Signed in and using the product"),
+    stage("lost", "00000000-0000-0000-0000-000000000105", "Lost", TEAM_SALES, 5, 0, false, true, 1,
+        "Not a fit, unreachable or a test row"),
+    stage("applied", "00000000-0000-0000-0000-000000000111", "Applied", TEAM_RECRUITMENT, 1, 10, false, false, 4,
+        "Application received; not yet reviewed"),
+    stage("screening", "00000000-0000-0000-0000-000000000112", "Screening", TEAM_RECRUITMENT, 2, 25, false, false, 3,
+        "CV and experience under review"),
+    stage("interview", "00000000-0000-0000-0000-000000000113", "Interview", TEAM_RECRUITMENT, 3, 50, false, false, 7,
+        "Interviews scheduled or in progress"),
+    stage("offer", "00000000-0000-0000-0000-000000000114", "Offer", TEAM_RECRUITMENT, 4, 80, false, false, 2,
+        "Offer made; waiting for an answer"),
+    stage("hired", "00000000-0000-0000-0000-000000000115", "Hired", TEAM_RECRUITMENT, 5, 100, true, false, 10,
+        "Accepted"),
+    stage("refused", "00000000-0000-0000-0000-000000000116", "Refused", TEAM_RECRUITMENT, 6, 0, false, true, 1,
+        "Declined, withdrawn or not a fit"),
 ];
 
 /// Deterministic source ids so the portal can distinguish lead origins.
@@ -88,17 +95,60 @@ pub const SOURCE_WAITING_LIST: &str = "00000000-0000-0000-0000-000000000201";
 pub const SOURCE_CONTACT_FORM: &str = "00000000-0000-0000-0000-000000000202";
 pub const SOURCE_CAREERS: &str = "00000000-0000-0000-0000-000000000203";
 
-const APPLICATION_SELECT: &str = "id,first_name,last_name,job_short_id,job_title,location,linkedin,github,technologies,interest,created_at,email_addresses(email,verified)";
+/// First-touch attribution columns every marketing form records (migrations 25, 29).
+const ATTRIBUTION_COLS: &str = "utm_source,utm_medium,utm_campaign,utm_content,utm_term,link_code,referrer,landing_path,first_touch_at,affiliate_ref";
+
+fn capture_select() -> String {
+    format!("id,name,source,created_at,company_id,plan_id,{ATTRIBUTION_COLS},email_addresses(email,verified),companies(name),plans(code,name)")
+}
+fn message_select() -> String {
+    format!("id,name,message,created_at,company_id,{ATTRIBUTION_COLS},email_addresses(email,verified),companies(name)")
+}
+fn application_select() -> String {
+    format!("id,first_name,last_name,phone,job_short_id,job_title,location,linkedin,github,technologies,other_technologies,work_experience,interest,created_at,{ATTRIBUTION_COLS},email_addresses(email,verified)")
+}
+const STATE_SELECT: &str = "lead_id,stage,note,priority,updated_at";
+
 /// Tag applied to leads whose email address is verified.
 pub const TAG_EMAIL_VERIFIED: &str = "00000000-0000-0000-0000-000000000301";
 
-pub fn stage_by_code(code: &str) -> &'static StageDef {
-    STAGES.iter().find(|s| s.code == code).unwrap_or(&STAGES[0])
+/// The stage for `code` within `team`'s pipeline; an unknown or foreign code
+/// (a careers row still carrying a sales code) lands in that pipeline's first.
+pub fn stage_in_team(code: &str, team: &str) -> &'static StageDef {
+    STAGES
+        .iter()
+        .find(|s| s.code == code && s.team == team)
+        .or_else(|| STAGES.iter().filter(|s| s.team == team).min_by_key(|s| s.sequence))
+        .unwrap_or(&STAGES[0])
 }
 
 pub fn stage_by_id(id: &str) -> Option<&'static StageDef> {
     STAGES.iter().find(|s| s.id == id)
 }
+
+pub fn stages_for(team: Option<&str>) -> impl Iterator<Item = &'static StageDef> + '_ {
+    STAGES.iter().filter(move |s| team.map_or(true, |t| s.team == t))
+}
+
+/// Odoo priority (0-3 stars) <-> the spec's priority enum.
+pub fn priority_name(stars: i64) -> &'static str {
+    match stars {
+        i64::MIN..=0 => "LOW",
+        1 => "NORMAL",
+        2 => "HIGH",
+        _ => "URGENT",
+    }
+}
+pub fn priority_stars(name: &str) -> Option<i16> {
+    match name {
+        "LOW" => Some(0),
+        "NORMAL" => Some(1),
+        "HIGH" => Some(2),
+        "URGENT" => Some(3),
+        _ => None,
+    }
+}
+
 
 /// Monthly USD price per plan code — mirrors the public pricing page. Used to
 /// give leads an honest expected-revenue figure; unknown codes contribute 0.
@@ -232,97 +282,6 @@ fn nested_b(v: &Value, outer: &str, key: &str) -> Option<bool> {
         .and_then(Value::as_bool)
 }
 
-/// A lead with every optional field empty. The honest baseline: only what the
-/// marketing DB actually knows gets filled in by the assemblers below.
-fn empty_lead(id: String, name: String, create_date: String) -> Lead {
-    Lead {
-        id,
-        name,
-        r#type: "LEAD".to_string(),
-        create_date,
-        active: true,
-        automated_probability: None,
-        campaign_id: None,
-        color: None,
-        company_id: None,
-        company_name: None,
-        contact_name: None,
-        date_closed: None,
-        date_deadline: None,
-        date_last_stage_update: None,
-        date_open: None,
-        day_close: None,
-        day_open: None,
-        description: None,
-        duplicate_lead_count: None,
-        duplicate_lead_ids: None,
-        email_from: None,
-        email_normalized: None,
-        expected_revenue: None,
-        function: None,
-        is_automated_probability: None,
-        is_blacklisted: None,
-        is_rotting: None,
-        lost_reason_id: None,
-        medium_id: None,
-        mobile: None,
-        partner_id: None,
-        phone: None,
-        phone_sanitized: None,
-        priority: None,
-        probability: None,
-        prorated_revenue: None,
-        recurring_plan_id: None,
-        recurring_revenue: None,
-        recurring_revenue_monthly: None,
-        referred_by: None,
-        source_id: None,
-        stage_color: None,
-        stage_id: None,
-        stage_name: None,
-        stage_probability: None,
-        tag_ids: None,
-        team_id: None,
-        title: None,
-        user_id: None,
-        website: None,
-        won_status: None,
-        write_date: None,
-        write_uid: None,
-    }
-}
-
-fn apply_state(lead: &mut Lead, state: Option<&Value>) {
-    let stage = state
-        .and_then(|st| s(st, "stage"))
-        .unwrap_or_else(|| "new".to_string());
-    let def = stage_by_code(&stage);
-    lead.stage_id = Some(def.id.to_string());
-    lead.stage_name = Some(def.name.to_string());
-    lead.stage_probability = Some(def.probability);
-    lead.probability = Some(def.probability as f64);
-    lead.won_status = Some(
-        if def.is_won {
-            "WON"
-        } else if def.is_lost {
-            "LOST"
-        } else {
-            "PENDING"
-        }
-        .to_string(),
-    );
-    if let Some(st) = state {
-        // The triage note overrides the initial description (original message /
-        // signup source line) once someone has written one.
-        if let Some(note) = s(st, "note") {
-            if !note.is_empty() {
-                lead.description = Some(note);
-            }
-        }
-        lead.write_date = s(st, "updated_at");
-        lead.date_last_stage_update = s(st, "updated_at");
-    }
-}
 
 /// Make a lead fit the `Lead` response schema whatever the marketing forms
 /// stored. The router validates every response; one bad row (an empty email,
@@ -378,6 +337,130 @@ fn conform(mut lead: Lead) -> Lead {
     lead
 }
 
+
+/// A lead with every optional field empty. The honest baseline: only what the
+/// marketing DB actually knows gets filled in by the assemblers below.
+fn empty_lead(id: String, name: String, create_date: String) -> Lead {
+    Lead {
+        id,
+        name,
+        r#type: "LEAD".to_string(),
+        create_date,
+        active: true,
+        ..Default::default()
+    }
+}
+
+/// Stage, priority and triage note from crm_lead_state, within `team`'s
+/// pipeline. The note is the CRM's own text; what the submitter wrote is in
+/// `form_fields` and is never overwritten.
+fn apply_state(lead: &mut Lead, state: Option<&Value>, team: &'static str) {
+    let code = state.and_then(|st| s(st, "stage")).unwrap_or_default();
+    let def = stage_in_team(&code, team);
+    lead.team_id = Some(team.to_string());
+    lead.stage_id = Some(def.id.to_string());
+    lead.stage_name = Some(def.name.to_string());
+    lead.stage_probability = Some(def.probability);
+    lead.stage_color = Some(def.color);
+    lead.probability = Some(def.probability as f64);
+    lead.won_status = Some(
+        if def.is_won {
+            "WON"
+        } else if def.is_lost {
+            "LOST"
+        } else {
+            "PENDING"
+        }
+        .to_string(),
+    );
+    let stars = state.and_then(|st| st.get("priority")).and_then(Value::as_i64).unwrap_or(0);
+    lead.priority = Some(priority_name(stars).to_string());
+    if let Some(st) = state {
+        lead.description = s(st, "note").filter(|n| !n.trim().is_empty());
+        lead.write_date = s(st, "updated_at");
+        lead.date_last_stage_update = s(st, "updated_at");
+    }
+}
+
+/// The submitter's first-touch traffic source, or None when the row predates
+/// attribution (no column set). `channel` is the one-line summary the board
+/// shows on cards: an affiliate first, then the campaign, then the referrer.
+fn attribution_of(row: &Value) -> Option<LeadAttribution> {
+    let get = |k: &str| s(row, k).map(|v| v.trim().to_string()).filter(|v| !v.is_empty());
+    let mut a = LeadAttribution {
+        utm_source: get("utm_source"),
+        utm_medium: get("utm_medium"),
+        utm_campaign: get("utm_campaign"),
+        utm_content: get("utm_content"),
+        utm_term: get("utm_term"),
+        link_code: get("link_code"),
+        referrer: get("referrer"),
+        landing_path: get("landing_path"),
+        first_touch_at: get("first_touch_at"),
+        affiliate_ref: get("affiliate_ref"),
+        channel: None,
+    };
+    let any = [
+        &a.utm_source, &a.utm_medium, &a.utm_campaign, &a.utm_content, &a.utm_term,
+        &a.link_code, &a.referrer, &a.landing_path, &a.first_touch_at, &a.affiliate_ref,
+    ]
+    .iter()
+    .any(|v| v.is_some());
+    if !any {
+        return None;
+    }
+    let referrer_host = a.referrer.as_deref().and_then(|r| {
+        let rest = r.split("://").nth(1).unwrap_or(r);
+        rest.split(['/', '?', '#']).next().map(str::to_string).filter(|h| !h.is_empty())
+    });
+    let campaign = match (a.utm_source.as_deref(), a.utm_medium.as_deref()) {
+        (Some("direct"), _) | (None, Some("none")) => None,
+        (Some(src), Some(med)) => Some(format!("{src} / {med}")),
+        (Some(src), None) => Some(src.to_string()),
+        _ => None,
+    };
+    let base = campaign
+        .or_else(|| referrer_host.map(|h| format!("{h} (referral)")))
+        .unwrap_or_else(|| "direct".to_string());
+    a.channel = Some(match a.affiliate_ref.as_deref() {
+        Some(r) => format!("FirstPromoter: {r} · {base}"),
+        None => base,
+    });
+    Some(a)
+}
+
+fn field(key: &str, label: &str, kind: &str, value: Option<String>) -> Option<LeadFormField> {
+    let value = value.map(|v| v.trim().to_string()).filter(|v| !v.is_empty())?;
+    Some(LeadFormField {
+        key: key.to_string(),
+        label: label.to_string(),
+        kind: kind.to_string(),
+        value: Some(value),
+        values: None,
+        entries: None,
+    })
+}
+
+fn form_label(form: &str) -> &'static str {
+    match form {
+        "hero" => "Homepage hero",
+        "exit_intent" => "Exit-intent popup",
+        "free_trial" => "Waiting-list page",
+        "launch_waitlist" => "Launch waitlist page",
+        "contact" => "Contact form",
+        "careers" => "Careers application",
+        _ => "Website form",
+    }
+}
+
+fn email_fields(row: &Value) -> Vec<Option<LeadFormField>> {
+    let verified = nested_b(row, "email_addresses", "verified").unwrap_or(false);
+    vec![
+        field("email", "Email", "email", nested_s(row, "email_addresses", "email")),
+        field("email_verified", "Email verified", "text", Some(if verified { "Yes" } else { "No" }.to_string())),
+    ]
+}
+
 fn capture_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     let id = s(row, "id").unwrap_or_default();
     let email = nested_s(row, "email_addresses", "email").unwrap_or_default();
@@ -392,28 +475,40 @@ fn capture_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     lead.company_id = s(row, "company_id");
     lead.company_name = nested_s(row, "companies", "name");
     lead.source_id = Some(SOURCE_WAITING_LIST.to_string());
-    // Which form placement captured them: hero / exit_intent / free_trial.
-    lead.referred_by = s(row, "source");
+    let form = s(row, "source").unwrap_or_else(|| "free_trial".to_string());
+    // Which form placement captured them: hero / exit_intent / free_trial / launch_waitlist.
+    lead.referred_by = Some(form.clone());
     if nested_b(row, "email_addresses", "verified").unwrap_or(false) {
         lead.tag_ids = Some(vec![TAG_EMAIL_VERIFIED.to_string()]);
     }
+    let mut plan_text = None;
     if let Some(plan) = row.get("plans").filter(|p| !p.is_null()) {
         let code = plan.get("code").and_then(Value::as_str).unwrap_or("");
+        let pname = plan.get("name").and_then(Value::as_str).unwrap_or(code);
         let monthly = plan_monthly_usd(code);
         lead.recurring_plan_id = s(row, "plan_id");
         if monthly > 0.0 {
             lead.recurring_revenue = Some(monthly);
             lead.recurring_revenue_monthly = Some(monthly);
             lead.expected_revenue = Some(monthly * 12.0);
+            plan_text = Some(format!("{pname} (${monthly:.0}/mo)"));
+        } else if !pname.is_empty() {
+            plan_text = Some(pname.to_string());
         }
-        lead.description = Some(format!(
-            "Waiting-list signup — interested in {}",
-            plan.get("name").and_then(Value::as_str).unwrap_or(code)
-        ));
-    } else {
-        lead.description = Some("Waiting-list signup".to_string());
     }
-    apply_state(&mut lead, state);
+    let mut fields = vec![
+        field("name", "Name", "text", s(row, "name")),
+    ];
+    fields.extend(email_fields(row));
+    fields.extend([
+        field("company", "Company", "text", nested_s(row, "companies", "name")),
+        field("plan", "Plan interest", "text", plan_text),
+        field("form", "Signed up on", "text", Some(form_label(&form).to_string())),
+    ]);
+    lead.form = Some(form);
+    lead.form_fields = Some(fields.into_iter().flatten().collect());
+    lead.attribution = attribution_of(row);
+    apply_state(&mut lead, state, TEAM_SALES);
     conform(lead)
 }
 
@@ -435,8 +530,16 @@ fn message_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     if nested_b(row, "email_addresses", "verified").unwrap_or(false) {
         lead.tag_ids = Some(vec![TAG_EMAIL_VERIFIED.to_string()]);
     }
-    lead.description = s(row, "message");
-    apply_state(&mut lead, state);
+    let mut fields = vec![field("name", "Name", "text", s(row, "name"))];
+    fields.extend(email_fields(row));
+    fields.extend([
+        field("company", "Company", "text", nested_s(row, "companies", "name")),
+        field("message", "Message", "longtext", s(row, "message")),
+    ]);
+    lead.form = Some("contact".to_string());
+    lead.form_fields = Some(fields.into_iter().flatten().collect());
+    lead.attribution = attribution_of(row);
+    apply_state(&mut lead, state, TEAM_SALES);
     conform(lead)
 }
 
@@ -453,9 +556,10 @@ fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     let name = if who.is_empty() { email.clone() } else { who.clone() };
     let created = s(row, "created_at").unwrap_or_default();
     let mut lead = empty_lead(id, name, created);
-    lead.contact_name = Some(who);
+    lead.contact_name = Some(who.clone());
     lead.email_from = Some(email.clone());
     lead.email_normalized = Some(email.to_lowercase());
+    lead.phone = s(row, "phone");
     lead.source_id = Some(SOURCE_CAREERS.to_string());
     // The role applied for (job short id), like referred_by carries the form placement.
     lead.referred_by = s(row, "job_short_id").or_else(|| Some("careers".to_string()));
@@ -469,43 +573,90 @@ fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     if nested_b(row, "email_addresses", "verified").unwrap_or(false) {
         lead.tag_ids = Some(vec![TAG_EMAIL_VERIFIED.to_string()]);
     }
-    let role = s(row, "job_title").unwrap_or_else(|| "General application".to_string());
-    let mut desc = format!("Careers application: {role}");
-    if let Some(loc) = s(row, "location").filter(|l| !l.is_empty()) {
-        desc.push_str(&format!(" ({loc})"));
+    let role = match (s(row, "job_title"), s(row, "job_short_id")) {
+        (Some(t), Some(j)) => Some(format!("{t} ({j})")),
+        (Some(t), None) => Some(t),
+        (None, Some(j)) => Some(j),
+        (None, None) => Some("General application".to_string()),
+    };
+    let technologies: Vec<String> = row
+        .get("technologies")
+        .and_then(Value::as_array)
+        .map(|t| t.iter().filter_map(Value::as_str).map(str::to_string).collect())
+        .unwrap_or_default();
+    // Work history exactly as entered: company, jobTitle, startDate, endDate,
+    // background, technicalExperience. Shown as cards; never reshaped.
+    let experience: Vec<Value> = row
+        .get("work_experience")
+        .and_then(Value::as_array)
+        .map(|a| {
+            a.iter()
+                .filter(|e| {
+                    e.as_object()
+                        .map(|o| o.values().any(|v| v.as_str().map_or(!v.is_null(), |s| !s.trim().is_empty())))
+                        .unwrap_or(false)
+                })
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut fields = vec![
+        field("name", "Name", "text", Some(who)),
+    ];
+    fields.extend(email_fields(row));
+    fields.extend([
+        field("phone", "Phone", "phone", s(row, "phone")),
+        field("location", "Location", "text", s(row, "location")),
+        field("role", "Role applied for", "text", role),
+        field("linkedin", "LinkedIn", "url", s(row, "linkedin")),
+        field("github", "GitHub", "url", s(row, "github")),
+    ]);
+    if !technologies.is_empty() {
+        fields.push(Some(LeadFormField {
+            key: "technologies".into(),
+            label: "Technologies".into(),
+            kind: "list".into(),
+            value: None,
+            values: Some(technologies),
+            entries: None,
+        }));
     }
-    if let Some(tech) = row.get("technologies").and_then(Value::as_array).filter(|t| !t.is_empty()) {
-        let t: Vec<&str> = tech.iter().filter_map(Value::as_str).take(12).collect();
-        desc.push_str(&format!("\nTechnologies: {}", t.join(", ")));
+    fields.push(field("other_technologies", "Other technologies", "text", s(row, "other_technologies")));
+    if !experience.is_empty() {
+        fields.push(Some(LeadFormField {
+            key: "work_experience".into(),
+            label: "Work experience".into(),
+            kind: "experience".into(),
+            value: None,
+            values: None,
+            entries: Some(experience),
+        }));
     }
-    for (label, key) in [("LinkedIn", "linkedin"), ("GitHub", "github")] {
-        if let Some(u) = s(row, key).filter(|u| !u.trim().is_empty()) {
-            desc.push_str(&format!("\n{label}: {}", u.trim()));
-        }
-    }
-    if let Some(why) = s(row, "interest").filter(|w| !w.is_empty()) {
-        desc.push_str(&format!("\n\n{why}"));
-    }
-    lead.description = Some(desc);
-    apply_state(&mut lead, state);
+    fields.push(field("interest", "Why PriceWhisperer", "longtext", s(row, "interest")));
+    lead.form = Some("careers".to_string());
+    lead.form_fields = Some(fields.into_iter().flatten().collect());
+    lead.attribution = attribution_of(row);
+    apply_state(&mut lead, state, TEAM_RECRUITMENT);
     conform(lead)
 }
 
-/// Fetch every lead (both sources), newest first. Volumes are private-beta
+/// Fetch every lead (all three forms), newest first. Volumes are private-beta
 /// sized; when signups outgrow one page this becomes a proper pushdown query.
 pub fn fetch_leads() -> Result<Vec<Lead>, String> {
     let sb = supabase()?;
-    let captures = sb.get(
-        "/rest/v1/email_captures?select=id,name,source,created_at,company_id,plan_id,email_addresses(email,verified),companies(name),plans(code,name)&order=created_at.desc&limit=1000",
-    )?;
-    let messages = sb.get(
-        "/rest/v1/contact_messages?select=id,name,message,created_at,company_id,email_addresses(email,verified),companies(name)&order=created_at.desc&limit=1000",
-    )?;
-    let applications = sb.get(&format!(
-        "/rest/v1/job_applications?select={APPLICATION_SELECT}&order=created_at.desc&limit=1000"
+    let captures = sb.get(&format!(
+        "/rest/v1/email_captures?select={}&order=created_at.desc&limit=1000",
+        capture_select()
     ))?;
-    let states =
-        sb.get("/rest/v1/crm_lead_state?select=lead_id,stage,note,updated_at&limit=10000")?;
+    let messages = sb.get(&format!(
+        "/rest/v1/contact_messages?select={}&order=created_at.desc&limit=1000",
+        message_select()
+    ))?;
+    let applications = sb.get(&format!(
+        "/rest/v1/job_applications?select={}&order=created_at.desc&limit=1000",
+        application_select()
+    ))?;
+    let states = sb.get(&format!("/rest/v1/crm_lead_state?select={STATE_SELECT}&limit=10000"))?;
 
     let empty = Vec::new();
     let states = states.as_array().unwrap_or(&empty);
@@ -532,34 +683,39 @@ pub fn fetch_leads() -> Result<Vec<Lead>, String> {
     Ok(leads)
 }
 
-pub fn fetch_lead(id: &str) -> Result<Option<Lead>, String> {
-    // Two point lookups beat scanning both tables; the id lives in exactly one.
-    let sb = supabase()?;
+fn clean_id(id: &str) -> Option<String> {
     let enc: String = id
         .chars()
         .filter(|c| c.is_ascii_hexdigit() || *c == '-')
         .collect();
-    if enc.len() != 36 {
-        return Ok(None);
-    }
+    (enc.len() == 36).then_some(enc)
+}
+
+pub fn fetch_lead(id: &str) -> Result<Option<Lead>, String> {
+    // Point lookups beat scanning every table; the id lives in exactly one.
+    let sb = supabase()?;
+    let Some(enc) = clean_id(id) else { return Ok(None) };
     let state = sb.get(&format!(
-        "/rest/v1/crm_lead_state?select=lead_id,stage,note,updated_at&lead_id=eq.{enc}"
+        "/rest/v1/crm_lead_state?select={STATE_SELECT}&lead_id=eq.{enc}"
     ))?;
     let state_row = state.as_array().and_then(|a| a.first()).cloned();
     let captures = sb.get(&format!(
-        "/rest/v1/email_captures?select=id,name,source,created_at,company_id,plan_id,email_addresses(email,verified),companies(name),plans(code,name)&id=eq.{enc}"
+        "/rest/v1/email_captures?select={}&id=eq.{enc}",
+        capture_select()
     ))?;
     if let Some(row) = captures.as_array().and_then(|a| a.first()) {
         return Ok(Some(capture_to_lead(row, state_row.as_ref())));
     }
     let messages = sb.get(&format!(
-        "/rest/v1/contact_messages?select=id,name,message,created_at,company_id,email_addresses(email,verified),companies(name)&id=eq.{enc}"
+        "/rest/v1/contact_messages?select={}&id=eq.{enc}",
+        message_select()
     ))?;
     if let Some(row) = messages.as_array().and_then(|a| a.first()) {
         return Ok(Some(message_to_lead(row, state_row.as_ref())));
     }
     let applications = sb.get(&format!(
-        "/rest/v1/job_applications?select={APPLICATION_SELECT}&id=eq.{enc}"
+        "/rest/v1/job_applications?select={}&id=eq.{enc}",
+        application_select()
     ))?;
     if let Some(row) = applications.as_array().and_then(|a| a.first()) {
         return Ok(Some(application_to_lead(row, state_row.as_ref())));
@@ -567,59 +723,152 @@ pub fn fetch_lead(id: &str) -> Result<Option<Lead>, String> {
     Ok(None)
 }
 
-/// Write triage state. `stage` and `note` update only what is provided.
-pub fn write_state(lead_id: &str, stage: Option<&str>, note: Option<&str>) -> Result<(), String> {
+/// A triage change: only what is `Some` is written.
+#[derive(Default)]
+pub struct StateChange<'a> {
+    /// Stage code, already validated against the lead's pipeline.
+    pub stage: Option<&'static str>,
+    pub note: Option<&'a str>,
+    pub priority: Option<i16>,
+}
+
+/// Write triage state for `lead`. A first write for a lead also records the
+/// lead's current stage, so a note or a star never resets the column.
+pub fn write_state(lead: &Lead, change: StateChange<'_>) -> Result<(), String> {
     let sb = supabase()?;
-    let enc: String = lead_id
-        .chars()
-        .filter(|c| c.is_ascii_hexdigit() || *c == '-')
-        .collect();
-    if enc.len() != 36 {
-        return Err("invalid lead id".to_string());
-    }
+    let enc = clean_id(&lead.id).ok_or_else(|| "invalid lead id".to_string())?;
     let existing = sb.get(&format!(
         "/rest/v1/crm_lead_state?select=lead_id&lead_id=eq.{enc}"
     ))?;
     let exists = existing.as_array().map(|a| !a.is_empty()).unwrap_or(false);
     let mut body = json!({ "updated_at": chrono::Utc::now().to_rfc3339() });
-    if let Some(stg) = stage {
-        body["stage"] = json!(stage_by_code(stg).code);
+    if let Some(code) = change.stage {
+        body["stage"] = json!(code);
     }
-    if let Some(n) = note {
+    if let Some(n) = change.note {
         body["note"] = json!(n);
+    }
+    if let Some(p) = change.priority {
+        body["priority"] = json!(p.clamp(0, 3));
     }
     if exists {
         sb.patch(&format!("/rest/v1/crm_lead_state?lead_id=eq.{enc}"), body)?;
     } else {
         body["lead_id"] = json!(enc);
         if body.get("stage").is_none() {
-            body["stage"] = json!("new");
+            let current = lead
+                .stage_id
+                .as_deref()
+                .and_then(stage_by_id)
+                .map(|d| d.code)
+                .unwrap_or("new");
+            body["stage"] = json!(current);
         }
         sb.post("/rest/v1/crm_lead_state", body)?;
     }
     Ok(())
 }
 
+/// The stage `stage_id` names, if it belongs to `lead`'s pipeline. Moving a
+/// careers applicant into a sales column (or back) is refused, not guessed.
+pub fn stage_for_lead(lead: &Lead, stage_id: &str) -> Result<&'static StageDef, String> {
+    let def = stage_by_id(stage_id).ok_or_else(|| "unknown stage_id".to_string())?;
+    match lead.team_id.as_deref() {
+        Some(team) if team != def.team => Err(format!(
+            "stage {} belongs to the other pipeline",
+            def.name
+        )),
+        _ => Ok(def),
+    }
+}
+
+
 #[cfg(test)]
-mod conform_tests {
+mod tests {
     use super::*;
 
-    #[test]
-    fn careers_role_is_the_function_not_the_salutation() {
-        // The row that took /leads down on 1 Oct 2026.
-        let row = json!({
+    fn charles_row() -> Value {
+        // The row that took /leads down on 1 Oct 2026, with its work history.
+        json!({
             "id": "06f8b0e2-98e5-4c65-ac07-1e31131787a4",
-            "first_name": "Ada", "last_name": "Lovelace",
+            "first_name": "Ada", "last_name": "Lovelace", "phone": "+359 888 000 000",
+            "job_short_id": "6x2y4z8ab",
             "job_title": "Senior Backend Engineer - Exchange Integration",
+            "location": "Bansko, Bulgaria",
             "linkedin": "linkedin.com/in/ada", "github": null,
+            "technologies": ["Rust", "FluxCD"],
+            "work_experience": [
+                {"company": "Analytical Engines", "jobTitle": "Engineer", "startDate": "1842", "endDate": "1843",
+                 "background": "Notes", "technicalExperience": "Bernoulli numbers"},
+                {"company": "", "jobTitle": "", "startDate": "", "endDate": "", "background": "", "technicalExperience": ""}
+            ],
+            "interest": "I want to work on the forefront of technology",
+            "utm_source": "x", "utm_campaign": "launch_waitlist", "utm_medium": "social",
             "created_at": "2026-09-30T10:00:00+00:00",
             "email_addresses": { "email": "ada@example.com", "verified": false }
-        });
-        let lead = application_to_lead(&row, None);
-        assert_eq!(lead.title, None);
+        })
+    }
+
+    #[test]
+    fn careers_is_a_recruitment_lead_with_every_field() {
+        let lead = application_to_lead(&charles_row(), None);
+        assert_eq!(lead.title, None, "title is the salutation enum");
         assert_eq!(lead.function.as_deref(), Some("Senior Backend Engineer - Exchange Integration"));
         assert_eq!(lead.website.as_deref(), Some("https://linkedin.com/in/ada"));
-        assert!(lead.description.unwrap().contains("LinkedIn: linkedin.com/in/ada"));
+        assert_eq!(lead.team_id.as_deref(), Some(TEAM_RECRUITMENT));
+        assert_eq!(lead.stage_name.as_deref(), Some("Applied"));
+        assert_eq!(lead.form.as_deref(), Some("careers"));
+        assert_eq!(lead.description, None, "no triage note yet; the submission lives in form_fields");
+        let f = lead.form_fields.unwrap();
+        let keys: Vec<&str> = f.iter().map(|x| x.key.as_str()).collect();
+        for k in ["name", "email", "phone", "location", "role", "linkedin", "technologies", "work_experience", "interest"] {
+            assert!(keys.contains(&k), "{k} missing from {keys:?}");
+        }
+        let exp = f.iter().find(|x| x.key == "work_experience").unwrap();
+        assert_eq!(exp.entries.as_ref().unwrap().len(), 1, "the empty trailing role is dropped");
+        let role = f.iter().find(|x| x.key == "role").unwrap();
+        assert_eq!(role.value.as_deref(), Some("Senior Backend Engineer - Exchange Integration (6x2y4z8ab)"));
+        assert_eq!(lead.attribution.unwrap().channel.as_deref(), Some("x / social"));
+    }
+
+    #[test]
+    fn sales_codes_on_a_careers_row_fall_back_to_the_recruitment_pipeline() {
+        let st = json!({"lead_id": "06f8b0e2-98e5-4c65-ac07-1e31131787a4", "stage": "invited", "priority": 2, "note": "call Tues"});
+        let lead = application_to_lead(&charles_row(), Some(&st));
+        assert_eq!(lead.stage_name.as_deref(), Some("Applied"));
+        assert_eq!(lead.priority.as_deref(), Some("HIGH"));
+        assert_eq!(lead.description.as_deref(), Some("call Tues"));
+        let interview = STAGES.iter().find(|s| s.code == "interview").unwrap();
+        assert!(stage_for_lead(&lead, interview.id).is_ok());
+        let invited = STAGES.iter().find(|s| s.code == "invited").unwrap();
+        assert!(stage_for_lead(&lead, invited.id).is_err(), "no sales columns for an applicant");
+    }
+
+    #[test]
+    fn attribution_channel_prefers_affiliate_then_campaign_then_referrer() {
+        let none = json!({"id": "x"});
+        assert!(attribution_of(&none).is_none(), "rows from before attribution show nothing");
+        let aff = json!({"affiliate_ref": "bob", "utm_source": "youtube", "utm_medium": "influencer"});
+        assert_eq!(attribution_of(&aff).unwrap().channel.as_deref(), Some("FirstPromoter: bob · youtube / influencer"));
+        let referral = json!({"utm_source": "news.ycombinator.com", "utm_medium": "referral", "referrer": "https://news.ycombinator.com/item?id=1"});
+        assert_eq!(attribution_of(&referral).unwrap().channel.as_deref(), Some("news.ycombinator.com / referral"));
+        let bare = json!({"referrer": "https://example.org/post"});
+        assert_eq!(attribution_of(&bare).unwrap().channel.as_deref(), Some("example.org (referral)"));
+        let direct = json!({"utm_source": "direct", "utm_medium": "none", "landing_path": "/launch-waitlist"});
+        assert_eq!(attribution_of(&direct).unwrap().channel.as_deref(), Some("direct"));
+    }
+
+    #[test]
+    fn launch_waitlist_is_its_own_form() {
+        let row = json!({"id": "6bc849f1-1e20-4cd3-9a75-fc90964e911d", "name": "Grace", "source": "launch_waitlist",
+            "created_at": "2026-10-01T10:00:00+00:00", "email_addresses": {"email": "g@example.com", "verified": true},
+            "plans": {"code": "professional", "name": "Professional"}});
+        let lead = capture_to_lead(&row, None);
+        assert_eq!(lead.form.as_deref(), Some("launch_waitlist"));
+        assert_eq!(lead.team_id.as_deref(), Some(TEAM_SALES));
+        let f = lead.form_fields.unwrap();
+        assert!(f.iter().any(|x| x.key == "form" && x.value.as_deref() == Some("Launch waitlist page")));
+        assert!(f.iter().any(|x| x.key == "plan" && x.value.as_deref() == Some("Professional ($299/mo)")));
     }
 
     #[test]
@@ -642,5 +891,15 @@ mod conform_tests {
         assert_eq!(l.website, None);
         assert_eq!(l.title, None);
         assert_eq!(l.function.unwrap().chars().count(), 128);
+    }
+
+    #[test]
+    fn every_stage_code_is_unique_per_pipeline_and_ids_are_unique() {
+        let mut ids: Vec<&str> = STAGES.iter().map(|s| s.id).collect();
+        ids.sort();
+        ids.dedup();
+        assert_eq!(ids.len(), STAGES.len());
+        assert_eq!(stage_in_team("nope", TEAM_SALES).code, "new");
+        assert_eq!(stage_in_team("", TEAM_RECRUITMENT).code, "applied");
     }
 }

@@ -14,8 +14,13 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
     if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
         return denied;
     }
+    // One pipeline's funnel with team_id (Sales or Recruitment), else all.
+    let team = req.data.team_id.as_deref().filter(|t| !t.is_empty());
     let leads = match crate::supabase::fetch_leads() {
-        Ok(leads) => leads,
+        Ok(leads) => leads
+            .into_iter()
+            .filter(|l| team.map_or(true, |t| l.team_id.as_deref() == Some(t)))
+            .collect::<Vec<_>>(),
         Err(error) => {
             return HttpJson::new(502, json!({ "code": 502, "message": error }));
         }
@@ -23,8 +28,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
 
     let mut total_revenue = 0.0f64;
     let mut total_weighted = 0.0f64;
-    let stages: Vec<Value> = crate::supabase::STAGES
-        .iter()
+    let stages: Vec<Value> = crate::supabase::stages_for(team)
         .map(|def| {
             let in_stage: Vec<_> = leads
                 .iter()
