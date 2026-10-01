@@ -324,6 +324,60 @@ fn apply_state(lead: &mut Lead, state: Option<&Value>) {
     }
 }
 
+/// Make a lead fit the `Lead` response schema whatever the marketing forms
+/// stored. The router validates every response; one bad row (an empty email,
+/// a "linkedin.com/in/x" without a scheme, an over-long field) used to fail
+/// the WHOLE list with "Response validation failed". Values that cannot be
+/// made valid are dropped, never invented; over-long text is truncated.
+fn conform(mut lead: Lead) -> Lead {
+    fn cut(v: String, max: usize) -> String {
+        if v.chars().count() <= max { v } else { v.chars().take(max).collect() }
+    }
+    fn cut_opt(v: Option<String>, max: usize) -> Option<String> {
+        v.map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).map(|x| cut(x, max))
+    }
+    fn email_ok(e: &str) -> bool {
+        let e = e.trim();
+        let Some((local, domain)) = e.split_once('@') else { return false };
+        !local.is_empty()
+            && domain.contains('.')
+            && !domain.starts_with('.')
+            && !domain.ends_with('.')
+            && !e.chars().any(char::is_whitespace)
+            && e.len() <= 255
+    }
+    fn uri(w: String) -> Option<String> {
+        let w = w.trim().to_string();
+        if w.is_empty() || w.chars().any(char::is_whitespace) {
+            return None;
+        }
+        let w = if w.starts_with("http://") || w.starts_with("https://") {
+            w
+        } else if w.contains('.') && !w.contains("://") {
+            format!("https://{w}")
+        } else {
+            return None;
+        };
+        (w.len() <= 255).then_some(w)
+    }
+    lead.name = cut(lead.name.trim().to_string(), 255);
+    if lead.name.is_empty() {
+        lead.name = "(no name)".to_string();
+    }
+    lead.email_from = lead.email_from.filter(|e| email_ok(e)).map(|e| e.trim().to_string());
+    lead.email_normalized = cut_opt(lead.email_normalized, 255);
+    lead.contact_name = cut_opt(lead.contact_name, 255);
+    lead.company_name = cut_opt(lead.company_name, 255);
+    lead.referred_by = cut_opt(lead.referred_by, 255);
+    lead.function = cut_opt(lead.function, 128);
+    lead.phone = cut_opt(lead.phone, 64);
+    lead.phone_sanitized = cut_opt(lead.phone_sanitized, 64);
+    lead.mobile = cut_opt(lead.mobile, 64);
+    lead.website = lead.website.and_then(uri);
+    lead.title = lead.title.filter(|t| matches!(t.as_str(), "MR" | "MRS" | "MME"));
+    lead
+}
+
 fn capture_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     let id = s(row, "id").unwrap_or_default();
     let email = nested_s(row, "email_addresses", "email").unwrap_or_default();
@@ -360,7 +414,7 @@ fn capture_to_lead(row: &Value, state: Option<&Value>) -> Lead {
         lead.description = Some("Waiting-list signup".to_string());
     }
     apply_state(&mut lead, state);
-    lead
+    conform(lead)
 }
 
 fn message_to_lead(row: &Value, state: Option<&Value>) -> Lead {
@@ -383,7 +437,7 @@ fn message_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     }
     lead.description = s(row, "message");
     apply_state(&mut lead, state);
-    lead
+    conform(lead)
 }
 
 fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
@@ -405,8 +459,13 @@ fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     lead.source_id = Some(SOURCE_CAREERS.to_string());
     // The role applied for (job short id), like referred_by carries the form placement.
     lead.referred_by = s(row, "job_short_id").or_else(|| Some("careers".to_string()));
-    lead.title = s(row, "job_title");
-    lead.website = s(row, "linkedin").or_else(|| s(row, "github"));
+    // The role goes in `function` (job position, max 128). `title` is the
+    // salutation enum (MR/MRS/MME): putting the job title there failed the
+    // response schema and took the whole leads list down with a 500.
+    lead.function = s(row, "job_title");
+    lead.website = s(row, "linkedin")
+        .filter(|w| !w.trim().is_empty())
+        .or_else(|| s(row, "github"));
     if nested_b(row, "email_addresses", "verified").unwrap_or(false) {
         lead.tag_ids = Some(vec![TAG_EMAIL_VERIFIED.to_string()]);
     }
@@ -419,12 +478,17 @@ fn application_to_lead(row: &Value, state: Option<&Value>) -> Lead {
         let t: Vec<&str> = tech.iter().filter_map(Value::as_str).take(12).collect();
         desc.push_str(&format!("\nTechnologies: {}", t.join(", ")));
     }
+    for (label, key) in [("LinkedIn", "linkedin"), ("GitHub", "github")] {
+        if let Some(u) = s(row, key).filter(|u| !u.trim().is_empty()) {
+            desc.push_str(&format!("\n{label}: {}", u.trim()));
+        }
+    }
     if let Some(why) = s(row, "interest").filter(|w| !w.is_empty()) {
         desc.push_str(&format!("\n\n{why}"));
     }
     lead.description = Some(desc);
     apply_state(&mut lead, state);
-    lead
+    conform(lead)
 }
 
 /// Fetch every lead (both sources), newest first. Volumes are private-beta
@@ -534,4 +598,49 @@ pub fn write_state(lead_id: &str, stage: Option<&str>, note: Option<&str>) -> Re
         sb.post("/rest/v1/crm_lead_state", body)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod conform_tests {
+    use super::*;
+
+    #[test]
+    fn careers_role_is_the_function_not_the_salutation() {
+        // The row that took /leads down on 1 Oct 2026.
+        let row = json!({
+            "id": "06f8b0e2-98e5-4c65-ac07-1e31131787a4",
+            "first_name": "Ada", "last_name": "Lovelace",
+            "job_title": "Senior Backend Engineer - Exchange Integration",
+            "linkedin": "linkedin.com/in/ada", "github": null,
+            "created_at": "2026-09-30T10:00:00+00:00",
+            "email_addresses": { "email": "ada@example.com", "verified": false }
+        });
+        let lead = application_to_lead(&row, None);
+        assert_eq!(lead.title, None);
+        assert_eq!(lead.function.as_deref(), Some("Senior Backend Engineer - Exchange Integration"));
+        assert_eq!(lead.website.as_deref(), Some("https://linkedin.com/in/ada"));
+        assert!(lead.description.unwrap().contains("LinkedIn: linkedin.com/in/ada"));
+    }
+
+    #[test]
+    fn invalid_values_are_dropped_not_invented() {
+        let row = json!({
+            "id": "6bc849f1-1e20-4cd3-9a75-fc90964e911d",
+            "name": "",
+            "created_at": "2026-09-30T10:00:00+00:00",
+            "email_addresses": { "email": "not an email" }
+        });
+        let lead = capture_to_lead(&row, None);
+        assert_eq!(lead.email_from, None);
+        assert_eq!(lead.name, "not an email");
+        let mut l = empty_lead("x".into(), "y".repeat(400), "t".into());
+        l.website = Some("ftp thing".into());
+        l.title = Some("Dr".into());
+        l.function = Some("z".repeat(200));
+        let l = conform(l);
+        assert_eq!(l.name.chars().count(), 255);
+        assert_eq!(l.website, None);
+        assert_eq!(l.title, None);
+        assert_eq!(l.function.unwrap().chars().count(), 128);
+    }
 }
