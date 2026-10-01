@@ -2,6 +2,8 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::LeadAttribution;
+use crate::handlers::types::LeadFormField;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -133,6 +135,10 @@ pub struct Response {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "attribution")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "automated_probability")]
     pub automated_probability: Option<f64>,
 
@@ -206,6 +212,14 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "expected_revenue")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "form")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "form_fields")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "function")]

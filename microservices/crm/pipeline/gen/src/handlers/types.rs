@@ -20,6 +20,9 @@ pub struct ChangeStageResponse {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub automated_probability: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,6 +77,12 @@ pub struct ChangeStageResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function: Option<String>,
@@ -299,6 +308,9 @@ pub struct CreateLeadResponse {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub automated_probability: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -353,6 +365,12 @@ pub struct CreateLeadResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function: Option<String>,
@@ -586,6 +604,9 @@ pub struct GetLeadResponse {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub automated_probability: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -640,6 +661,12 @@ pub struct GetLeadResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function: Option<String>,
@@ -782,6 +809,9 @@ pub struct Lead {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub automated_probability: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -836,6 +866,12 @@ pub struct Lead {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function: Option<String>,
@@ -933,6 +969,60 @@ pub struct Lead {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub write_uid: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LeadAttribution {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub affiliate_ref: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_touch_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub landing_path: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub referrer: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_campaign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_content: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_medium: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_term: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LeadFormField {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entries: Option<Vec<serde_json::Value>>,
+
+    pub key: String,
+
+    pub kind: String,
+
+    pub label: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub values: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1181,6 +1271,9 @@ pub struct UpdateLeadResponse {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<LeadAttribution>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub automated_probability: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1235,6 +1328,12 @@ pub struct UpdateLeadResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expected_revenue: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_fields: Option<Vec<LeadFormField>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function: Option<String>,

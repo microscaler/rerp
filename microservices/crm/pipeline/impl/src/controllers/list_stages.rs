@@ -1,4 +1,8 @@
 // BRRTRouter: user-owned
+//
+// The Kanban columns: every stage, or one pipeline's with filter_team_id
+// (Sales or Recruitment - see supabase::TEAM_*). `fold` marks the closed-out
+// lane the board collapses.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
@@ -10,8 +14,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
     if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
         return denied;
     }
-    let items: Vec<Value> = crate::supabase::STAGES
-        .iter()
+    let team = req.data.filter_team_id.as_deref().filter(|t| !t.is_empty());
+    let items: Vec<Value> = crate::supabase::stages_for(team)
         .map(|s| {
             json!({
                 "id": s.id,
@@ -20,6 +24,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
                 "probability": s.probability,
                 "is_won": s.is_won,
                 "is_lost": s.is_lost,
+                "fold": s.fold,
+                "color": s.color,
+                "requirements": s.requirements,
+                "team_ids": [s.team],
             })
         })
         .collect();

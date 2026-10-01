@@ -44,6 +44,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             Some(id) if !id.is_empty() => lead.stage_id.as_deref() == Some(id),
             _ => true,
         })
+        .filter(|lead| match data.filter_team_id.as_deref() {
+            Some(t) if !t.is_empty() => lead.team_id.as_deref() == Some(t),
+            _ => true,
+        })
         .filter(|lead| match data.filter_won_status.as_deref() {
             Some(ws) if !ws.is_empty() => lead.won_status.as_deref() == Some(ws),
             _ => true,
