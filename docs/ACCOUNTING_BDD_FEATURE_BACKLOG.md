@@ -9,6 +9,7 @@ Related docs:
 - [`OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md`](./OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md) — maturity target and Odoo benchmark narrative.
 - [`OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md`](./OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md) — service-by-service OpenAPI resource backlog.
 - [`docs/llmwiki/topics/accounting-openapi-odoo-gap.md`](./llmwiki/topics/accounting-openapi-odoo-gap.md) — agent-facing summary.
+- [`accounting/testing-scenarios/README.md`](./accounting/testing-scenarios/README.md) — granular per-service use-case and testing scenarios (Given/When/Then with worked numbers, IFRS references, test-coverage matrices).
 
 ## Conventions
 

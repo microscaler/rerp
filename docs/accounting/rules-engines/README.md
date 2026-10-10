@@ -10,6 +10,7 @@ Related docs:
 - [`../../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md`](../../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md)
 - [`../../OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md`](../../OPENAPI_ACCOUNTING_ODOO_GAP_ANALYSIS.md)
 - [`../../llmwiki/topics/accounting-openapi-odoo-gap.md`](../../llmwiki/topics/accounting-openapi-odoo-gap.md)
+- [`../testing-scenarios/README.md`](../testing-scenarios/README.md) — per-service use-case and testing scenarios this directory's dossiers elaborate into acceptance criteria.
 
 ## Design Principle
 
