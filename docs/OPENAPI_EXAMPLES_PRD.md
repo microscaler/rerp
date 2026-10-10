@@ -413,6 +413,6 @@ Create a mapping document showing:
 ## References
 
 - [OpenAPI 3.1 Examples Specification](https://spec.openapis.org/oas/v3.1.0#example-object)
-- [BRRTRouter Petstore Example](../BRRTRouter/examples/openapi.yaml)
-- [BRRTRouter Sample UI](../BRRTRouter/sample-ui/)
+- [BRRTRouter Petstore Example(https://github.com/microscaler/BRRTRouter/blob/main/examples/openapi.yaml)
+- [BRRTRouter Sample UI(https://github.com/microscaler/BRRTRouter/tree/main/sample-ui)
 - [RERP Accounting OpenAPI Specs](../openapi/accounting/)

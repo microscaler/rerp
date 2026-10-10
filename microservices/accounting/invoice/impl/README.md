@@ -6,7 +6,7 @@ claims and commits the invoice and balanced journal in one Lifeguard RLS
 transaction.
 
 The canonical source contract is
-[`../../../../../openapi/accounting/invoice/openapi.yaml`](../../../../../openapi/accounting/invoice/openapi.yaml).
+[`../../../../openapi/accounting/invoice/openapi.yaml`](../../../../openapi/accounting/invoice/openapi.yaml).
 Five operations are active:
 post a customer invoice, retrieve it, retrieve its journal, post a full credit
 note, and materialize/retrieve its immutable PDF artifact. The executable

@@ -119,8 +119,8 @@ The competitors evaluated:
 ## Quick Links
 
 - [Current OpenAPI Spec](../openapi.yaml) — RERP Inventory gateway specification
-- [Stock Service Spec](stock/openapi.yaml) — Stock items and availability sub-spec
-- [Stock Movements Spec](stock-movements/openapi.yaml) — Movement transactions sub-spec
-- [Stock Valuations Spec](stock-valuations/openapi.yaml) — Costing and valuation sub-spec
+- [Stock Service Spec](../stock/openapi.yaml) — Stock items and availability sub-spec
+- [Stock Movements Spec](../stock-movements/openapi.yaml) — Movement transactions sub-spec
+- [Stock Valuations Spec](../stock-valuations/openapi.yaml) — Costing and valuation sub-spec
 - [Warehouse Operations Spec](../warehouse/openapi.yaml) — Multi-warehouse sub-spec
 - [Dropshipping Spec](../dropshipping/openapi.yaml) — Dropship orders sub-spec
