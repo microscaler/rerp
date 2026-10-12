@@ -175,7 +175,7 @@ Unlike traditional CRMs where AI assists humans, ServiceNow's AI agents **execut
 
 ## Quick Links
 
-- [CRM Audit & Gap Analysis](../../docs/crm_audit_analysis.md) — Full technical gap analysis
+- [CRM Audit & Gap Analysis](../docs/crm_audit_analysis.md) — Full technical gap analysis
 - [Current OpenAPI Spec](../openapi.yaml) — RERP CRM gateway specification
 - [Core Service Spec](../core/openapi.yaml) — Core entities sub-spec
 - [Automation Service Spec](../automation/openapi.yaml) — Workflow/service automation spec

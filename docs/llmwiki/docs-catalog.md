@@ -34,6 +34,7 @@ Inventory of source material that this wiki synthesizes. This is not a complete 
 - [`docs/OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md`](../OPENAPI_ACCOUNTING_ODOO_SERVICE_MAP.md) — Actionable service-by-service mapping from RERP accounting specs to Odoo Enterprise workflow/module anchors and proposed OpenAPI backlog resources.
 - [`docs/ACCOUNTING_BDD_FEATURE_BACKLOG.md`](../ACCOUNTING_BDD_FEATURE_BACKLOG.md) — Broad behavior-driven accounting feature backlog; maps maturity themes to high-level Given/When/Then scenarios before granular feature/test explosion.
 - [`docs/accounting/rules-engines/`](../accounting/rules-engines/) — Contract-first design dossiers for accounting rules engines, including detailed reconciliation and report expression engine designs plus scaffold dossiers for later engines.
+- [`docs/accounting/testing-scenarios/`](../accounting/testing-scenarios/) — Granular per-service accounting use-case and testing scenarios (Given/When/Then with worked numbers, IFRS references with official URLs, test-coverage matrices per service).
 - [`docs/history/architecture-snapshots/SYSTEM_BFF_GENERATION.md`](../history/architecture-snapshots/SYSTEM_BFF_GENERATION.md) — Historical BFF generation architecture.
 - [`docs/history/implementation-snapshots/BFF_GENERATION_COMPLETE.md`](../history/implementation-snapshots/BFF_GENERATION_COMPLETE.md) — Historical BFF completion status; mentions retired script paths.
 - [`openapi/accounting/bff-suite-config.yaml`](../../openapi/accounting/bff-suite-config.yaml) — Current accounting BFF source config.

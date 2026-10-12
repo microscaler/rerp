@@ -19,4 +19,4 @@
 
 The API contract and compileable generated scaffold exist so implementation starts in its permanent home. Generated controller bodies are placeholders and this component must not be added to Tilt, Helm, or a shared environment until persistence, template validation, sandboxed rendering, object-storage registration, Sesame authorization, Lifeguard RLS, and truthful failure handling replace them.
 
-See [PRD-008](../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md) and [ADR 002](../../../../docs/adrs/002-document-generation-ownership.md).
+See [PRD-008](../../../openapi/documents/DOCUMENTS_ANALYSIS/PRDs/PRD-008-Document-Generation-and-Rendition.md) and [ADR 002](../../../docs/adrs/002-document-generation-ownership.md).
