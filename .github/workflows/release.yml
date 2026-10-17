@@ -1,5 +1,5 @@
 # Release workflow: bump Cargo.toml, generate notes (OpenAI or Anthropic), commit, tag, push, create GitHub Release.
-# Tag push uses REPO_PAT so it triggers ci.yml; ci.yml builds and pushes containers only on refs/tags/v*.
+# The workflow token pushes the commit and tag; the image build (images.yml) is dispatched on the tag.
 # PRD: docs/RELEASE_MANAGEMENT_PRD.md
 #
 # Required secrets:
@@ -39,6 +39,7 @@ on:
 
 permissions:
   contents: write
+  actions: write     # dispatch the image build on the new tag
 
 jobs:
   release:
@@ -54,7 +55,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ env.BRANCH }}
-          token: ${{ secrets.REPO_PAT }}
+          token: ${{ github.token }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -81,6 +82,9 @@ jobs:
           fi
 
       - name: Generate release notes (OpenAI or Anthropic per provider)
+        id: notes
+        # Without the provider's API key the release takes GitHub's generated notes instead.
+        continue-on-error: true
         # Script exits 1 on missing API key, API error, or empty body → GHA fails the job.
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -100,5 +104,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ steps.bump.outputs.version }}"
-          body_path: release-body.md
-          generate_release_notes: false
+          body_path: ${{ steps.notes.outcome == 'success' && 'release-body.md' || '' }}
+          generate_release_notes: ${{ steps.notes.outcome != 'success' }}
+
+      # A tag pushed with the workflow's own token starts no workflow, so the images are built by dispatching
+      # images.yml on the tag: its pipeline sees refs/tags/v* and publishes to ghcr.io.
+      - name: Build and publish the release images
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run images.yml --repo "$GITHUB_REPOSITORY" --ref "v${{ steps.bump.outputs.version }}"
