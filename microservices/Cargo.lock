@@ -400,6 +400,7 @@ dependencies = [
  "lru",
  "may",
  "may_minihttp",
+ "may_tracing",
  "memory-stats",
  "microscaler-observability",
  "minijinja",
@@ -2090,6 +2091,7 @@ dependencies = [
  "may",
  "may_minihttp",
  "may_postgres",
+ "may_tracing",
  "once_cell",
  "opentelemetry",
  "opentelemetry-prometheus",
@@ -2270,6 +2272,15 @@ dependencies = [
  "crossbeam-utils",
  "rustversion",
  "smallvec",
+]
+
+[[package]]
+name = "may_tracing"
+version = "0.1.1"
+source = "git+https://github.com/microscaler/may_tracing.git?tag=v0.1.1#121de43e6e5e96d45f3339a238150804070a4be8"
+dependencies = [
+ "may",
+ "tracing",
 ]
 
 [[package]]

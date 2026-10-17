@@ -1,4 +1,4 @@
-From 4bd777d9384fa98a657433d19814df2b1f28bda7 Mon Sep 17 00:00:00 2001
+From a7e4150946e6a4761ca20bd4a26967943e6f068d Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Fri, 18 Sep 2026 16:40:23 +0000
 Subject: [PATCH] feat(workplace): propose workplace booking suite (ADR 003,
@@ -191,7 +191,7 @@ index 0000000..0e21968
 +
 +None.
 diff --git a/docs/adrs/README.md b/docs/adrs/README.md
-index 79b8ea6..56fecbe 100644
+index 79b8ea6..56fecbe 100755
 --- a/docs/adrs/README.md
 +++ b/docs/adrs/README.md
 @@ -4,7 +4,7 @@ This register is the authoritative inventory of RERP ADRs. See
@@ -212,7 +212,7 @@ index 79b8ea6..56fecbe 100644
  ## Creating an ADR
  
 diff --git a/docs/authority.json b/docs/authority.json
-index 0372df8..a373a4e 100644
+index 0372df8..a373a4e 100755
 --- a/docs/authority.json
 +++ b/docs/authority.json
 @@ -60,6 +60,30 @@
@@ -247,13 +247,13 @@ index 0372df8..a373a4e 100644
    ]
  }
 diff --git a/docs/llmwiki/log.md b/docs/llmwiki/log.md
-index 582c26f..b455305 100644
+index 88983de..8449bd6 100755
 --- a/docs/llmwiki/log.md
 +++ b/docs/llmwiki/log.md
-@@ -466,3 +466,15 @@ migrations.
- - Bumped the immutable database-bootstrap pod template after its initial
-   one-shot failure; the same image subsequently completed the full idempotent
-   migration sequence successfully in a diagnostic pod.
+@@ -474,3 +474,15 @@ migrations.
+ - Replaced duplicate Invoice and General Ledger claim parsers with the shared
+   strict parser while retaining RERP's Lifeguard `SessionContext` mapping.
+ - Verified both binary identity test suites on ms02 (three tests each).
 +
 +## [2026-09-18] propose | Workplace booking suite
 +
@@ -3747,4 +3747,5 @@ index 0000000..5f28485
 +      description: Access token issued by the RERP identity service (Sesame IDAM)
 -- 
 2.43.0
+
 
