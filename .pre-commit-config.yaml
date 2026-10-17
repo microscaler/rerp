@@ -7,14 +7,13 @@ repos:
     hooks:
       - id: qa
         name: Tooling QA (lint, format-check, tests)
-        entry: just qa
+        entry: tooling/scripts/hook-qa.sh
         language: system
         pass_filenames: false
 
       - id: microservices-fmt
         name: Cargo fmt (components+entities) if microservices/ changed
-        entry: tooling/.venv/bin/rerp
-        args: [pre-commit, microservices-fmt]
+        entry: tooling/scripts/hook-microservices-fmt.sh
         language: system
         pass_filenames: false
 
