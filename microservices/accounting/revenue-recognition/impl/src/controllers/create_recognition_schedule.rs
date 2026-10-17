@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_revenue_recognition_gen::handlers::create_recognition_schedule::{Request, Response};
+use rerp_accounting_revenue_recognition_gen::handlers::create_recognition_schedule::{
+    Request, Response,
+};
 
 #[handler(CreateRecognitionScheduleController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

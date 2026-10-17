@@ -9,6 +9,5 @@ use rerp_accounting_tax_compliance_gen::handlers::list_tax_payments::{Request, R
 #[handler(ListTaxPaymentsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

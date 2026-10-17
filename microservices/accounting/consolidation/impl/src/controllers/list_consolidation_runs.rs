@@ -9,6 +9,5 @@ use rerp_accounting_consolidation_gen::handlers::list_consolidation_runs::{Reque
 #[handler(ListConsolidationRunsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

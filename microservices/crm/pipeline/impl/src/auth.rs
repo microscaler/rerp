@@ -64,13 +64,25 @@ fn require(claims: Option<&Value>, roles: &[&str]) -> Result<(), HttpJson<Value>
         // The jwks provider rejects unauthenticated requests before
         // dispatch; reaching here without claims means the route was
         // served without bearer verification - fail closed.
-        return Err(deny(401, "unauthenticated", "missing verified token claims"));
+        return Err(deny(
+            401,
+            "unauthenticated",
+            "missing verified token claims",
+        ));
     };
     if !tenant_matches(claims) {
-        return Err(deny(403, "wrong_tenant", "token tenant is not permitted for this API"));
+        return Err(deny(
+            403,
+            "wrong_tenant",
+            "token tenant is not permitted for this API",
+        ));
     }
     if !roles.iter().any(|role| has_role(claims, role)) {
-        return Err(deny(403, "missing_role", "token lacks a CRM role for this operation"));
+        return Err(deny(
+            403,
+            "missing_role",
+            "token lacks a CRM role for this operation",
+        ));
     }
     Ok(())
 }

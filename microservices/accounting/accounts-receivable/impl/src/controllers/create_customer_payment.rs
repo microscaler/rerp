@@ -5,7 +5,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::create_customer_payment::{Request, Response};
+use rerp_accounting_accounts_receivable_gen::handlers::create_customer_payment::{
+    Request, Response,
+};
 
 #[handler(CreatePaymentController)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> Response {

@@ -9,6 +9,5 @@ use rerp_accounting_audit_controls_gen::handlers::list_control_exceptions::{Requ
 #[handler(ListControlExceptionsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

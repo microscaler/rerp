@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_documents_extraction_gen::handlers::link_document_to_invoice::{Request, Response};
+use rerp_accounting_documents_extraction_gen::handlers::link_document_to_invoice::{
+    Request, Response,
+};
 
 #[handler(LinkDocumentToInvoiceController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

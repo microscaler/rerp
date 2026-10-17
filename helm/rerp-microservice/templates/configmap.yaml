@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Values.service.name }}-config
-  namespace: {{ .Values.deployment.namespace }}
+  namespace: {{ .Values.deployment.namespace | default .Release.Namespace }}
   labels:
     app: {{ .Values.service.name }}
 data:

@@ -9,6 +9,5 @@ use rerp_accounting_lease_accounting_gen::handlers::list_lease_modifications::{R
 #[handler(ListLeaseModificationsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

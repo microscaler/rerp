@@ -9,4 +9,3 @@ pub mod edi_mapping;
 pub mod entity_registry {
     include!(concat!(env!("OUT_DIR"), "/entity_registry.rs"));
 }
-

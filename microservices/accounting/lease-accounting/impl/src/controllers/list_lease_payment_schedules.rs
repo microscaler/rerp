@@ -4,11 +4,12 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_lease_accounting_gen::handlers::list_lease_payment_schedules::{Request, Response};
+use rerp_accounting_lease_accounting_gen::handlers::list_lease_payment_schedules::{
+    Request, Response,
+};
 
 #[handler(ListLeasePaymentSchedulesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

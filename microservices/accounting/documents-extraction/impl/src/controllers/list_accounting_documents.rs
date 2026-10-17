@@ -4,11 +4,12 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_documents_extraction_gen::handlers::list_accounting_documents::{Request, Response};
+use rerp_accounting_documents_extraction_gen::handlers::list_accounting_documents::{
+    Request, Response,
+};
 
 #[handler(ListAccountingDocumentsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

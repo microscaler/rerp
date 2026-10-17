@@ -5,21 +5,22 @@
 # 8080 -> container 8080. Only an ingress/BFF or explicit Tilt port-forward is
 # exposed to the host, so per-service port allocation is unnecessary.
 service:
-  name: ""  # e.g., general-ledger, invoice, accounts-receivable, accounts-payable
+  name: rerp-microservice  # each service's values set it, e.g. general-ledger, invoice, accounts-receivable, accounts-payable
   port: 8080
   containerPort: 8080
 
 # Image configuration
 image:
   repository: localhost:5001
-  name: ""  # e.g., rerp-accounting-general-ledger
+  name: rerp-microservice  # each service's values set it, e.g. rerp-accounting-general-ledger
   tag: tilt
   pullPolicy: IfNotPresent
 
 # Deployment configuration
 deployment:
   replicas: 1
-  namespace: rerp
+  # Empty: the release namespace. Each service's values (and the dev profile) set rerp.
+  namespace: ""
 
 # Application configuration
 app:

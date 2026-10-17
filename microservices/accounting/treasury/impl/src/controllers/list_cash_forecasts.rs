@@ -9,6 +9,5 @@ use rerp_accounting_treasury_gen::handlers::list_cash_forecasts::{Request, Respo
 #[handler(ListCashForecastsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

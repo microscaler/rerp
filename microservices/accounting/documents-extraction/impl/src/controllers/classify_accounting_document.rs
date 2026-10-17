@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_documents_extraction_gen::handlers::classify_accounting_document::{Request, Response};
+use rerp_accounting_documents_extraction_gen::handlers::classify_accounting_document::{
+    Request, Response,
+};
 
 #[handler(ClassifyAccountingDocumentController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

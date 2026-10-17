@@ -31,6 +31,9 @@ build:
           # The buildpack ships only bin/ unless told otherwise. Each service reads its OpenAPI spec, docs and static
           # site from its crate's gen/ directory; the chart passes those paths (--spec, --doc-dir, --static-dir) and
           # mounts config.yaml at /app/config.
+          # Test what is built: the default leg is every crate in the workspace, and the accounting ones do not
+          # compile yet. Widen with BP_RUST_PACKAGES.
+          - BP_TEST_COMMAND=cargo test --manifest-path "$GITHUB_WORKSPACE/microservices/Cargo.toml" -p rerp_crm_pipeline -p rerp_crm_pipeline_gen --no-fail-fast
           - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config
     # The service chart (helm buildpack): published with the images on a v* tag.
     - image: ghcr.io/microscaler/rerp-microservice-chart

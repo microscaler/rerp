@@ -9,6 +9,5 @@ use rerp_accounting_revenue_recognition_gen::handlers::list_recognition_runs::{R
 #[handler(ListRecognitionRunsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

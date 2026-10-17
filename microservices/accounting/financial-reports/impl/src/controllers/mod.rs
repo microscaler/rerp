@@ -3,9 +3,6 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-
-
-
 pub mod create_custom_report;
 pub mod create_report_definition;
 pub mod create_report_export;

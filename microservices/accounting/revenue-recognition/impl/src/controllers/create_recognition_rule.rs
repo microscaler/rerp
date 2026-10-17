@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_revenue_recognition_gen::handlers::create_recognition_rule::{Request, Response};
+use rerp_accounting_revenue_recognition_gen::handlers::create_recognition_rule::{
+    Request, Response,
+};
 
 #[handler(CreateRecognitionRuleController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

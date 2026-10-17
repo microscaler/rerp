@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_revenue_recognition_gen::handlers::create_deferred_expense::{Request, Response};
+use rerp_accounting_revenue_recognition_gen::handlers::create_deferred_expense::{
+    Request, Response,
+};
 
 #[handler(CreateDeferredExpenseController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

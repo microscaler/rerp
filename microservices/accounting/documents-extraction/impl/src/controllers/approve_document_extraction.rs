@@ -4,7 +4,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_documents_extraction_gen::handlers::approve_document_extraction::{Request, Response};
+use rerp_accounting_documents_extraction_gen::handlers::approve_document_extraction::{
+    Request, Response,
+};
 
 #[handler(ApproveDocumentExtractionController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {

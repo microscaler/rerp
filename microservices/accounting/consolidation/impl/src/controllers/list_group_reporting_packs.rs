@@ -9,6 +9,5 @@ use rerp_accounting_consolidation_gen::handlers::list_group_reporting_packs::{Re
 #[handler(ListGroupReportingPacksController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

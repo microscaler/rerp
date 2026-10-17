@@ -19,13 +19,9 @@ pub mod create_bank_statement;
 
 pub mod get_bank_statement;
 
-
-
 pub mod list_reconciliations;
 
 pub mod create_reconciliation;
-
-
 
 pub mod auto_match_transactions;
 pub mod cash_position;

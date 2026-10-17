@@ -9,6 +9,5 @@ use rerp_accounting_documents_extraction_gen::handlers::list_extraction_jobs::{R
 #[handler(ListExtractionJobsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

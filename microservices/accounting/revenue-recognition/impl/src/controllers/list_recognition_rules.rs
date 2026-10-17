@@ -4,11 +4,12 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_revenue_recognition_gen::handlers::list_recognition_rules::{Request, Response};
+use rerp_accounting_revenue_recognition_gen::handlers::list_recognition_rules::{
+    Request, Response,
+};
 
 #[handler(ListRecognitionRulesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
     // TODO: Implement your business logic here
-    Response {
-    }
+    Response {}
 }

@@ -5,7 +5,9 @@
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::list_customer_payments::{Request, Response};
+use rerp_accounting_accounts_receivable_gen::handlers::list_customer_payments::{
+    Request, Response,
+};
 
 #[allow(unused_imports)]
 use rerp_accounting_accounts_receivable_gen::handlers::types::Payment;
