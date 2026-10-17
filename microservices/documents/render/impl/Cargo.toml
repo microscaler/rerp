@@ -30,4 +30,4 @@ may = { workspace = true }
 # Add your additional dependencies here
 
 [build-dependencies]
-lifeguard-migrate = { path = "../../../../../lifeguard/lifeguard-migrate" }
+lifeguard-migrate = { workspace = true }

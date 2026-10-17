@@ -24,6 +24,20 @@ spec:
         - name: {{ .Values.service.name }}
           image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- /* Release images (buildpacks, ghcr.io/microscaler/rerp-*) start the binary from /workspace with no
+               arguments, so the service's spec, docs, static site and mounted config are passed explicitly:
+               app.serviceDir is the crate's directory in the image (/workspace/microservices/<suite>/<service>).
+               The Tilt dev images (docker/microservices) bake these into their entrypoint and leave it empty.
+               args replaces the lot. */}}
+          {{- $args := .Values.args }}
+          {{- if and (not $args) .Values.app.serviceDir }}
+          {{- $d := .Values.app.serviceDir }}
+          {{- $args = list "--spec" (printf "%s/gen/doc/openapi.yaml" $d) "--doc-dir" (printf "%s/gen/doc" $d) "--static-dir" (printf "%s/gen/static_site" $d) "--config" "/app/config/config.yaml" }}
+          {{- end }}
+          {{- with $args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 {{- if .Values.databaseEnv.enabled }}
           envFrom:
             - configMapRef:

@@ -31,6 +31,12 @@ _brrtrouter_env = os.getenv('BRRTROUTER_ROOT', '').strip().rstrip('/')
 brrtrouter_root = _brrtrouter_env if _brrtrouter_env else '../BRRTRouter'
 os.putenv('BRRTROUTER_ROOT', str(local('realpath "%s"' % brrtrouter_root, quiet=True)).strip())
 
+# Release deps are git revisions in microservices/Cargo.toml (what CI and the buildpack build). Local dev builds
+# against the sibling checkouts instead: RERP_LOCAL_DEPS=1 writes a gitignored cargo --config file from
+# [workspace.metadata.local-deps], and `rerp build` (brrtrouter_tooling host_aware) passes it through.
+local('RERP_LOCAL_DEPS=1 python3 tooling/src/rerp_tooling/local_deps.py', quiet=True)
+os.putenv('OCTOPILOT_CARGO_CONFIG', '%s/microservices/.cargo/local-deps.config' % os.getcwd())
+
 # Python venv for RERP/BRRTRouter tooling (shared). Override:
 #   export BRRTROUTER_VENV=/path/to/venv
 # Default: ~/.local/share/brrtrouter/venv

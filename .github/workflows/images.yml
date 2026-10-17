@@ -1,0 +1,49 @@
+name: Release images
+
+# Official images, built by the octopilot pipeline from skaffold.yaml: one buildpack build of the RERP suites
+# (the CRM pipeline today; accounting when it compiles again), one image per service (suite-images.txt) holding only its own binary on paketobuildpacks/run-jammy-tiny.
+# A v* tag (cut by release.yml) publishes them to ghcr.io/microscaler with the chart and attaches the result to the
+# GitHub Release. This repository is public: nothing here names a private registry, cloud project or secret.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths-ignore:
+      - "**/*.md"
+      - docs/**
+      - llmwiki/**
+      - deployment-configuration/**
+      - k8s/**
+      - "Tiltfile*"
+  workflow_dispatch:
+
+concurrency:
+  group: rerp-images-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    name: Octopilot
+    # The reusable workflow's release job needs contents: write (GitHub Release) and packages: write (ghcr.io).
+    # actions: write lets the pipeline trim old artifacts (keep_artifacts) before it uploads its own.
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      pull-requests: write
+      actions: write
+    uses: octopilot/actions/.github/workflows/pipeline.yml@main
+    with:
+      op_version: main
+      integration: false
+      release_to_ghcr: true
+      # The suite build is an intermediate: only the per-service images (suite-images.txt) are released.
+      release_skip: rerp-suite
+      # Housekeeping before anything is uploaded or pushed: Actions artifacts down to the newest 3 of each name and
+      # none older than 7 days (the organisation's artifact quota is shared), and 5 versions of each image on ghcr.io
+      # counting the one being released.
+      keep_artifacts: 3
+      artifact_max_age_days: 7
+      keep_images: 5
+    secrets: inherit

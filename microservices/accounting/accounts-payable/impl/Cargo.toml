@@ -25,7 +25,7 @@ lifeguard = { workspace = true }
 lifeguard-derive = { workspace = true }
 
 # lifeguard-migrate used by generated entity_registry.rs
-lifeguard-migrate = { path = "../../../../../lifeguard/lifeguard-migrate" }
+lifeguard-migrate = { workspace = true }
 
 # BRRTRouter (re-exported from gen crate, but may need direct access)
 brrtrouter = { workspace = true }
@@ -51,4 +51,4 @@ chrono = { workspace = true }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [build-dependencies]
-lifeguard-migrate = { path = "../../../../../lifeguard/lifeguard-migrate" }
+lifeguard-migrate = { workspace = true }

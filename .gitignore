@@ -95,3 +95,6 @@ pip-delete-this-directory.txt
 # =============================================================================
 ui/website/dist/
 ui/website/node_modules/
+
+# cargo --config overrides for sibling checkouts (rerp_tooling/local_deps.py, RERP_LOCAL_DEPS=1)
+microservices/.cargo/local-deps.config

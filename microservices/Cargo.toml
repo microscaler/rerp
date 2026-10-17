@@ -59,19 +59,21 @@ version = "0.1.3"
 edition = "2021"
 
 [workspace.dependencies]
+# Release builds (CI, the buildpack) use these git revisions: the same revs PriceWhisperer pins. Local dev
+# overrides them with sibling checkouts from [workspace.metadata.local-deps] below (RERP_LOCAL_DEPS=1, which Tilt sets).
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
-brrtrouter = { path = "../../BRRTRouter", default-features = false }
-brrtrouter_macros = { path = "../../BRRTRouter/brrtrouter_macros" }
-sesame-idam-client = { path = "../../sesame-idam-client" }
+brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "9bcb2db0020fb9d86ea19954ef113b6d8019ece3", default-features = false }
+brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "9bcb2db0020fb9d86ea19954ef113b6d8019ece3" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "b43fe3ae8f6bc9ff4d6144cd7860cb44ea3fb241" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }
 http_legacy = { package = "http", version = "0.2" }
 
 # Lifeguard ORM
-lifeguard = { path = "../../lifeguard" }
-lifeguard-derive = { path = "../../lifeguard/lifeguard-derive" }
-lifeguard-migrate = { path = "../../lifeguard/lifeguard-migrate" }
+lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
+lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
+lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
 rerp_entities = { package = "rerp-entities", path = "accounting/entities" }
 
 # Standard dependencies
@@ -91,6 +93,17 @@ may-postgres = "0.1"
 rust_decimal = "1.33"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Sibling paths for local dev. Cargo does not read this table. Tilt sets RERP_LOCAL_DEPS=1, which writes
+# microservices/.cargo/local-deps.config (gitignored) and points the build at it through OCTOPILOT_CARGO_CONFIG;
+# CI never sets it, so CI and the buildpack use the git revs above. Paths are relative to microservices/.
+[workspace.metadata.local-deps]
+brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", path = "../../BRRTRouter" }
+brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", path = "../../BRRTRouter/brrtrouter_macros" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", path = "../../sesame-idam-client" }
+lifeguard = { git = "https://github.com/microscaler/lifeguard.git", path = "../../lifeguard" }
+lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", path = "../../lifeguard/lifeguard-derive" }
+lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", path = "../../lifeguard/lifeguard-migrate" }
 
 [patch.crates-io]
 # sea-query 1.0.2 emits a bounded window-frame offset with no separator

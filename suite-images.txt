@@ -1,0 +1,15 @@
+# cargo bin (the /cnb/process name), then the image repository.
+# op copies the suite build once per line, keeping only that binary, and sets its process as the entrypoint.
+# It does not compile again.
+# Accounting: commented out until it compiles again (skaffold.yaml BP_RUST_PACKAGES).
+# general_ledger ghcr.io/microscaler/rerp-accounting-general-ledger
+# invoice ghcr.io/microscaler/rerp-accounting-invoice
+# accounts_receivable ghcr.io/microscaler/rerp-accounting-accounts-receivable
+# accounts_payable ghcr.io/microscaler/rerp-accounting-accounts-payable
+# bank_sync ghcr.io/microscaler/rerp-accounting-bank-sync
+# asset ghcr.io/microscaler/rerp-accounting-asset
+# budget ghcr.io/microscaler/rerp-accounting-budget
+# edi ghcr.io/microscaler/rerp-accounting-edi
+# financial_reports ghcr.io/microscaler/rerp-accounting-financial-reports
+# bff ghcr.io/microscaler/rerp-accounting-bff
+pipeline ghcr.io/microscaler/rerp-crm-pipeline

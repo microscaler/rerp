@@ -1,0 +1,39 @@
+# Release shape: what the octopilot pipeline builds (.github/workflows/images.yml). Tilt does not read this file.
+# The RERP suites are one buildpack build: octopilot/rust compiles every package below in one cargo
+# invocation, and op publishes one image per line of suite-images.txt from that build, each holding only its own
+# binary (the suite's other binaries are left out) on the same shared run-image and launcher layers.
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: rerp
+build:
+  artifacts:
+    - image: ghcr.io/microscaler/rerp-suite
+      context: .
+      buildpacks:
+        # octopilot/rust 0.1.17: one cargo invocation for the suite, and processes that launch the binary directly
+        # (no bash), which the tiny run image needs.
+        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-557fbe8
+        # Distroless-like Ubuntu 22.04 (the build image's release, so the same glibc): glibc, libgcc, CA certificates
+        # and tzdata, 11 MB. No shell in the containers: debug with kubectl debug.
+        runImage: index.docker.io/paketobuildpacks/run-jammy-tiny:0.2.186
+        env:
+          - BP_RUST_BRRTROUTER=1
+          - BP_RUST_WORKSPACE_DIR=microservices
+          # The CRM pipeline only, for now. The accounting services do not compile on main (generated handlers and
+          # their controllers have drifted apart, and sesame-idam-client's optional organization_id no longer fits
+          # lifeguard's SessionContext); their entries are ready in suite-images.txt, commented out. Add their packages
+          # here, and their gen/impl paths to BP_RUST_KEEP, when they build again:
+          #   rerp_accounting_general_ledger rerp_accounting_invoice rerp_accounting_accounts_receivable
+          #   rerp_accounting_accounts_payable rerp_accounting_bank_sync rerp_accounting_asset rerp_accounting_budget
+          #   rerp_accounting_edi rerp_accounting_financial_reports rerp_accounting_bff
+          - BP_RUST_PACKAGES=rerp_crm_pipeline
+          # The buildpack ships only bin/ unless told otherwise. Each service reads its OpenAPI spec, docs and static
+          # site from its crate's gen/ directory; the chart passes those paths (--spec, --doc-dir, --static-dir) and
+          # mounts config.yaml at /app/config.
+          - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config
+    # The service chart (helm buildpack): published with the images on a v* tag.
+    - image: ghcr.io/microscaler/rerp-microservice-chart
+      context: helm/rerp-microservice
+      buildpacks:
+        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-557fbe8
