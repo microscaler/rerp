@@ -53,6 +53,13 @@ members = [
     "migrator",
 ]
 resolver = "2"
+# What a bare `cargo build` (the octopilot pipeline's release build) compiles: the services that build today. The
+# accounting crates do not compile on main yet (skaffold.yaml BP_RUST_PACKAGES); add them here when they do.
+# `--workspace` (rerp build workspace, ci.yml) still builds every member.
+default-members = [
+    "crm/pipeline/gen",
+    "crm/pipeline/impl",
+]
 
 [workspace.package]
 version = "0.1.3"
