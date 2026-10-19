@@ -16,11 +16,17 @@
 //! `"https://sesame-idam.dev/claims"` carrying `tenant`, `portal`,
 //! `roles: ["crm.editor", ...]` and `permissions`. Roles come from
 //! sesame `role_assignments` via authz-core.
+//!
+//! The namespace is the issuing Sesame deployment's: `SESAME_CLAIMS_NAMESPACE`
+//! (pp: `https://sesame-idam.pricewhisperer.ai/claims`), Sesame's default when
+//! unset. A token whose namespace differs carries no roles here, so a hard-coded
+//! namespace refused every staff member in pp (19 Oct 2026).
 
 use brrtrouter::typed::HttpJson;
 use serde_json::{json, Value};
 
-const CLAIMS_NAMESPACE: &str = "https://sesame-idam.dev/claims";
+/// Sesame's default claims namespace (used when SESAME_CLAIMS_NAMESPACE is unset).
+const DEFAULT_CLAIMS_NAMESPACE: &str = "https://sesame-idam.dev/claims";
 const REQUIRED_TENANT: &str = "pricewhisperer";
 const ROLE_EDITOR: &str = "crm.editor";
 const ROLE_VIEWER: &str = "crm.viewer";
@@ -32,8 +38,20 @@ fn deny(status: u16, error: &str, message: &str) -> HttpJson<Value> {
     )
 }
 
+/// The claims namespace of the Sesame deployment that issues our tokens, read once.
+fn claims_namespace() -> &'static str {
+    static NS: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    NS.get_or_init(|| namespace_from(std::env::var("SESAME_CLAIMS_NAMESPACE").ok()))
+}
+
+fn namespace_from(raw: Option<String>) -> String {
+    raw.map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .unwrap_or_else(|| DEFAULT_CLAIMS_NAMESPACE.to_string())
+}
+
 fn namespaced(claims: &Value) -> Option<&Value> {
-    claims.get(CLAIMS_NAMESPACE)
+    claims.get(claims_namespace())
 }
 
 /// Both the top-level `tenant_id` and the namespaced `tenant` are issued
@@ -104,7 +122,7 @@ mod tests {
     fn token(tenant: &str, roles: &[&str]) -> Value {
         json!({
             "tenant_id": tenant,
-            CLAIMS_NAMESPACE: { "tenant": tenant, "roles": roles, "permissions": [] }
+            (claims_namespace()): { "tenant": tenant, "roles": roles, "permissions": [] }
         })
     }
 
@@ -136,6 +154,27 @@ mod tests {
     }
 
     #[test]
+    fn namespace_comes_from_the_environment_with_sesames_default() {
+        assert_eq!(
+            namespace_from(Some(
+                " https://sesame-idam.pricewhisperer.ai/claims ".into()
+            )),
+            "https://sesame-idam.pricewhisperer.ai/claims"
+        );
+        assert_eq!(namespace_from(Some("".into())), DEFAULT_CLAIMS_NAMESPACE);
+        assert_eq!(namespace_from(None), DEFAULT_CLAIMS_NAMESPACE);
+    }
+
+    #[test]
+    fn roles_under_another_namespace_do_not_count() {
+        let claims = json!({
+            "tenant_id": "pricewhisperer",
+            "https://elsewhere.example/claims": { "roles": ["crm.editor"] }
+        });
+        assert!(require_viewer(Some(&claims)).is_err());
+    }
+
+    #[test]
     fn missing_claims_rejected() {
         assert!(require_viewer(None).is_err());
         assert!(require_editor(None).is_err());
@@ -145,7 +184,7 @@ mod tests {
     fn tenant_only_top_level_still_passes() {
         let claims = json!({
             "tenant_id": "pricewhisperer",
-            CLAIMS_NAMESPACE: { "roles": ["crm.viewer"] }
+            (claims_namespace()): { "roles": ["crm.viewer"] }
         });
         assert!(require_viewer(Some(&claims)).is_ok());
     }
