@@ -1,6 +1,6 @@
 [package]
 name = "rerp-accounting-core"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Pure accounting invariants and posting plans for RERP"
 license = "MIT OR Apache-2.0"
