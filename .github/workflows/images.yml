@@ -1,7 +1,7 @@
 name: Release images
 
 # Official images, built by the octopilot pipeline from skaffold.yaml: one buildpack build of the RERP suites
-# (the CRM pipeline today; accounting when it compiles again), one image per service (suite-images.txt) holding only its own binary on paketobuildpacks/run-jammy-tiny.
+# (one build per suite, side by side, only for the suites a change touches), one image per service (suites/<suite>.txt) holding only its own binary on paketobuildpacks/run-jammy-tiny.
 # A v* tag (cut by release.yml) publishes them to ghcr.io/microscaler with the chart and attaches the result to the
 # GitHub Release. This repository is public: nothing here names a private registry, cloud project or secret.
 
@@ -17,6 +17,11 @@ on:
       - k8s/**
       - "Tiltfile*"
   workflow_dispatch:
+    inputs:
+      build_all:
+        description: Build every suite, not only the ones changed since the previous run or tag
+        type: boolean
+        default: false
 
 concurrency:
   group: rerp-images-${{ github.ref }}
@@ -38,8 +43,13 @@ jobs:
       op_version: main
       integration: false
       release_to_ghcr: true
-      # The suite build is an intermediate: only the per-service images (suite-images.txt) are released.
-      release_skip: rerp-suite
+      # Suite builds are intermediates: only their per-service images (suites/<suite>.txt) are released.
+      release_skip: rerp-crm rerp-documents
+      # Build only the suites a change touches, side by side (skaffold.yaml has one artifact per suite). A tag
+      # compares the previous tag, so a release carries every suite changed since the last one; the others keep
+      # their last version (each service's image policy moves on its own). Dispatch with build_all for everything.
+      only_changed: true
+      build_all: ${{ inputs.build_all == true }}
       # Housekeeping before anything is uploaded or pushed: Actions artifacts down to the newest 3 of each name and
       # none older than 7 days (the organisation's artifact quota is shared), and 5 versions of each image on ghcr.io
       # counting the one being released.

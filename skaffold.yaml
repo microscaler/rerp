@@ -1,14 +1,17 @@
 # Release shape: what the octopilot pipeline builds (.github/workflows/images.yml). Tilt does not read this file.
-# The RERP suites are one buildpack build: octopilot/rust compiles every package below in one cargo
-# invocation, and op publishes one image per line of suite-images.txt from that build, each holding only its own
-# binary (the suite's other binaries are left out) on the same shared run-image and launcher layers.
+# One buildpack build per suite, side by side: octopilot/rust compiles a suite's packages in one cargo invocation, and
+# op publishes one image per line of that suite's map (BP_SUITE_IMAGES, suites/<suite>.txt), each holding only its own
+# binary on the shared run-image and launcher layers. The pipeline runs with only_changed: a suite builds when its
+# crates, the workspace crates they depend on, its share of Cargo.lock, its declared paths or its map changed
+# (octopilot/actions detect-contexts/changes.py); this file and .github/workflows rebuild every suite.
 apiVersion: skaffold/v4beta7
 kind: Config
 metadata:
   name: rerp
 build:
   artifacts:
-    - image: ghcr.io/microscaler/rerp-suite
+    # CRM: the pipeline service behind the PriceWhisperer platform portal's CRM.
+    - image: ghcr.io/microscaler/rerp-crm
       context: .
       buildpacks:
         # octopilot/rust 0.1.17: one cargo invocation for the suite, and processes that launch the binary directly
@@ -20,21 +23,36 @@ build:
         env:
           - BP_RUST_BRRTROUTER=1
           - BP_RUST_WORKSPACE_DIR=microservices
-          # The CRM pipeline only, for now. The accounting services do not compile on main (generated handlers and
-          # their controllers have drifted apart, and sesame-idam-client's optional organization_id no longer fits
-          # lifeguard's SessionContext); their entries are ready in suite-images.txt, commented out. Add their packages
-          # here, and their gen/impl paths to BP_RUST_KEEP, when they build again:
-          #   rerp_accounting_general_ledger rerp_accounting_invoice rerp_accounting_accounts_receivable
-          #   rerp_accounting_accounts_payable rerp_accounting_bank_sync rerp_accounting_asset rerp_accounting_budget
-          #   rerp_accounting_edi rerp_accounting_financial_reports rerp_accounting_bff
           - BP_RUST_PACKAGES=rerp_crm_pipeline
+          - BP_SUITE_IMAGES=suites/crm.txt
           # The buildpack ships only bin/ unless told otherwise. Each service reads its OpenAPI spec, docs and static
           # site from its crate's gen/ directory; the chart passes those paths (--spec, --doc-dir, --static-dir) and
           # mounts config.yaml at /app/config.
-          # Test what is built: the default leg is every crate in the workspace, and the accounting ones do not
-          # compile yet. Widen with BP_RUST_PACKAGES.
           - BP_TEST_COMMAND=cargo test --manifest-path "$GITHUB_WORKSPACE/microservices/Cargo.toml" -p rerp_crm_pipeline -p rerp_crm_pipeline_gen --no-fail-fast
+          - BP_TEST_LABEL=crm
           - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config
+        dependencies:
+          paths: [openapi/crm/**]
+    # Documents: the one document system in RERP (rendering today; extraction, routing and the out-of-band pipeline
+    # next). No other suite does AI document processing.
+    - image: ghcr.io/microscaler/rerp-documents
+      context: .
+      buildpacks:
+        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-557fbe8
+        runImage: index.docker.io/paketobuildpacks/run-jammy-tiny:0.2.186
+        env:
+          - BP_RUST_BRRTROUTER=1
+          - BP_RUST_WORKSPACE_DIR=microservices
+          - BP_RUST_PACKAGES=rerp_documents_render
+          - BP_SUITE_IMAGES=suites/documents.txt
+          - BP_TEST_COMMAND=cargo test --manifest-path "$GITHUB_WORKSPACE/microservices/Cargo.toml" -p rerp_documents_render -p rerp_documents_render_gen --no-fail-fast
+          - BP_TEST_LABEL=documents
+          - BP_RUST_KEEP=microservices/documents/render/gen/doc,microservices/documents/render/gen/static_site,microservices/documents/render/gen/config
+        dependencies:
+          paths: [openapi/documents/**]
+    # Accounting joins as its own artifact (rerp-accounting, suites/accounting.txt) once it compiles again: its
+    # generated handlers and controllers have drifted apart, and sesame-idam-client's optional organization_id no
+    # longer fits lifeguard's SessionContext.
     # The service chart (helm buildpack): published with the images on a v* tag.
     - image: ghcr.io/microscaler/rerp-microservice-chart
       context: helm/rerp-microservice

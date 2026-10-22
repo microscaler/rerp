@@ -1,0 +1,2 @@
+# Documents suite (skaffold.yaml rerp-documents): cargo bin, then the image repository (see suites/crm.txt).
+render ghcr.io/microscaler/rerp-documents-render
