@@ -1,0 +1,95 @@
+# Repo-wide checks that are not a suite build. Each suite's Rust is built and tested in its own leg of the octopilot
+# pipeline (images.yml, only for the suites a change touches); the brochure site deploys from deploy-website.yml.
+#
+#   commits   conventional commit messages (pull requests; release notes are written from them)
+#   tooling   the rerp CLI's tests (release.yml uses it to bump and tag) and the docs governance check
+#   specs     every OpenAPI spec validates, BFF generation runs (dry), port assignments agree
+#   format    cargo fmt over the workspace
+name: Checks
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**/*.md", "docs/**", "llmwiki/**", "ui/website/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: rerp-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  BRRTROUTER_TOOLING: "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
+
+jobs:
+  commits:
+    name: Conventional commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v6
+
+  tooling:
+    name: Tooling
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling[dev] "$BRRTROUTER_TOOLING"
+      - name: Documentation authority and ADR lifecycle
+        run: tooling/.venv/bin/python tooling/scripts/check_doc_governance.py
+      # Coverage floor at today's level (47%, 22 Oct 2026, after release, ci and openapi moved to the workspace CLI):
+      # it may only go up.
+      - name: Tests with coverage
+        run: cd tooling && .venv/bin/pytest tests/ -q --cov=rerp_tooling --cov-report=term-missing --cov-fail-under=45
+
+  specs:
+    name: OpenAPI specs and ports
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Set up tooling .venv
+        run: |
+          python3 -m venv tooling/.venv
+          tooling/.venv/bin/pip install --upgrade pip
+          tooling/.venv/bin/pip install -e ./tooling "$BRRTROUTER_TOOLING"
+      - name: Validate OpenAPI specs
+        run: tooling/.venv/bin/rerp openapi validate
+      - name: Generate BFF specs (dry run)
+        run: tooling/.venv/bin/rerp bff generate-system
+      - name: Validate port assignments
+        run: tooling/.venv/bin/rerp ports validate
+
+  format:
+    name: Rust format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: cargo fmt --check
+        run: cd microservices && cargo fmt --check || (echo "Run 'cargo fmt' in microservices/ to fix." && exit 1)

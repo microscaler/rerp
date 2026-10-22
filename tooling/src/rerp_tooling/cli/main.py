@@ -640,7 +640,7 @@ def main():
 
     else:
         # Everything else (release, ci, openapi, ports, ...) is the generic workspace CLI, as in the PriceWhisperer
-        # and hauliage shims; release.yml and ci.yml call `rerp release` and `rerp ci`.
+        # and hauliage shims; release.yml calls `rerp release`.
         from brrtrouter_tooling.workspace.cli.main import main as workspace_main
 
         sys.argv = ["rerp", cmd] + rest

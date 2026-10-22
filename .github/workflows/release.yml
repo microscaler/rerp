@@ -2,10 +2,8 @@
 # The workflow token pushes the commit and tag; the image build (images.yml) is dispatched on the tag.
 # PRD: docs/RELEASE_MANAGEMENT_PRD.md
 #
-# Required secrets:
-#   REPO_PAT: repo PAT (or GitHub App token) with repo scope—used for checkout/push so the tag push triggers ci.yml.
-#     (GITHUB_TOKEN pushes do not trigger workflows.) Create at: Settings → Developer settings → Personal access tokens.
-#   OPENAI_API_KEY (when provider=openai), ANTHROPIC_API_KEY (when provider=anthropic)
+# Optional secrets: OPENAI_API_KEY (provider=openai) or ANTHROPIC_API_KEY (provider=anthropic) for the release notes;
+# without one the release takes GitHub's generated notes.
 
 name: Release
 
