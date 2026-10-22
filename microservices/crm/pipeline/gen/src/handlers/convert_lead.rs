@@ -2,22 +2,23 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::ConversionCustomer;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
-use brrtrouter::typed::{HandlerResponseOutput, HttpJson};
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(rename = "create_account")]
-    pub create_account: bool,
+    #[serde(rename = "customer")]
+    pub customer: ConversionCustomer,
 
-    #[serde(rename = "create_contact")]
-    pub create_contact: bool,
+    #[serde(rename = "reason")]
+    pub reason: String,
 
-    #[serde(rename = "type")]
-    pub r#type: String,
+    #[serde(rename = "reference")]
+    pub reference: String,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -26,39 +27,21 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(rename = "account_id")]
-    pub account_id: String,
-
-    #[serde(rename = "contact_id")]
-    pub contact_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "converted_lead")]
-    pub converted_lead: Option<serde_json::Value>,
+    #[serde(rename = "conversion_id")]
+    pub conversion_id: String,
 
     #[serde(rename = "lead_id")]
     pub lead_id: String,
-}
 
-/// OpenAPI multi-status success envelope (Epic 13.9).
-pub enum ApiResponse {
-    /// HTTP 200
-    Ok(Response),
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "message_id")]
+    pub message_id: Option<String>,
 
-    /// HTTP 201
-    Created(Response),
-}
+    #[serde(rename = "reason")]
+    pub reason: String,
 
-impl HandlerResponseOutput for ApiResponse {
-    fn into_handler_response(
-        self,
-    ) -> Result<brrtrouter::dispatcher::HandlerResponse, serde_json::Error> {
-        match self {
-            Self::Ok(body) => HttpJson::new(200, body).into_handler_response(),
-
-            Self::Created(body) => HttpJson::new(201, body).into_handler_response(),
-        }
-    }
+    #[serde(rename = "stage")]
+    pub stage: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -101,6 +84,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> ApiResponse {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::convert_lead::handle(req)
 }

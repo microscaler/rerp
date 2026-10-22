@@ -1,0 +1,17 @@
+# The conversion contract (ADR 003): the one message by which a converted customer crosses from the marketing funnel
+# into RERP. The pipeline signs and publishes it; CRM accounts screens, verifies and pulls it. Also carries the small
+# Pub/Sub REST client both sides use (may-native, Workload Identity from the GKE metadata server).
+[package]
+name = "rerp_crm_conversion"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { version = "1.0", features = ["v4", "v5", "serde"] }
+ed25519-dalek = "2"
+base64 = "0.22"
+may_minihttp = { workspace = true }
+http_legacy = { workspace = true }

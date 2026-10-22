@@ -174,37 +174,73 @@ pub struct ChangeStageResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ConversionResult {
-    pub account_id: String,
+pub struct ConversionAddress {
+    pub city: String,
 
-    pub contact_id: String,
+    pub country: String,
+
+    pub line1: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub converted_lead: Option<serde_json::Value>,
+    pub line2: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postal_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub region: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConversionCustomer {
+    pub address: ConversionAddress,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    pub email: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConversionResult {
+    pub conversion_id: String,
 
     pub lead_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<String>,
+
+    pub reason: String,
+
+    pub stage: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ConvertLeadRequest {
-    pub create_account: bool,
+    pub customer: ConversionCustomer,
 
-    pub create_contact: bool,
+    pub reason: String,
 
-    #[serde(rename = "type")]
-    pub r#type: String,
+    pub reference: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ConvertLeadResponse {
-    pub account_id: String,
-
-    pub contact_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub converted_lead: Option<serde_json::Value>,
+    pub conversion_id: String,
 
     pub lead_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<String>,
+
+    pub reason: String,
+
+    pub stage: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

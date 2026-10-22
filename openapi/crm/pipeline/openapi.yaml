@@ -2,8 +2,7 @@ openapi: 3.1.0
 info:
   title: Pipeline
   version: v1.0.0
-  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline
-    summary.
+  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline summary.
   x-api-version: CRM Pipeline API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -185,7 +184,6 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Get leads associated with a campaign
       x-operation-id: post_leads_list
       x-controller: rerp_crm::pipeline::controller::leads
@@ -394,7 +392,7 @@ paths:
   /leads/{id}/convert:
     post:
       operationId: convert_lead
-      summary: Convert lead to opportunity or create contact/account
+      summary: 'Convert a lead: it crosses into RERP as a customer'
       tags:
       - leads
       parameters:
@@ -405,59 +403,44 @@ paths:
           type: string
           format: uuid
       requestBody:
+        required: true
+        description: Why the lead converted, and the billing details RERP needs
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ConvertLeadRequest'
-            examples:
-              default: *id002
-        description: Convert a lead to contact and/or account
       responses:
-        '200':
-          description: Converted lead with new IDs
+        '202':
+          description: 'Converted: the conversion is published and the lead marked converted'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConversionResult'
-              examples:
-                default:
-                  converted: true
-                  lead_id: 00000000-0000-0000-0000-000000000001
-                  contact_id: 00000000-0000-0000-0000-000000000002
-                  converted_at: '2024-01-15T10:30:00Z'
-        '404':
-          description: Not found
-        '500':
-          description: Internal server error
+        '400':
+          description: Invalid billing details or reason
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '201':
-          description: Resource created successfully
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - the token lacks crm.editor
+        '404':
+          description: Lead not found
+        '503':
+          description: Conversion could not be published; nothing was marked, safe to retry
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-              examples:
-                default:
-                  success: true
-                  contact_id: 00000000-0000-0000-0000-000000000002
-                  account_id: 00000000-0000-0000-0000-000000000001
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '400':
-          description: Bad request - Invalid request body or parameters
-        '409':
-          description: Conflict - resource conflict or cannot complete action
+                $ref: '#/components/schemas/ErrorResponse'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
-      description: Perform an action on leads
+      description: Marks the lead won and publishes a signed conversion to RERP (ADR 003). Only a converted customer
+        crosses from the marketing funnel; RERP creates the customer (a CRM account) when it pulls the conversion, so
+        the crossing is asynchronous. Converting the same lead again republishes the same conversion and creates nothing
+        new.
       x-operation-id: post_leads_convert
       x-controller: rerp_crm::pipeline::controller::leads::id::convert
       x-handler-name: leads_id_convert
@@ -521,7 +504,6 @@ paths:
           description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Create a new leads
       x-operation-id: post_detect-duplicates
       x-controller: rerp_crm::pipeline::controller::leads::detect-duplicates
@@ -596,7 +578,6 @@ paths:
           description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Perform an action on leads
       x-operation-id: post_leads_merge
       x-controller: rerp_crm::pipeline::controller::leads::id::merge
@@ -744,7 +725,6 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Create a new stages
       x-operation-id: post_stages_list
       x-controller: rerp_crm::pipeline::controller::stages
@@ -841,7 +821,6 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Update stages by ID
       x-operation-id: put_id_by_id
       x-controller: rerp_crm::pipeline::controller::stages::id
@@ -1089,8 +1068,7 @@ components:
         is_rotting:
           type: boolean
           readOnly: true
-      description: A potential customer who has shown interest in our products or
-        services
+      description: A potential customer who has shown interest in our products or services
     CreateLeadRequest:
       type: object
       required:
@@ -1433,46 +1411,53 @@ components:
       description: Request body for transitioning a lead to a new stage
     ConvertLeadRequest:
       type: object
+      additionalProperties: false
+      required:
+      - reason
+      - reference
+      - customer
       properties:
-        type:
+        reason:
           type: string
           enum:
-          - OPPORTUNITY
-          - CONTACT
-          - BOTH
-          description: What to create from lead
-        create_contact:
-          type: boolean
-          default: false
-        create_account:
-          type: boolean
-          default: false
-      required:
-      - type
-      - create_contact
-      - create_account
-      description: Request body for converting a lead to contact/account
+          - order
+          - contract
+          description: An accepted quote or order, or a signed contract. Paid Stripe checkouts convert automatically.
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The order, quote or contract reference
+        customer:
+          $ref: '#/components/schemas/ConversionCustomer'
+      description: Request body for converting a lead (ADR 003)
     ConversionResult:
       type: object
+      required:
+      - lead_id
+      - conversion_id
+      - reason
+      - stage
       properties:
         lead_id:
           type: string
           format: uuid
-        contact_id:
+        conversion_id:
           type: string
           format: uuid
-          description: Created contact if requested
-        account_id:
+          description: 'Deterministic per lead: a retry is the same conversion'
+        reason:
           type: string
-          format: uuid
-          description: Created account if requested
-        converted_lead:
-          type: object
-      required:
-      - lead_id
-      - contact_id
-      - account_id
-      description: Result of converting a lead to a contact or account
+          enum:
+          - order
+          - contract
+        stage:
+          type: string
+          description: The lead stage after conversion (converted)
+        message_id:
+          type: string
+          description: The Pub/Sub message id of the published conversion
+      description: A published conversion
     DuplicateDetectionRequest:
       type: object
       properties:
@@ -1544,8 +1529,7 @@ components:
           type: integer
         limit:
           type: integer
-      description: A generic paginated response wrapper with items and pagination
-        metadata
+      description: A generic paginated response wrapper with items and pagination metadata
     ErrorResponse:
       type: object
       required:
@@ -1642,6 +1626,70 @@ components:
                 type: number
                 format: float
       description: Paginated list of PipelineSummary records
+    ConversionAddress:
+      type: object
+      additionalProperties: false
+      required:
+      - line1
+      - city
+      - country
+      properties:
+        line1:
+          type: string
+          minLength: 1
+          maxLength: 200
+        line2:
+          type: string
+          minLength: 1
+          maxLength: 200
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+        postal_code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        region:
+          type: string
+          minLength: 1
+          maxLength: 100
+        country:
+          type: string
+          pattern: ^[A-Z]{2}$
+          description: ISO 3166-1 alpha-2
+      description: Billing address
+    ConversionCustomer:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - email
+      - address
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Legal or company name (a person for an individual)
+        contact_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        email:
+          type: string
+          minLength: 3
+          maxLength: 254
+          format: email
+          description: Billing email
+        address:
+          $ref: '#/components/schemas/ConversionAddress'
+        tax_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: VAT or tax id, when known
+      description: The billing details that cross into RERP
   parameters:
     Id:
       name: id

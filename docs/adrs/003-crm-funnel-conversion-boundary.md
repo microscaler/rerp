@@ -52,8 +52,9 @@ the event from Stripe before acting.
    - Re-verification at the source before belief:
      - a Stripe conversion is re-retrieved from Stripe by id with a restricted,
        read-only key;
-     - a manual conversion is re-read from the funnel with a read-only key: the
-       lead must exist and be marked converted with the same conversion id.
+     - a manual conversion carries an Ed25519 signature by the pipeline over
+       the canonical payload; intake holds only the public key. RERP needs no
+       credential for the funnel at all.
    - Once-only: a conversion ledger keyed by conversion id. A second conversion
      of the same funnel lead or Stripe customer links to the existing customer
      and creates nothing new.
@@ -75,8 +76,8 @@ the event from Stripe before acting.
 - Manual conversions stay rare enough that typing billing details is no burden.
 - One funnel and one tenant per brand. Each conversion carries the tenant it
   converts into, and intake rejects tenants it does not serve.
-- Pub/Sub IAM is the publisher check. Re-verification at the source is the
-  second, independent check.
+- Pub/Sub IAM is the publisher check. The pipeline's signature, or Stripe's
+  own record, is the second, independent check.
 
 ## Alternatives considered
 
@@ -101,8 +102,8 @@ Rejected.
 
 ### Positive
 
-- The internet-facing store holds no key into RERP, and RERP holds only
-  read-only keys outward.
+- The internet-facing store holds no key into RERP, and RERP holds no key
+  into the funnel. Outward, RERP holds only a restricted, read-only Stripe key.
 - RERP holds only customers it has a contractual or accounting reason to keep.
 - One audited crossing, idempotent and verified at the source.
 
@@ -132,6 +133,7 @@ Rejected.
 4. **Platform** (gcp-infrastructure, through Crossplane):
    - the RERP database and its credentials;
    - the topic, subscription and dead-letter queue;
+   - the pipeline's signing key, with its public half in the intake's config;
    - service accounts and their Workload Identity bindings;
    - the restricted Stripe key;
    - the crm-accounts deployment.
@@ -142,9 +144,9 @@ Acceptance:
 
 - A manual *won* conversion creates exactly one account.
 - Replaying the message creates nothing.
-- A forged message (an unknown lead, a lead not marked converted, an unknown
-  Stripe id) creates nothing and is dropped.
-- No RERP credential exists in the funnel or the website. No funnel write
+- A forged message (a bad or missing signature, an altered payload, an
+  unknown Stripe id) creates nothing and is dropped.
+- No RERP credential exists in the funnel or the website. No funnel
   credential exists in any RERP service other than the pipeline.
 
 ## Related decisions and artifacts
@@ -153,3 +155,9 @@ Acceptance:
 - PriceWhisperer ADR-0005: Stripe webhook relay and Pub/Sub intake.
 - `microservices/crm/pipeline/impl/src/supabase.rs`: today's funnel reader.
 - `openapi/crm/accounts/openapi.yaml`: the customer (account) contract.
+
+## Notes
+
+- 2026-10-23: before any implementation, manual-conversion verification moved
+  from re-reading the funnel with a read-only key to a pipeline signature. It
+  proves the same origin without RERP holding any funnel credential.

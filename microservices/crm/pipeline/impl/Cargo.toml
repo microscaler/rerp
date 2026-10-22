@@ -25,6 +25,8 @@ jemalloc = ["tikv-jemallocator"]
 
 [dependencies]
 rerp_crm_pipeline_gen = { path = "../gen" }
+# The conversion contract and Pub/Sub client (ADR 003).
+rerp_crm_conversion = { path = "../../conversion" }
 
 brrtrouter = { workspace = true }
 brrtrouter_macros = { workspace = true }

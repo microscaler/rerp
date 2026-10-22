@@ -4085,6 +4085,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_conversion"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "ed25519-dalek",
+ "http 0.2.12",
+ "may_minihttp",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_pipeline"
 version = "0.1.0"
 dependencies = [
@@ -4099,6 +4113,7 @@ dependencies = [
  "http 1.5.0",
  "may",
  "may_minihttp",
+ "rerp_crm_conversion",
  "rerp_crm_pipeline_gen",
  "serde",
  "serde_json",
@@ -5559,6 +5574,7 @@ dependencies = [
  "getrandom 0.4.3",
  "js-sys",
  "serde_core",
+ "sha1_smol",
  "wasm-bindgen",
 ]
 
