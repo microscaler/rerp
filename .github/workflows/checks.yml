@@ -3,7 +3,7 @@
 #
 #   commits   conventional commit messages (pull requests; release notes are written from them)
 #   tooling   the rerp CLI's tests (release.yml uses it to bump and tag) and the docs governance check
-#   specs     every OpenAPI spec validates, BFF generation runs (dry), port assignments agree
+#   specs     every OpenAPI spec validates, BFF generation succeeds, port assignments agree
 #   format    cargo fmt over the workspace
 name: Checks
 
@@ -76,10 +76,7 @@ jobs:
           tooling/.venv/bin/pip install -e ./tooling
       - name: Validate OpenAPI specs
         run: tooling/.venv/bin/rerp openapi validate
-      # Advisory until accounting's specs are fixed: accounts-receivable and invoice both define get_customer_invoice
-      # (22 Oct 2026). Make it blocking again with the accounting suite's artifact.
-      - name: Generate BFF specs (dry run, advisory)
-        continue-on-error: true
+      - name: Generate BFF specs
         run: tooling/.venv/bin/rerp bff generate-system
       - name: Validate port assignments
         run: tooling/.venv/bin/rerp ports validate

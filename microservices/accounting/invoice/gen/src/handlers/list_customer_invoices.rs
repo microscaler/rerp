@@ -2,7 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::CreditMemo;
+use crate::handlers::types::PostedInvoiceSummary;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -12,24 +12,28 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "customer_id")]
+    pub customer_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "document_type")]
+    pub document_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "invoice_date_from")]
+    pub invoice_date_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "invoice_date_to")]
+    pub invoice_date_to: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "page")]
     pub page: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
     pub limit: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "customer_id")]
-    pub customer_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "reason")]
-    pub reason: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "status")]
-    pub status: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -40,7 +44,7 @@ pub struct Response {
     pub has_more: Option<bool>,
 
     #[serde(rename = "items")]
-    pub items: Vec<CreditMemo>,
+    pub items: Vec<PostedInvoiceSummary>,
 
     #[serde(rename = "limit")]
     pub limit: i32,
@@ -59,6 +63,63 @@ impl TryFrom<HandlerRequest> for Request {
         use serde_json::{Map, Value};
 
         let mut data_map = Map::new();
+
+        if let Some(v) = req.get_query_param("customer_id") {
+            data_map.insert(
+                "customer_id".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("document_type") {
+            data_map.insert(
+                "document_type".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,Some(&serde_json::json!({"enum":["CUSTOMER_INVOICE","CUSTOMER_CREDIT_NOTE"],"type":"string"})),None,None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("invoice_date_from") {
+            data_map.insert(
+                "invoice_date_from".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("invoice_date_to") {
+            data_map.insert(
+                "invoice_date_to".to_string(),
+                brrtrouter::server::request::decode_param_value(
+                    v,
+                    Some(&serde_json::json!({"format":"date","type":"string"})),
+                    None,
+                    None,
+                ),
+            );
+        } else {
+
+            // optional parameter
+        }
 
         if let Some(v) = req.get_query_param("page") {
             data_map.insert(
@@ -87,45 +148,6 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("customer_id") {
-            data_map.insert(
-                "customer_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("reason") {
-            data_map.insert(
-                "reason".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["RETURN","OVERCHARGE","DAMAGE","DISCOUNT","DISPUTE","ADJUSTMENT","OTHER"],"type":"string"})),None,None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("status") {
-            data_map.insert(
-                "status".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["DRAFT","APPLIED","AVAILABLE"],"type":"string"})),None,None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
         if let Some(body) = req.body {
             match body {
                 Value::Object(map) => {
@@ -145,5 +167,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::list_credit_memos::handle(req)
+    crate::controllers::list_customer_invoices::handle(req)
 }

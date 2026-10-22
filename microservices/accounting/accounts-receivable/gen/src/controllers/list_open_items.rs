@@ -1,14 +1,14 @@
-// User-owned controller for handler 'list_credit_memos'.
+// User-owned controller for handler 'list_open_items'.
 
-use crate::handlers::list_credit_memos::{Request, Response};
+use crate::handlers::list_open_items::{Request, Response};
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
-use crate::handlers::types::CreditMemo;
+use crate::handlers::types::OpenItem;
 
-#[handler(ListCreditMemosController)]
+#[handler(ListOpenItemsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         has_more: Some(true),

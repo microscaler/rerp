@@ -2,9 +2,10 @@ openapi: 3.1.0
 info:
   title: Accounts Receivable
   version: 1.0.0
-  description: 'Accounts receivable management service handling customer invoices, payments, collections, and aging analysis.
-    Supports the full AR lifecycle: invoice creation, payment application, credit memos, dispute management, and aging reporting.
-    Integrates with the general ledger for account posting.'
+  description: 'Accounts receivable: open items, payments and their application, collections and dunning, and aging. Customer
+    invoices and credit notes are owned by the invoice service (one owner per document type, as in Odoo''s account.move);
+    AR tracks what is still owed against those posted documents. An open item references the invoice service''s document by
+    invoice_id.'
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -14,12 +15,10 @@ servers:
 - url: /api/v1/accounting/accounts-receivable
   description: Accounts Receivable API
 tags:
-- name: customer-invoices
-  description: Customer invoices and their AR status
+- name: open-items
+  description: Outstanding balances of posted customer invoices
 - name: payments
   description: Customer payments and payment applications
-- name: credit-memos
-  description: Credit memos for returns, adjustments, and disputes
 - name: collections
   description: Collection activities, dunning, and follow-ups
 - name: aging
@@ -27,12 +26,11 @@ tags:
 - name: reports
   description: Aging summary and collections reports
 paths:
-  /customer-invoices:
+  /open-items:
     get:
-      operationId: list_customer_invoices
-      summary: List customer invoices
-      description: Paginated list of all customer invoices with AR-specific fields including aging bucket and outstanding
-        amounts.
+      operationId: list_open_items
+      summary: List open items
+      description: Paginated outstanding balances of posted customer invoices, with aging bucket and days overdue.
       parameters:
       - name: page
         in: query
@@ -102,11 +100,11 @@ paths:
         description: Maximum days overdue filter
       responses:
         '200':
-          description: Paginated list of customer invoices
+          description: Paginated list of open items
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCustomerInvoices'
+                $ref: '#/components/schemas/PaginatedOpenItems'
         '401':
           description: Unauthorized
           content:
@@ -119,63 +117,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    post:
-      operationId: create_customer_invoice
-      summary: Create customer invoice
-      description: Create a new AR record for an invoice. Links the invoice to the customer and initializes the outstanding
-        amount tracking.
-      x-brrtrouter-impl: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateCustomerInvoiceRequest'
-            example:
-              invoice_id: 1000.0
-              customer_id: 650e8400-e29b-41d4-a716-446655440001
-              currency_code: USD
-              due_date: '2026-01-15'
-              terms: sample value
-              credit_limit_check: true
-              company_id: 550e8400-e29b-41d4-a716-446655440000
-      responses:
-        '201':
-          description: CustomerInvoice created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomerInvoice'
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Credit limit exceeded for customer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: &id001
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: &id002
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /customer-invoices/{id}:
+  /open-items/{id}:
     get:
-      operationId: get_customer_invoice
-      summary: Get customer invoice by id
-      description: Retrieve a single customer invoice with its full AR details including aging, payment history, and credit
-        memo history.
+      operationId: get_open_item
+      summary: Get open item by id
+      description: A single open item with its payment applications. The invoice itself is read from the invoice
+        service.
       x-brrtrouter-impl: true
       parameters:
       - name: id
@@ -186,95 +133,13 @@ paths:
           format: uuid
       responses:
         '200':
-          description: CustomerInvoice details with AR context
+          description: Open item with AR context
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerInvoiceWithDetails'
+                $ref: '#/components/schemas/OpenItemWithDetails'
         '404':
           description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      operationId: update_customer_invoice
-      summary: Update customer invoice
-      description: Update an AR record's status or aging bucket. Does not modify the base invoice.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCustomerInvoiceRequest'
-            example:
-              status: active
-              aging_bucket: sample value
-              due_date: '2026-01-15'
-              terms: sample value
-              credit_limit_check: true
-      responses:
-        '200':
-          description: CustomerInvoice updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomerInvoice'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Validation error
-          content: &id004
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: &id003
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      operationId: delete_customer_invoice
-      summary: Delete customer invoice
-      description: Delete a customer invoice record. Only allowed for invoices in DRAFT status.
-      x-brrtrouter-impl: true
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: CustomerInvoice deleted
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Cannot delete confirmed or paid invoices
           content:
             application/json:
               schema:
@@ -283,7 +148,8 @@ paths:
     get:
       operationId: list_customer_payments
       summary: List payments
-      description: Paginated list of all customer payments with filtering by status, date range, customer, and payment method.
+      description: Paginated list of all customer payments with filtering by status, date range, customer, and payment
+        method.
       parameters:
       - name: page
         in: query
@@ -370,7 +236,8 @@ paths:
     post:
       operationId: create_customer_payment
       summary: Create payment
-      description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is true.
+      description: Record a new customer payment. Optionally auto-apply to oldest outstanding invoices if auto_apply is
+        true.
       x-brrtrouter-impl: true
       requestBody:
         required: true
@@ -403,13 +270,22 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '403':
           description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /payments/{id}:
     get:
       operationId: get_customer_payment
@@ -481,7 +357,10 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Validation error
-          content: *id004
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -618,120 +497,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Validation error
+          content: *id003
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
           content: *id004
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
-  /credit-memos:
-    get:
-      operationId: list_credit_memos
-      summary: List credit memos
-      description: Paginated list of all credit memos with filtering by customer, reason, and status.
-      parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-      - name: customer_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      - name: reason
-        in: query
-        schema:
-          type: string
-          enum:
-          - RETURN
-          - OVERCHARGE
-          - DAMAGE
-          - DISCOUNT
-          - DISPUTE
-          - ADJUSTMENT
-          - OTHER
-      - name: status
-        in: query
-        schema:
-          type: string
-          enum:
-          - DRAFT
-          - APPLIED
-          - AVAILABLE
-      responses:
-        '200':
-          description: Paginated list of credit memos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedCreditMemos'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    post:
-      operationId: create_credit_memo
-      summary: Create credit memo
-      description: Create a new credit memo for returns, adjustments, or dispute settlements.
-      x-brrtrouter-impl: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateCreditMemoRequest'
-            example:
-              reference_id: REF-2026-0001
-              customer_invoice_id: 1000.0
-              amount: 10000.0
-              currency_code: USD
-              reason: Reclassification of asset category
-              description: Primary operating company
-              company_id: 550e8400-e29b-41d4-a716-446655440000
-      responses:
-        '201':
-          description: CreditMemo created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreditMemo'
-        '400':
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: "Unauthorized \u2014 invalid or expired token"
-          content: *id001
-        '403':
-          description: "Forbidden \u2014 insufficient permissions"
-          content: *id002
-        '409':
-          description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
   /collections:
     get:
       operationId: list_collection_activities
@@ -844,7 +619,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /ar-agings:
     get:
       operationId: list_ar_agings
@@ -929,7 +704,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /ar-agings/{id}:
     get:
       operationId: get_ar_aging
@@ -959,7 +734,8 @@ paths:
     get:
       operationId: aging_summary
       summary: Aging summary report
-      description: Generate a company-wide or customer-specific AR aging summary with DSO and collection efficiency metrics.
+      description: Generate a company-wide or customer-specific AR aging summary with DSO and collection efficiency
+        metrics.
       x-brrtrouter-impl: true
       parameters:
       - name: company_id
@@ -1085,7 +861,7 @@ paths:
                 $ref: '#/components/schemas/FollowUpLevel'
         '400':
           description: Validation error
-          content: *id004
+          content: *id003
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -1094,7 +870,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /follow-up-runs:
     post:
       operationId: create_follow_up_run
@@ -1119,7 +895,7 @@ paths:
                 $ref: '#/components/schemas/FollowUpRun'
         '400':
           description: Validation error
-          content: *id004
+          content: *id003
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -1128,7 +904,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /collection-cases:
     get:
       operationId: list_collection_cases
@@ -1163,7 +939,7 @@ paths:
                 $ref: '#/components/schemas/CollectionCase'
         '400':
           description: Validation error
-          content: *id004
+          content: *id003
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -1172,7 +948,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /payment-promises:
     post:
       operationId: create_payment_promise
@@ -1198,7 +974,7 @@ paths:
                 $ref: '#/components/schemas/PaymentPromise'
         '400':
           description: Validation error
-          content: *id004
+          content: *id003
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -1207,7 +983,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
   /customer-statements/send:
     post:
       operationId: send_customer_statements
@@ -1232,7 +1008,7 @@ paths:
                 $ref: '#/components/schemas/StatementSendJob'
         '400':
           description: Validation error
-          content: *id004
+          content: *id003
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -1241,7 +1017,7 @@ paths:
           content: *id002
         '409':
           description: "Conflict \u2014 resource already exists or violates business rules"
-          content: *id003
+          content: *id004
 components:
   parameters:
     Id:
@@ -1312,7 +1088,7 @@ components:
           type: integer
           description: Page size limit
           example: 1
-    CustomerInvoice:
+    OpenItem:
       type: object
       required:
       - aging_bucket
@@ -1333,13 +1109,13 @@ components:
         id:
           type: string
           format: uuid
-          description: Unique identifier for this AR record
+          description: Open item id
           example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
           type: string
           format: uuid
-          description: Reference to the base Invoice entity in the Invoice service
-          example: 1000.0
+          description: Posted customer invoice id in the invoice service
+          example: 7a1e8400-e29b-41d4-a716-446655440002
         customer_id:
           type: string
           format: uuid
@@ -1371,7 +1147,7 @@ components:
           - PAID
           - WRITTEN_OFF
           - DISPUTED
-          description: AR status of this invoice
+          description: Settlement status of the open item
           example: active
         aging_bucket:
           type: string
@@ -1419,9 +1195,9 @@ components:
           type: string
           format: date-time
           example: '2026-01-15T10:30:00Z'
-    CustomerInvoiceWithDetails:
+    OpenItemWithDetails:
       allOf:
-      - $ref: '#/components/schemas/CustomerInvoice'
+      - $ref: '#/components/schemas/OpenItem'
       - type: object
         properties:
           days_overdue:
@@ -1433,100 +1209,6 @@ components:
             items:
               $ref: '#/components/schemas/PaymentApplication'
             description: Payment applications against this invoice
-          credit_memo_history:
-            type: array
-            items:
-              $ref: '#/components/schemas/CreditMemo'
-            description: Credit memos applied to this invoice
-    CreateCustomerInvoiceRequest:
-      type: object
-      required:
-      - invoice_id
-      - customer_id
-      - currency_code
-      properties:
-        invoice_id:
-          type: string
-          format: uuid
-          description: Base Invoice entity reference
-          example: 1000.0
-        customer_id:
-          type: string
-          format: uuid
-          description: Customer/partner
-          example: 650e8400-e29b-41d4-a716-446655440001
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          pattern: ^[A-Z]{3}$
-          example: USD
-        due_date:
-          type: string
-          format: date
-          nullable: true
-          description: Payment due date. Defaults to invoice date + terms if not provided.
-          example: '2026-01-15'
-        terms:
-          type: string
-          enum:
-          - NET_15
-          - NET_30
-          - NET_45
-          - NET_60
-          - DUE_ON_RECEIPT
-          - CUSTOM
-          example: sample value
-        credit_limit_check:
-          type: boolean
-          default: true
-          description: Whether to check customer credit limit
-          example: true
-        company_id:
-          type: string
-          format: uuid
-          nullable: true
-          example: 550e8400-e29b-41d4-a716-446655440000
-    UpdateCustomerInvoiceRequest:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - PARTIAL
-          - PAID
-          - WRITTEN_OFF
-          - DISPUTED
-          example: active
-        aging_bucket:
-          type: string
-          enum:
-          - CURRENT
-          - 1-30
-          - 31-60
-          - 61-90
-          - 90+
-          - INVALID
-          example: sample value
-        due_date:
-          type: string
-          format: date
-          example: '2026-01-15'
-        terms:
-          type: string
-          enum:
-          - NET_15
-          - NET_30
-          - NET_45
-          - NET_60
-          - DUE_ON_RECEIPT
-          - CUSTOM
-          example: sample value
-        credit_limit_check:
-          type: boolean
-          example: true
     Payment:
       type: object
       required:
@@ -1789,134 +1471,6 @@ components:
           format: double
           minimum: 0
           example: 1000.0
-    CreditMemo:
-      type: object
-      required:
-      - id
-      - customer_invoice_id
-      - amount
-      - currency_code
-      - reason
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for this credit memo
-          example: 550e8400-e29b-41d4-a716-446655440000
-        reference_id:
-          type: string
-          format: uuid
-          nullable: true
-          description: Optional external reference (RMA number, etc.)
-          example: REF-2026-0001
-        customer_invoice_id:
-          type: string
-          format: uuid
-          description: Invoice this credit memo relates to
-          example: 1000.0
-        customer_id:
-          type: string
-          format: uuid
-          description: Customer this credit memo is for
-          example: 650e8400-e29b-41d4-a716-446655440001
-        amount:
-          type: number
-          format: double
-          minimum: 0
-          description: Credit memo amount
-          example: 10000.0
-        remaining_amount:
-          type: number
-          format: double
-          description: Remaining unapplied credit
-          example: 1000.0
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        reason:
-          type: string
-          enum:
-          - RETURN
-          - OVERCHARGE
-          - DAMAGE
-          - DISCOUNT
-          - DISPUTE
-          - ADJUSTMENT
-          - OTHER
-          example: Reclassification of asset category
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - APPLIED
-          - AVAILABLE
-          example: active
-        description:
-          type: string
-          maxLength: 1000
-          nullable: true
-          example: Primary operating company
-        company_id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        created_at:
-          type: string
-          format: date-time
-          example: '2026-01-15T10:30:00Z'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2026-01-15T10:30:00Z'
-    CreateCreditMemoRequest:
-      type: object
-      required:
-      - customer_invoice_id
-      - amount
-      - currency_code
-      - reason
-      properties:
-        reference_id:
-          type: string
-          format: uuid
-          nullable: true
-          example: REF-2026-0001
-        customer_invoice_id:
-          type: string
-          format: uuid
-          example: 1000.0
-        amount:
-          type: number
-          format: double
-          minimum: 0
-          example: 10000.0
-        currency_code:
-          type: string
-          minLength: 3
-          maxLength: 3
-          example: USD
-        reason:
-          type: string
-          enum:
-          - RETURN
-          - OVERCHARGE
-          - DAMAGE
-          - DISCOUNT
-          - DISPUTE
-          - ADJUSTMENT
-          - OTHER
-          example: Reclassification of asset category
-        description:
-          type: string
-          maxLength: 1000
-          nullable: true
-          example: Primary operating company
-        company_id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
     CollectionActivity:
       type: object
       required:
@@ -2469,7 +2023,7 @@ components:
         total:
           type: integer
           example: 1
-    PaginatedCustomerInvoices:
+    PaginatedOpenItems:
       type: object
       required:
       - items
@@ -2480,7 +2034,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/CustomerInvoice'
+            $ref: '#/components/schemas/OpenItem'
           example: []
         total:
           type: integer
@@ -2506,31 +2060,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Payment'
-          example: []
-        total:
-          type: integer
-          example: 1
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 1
-        has_more:
-          type: boolean
-          example: true
-    PaginatedCreditMemos:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreditMemo'
           example: []
         total:
           type: integer

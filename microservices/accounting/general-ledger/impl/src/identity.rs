@@ -10,7 +10,9 @@ pub fn from_validated_claims(claims: Option<&Value>) -> Result<SessionContext, I
     Ok(SessionContext {
         tenant_id: claims.tenant_id,
         subject_id: claims.subject_id,
-        organization_id: claims.organization_id,
+        organization_id: claims
+            .organization_id
+            .ok_or(IdentityError::MissingField("org_id"))?,
         session_id: claims.session_id,
         roles: claims.roles,
         permissions: claims.permissions,

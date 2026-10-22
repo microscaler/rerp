@@ -18,6 +18,12 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
+        "list_customer_invoices",
+        crate::controllers::list_customer_invoices::ListCustomerInvoicesController,
+        24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "post_customer_invoice",
         crate::controllers::post_customer_invoice::PostCustomerInvoiceController,
         16384,
@@ -62,6 +68,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
+            "list_customer_invoices" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_customer_invoices::ListCustomerInvoicesController,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "post_customer_invoice" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::post_customer_invoice::PostCustomerInvoiceController,

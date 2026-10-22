@@ -14,6 +14,61 @@ tags:
   - name: customer-invoices
 paths:
   /v1/customer-invoices:
+    get:
+      operationId: list_customer_invoices
+      tags: [customer-invoices]
+      summary: List posted customer invoices and credit notes
+      description: >-
+        The invoice service owns customer invoices and credit notes. Accounts
+        receivable tracks their open balances (open items) by invoice id.
+      x-brrtrouter-impl: true
+      parameters:
+        - name: customer_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: document_type
+          in: query
+          schema:
+            type: string
+            enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
+        - name: invoice_date_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: invoice_date_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Posted invoices, newest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostedInvoices'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     post:
       operationId: post_customer_invoice
       tags: [customer-invoices]
@@ -438,6 +493,67 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PostedInvoiceLine'
+    PostedInvoiceSummary:
+      type: object
+      required:
+        - id
+        - document_number
+        - document_type
+        - customer_id
+        - invoice_date
+        - due_date
+        - currency_code
+        - total_amount
+        - posted_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_number:
+          type: string
+        document_type:
+          type: string
+          enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
+        original_document_id:
+          type: string
+          format: uuid
+          nullable: true
+        customer_id:
+          type: string
+          format: uuid
+        invoice_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+        tax_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        total_amount:
+          type: string
+          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+        posted_at:
+          type: string
+          format: date-time
+    PaginatedPostedInvoices:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostedInvoiceSummary'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        has_more:
+          type: boolean
     JournalLine:
       type: object
       required: [line_number, account_id, description, side, amount]

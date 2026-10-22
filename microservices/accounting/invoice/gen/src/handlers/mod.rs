@@ -5,6 +5,8 @@
 
 pub mod types;
 
+pub mod list_customer_invoices;
+
 pub mod post_customer_invoice;
 
 pub mod get_customer_invoice;

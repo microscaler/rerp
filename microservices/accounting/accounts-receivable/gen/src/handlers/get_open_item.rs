@@ -10,75 +10,13 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "aging_bucket")]
-    pub aging_bucket: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "credit_limit_check")]
-    pub credit_limit_check: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "due_date")]
-    pub due_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "status")]
-    pub status: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "terms")]
-    pub terms: Option<String>,
-
     #[serde(rename = "id")]
     pub id: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(rename = "aging_bucket")]
-    pub aging_bucket: String,
-
-    #[serde(rename = "company_id")]
-    pub company_id: String,
-
-    #[serde(rename = "created_at")]
-    pub created_at: String,
-
-    #[serde(rename = "credit_limit_check")]
-    pub credit_limit_check: bool,
-
-    #[serde(rename = "currency_code")]
-    pub currency_code: String,
-
-    #[serde(rename = "customer_id")]
-    pub customer_id: String,
-
-    #[serde(rename = "due_date")]
-    pub due_date: String,
-
-    #[serde(rename = "id")]
-    pub id: String,
-
-    #[serde(rename = "invoice_id")]
-    pub invoice_id: String,
-
-    #[serde(rename = "original_amount")]
-    pub original_amount: f64,
-
-    #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: f64,
-
-    #[serde(rename = "status")]
-    pub status: String,
-
-    #[serde(rename = "terms")]
-    pub terms: String,
-
-    #[serde(rename = "updated_at")]
-    pub updated_at: String,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -121,5 +59,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::update_customer_invoice::handle(req)
+    crate::controllers::get_open_item::handle(req)
 }

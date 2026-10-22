@@ -10,7 +10,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         applications: vec![],
         payment_id: "example".to_string(),
-        total_applied: 3.14,
-        unapplied_amount: 3.14,
+        total_applied: 1.5,
+        unapplied_amount: 1.5,
     })
 }

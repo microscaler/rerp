@@ -6,7 +6,7 @@ use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
-use crate::handlers::types::CustomerInvoice;
+use crate::handlers::types::PostedInvoiceSummary;
 
 #[handler(ListCustomerInvoicesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {

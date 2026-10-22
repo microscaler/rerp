@@ -60,48 +60,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "list_credit_memos",
-        crate::controllers::list_credit_memos::ListCreditMemosController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_credit_memo",
-        crate::controllers::create_credit_memo::CreateCreditMemoController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_customer_invoices",
-        crate::controllers::list_customer_invoices::ListCustomerInvoicesController,
-        24576,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_customer_invoice",
-        crate::controllers::create_customer_invoice::CreateCustomerInvoiceController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "get_customer_invoice",
-        crate::controllers::get_customer_invoice::GetCustomerInvoiceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_customer_invoice",
-        crate::controllers::update_customer_invoice::UpdateCustomerInvoiceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_customer_invoice",
-        crate::controllers::delete_customer_invoice::DeleteCustomerInvoiceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "send_customer_statements",
         crate::controllers::send_customer_statements::SendCustomerStatementsController,
         16384,
@@ -123,6 +81,18 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         "create_follow_up_run",
         crate::controllers::create_follow_up_run::CreateFollowUpRunController,
         16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_open_items",
+        crate::controllers::list_open_items::ListOpenItemsController,
+        24576,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_open_item",
+        crate::controllers::get_open_item::GetOpenItemController,
+        20480,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -262,62 +232,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "list_credit_memos" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_credit_memos::ListCreditMemosController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_credit_memo" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_credit_memo::CreateCreditMemoController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_customer_invoices" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_customer_invoices::ListCustomerInvoicesController,
-                    24576,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_customer_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_customer_invoice::CreateCustomerInvoiceController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_customer_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_customer_invoice::GetCustomerInvoiceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_customer_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_customer_invoice::UpdateCustomerInvoiceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_customer_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_customer_invoice::DeleteCustomerInvoiceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "send_customer_statements" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::send_customer_statements::SendCustomerStatementsController,
@@ -346,6 +260,22 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_follow_up_run::CreateFollowUpRunController,
                     16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_open_items" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_open_items::ListOpenItemsController,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_open_item" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_open_item::GetOpenItemController,
+                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

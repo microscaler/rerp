@@ -541,7 +541,6 @@ components:
     Page:
       name: page
       in: query
-      required: false
       schema:
         type: integer
         minimum: 1
@@ -549,7 +548,6 @@ components:
     Limit:
       name: limit
       in: query
-      required: false
       schema:
         type: integer
         minimum: 1

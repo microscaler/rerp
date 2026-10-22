@@ -2,7 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::CustomerInvoice;
+use crate::handlers::types::OpenItem;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -60,7 +60,7 @@ pub struct Response {
     pub has_more: Option<bool>,
 
     #[serde(rename = "items")]
-    pub items: Vec<CustomerInvoice>,
+    pub items: Vec<OpenItem>,
 
     #[serde(rename = "limit")]
     pub limit: i32,
@@ -240,5 +240,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::list_customer_invoices::handle(req)
+    crate::controllers::list_open_items::handle(req)
 }

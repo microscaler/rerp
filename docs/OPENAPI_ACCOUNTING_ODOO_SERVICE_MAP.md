@@ -50,7 +50,7 @@ Backlog:
 |---|---|---|---|
 | `general-ledger` | Accounts, chart, journals, journal entries, fiscal periods/years, fiscal positions, payment terms/methods, tax repartition, GL reports | `account_accountant`, `account_reports`, `account_inter_company_rules`, `account_reports/models/account_return.py` | Lock dates, audit cells, statutory returns, inter-company, multi-currency revaluation |
 | `invoice` | Invoice CRUD, lines, tax calculation, approve/post/cancel/void, workflow history | `account_accountant/models/account_move.py`, `account_invoice_extract`, `documents_account` | Payment-register semantics, refunds/credit notes, extraction, e-invoicing, deferred revenue/expense |
-| `accounts-receivable` | Customer invoices, payments, applications, auto-apply, credit memos, collections, AR aging | `account_followup`, `account_reports/models/account_partner_ledger.py`, `account_reports/models/account_customer_statement.py` | Dunning policies, follow-up channels, partner ledger, statements, dispute/promise-to-pay |
+| `accounts-receivable` | Open items (outstanding balances of posted invoices), payments, applications, auto-apply, collections, AR aging. Customer invoices and credit notes belong to `invoice` | `account_followup`, `account_reports/models/account_partner_ledger.py`, `account_reports/models/account_customer_statement.py` | Dunning policies, follow-up channels, partner ledger, statements, dispute/promise-to-pay |
 | `accounts-payable` | Vendor invoices, payments, approvals, commitments, cash-flow forecast | `account_batch_payment`, `account_iso20022`, `account_invoice_extract`, `l10n_us_1099` | Payment files, batch lifecycle, vendor bill extraction, 3-way match, statutory supplier reporting |
 | `bank-sync` | Bank accounts, statements, transactions, trigger sync, match/auto-match, reconciliations, cash position | `account_accountant/models/account_bank_statement.py`, `account_accountant/wizard/account_reconcile_wizard.py`, `account_online_synchronization`, bank statement import addons | Reconciliation models/rules, suggestions, partials, write-offs, exchange diff, provider consent/import lifecycle |
 | `asset` | Assets, depreciation entries, run/bulk depreciation, revaluation, disposal, categories, summary | `account_asset/models/account_asset.py`, `account_asset/wizard/asset_modify.py`, `account_asset/models/account_assets_report.py` | Asset models/groups, pause/resume/modify/sell/dispose lifecycle, generated journal entries, analytic integration |
@@ -191,7 +191,7 @@ Backlog:
 Current RERP anchors:
 
 - `openapi/accounting/accounts-receivable/openapi.yaml`
-- Key operations: `list_customer_invoices`, `list_payments`, `create_payment_application`, `auto_apply_payment`, `list_credit_memos`, `list_collection_activities`, `list_ar_agings`, `aging_summary`, `collections_summary`.
+- Key operations: `list_open_items`, `get_open_item`, `list_payments`, `create_payment_application`, `auto_apply_payment`, `list_collection_activities`, `list_ar_agings`, `aging_summary`, `collections_summary`.
 
 Odoo anchors:
 

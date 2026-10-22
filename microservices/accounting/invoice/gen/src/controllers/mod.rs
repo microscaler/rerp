@@ -3,6 +3,8 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
+pub mod list_customer_invoices;
+
 pub mod post_customer_invoice;
 
 pub mod get_customer_invoice;

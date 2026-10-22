@@ -53,6 +53,14 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "list_customer_invoices" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_customer_invoices::ListCustomerInvoicesController,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "post_customer_invoice" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::post_customer_invoice::PostCustomerInvoiceController,

@@ -581,6 +581,127 @@ fn load_posting_plan<E: LifeExecutor>(
     })
 }
 
+/// Filters for listing posted customer documents. Tenant scope comes from the
+/// session transaction (row-level security), as for `get_invoice`.
+#[derive(Clone, Debug, Default)]
+pub struct InvoiceListFilter {
+    pub customer_id: Option<Uuid>,
+    pub document_type: Option<AccountingDocumentType>,
+    pub invoice_date_from: Option<NaiveDate>,
+    pub invoice_date_to: Option<NaiveDate>,
+    pub page: u32,
+    pub limit: u32,
+}
+
+impl InvoiceListFilter {
+    pub fn parse(
+        customer_id: Option<&str>,
+        document_type: Option<&str>,
+        invoice_date_from: Option<&str>,
+        invoice_date_to: Option<&str>,
+        page: Option<i32>,
+        limit: Option<i32>,
+    ) -> Result<Self, PostingError> {
+        let page = page.unwrap_or(1);
+        let limit = limit.unwrap_or(20);
+        if page < 1 {
+            return Err(PostingError::Validation(
+                "page must be at least 1".to_string(),
+            ));
+        }
+        if !(1..=100).contains(&limit) {
+            return Err(PostingError::Validation(
+                "limit must be between 1 and 100".to_string(),
+            ));
+        }
+        let document_type = document_type
+            .map(|value| {
+                parse_document_type(value).map_err(|_| {
+                    PostingError::Validation(
+                        "document_type must be CUSTOMER_INVOICE or CUSTOMER_CREDIT_NOTE"
+                            .to_string(),
+                    )
+                })
+            })
+            .transpose()?;
+        let invoice_date_from = invoice_date_from
+            .map(|value| parse_date(value, "invoice_date_from"))
+            .transpose()?;
+        let invoice_date_to = invoice_date_to
+            .map(|value| parse_date(value, "invoice_date_to"))
+            .transpose()?;
+        if matches!((invoice_date_from, invoice_date_to), (Some(from), Some(to)) if from > to) {
+            return Err(PostingError::Validation(
+                "invoice_date_from must not be after invoice_date_to".to_string(),
+            ));
+        }
+        Ok(Self {
+            customer_id: customer_id
+                .map(|value| parse_uuid(value, "customer_id"))
+                .transpose()?,
+            document_type,
+            invoice_date_from,
+            invoice_date_to,
+            page: page as u32,
+            limit: limit as u32,
+        })
+    }
+}
+
+/// Posted customer invoices and credit notes, newest first, without lines.
+pub fn list_invoices<E: LifeExecutor>(
+    executor: &E,
+    filter: &InvoiceListFilter,
+) -> Result<Value, PostingError> {
+    let query = || {
+        let mut query = DocumentEntity::find();
+        if let Some(value) = filter.customer_id {
+            query = query.filter(DocumentColumn::CustomerId.eq(value));
+        }
+        if let Some(value) = filter.document_type {
+            query = query.filter(DocumentColumn::DocumentType.eq(document_type_name(value)));
+        }
+        if let Some(value) = filter.invoice_date_from {
+            query = query.filter(DocumentColumn::DocumentDate.gte(value));
+        }
+        if let Some(value) = filter.invoice_date_to {
+            query = query.filter(DocumentColumn::DocumentDate.lte(value));
+        }
+        query
+    };
+    let total = query()
+        .count()
+        .one(executor)
+        .map_err(|error| PostingError::Database(error.to_string()))?;
+    let documents = query()
+        .order_by(DocumentColumn::DocumentDate, Order::Desc)
+        .order_by(DocumentColumn::DocumentNumber, Order::Desc)
+        .offset(u64::from(filter.page - 1) * u64::from(filter.limit))
+        .limit(u64::from(filter.limit))
+        .all(executor)
+        .map_err(|error| PostingError::Database(error.to_string()))?;
+    let shown = i64::from(filter.page - 1) * i64::from(filter.limit) + documents.len() as i64;
+    Ok(json!({
+        "items": documents.iter().map(|document| json!({
+            "id": document.id,
+            "document_number": document.document_number,
+            "document_type": document.document_type,
+            "original_document_id": document.original_document_id,
+            "customer_id": document.customer_id,
+            "invoice_date": document.document_date,
+            "due_date": document.due_date,
+            "currency_code": document.currency_code,
+            "tax_amount": document.tax_amount.to_string(),
+            "total_amount": document.total_amount.to_string(),
+            "posted_at": document.posted_at.and_utc().to_rfc3339(),
+        })).collect::<Vec<_>>(),
+        "total": total,
+        "page": filter.page,
+        "limit": filter.limit,
+        "has_more": shown < total,
+    }))
+}
+
 fn load_invoice<E: LifeExecutor>(
     executor: &E,
     document_id: Uuid,
@@ -861,6 +982,42 @@ pub fn posting_json(posting: &StoredPosting) -> Value {
 mod tests {
     use super::*;
     use rerp_accounting_invoice_gen::handlers::types::{CustomerInvoiceLine, SourceReference};
+
+    #[test]
+    fn invoice_list_filter_defaults_and_validates() {
+        let filter = InvoiceListFilter::parse(None, None, None, None, None, None).unwrap();
+        assert_eq!((filter.page, filter.limit), (1, 20));
+        let filter = InvoiceListFilter::parse(
+            Some("00000000-0000-0000-0000-000000000001"),
+            Some("CUSTOMER_CREDIT_NOTE"),
+            Some("2026-01-01"),
+            Some("2026-01-31"),
+            Some(2),
+            Some(50),
+        )
+        .unwrap();
+        assert_eq!(
+            filter.document_type,
+            Some(AccountingDocumentType::CustomerCreditNote)
+        );
+        assert_eq!((filter.page, filter.limit), (2, 50));
+        for bad in [
+            InvoiceListFilter::parse(None, None, None, None, Some(0), None),
+            InvoiceListFilter::parse(None, None, None, None, None, Some(101)),
+            InvoiceListFilter::parse(None, Some("VENDOR_BILL"), None, None, None, None),
+            InvoiceListFilter::parse(Some("nope"), None, None, None, None, None),
+            InvoiceListFilter::parse(
+                None,
+                None,
+                Some("2026-02-01"),
+                Some("2026-01-01"),
+                None,
+                None,
+            ),
+        ] {
+            assert!(matches!(bad, Err(PostingError::Validation(_))));
+        }
+    }
 
     #[test]
     fn public_invoice_json_does_not_expose_tenant_or_gl_mapping() {

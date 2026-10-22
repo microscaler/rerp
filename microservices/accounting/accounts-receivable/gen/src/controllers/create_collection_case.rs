@@ -12,6 +12,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         customer_id: "example".to_string(),
         id: "example".to_string(),
         status: "example".to_string(),
-        total_due: 3.14,
+        total_due: 1.5,
     })
 }

@@ -9,7 +9,7 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         by_type: Some(Default::default()),
-        response_rate: Some(3.14),
+        response_rate: Some(1.5),
         total_activities: Some(42),
         upcoming_follow_ups: Some(42),
     })

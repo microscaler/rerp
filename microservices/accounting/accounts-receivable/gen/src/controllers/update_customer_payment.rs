@@ -8,7 +8,7 @@ use brrtrouter_macros::handler;
 #[handler(UpdateCustomerPaymentController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        amount: 3.14,
+        amount: 1.5,
         applied_at: "example".to_string(),
         company_id: "example".to_string(),
         created_at: Some("example".to_string()),

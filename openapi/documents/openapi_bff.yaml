@@ -1,0 +1,5349 @@
+openapi: 3.1.0
+info:
+  title: RERP Documents Backend for Frontend API
+  description: Aggregated API for canonical document storage, ingestion, intelligence, workflows, and generated document renditions.
+    All services derive tenant scope from validated Sesame identity. Service containers listen on 8080.
+  version: 0.1.0
+  contact:
+    name: RERP Documents API Support
+    email: documents-api@rerp.ai
+servers:
+- url: https://api.rerp.ai
+  description: Production server
+- url: http://localhost:8080
+  description: Local suite BFF
+tags:
+- name: analyze
+- name: auto-approve-rules
+- name: classifiers
+- name: classify
+- name: confirmations
+- name: copies
+- name: documents
+- name: email-aliases
+- name: extraction
+- name: folders
+- name: intake
+- name: mobile
+- name: pipeline
+- name: renditions
+- name: routes
+- name: schemas
+- name: storage
+- name: templates
+- name: versions
+paths:
+  /analysis/{id}:
+    get:
+      operationId: get_analysis_job
+      summary: Get analysis job status or result
+      description: Poll an analysis job by ID. Returns the job status or the final AnalysisResult if processing is complete.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Analysis job result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisJob'
+        '404':
+          description: Job not found
+      tags:
+      - analyze
+      x-service: analyze
+      x-service-base-path: /api/documents/analyze
+      x-brrtrouter-downstream-path: /api/documents/analyze/analysis/{id}
+      x-brrtrouter-impl: false
+  /batch:
+    post:
+      operationId: batch_upload
+      summary: Batch upload multiple documents
+      description: Upload multiple documents in a single request. Each document is processed independently. Failing documents
+        do not block successful ones.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Array of document files
+                org_id:
+                  type: string
+                  format: uuid
+                  description: Organization ID (RLS-scoped)
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Target folder ID for all documents
+                metadata:
+                  type: object
+                  nullable: true
+                  description: Shared metadata applied to all documents
+                  additionalProperties: true
+                per_file_metadata:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                  nullable: true
+                  description: Per-file metadata overrides (must match order of files array)
+      responses:
+        '201':
+          description: Batch upload accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeBatchResult'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/batch
+      x-brrtrouter-impl: false
+  /classifications/{id}:
+    get:
+      operationId: get_classification_result
+      summary: Get classification job status or result
+      description: Poll a classification job by ID. Returns the job status or the final Classification if processing is complete.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Classification job result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassificationJob'
+        '404':
+          description: Job not found
+      tags:
+      - classify
+      x-service: classify
+      x-service-base-path: /api/documents/classify
+      x-brrtrouter-downstream-path: /api/documents/classify/classifications/{id}
+      x-brrtrouter-impl: false
+  /classifiers:
+    get:
+      operationId: list_classifiers
+      summary: List custom classifiers
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of classifiers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassifiersListResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyError'
+      tags:
+      - classifiers
+      x-service: classify
+      x-service-base-path: /api/documents/classify
+      x-brrtrouter-downstream-path: /api/documents/classify/classifiers
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_classifier
+      summary: Create a custom classifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifyClassifierDef'
+      responses:
+        '201':
+          description: Classifier created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassifier'
+        '400':
+          description: Invalid request
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyError'
+      tags:
+      - classifiers
+      x-service: classify
+      x-service-base-path: /api/documents/classify
+      x-brrtrouter-downstream-path: /api/documents/classify/classifiers
+      x-brrtrouter-impl: false
+  /confirmations/batch-approve:
+    post:
+      operationId: batch_approve_confirmations
+      summary: Approve multiple confirmations at once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationBatchApproveRequest'
+      responses:
+        '202':
+          description: Batch approval submitted asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationBatchResult'
+        '400':
+          description: Invalid request
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/batch-approve
+      x-brrtrouter-impl: false
+  /confirmations/pending:
+    get:
+      operationId: list_pending_confirmations
+      summary: List pending confirmations
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of pending confirmations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationConfirmationsListResponse'
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/pending
+      x-brrtrouter-impl: false
+  /confirmations/{id}:
+    get:
+      operationId: get_confirmation
+      summary: Get confirmation details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Confirmation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationConfirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/{id}
+      x-brrtrouter-impl: false
+  /confirmations/{id}/approve:
+    post:
+      operationId: approve_confirmation
+      summary: Approve extraction (triggers target module API asynchronously)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Confirmation approved; target module API called asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationConfirmationApproved'
+        '404':
+          description: Not found
+        '400':
+          description: Cannot approve (e.g., already approved)
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/{id}/approve
+      x-brrtrouter-impl: false
+  /confirmations/{id}/correct:
+    post:
+      operationId: correct_confirmation
+      summary: Correct extracted data (updates schema/ML model)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationCorrectRequest'
+      responses:
+        '200':
+          description: Correction recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationConfirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/{id}/correct
+      x-brrtrouter-impl: false
+  /confirmations/{id}/reject:
+    post:
+      operationId: reject_confirmation
+      summary: Reject extraction (returns to manual review)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationRejectRequest'
+      responses:
+        '200':
+          description: Confirmation rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationConfirmation'
+        '404':
+          description: Not found
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/confirmations/{id}/reject
+      x-brrtrouter-impl: false
+  /documents:
+    get:
+      operationId: list_documents
+      summary: List documents (paginated)
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Full-text search across document metadata
+      - name: folder_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+          nullable: true
+        description: Filter by folder
+      - name: document_type
+        in: query
+        required: false
+        schema:
+          type: string
+          nullable: true
+        description: Filter by document type
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorePaginatedDocuments'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_document
+      summary: Upload a new document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                org_id:
+                  type: string
+                  format: uuid
+                title:
+                  type: string
+                document_type:
+                  type: string
+                  nullable: true
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: string
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreDocument'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents
+      x-brrtrouter-impl: false
+  /documents/analyze-bulk:
+    post:
+      operationId: analyze_documents_bulk
+      summary: Ask a question about multiple documents
+      description: Asynchronously ask a question that may reference multiple documents. The LLM processes all documents and
+        generates a synthesized answer. Maximum 20 documents per request. Returns an AnalysisJob for polling.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeAnalyzeBulkRequest'
+      responses:
+        '200':
+          description: Cached analysis result returned immediately
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisResult'
+        '202':
+          description: Analysis job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisJob'
+        '400':
+          description: Invalid request (e.g. too many documents, query too long)
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeError'
+      tags:
+      - analyze
+      x-service: analyze
+      x-service-base-path: /api/documents/analyze
+      x-brrtrouter-downstream-path: /api/documents/analyze/documents/analyze-bulk
+      x-brrtrouter-impl: false
+  /documents/search:
+    get:
+      operationId: search_documents
+      summary: Full-text search across all documents
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Search query
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorePaginatedDocuments'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/search
+      x-brrtrouter-impl: false
+  /documents/{id}:
+    get:
+      operationId: get_document
+      summary: Get document metadata
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Document details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreDocument'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}
+      x-brrtrouter-impl: false
+    put:
+      operationId: update_document
+      summary: Update document metadata
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreUpdateDocumentRequest'
+      responses:
+        '200':
+          description: Document updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreDocument'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}
+      x-brrtrouter-impl: false
+    delete:
+      operationId: delete_document
+      summary: Delete document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Document deleted
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - documents
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}
+      x-brrtrouter-impl: false
+  /documents/{id}/analysis:
+    get:
+      operationId: get_analysis
+      summary: Get cached analysis results for a document
+      description: Returns the most recent analysis result for a document. This is a cached lookup, not a new analysis.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisResult'
+        '404':
+          description: No analysis found
+      tags:
+      - analyze
+      x-service: analyze
+      x-service-base-path: /api/documents/analyze
+      x-brrtrouter-downstream-path: /api/documents/analyze/documents/{id}/analysis
+      x-brrtrouter-impl: false
+  /documents/{id}/analyze:
+    post:
+      operationId: analyze_document
+      summary: Ask a question about a document
+      description: Asynchronously ask a question about a document. The LLM generates an answer based on document context.
+        Returns an AnalysisJob for polling. If a cached analysis result exists for this query, it may be returned immediately
+        with 200.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeAnalyzeRequest'
+      responses:
+        '200':
+          description: Cached analysis result returned immediately
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisResult'
+        '202':
+          description: Analysis job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeAnalysisJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request (e.g. query too long)
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeError'
+      tags:
+      - analyze
+      x-service: analyze
+      x-service-base-path: /api/documents/analyze
+      x-brrtrouter-downstream-path: /api/documents/analyze/documents/{id}/analyze
+      x-brrtrouter-impl: false
+  /documents/{id}/classification:
+    get:
+      operationId: get_classification
+      summary: Get existing classification result for a document
+      description: Returns the most recent classification result for a document. If no classification exists, returns 404.
+        This is a cached lookup, not a re-classification.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Classification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassification'
+        '404':
+          description: No classification found
+      tags:
+      - classify
+      x-service: classify
+      x-service-base-path: /api/documents/classify
+      x-brrtrouter-downstream-path: /api/documents/classify/documents/{id}/classification
+      x-brrtrouter-impl: false
+  /documents/{id}/classify:
+    post:
+      operationId: classify_document
+      summary: Submit document for classification
+      description: Asynchronously classify a document. Returns a ClassificationJob that can be polled via GET /classifications/{job_id}.
+        If a classification already exists for this document, returns it immediately with 200.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifyClassifyRequest'
+      responses:
+        '200':
+          description: Classification result returned (cached, existing result found)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassification'
+        '202':
+          description: Classification job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyClassificationJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassifyError'
+      tags:
+      - classify
+      x-service: classify
+      x-service-base-path: /api/documents/classify
+      x-brrtrouter-downstream-path: /api/documents/classify/documents/{id}/classify
+      x-brrtrouter-impl: false
+  /documents/{id}/download:
+    get:
+      operationId: download_document
+      summary: Download the raw document file
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Document file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - storage
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}/download
+      x-brrtrouter-impl: false
+  /documents/{id}/extract/{schema_id}:
+    get:
+      operationId: get_extraction_result
+      summary: Get extraction results for a document and schema
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: schema_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Extraction results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractExtractionResult'
+        '404':
+          description: Not found
+      tags:
+      - extraction
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/documents/{id}/extract/{schema_id}
+      x-brrtrouter-impl: false
+  /documents/{id}/extract/{schema_id}/highlights:
+    get:
+      operationId: get_extraction_highlights
+      summary: Get bounding box coordinates for extracted fields
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: schema_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Bounding box coordinates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractHighlights'
+        '404':
+          description: Not found
+      tags:
+      - extraction
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/documents/{id}/extract/{schema_id}/highlights
+      x-brrtrouter-impl: false
+  /documents/{id}/merge:
+    post:
+      operationId: merge_documents
+      summary: Merge multiple documents into one (async)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationMergeRequest'
+      responses:
+        '202':
+          description: Document merge scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationMergedDocument'
+        '404':
+          description: Document not found
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/documents/{id}/merge
+      x-brrtrouter-impl: false
+  /documents/{id}/parse:
+    post:
+      operationId: parse_document
+      summary: Submit document for OCR + table extraction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractParseRequest'
+      responses:
+        '202':
+          description: Extraction job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractExtractionJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request
+      tags:
+      - extraction
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/documents/{id}/parse
+      x-brrtrouter-impl: false
+  /documents/{id}/presigned-download:
+    get:
+      operationId: get_presigned_download_url
+      summary: Get a presigned URL for downloading the document file from S3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: version_id
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+          nullable: true
+      responses:
+        '200':
+          description: Presigned download URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorePresignedUrl'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - storage
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}/presigned-download
+      x-brrtrouter-impl: false
+  /documents/{id}/presigned-url:
+    get:
+      operationId: get_presigned_upload_url
+      summary: Get a presigned URL for uploading a document file to S3
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: content_type
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: content_length
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Presigned URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorePresignedUrl'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - storage
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}/presigned-url
+      x-brrtrouter-impl: false
+  /documents/{id}/split:
+    post:
+      operationId: split_document
+      summary: Split a multi-page document into separate documents (async)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationSplitRequest'
+      responses:
+        '202':
+          description: Document split scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationSplitResult'
+        '404':
+          description: Document not found
+      tags:
+      - confirmations
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/documents/{id}/split
+      x-brrtrouter-impl: false
+  /documents/{id}/standardize:
+    post:
+      operationId: standardize_document
+      summary: Extract fields using a schema
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractStandardizeRequest'
+      responses:
+        '202':
+          description: Standardization job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractExtractionJob'
+        '404':
+          description: Document not found
+        '400':
+          description: Invalid request
+      tags:
+      - extraction
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/documents/{id}/standardize
+      x-brrtrouter-impl: false
+  /documents/{id}/versions:
+    get:
+      operationId: list_document_versions
+      summary: List all versions of a document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorePaginatedVersions'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - versions
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}/versions
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_document_version
+      summary: Create a new version of a document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                note:
+                  type: string
+                  nullable: true
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Version created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreVersion'
+        '404':
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - versions
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/documents/{id}/versions
+      x-brrtrouter-impl: false
+  /email:
+    post:
+      operationId: receive_email
+      summary: Webhook email forwarding
+      description: Webhook endpoint for email forwarding. Receives an EmailPayload from an email provider and creates a document
+        in core/. The document metadata includes sender, recipients, subject, and attachments.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntakeEmailPayload'
+      responses:
+        '202':
+          description: Email accepted for processing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted:
+                    type: boolean
+                    example: true
+                  document_ids:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                    description: Document IDs created for each attachment
+                required:
+                - accepted
+                - document_ids
+        '400':
+          description: Invalid email payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/email
+      x-brrtrouter-impl: false
+  /email-aliases:
+    get:
+      operationId: list_email_aliases
+      summary: List configured email aliases
+      description: List all suite-level email aliases configured for the current organization. Aliases determine the target
+        suite and routing scope for email-forwarded documents.
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of email aliases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IntakeEmailAlias'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/email-aliases
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_email_alias
+      summary: Create email alias
+      description: Create a new suite-level email alias. When documents arrive via this email address, they are routed to
+        the specified suite and module.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntakeEmailAlias'
+      responses:
+        '201':
+          description: Email alias created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeEmailAlias'
+        '400':
+          description: Invalid alias configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '409':
+          description: Email address already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/email-aliases
+      x-brrtrouter-impl: false
+  /email-aliases/{id}:
+    delete:
+      operationId: delete_email_alias
+      summary: Remove email alias
+      description: Remove an existing email alias. Documents sent to this address will no longer be auto-routed.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Email alias removed
+        '404':
+          description: Alias not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/email-aliases/{id}
+      x-brrtrouter-impl: false
+  /executions:
+    get:
+      operationId: list_executions
+      summary: List all pipeline executions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of executions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineExecutionsListResponse'
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/executions
+      x-brrtrouter-impl: false
+  /executions/{id}:
+    get:
+      operationId: get_execution
+      summary: Get execution details with audit trail
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Execution details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineExecutionDetail'
+        '404':
+          description: Not found
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/executions/{id}
+      x-brrtrouter-impl: false
+  /folders:
+    get:
+      operationId: list_folders
+      summary: List folder tree for the current organization
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter folder names
+      responses:
+        '200':
+          description: Folder tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreFolderTree'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - folders
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/folders
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_folder
+      summary: Create a new folder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreCreateFolderRequest'
+      responses:
+        '201':
+          description: Folder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreFolder'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - folders
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/folders
+      x-brrtrouter-impl: false
+  /folders/{id}:
+    get:
+      operationId: get_folder
+      summary: Get folder details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Folder details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreFolder'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - folders
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/folders/{id}
+      x-brrtrouter-impl: false
+    put:
+      operationId: update_folder
+      summary: Update folder details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreUpdateFolderRequest'
+      responses:
+        '200':
+          description: Folder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreFolder'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - folders
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/folders/{id}
+      x-brrtrouter-impl: false
+    delete:
+      operationId: delete_folder
+      summary: Delete folder (does not delete documents within it)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Folder deleted
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoreError'
+      tags:
+      - folders
+      x-service: core
+      x-service-base-path: /api/documents/core
+      x-brrtrouter-downstream-path: /api/documents/core/folders/{id}
+      x-brrtrouter-impl: false
+  /mobile/status:
+    get:
+      operationId: mobile_sync_status
+      summary: Mobile app sync status
+      description: Get the current sync status for the mobile app. Reports pending uploads, processing state, and any sync
+        errors for the authenticated user's documents.
+      responses:
+        '200':
+          description: Mobile sync status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeMobileStatus'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/mobile/status
+      x-brrtrouter-impl: false
+  /pipelines:
+    post:
+      operationId: create_pipeline
+      summary: Create a pipeline definition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelinePipelineDef'
+      responses:
+        '201':
+          description: Pipeline created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelinePipeline'
+        '400':
+          description: Invalid request
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/pipelines
+      x-brrtrouter-impl: false
+  /pipelines/{id}/execute:
+    post:
+      operationId: execute_pipeline
+      summary: Execute pipeline on document(s)
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelineExecuteRequest'
+      responses:
+        '202':
+          description: Pipeline execution started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelinePipelineJob'
+        '404':
+          description: Pipeline not found
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/pipelines/{id}/execute
+      x-brrtrouter-impl: false
+  /pipelines/{id}/result:
+    get:
+      operationId: get_pipeline_result
+      summary: Get pipeline execution output
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pipeline result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelinePipelineResult'
+        '404':
+          description: Not found
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/pipelines/{id}/result
+      x-brrtrouter-impl: false
+  /pipelines/{id}/status:
+    get:
+      operationId: get_pipeline_status
+      summary: Check pipeline execution status
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Pipeline status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelinePipelineJob'
+        '404':
+          description: Pipeline execution not found
+      tags:
+      - pipeline
+      x-service: pipeline
+      x-service-base-path: /api/documents/pipeline
+      x-brrtrouter-downstream-path: /api/documents/pipeline/pipelines/{id}/status
+      x-brrtrouter-impl: false
+  /renditions:
+    post:
+      operationId: create_document_rendition
+      summary: Idempotently accept a frozen model for one immutable original rendition
+      description: Intended for a source-suite post-commit worker. Reusing the same idempotency key and request fingerprint
+        returns the existing operation; reusing it with different content returns 409.
+      tags:
+      - renditions
+      x-required-permission: documents.renditions.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderCreateRenditionRequest'
+      responses:
+        '200':
+          description: Existing idempotent rendition operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentRendition'
+        '202':
+          description: Rendition accepted for materialization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentRendition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/renditions
+      x-brrtrouter-impl: false
+  /renditions/{rendition_id}:
+    get:
+      operationId: get_document_rendition
+      summary: Retrieve rendition state and immutable lineage
+      tags:
+      - renditions
+      parameters:
+      - $ref: '#/components/parameters/RenditionId'
+      responses:
+        '200':
+          description: Rendition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentRendition'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}
+      x-brrtrouter-impl: false
+  /renditions/{rendition_id}/copies:
+    post:
+      operationId: create_document_rendition_copy
+      summary: Idempotently create a visibly marked immutable derivative copy
+      tags:
+      - copies
+      x-required-permission: documents.copies.create
+      parameters:
+      - $ref: '#/components/parameters/RenditionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderCreateCopyRequest'
+      responses:
+        '200':
+          description: Existing idempotent copy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentRendition'
+        '202':
+          description: Copy accepted for materialization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentRendition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}/copies
+      x-brrtrouter-impl: false
+  /renditions/{rendition_id}/download:
+    post:
+      operationId: create_document_rendition_download
+      summary: Create a short-lived authorized download URL for a ready rendition
+      tags:
+      - renditions
+      x-required-permission: documents.renditions.read
+      parameters:
+      - $ref: '#/components/parameters/RenditionId'
+      responses:
+        '200':
+          description: Short-lived download authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderAuthorizedDownload'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}/download
+      x-brrtrouter-impl: false
+  /routes:
+    get:
+      operationId: list_routes
+      summary: List all routing rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of routing rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesRoutesListResponse'
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_route
+      summary: Create a routing rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutesRouteDef'
+      responses:
+        '201':
+          description: Route created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesRoute'
+        '400':
+          description: Invalid request
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes
+      x-brrtrouter-impl: false
+  /routes/by-document-type:
+    get:
+      operationId: get_routes_by_document_type
+      summary: Get routes for a document type
+      parameters:
+      - name: document_type
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Matching routes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoutesRoute'
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/by-document-type
+      x-brrtrouter-impl: false
+  /routes/export:
+    get:
+      operationId: export_routes
+      summary: Export all routing rules
+      responses:
+        '200':
+          description: Exported rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoutesRoute'
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/export
+      x-brrtrouter-impl: false
+  /routes/import:
+    post:
+      operationId: import_routes
+      summary: Bulk import routing rules from YAML/JSON
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutesImportRoutesRequest'
+      responses:
+        '201':
+          description: Routes imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesImportResult'
+        '400':
+          description: Invalid request
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/import
+      x-brrtrouter-impl: false
+  /routes/{id}:
+    get:
+      operationId: get_route
+      summary: Get routing rule details
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Routing rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesRoute'
+        '404':
+          description: Not found
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/{id}
+      x-brrtrouter-impl: false
+    put:
+      operationId: update_route
+      summary: Update a routing rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutesRouteDef'
+      responses:
+        '200':
+          description: Route updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesRoute'
+        '404':
+          description: Not found
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/{id}
+      x-brrtrouter-impl: false
+    delete:
+      operationId: delete_route
+      summary: Delete a routing rule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Route deleted
+        '404':
+          description: Not found
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/{id}
+      x-brrtrouter-impl: false
+  /routes/{id}/test:
+    post:
+      operationId: test_route
+      summary: Test routing rule with a sample document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutesTestRouteRequest'
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutesTestResult'
+        '404':
+          description: Route not found
+      tags:
+      - routes
+      x-service: routes
+      x-service-base-path: /api/documents/routes
+      x-brrtrouter-downstream-path: /api/documents/routes/routes/{id}/test
+      x-brrtrouter-impl: false
+  /rules:
+    get:
+      operationId: list_auto_approve_rules
+      summary: List auto-approve rules
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of auto-approve rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationAutoApproveRulesListResponse'
+      tags:
+      - auto-approve-rules
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/rules
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_auto_approve_rule
+      summary: Create an auto-approve rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationAutoApproveRuleDef'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmationAutoApproveRule'
+        '400':
+          description: Invalid request
+      tags:
+      - auto-approve-rules
+      x-service: confirmation
+      x-service-base-path: /api/documents/confirmation
+      x-brrtrouter-downstream-path: /api/documents/confirmation/rules
+      x-brrtrouter-impl: false
+  /schemas:
+    get:
+      operationId: list_schemas
+      summary: List extraction schemas
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of schemas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractSchemasListResponse'
+      tags:
+      - schemas
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/schemas
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_schema
+      summary: Create or edit an extraction schema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractSchemaDef'
+      responses:
+        '201':
+          description: Schema created or updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractSchema'
+        '400':
+          description: Invalid request
+      tags:
+      - schemas
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/schemas
+      x-brrtrouter-impl: false
+  /schemas/generate:
+    post:
+      operationId: generate_schema
+      summary: Auto-generate schema from sample documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractGenerateSchemaRequest'
+      responses:
+        '201':
+          description: Schema generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractSchema'
+        '400':
+          description: Invalid request
+      tags:
+      - schemas
+      x-service: extract
+      x-service-base-path: /api/documents/extract
+      x-brrtrouter-downstream-path: /api/documents/extract/schemas/generate
+      x-brrtrouter-impl: false
+  /sources/{source_suite}/{source_type}/{source_id}/renditions:
+    get:
+      operationId: list_source_document_renditions
+      summary: List originals and copies linked to one source resource
+      tags:
+      - renditions
+      parameters:
+      - name: source_suite
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{0,62}$
+      - name: source_type
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{0,126}$
+      - name: source_id
+        in: path
+        required: true
+        schema:
+          type: string
+          maxLength: 200
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated source renditions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderRenditionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/sources/{source_suite}/{source_type}/{source_id}/renditions
+      x-brrtrouter-impl: false
+  /template-versions/{version_id}:
+    get:
+      operationId: get_document_template_version
+      summary: Retrieve one template version
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Template version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}
+      x-brrtrouter-impl: false
+  /template-versions/{version_id}/preview:
+    post:
+      operationId: preview_document_template_version
+      summary: Render a non-authoritative preview without creating an original rendition
+      tags:
+      - templates
+      x-required-permission: documents.templates.manage
+      parameters:
+      - $ref: '#/components/parameters/VersionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderPreviewTemplateRequest'
+      responses:
+        '200':
+          description: Preview generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderPreviewResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/preview
+      x-brrtrouter-impl: false
+  /template-versions/{version_id}/publish:
+    post:
+      operationId: publish_document_template_version
+      summary: Publish and permanently freeze a validated template version
+      tags:
+      - templates
+      x-required-permission: documents.templates.publish
+      parameters:
+      - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Version published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/publish
+      x-brrtrouter-impl: false
+  /template-versions/{version_id}/retire:
+    post:
+      operationId: retire_document_template_version
+      summary: Retire a published version from future selection without changing existing renditions
+      tags:
+      - templates
+      x-required-permission: documents.templates.publish
+      parameters:
+      - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Version retired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplateVersion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/retire
+      x-brrtrouter-impl: false
+  /template-versions/{version_id}/validate:
+    post:
+      operationId: validate_document_template_version
+      summary: Validate syntax, schema compatibility, assets, security, and boundary fixtures
+      tags:
+      - templates
+      x-required-permission: documents.templates.manage
+      parameters:
+      - $ref: '#/components/parameters/VersionId'
+      responses:
+        '200':
+          description: Validation completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderTemplateValidationResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/validate
+      x-brrtrouter-impl: false
+  /templates:
+    get:
+      operationId: list_document_templates
+      summary: List document templates visible in the authenticated tenant scope
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: document_kind
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/TemplateStatus'
+      responses:
+        '200':
+          description: Paginated templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderTemplatePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/templates
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_document_template
+      summary: Create a stable document-template identity
+      tags:
+      - templates
+      x-required-permission: documents.templates.manage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderCreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/templates
+      x-brrtrouter-impl: false
+  /templates/{template_id}:
+    get:
+      operationId: get_document_template
+      summary: Retrieve a document template and its published-version summary
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/TemplateId'
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}
+      x-brrtrouter-impl: false
+  /templates/{template_id}/versions:
+    get:
+      operationId: list_document_template_versions
+      summary: List versions of a document template
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/TemplateId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated template versions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderTemplateVersionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}/versions
+      x-brrtrouter-impl: false
+    post:
+      operationId: create_document_template_version
+      summary: Create a mutable draft template version
+      tags:
+      - templates
+      x-required-permission: documents.templates.manage
+      parameters:
+      - $ref: '#/components/parameters/TemplateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderCreateTemplateVersionRequest'
+      responses:
+        '201':
+          description: Draft version created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderDocumentTemplateVersion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-service: render
+      x-service-base-path: /api/documents/render
+      x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}/versions
+      x-brrtrouter-impl: false
+  /upload:
+    post:
+      operationId: upload_document
+      summary: Upload document with metadata
+      description: Upload a document file via multipart/form-data. Metadata is merged into the document record in core/. Writes
+        to core/.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document file (pdf, image, docx, etc.)
+                org_id:
+                  type: string
+                  format: uuid
+                  description: Organization ID (RLS-scoped)
+                folder_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Target folder ID
+                metadata:
+                  type: object
+                  nullable: true
+                  description: Arbitrary metadata (source, tags, sender_email)
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Document uploaded and queued for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeDocument'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/upload
+      x-brrtrouter-impl: false
+  /url:
+    post:
+      operationId: submit_url
+      summary: Submit document by URL
+      description: Submit a document to be fetched by RERP from the given URL. RERP downloads the file and stores it in core/.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntakeCreateDocumentRequest'
+      responses:
+        '201':
+          description: Document URL queued for fetch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeDocument'
+        '400':
+          description: Invalid URL or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeError'
+      x-service: intake
+      x-service-base-path: /api/documents/intake
+      x-brrtrouter-downstream-path: /api/documents/intake/url
+      x-brrtrouter-impl: false
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+    TemplateId:
+      name: template_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    VersionId:
+      name: version_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RenditionId:
+      name: rendition_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    AnalyzeAnalysisJob:
+      type: object
+      required:
+      - id
+      - query
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID for polling via GET /analysis/{id}
+        document_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null if bulk analysis
+        query:
+          type: string
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - complete
+          - failed
+        result:
+          nullable: true
+          $ref: '#/components/schemas/AnalyzeAnalysisResult'
+          description: Final analysis result (available when status is complete)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    AnalyzeAnalysisResult:
+      type: object
+      required:
+      - id
+      - query
+      - answer
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null if bulk analysis
+        query:
+          type: string
+        answer:
+          type: string
+          description: LLM-generated answer
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              page:
+                type: integer
+              text:
+                type: string
+              confidence:
+                type: number
+                format: decimal
+          description: Source passages from the document
+        tokens_used:
+          type: object
+          properties:
+            prompt_tokens:
+              type: integer
+            completion_tokens:
+              type: integer
+            total_tokens:
+              type: integer
+        model:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    AnalyzeAnalyzeBulkRequest:
+      type: object
+      required:
+      - org_id
+      - query
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        query:
+          type: string
+          maxLength: 2000
+          description: Free-text question about multiple documents
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 20
+          description: Document UUIDs to analyze (max 20)
+        model:
+          type: string
+          nullable: true
+          description: Optional model override
+    AnalyzeAnalyzeRequest:
+      type: object
+      required:
+      - org_id
+      - query
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        query:
+          type: string
+          maxLength: 2000
+          description: Free-text question about the document
+        model:
+          type: string
+          nullable: true
+          description: Optional model override
+        context_window:
+          type: integer
+          default: 4000
+          description: Token context window size
+        max_tokens:
+          type: integer
+          default: 2000
+          description: Maximum tokens in the response
+    AnalyzeError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ClassifyClassification:
+      type: object
+      required:
+      - id
+      - document_id
+      - document_type
+      - confidence
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+          description: Classified document type (e.g. invoice, resume, contract)
+        confidence:
+          type: number
+          format: decimal
+          description: Classification confidence (0.0-1.0)
+        classifier_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Classifier used
+        rerp_module:
+          type: string
+          nullable: true
+          description: Target RERP module (e.g. accounts-payable, hr-recruitment)
+        created_at:
+          type: string
+          format: date-time
+    ClassifyClassificationJob:
+      type: object
+      required:
+      - id
+      - document_id
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID for polling via GET /classifications/{id}
+        document_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - complete
+          - failed
+        classifier_id:
+          type: string
+          format: uuid
+          nullable: true
+        result:
+          nullable: true
+          $ref: '#/components/schemas/ClassifyClassification'
+          description: Final classification result (available when status is complete)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ClassifyClassifier:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        model:
+          type: string
+          description: ML model identifier
+        labels:
+          type: array
+          items:
+            type: string
+          description: Supported document type labels
+        model_params:
+          type: object
+          nullable: true
+          description: Model configuration parameters
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ClassifyClassifierDef:
+      type: object
+      required:
+      - org_id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        model:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        model_params:
+          type: object
+          nullable: true
+    ClassifyClassifiersListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassifyClassifier'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ClassifyClassifyRequest:
+      type: object
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        classifier_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional custom classifier ID; if omitted uses default
+    ClassifyError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ConfirmationAutoApproveRule:
+      type: object
+      required:
+      - id
+      - org_id
+      - document_type
+      - min_confidence
+      - target_modules
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+        min_confidence:
+          type: number
+          format: decimal
+          description: Minimum confidence to auto-approve
+        target_modules:
+          type: array
+          items:
+            type: string
+          description: Modules this rule applies to (empty = all)
+        enabled:
+          type: boolean
+          default: true
+        created_at:
+          type: string
+          format: date-time
+    ConfirmationAutoApproveRuleDef:
+      type: object
+      required:
+      - org_id
+      - document_type
+      - min_confidence
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        org_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+        min_confidence:
+          type: number
+          format: decimal
+        target_modules:
+          type: array
+          items:
+            type: string
+          default: []
+        enabled:
+          type: boolean
+          default: true
+    ConfirmationAutoApproveRulesListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfirmationAutoApproveRule'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ConfirmationBatchApproveRequest:
+      type: object
+      required:
+      - confirmation_ids
+      properties:
+        confirmation_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs of confirmations to approve
+    ConfirmationBatchResult:
+      type: object
+      required:
+      - total
+      - success
+      - failed
+      properties:
+        total:
+          type: integer
+        success:
+          type: integer
+        failed:
+          type: integer
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              success:
+                type: boolean
+              error:
+                type: string
+                nullable: true
+    ConfirmationConfirmation:
+      type: object
+      required:
+      - id
+      - document_id
+      - status
+      - classification
+      - extraction
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        execution_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Associated pipeline execution
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+          - corrected
+          - expired
+        classification:
+          type: object
+          description: Document classification result
+        extraction:
+          type: object
+          description: Extraction results awaiting review
+        extracted_data:
+          type: object
+          nullable: true
+          description: Structured extracted fields
+        confidence:
+          type: number
+          format: decimal
+          nullable: true
+        target_module:
+          type: string
+          nullable: true
+        target_endpoint:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+    ConfirmationConfirmationApproved:
+      type: object
+      required:
+      - id
+      - document_id
+      - action
+      - status
+      - created_record_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+          description: Organization this confirmation belongs to
+        action:
+          type: string
+          enum:
+          - approve
+        status:
+          type: string
+          enum:
+          - approved
+        created_record_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Record ID created in target module
+        target_module:
+          type: string
+        target_endpoint:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ConfirmationConfirmationsListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfirmationConfirmation'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ConfirmationCorrectRequest:
+      type: object
+      required:
+      - org_id
+      - corrections
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        corrections:
+          type: object
+          description: Field-level corrections to extracted data
+    ConfirmationError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ConfirmationMergeRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      - output_filename
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        output_filename:
+          type: string
+    ConfirmationMergedDocument:
+      type: object
+      required:
+      - id
+      - document_ids
+      - storage_uri
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        storage_uri:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    ConfirmationRejectRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          description: Optional rejection reason
+    ConfirmationSplitRequest:
+      type: object
+      required:
+      - org_id
+      - document_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+          description: Page numbers to split (if omitted, splits by separator detection)
+    ConfirmationSplitResult:
+      type: object
+      required:
+      - original_id
+      - split_ids
+      properties:
+        original_id:
+          type: string
+          format: uuid
+        split_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+    CoreCreateFolderRequest:
+      type: object
+      required:
+      - org_id
+      - name
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+    CoreCreateVersionRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        file:
+          type: string
+          format: binary
+          description: New file content for the version
+        note:
+          type: string
+          nullable: true
+    CoreDocument:
+      type: object
+      required:
+      - id
+      - org_id
+      - title
+      - storage_uri
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+          description: Organization this document belongs to
+        title:
+          type: string
+        document_type:
+          type: string
+          nullable: true
+          description: e.g., invoice, contract, resume
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent folder
+        file_name:
+          type: string
+          description: Original filename
+        file_size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        content_type:
+          type: string
+          description: MIME type
+        storage_uri:
+          type: string
+          description: S3 storage path for the file
+        current_version_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Latest version ID
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - active
+          - archived
+          - deleted
+          default: active
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    CoreError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Additional context for debugging
+    CoreFolder:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent folder, null for root
+        path:
+          type: string
+          description: Full path (e.g., /finance/invoices/2024)
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    CoreFolderTree:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreFolder'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    CorePaginatedDocuments:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreDocument'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    CorePaginatedVersions:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreVersion'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    CorePresignedUrl:
+      type: object
+      required:
+      - url
+      - expires_at
+      properties:
+        url:
+          type: string
+          description: Presigned S3 URL
+        expires_at:
+          type: string
+          format: date-time
+          description: When the URL expires
+        method:
+          type: string
+          enum:
+          - GET
+          - PUT
+          description: HTTP method to use with the URL
+    CoreUpdateDocumentRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        document_type:
+          type: string
+          nullable: true
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+    CoreUpdateFolderRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          nullable: true
+        parent_folder_id:
+          type: string
+          format: uuid
+          nullable: true
+    CoreVersion:
+      type: object
+      required:
+      - id
+      - document_id
+      - storage_uri
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        version_number:
+          type: integer
+          description: Sequential version number (1, 2, ...)
+        org_id:
+          type: string
+          format: uuid
+        storage_uri:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          format: int64
+        content_type:
+          type: string
+        note:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional details
+          additionalProperties: true
+    ExtractError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    ExtractExtractionJob:
+      type: object
+      required:
+      - id
+      - document_id
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Job ID for status polling
+        document_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - complete
+          - failed
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+    ExtractExtractionResult:
+      type: object
+      required:
+      - id
+      - document_id
+      - result_json
+      - confidence
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        result_json:
+          type: object
+          description: Extracted fields as JSON (schema-dependent)
+        confidence:
+          type: number
+          format: decimal
+          description: Overall extraction confidence (0.0-1.0)
+        status:
+          type: string
+          enum:
+          - processing
+          - complete
+          - failed
+        highlights_json:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtractHighlight'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ExtractGenerateSchemaRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+          description: Optional schema name
+    ExtractHighlight:
+      type: object
+      description: Bounding box coordinates for a single extracted field
+      properties:
+        field_name:
+          type: string
+        page:
+          type: integer
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: float
+        width:
+          type: number
+          format: float
+        height:
+          type: number
+          format: float
+    ExtractHighlights:
+      type: object
+      required:
+      - highlights
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        schema_id:
+          type: string
+          format: uuid
+        highlights:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtractHighlight'
+    ExtractParseRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        schema_id:
+          type: string
+          format: uuid
+          description: Optional schema to use; if omitted, auto-detect
+    ExtractSchema:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - schema_def
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        schema_def:
+          type: object
+          description: JSON schema definition for field extraction
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+                enum:
+                - string
+                - number
+                - date
+                - currency
+                - boolean
+                - array
+                - object
+              description:
+                type: string
+              required:
+                type: boolean
+                default: false
+        created_at:
+          type: string
+          format: date-time
+    ExtractSchemaDef:
+      type: object
+      required:
+      - name
+      - schema_def
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        name:
+          type: string
+        schema_def:
+          type: object
+        description:
+          type: string
+    ExtractSchemasListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtractSchema'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    ExtractStandardizeRequest:
+      type: object
+      required:
+      - org_id
+      - schema_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID for RLS
+        schema_id:
+          type: string
+          format: uuid
+          description: Schema to use for extraction
+    IntakeBatchResult:
+      type: object
+      description: Result of a batch upload operation. Each item reports success or failure for one document.
+      required:
+      - total
+      - successful
+      - failed
+      - items
+      properties:
+        total:
+          type: integer
+          description: Total number of documents in the batch
+        successful:
+          type: integer
+          description: Number of documents successfully uploaded
+        failed:
+          type: integer
+          description: Number of documents that failed
+        items:
+          type: array
+          items:
+            type: object
+            required:
+            - index
+            - status
+            properties:
+              index:
+                type: integer
+                description: Zero-based index in the original files array
+              status:
+                type: string
+                enum:
+                - success
+                - failed
+                description: Per-document status
+              document_id:
+                type: string
+                format: uuid
+                nullable: true
+                description: Document ID if successful
+              error:
+                type: string
+                nullable: true
+                description: Error message if failed
+              filename:
+                type: string
+                description: Original filename
+    IntakeCreateDocumentRequest:
+      type: object
+      description: Request body for URL submission and batch metadata. Includes target org, folder, and file URL or metadata.
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public URL to fetch the document from
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Target folder ID
+        metadata:
+          type: object
+          nullable: true
+          description: Document metadata — source, tags, sender_email
+          additionalProperties: true
+    IntakeDocument:
+      type: object
+      description: Document record stored in core/. Includes ID, file metadata, storage URI, status, and JSONB metadata.
+      required:
+      - id
+      - org_id
+      - filename
+      - file_type
+      - file_size
+      - storage_uri
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique document identifier
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        user_id:
+          type: string
+          format: uuid
+          description: User who uploaded or created the document
+        filename:
+          type: string
+          description: Original filename
+        file_type:
+          type: string
+          description: MIME type or extension (pdf, image, docx, etc.)
+        file_size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        storage_uri:
+          type: string
+          description: S3/MinIO storage path (s3://bucket/path/uuid.pdf)
+        folder_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Target folder ID
+        status:
+          type: string
+          description: Processing status — uploaded, processing, extracted, failed
+          enum:
+          - uploaded
+          - processing
+          - extracted
+          - failed
+        metadata:
+          type: object
+          nullable: true
+          description: JSONB metadata — source (email/camera/webhook), tags, sender_email, etc.
+          additionalProperties: true
+        search_vector:
+          type: string
+          description: PostgreSQL tsvector for full-text search (read-only)
+        created_at:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        extraction_result:
+          type: object
+          nullable: true
+          description: JSONB extraction result when available (schema-agnostic fields)
+          additionalProperties: true
+    IntakeEmailAlias:
+      type: object
+      description: A suite-level email alias used for routing email-forwarded documents. One alias per suite, optionally scoped
+        to a module.
+      required:
+      - id
+      - org_id
+      - email_address
+      - suite
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique alias identifier
+        org_id:
+          type: string
+          format: uuid
+          description: Organization ID (RLS-scoped)
+        email_address:
+          type: string
+          format: email
+          description: The configured email address (e.g., invoices@company.rerp.local)
+        suite:
+          type: string
+          description: Target RERP suite (e.g., accounts, crm, hr, inventory)
+        module:
+          type: string
+          nullable: true
+          description: Optional module within the suite (e.g., ap, ar)
+        auto_approve:
+          type: boolean
+          nullable: true
+          default: false
+          description: Whether documents arriving via this alias should auto-approve
+        created_at:
+          type: string
+          format: date-time
+          description: Alias creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last update timestamp
+    IntakeEmailAttachment:
+      type: object
+      description: A single file attachment from an email.
+      required:
+      - filename
+      - content_type
+      - storage_uri
+      properties:
+        filename:
+          type: string
+          description: Original filename of the attachment
+        content_type:
+          type: string
+          description: MIME type of the attachment
+        storage_uri:
+          type: string
+          description: S3/MinIO storage path where the attachment content is stored (s3://bucket/path/uuid.pdf)
+        size:
+          type: integer
+          format: int64
+          description: File size in bytes
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Optional additional metadata (e.g., checksum, encoding)
+    IntakeEmailPayload:
+      type: object
+      description: Email payload received from an email forwarding webhook. Includes sender, recipients, subject, body, and
+        attachments.
+      required:
+      - to
+      - from
+      - subject
+      - body
+      - attachments
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          description: Recipient email addresses
+        from:
+          type: string
+          format: email
+          description: Sender email address
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+          nullable: true
+          description: CC recipients
+        bcc:
+          type: array
+          items:
+            type: string
+            format: email
+          nullable: true
+          description: BCC recipients
+        subject:
+          type: string
+          description: Email subject line
+        body:
+          type: string
+          description: Email body text
+        body_html:
+          type: string
+          nullable: true
+          description: Email body in HTML format
+        received_at:
+          type: string
+          format: date-time
+          description: Timestamp when the email was received
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntakeEmailAttachment'
+          description: List of file attachments from the email
+        headers:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+          description: Raw email headers (for debugging/trace)
+    IntakeError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+          additionalProperties: true
+    IntakeMobileStatus:
+      type: object
+      description: Mobile app sync status report. Reports pending uploads, in-progress processing, and errors for the authenticated
+        user.
+      required:
+      - last_sync
+      - pending_count
+      - processing_count
+      properties:
+        last_sync:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp of the last successful sync
+        pending_count:
+          type: integer
+          description: Number of documents pending upload from the mobile device
+        processing_count:
+          type: integer
+          description: Number of documents currently being processed (extract, classify, route)
+        failed_count:
+          type: integer
+          description: Number of documents that failed processing and need user attention
+        sync_errors:
+          type: array
+          items:
+            type: object
+            properties:
+              document_id:
+                type: string
+                format: uuid
+                description: Document ID with a sync error
+              error:
+                type: string
+                description: Error message describing the sync failure
+              created_at:
+                type: string
+                format: date-time
+                description: When the error was recorded
+          nullable: true
+          description: List of recent sync errors (up to last 10)
+        device_info:
+          type: object
+          nullable: true
+          properties:
+            platform:
+              type: string
+              description: Mobile platform (ios, android)
+            app_version:
+              type: string
+              description: Mobile app version
+            last_seen:
+              type: string
+              format: date-time
+              description: Last time the device connected
+          description: Device and app metadata for the current session
+    PipelineConfirmRequest:
+      type: object
+      required:
+      - org_id
+      - action
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum:
+          - approve
+          - reject
+        notes:
+          type: string
+          nullable: true
+    PipelineConfirmation:
+      type: object
+      required:
+      - id
+      - document_id
+      - action
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        execution_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum:
+          - approve
+          - reject
+          - correct
+        notes:
+          type: string
+          nullable: true
+        corrected_data:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    PipelineCorrectRequest:
+      type: object
+      required:
+      - org_id
+      - corrections
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        corrections:
+          type: object
+          description: Field-level corrections to extracted data
+    PipelineError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    PipelineExecuteRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional custom pipeline; uses default if omitted
+        pipeline_name:
+          type: string
+          nullable: true
+          description: Alternative to pipeline_id — lookup by name within org
+    PipelineExecutionDetail:
+      type: object
+      required:
+      - id
+      - document_id
+      - stage
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+        stage:
+          type: string
+          description: Current processing stage
+          enum:
+          - ingest
+          - parse
+          - classify
+          - extract
+          - route
+          - confirm
+          - create
+          - notify
+          - complete
+          - failed
+          - manual_review
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - complete
+          - failed
+          - skipped
+        result_json:
+          type: object
+          nullable: true
+        error_msg:
+          type: string
+          nullable: true
+        retry_count:
+          type: integer
+          default: 0
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    PipelineExecutionsListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PipelineExecutionDetail'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    PipelineMergeRequest:
+      type: object
+      required:
+      - org_id
+      - document_ids
+      - output_filename
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        output_filename:
+          type: string
+    PipelineMergedDocument:
+      type: object
+      required:
+      - id
+      - document_ids
+      - storage_uri
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        storage_uri:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    PipelinePipeline:
+      type: object
+      required:
+      - id
+      - name
+      - stages
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        stages:
+          type: array
+          items:
+            type: string
+            enum:
+            - ingest
+            - parse
+            - classify
+            - extract
+            - route
+            - confirm
+            - create
+            - notify
+          description: Ordered pipeline stages
+        rules:
+          type: object
+          nullable: true
+          description: Pipeline-level configuration overrides
+        created_at:
+          type: string
+          format: date-time
+    PipelinePipelineDef:
+      type: object
+      required:
+      - name
+      - stages
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        name:
+          type: string
+        description:
+          type: string
+        stages:
+          type: array
+          items:
+            type: string
+            enum:
+            - ingest
+            - parse
+            - classify
+            - extract
+            - route
+            - confirm
+            - create
+            - notify
+        rules:
+          type: object
+          nullable: true
+    PipelinePipelineJob:
+      type: object
+      required:
+      - id
+      - document_ids
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          nullable: true
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum:
+          - queued
+          - running
+          - complete
+          - failed
+          - cancelled
+        current_stage:
+          type: string
+          nullable: true
+        progress:
+          type: object
+          properties:
+            total:
+              type: integer
+            completed:
+              type: integer
+            failed:
+              type: integer
+        result_json:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    PipelinePipelineResult:
+      type: object
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        extraction:
+          type: object
+          nullable: true
+        classification:
+          type: object
+          nullable: true
+        routing:
+          type: object
+          nullable: true
+        confirmed:
+          type: boolean
+        created_record:
+          type: object
+          nullable: true
+    PipelineSplitRequest:
+      type: object
+      required:
+      - org_id
+      - document_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+          description: Page numbers to split (if omitted, splits by separator detection)
+    PipelineSplitResult:
+      type: object
+      required:
+      - original_id
+      - split_ids
+      properties:
+        original_id:
+          type: string
+          format: uuid
+        split_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pages:
+          type: array
+          items:
+            type: integer
+    RenderAuthorizedDownload:
+      type: object
+      required:
+      - url
+      - expires_at
+      properties:
+        url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+    RenderCreateCopyRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - idempotency_key
+      - reason_code
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+        reason_code:
+          type: string
+          enum:
+          - CUSTOMER_REQUEST
+          - INTERNAL_RECORD
+          - LEGAL_REQUEST
+          - REPLACEMENT_DELIVERY
+        locale:
+          type: string
+          pattern: ^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$
+    RenderCreateRenditionRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - idempotency_key
+      - source
+      - document_kind
+      - issued_at
+      - locale
+      - render_schema
+      - render_model
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/RenderSourceReference'
+        document_kind:
+          type: string
+          minLength: 1
+          maxLength: 100
+        issued_at:
+          type: string
+          format: date-time
+        locale:
+          type: string
+          pattern: ^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$
+        template_selector:
+          $ref: '#/components/schemas/RenderTemplateSelector'
+        render_schema:
+          type: string
+          minLength: 1
+          maxLength: 200
+        render_model:
+          type: object
+          additionalProperties: true
+    RenderCreateTemplateRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - key
+      - name
+      - document_kind
+      properties:
+        key:
+          type: string
+          pattern: ^[a-z][a-z0-9._-]{0,126}$
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        document_kind:
+          type: string
+          minLength: 1
+          maxLength: 100
+          examples:
+          - accounting.customer-invoice
+        description:
+          type: string
+          maxLength: 2000
+    RenderCreateTemplateVersionRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - template_contract
+      - render_schema
+      - engine
+      - template_html
+      - stylesheet_css
+      properties:
+        template_contract:
+          type: string
+          const: rerp-document-template/v1
+        render_schema:
+          type: string
+          minLength: 1
+          maxLength: 200
+          examples:
+          - accounting.customer-invoice-render-model/v1
+        engine:
+          type: string
+          const: minijinja/v1
+        template_html:
+          type: string
+          minLength: 1
+          maxLength: 524288
+        stylesheet_css:
+          type: string
+          maxLength: 262144
+        assets:
+          type: array
+          maxItems: 64
+          items:
+            $ref: '#/components/schemas/RenderTemplateAssetReference'
+        supported_locales:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+            pattern: ^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$
+        page_size:
+          type: string
+          enum:
+          - A4
+          - LETTER
+          default: A4
+        orientation:
+          type: string
+          enum:
+          - PORTRAIT
+          - LANDSCAPE
+          default: PORTRAIT
+    RenderDocumentMutability:
+      type: string
+      enum:
+      - IMMUTABLE
+    RenderDocumentOrigin:
+      type: string
+      enum:
+      - GENERATED
+    RenderDocumentRendition:
+      type: object
+      required:
+      - id
+      - source
+      - origin
+      - mutability
+      - role
+      - status
+      - media_type
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          description: Canonical Documents core record when materialized
+        source:
+          $ref: '#/components/schemas/RenderSourceReference'
+        origin:
+          $ref: '#/components/schemas/RenderDocumentOrigin'
+        mutability:
+          $ref: '#/components/schemas/RenderDocumentMutability'
+        role:
+          $ref: '#/components/schemas/RenderRenditionRole'
+        source_rendition_id:
+          type: string
+          format: uuid
+          description: Original rendition for COPY artifacts
+        status:
+          $ref: '#/components/schemas/RenderRenditionStatus'
+        media_type:
+          type: string
+          const: application/pdf
+        template_version_id:
+          type: string
+          format: uuid
+        renderer:
+          type: string
+        renderer_version:
+          type: string
+        sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+        ready_at:
+          type: string
+          format: date-time
+        failure_code:
+          type: string
+        failure_message:
+          type: string
+    RenderDocumentTemplate:
+      type: object
+      required:
+      - id
+      - key
+      - name
+      - document_kind
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+        name:
+          type: string
+        document_kind:
+          type: string
+        description:
+          type: string
+        published_version_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    RenderDocumentTemplateVersion:
+      type: object
+      required:
+      - id
+      - template_id
+      - version_number
+      - template_contract
+      - render_schema
+      - engine
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        version_number:
+          type: integer
+          minimum: 1
+        template_contract:
+          type: string
+        render_schema:
+          type: string
+        engine:
+          type: string
+        status:
+          $ref: '#/components/schemas/RenderTemplateStatus'
+        bundle_sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        created_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+        retired_at:
+          type: string
+          format: date-time
+    RenderErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        correlation_id:
+          type: string
+          format: uuid
+        details:
+          type: object
+          additionalProperties: true
+    RenderPreviewResult:
+      type: object
+      required:
+      - media_type
+      - sha256
+      - size_bytes
+      - download_url
+      - expires_at
+      properties:
+        media_type:
+          type: string
+          const: application/pdf
+        sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        size_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+        download_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+    RenderPreviewTemplateRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - render_schema
+      - locale
+      - render_model
+      properties:
+        render_schema:
+          type: string
+        locale:
+          type: string
+        render_model:
+          type: object
+          additionalProperties: true
+    RenderRenditionPage:
+      type: object
+      required:
+      - items
+      - page
+      - limit
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenderDocumentRendition'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    RenderRenditionRole:
+      type: string
+      enum:
+      - ORIGINAL
+      - COPY
+    RenderRenditionStatus:
+      type: string
+      enum:
+      - PENDING
+      - RENDERING
+      - READY
+      - FAILED
+    RenderSourceReference:
+      type: object
+      additionalProperties: false
+      required:
+      - suite
+      - resource_type
+      - resource_id
+      - source_version
+      - snapshot_sha256
+      properties:
+        suite:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{0,62}$
+        resource_type:
+          type: string
+          pattern: ^[a-z][a-z0-9-]{0,126}$
+        resource_id:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source_version:
+          type: string
+          minLength: 1
+          maxLength: 100
+        snapshot_sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+    RenderTemplateAssetReference:
+      type: object
+      additionalProperties: false
+      required:
+      - path
+      - document_id
+      - version_id
+      - sha256
+      properties:
+        path:
+          type: string
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._/-]{0,254}$
+        document_id:
+          type: string
+          format: uuid
+          description: Asset document in Documents core
+        version_id:
+          type: string
+          format: uuid
+        sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+    RenderTemplatePage:
+      type: object
+      required:
+      - items
+      - page
+      - limit
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenderDocumentTemplate'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    RenderTemplateSelector:
+      type: object
+      additionalProperties: false
+      properties:
+        template_key:
+          type: string
+          pattern: ^[a-z][a-z0-9._-]{0,126}$
+        template_version_id:
+          type: string
+          format: uuid
+        legal_entity_id:
+          type: string
+          format: uuid
+          description: Domain policy selector, not tenant scope
+        jurisdiction:
+          type: string
+          maxLength: 32
+    RenderTemplateStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - RETIRED
+    RenderTemplateValidationResult:
+      type: object
+      required:
+      - valid
+      - checked_at
+      - issues
+      properties:
+        valid:
+          type: boolean
+        checked_at:
+          type: string
+          format: date-time
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenderValidationIssue'
+    RenderTemplateVersionPage:
+      type: object
+      required:
+      - items
+      - page
+      - limit
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenderDocumentTemplateVersion'
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    RenderValidationIssue:
+      type: object
+      required:
+      - code
+      - message
+      - severity
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        severity:
+          type: string
+          enum:
+          - ERROR
+          - WARNING
+        path:
+          type: string
+    RoutesError:
+      type: object
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          additionalProperties: true
+    RoutesImportResult:
+      type: object
+      required:
+      - imported
+      - failed
+      properties:
+        imported:
+          type: integer
+        failed:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+    RoutesImportRoutesRequest:
+      type: object
+      required:
+      - org_id
+      - rules
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoutesRouteDef'
+    RoutesRoute:
+      type: object
+      required:
+      - id
+      - org_id
+      - name
+      - document_type
+      - target_module
+      - target_endpoint
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        document_type:
+          type: string
+        source:
+          type: array
+          items:
+            type: string
+            enum:
+            - email
+            - camera
+            - webhook
+            - upload
+          description: Intake channels this rule applies to
+        target_module:
+          type: string
+          description: Target RERP module name (e.g. accounts-payable, crm)
+        target_endpoint:
+          type: string
+          description: API endpoint to create/update record (e.g. /api/v1/accounts-payable/invoices)
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Extraction schema to use
+        auto_approve:
+          type: boolean
+          default: false
+        auto_approve_threshold:
+          type: number
+          format: decimal
+          default: 0.85
+          description: Confidence threshold for auto-approve
+        notify:
+          type: array
+          items:
+            type: string
+          description: User roles or user IDs to notify
+        fallback_route:
+          type: string
+          nullable: true
+          description: What to do if confidence < threshold (e.g. manual_review)
+        retry_count:
+          type: integer
+          default: 3
+        retry_delay:
+          type: integer
+          default: 60
+          description: Seconds between retries
+        created_at:
+          type: string
+          format: date-time
+    RoutesRouteDef:
+      type: object
+      required:
+      - org_id
+      - name
+      - document_type
+      - target_module
+      - target_endpoint
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omitted to create new; include to update
+        org_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        document_type:
+          type: string
+        source:
+          type: array
+          items:
+            type: string
+            enum:
+            - email
+            - camera
+            - webhook
+            - upload
+          default: []
+        target_module:
+          type: string
+        target_endpoint:
+          type: string
+        schema_id:
+          type: string
+          format: uuid
+          nullable: true
+        auto_approve:
+          type: boolean
+          default: false
+        auto_approve_threshold:
+          type: number
+          format: decimal
+          default: 0.85
+        notify:
+          type: array
+          items:
+            type: string
+          default: []
+        fallback_route:
+          type: string
+          nullable: true
+        retry_count:
+          type: integer
+          default: 3
+        retry_delay:
+          type: integer
+          default: 60
+    RoutesRoutesListResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoutesRoute'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+    RoutesTestResult:
+      type: object
+      required:
+      - matched
+      - rule
+      properties:
+        matched:
+          type: boolean
+        rule:
+          nullable: true
+          $ref: '#/components/schemas/RoutesRoute'
+        confidence:
+          type: number
+          format: decimal
+          nullable: true
+        auto_approved:
+          type: boolean
+    RoutesTestRouteRequest:
+      type: object
+      required:
+      - org_id
+      properties:
+        org_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          description: Existing document to test against
+        raw_text:
+          type: string
+          description: Raw text to test routing with (if no document_id)
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Sesame-issued bearer token validated by BRRTRouter

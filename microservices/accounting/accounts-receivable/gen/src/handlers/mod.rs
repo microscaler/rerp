@@ -19,20 +19,6 @@ pub mod list_collection_activities;
 
 pub mod create_collection_activity;
 
-pub mod list_credit_memos;
-
-pub mod create_credit_memo;
-
-pub mod list_customer_invoices;
-
-pub mod create_customer_invoice;
-
-pub mod get_customer_invoice;
-
-pub mod update_customer_invoice;
-
-pub mod delete_customer_invoice;
-
 pub mod send_customer_statements;
 
 pub mod list_follow_up_levels;
@@ -40,6 +26,10 @@ pub mod list_follow_up_levels;
 pub mod create_follow_up_level;
 
 pub mod create_follow_up_run;
+
+pub mod list_open_items;
+
+pub mod get_open_item;
 
 pub mod create_payment_promise;
 

@@ -143,6 +143,34 @@ pub struct JournalLine {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListCustomerInvoicesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
+
+    pub items: Vec<PostedInvoiceSummary>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedPostedInvoices {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_more: Option<bool>,
+
+    pub items: Vec<PostedInvoiceSummary>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PostCustomerInvoiceRequest {
     pub currency_code: String,
 
@@ -238,6 +266,33 @@ pub struct PostedInvoiceLine {
     pub total_amount: String,
 
     pub unit_price: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PostedInvoiceSummary {
+    pub currency_code: String,
+
+    pub customer_id: String,
+
+    pub document_number: String,
+
+    pub document_type: String,
+
+    pub due_date: String,
+
+    pub id: String,
+
+    pub invoice_date: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub original_document_id: Option<String>,
+
+    pub posted_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tax_amount: Option<String>,
+
+    pub total_amount: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
