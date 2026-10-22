@@ -24,7 +24,6 @@ permissions:
 
 env:
   PYTHON_VERSION: "3.12"
-  BRRTROUTER_TOOLING: "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"
 
 jobs:
   commits:
@@ -52,7 +51,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
-          tooling/.venv/bin/pip install -e ./tooling[dev] "$BRRTROUTER_TOOLING"
+          tooling/.venv/bin/pip install -e "./tooling[dev]"   # pins brrtrouter-tooling to the release crates' BRRTRouter rev
       - name: Documentation authority and ADR lifecycle
         run: tooling/.venv/bin/python tooling/scripts/check_doc_governance.py
       # Coverage floor at today's level (47%, 22 Oct 2026, after release, ci and openapi moved to the workspace CLI):
@@ -74,7 +73,7 @@ jobs:
         run: |
           python3 -m venv tooling/.venv
           tooling/.venv/bin/pip install --upgrade pip
-          tooling/.venv/bin/pip install -e ./tooling "$BRRTROUTER_TOOLING"
+          tooling/.venv/bin/pip install -e ./tooling
       - name: Validate OpenAPI specs
         run: tooling/.venv/bin/rerp openapi validate
       - name: Generate BFF specs (dry run)

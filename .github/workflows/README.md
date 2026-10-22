@@ -13,6 +13,5 @@ workflow changes. Images stay public: nothing here names a private registry, clo
 
 The `rerp-base` image (`docker/base/`) is built locally by Tilt for development; it is not published.
 
-The `rerp` CLI depends on `brrtrouter_tooling`, installed from BRRTRouter@main
-(`pip install "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@main#subdirectory=tooling"`),
-or `pip install -e ../BRRTRouter/tooling` with a sibling checkout.
+The `rerp` CLI pins `brrtrouter_tooling` (tooling/pyproject.toml) to the BRRTRouter revision the release crates use;
+`pip install -e ../BRRTRouter/tooling` in the same venv swaps in a sibling checkout.
