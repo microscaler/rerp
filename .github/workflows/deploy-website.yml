@@ -7,7 +7,6 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/**'
       - 'ui/website/**'
       - 'ui/shared/**'
       - '.github/workflows/deploy-website.yml'
