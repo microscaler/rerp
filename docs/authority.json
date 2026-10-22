@@ -50,6 +50,18 @@
       "superseded_by": []
     },
     {
+      "id": "ADR-003",
+      "scope": "crm.funnel-conversion-boundary",
+      "path": "docs/adrs/003-crm-funnel-conversion-boundary.md",
+      "kind": "adr",
+      "status": "ACCEPTED",
+      "authority": "normative",
+      "owner": "RERP CRM and Accounting",
+      "last_reviewed": "2026-10-23",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
       "id": "PLAN-001",
       "scope": "accounting.hauliage-dogfood-delivery",
       "path": "docs/roadmap/hauliage-accounting-dogfood/README.md",
