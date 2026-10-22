@@ -13,7 +13,6 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
       "@shared/*": ["../shared/*"],
       "@shared-portals/*": ["../shared-portals/*"]

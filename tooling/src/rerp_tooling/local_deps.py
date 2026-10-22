@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import os
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 WORKSPACE = REPO_ROOT / "microservices"
@@ -82,7 +83,11 @@ def apply(enabled: bool, workspace: Path = WORKSPACE, manifest_path: Path = MANI
         return []
     manifest = load_manifest(manifest_path)
     lines = config_lines(manifest, workspace if manifest_path == MANIFEST else manifest_path.parent)
-    dest = workspace / ".cargo" / "local-deps.config" if workspace == WORKSPACE else manifest_path.parent / ".cargo" / "local-deps.config"
+    dest = (
+        workspace / ".cargo" / "local-deps.config"
+        if workspace == WORKSPACE
+        else manifest_path.parent / ".cargo" / "local-deps.config"
+    )
     if not lines:
         if dest.exists():
             dest.unlink()
