@@ -77,9 +77,9 @@ edition = "2021"
 # Release builds (CI, the buildpack) use these git revisions: the same revs PriceWhisperer pins. Local dev
 # overrides them with sibling checkouts from [workspace.metadata.local-deps] below (RERP_LOCAL_DEPS=1, which Tilt sets).
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
-brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b08921ac68ec715d53c8997aea6b3c8c47fd38bc", default-features = false }
-brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b08921ac68ec715d53c8997aea6b3c8c47fd38bc" }
-sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "4656541a2b327e9bac31d8d2bc96640bb7b1ad6a" }
+brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b45d264219e7ffed004f597c4ddd022b43cd096d", default-features = false }
+brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b45d264219e7ffed004f597c4ddd022b43cd096d" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "bf0ebb3cc1a67644806d87315f882772931b37a3" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }

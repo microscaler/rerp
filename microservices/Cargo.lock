@@ -401,7 +401,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=b08921ac68ec715d53c8997aea6b3c8c47fd38bc#b08921ac68ec715d53c8997aea6b3c8c47fd38bc"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=b45d264219e7ffed004f597c4ddd022b43cd096d#b45d264219e7ffed004f597c4ddd022b43cd096d"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -455,7 +455,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter_macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=b08921ac68ec715d53c8997aea6b3c8c47fd38bc#b08921ac68ec715d53c8997aea6b3c8c47fd38bc"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=b45d264219e7ffed004f597c4ddd022b43cd096d#b45d264219e7ffed004f597c4ddd022b43cd096d"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -2536,7 +2536,7 @@ checksum = "c2a86d3146ed3995b5913c414f6664344b9617457320782e64f0bb44afd49d74"
 [[package]]
 name = "microscaler-observability"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?rev=369b08c5427b9e092709860c10eba15e40e8eaac#369b08c5427b9e092709860c10eba15e40e8eaac"
+source = "git+https://github.com/microscaler/microscaler-observability.git?rev=65a36ef1156be329e6cdbb964df96f8e6e2072e7#65a36ef1156be329e6cdbb964df96f8e6e2072e7"
 dependencies = [
  "base64 0.22.1",
  "flate2",
@@ -3355,7 +3355,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
 dependencies = [
  "bytes 1.12.1",
- "heck 0.5.0",
+ "heck 0.4.1",
  "itertools 0.12.1",
  "log",
  "multimap",
@@ -3635,7 +3635,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rerp-accounting-core"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "chrono",
  "rust_decimal",
@@ -3648,7 +3648,7 @@ dependencies = [
 
 [[package]]
 name = "rerp-entities"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "chrono",
  "lifeguard",
@@ -3663,7 +3663,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_payable"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3710,7 +3710,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_receivable"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3757,7 +3757,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_asset"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3845,7 +3845,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bank_sync"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3892,7 +3892,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bff"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3934,7 +3934,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_budget"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4063,7 +4063,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_edi"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4111,7 +4111,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_financial_reports"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4158,7 +4158,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_general_ledger"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4207,7 +4207,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_invoice"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4530,7 +4530,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_documents_render"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
@@ -5000,7 +5000,7 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=4656541a2b327e9bac31d8d2bc96640bb7b1ad6a#4656541a2b327e9bac31d8d2bc96640bb7b1ad6a"
+source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=bf0ebb3cc1a67644806d87315f882772931b37a3#bf0ebb3cc1a67644806d87315f882772931b37a3"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",
