@@ -67,9 +67,9 @@ pub fn record<E: LifeExecutor>(executor: &E, screened: &Screened) -> Result<Reco
             let a = &cu.address;
             executor.execute_values(
                 "INSERT INTO crm_accounts (id, tenant_id, organization_id, name, contact_name, email, street, street2, \
-                 city, zip, region, country_code, tax_id, funnel_lead_id, stripe_customer_id) \
+                 city, zip, region, country_code, tax_id, funnel_lead_id, stripe_customer_id, phone) \
                  VALUES ($1::text::uuid, $2::text, $3::text::uuid, $4::text, $5::text, $6::text, $7::text, $8::text, \
-                 $9::text, $10::text, $11::text, $12::text, $13::text, $14::text::uuid, $15::text)",
+                 $9::text, $10::text, $11::text, $12::text, $13::text, $14::text::uuid, $15::text, $16::text)",
                 &Values(vec![
                     text(&id.to_string()),
                     text(tenant),
@@ -86,6 +86,7 @@ pub fn record<E: LifeExecutor>(executor: &E, screened: &Screened) -> Result<Reco
                     opt(&cu.tax_id),
                     opt(&lead),
                     opt(&stripe_customer),
+                    opt(&cu.phone),
                 ]),
             )?;
             (id, Recorded::Created(id))
@@ -120,7 +121,7 @@ const ACCOUNT_COLUMNS: &str = "a.id::text, a.name, a.contact_name, a.email, a.st
      to_char(a.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), \
      to_char(a.updated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), \
      o.conversion_id::text, o.reason, o.reference, o.funnel_lead_id::text, o.stripe_customer_id, o.converted_by, \
-     to_char(o.converted_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')";
+     to_char(o.converted_at AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"'), a.phone";
 
 /// The first conversion of each account is its origin.
 const ORIGIN_JOIN: &str =
@@ -146,6 +147,7 @@ fn account_json(row: &lifeguard::may_postgres::Row) -> Value {
         ("zip", 7),
         ("region", 8),
         ("tax_id", 10),
+        ("phone", 21),
     ] {
         if let Some(value) = s(i) {
             v[key] = json!(value);

@@ -7,9 +7,10 @@
 //! { "payload": "<Conversion as a JSON string>", "signature": "<base64 Ed25519>", "key_id": "k1" }
 //! ```
 //!
-//! The signature covers the payload string's exact bytes, so nothing is re-serialised before checking. Manual
-//! conversions must be signed by the pipeline; Stripe conversions are unsigned and are re-retrieved from Stripe by the
-//! intake instead. Everything here is pure: screening needs nothing but the bytes and the public keys.
+//! The signature covers the payload string's exact bytes, so nothing is re-serialised before checking. Every conversion
+//! is signed, and a key's id says what it may sign: `billing*` keys (PriceWhisperer billing, which has re-retrieved
+//! the checkout from Stripe) sign paid Stripe checkouts only; every other key (the CRM pipeline) signs manual
+//! conversions only. Everything here is pure: screening needs nothing but the bytes and the public keys.
 
 pub mod provision;
 pub mod pubsub;
@@ -86,6 +87,9 @@ pub struct Customer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contact_name: Option<String>,
     pub email: String,
+    /// As the customer gave it (Stripe collects it at checkout).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
     pub address: Address,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tax_id: Option<String>,
@@ -119,6 +123,12 @@ pub fn manual_conversion_id(funnel_lead_id: Uuid) -> Uuid {
     Uuid::new_v5(&ID_NAMESPACE, format!("lead:{funnel_lead_id}").as_bytes())
 }
 
+/// The organisation that owns a tenant's customers when no Sesame organisation is in play (a tenant whose staff
+/// belong to no organisation, or a Stripe checkout): one fixed id per tenant, the same wherever it is computed.
+pub fn tenant_organization_id(tenant: &str) -> Uuid {
+    Uuid::new_v5(&ID_NAMESPACE, format!("tenant:{tenant}").as_bytes())
+}
+
 /// The id a Stripe conversion always gets: one per checkout session.
 pub fn stripe_conversion_id(checkout_session_id: &str) -> Uuid {
     Uuid::new_v5(
@@ -145,6 +155,8 @@ pub enum Reject {
     Invalid(String),
     Unsigned,
     UnknownKey(String),
+    /// The key may not sign this kind of conversion.
+    WrongKey(String),
     BadSignature,
 }
 
@@ -154,8 +166,9 @@ impl std::fmt::Display for Reject {
             Reject::TooLarge => f.write_str("message too large"),
             Reject::Malformed(m) => write!(f, "malformed: {m}"),
             Reject::Invalid(m) => write!(f, "invalid: {m}"),
-            Reject::Unsigned => f.write_str("manual conversion is not signed"),
+            Reject::Unsigned => f.write_str("conversion is not signed"),
             Reject::UnknownKey(k) => write!(f, "unknown signing key {k}"),
+            Reject::WrongKey(k) => write!(f, "key {k} may not sign this kind of conversion"),
             Reject::BadSignature => f.write_str("signature does not verify"),
         }
     }
@@ -223,6 +236,7 @@ impl Conversion {
         check_len("customer.name", &c.name, 1, 200)?;
         check_opt("customer.contact_name", &c.contact_name, 200)?;
         check_email(&c.email)?;
+        check_opt("customer.phone", &c.phone, 40)?;
         check_opt("customer.tax_id", &c.tax_id, 50)?;
         let a = &c.address;
         check_len("address.line1", &a.line1, 1, 200)?;
@@ -368,9 +382,19 @@ impl Keys {
         Ok(Self(keys))
     }
 
-    /// `CRM_CONVERSION_VERIFY_KEYS`.
+    /// `CRM_CONVERSION_VERIFY_KEYS` and any `CRM_CONVERSION_VERIFY_KEYS_*` (one per signer's secret).
     pub fn from_env() -> Result<Self, String> {
-        Self::parse(&std::env::var("CRM_CONVERSION_VERIFY_KEYS").unwrap_or_default())
+        let mut specs: Vec<(String, String)> = std::env::vars()
+            .filter(|(k, _)| k.starts_with("CRM_CONVERSION_VERIFY_KEYS"))
+            .collect();
+        specs.sort();
+        Self::parse(
+            &specs
+                .into_iter()
+                .map(|(_, v)| v)
+                .collect::<Vec<_>>()
+                .join(","),
+        )
     }
 
     pub fn is_empty(&self) -> bool {
@@ -378,13 +402,16 @@ impl Keys {
     }
 }
 
-/// A screened conversion. `needs_stripe_check` is true for an unsigned Stripe conversion: the intake must re-retrieve
-/// it from Stripe before believing it.
+/// Whether the key `key_id` may sign a conversion for `reason`.
+pub fn key_may_sign(key_id: &str, reason: Reason) -> bool {
+    key_id.starts_with("billing") != reason.is_manual()
+}
+
+/// A screened conversion: valid, and signed by a trusted key allowed to sign it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Screened {
     pub conversion: Conversion,
     pub signed_by: Option<String>,
-    pub needs_stripe_check: bool,
 }
 
 /// Every check that needs nothing but the bytes and the public keys.
@@ -415,14 +442,15 @@ pub fn screen(message: &[u8], keys: &Keys) -> Result<Screened, Reject> {
         (None, None) => None,
         _ => return Err(Reject::Malformed("signature and key_id go together".into())),
     };
-    if conversion.reason.is_manual() && signed_by.is_none() {
+    let Some(key_id) = signed_by.clone() else {
         return Err(Reject::Unsigned);
+    };
+    if !key_may_sign(&key_id, conversion.reason) {
+        return Err(Reject::WrongKey(key_id));
     }
-    let needs_stripe_check = !conversion.reason.is_manual();
     Ok(Screened {
         conversion,
         signed_by,
-        needs_stripe_check,
     })
 }
 
@@ -457,6 +485,7 @@ mod tests {
                     region: None,
                     country: "BG".into(),
                 },
+                phone: None,
                 tax_id: Some("BG123456789".into()),
             },
             converted_by: Some("a1000001-0001-4000-8000-000000000004".into()),
@@ -476,7 +505,6 @@ mod tests {
         let got = screen(&bytes, &keys(&s)).unwrap();
         assert_eq!(got.conversion, manual());
         assert_eq!(got.signed_by.as_deref(), Some("k1"));
-        assert!(!got.needs_stripe_check);
     }
 
     #[test]
@@ -546,25 +574,96 @@ mod tests {
         }
     }
 
-    #[test]
-    fn a_stripe_conversion_is_unsigned_and_flagged_for_stripe() {
+    fn stripe() -> Conversion {
         let mut c = manual();
         c.reason = Reason::StripeCheckout;
         c.funnel_lead_id = None;
         c.converted_by = None;
+        c.customer.phone = Some("+359 88 123 4567".into());
         c.stripe = Some(StripeRef {
             customer_id: "cus_123".into(),
             checkout_session_id: "cs_test_1".into(),
         });
         c.conversion_id = stripe_conversion_id("cs_test_1");
-        let env = Envelope {
-            payload: serde_json::to_string(&c).unwrap(),
+        c
+    }
+
+    #[test]
+    fn keys_sign_only_their_kind_of_conversion() {
+        let pipeline = Sealer::from_seed_b64("k1", &seed()).unwrap();
+        let billing = Sealer::from_seed_b64("billing1", &B64.encode([9u8; 32])).unwrap();
+        let keys = Keys::parse(&format!(
+            "k1:{},billing1:{}",
+            pipeline.public_b64(),
+            billing.public_b64()
+        ))
+        .unwrap();
+        let ok = |s: &Sealer, c: &Conversion| {
+            screen(&serde_json::to_vec(&s.seal(c).unwrap()).unwrap(), &keys)
+        };
+        assert_eq!(
+            ok(&billing, &stripe()).unwrap().signed_by.as_deref(),
+            Some("billing1")
+        );
+        assert!(ok(&pipeline, &manual()).is_ok());
+        assert_eq!(ok(&pipeline, &stripe()), Err(Reject::WrongKey("k1".into())));
+        assert_eq!(
+            ok(&billing, &manual()),
+            Err(Reject::WrongKey("billing1".into()))
+        );
+        let unsigned = Envelope {
+            payload: serde_json::to_string(&stripe()).unwrap(),
             signature: None,
             key_id: None,
         };
-        let got = screen(&serde_json::to_vec(&env).unwrap(), &Keys::default()).unwrap();
-        assert!(got.needs_stripe_check);
-        assert_eq!(got.signed_by, None);
+        assert_eq!(
+            screen(&serde_json::to_vec(&unsigned).unwrap(), &keys),
+            Err(Reject::Unsigned)
+        );
+    }
+
+    /// The payload PriceWhisperer billing writes (its own serialiser; no shared crate) must screen here unchanged.
+    /// Keep in step with billing's conversions.rs test of the same name.
+    #[test]
+    fn billings_wire_format_screens() {
+        let id = stripe_conversion_id("cs_test_abc").to_string();
+        let payload = BILLING_FIXTURE.replace("CONV", &id);
+        let key = SigningKey::from_bytes(&[9u8; 32]);
+        let env = Envelope {
+            signature: Some(B64.encode(key.sign(payload.as_bytes()).to_bytes())),
+            payload,
+            key_id: Some("billing1".into()),
+        };
+        let keys = Keys::parse(&format!(
+            "billing1:{}",
+            B64.encode(key.verifying_key().to_bytes())
+        ))
+        .unwrap();
+        let got = screen(&serde_json::to_vec(&env).unwrap(), &keys).unwrap();
+        assert_eq!(got.conversion.reason, Reason::StripeCheckout);
+        assert_eq!(
+            got.conversion.customer.phone.as_deref(),
+            Some("+359881234567")
+        );
+        assert_eq!(
+            got.conversion.customer.tax_id.as_deref(),
+            Some("BG123456789")
+        );
+    }
+
+    const BILLING_FIXTURE: &str = r#"{"version":1,"conversion_id":"CONV","tenant_id":"pricewhisperer","organization_id":"00000000-0000-4000-8000-000000000001","reason":"stripe_checkout","reference":"cs_test_abc","stripe":{"customer_id":"cus_abc","checkout_session_id":"cs_test_abc"},"customer":{"name":"Ada Trading Ltd","contact_name":"Ada Lovelace","email":"ada@example.com","phone":"+359881234567","address":{"line1":"1 High Street","city":"Sofia","postal_code":"1000","country":"BG"},"tax_id":"BG123456789"},"converted_at":"2026-10-23T08:00:00Z"}"#;
+
+    /// The ids PriceWhisperer billing computes on its own (its conversions.rs tests assert the same literals).
+    #[test]
+    fn ids_billing_also_computes() {
+        assert_eq!(
+            stripe_conversion_id("cs_test_abc").to_string(),
+            "b14363bd-ecd1-5883-a7da-56000f3bc073"
+        );
+        assert_eq!(
+            tenant_organization_id("pricewhisperer").to_string(),
+            "143b71df-2d22-53d3-8d50-bfede26eb119"
+        );
     }
 
     #[test]

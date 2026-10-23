@@ -203,6 +203,9 @@ pub struct ConversionCustomer {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tax_id: Option<String>,
 }
 

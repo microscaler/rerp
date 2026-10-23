@@ -7,12 +7,14 @@ pub use sesame_idam_client::ClaimsError as IdentityError;
 pub fn from_validated_claims(claims: Option<&Value>) -> Result<SessionContext, IdentityError> {
     let claims = sesame_idam_client::parse_validated_claims(claims)?;
 
+    // a tenant whose staff belong to no organisation: the tenant's own (as conversions use)
+    let organization_id = claims
+        .organization_id
+        .unwrap_or_else(|| rerp_crm_conversion::tenant_organization_id(&claims.tenant_id));
     Ok(SessionContext {
         tenant_id: claims.tenant_id,
         subject_id: claims.subject_id,
-        organization_id: claims
-            .organization_id
-            .ok_or(IdentityError::MissingField("org_id"))?,
+        organization_id,
         session_id: claims.session_id,
         roles: claims.roles,
         permissions: claims.permissions,

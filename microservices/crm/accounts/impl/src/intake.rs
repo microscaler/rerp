@@ -2,25 +2,21 @@
 //!
 //! Pulls Pub/Sub `crm-conversions` from inside the cluster. Nothing outside dials in. Every message is untrusted:
 //!
-//!   1. `rerp_crm_conversion::screen`: size, schema with no unknown fields, field checks; a manual conversion must
-//!      carry a valid signature by a pipeline key this service trusts;
+//!   1. `rerp_crm_conversion::screen`: size, schema with no unknown fields, field checks, and a valid signature by a
+//!      key this service trusts that may sign that kind of conversion: the pipeline's for manual conversions,
+//!      PriceWhisperer billing's for paid Stripe checkouts (billing has re-retrieved the checkout from Stripe; RERP
+//!      holds no Stripe credential);
 //!   2. the tenant must be one this intake serves;
-//!   3. a Stripe conversion is re-retrieved from Stripe (the checkout session must exist, be complete and paid, and
-//!      belong to the named customer) with a restricted read-only key before it is believed;
-//!   4. `accounts::record` writes it once: the conversion id is deterministic, so a replay changes nothing.
+//!   3. `accounts::record` writes it once: the conversion id is deterministic, so a replay changes nothing.
 //!
-//! Ack after the write commits, or when the message is not ours to process (logged and dropped). Database and Stripe
-//! failures nack, so Pub/Sub redelivers with back-off and dead-letters after its attempt limit.
+//! Ack after the write commits, or when the message is not ours to process (logged and dropped). Database failures
+//! nack, so Pub/Sub redelivers with back-off and dead-letters after its attempt limit.
 //!
-//! Env: CRM_CONVERSIONS_SUBSCRIPTION, CRM_CONVERSION_VERIFY_KEYS, CRM_INTAKE_TENANTS, STRIPE_RESTRICTED_KEY (only for
-//! Stripe conversions).
+//! Env: CRM_CONVERSIONS_SUBSCRIPTION, CRM_CONVERSION_VERIFY_KEYS(_*), CRM_INTAKE_TENANTS.
 
-use http_legacy::Method;
 use lifeguard::SessionContext;
-use may_minihttp::client::{Client, RedirectPolicy};
 use rerp_crm_conversion::pubsub::PubSub;
 use rerp_crm_conversion::{screen, Conversion, Keys, Screened};
-use serde_json::Value;
 use std::time::Duration;
 use uuid::Uuid;
 
@@ -71,15 +67,6 @@ impl Intake {
             Err(v) => return v,
         };
         let id = screened.conversion.conversion_id;
-        if screened.needs_stripe_check {
-            match stripe_confirms(&screened.conversion) {
-                Ok(true) => {}
-                Ok(false) => {
-                    return Verdict::Drop(format!("{id}: Stripe does not confirm this checkout"))
-                }
-                Err(e) => return Verdict::Retry(format!("{id}: Stripe check failed: {e}")),
-            }
-        }
         let context = session(&screened.conversion);
         let pool = match crate::database::db() {
             Ok(db) => db.pool(),
@@ -114,59 +101,6 @@ pub fn session(conversion: &Conversion) -> SessionContext {
         user_type: Some("service".to_string()),
         org_type: None,
     }
-}
-
-/// Re-retrieve the checkout session from Stripe: it must exist, be complete and paid, and belong to the customer.
-fn stripe_confirms(conversion: &Conversion) -> Result<bool, String> {
-    let key = std::env::var("STRIPE_RESTRICTED_KEY")
-        .ok()
-        .filter(|k| !k.trim().is_empty())
-        .ok_or("STRIPE_RESTRICTED_KEY is not set")?;
-    let stripe = conversion.stripe.as_ref().ok_or("no Stripe reference")?;
-    let session_id: String = stripe
-        .checkout_session_id
-        .chars()
-        .filter(|c| c.is_ascii_alphanumeric() || *c == '_')
-        .collect();
-    let client = Client::builder()
-        .redirect_policy(RedirectPolicy::None)
-        .connect_timeout(Duration::from_secs(5))
-        .request_timeout(Duration::from_secs(15))
-        .build()
-        .map_err(|e| e.to_string())?;
-    let rsp = client
-        .request(
-            Method::GET,
-            &format!("https://api.stripe.com/v1/checkout/sessions/{session_id}"),
-        )
-        .map_err(|e| e.to_string())?
-        .header_str("authorization", &format!("Bearer {}", key.trim()))
-        .map_err(|e| e.to_string())?
-        .send()
-        .map_err(|e| e.to_string())?;
-    match rsp.status().as_u16() {
-        200 => {}
-        404 => return Ok(false),
-        429 | 500..=599 => return Err(format!("HTTP {}", rsp.status().as_u16())),
-        other => return Err(format!("unexpected HTTP {other}")),
-    }
-    let v: Value = serde_json::from_slice(rsp.body()).map_err(|e| e.to_string())?;
-    Ok(checkout_confirms(&v, &stripe.customer_id))
-}
-
-/// A Stripe checkout session confirms a conversion when it is complete, paid and belongs to the customer.
-pub fn checkout_confirms(session: &Value, customer_id: &str) -> bool {
-    let s = |k: &str| session.get(k).and_then(Value::as_str);
-    let customer = session
-        .get("customer")
-        .and_then(|c| c.as_str().or_else(|| c.get("id").and_then(Value::as_str)));
-    s("object") == Some("checkout.session")
-        && s("status") == Some("complete")
-        && matches!(
-            s("payment_status"),
-            Some("paid") | Some("no_payment_required")
-        )
-        && customer == Some(customer_id)
 }
 
 /// Start the consumer when CRM_CONVERSIONS_SUBSCRIPTION is set; refuse to start half-configured.
@@ -281,6 +215,7 @@ mod tests {
                     region: None,
                     country: "BG".into(),
                 },
+                phone: None,
                 tax_id: None,
             },
             converted_by: Some("s1".into()),
@@ -315,20 +250,5 @@ mod tests {
         assert_eq!(s.tenant_id, "pricewhisperer");
         assert_eq!(s.subject_id, INTAKE_SUBJECT);
         assert_eq!(s.organization_id, Uuid::from_u128(9));
-    }
-
-    #[test]
-    fn stripe_must_confirm_a_complete_paid_checkout_for_the_customer() {
-        let ok = json!({"object": "checkout.session", "status": "complete", "payment_status": "paid", "customer": "cus_1"});
-        assert!(checkout_confirms(&ok, "cus_1"));
-        assert!(!checkout_confirms(&ok, "cus_2"));
-        let mut open = ok.clone();
-        open["status"] = json!("open");
-        assert!(!checkout_confirms(&open, "cus_1"));
-        let mut unpaid = ok.clone();
-        unpaid["payment_status"] = json!("unpaid");
-        assert!(!checkout_confirms(&unpaid, "cus_1"));
-        let expanded = json!({"object": "checkout.session", "status": "complete", "payment_status": "paid", "customer": {"id": "cus_1"}});
-        assert!(checkout_confirms(&expanded, "cus_1"));
     }
 }

@@ -9,10 +9,16 @@ use lifeguard::LifeExecutor;
 use sea_query::Values;
 
 const RLS_CONTRACT: &str = include_str!("../../../../accounting/sql/rls/v1/install.sql");
-const MIGRATIONS: &[(&str, &str)] = &[(
-    "0001_accounts",
-    include_str!("../../../migrations/0001_accounts.sql"),
-)];
+const MIGRATIONS: &[(&str, &str)] = &[
+    (
+        "0001_accounts",
+        include_str!("../../../migrations/0001_accounts.sql"),
+    ),
+    (
+        "0002_accounts_phone",
+        include_str!("../../../migrations/0002_accounts_phone.sql"),
+    ),
+];
 
 /// Split a script into statements: semicolons end statements except inside dollar-quoted bodies, quotes and comments.
 /// Transaction control is dropped (each statement commits on its own).

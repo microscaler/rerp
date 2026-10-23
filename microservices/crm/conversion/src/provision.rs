@@ -1,6 +1,7 @@
 //! One-off: make the pipeline's Ed25519 signing key and store it in Secret Manager (ADR 003).
 //!
-//! Run by a Kubernetes Job with the RERP image itself (`CRM_PROVISION_CONVERSION_KEY=<project>/<secret>`), as an
+//! Run by a Kubernetes Job with the RERP image itself (`CRM_PROVISION_CONVERSION_KEY=<project>/<secret>`, and
+//! `CRM_PROVISION_CONVERSION_KEY_ID`, default `k1`; `billing*` for PriceWhisperer billing's key), as an
 //! identity that may create that secret and add versions but never read one. Stores one JSON value:
 //! `{RERP_CRM_CONVERSION_KEY_ID: "k1", RERP_CRM_CONVERSION_SIGNING_KEY: <base64 seed>,
 //!   RERP_CRM_CONVERSION_VERIFY_KEYS: "k1:<base64 public key>"}`. Idempotent: a secret that already holds an enabled
@@ -71,12 +72,12 @@ fn transient(status: u16) -> bool {
 }
 
 /// The JSON value stored for a seed (also used by tests).
-pub fn secret_value(seed: &[u8; 32]) -> Value {
+pub fn secret_value(key_id: &str, seed: &[u8; 32]) -> Value {
     let key = SigningKey::from_bytes(seed);
     json!({
-        "RERP_CRM_CONVERSION_KEY_ID": "k1",
+        "RERP_CRM_CONVERSION_KEY_ID": key_id,
         "RERP_CRM_CONVERSION_SIGNING_KEY": B64.encode(seed),
-        "RERP_CRM_CONVERSION_VERIFY_KEYS": format!("k1:{}", B64.encode(key.verifying_key().to_bytes())),
+        "RERP_CRM_CONVERSION_VERIFY_KEYS": format!("{key_id}:{}", B64.encode(key.verifying_key().to_bytes())),
     })
 }
 
@@ -170,7 +171,9 @@ pub fn run(spec: &str) -> Result<String, String> {
         println!("secret {secret}: created");
     }
     // 3. The key, stored as the first version.
-    let value = secret_value(&seed()?);
+    let key_id =
+        std::env::var("CRM_PROVISION_CONVERSION_KEY_ID").unwrap_or_else(|_| "k1".to_string());
+    let value = secret_value(&key_id, &seed()?);
     let body = json!({"payload": {"data": B64.encode(value.to_string())}});
     loop {
         match sm.call(
@@ -192,7 +195,7 @@ pub fn run(spec: &str) -> Result<String, String> {
             Err(e) => retry(&e)?,
         }
     }
-    Ok(format!("secret {secret}: key k1 stored"))
+    Ok(format!("secret {secret}: key {key_id} stored"))
 }
 
 #[cfg(test)]
@@ -202,7 +205,7 @@ mod tests {
 
     #[test]
     fn the_stored_value_is_a_working_key_pair() {
-        let v = secret_value(&[3u8; 32]);
+        let v = secret_value("k1", &[3u8; 32]);
         let sealer = Sealer::from_seed_b64(
             v["RERP_CRM_CONVERSION_KEY_ID"].as_str().unwrap(),
             v["RERP_CRM_CONVERSION_SIGNING_KEY"].as_str().unwrap(),

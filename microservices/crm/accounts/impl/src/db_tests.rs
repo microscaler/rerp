@@ -24,6 +24,7 @@ fn customer(name: &str) -> Customer {
             region: None,
             country: "BG".into(),
         },
+        phone: Some("+359881234567".into()),
         tax_id: Some("BG123".into()),
     }
 }
@@ -44,7 +45,6 @@ fn manual(lead: Uuid, name: &str) -> Screened {
             converted_at: "2026-10-23T00:00:00Z".parse().unwrap(),
         },
         signed_by: Some("k1".into()),
-        needs_stripe_check: false,
     }
 }
 
@@ -67,7 +67,6 @@ fn stripe(customer_id: &str, session: &str) -> Screened {
             converted_at: "2026-10-23T01:00:00Z".parse().unwrap(),
         },
         signed_by: None,
-        needs_stripe_check: true,
     }
 }
 

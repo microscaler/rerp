@@ -49,12 +49,12 @@ the event from Stripe before acting.
    pulls the subscription from inside the cluster; nothing outside dials in.
 4. **Intake treats every message as untrusted.**
    - Size limit, schema and field allowlist; anything else is acked and dropped.
-   - Re-verification at the source before belief:
-     - a Stripe conversion is re-retrieved from Stripe by id with a restricted,
-       read-only key;
-     - a manual conversion carries an Ed25519 signature by the pipeline over
-       the canonical payload; intake holds only the public key. RERP needs no
-       credential for the funnel at all.
+   - Every conversion carries an Ed25519 signature over the payload's exact
+     bytes, by a key whose id says what it may sign: the pipeline's keys sign
+     manual conversions only, billing's (`billing*`) paid Stripe checkouts
+     only. Billing signs only after re-retrieving the checkout from Stripe.
+     The intake holds only public keys: RERP needs no funnel credential and no
+     Stripe credential.
    - Once-only: a conversion ledger keyed by conversion id. A second conversion
      of the same funnel lead or Stripe customer links to the existing customer
      and creates nothing new.
@@ -62,7 +62,7 @@ the event from Stripe before acting.
    RERP's database (Odoo's `res.partner` role). Accounting refers to it by id
    (invoice `customer_id`, AR open items) and only reads it.
 6. **Minimal crossing payload.** Legal or company name, contact name, billing
-   email, billing address, country, tax id when known, the conversion reason
+   email, phone when known, billing address, country, tax id when known, the conversion reason
    and its reference (Stripe customer and checkout ids, or the order/contract
    reference), the funnel lead id when there is one, and who converted it.
    Marketing history, notes and consent stay in the funnel.
@@ -76,8 +76,12 @@ the event from Stripe before acting.
 - Manual conversions stay rare enough that typing billing details is no burden.
 - One funnel and one tenant per brand. Each conversion carries the tenant it
   converts into, and intake rejects tenants it does not serve.
-- Pub/Sub IAM is the publisher check. The pipeline's signature, or Stripe's
-  own record, is the second, independent check.
+- Pub/Sub IAM is the publisher check. The signature, by a key allowed to sign
+  that kind of conversion, is the second, independent check.
+- A tenant whose staff belong to no Sesame organisation (PriceWhisperer today)
+  owns its customers through a fixed organisation id derived from the tenant
+  (`tenant_organization_id`), which the pipeline, billing and accounts compute
+  alike.
 
 ## Alternatives considered
 
@@ -103,7 +107,7 @@ Rejected.
 ### Positive
 
 - The internet-facing store holds no key into RERP, and RERP holds no key
-  into the funnel. Outward, RERP holds only a restricted, read-only Stripe key.
+  into the funnel or Stripe.
 - RERP holds only customers it has a contractual or accounting reason to keep.
 - One audited crossing, idempotent and verified at the source.
 
@@ -135,10 +139,11 @@ Rejected.
    - the topic, subscription and dead-letter queue;
    - the pipeline's signing key, with its public half in the intake's config;
    - service accounts and their Workload Identity bindings;
-   - the restricted Stripe key;
+   - billing's signing key, and billing's right to publish;
    - the crm-accounts deployment.
-5. **Stripe path.** PriceWhisperer billing publishes a conversion on a
-   completed checkout.
+5. **Stripe path.** PriceWhisperer billing signs and publishes a conversion
+   when a checkout completes paid, or, for a trial, on its first paid
+   invoice. Test subjects (the helm end-to-end purchase) never convert.
 
 Acceptance:
 
@@ -161,3 +166,8 @@ Acceptance:
 - 2026-10-23: before any implementation, manual-conversion verification moved
   from re-reading the funnel with a read-only key to a pipeline signature. It
   proves the same origin without RERP holding any funnel credential.
+- 2026-10-23: Stripe conversions are signed by billing (which has already
+  re-retrieved the checkout from Stripe) instead of being re-checked by RERP
+  with a restricted Stripe key; key ids scope what each signer may sign. The
+  contract gained the customer's phone, and tenants without a Sesame
+  organisation get a derived tenant organisation.

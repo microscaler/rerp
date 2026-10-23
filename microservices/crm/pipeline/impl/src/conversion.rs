@@ -39,9 +39,10 @@ pub fn staff(claims: Option<&Value>) -> Result<Staff, String> {
     let tenant = text("tenant_id")
         .ok_or("the token has no tenant")?
         .to_string();
+    // The staff member's organisation, else the tenant's own (a tenant whose staff belong to no organisation).
     let organization = text("org_id")
         .and_then(|o| Uuid::parse_str(o).ok())
-        .ok_or("the token has no organisation to own the customer")?;
+        .unwrap_or_else(|| rerp_crm_conversion::tenant_organization_id(&tenant));
     Ok(Staff {
         subject,
         tenant,
@@ -98,6 +99,7 @@ pub fn build(
                 region: clean_opt(&a.region),
                 country: clean(&a.country).to_ascii_uppercase(),
             },
+            phone: clean_opt(&customer.phone),
             tax_id: clean_opt(&customer.tax_id),
         },
         converted_by: Some(staff.subject.clone()),
@@ -182,6 +184,7 @@ mod tests {
                 region: None,
                 country: "bg".into(),
             },
+            phone: None,
             tax_id: None,
         }
     }
@@ -191,7 +194,10 @@ mod tests {
         let ok = json!({"sub": "s1", "tenant_id": "pricewhisperer", "org_id": "b2000002-0002-4000-8000-000000000002"});
         assert_eq!(staff(Some(&ok)).unwrap().tenant, "pricewhisperer");
         let no_org = json!({"sub": "s1", "tenant_id": "pricewhisperer"});
-        assert!(staff(Some(&no_org)).is_err());
+        assert_eq!(
+            staff(Some(&no_org)).unwrap().organization,
+            rerp_crm_conversion::tenant_organization_id("pricewhisperer")
+        );
         assert!(staff(None).is_err());
     }
 

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Pipeline
   version: v1.0.0
-  description: Pipeline service \u2014 leads, opportunities, stages, lead conversion, pipeline summary.
+  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline summary.
   x-api-version: CRM Pipeline API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -184,7 +184,6 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Get leads associated with a campaign
       x-operation-id: post_leads_list
       x-controller: rerp_crm::pipeline::controller::leads
@@ -258,13 +257,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: Forbidden \u2014 insufficient permissions
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict \u2014 resource version mismatch or duplicate
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -304,7 +303,7 @@ paths:
         '404':
           description: Not found
         '403':
-          description: Forbidden \u2014 insufficient permissions
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -362,13 +361,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: Forbidden \u2014 insufficient permissions
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict \u2014 resource version mismatch or duplicate
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -505,7 +504,6 @@ paths:
           description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Create a new leads
       x-operation-id: post_detect-duplicates
       x-controller: rerp_crm::pipeline::controller::leads::detect-duplicates
@@ -580,7 +578,6 @@ paths:
           description: Conflict - resource conflict or cannot complete action
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Perform an action on leads
       x-operation-id: post_leads_merge
       x-controller: rerp_crm::pipeline::controller::leads::id::merge
@@ -728,7 +725,6 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Create a new stages
       x-operation-id: post_stages_list
       x-controller: rerp_crm::pipeline::controller::stages
@@ -802,13 +798,13 @@ paths:
         '404':
           description: Not found
         '403':
-          description: Forbidden \u2014 insufficient permissions
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Conflict \u2014 resource version mismatch or duplicate
+          description: Conflict — resource version mismatch or duplicate
           content:
             application/json:
               schema:
@@ -825,7 +821,6 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Update stages by ID
       x-operation-id: put_id_by_id
       x-controller: rerp_crm::pipeline::controller::stages::id
@@ -850,7 +845,7 @@ paths:
         '409':
           description: Stage is in use
         '403':
-          description: Forbidden \u2014 insufficient permissions
+          description: Forbidden — insufficient permissions
           content:
             application/json:
               schema:
@@ -1687,6 +1682,11 @@ components:
           maxLength: 254
           format: email
           description: Billing email
+        phone:
+          type: string
+          minLength: 1
+          maxLength: 40
+          description: Phone, as the customer gave it
         address:
           $ref: '#/components/schemas/ConversionAddress'
         tax_id:

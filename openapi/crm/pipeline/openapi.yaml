@@ -1682,6 +1682,11 @@ components:
           maxLength: 254
           format: email
           description: Billing email
+        phone:
+          type: string
+          minLength: 1
+          maxLength: 40
+          description: Phone, as the customer gave it
         address:
           $ref: '#/components/schemas/ConversionAddress'
         tax_id:
