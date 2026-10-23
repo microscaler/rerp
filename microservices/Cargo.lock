@@ -4085,6 +4085,53 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_accounts"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=9bcb2db0020fb9d86ea19954ef113b6d8019ece3)",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "config",
+ "http 0.2.12",
+ "http 1.5.0",
+ "lifeguard",
+ "may",
+ "may_minihttp",
+ "rerp_crm_accounts_gen",
+ "rerp_crm_conversion",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sesame-idam-client",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
+name = "rerp_crm_accounts_gen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=9bcb2db0020fb9d86ea19954ef113b6d8019ece3)",
+ "brrtrouter_macros",
+ "clap",
+ "config",
+ "http 0.2.12",
+ "http 1.5.0",
+ "may",
+ "may_minihttp",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tikv-jemallocator",
+]
+
+[[package]]
 name = "rerp_crm_conversion"
 version = "0.1.0"
 dependencies = [

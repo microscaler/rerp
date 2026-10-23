@@ -1,3 +1,4 @@
 # CRM suite (skaffold.yaml rerp-crm): cargo bin (the /cnb/process name), then the image repository.
 # op copies the suite build once per line, keeping only that binary, and sets its process as the entrypoint.
 pipeline ghcr.io/microscaler/rerp-crm-pipeline
+accounts ghcr.io/microscaler/rerp-crm-accounts

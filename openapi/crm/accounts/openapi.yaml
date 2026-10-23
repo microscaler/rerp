@@ -2,7 +2,9 @@ openapi: 3.1.0
 info:
   title: Accounts
   version: v1.0.0
-  description: Account/company management — companies, industry, size, hierarchy.
+  description: 'Accounts: the customer record (Odoo res.partner). A customer is created only when a lead converts (ADR 003):
+    CRM accounts pulls the conversion from Pub/Sub, verifies it and records the account. Accounting refers to customers by
+    account id.'
   x-api-version: CRM Accounts API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -78,7 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedResponse'
+                $ref: '#/components/schemas/PaginatedAccount'
               examples:
                 default:
                   items: []
@@ -97,6 +99,7 @@ paths:
       x-operation-id: get_accounts_list
       x-controller: rerp_crm::accounts::controller::accounts
       x-handler-name: accounts
+      x-brrtrouter-impl: true
     post:
       operationId: create_account
       summary: Create a new account/company
@@ -147,7 +150,6 @@ paths:
           description: Not found
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Create a new accounts
       x-operation-id: post_accounts_list
       x-controller: rerp_crm::accounts::controller::accounts
@@ -186,6 +188,7 @@ paths:
       x-operation-id: get_id_by_id
       x-controller: rerp_crm::accounts::controller::accounts::id
       x-handler-name: accounts_id
+      x-brrtrouter-impl: true
     put:
       operationId: update_account
       summary: Update account fields
@@ -244,7 +247,6 @@ paths:
           description: Unauthorized - Invalid or missing authentication token
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
       description: Update accounts by ID
       x-operation-id: put_id_by_id
       x-controller: rerp_crm::accounts::controller::accounts::id
@@ -559,6 +561,26 @@ components:
           type: number
           format: double
           readOnly: true
+        contact_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The person to address at the customer
+        region:
+          type: string
+          minLength: 1
+          maxLength: 100
+        country_code:
+          type: string
+          pattern: ^[A-Z]{2}$
+          description: ISO 3166-1 alpha-2 (RERP has no country table yet; country_id stays unset)
+        tax_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: VAT or tax id
+        origin:
+          $ref: '#/components/schemas/AccountOrigin'
       description: A company or organization that is a customer or prospect
     CreateAccountRequest:
       type: object
@@ -795,8 +817,7 @@ components:
           type: integer
         limit:
           type: integer
-      description: A generic paginated response wrapper with items and pagination
-        metadata
+      description: A generic paginated response wrapper with items and pagination metadata
     PaginatedAccount:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -807,6 +828,37 @@ components:
             items:
               $ref: '#/components/schemas/Account'
       description: Paginated list of Account records
+    AccountOrigin:
+      type: object
+      readOnly: true
+      required:
+      - conversion_id
+      - reason
+      - reference
+      - converted_at
+      properties:
+        conversion_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          enum:
+          - stripe_checkout
+          - order
+          - contract
+        reference:
+          type: string
+        funnel_lead_id:
+          type: string
+          format: uuid
+        stripe_customer_id:
+          type: string
+        converted_by:
+          type: string
+        converted_at:
+          type: string
+          format: date-time
+      description: How the customer crossed into RERP (ADR 003)
   securitySchemes:
     bearerAuth:
       type: http

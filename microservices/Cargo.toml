@@ -50,6 +50,9 @@ members = [
     "crm/pipeline/impl",
     # The conversion contract between the funnel and RERP (ADR 003)
     "crm/conversion",
+    # CRM accounts: the customer record; created only from conversions (ADR 003)
+    "crm/accounts/gen",
+    "crm/accounts/impl",
 
     # Centralized migration generation
     "migrator",
@@ -61,6 +64,9 @@ resolver = "2"
 default-members = [
     "crm/pipeline/gen",
     "crm/pipeline/impl",
+    "crm/conversion",
+    "crm/accounts/gen",
+    "crm/accounts/impl",
 ]
 
 [workspace.package]

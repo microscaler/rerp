@@ -1,0 +1,47 @@
+# RERP CRM accounts: the customer record (ADR 003).
+#
+# Customers are created only from conversions: the intake pulls Pub/Sub crm-conversions, screens and verifies each
+# message (rerp_crm_conversion) and records the account once, in RERP's database under Sesame RLS. Staff read accounts
+# through list_accounts and get_account.
+#
+# Env: DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME (RERP database); CRM_CONVERSIONS_SUBSCRIPTION
+# (projects/<p>/subscriptions/<s>; the intake runs only when set); CRM_CONVERSION_VERIFY_KEYS (k1:<base64>,...);
+# CRM_INTAKE_TENANTS (comma-separated tenants the intake serves).
+[package]
+name = "rerp_crm_accounts"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "accounts"
+path = "src/main.rs"
+
+[features]
+default = []
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+rerp_crm_accounts_gen = { path = "../gen" }
+rerp_crm_conversion = { path = "../../conversion" }
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+sesame-idam-client = { workspace = true }
+lifeguard = { workspace = true }
+# Query parameters cross the pool channel as sea_query::Values.
+sea-query = { version = "1.0.0-rc.29", features = ["with-json"] }
+may_minihttp = { workspace = true }
+http_legacy = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+config = { workspace = true }
+http = { workspace = true }
+may = { workspace = true }
+anyhow = { workspace = true }
+arc-swap = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+tikv-jemallocator = { workspace = true, optional = true }

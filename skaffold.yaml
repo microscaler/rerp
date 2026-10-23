@@ -23,14 +23,14 @@ build:
         env:
           - BP_RUST_BRRTROUTER=1
           - BP_RUST_WORKSPACE_DIR=microservices
-          - BP_RUST_PACKAGES=rerp_crm_pipeline
+          - BP_RUST_PACKAGES=rerp_crm_pipeline,rerp_crm_accounts
           - BP_SUITE_IMAGES=suites/crm.txt
           # The buildpack ships only bin/ unless told otherwise. Each service reads its OpenAPI spec, docs and static
           # site from its crate's gen/ directory; the chart passes those paths (--spec, --doc-dir, --static-dir) and
           # mounts config.yaml at /app/config.
-          - BP_TEST_COMMAND=cargo test --manifest-path "$GITHUB_WORKSPACE/microservices/Cargo.toml" -p rerp_crm_pipeline -p rerp_crm_pipeline_gen --no-fail-fast
+          - BP_TEST_COMMAND=cargo test --manifest-path "$GITHUB_WORKSPACE/microservices/Cargo.toml" -p rerp_crm_pipeline -p rerp_crm_pipeline_gen -p rerp_crm_accounts -p rerp_crm_accounts_gen -p rerp_crm_conversion --no-fail-fast
           - BP_TEST_LABEL=crm
-          - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config
+          - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config,microservices/crm/accounts/gen/doc,microservices/crm/accounts/gen/static_site,microservices/crm/accounts/impl/config
         dependencies:
           paths: [openapi/crm/**]
     # Documents: the one document system in RERP (rendering today; extraction, routing and the out-of-band pipeline
