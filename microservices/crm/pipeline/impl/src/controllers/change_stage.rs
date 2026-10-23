@@ -17,6 +17,13 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             return HttpJson::new(400, json!({ "code": 400, "message": "unknown stage_id" }));
         }
     };
+    // The won stage is reached only by converting (ADR 003): the customer's billing details must cross to RERP.
+    if def.is_won {
+        return HttpJson::new(
+            409,
+            json!({ "code": 409, "message": "a lead is marked converted by converting it (POST /leads/{id}/convert)" }),
+        );
+    }
     // An optional comment on the transition becomes the triage note.
     let note = data.comment.as_deref().filter(|c| !c.is_empty());
     if let Err(error) = crate::supabase::write_state(&data.id, Some(def.code), note) {
