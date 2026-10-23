@@ -1,5 +1,5 @@
-//! Database tests for the customer record: run against a real Postgres with the Sesame RLS contract and
-//! crm/migrations applied, as a login that is not a superuser (superusers bypass RLS). Ignored by default:
+//! Database tests for the customer record: run against a real Postgres as a login that is not a superuser (superusers
+//! bypass RLS) and may create in schema public, as the platform's owner group does. The test applies the schema itself. Ignored by default:
 //! `DB_HOST=... DB_PORT=... DB_USER=... DB_PASS=... DB_NAME=... cargo test -p rerp_crm_accounts -- --ignored db_`
 
 use crate::accounts::{self, Recorded};
@@ -84,6 +84,9 @@ fn run<T>(
 #[test]
 #[ignore]
 fn db_conversions_create_once_link_and_stay_tenant_scoped() {
+    let db = crate::database::db().expect("database");
+    crate::schema::ensure(db).expect("schema");
+    crate::schema::ensure(db).expect("schema is idempotent");
     let unique = Uuid::new_v4();
     let lead = Uuid::new_v4();
     let a = manual(lead, &format!("Acme {unique}"));

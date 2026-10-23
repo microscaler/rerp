@@ -32,6 +32,7 @@ mod http_support;
 mod identity;
 mod impl_registry;
 mod intake;
+mod schema;
 use controllers::*;
 use std::fs;
 use std::io;
@@ -615,7 +616,8 @@ fn main() -> io::Result<()> {
             }
         }
     }
-    // The conversion intake (ADR 003): the only way a customer enters RERP.
+    // The customer schema (idempotent), then the conversion intake (ADR 003): the only way a customer enters RERP.
+    schema::ensure_at_startup();
     intake::start_if_enabled();
 
     // Port selection priority: config.yaml > PORT environment variable > default 8081

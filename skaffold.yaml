@@ -32,7 +32,8 @@ build:
           - BP_TEST_LABEL=crm
           - BP_RUST_KEEP=microservices/crm/pipeline/gen/doc,microservices/crm/pipeline/gen/static_site,microservices/crm/pipeline/impl/config,microservices/crm/accounts/gen/doc,microservices/crm/accounts/gen/static_site,microservices/crm/accounts/impl/config
         dependencies:
-          paths: [openapi/crm/**]
+          # crm/accounts compiles in the Sesame RLS contract vendored under accounting/sql.
+          paths: [openapi/crm/**, microservices/accounting/sql/**]
     # Documents: the one document system in RERP (rendering today; extraction, routing and the out-of-band pipeline
     # next). No other suite does AI document processing.
     - image: ghcr.io/microscaler/rerp-documents

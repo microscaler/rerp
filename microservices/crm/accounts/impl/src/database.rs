@@ -29,6 +29,12 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
     if !password.is_empty() {
         url.push_str(&format!(" password={password}"));
     }
+    // TLS, libpq names: DB_SSLMODE (disable | prefer | require | verify-ca | verify-full) and DB_SSLROOTCERT.
+    for (key, param) in [("DB_SSLMODE", "sslmode"), ("DB_SSLROOTCERT", "sslrootcert")] {
+        if let Some(value) = non_empty_env(key) {
+            url.push_str(&format!(" {param}={value}"));
+        }
+    }
     let config = DatabaseConfig {
         url,
         max_connections: std::env::var("DB_POOL_MAX")
