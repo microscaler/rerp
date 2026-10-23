@@ -143,7 +143,9 @@ mod tests {
         assert!(rls
             .iter()
             .any(|s| s.contains("FUNCTION public.rls_set_session")));
-        assert!(rls.iter().all(|s| s.matches("$$").count().is_multiple_of(2)));
+        assert!(rls
+            .iter()
+            .all(|s| s.matches("$$").count().is_multiple_of(2)));
         let crm = statements(MIGRATIONS[0].1);
         assert!(crm
             .iter()

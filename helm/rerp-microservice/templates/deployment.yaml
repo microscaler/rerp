@@ -6,6 +6,9 @@ metadata:
   labels:
     app: {{ .Values.service.name }}
     version: {{ .Values.deployment.namespace | default "dev" }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.deployment.replicas }}
   selector:
@@ -20,6 +23,9 @@ spec:
         # Force pod restart when config changes
         checksum/config: "{{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum | trunc 8 }}"
     spec:
+      {{- with .Values.serviceAccount.name }}
+      serviceAccountName: {{ . }}
+      {{- end }}
       containers:
         - name: {{ .Values.service.name }}
           image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
@@ -40,8 +46,10 @@ spec:
           {{- end }}
 {{- if .Values.databaseEnv.enabled }}
           envFrom:
+            {{- with .Values.databaseEnv.configMapName }}
             - configMapRef:
-                name: {{ .Values.databaseEnv.configMapName }}
+                name: {{ . }}
+            {{- end }}
             - secretRef:
                 name: {{ .Values.databaseEnv.secretName }}
 {{- end }}

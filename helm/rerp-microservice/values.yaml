@@ -21,6 +21,16 @@ deployment:
   replicas: 1
   # Empty: the release namespace. Each service's values (and the dev profile) set rerp.
   namespace: ""
+  # Extra labels on the Deployment, e.g. rerp.microscaler.io/db: <service> so the platform's credential rotation
+  # restarts it onto a new database login.
+  labels: {}
+
+# The pod's Kubernetes service account. With create, the chart makes it (annotations carry Workload Identity:
+# iam.gke.io/gcp-service-account). Empty name: the namespace's default account.
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}
 
 # Application configuration
 app:
@@ -60,6 +70,7 @@ resources:
 
 databaseEnv:
   enabled: true
+  # Empty: no ConfigMap, only the Secret (whose keys are the DB_* variables).
   configMapName: rerp-database-config
   secretName: rerp-db-credentials
 
