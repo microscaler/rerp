@@ -11,6 +11,7 @@
 //! conversions must be signed by the pipeline; Stripe conversions are unsigned and are re-retrieved from Stripe by the
 //! intake instead. Everything here is pure: screening needs nothing but the bytes and the public keys.
 
+pub mod provision;
 pub mod pubsub;
 
 use base64::engine::general_purpose::STANDARD as B64;

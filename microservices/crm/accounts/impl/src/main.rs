@@ -151,6 +151,19 @@ struct Args {
 }
 
 fn main() -> io::Result<()> {
+    // One-off (ADR 003): make the conversion signing key in Secret Manager and exit. Run by a Job with this image.
+    if let Ok(spec) = std::env::var("CRM_PROVISION_CONVERSION_KEY") {
+        match rerp_crm_conversion::provision::run(&spec) {
+            Ok(done) => {
+                println!("{done}");
+                std::process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("provision failed: {e}");
+                std::process::exit(1);
+            }
+        }
+    }
     // Initialize structured logging early so all subsequent logs (including request logs)
     // are emitted and scraped by Promtail/Loki. Honors RUST_LOG via EnvFilter.
     if let Err(e) =
