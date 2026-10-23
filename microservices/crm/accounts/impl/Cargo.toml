@@ -17,7 +17,8 @@ name = "accounts"
 path = "src/main.rs"
 
 [features]
-default = []
+# jemalloc by default (23 Oct 2026): less fragmentation than glibc malloc with many threads, and heap profiles in pp.
+default = ["jemalloc"]
 jemalloc = ["tikv-jemallocator"]
 
 [dependencies]

@@ -77,9 +77,9 @@ edition = "2021"
 # Release builds (CI, the buildpack) use these git revisions: the same revs PriceWhisperer pins. Local dev
 # overrides them with sibling checkouts from [workspace.metadata.local-deps] below (RERP_LOCAL_DEPS=1, which Tilt sets).
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
-brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "10e568407e461c1cf651ec13299b48cc8bf9260e", default-features = false }
-brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "10e568407e461c1cf651ec13299b48cc8bf9260e" }
-sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "65131d1375bffc8e51cfde4daae14222263aca12" }
+brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b08921ac68ec715d53c8997aea6b3c8c47fd38bc", default-features = false }
+brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "b08921ac68ec715d53c8997aea6b3c8c47fd38bc" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "4656541a2b327e9bac31d8d2bc96640bb7b1ad6a" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }
@@ -101,7 +101,9 @@ may = "0.3"
 may_minihttp = { git = "https://github.com/microscaler/may_minihttp.git", branch = "integration/microscaler-fork", features = ["client"] }
 anyhow = "1.0"
 clap = { version = "4.5", features = ["derive"] }
-tikv-jemallocator = { version = "0.5", features = ["profiling"] }
+# 0.7 with "profiling": one jemalloc-sys across the graph with microscaler-observability's heap profiler
+# (jemalloc_pprof), and heap profiles to Cloud Profiler in pp (_RJEM_MALLOC_CONF, BRRTRouter ADR 005).
+tikv-jemallocator = { version = "0.7", features = ["profiling"] }
 
 # Database
 may-postgres = "0.1"
