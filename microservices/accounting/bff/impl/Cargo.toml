@@ -1,6 +1,6 @@
 [package]
 name = "rerp_accounting_bff"
-version = "0.1.11"
+version = "0.1.12"
 edition = "2021"
 
 [[bin]]
