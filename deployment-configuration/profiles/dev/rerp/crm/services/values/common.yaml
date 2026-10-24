@@ -70,4 +70,4 @@ env:
   BRRTR_LOG_SAMPLING_MODE: all
   BRRTR_LOG_ASYNC: "true"
   BRRTR_LOG_INCLUDE_LOCATION: "false"
-  BRRTR_STACK_SIZE: "0x40000"
+  BRRTR_STACK_SIZE: "2MiB" # bytes; was 0x40000, read as may words until BRRTRouter 25 Oct 2026

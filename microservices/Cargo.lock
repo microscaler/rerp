@@ -401,7 +401,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=c0f0000057e6b4d32da6adce03e2ce7864726a20#c0f0000057e6b4d32da6adce03e2ce7864726a20"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=10c18e203762dc93157a897711551bdfa6ca51b0#10c18e203762dc93157a897711551bdfa6ca51b0"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -456,7 +456,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter_macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=c0f0000057e6b4d32da6adce03e2ce7864726a20#c0f0000057e6b4d32da6adce03e2ce7864726a20"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=10c18e203762dc93157a897711551bdfa6ca51b0#10c18e203762dc93157a897711551bdfa6ca51b0"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -2531,8 +2531,9 @@ checksum = "c2a86d3146ed3995b5913c414f6664344b9617457320782e64f0bb44afd49d74"
 [[package]]
 name = "microscaler-observability"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?rev=1e79c71d2f1f0563fae1da92dfec270e836be43e#1e79c71d2f1f0563fae1da92dfec270e836be43e"
+source = "git+https://github.com/microscaler/microscaler-observability.git?rev=2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f#2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f"
 dependencies = [
+ "backtrace",
  "base64 0.22.1",
  "flate2",
  "jemalloc_pprof",
@@ -3219,8 +3220,7 @@ checksum = "4a6394b9e965e73d0a289ee54f589087e2c676aedf60885baf52c76b771e4958"
 [[package]]
 name = "pprof"
 version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38a01da47675efa7673b032bf8efd8214f1917d89685e07e395ab125ea42b187"
+source = "git+https://github.com/microscaler/pprof-rs.git?rev=ccc6819e45e2440eba00d3be572a1cb81b52ec5b#ccc6819e45e2440eba00d3be572a1cb81b52ec5b"
 dependencies = [
  "aligned-vec",
  "backtrace",
@@ -3629,7 +3629,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rerp-accounting-core"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "chrono",
  "rust_decimal",
@@ -3642,7 +3642,7 @@ dependencies = [
 
 [[package]]
 name = "rerp-entities"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "chrono",
  "lifeguard",
@@ -3657,7 +3657,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_payable"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3704,7 +3704,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_receivable"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3751,7 +3751,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_asset"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3839,7 +3839,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bank_sync"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3886,7 +3886,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bff"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3928,7 +3928,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_budget"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4057,7 +4057,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_edi"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4105,7 +4105,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_financial_reports"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4152,7 +4152,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_general_ledger"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4201,7 +4201,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_invoice"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4524,7 +4524,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_documents_render"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
@@ -4994,7 +4994,7 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=539474de070e894e911369db7a63f25db69de279#539474de070e894e911369db7a63f25db69de279"
+source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=f5e95db4a0baed387f35d040037ab4ce99184ff4#f5e95db4a0baed387f35d040037ab4ce99184ff4"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",

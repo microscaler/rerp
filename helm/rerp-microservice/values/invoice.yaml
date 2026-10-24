@@ -15,7 +15,7 @@ app:
 # Invoice posting combines typed request validation, Lifeguard/RLS persistence,
 # journal construction, and document/object-store work in handler coroutines.
 env:
-  BRRTR_STACK_SIZE: "0x40000"
+  BRRTR_STACK_SIZE: "2MiB" # bytes; was 0x40000, read as may words until BRRTRouter 25 Oct 2026
 
 extraEnv:
   # Non-secret object-store settings come from the GitOps-owned

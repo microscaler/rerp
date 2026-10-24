@@ -99,9 +99,9 @@ env:
   BRRTR_LOG_SAMPLING_MODE: "all"
   BRRTR_LOG_ASYNC: "true"
   BRRTR_LOG_INCLUDE_LOCATION: "false"
-  # may's own coroutines (the HTTP connection coroutines: routing, validation, dispatch), in may words. Since
+  # may's own coroutines (the HTTP connection coroutines: routing, validation, dispatch), in bytes. Since
   # BRRTRouter 24 Oct 2026 it no longer sizes handlers: those come from x-brrtrouter-stack-size in the spec.
-  BRRTR_STACK_SIZE: "0x20000"
+  BRRTR_STACK_SIZE: "1MiB" # bytes; was 0x20000, read as may words until BRRTRouter 25 Oct 2026
 
 # Internal service-to-service routing; expose only BFF/ingress where required.
 serviceType: ClusterIP
