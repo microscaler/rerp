@@ -99,9 +99,8 @@ env:
   BRRTR_LOG_SAMPLING_MODE: "all"
   BRRTR_LOG_ASYNC: "true"
   BRRTR_LOG_INCLUDE_LOCATION: "false"
-  # May coroutine stack in bytes. 128 KiB is the safe shared baseline for
-  # BRRTRouter services which perform typed validation and database work.
-  # Heavier services override this to BRRTRouter's 256 KiB default maximum.
+  # may's own coroutines (the HTTP connection coroutines: routing, validation, dispatch), in may words. Since
+  # BRRTRouter 24 Oct 2026 it no longer sizes handlers: those come from x-brrtrouter-stack-size in the spec.
   BRRTR_STACK_SIZE: "0x20000"
 
 # Internal service-to-service routing; expose only BFF/ingress where required.

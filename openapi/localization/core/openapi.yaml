@@ -1,4 +1,7 @@
 openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
 info:
   title: Localization
   version: 1.0.0
