@@ -1,6 +1,6 @@
 [package]
 name = "rerp_accounting_accounts_payable"
-version = "0.1.14"
+version = "0.1.15"
 edition = "2021"
 build = "build.rs"
 
