@@ -1,0 +1,25 @@
+{{- /*
+Google Cloud Managed Service for Prometheus scrapes the service's /metrics (BRRTRouter) on the http port: the HTTP
+golden signals, process metrics and the per-handler stack metrics. Managed collection attaches App Hub labels to
+registered workloads; top_level_controller_{name,type} are the GKE workload attributes Application Monitoring requires.
+Off by default: the CRD (monitoring.googleapis.com/v1) exists only where Managed Service for Prometheus is installed.
+*/}}
+{{- if .Values.podMonitoring.enabled }}
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: {{ .Values.service.name }}
+  namespace: {{ .Values.deployment.namespace | default .Release.Namespace }}
+  labels:
+    app: {{ .Values.service.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name }}
+  endpoints:
+    - port: http
+      path: {{ .Values.prometheus.path | default "/metrics" | quote }}
+      interval: {{ .Values.podMonitoring.interval | quote }}
+  targetLabels:
+    metadata: [pod, container, top_level_controller_name, top_level_controller_type]
+{{- end }}

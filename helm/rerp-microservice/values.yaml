@@ -113,6 +113,11 @@ prometheus:
   port: 8080
   path: "/metrics"
 
+# Managed Service for Prometheus (GKE): a PodMonitoring for /metrics. Off unless the cluster runs managed collection.
+podMonitoring:
+  enabled: false
+  interval: 30s
+
 # Release images (buildpacks): the service crate's directory inside the image, from which the chart passes --spec,
 # --doc-dir, --static-dir and --config (e.g. /workspace/microservices/crm/pipeline). Empty for the Tilt dev images.
 # args: the container's arguments verbatim, replacing those.
