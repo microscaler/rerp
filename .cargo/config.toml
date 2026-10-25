@@ -1,0 +1,9 @@
+# Read by every cargo run under this repo (Tilt, CI's buildpack build from the repo root, a shell in microservices/).
+
+[env]
+# jemalloc's options, compiled into every service (tikv-jemalloc-sys --with-malloc-conf); _RJEM_MALLOC_CONF at run time
+# adds to them (pp turns heap profiling on that way). Without background purge threads jemalloc keeps an idle
+# thread's freed pages for good: 4 persistent workers that build and free 400 MiB stay at 449 MiB resident; with
+# background_thread:true they are back to 22-26 MiB within 15 s (dirty_decay_ms 10 s default, muzzy 0) at no
+# measurable CPU cost, and narenas:2 saves ~4 MiB more (measured 25 Oct 2026, PriceWhisperer 8d08444f).
+JEMALLOC_SYS_WITH_MALLOC_CONF = "background_thread:true,narenas:2"
