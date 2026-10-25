@@ -270,34 +270,38 @@ fn documents_providers() -> Vec<Provider> {
 }
 
 fn providers_for_suite(suite: Suite) -> Result<Vec<Provider>, String> {
-    let providers = match suite {
+    // Each arm yields a Result, so the match has a type whichever suite features are compiled
+    // in. (With neither feature, as `cargo check --workspace` builds it, every arm used to
+    // `return`, leaving `providers` without a type: E0282.)
+    let providers: Result<Vec<Provider>, String> = match suite {
         Suite::Accounting => {
             #[cfg(feature = "accounting")]
             {
-                accounting_providers()
+                Ok(accounting_providers())
             }
             #[cfg(not(feature = "accounting"))]
             {
-                return Err(
+                Err(
                     "the accounting provider is not compiled; rerun with --features accounting"
                         .to_string(),
-                );
+                )
             }
         }
         Suite::Documents => {
             #[cfg(feature = "documents")]
             {
-                documents_providers()
+                Ok(documents_providers())
             }
             #[cfg(not(feature = "documents"))]
             {
-                return Err(
+                Err(
                     "the documents provider is not compiled; rerun with --features documents"
                         .to_string(),
-                );
+                )
             }
         }
     };
+    let providers = providers?;
     for provider in &providers {
         if provider.id.suite != suite {
             return Err(format!(
