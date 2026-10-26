@@ -857,16 +857,14 @@ components:
           description: End date of the reporting period
           example: '2026-01-31'
         period_start:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: Start date. Defaults to beginning of fiscal year.
           example: '2026-01-01'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           description: Report currency. Defaults to company currency.
           example: USD
         include_detail:
@@ -1024,10 +1022,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           example: USD
         include_detail:
           type: boolean
@@ -1139,10 +1136,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           example: USD
     GeneralLedgerReport:
       type: object
@@ -1207,8 +1203,7 @@ components:
               description:
                 type: string
               reference:
-                type: string
-                nullable: true
+                type: [string, 'null']
           description: GL entries with running balance
           example:
           - entry_id: 550e8400-e29b-41d4-a716-446655440000
@@ -1248,15 +1243,13 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           example: USD
         account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Filter by specific account
           example: 750e8400-e29b-41d4-a716-446655440002
         include_empty_accounts:
@@ -1359,10 +1352,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           example: USD
     CustomReport:
       type: object
@@ -1382,9 +1374,8 @@ components:
           description: Report name
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Report description
           example: Primary operating company
         type:
@@ -1403,8 +1394,7 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         definition:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Report configuration (SQL, aggregation rules, etc.)
           example:
             key: value
@@ -1438,9 +1428,8 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Primary operating company
         type:
           type: string
@@ -1457,8 +1446,7 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         definition:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Report definition (SQL query, aggregation rules, column mappings)
           example: *id006
         is_shared:
@@ -1473,13 +1461,11 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Primary operating company
         definition:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: *id007
         is_shared:
           type: boolean
@@ -1509,41 +1495,35 @@ components:
           - FAILED
           example: active
         data:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Report results data
           example:
             revenue: 200000.0
             expenses: 75000.0
         error_message:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Error if report failed
           example: 'Failed to generate report: database timeout'
         period_start:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           example: '2026-01-01'
         period_end:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           example: '2026-01-31'
         currency_code:
-          type: string
+          type: [string, 'null']
           minLength: 3
           maxLength: 3
-          nullable: true
           example: USD
         created_at:
           type: string
           format: date-time
           example: '2026-01-15T10:30:00Z'
         completed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           example: '2026-01-15T14:30:00Z'
     ReportDefinition:
       type: object
@@ -1578,9 +1558,8 @@ components:
           type: boolean
           example: true
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440000
     CreateReportDefinitionRequest:
       type: object
@@ -1606,9 +1585,8 @@ components:
           - STATUTORY
           example: custom
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440000
         active:
           type: boolean
@@ -1642,9 +1620,8 @@ components:
           description: Expression evaluated by the report engine.
           example: revenue
         parent_line_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 1000.0
     ReportCellDrillDown:
       type: object
@@ -1723,8 +1700,7 @@ components:
           - FAILED
           example: active
         artifact_uri:
-          type: string
-          nullable: true
+          type: [string, 'null']
           example: s3://reports/2026-01/balance_sheet.pdf
     StatutoryReportPack:
       type: object
@@ -1865,8 +1841,7 @@ components:
           type: string
           example: Report generation failed
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: sample value
     ValidationError:
       type: object

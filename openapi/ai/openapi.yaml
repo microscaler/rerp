@@ -750,7 +750,6 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true

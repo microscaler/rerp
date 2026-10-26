@@ -196,9 +196,8 @@ components:
           format: uuid
           description: Organization ID for RLS
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Optional custom classifier ID; if omitted uses default
     Classification:
       type: object
@@ -223,13 +222,11 @@ components:
           format: decimal
           description: Classification confidence (0.0-1.0)
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Classifier used
         rerp_module:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Target RERP module (e.g. accounts-payable, hr-recruitment)
         created_at:
           type: string
@@ -253,20 +250,19 @@ components:
           type: string
           enum: [queued, processing, complete, failed]
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         result:
-          nullable: true
-          $ref: '#/components/schemas/Classification'
+          oneOf:
+          - $ref: '#/components/schemas/Classification'
+          - type: 'null'
           description: Final classification result (available when status is complete)
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     Classifier:
       type: object
       required:
@@ -292,16 +288,14 @@ components:
             type: string
           description: Supported document type labels
         model_params:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Model configuration parameters
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ClassifierDef:
       type: object
       required:
@@ -309,9 +303,8 @@ components:
       - name
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -325,8 +318,7 @@ components:
           items:
             type: string
         model_params:
-          type: object
-          nullable: true
+          type: [object, 'null']
     ClassifiersListResponse:
       type: object
       required:
@@ -358,6 +350,5 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true

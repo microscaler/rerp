@@ -84,21 +84,18 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                   description: Target folder ID for all documents
                 metadata:
-                  type: object
-                  nullable: true
+                  type: [object, 'null']
                   description: Shared metadata applied to all documents
                   additionalProperties: true
                 per_file_metadata:
-                  type: array
+                  type: [array, 'null']
                   items:
                     type: object
                     additionalProperties: true
-                  nullable: true
                   description: Per-file metadata overrides (must match order of files array)
       responses:
         '201':
@@ -394,16 +391,14 @@ paths:
         in: query
         required: false
         schema:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         description: Filter by folder
       - name: document_type
         in: query
         required: false
         schema:
-          type: string
-          nullable: true
+          type: [string, 'null']
         description: Filter by document type
       responses:
         '200':
@@ -451,12 +446,10 @@ paths:
                 title:
                   type: string
                 document_type:
-                  type: string
-                  nullable: true
+                  type: [string, 'null']
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                 tags:
                   type: array
                   items:
@@ -998,9 +991,8 @@ paths:
         in: query
         required: false
         schema:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
       responses:
         '200':
           description: Presigned download URL
@@ -1182,8 +1174,7 @@ paths:
                   type: string
                   format: binary
                 note:
-                  type: string
-                  nullable: true
+                  type: [string, 'null']
                 metadata:
                   type: object
                   additionalProperties: true
@@ -2528,13 +2519,11 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                   description: Target folder ID
                 metadata:
-                  type: object
-                  nullable: true
+                  type: [object, 'null']
                   description: Arbitrary metadata (source, tags, sender_email)
                   additionalProperties: true
       responses:
@@ -2657,9 +2646,8 @@ components:
           format: uuid
           description: Job ID for polling via GET /analysis/{id}
         document_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Null if bulk analysis
         query:
           type: string
@@ -2671,16 +2659,16 @@ components:
           - complete
           - failed
         result:
-          nullable: true
-          $ref: '#/components/schemas/AnalyzeAnalysisResult'
+          oneOf:
+          - $ref: '#/components/schemas/AnalyzeAnalysisResult'
+          - type: 'null'
           description: Final analysis result (available when status is complete)
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     AnalyzeAnalysisResult:
       type: object
       required:
@@ -2693,9 +2681,8 @@ components:
           type: string
           format: uuid
         document_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Null if bulk analysis
         query:
           type: string
@@ -2753,8 +2740,7 @@ components:
           maxItems: 20
           description: Document UUIDs to analyze (max 20)
         model:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Optional model override
     AnalyzeAnalyzeRequest:
       type: object
@@ -2771,8 +2757,7 @@ components:
           maxLength: 2000
           description: Free-text question about the document
         model:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Optional model override
         context_window:
           type: integer
@@ -2795,8 +2780,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     ClassifyClassification:
       type: object
@@ -2821,13 +2805,11 @@ components:
           format: decimal
           description: Classification confidence (0.0-1.0)
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Classifier used
         rerp_module:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Target RERP module (e.g. accounts-payable, hr-recruitment)
         created_at:
           type: string
@@ -2855,20 +2837,19 @@ components:
           - complete
           - failed
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         result:
-          nullable: true
-          $ref: '#/components/schemas/ClassifyClassification'
+          oneOf:
+          - $ref: '#/components/schemas/ClassifyClassification'
+          - type: 'null'
           description: Final classification result (available when status is complete)
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ClassifyClassifier:
       type: object
       required:
@@ -2894,16 +2875,14 @@ components:
             type: string
           description: Supported document type labels
         model_params:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Model configuration parameters
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ClassifyClassifierDef:
       type: object
       required:
@@ -2911,9 +2890,8 @@ components:
       - name
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -2927,8 +2905,7 @@ components:
           items:
             type: string
         model_params:
-          type: object
-          nullable: true
+          type: [object, 'null']
     ClassifyClassifiersListResponse:
       type: object
       required:
@@ -2955,9 +2932,8 @@ components:
           format: uuid
           description: Organization ID for RLS
         classifier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Optional custom classifier ID; if omitted uses default
     ClassifyError:
       type: object
@@ -2972,8 +2948,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     ConfirmationAutoApproveRule:
       type: object
@@ -3016,9 +2991,8 @@ components:
       - min_confidence
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -3089,8 +3063,7 @@ components:
               success:
                 type: boolean
               error:
-                type: string
-                nullable: true
+                type: [string, 'null']
     ConfirmationConfirmation:
       type: object
       required:
@@ -3108,9 +3081,8 @@ components:
           type: string
           format: uuid
         execution_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Associated pipeline execution
         status:
           type: string
@@ -3127,26 +3099,21 @@ components:
           type: object
           description: Extraction results awaiting review
         extracted_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Structured extracted fields
         confidence:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         target_module:
-          type: string
-          nullable: true
+          type: [string, 'null']
         target_endpoint:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
         confirmed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ConfirmationConfirmationApproved:
       type: object
       required:
@@ -3175,9 +3142,8 @@ components:
           enum:
           - approved
         created_record_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Record ID created in target module
         target_module:
           type: string
@@ -3229,8 +3195,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     ConfirmationMergeRequest:
       type: object
@@ -3330,9 +3295,8 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     CoreCreateVersionRequest:
       type: object
       required:
@@ -3346,8 +3310,7 @@ components:
           format: binary
           description: New file content for the version
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
     CoreDocument:
       type: object
       required:
@@ -3367,13 +3330,11 @@ components:
         title:
           type: string
         document_type:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: e.g., invoice, contract, resume
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent folder
         file_name:
           type: string
@@ -3389,15 +3350,13 @@ components:
           type: string
           description: S3 storage path for the file
         current_version_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Latest version ID
         tags:
-          type: array
+          type: [array, 'null']
           items:
             type: string
-          nullable: true
         status:
           type: string
           enum:
@@ -3409,9 +3368,8 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     CoreError:
       type: object
       required:
@@ -3425,8 +3383,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
           description: Additional context for debugging
     CoreFolder:
@@ -3446,14 +3403,12 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent folder, null for root
         path:
-          type: string
+          type: [string, 'null']
           description: Full path (e.g., /finance/invoices/2024)
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -3539,20 +3494,16 @@ components:
           type: string
           format: uuid
         title:
-          type: string
-          nullable: true
+          type: [string, 'null']
         document_type:
-          type: string
-          nullable: true
+          type: [string, 'null']
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         tags:
-          type: array
+          type: [array, 'null']
           items:
             type: string
-          nullable: true
     CoreUpdateFolderRequest:
       type: object
       required:
@@ -3562,12 +3513,10 @@ components:
           type: string
           format: uuid
         name:
-          type: string
-          nullable: true
+          type: [string, 'null']
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     CoreVersion:
       type: object
       required:
@@ -3598,8 +3547,7 @@ components:
         content_type:
           type: string
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -3616,8 +3564,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional details
           additionalProperties: true
     ExtractError:
@@ -3633,8 +3580,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     ExtractExtractionJob:
       type: object
@@ -3659,16 +3605,14 @@ components:
           - complete
           - failed
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ExtractExtractionResult:
       type: object
       required:
@@ -3686,9 +3630,8 @@ components:
           type: string
           format: uuid
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         result_json:
           type: object
           description: Extracted fields as JSON (schema-dependent)
@@ -3830,9 +3773,8 @@ components:
       - schema_def
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         name:
           type: string
@@ -3908,13 +3850,11 @@ components:
                 - failed
                 description: Per-document status
               document_id:
-                type: string
+                type: [string, 'null']
                 format: uuid
-                nullable: true
                 description: Document ID if successful
               error:
-                type: string
-                nullable: true
+                type: [string, 'null']
                 description: Error message if failed
               filename:
                 type: string
@@ -3934,13 +3874,11 @@ components:
           format: uuid
           description: Organization ID (RLS-scoped)
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Target folder ID
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Document metadata — source, tags, sender_email
           additionalProperties: true
     IntakeDocument:
@@ -3982,9 +3920,8 @@ components:
           type: string
           description: S3/MinIO storage path (s3://bucket/path/uuid.pdf)
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Target folder ID
         status:
           type: string
@@ -3995,8 +3932,7 @@ components:
           - extracted
           - failed
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: JSONB metadata — source (email/camera/webhook), tags, sender_email, etc.
           additionalProperties: true
         search_vector:
@@ -4011,8 +3947,7 @@ components:
           format: date-time
           description: Last update timestamp
         extraction_result:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: JSONB extraction result when available (schema-agnostic fields)
           additionalProperties: true
     IntakeEmailAlias:
@@ -4042,12 +3977,10 @@ components:
           type: string
           description: Target RERP suite (e.g., accounts, crm, hr, inventory)
         module:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Optional module within the suite (e.g., ap, ar)
         auto_approve:
-          type: boolean
-          nullable: true
+          type: [boolean, 'null']
           default: false
           description: Whether documents arriving via this alias should auto-approve
         created_at:
@@ -4055,9 +3988,8 @@ components:
           format: date-time
           description: Alias creation timestamp
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Last update timestamp
     IntakeEmailAttachment:
       type: object
@@ -4081,8 +4013,7 @@ components:
           format: int64
           description: File size in bytes
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
           description: Optional additional metadata (e.g., checksum, encoding)
     IntakeEmailPayload:
@@ -4107,18 +4038,16 @@ components:
           format: email
           description: Sender email address
         cc:
-          type: array
+          type: [array, 'null']
           items:
             type: string
             format: email
-          nullable: true
           description: CC recipients
         bcc:
-          type: array
+          type: [array, 'null']
           items:
             type: string
             format: email
-          nullable: true
           description: BCC recipients
         subject:
           type: string
@@ -4127,8 +4056,7 @@ components:
           type: string
           description: Email body text
         body_html:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Email body in HTML format
         received_at:
           type: string
@@ -4140,8 +4068,7 @@ components:
             $ref: '#/components/schemas/IntakeEmailAttachment'
           description: List of file attachments from the email
         headers:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties:
             type: string
           description: Raw email headers (for debugging/trace)
@@ -4158,8 +4085,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true
     IntakeMobileStatus:
@@ -4172,9 +4098,8 @@ components:
       - processing_count
       properties:
         last_sync:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Timestamp of the last successful sync
         pending_count:
           type: integer
@@ -4186,7 +4111,7 @@ components:
           type: integer
           description: Number of documents that failed processing and need user attention
         sync_errors:
-          type: array
+          type: [array, 'null']
           items:
             type: object
             properties:
@@ -4201,11 +4126,9 @@ components:
                 type: string
                 format: date-time
                 description: When the error was recorded
-          nullable: true
           description: List of recent sync errors (up to last 10)
         device_info:
-          type: object
-          nullable: true
+          type: [object, 'null']
           properties:
             platform:
               type: string
@@ -4233,8 +4156,7 @@ components:
           - approve
           - reject
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
     PipelineConfirmation:
       type: object
       required:
@@ -4259,11 +4181,9 @@ components:
           - reject
           - correct
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         corrected_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -4292,8 +4212,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     PipelineExecuteRequest:
       type: object
@@ -4310,13 +4229,11 @@ components:
             type: string
             format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Optional custom pipeline; uses default if omitted
         pipeline_name:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Alternative to pipeline_id — lookup by name within org
     PipelineExecutionDetail:
       type: object
@@ -4334,9 +4251,8 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         stage:
           type: string
           description: Current processing stage
@@ -4361,11 +4277,9 @@ components:
           - failed
           - skipped
         result_json:
-          type: object
-          nullable: true
+          type: [object, 'null']
         error_msg:
-          type: string
-          nullable: true
+          type: [string, 'null']
         retry_count:
           type: integer
           default: 0
@@ -4373,9 +4287,8 @@ components:
           type: string
           format: date-time
         completed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     PipelineExecutionsListResponse:
       type: object
       required:
@@ -4445,8 +4358,7 @@ components:
         name:
           type: string
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         stages:
           type: array
           items:
@@ -4462,8 +4374,7 @@ components:
             - notify
           description: Ordered pipeline stages
         rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Pipeline-level configuration overrides
         created_at:
           type: string
@@ -4475,9 +4386,8 @@ components:
       - stages
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         name:
           type: string
@@ -4497,8 +4407,7 @@ components:
             - create
             - notify
         rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
     PipelinePipelineJob:
       type: object
       required:
@@ -4511,9 +4420,8 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         document_ids:
           type: array
           items:
@@ -4528,8 +4436,7 @@ components:
           - failed
           - cancelled
         current_stage:
-          type: string
-          nullable: true
+          type: [string, 'null']
         progress:
           type: object
           properties:
@@ -4540,15 +4447,13 @@ components:
             failed:
               type: integer
         result_json:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
         completed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     PipelinePipelineResult:
       type: object
       properties:
@@ -4556,19 +4461,15 @@ components:
           type: string
           format: uuid
         extraction:
-          type: object
-          nullable: true
+          type: [object, 'null']
         classification:
-          type: object
-          nullable: true
+          type: [object, 'null']
         routing:
-          type: object
-          nullable: true
+          type: [object, 'null']
         confirmed:
           type: boolean
         created_record:
-          type: object
-          nullable: true
+          type: [object, 'null']
     PipelineSplitRequest:
       type: object
       required:
@@ -5132,8 +5033,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
     RoutesImportResult:
       type: object
@@ -5200,9 +5100,8 @@ components:
           type: string
           description: API endpoint to create/update record (e.g. /api/v1/accounts-payable/invoices)
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Extraction schema to use
         auto_approve:
           type: boolean
@@ -5218,8 +5117,7 @@ components:
             type: string
           description: User roles or user IDs to notify
         fallback_route:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: What to do if confidence < threshold (e.g. manual_review)
         retry_count:
           type: integer
@@ -5241,9 +5139,8 @@ components:
       - target_endpoint
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -5267,9 +5164,8 @@ components:
         target_endpoint:
           type: string
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         auto_approve:
           type: boolean
           default: false
@@ -5283,8 +5179,7 @@ components:
             type: string
           default: []
         fallback_route:
-          type: string
-          nullable: true
+          type: [string, 'null']
         retry_count:
           type: integer
           default: 3
@@ -5318,12 +5213,12 @@ components:
         matched:
           type: boolean
         rule:
-          nullable: true
-          $ref: '#/components/schemas/RoutesRoute'
+          oneOf:
+          - $ref: '#/components/schemas/RoutesRoute'
+          - type: 'null'
         confidence:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         auto_approved:
           type: boolean
     RoutesTestRouteRequest:

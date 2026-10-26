@@ -652,8 +652,7 @@ components:
             type: string
             description: Postal or ZIP code
           capacity:
-            type: integer
-            nullable: true
+            type: [integer, 'null']
             description: Total capacity in cubic meters
           status:
             type: string
@@ -694,8 +693,7 @@ components:
           type: string
           description: Postal or ZIP code
         capacity:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Total capacity in cubic meters
         status:
           type: string
@@ -730,8 +728,7 @@ components:
           type: string
           description: Postal or ZIP code
         capacity:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Total capacity in cubic meters
         status:
           type: string
@@ -770,13 +767,11 @@ components:
             - returns
             description: Location type
           parent_location_id:
-            type: string
+            type: [string, 'null']
             format: uuid
-            nullable: true
             description: Hierarchical parent location
           capacity:
-            type: integer
-            nullable: true
+            type: [integer, 'null']
             description: Capacity in cubic meters or units
           is_active:
             type: boolean
@@ -812,13 +807,11 @@ components:
           - returns
           description: Location type
         parent_location_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent location for hierarchy
         capacity:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Capacity
         is_active:
           type: boolean
@@ -843,8 +836,7 @@ components:
           - returns
           description: Location type
         capacity:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Capacity
         is_active:
           type: boolean
@@ -876,14 +868,12 @@ components:
             - cancelled
             description: Transfer status
           estimated_arrival:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Expected arrival date
           actual_arrival:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Actual arrival date
           notes:
             type: string
@@ -904,9 +894,8 @@ components:
           format: uuid
           description: Destination location ID
         estimated_arrival:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Expected arrival
         notes:
           type: string
@@ -924,14 +913,12 @@ components:
           - cancelled
           description: Transfer status update
         estimated_arrival:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Updated expected arrival
         actual_arrival:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Mark as arrived
         notes:
           type: string
@@ -950,8 +937,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true
   securitySchemes:

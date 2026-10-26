@@ -257,16 +257,14 @@ components:
           type: string
           enum: [queued, processing, complete, failed]
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ExtractionResult:
       type: object
       required:
@@ -284,9 +282,8 @@ components:
           type: string
           format: uuid
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         result_json:
           type: object
           description: Extracted fields as JSON (schema-dependent)
@@ -387,9 +384,8 @@ components:
       - schema_def
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         name:
           type: string
@@ -446,6 +442,5 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true

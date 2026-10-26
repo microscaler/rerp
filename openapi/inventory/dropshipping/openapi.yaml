@@ -581,13 +581,11 @@ components:
             - cancelled
             description: Vendor order status
           expected_delivery:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Expected delivery date
           tracking_number:
-            type: string
-            nullable: true
+            type: [string, 'null']
             description: Shipping tracking number
           notes:
             type: string
@@ -614,9 +612,8 @@ components:
             type: object
           description: Line items with vendor pricing and quantities
         expected_delivery:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Expected delivery date
         notes:
           type: string
@@ -636,13 +633,11 @@ components:
           - cancelled
           description: Order status update
         expected_delivery:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Updated expected delivery
         tracking_number:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Shipping tracking number
         notes:
           type: string
@@ -661,8 +656,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true
   securitySchemes:

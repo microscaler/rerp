@@ -36,16 +36,14 @@ paths:
         in: query
         required: false
         schema:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         description: Filter by folder
       - name: document_type
         in: query
         required: false
         schema:
-          type: string
-          nullable: true
+          type: [string, 'null']
         description: Filter by document type
       responses:
         '200':
@@ -89,12 +87,10 @@ paths:
                 title:
                   type: string
                 document_type:
-                  type: string
-                  nullable: true
+                  type: [string, 'null']
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                 tags:
                   type: array
                   items:
@@ -258,8 +254,7 @@ paths:
                   type: string
                   format: binary
                 note:
-                  type: string
-                  nullable: true
+                  type: [string, 'null']
                 metadata:
                   type: object
                   additionalProperties: true
@@ -357,9 +352,8 @@ paths:
         in: query
         required: false
         schema:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
       responses:
         '200':
           description: Presigned download URL
@@ -576,13 +570,11 @@ components:
         title:
           type: string
         document_type:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: e.g., invoice, contract, resume
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent folder
         file_name:
           type: string
@@ -598,15 +590,13 @@ components:
           type: string
           description: S3 storage path for the file
         current_version_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Latest version ID
         tags:
-          type: array
+          type: [array, 'null']
           items:
             type: string
-          nullable: true
         status:
           type: string
           enum: [active, archived, deleted]
@@ -615,9 +605,8 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     UpdateDocumentRequest:
       type: object
       required:
@@ -627,20 +616,16 @@ components:
           type: string
           format: uuid
         title:
-          type: string
-          nullable: true
+          type: [string, 'null']
         document_type:
-          type: string
-          nullable: true
+          type: [string, 'null']
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         tags:
-          type: array
+          type: [array, 'null']
           items:
             type: string
-          nullable: true
     Folder:
       type: object
       required:
@@ -658,14 +643,12 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent folder, null for root
         path:
-          type: string
+          type: [string, 'null']
           description: Full path (e.g., /finance/invoices/2024)
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -678,12 +661,10 @@ components:
           type: string
           format: uuid
         name:
-          type: string
-          nullable: true
+          type: [string, 'null']
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     CreateFolderRequest:
       type: object
       required:
@@ -696,9 +677,8 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     FolderTree:
       type: object
       required:
@@ -747,8 +727,7 @@ components:
         content_type:
           type: string
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -765,8 +744,7 @@ components:
           format: binary
           description: New file content for the version
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
     PresignedUrl:
       type: object
       required:
@@ -833,7 +811,6 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
           description: Additional context for debugging

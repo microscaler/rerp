@@ -807,9 +807,8 @@ components:
           description: Budget name/title
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Budget description
           example: Primary operating company
         fiscal_year:
@@ -875,33 +874,28 @@ components:
           description: Company this budget belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Department this budget applies to (null = company-wide)
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Cost center this budget applies to
           example: 750e8400-e29b-41d4-a716-446655440002
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who approved the budget
           example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: When the budget was approved
           example: '2026-01-15T10:30:00Z'
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Budget notes
           example: Approved by CFO on 2026-01-15
         created_by:
@@ -918,9 +912,8 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         submitted_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: When submitted for approval
           example: sample value
     BudgetWithLines:
@@ -934,8 +927,7 @@ components:
               $ref: '#/components/schemas/BudgetLine'
             description: Budget line items
           variance_summary:
-            type: object
-            nullable: true
+            type: [object, 'null']
             description: Summary of budget vs actuals variance
     CreateBudgetRequest:
       type: object
@@ -949,9 +941,8 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
         fiscal_year:
           type: integer
@@ -982,14 +973,12 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 750e8400-e29b-41d4-a716-446655440002
         budget_lines:
           type: array
@@ -998,9 +987,8 @@ components:
           description: Budget line items
           example: 1000.0
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     UpdateBudgetRequest:
       type: object
@@ -1010,14 +998,12 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         status:
           type: string
@@ -1054,33 +1040,28 @@ components:
           description: Budget this line belongs to
           example: 1000.0
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL account this line is for
           example: 950e8400-e29b-41d4-a716-446655440024
         gl_account_code:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           description: GL account code
           example: GL-ACCT-2026
         gl_account_name:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           description: GL account name
           example: Main Account
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Department for this line
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Cost center for this line
           example: 750e8400-e29b-41d4-a716-446655440002
         period:
@@ -1116,15 +1097,13 @@ components:
           description: Variance (amount - actual_amount)
           example: 500.0
         variance_percent:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           description: Variance as percentage of budget
           example: 5.0
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Notes for this budget line
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -1142,24 +1121,20 @@ components:
       - amount
       properties:
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 950e8400-e29b-41d4-a716-446655440024
         gl_account_code:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           example: GL-ACCT-2026
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 750e8400-e29b-41d4-a716-446655440002
         period:
           type: string
@@ -1179,9 +1154,8 @@ components:
           maxLength: 3
           example: USD
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     VarianceReport:
       type: object
@@ -1314,9 +1288,8 @@ components:
           description: Forecast name
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Primary operating company
         forecast_type:
           type: string
@@ -1392,9 +1365,8 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Primary operating company
         forecast_type:
           type: string
@@ -1446,14 +1418,12 @@ components:
           description: Forecasted amount
           example: 10000.0
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 950e8400-e29b-41d4-a716-446655440024
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         created_at:
           type: string
@@ -1493,13 +1463,11 @@ components:
           - APPLIED
           example: active
         reason:
-          type: string
-          nullable: true
+          type: [string, 'null']
           example: Reclassification of asset category
         requested_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: sample value
     CreateBudgetRevisionRequest:
       type: object
@@ -1530,9 +1498,8 @@ components:
                 format: double
           example: *id005
         requested_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: sample value
     PaginatedBudgetRevisions:
       type: object
@@ -1643,8 +1610,7 @@ components:
           type: string
           example: Budget not found
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: sample value
     ValidationError:
       type: object

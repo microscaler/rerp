@@ -286,9 +286,8 @@ components:
           type: string
           format: uuid
         execution_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Associated pipeline execution
         status:
           type: string
@@ -300,26 +299,21 @@ components:
           type: object
           description: Extraction results awaiting review
         extracted_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Structured extracted fields
         confidence:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         target_module:
-          type: string
-          nullable: true
+          type: [string, 'null']
         target_endpoint:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
         confirmed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ConfirmationApproved:
       type: object
       required:
@@ -346,9 +340,8 @@ components:
           type: string
           enum: [approved]
         created_record_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Record ID created in target module
         target_module:
           type: string
@@ -508,8 +501,7 @@ components:
               success:
                 type: boolean
               error:
-                type: string
-                nullable: true
+                type: [string, 'null']
     AutoApproveRule:
       type: object
       required:
@@ -551,9 +543,8 @@ components:
       - min_confidence
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -602,6 +593,5 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true

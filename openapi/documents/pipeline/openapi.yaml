@@ -183,8 +183,7 @@ components:
         name:
           type: string
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         stages:
           type: array
           items:
@@ -192,8 +191,7 @@ components:
             enum: [ingest, parse, classify, extract, route, confirm, create, notify]
           description: Ordered pipeline stages
         rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Pipeline-level configuration overrides
         created_at:
           type: string
@@ -205,9 +203,8 @@ components:
       - stages
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         name:
           type: string
@@ -219,8 +216,7 @@ components:
             type: string
             enum: [ingest, parse, classify, extract, route, confirm, create, notify]
         rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
     PipelineJob:
       type: object
       required:
@@ -233,9 +229,8 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         document_ids:
           type: array
           items:
@@ -245,8 +240,7 @@ components:
           type: string
           enum: [queued, running, complete, failed, cancelled]
         current_stage:
-          type: string
-          nullable: true
+          type: [string, 'null']
         progress:
           type: object
           properties:
@@ -257,15 +251,13 @@ components:
             failed:
               type: integer
         result_json:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
         completed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     ExecuteRequest:
       type: object
       required:
@@ -281,13 +273,11 @@ components:
             type: string
             format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Optional custom pipeline; uses default if omitted
         pipeline_name:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Alternative to pipeline_id — lookup by name within org
     ExecutionDetail:
       type: object
@@ -305,9 +295,8 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         stage:
           type: string
           description: Current processing stage
@@ -316,11 +305,9 @@ components:
           type: string
           enum: [queued, running, complete, failed, skipped]
         result_json:
-          type: object
-          nullable: true
+          type: [object, 'null']
         error_msg:
-          type: string
-          nullable: true
+          type: [string, 'null']
         retry_count:
           type: integer
           default: 0
@@ -328,9 +315,8 @@ components:
           type: string
           format: date-time
         completed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
     PipelineResult:
       type: object
       properties:
@@ -338,19 +324,15 @@ components:
           type: string
           format: uuid
         extraction:
-          type: object
-          nullable: true
+          type: [object, 'null']
         classification:
-          type: object
-          nullable: true
+          type: [object, 'null']
         routing:
-          type: object
-          nullable: true
+          type: [object, 'null']
         confirmed:
           type: boolean
         created_record:
-          type: object
-          nullable: true
+          type: [object, 'null']
     ConfirmRequest:
       type: object
       required:
@@ -364,8 +346,7 @@ components:
           type: string
           enum: [approve, reject]
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
     CorrectRequest:
       type: object
       required:
@@ -399,11 +380,9 @@ components:
           type: string
           enum: [approve, reject, correct]
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         corrected_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -510,6 +489,5 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true

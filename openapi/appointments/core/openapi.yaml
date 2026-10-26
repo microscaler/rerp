@@ -778,14 +778,12 @@ components:
             type: boolean
             description: Whether reminder was sent
           reminder_at:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Reminder scheduled time
           meeting_url:
-            type: string
+            type: [string, 'null']
             format: uri
-            nullable: true
             description: Online meeting link
           location:
             type: string
@@ -841,14 +839,12 @@ components:
           format: date-time
           description: Appointment end time (ISO 8601)
         reminder_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Reminder scheduled time
         meeting_url:
-          type: string
+          type: [string, 'null']
           format: uri
-          nullable: true
           description: Online meeting link
         location:
           type: string
@@ -891,9 +887,8 @@ components:
           type: string
           description: Update location
         meeting_url:
-          type: string
+          type: [string, 'null']
           format: uri
-          nullable: true
           description: Update meeting link
         notes:
           type: string
@@ -1057,9 +1052,8 @@ components:
             type: integer
             description: Sync interval in minutes
           last_sync_at:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Last sync timestamp
     CreateCalendarRequest:
       type: object
@@ -1127,8 +1121,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true
   securitySchemes:

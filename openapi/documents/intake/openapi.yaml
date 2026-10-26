@@ -40,13 +40,11 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                   description: Target folder ID
                 metadata:
-                  type: object
-                  nullable: true
+                  type: [object, 'null']
                   description: Arbitrary metadata (source, tags, sender_email)
                   additionalProperties: true
       responses:
@@ -131,21 +129,18 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: string
+                  type: [string, 'null']
                   format: uuid
-                  nullable: true
                   description: Target folder ID for all documents
                 metadata:
-                  type: object
-                  nullable: true
+                  type: [object, 'null']
                   description: Shared metadata applied to all documents
                   additionalProperties: true
                 per_file_metadata:
-                  type: array
+                  type: [array, 'null']
                   items:
                     type: object
                     additionalProperties: true
-                  nullable: true
                   description: Per-file metadata overrides (must match order of files array)
       responses:
         '201':
@@ -393,9 +388,8 @@ components:
           type: string
           description: S3/MinIO storage path (s3://bucket/path/uuid.pdf)
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Target folder ID
         status:
           type: string
@@ -406,8 +400,7 @@ components:
           - extracted
           - failed
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: JSONB metadata — source (email/camera/webhook), tags, sender_email, etc.
           additionalProperties: true
         search_vector:
@@ -422,8 +415,7 @@ components:
           format: date-time
           description: Last update timestamp
         extraction_result:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: JSONB extraction result when available (schema-agnostic fields)
           additionalProperties: true
     CreateDocumentRequest:
@@ -441,13 +433,11 @@ components:
           format: uuid
           description: Organization ID (RLS-scoped)
         folder_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Target folder ID
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Document metadata — source, tags, sender_email
           additionalProperties: true
     BatchResult:
@@ -486,13 +476,11 @@ components:
                 - failed
                 description: Per-document status
               document_id:
-                type: string
+                type: [string, 'null']
                 format: uuid
-                nullable: true
                 description: Document ID if successful
               error:
-                type: string
-                nullable: true
+                type: [string, 'null']
                 description: Error message if failed
               filename:
                 type: string
@@ -518,18 +506,16 @@ components:
           format: email
           description: Sender email address
         cc:
-          type: array
+          type: [array, 'null']
           items:
             type: string
             format: email
-          nullable: true
           description: CC recipients
         bcc:
-          type: array
+          type: [array, 'null']
           items:
             type: string
             format: email
-          nullable: true
           description: BCC recipients
         subject:
           type: string
@@ -538,8 +524,7 @@ components:
           type: string
           description: Email body text
         body_html:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Email body in HTML format
         received_at:
           type: string
@@ -551,8 +536,7 @@ components:
             $ref: '#/components/schemas/EmailAttachment'
           description: List of file attachments from the email
         headers:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties:
             type: string
           description: Raw email headers (for debugging/trace)
@@ -578,8 +562,7 @@ components:
           format: int64
           description: File size in bytes
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true
           description: Optional additional metadata (e.g., checksum, encoding)
     EmailAlias:
@@ -608,12 +591,10 @@ components:
           type: string
           description: Target RERP suite (e.g., accounts, crm, hr, inventory)
         module:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Optional module within the suite (e.g., ap, ar)
         auto_approve:
-          type: boolean
-          nullable: true
+          type: [boolean, 'null']
           default: false
           description: Whether documents arriving via this alias should auto-approve
         created_at:
@@ -621,9 +602,8 @@ components:
           format: date-time
           description: Alias creation timestamp
         updated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Last update timestamp
     MobileStatus:
       type: object
@@ -634,9 +614,8 @@ components:
       - processing_count
       properties:
         last_sync:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Timestamp of the last successful sync
         pending_count:
           type: integer
@@ -648,7 +627,7 @@ components:
           type: integer
           description: Number of documents that failed processing and need user attention
         sync_errors:
-          type: array
+          type: [array, 'null']
           items:
             type: object
             properties:
@@ -663,11 +642,9 @@ components:
                 type: string
                 format: date-time
                 description: When the error was recorded
-          nullable: true
           description: List of recent sync errors (up to last 10)
         device_info:
-          type: object
-          nullable: true
+          type: [object, 'null']
           properties:
             platform:
               type: string
@@ -693,7 +670,6 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true

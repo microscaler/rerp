@@ -257,9 +257,8 @@ components:
           type: string
           description: API endpoint to create/update record (e.g. /api/v1/accounts-payable/invoices)
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Extraction schema to use
         auto_approve:
           type: boolean
@@ -275,8 +274,7 @@ components:
             type: string
           description: User roles or user IDs to notify
         fallback_route:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: What to do if confidence < threshold (e.g. manual_review)
         retry_count:
           type: integer
@@ -298,9 +296,8 @@ components:
       - target_endpoint
       properties:
         id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Omitted to create new; include to update
         org_id:
           type: string
@@ -320,9 +317,8 @@ components:
         target_endpoint:
           type: string
         schema_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         auto_approve:
           type: boolean
           default: false
@@ -336,8 +332,7 @@ components:
             type: string
           default: []
         fallback_route:
-          type: string
-          nullable: true
+          type: [string, 'null']
         retry_count:
           type: integer
           default: 3
@@ -386,12 +381,12 @@ components:
         matched:
           type: boolean
         rule:
-          nullable: true
-          $ref: '#/components/schemas/Route'
+          oneOf:
+          - $ref: '#/components/schemas/Route'
+          - type: 'null'
         confidence:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         auto_approved:
           type: boolean
     ImportRoutesRequest:
@@ -434,6 +429,5 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           additionalProperties: true

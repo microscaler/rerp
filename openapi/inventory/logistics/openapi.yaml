@@ -657,9 +657,8 @@ components:
             type: string
             description: Carrier operating country code
           website:
-            type: string
+            type: [string, 'null']
             format: uri
-            nullable: true
             description: Carrier website URL
           tracking_url_template:
             type: string
@@ -701,9 +700,8 @@ components:
           type: string
           description: Operating country code
         website:
-          type: string
+          type: [string, 'null']
           format: uri
-          nullable: true
           description: Carrier website
         tracking_url_template:
           type: string
@@ -736,9 +734,8 @@ components:
           type: string
           description: Default service level
         website:
-          type: string
+          type: [string, 'null']
           format: uri
-          nullable: true
           description: Carrier website
         tracking_url_template:
           type: string
@@ -754,14 +751,12 @@ components:
       - type: object
         properties:
           dropship_order_id:
-            type: string
+            type: [string, 'null']
             format: uuid
-            nullable: true
             description: Parent dropship order reference
           vendor_order_id:
-            type: string
+            type: [string, 'null']
             format: uuid
-            nullable: true
             description: Parent vendor order reference
           carrier_id:
             type: string
@@ -774,13 +769,11 @@ components:
             type: string
             description: Selected service level (e.g., ground, 2-day)
           tracking_number:
-            type: string
-            nullable: true
+            type: [string, 'null']
             description: Carrier tracking number
           tracking_url:
-            type: string
+            type: [string, 'null']
             format: uri
-            nullable: true
             description: Carrier tracking page URL
           status:
             type: string
@@ -794,13 +787,11 @@ components:
             - returned
             description: Shipment delivery status
           weight:
-            type: number
+            type: [number, 'null']
             format: double
-            nullable: true
             description: Package weight in kg
           dimensions:
-            type: object
-            nullable: true
+            type: [object, 'null']
             properties:
               length:
                 type: number
@@ -810,24 +801,20 @@ components:
                 type: number
             description: Package dimensions in cm
           shipping_cost:
-            type: number
+            type: [number, 'null']
             format: double
-            nullable: true
             description: Actual shipping cost paid to carrier
           estimated_delivery:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Estimated delivery date
           actual_delivery:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Actual delivery date
           shipping_label_url:
-            type: string
+            type: [string, 'null']
             format: uri
-            nullable: true
             description: URL to download shipping label PDF
           notes:
             type: string
@@ -844,9 +831,8 @@ components:
           format: uuid
           description: Parent dropship order ID
         vendor_order_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent vendor order ID
         carrier_id:
           type: string
@@ -856,13 +842,11 @@ components:
           type: string
           description: Selected service level
         weight:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           description: Package weight in kg
         dimensions:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Package dimensions in cm
         notes:
           type: string
@@ -872,8 +856,7 @@ components:
       description: Request body for updating an existing shipment
       properties:
         tracking_number:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Update tracking number
         status:
           type: string
@@ -887,19 +870,16 @@ components:
           - returned
           description: Update delivery status
         estimated_delivery:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Updated estimated delivery
         actual_delivery:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Record actual delivery
         shipping_cost:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           description: Update actual shipping cost
         notes:
           type: string
@@ -963,9 +943,8 @@ components:
             format: date-time
             description: Rate effective start date
           effective_until:
-            type: string
+            type: [string, 'null']
             format: date-time
-            nullable: true
             description: Rate effective end date
           notes:
             type: string
@@ -1028,9 +1007,8 @@ components:
           format: date-time
           description: Effective start date
         effective_until:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Effective end date
         notes:
           type: string
@@ -1081,9 +1059,8 @@ components:
           format: date-time
           description: Effective start date
         effective_until:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Effective end date
         notes:
           type: string
@@ -1102,8 +1079,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional error details
           additionalProperties: true
   securitySchemes:

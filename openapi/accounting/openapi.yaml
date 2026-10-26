@@ -7202,9 +7202,8 @@ components:
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -7252,12 +7251,10 @@ components:
           - CREDIT_CARD
           - OTHER
         payment_reference:
-          type: string
-          nullable: true
+          type: [string, 'null']
         bank_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         status:
           type: string
           enum:
@@ -7269,15 +7266,12 @@ components:
           type: number
           format: decimal
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -7285,13 +7279,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     AccountsPayableApPaymentApplication:
       type: object
       required:
@@ -7316,12 +7308,10 @@ components:
           type: string
           format: date-time
         applied_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -7542,51 +7532,45 @@ components:
         days_until_due:
           type: integer
         aging_bucket:
-          type: string
+          type: [string, 'null']
           enum:
           - CURRENT
           - 1-30
           - 31-60
           - 61-90
           - 90+
-          nullable: true
+          - null
         purchase_order_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         matching_status:
-          type: string
+          type: [string, 'null']
           enum:
           - NOT_MATCHED
           - PARTIAL
           - MATCHED
-          nullable: true
+          - null
         approval_status:
-          type: string
+          type: [string, 'null']
           enum:
           - PENDING
           - APPROVED
           - REJECTED
-          nullable: true
+          - null
         approved_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         early_payment_discount_percent:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         early_payment_discount_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -7633,9 +7617,8 @@ components:
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -7772,52 +7755,44 @@ components:
         days_overdue:
           type: integer
         aging_bucket:
-          type: string
+          type: [string, 'null']
           enum:
           - CURRENT
           - 1-30
           - 31-60
           - 61-90
           - 90+
-          nullable: true
+          - null
         credit_limit:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         credit_used:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         collection_status:
-          type: string
+          type: [string, 'null']
           enum:
           - NORMAL
           - WARNING
           - COLLECTION
           - LEGAL
-          nullable: true
+          - null
         last_payment_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         last_payment_amount:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         write_off_amount:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         write_off_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         write_off_reason:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -7868,12 +7843,10 @@ components:
           - CREDIT_CARD
           - OTHER
         payment_reference:
-          type: string
-          nullable: true
+          type: [string, 'null']
         bank_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         status:
           type: string
           enum:
@@ -7882,13 +7855,11 @@ components:
           - RECONCILED
           - CANCELLED
         reconciled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         reconciled_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         applied_amount:
           type: number
           format: decimal
@@ -7896,15 +7867,12 @@ components:
           type: number
           format: decimal
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -7912,13 +7880,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     AccountsReceivablePaymentApplication:
       type: object
       required:
@@ -7943,12 +7909,10 @@ components:
           type: string
           format: date-time
         applied_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -8061,8 +8025,7 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         category_id:
           type: string
           format: uuid
@@ -8082,21 +8045,19 @@ components:
           type: string
           format: date
         in_service_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         disposal_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         depreciation_method:
-          type: string
+          type: [string, 'null']
           enum:
           - STRAIGHT_LINE
           - DECLINING_BALANCE
           - UNITS_OF_PRODUCTION
           - SUM_OF_YEARS
-          nullable: true
+          - null
         useful_life_months:
           type: integer
         depreciation_rate:
@@ -8111,32 +8072,26 @@ components:
           - DISPOSED
           - IMPAIRED
         location:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         asset_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         depreciation_expense_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         accumulated_depreciation_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -8144,13 +8099,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     AssetAssetRegister:
       type: object
       required:
@@ -8169,23 +8122,20 @@ components:
           type: string
           maxLength: 255
         parent_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         default_depreciation_method:
-          type: string
+          type: [string, 'null']
           enum:
           - STRAIGHT_LINE
           - DECLINING_BALANCE
           - UNITS_OF_PRODUCTION
           - SUM_OF_YEARS
-          nullable: true
+          - null
         default_useful_life_months:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
         is_active:
           type: boolean
         created_at:
@@ -8226,49 +8176,38 @@ components:
           type: number
           format: decimal
         sale_proceeds:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         gain_loss:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         transfer_to_location:
-          type: string
-          nullable: true
+          type: [string, 'null']
         transfer_to_company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         impairment_amount:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         impairment_reason:
-          type: string
-          nullable: true
+          type: [string, 'null']
         journal_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         reference_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -8276,13 +8215,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     AssetCreateAssetRegisterRequest:
       type: object
       required:
@@ -8429,9 +8366,8 @@ components:
           type: number
           format: decimal
         journal_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         status:
           type: string
           enum:
@@ -8439,13 +8375,11 @@ components:
           - POSTED
           - SKIPPED
         posted_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         posted_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         currency_code:
           type: string
           minLength: 3
@@ -8532,13 +8466,11 @@ components:
           type: string
           maxLength: 100
         bank_code:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
         bank_name:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         account_type:
           type: string
           enum:
@@ -8558,30 +8490,24 @@ components:
           type: number
           format: decimal
         last_reconciled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         sync_provider:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
         sync_credentials:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         last_synced_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         is_active:
           type: boolean
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -8589,13 +8515,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     BankSyncBankStatement:
       type: object
       required:
@@ -8612,20 +8536,17 @@ components:
           type: string
           format: uuid
         statement_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
         statement_date:
           type: string
           format: date
         period_start:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         period_end:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         opening_balance:
           type: number
           format: decimal
@@ -8648,15 +8569,13 @@ components:
           - RECONCILED
           - ERROR
         reconciled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         reconciled_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         import_format:
-          type: string
+          type: [string, 'null']
           enum:
           - OFX
           - CSV
@@ -8664,30 +8583,25 @@ components:
           - QIF
           - JSON
           - OTHER
-          nullable: true
+          - null
         import_source:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         imported_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         imported_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -8695,13 +8609,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     BankSyncBankTransaction:
       type: object
       required:
@@ -8723,9 +8635,8 @@ components:
           type: string
           format: date
         reference:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
         description:
           type: string
           maxLength: 255
@@ -8736,7 +8647,7 @@ components:
           type: number
           format: decimal
         transaction_type:
-          type: string
+          type: [string, 'null']
           enum:
           - DEBIT
           - CREDIT
@@ -8744,7 +8655,7 @@ components:
           - INTEREST
           - TRANSFER
           - OTHER
-          nullable: true
+          - null
         status:
           type: string
           enum:
@@ -8753,31 +8664,25 @@ components:
           - RECONCILED
           - IGNORED
         matched_payment_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         matched_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         reconciled_statement_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         statement_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         statement_line_number:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -8986,27 +8891,22 @@ components:
           - RECONCILED
           - DISPUTED
         reconciled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         reconciled_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -9014,13 +8914,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     BankSyncUpdateBankAccountRequest:
       type: object
       properties:
@@ -9127,8 +9025,7 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         fiscal_year:
           type: integer
         period_start:
@@ -9138,9 +9035,8 @@ components:
           type: string
           format: date
         current_version_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         status:
           type: string
           enum:
@@ -9149,20 +9045,18 @@ components:
           - CLOSED
           - CANCELLED
         approval_status:
-          type: string
+          type: [string, 'null']
           enum:
           - PENDING
           - APPROVED
           - REJECTED
-          nullable: true
+          - null
         approved_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         total_budget_amount:
           type: number
           format: decimal
@@ -9177,12 +9071,10 @@ components:
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -9190,13 +9082,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     BudgetBudgetLine:
       type: object
       required:
@@ -9239,8 +9129,7 @@ components:
           minLength: 3
           maxLength: 3
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -9523,28 +9412,21 @@ components:
           - REJECTED
           - PARTIAL
         acknowledgment_content:
-          type: string
-          nullable: true
+          type: [string, 'null']
         acknowledgment_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
         sent_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         received_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         error_codes:
-          type: object
-          nullable: true
+          type: [object, 'null']
         error_messages:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -9593,64 +9475,49 @@ components:
           type: string
           format: date-time
         parsed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         validated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         processed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         sender_id:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         receiver_id:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         raw_content:
-          type: string
-          nullable: true
+          type: [string, 'null']
         parsed_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
         related_invoice_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         related_purchase_order_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         error_message:
-          type: string
-          nullable: true
+          type: [string, 'null']
         error_details:
-          type: object
-          nullable: true
+          type: [object, 'null']
         retry_count:
           type: integer
         last_retry_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         acknowledgment_sent:
           type: boolean
         acknowledgment_sent_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         created_at:
           type: string
           format: date-time
@@ -9658,13 +9525,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     EdiEdiFormat:
       type: object
       required:
@@ -9683,19 +9548,15 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         version:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
         supported_document_types:
-          type: string
+          type: [string, 'null']
           maxLength: 255
-          nullable: true
         format_config:
-          type: object
-          nullable: true
+          type: [object, 'null']
         is_active:
           type: boolean
         created_at:
@@ -9734,19 +9595,15 @@ components:
         field_mappings:
           type: object
         transformation_rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
         validation_rules:
-          type: object
-          nullable: true
+          type: [object, 'null']
         default_values:
-          type: object
-          nullable: true
+          type: [object, 'null']
         is_active:
           type: boolean
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -9754,13 +9611,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     EdiUpdateEdiDocumentRequest:
       type: object
       properties:
@@ -9816,8 +9671,7 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           description: Additional details
           additionalProperties: true
     FinancialReportsCreateFinancialStatementRequest:
@@ -9912,15 +9766,13 @@ components:
         data:
           type: object
         summary:
-          type: object
-          nullable: true
+          type: [object, 'null']
         generated_at:
           type: string
           format: date-time
         generated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         data_version:
           type: integer
         currency_code:
@@ -9928,12 +9780,10 @@ components:
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -9960,8 +9810,7 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         report_type:
           type: string
           enum:
@@ -9971,21 +9820,17 @@ components:
           - TRIAL_BALANCE
           - CUSTOM
         template_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         report_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         period_start:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         period_end:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         status:
           type: string
           enum:
@@ -9994,38 +9839,30 @@ components:
           - APPROVED
           - PUBLISHED
         generated_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         generated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         approved_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         report_data:
-          type: object
-          nullable: true
+          type: [object, 'null']
         parameters:
-          type: object
-          nullable: true
+          type: [object, 'null']
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -10033,13 +9870,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     FinancialReportsReportSchedule:
       type: object
       required:
@@ -10060,8 +9895,7 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         frequency:
           type: string
           enum:
@@ -10072,16 +9906,13 @@ components:
           - YEARLY
           - CUSTOM
         schedule_config:
-          type: object
-          nullable: true
+          type: [object, 'null']
         next_run_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         last_run_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         run_count:
           type: integer
         status:
@@ -10092,27 +9923,23 @@ components:
           - COMPLETED
           - ERROR
         recipients:
-          type: object
-          nullable: true
+          type: [object, 'null']
         default_parameters:
-          type: object
-          nullable: true
+          type: [object, 'null']
         output_format:
-          type: string
+          type: [string, 'null']
           enum:
           - PDF
           - EXCEL
           - CSV
           - JSON
           - HTML
-          nullable: true
+          - null
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -10120,13 +9947,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     FinancialReportsReportTemplate:
       type: object
       required:
@@ -10149,8 +9974,7 @@ components:
           type: string
           maxLength: 255
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         report_type:
           type: string
           enum:
@@ -10162,14 +9986,11 @@ components:
         template_structure:
           type: object
         formulas:
-          type: object
-          nullable: true
+          type: [object, 'null']
         formatting:
-          type: object
-          nullable: true
+          type: [object, 'null']
         account_mappings:
-          type: object
-          nullable: true
+          type: [object, 'null']
         is_active:
           type: boolean
         is_system_template:
@@ -10183,13 +10004,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     FinancialReportsUpdateFinancialStatementRequest:
       type: object
       properties:
@@ -10265,11 +10084,9 @@ components:
         is_system_account:
           type: boolean
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -10304,16 +10121,14 @@ components:
           - REVENUE
           - EXPENSE
         parent_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         level:
           type: integer
         is_active:
           type: boolean
         description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -10456,11 +10271,10 @@ components:
         description:
           type: string
         reference_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
         source_type:
-          type: string
+          type: [string, 'null']
           enum:
           - MANUAL
           - INVOICE
@@ -10468,15 +10282,13 @@ components:
           - ADJUSTMENT
           - RECURRING
           - REVERSAL
-          nullable: true
+          - null
         source_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         fiscal_period_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         status:
           type: string
           enum:
@@ -10484,13 +10296,11 @@ components:
           - POSTED
           - REVERSED
         posted_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         posted_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         total_debit:
           type: number
           format: decimal
@@ -10505,12 +10315,10 @@ components:
           type: number
           format: decimal
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -10518,13 +10326,11 @@ components:
           type: string
           format: date-time
         created_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         updated_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     GeneralLedgerUpdateAccountRequest:
       type: object
       properties:
@@ -10695,9 +10501,8 @@ components:
           type: string
           format: date
         due_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         invoice_type:
           type: string
           enum:
@@ -10722,17 +10527,14 @@ components:
           - OVERPAID
           - REVERSED
         customer_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         vendor_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         payment_term_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         subtotal:
           type: number
           format: decimal
@@ -10759,36 +10561,27 @@ components:
           type: number
           format: decimal
         reference_number:
-          type: string
-          nullable: true
+          type: [string, 'null']
         vendor_reference:
-          type: string
-          nullable: true
+          type: [string, 'null']
         posted_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         paid_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         cancelled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         company_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         internal_notes:
-          type: string
-          nullable: true
+          type: [string, 'null']
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
@@ -10814,27 +10607,22 @@ components:
         line_number:
           type: integer
         product_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         product_code:
-          type: string
-          nullable: true
+          type: [string, 'null']
         product_name:
           type: string
         product_description:
-          type: string
-          nullable: true
+          type: [string, 'null']
         account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         quantity:
           type: number
           format: decimal
         unit_of_measure:
-          type: string
-          nullable: true
+          type: [string, 'null']
         unit_price:
           type: number
           format: decimal
@@ -10854,20 +10642,17 @@ components:
           type: number
           format: decimal
         tax_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         tax_rate:
-          type: number
+          type: [number, 'null']
           format: decimal
-          nullable: true
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
         metadata:
-          type: object
-          nullable: true
+          type: [object, 'null']
         created_at:
           type: string
           format: date-time
