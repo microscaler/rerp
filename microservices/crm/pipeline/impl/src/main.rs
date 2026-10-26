@@ -23,6 +23,8 @@ use rerp_crm_pipeline_gen::registry::*;
 use rerp_crm_pipeline_gen::*;
 // Import implementation controllers (business logic)
 mod auth;
+#[cfg(test)]
+mod contract_tests;
 mod controllers;
 mod conversion;
 mod impl_registry;
