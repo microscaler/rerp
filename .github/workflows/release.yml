@@ -90,7 +90,7 @@ jobs:
         run: tooling/.venv/bin/rerp release generate-notes --version ${{ steps.bump.outputs.version }} --output release-body.md --template .github/release-notes-template.md --provider ${{ env.NOTES_PROVIDER }}
 
       - name: Commit, tag and push
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v11
         with:
           add: "-u"
           message: "chore(release): v${{ steps.bump.outputs.version }}"
