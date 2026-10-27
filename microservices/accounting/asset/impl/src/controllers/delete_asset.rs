@@ -1,14 +1,16 @@
 // Implementation stub for handler 'delete_asset'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path delete_asset --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpNoContent, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_asset_gen::handlers::delete_asset::{Request, Response};
+use rerp_accounting_asset_gen::handlers::delete_asset::Request;
 
 #[handler(DeleteAssetController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpNoContent {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -19,9 +21,6 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
-        code: "example".to_string(),    // TODO: Set from your business logic
-        details: None,                  // TODO: Set from your business logic
-        message: "example".to_string(), // TODO: Set from your business logic
-    }
+    let _ = req;
+    HttpNoContent
 }
