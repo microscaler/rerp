@@ -15,6 +15,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         payment_method: "example".to_string(),
         scheduled_payment_date: Some("example".to_string()),
         status: "example".to_string(),
-        total_amount: 3.14,
+        total_amount: 1.5,
     })
 }

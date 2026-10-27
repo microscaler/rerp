@@ -59,6 +59,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLeaseRequest'
+            example:
+              lease_number: 1
+              classification: sample value
+              commencement_date: '2026-01-15'
+              discount_rate: 0
       responses:
         '201':
           description: Lease created
@@ -66,6 +71,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Lease'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /lease-payment-schedules:
     get:
       operationId: list_lease_payment_schedules
@@ -95,6 +124,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLeasePaymentScheduleRequest'
+            example:
+              lease_id: 550e8400-e29b-41d4-a716-446655440000
+              payment_date: 1000.0
+              amount: 10000.0
+              currency_code: USD
       responses:
         '201':
           description: Lease payment schedule created
@@ -102,6 +136,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeasePaymentSchedule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /lease-liabilities:
     get:
       operationId: list_lease_liabilities
@@ -159,6 +205,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLeaseModificationRequest'
+            example:
+              lease_id: 550e8400-e29b-41d4-a716-446655440000
+              effective_date: '2026-01-15'
+              reason: Reclassification of asset category
       responses:
         '201':
           description: Lease modification created
@@ -166,6 +216,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaseModification'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /lease-modifications/{id}/approve:
     post:
       operationId: approve_lease_modification
@@ -180,6 +242,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LeaseModification'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -209,22 +283,46 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    CompanyId:
+      name: X-Company-ID
+      in: header
+      required: true
+      description: Company identifier for multi-tenant scoping
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Free text search across resources
+      schema:
+        type: string
   schemas:
     Lease:
       type: object
-      required: [id, lease_number, classification, status, commencement_date]
+      required:
+      - id
+      - lease_number
+      - classification
+      - status
+      - commencement_date
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lease_number:
           type: string
+          example: 1
         classification:
           enum:
           - OPERATING
           - FINANCE
           - SHORT_TERM
           - LOW_VALUE
+          example: sample value
         status:
           enum:
           - DRAFT
@@ -232,159 +330,267 @@ components:
           - MODIFIED
           - TERMINATED
           - EXPIRED
+          example: active
         commencement_date:
           type: string
           format: date
+          example: '2026-01-15'
         termination_date:
           type: string
           format: date
+          example: 1000.0
         discount_rate:
           type: number
           format: double
+          example: 0
     CreateLeaseRequest:
       type: object
-      required: [lease_number, classification, commencement_date]
+      required:
+      - lease_number
+      - classification
+      - commencement_date
       properties:
         lease_number:
           type: string
+          example: 1
         classification:
           enum:
           - OPERATING
           - FINANCE
           - SHORT_TERM
           - LOW_VALUE
+          example: sample value
         commencement_date:
           type: string
           format: date
+          example: '2026-01-15'
         discount_rate:
           type: number
           format: double
+          example: 0
     LeasePaymentSchedule:
       type: object
-      required: [id, lease_id, payment_date, amount]
+      required:
+      - id
+      - lease_id
+      - payment_date
+      - amount
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_date:
           type: string
           format: date
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     CreateLeasePaymentScheduleRequest:
       type: object
-      required: [lease_id, payment_date, amount, currency_code]
+      required:
+      - lease_id
+      - payment_date
+      - amount
+      - currency_code
       properties:
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         payment_date:
           type: string
           format: date
+          example: 1000.0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     LeaseLiability:
       type: object
-      required: [id, lease_id, opening_balance, closing_balance]
+      required:
+      - id
+      - lease_id
+      - opening_balance
+      - closing_balance
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         opening_balance:
           type: number
           format: double
+          example: 50000.0
         closing_balance:
           type: number
           format: double
+          example: 55000.0
     RightOfUseAsset:
       type: object
-      required: [id, lease_id, asset_id, carrying_value]
+      required:
+      - id
+      - lease_id
+      - asset_id
+      - carrying_value
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         asset_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         carrying_value:
           type: number
           format: double
+          example: 1000.0
     LeaseModification:
       type: object
-      required: [id, lease_id, status, effective_date]
+      required:
+      - id
+      - lease_id
+      - status
+      - effective_date
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           type: string
-          enum: [DRAFT, APPROVED, POSTED, CANCELLED]
+          enum:
+          - DRAFT
+          - APPROVED
+          - POSTED
+          - CANCELLED
+          example: active
         effective_date:
           type: string
           format: date
+          example: '2026-01-15'
         reason:
           type: string
+          example: Reclassification of asset category
     CreateLeaseModificationRequest:
       type: object
-      required: [lease_id, effective_date, reason]
+      required:
+      - lease_id
+      - effective_date
+      - reason
       properties:
         lease_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         effective_date:
           type: string
           format: date
+          example: '2026-01-15'
         reason:
           type: string
+          example: Reclassification of asset category
     PaginatedLeases:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/Lease' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Lease'
     PaginatedLeasePaymentSchedules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeasePaymentSchedule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeasePaymentSchedule'
     PaginatedLeaseLiabilities:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseLiability' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeaseLiability'
     PaginatedRightOfUseAssets:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RightOfUseAsset' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RightOfUseAsset'
     PaginatedLeaseModifications:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/LeaseModification' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/LeaseModification'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
 security:
 - bearerAuth: []

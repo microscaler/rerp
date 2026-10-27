@@ -279,16 +279,6 @@ pub struct CustomReport {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteCustomReportResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DrillDownReportCellResponse {
     pub cell_id: String,
 

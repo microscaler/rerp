@@ -10,7 +10,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         budget_id: "example".to_string(),
         id: "example".to_string(),
-        reason: "example".to_string(),
+        reason: Some("example".to_string()),
         requested_by: Some("example".to_string()),
         revision_number: 42,
         status: "example".to_string(),

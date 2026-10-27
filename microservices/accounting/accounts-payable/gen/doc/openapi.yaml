@@ -1128,21 +1128,18 @@ components:
           description: Company this invoice belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who approved this invoice
           example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: When the invoice was approved
           example: '2026-01-15T10:30:00Z'
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Invoice description/memo
           example: Primary operating company
         created_at:
@@ -1218,9 +1215,8 @@ components:
           default: 0
           example: 1000.0
         due_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: Payment due date. Defaults to invoice_date + terms.
           example: '2026-01-15'
         terms:
@@ -1234,9 +1230,8 @@ components:
           - CUSTOM
           example: sample value
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
         company_id:
           type: string
@@ -1307,9 +1302,8 @@ components:
           - CUSTOM
           example: sample value
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
     VendorPayment:
       type: object
@@ -1334,9 +1328,8 @@ components:
           description: Unique identifier for the payment
           example: 550e8400-e29b-41d4-a716-446655440000
         reference_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           description: Payment reference (check number, wire reference)
           example: REF-2026-0001
         amount:
@@ -1366,9 +1359,8 @@ components:
           description: Scheduled or actual payment date
           example: 1000.0
         actual_payment_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: When payment was actually sent
           example: 1000.0
         status:
@@ -1397,15 +1389,13 @@ components:
           description: Whether payment has been posted to general ledger
           example: true
         gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL journal entry created for this payment
           example: 650e8400-e29b-41d4-a716-446655440001
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Payment notes
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -1426,9 +1416,8 @@ components:
       - payment_date
       properties:
         reference_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           example: REF-2026-0001
         amount:
           type: number
@@ -1464,9 +1453,8 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         auto_disburse:
           type: boolean
@@ -1506,9 +1494,8 @@ components:
           - CANCELLED
           example: active
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     VendorInvoiceLineItem:
       type: object
@@ -1534,9 +1521,8 @@ components:
           description: Parent vendor invoice
           example: 1000.0
         product_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Product this line item relates to
           example: 850e8400-e29b-41d4-a716-446655440028
         quantity:
@@ -1558,9 +1544,8 @@ components:
           description: Line total (quantity * unit_price)
           example: 10000.0
         tax_code:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           description: Tax code for this line
           example: VAT-2026
         description:
@@ -1569,9 +1554,8 @@ components:
           description: Line item description
           example: Primary operating company
         gl_account:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL account for posting
           example: GL-2026-001
     CreateInvoiceLineItemRequest:
@@ -1581,9 +1565,8 @@ components:
       - amount
       properties:
         product_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 850e8400-e29b-41d4-a716-446655440028
         quantity:
           type: number
@@ -1602,18 +1585,16 @@ components:
           minimum: 0
           example: 10000.0
         tax_code:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           example: VAT-2026
         description:
           type: string
           maxLength: 1000
           example: Primary operating company
         gl_account:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: GL-2026-001
     ApprovalRecord:
       type: object
@@ -1652,15 +1633,13 @@ components:
           description: When the action was taken
           example: '2026-01-15'
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Approval/rejection notes
           example: Approved by CFO on 2026-01-15
         threshold_met:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           description: Approval threshold that was met
           example: 1000.0
     CreateApprovalRequest:
@@ -1682,9 +1661,8 @@ components:
           - DELEGATE
           example: sample value
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     PaymentCommitment:
       type: object
@@ -1701,9 +1679,8 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Related approved invoice
           example: 1000.0
         vendor_id:
@@ -1937,8 +1914,7 @@ components:
           - FAILED
           example: active
         artifact_uri:
-          type: string
-          nullable: true
+          type: [string, 'null']
           example: s3://reports/2026-01/balance_sheet.pdf
     RegisterVendorInvoicePaymentRequest:
       type: object
@@ -1973,8 +1949,7 @@ components:
           format: date
           example: 1000.0
         reference_number:
-          type: string
-          nullable: true
+          type: [string, 'null']
           example: REF-2026-0001
     ThreeWayMatchRequest:
       type: object
@@ -1993,14 +1968,12 @@ components:
             format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         tolerance_amount:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         tolerance_percent:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
     ThreeWayMatchResult:
       type: object
@@ -2169,8 +2142,7 @@ components:
           type: string
           example: Vendor invoice not found
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: sample value
     ValidationError:
       type: object

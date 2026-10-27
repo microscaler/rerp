@@ -2,6 +2,8 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::DepreciationEntry;
+use crate::handlers::types::RevaluationRecord;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -79,7 +81,107 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "accumulated_depreciation")]
+    pub accumulated_depreciation: Option<f64>,
+
+    #[serde(rename = "acquisition_cost")]
+    pub acquisition_cost: f64,
+
+    #[serde(rename = "acquisition_date")]
+    pub acquisition_date: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "acquisition_gl_entry_id")]
+    pub acquisition_gl_entry_id: Option<String>,
+
+    #[serde(rename = "asset_number")]
+    pub asset_number: String,
+
+    #[serde(rename = "category_id")]
+    pub category_id: String,
+
+    #[serde(rename = "company_id")]
+    pub company_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "created_at")]
+    pub created_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "currency_code")]
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "custodian_id")]
+    pub custodian_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "department_id")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "depreciation_schedule")]
+    pub depreciation_schedule: Option<Vec<DepreciationEntry>>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "description")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "disposal_record")]
+    pub disposal_record: Option<serde_json::Value>,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "insurance_policy")]
+    pub insurance_policy: Option<String>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "location")]
+    pub location: Option<String>,
+
+    #[serde(rename = "name")]
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "net_book_value")]
+    pub net_book_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "notes")]
+    pub notes: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "revaluation_history")]
+    pub revaluation_history: Option<Vec<RevaluationRecord>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "serial_number")]
+    pub serial_number: Option<String>,
+
+    #[serde(rename = "status")]
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "supplier_id")]
+    pub supplier_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "useful_life_months")]
+    pub useful_life_months: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "warranty_expiry")]
+    pub warranty_expiry: Option<String>,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;

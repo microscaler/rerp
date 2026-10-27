@@ -11,7 +11,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         active: true,
         created_at: Some("example".to_string()),
         id: "example".to_string(),
-        match_tolerance_amount: Some(3.14),
+        match_tolerance_amount: Some(1.5),
         match_tolerance_days: Some(42),
         name: "example".to_string(),
         rule_type: "example".to_string(),

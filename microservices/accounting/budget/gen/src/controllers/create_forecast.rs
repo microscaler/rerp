@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         period_end: Some("example".to_string()),
         period_start: Some("example".to_string()),
         status: Some("example".to_string()),
-        total_forecasted: Some(3.14),
+        total_forecasted: Some(1.5),
         updated_at: Some("example".to_string()),
     })
 }

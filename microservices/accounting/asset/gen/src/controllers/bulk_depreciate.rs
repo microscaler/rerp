@@ -10,7 +10,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         assets_processed: Some(42),
         errors: Some(vec![]),
-        total_depreciation: Some(3.14),
+        total_depreciation: Some(1.5),
         total_entries: Some(42),
     })
 }

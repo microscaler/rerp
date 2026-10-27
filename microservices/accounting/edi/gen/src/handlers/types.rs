@@ -150,7 +150,8 @@ pub struct CreateEdiMappingResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub document_type: String,
 
@@ -281,7 +282,8 @@ pub struct EdiAcknowledgment {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,
 
-    pub received_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub received_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_at: Option<String>,
@@ -429,7 +431,8 @@ pub struct EdiMapping {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub document_type: String,
 
@@ -660,7 +663,8 @@ pub struct GetEdiMappingResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub document_type: String,
 
@@ -702,6 +706,132 @@ pub struct GetEdiSubmissionStatusResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submitted_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiAcknowledgmentsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiAcknowledgment>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiDocumentsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiDocument>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiErrorsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiError>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiMappingsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiMapping>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiProfilesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiProfile>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiSubmissionsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiSubmission>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEdiValidationProfilesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiValidationProfile>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiAcknowledgments {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiAcknowledgment>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiDocuments {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiDocument>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiErrors {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiError>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiMappings {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiMapping>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiProfiles {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiProfile>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiSubmissions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiSubmission>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEdiValidationProfiles {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EdiValidationProfile>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -891,7 +1021,8 @@ pub struct UpdateEdiMappingResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<serde_json::Value>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub document_type: String,
 

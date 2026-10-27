@@ -24,16 +24,6 @@ pub struct ApprovalRecord {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ApprovePaymentBatchResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CashFlowForecast {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub by_day: Option<Vec<serde_json::Value>>,
@@ -207,9 +197,11 @@ pub struct CreateVendorInvoiceResponse {
 
     pub approval_status: String,
 
-    pub approved_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_at: Option<String>,
 
-    pub approved_by: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_by: Option<String>,
 
     pub company_id: String,
 
@@ -217,7 +209,8 @@ pub struct CreateVendorInvoiceResponse {
 
     pub currency_code: String,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub due_date: String,
 
@@ -272,7 +265,8 @@ pub struct CreateVendorPaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateVendorPaymentResponse {
-    pub actual_payment_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub actual_payment_date: Option<String>,
 
     pub amount: f64,
 
@@ -283,11 +277,13 @@ pub struct CreateVendorPaymentResponse {
 
     pub currency_code: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -295,7 +291,8 @@ pub struct CreateVendorPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -303,26 +300,6 @@ pub struct CreateVendorPaymentResponse {
     pub updated_at: Option<String>,
 
     pub vendor_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteVendorInvoiceResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteVendorPaymentResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -364,8 +341,65 @@ pub struct ExportPaymentFileRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetVendorInvoiceResponse {
+    pub amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approval_history: Option<Vec<ApprovalRecord>>,
+
+    pub approval_status: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_at: Option<String>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_by: Option<String>,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    pub currency_code: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
+
+    pub due_date: String,
+
+    pub id: String,
+
+    pub invoice_date: String,
+
+    pub invoice_id: String,
+
+    pub invoice_number: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_items: Option<Vec<VendorInvoiceLineItem>>,
+
+    pub net_amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_history: Option<Vec<VendorPayment>>,
+
+    pub payment_status: String,
+
+    pub status: String,
+
+    pub tax_amount: f64,
+
+    pub terms: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub vendor_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetVendorPaymentResponse {
-    pub actual_payment_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub actual_payment_date: Option<String>,
 
     pub amount: f64,
 
@@ -376,11 +410,13 @@ pub struct GetVendorPaymentResponse {
 
     pub currency_code: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -388,7 +424,8 @@ pub struct GetVendorPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -631,7 +668,8 @@ pub struct RegisterVendorInvoicePaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct RegisterVendorInvoicePaymentResponse {
-    pub actual_payment_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub actual_payment_date: Option<String>,
 
     pub amount: f64,
 
@@ -642,11 +680,13 @@ pub struct RegisterVendorInvoicePaymentResponse {
 
     pub currency_code: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -654,7 +694,8 @@ pub struct RegisterVendorInvoicePaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -722,9 +763,11 @@ pub struct UpdateVendorInvoiceResponse {
 
     pub approval_status: String,
 
-    pub approved_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_at: Option<String>,
 
-    pub approved_by: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_by: Option<String>,
 
     pub company_id: String,
 
@@ -732,7 +775,8 @@ pub struct UpdateVendorInvoiceResponse {
 
     pub currency_code: String,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub due_date: String,
 
@@ -780,7 +824,8 @@ pub struct UpdateVendorPaymentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateVendorPaymentResponse {
-    pub actual_payment_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub actual_payment_date: Option<String>,
 
     pub amount: f64,
 
@@ -791,11 +836,13 @@ pub struct UpdateVendorPaymentResponse {
 
     pub currency_code: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -803,7 +850,8 @@ pub struct UpdateVendorPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -828,9 +876,11 @@ pub struct VendorInvoice {
 
     pub approval_status: String,
 
-    pub approved_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_at: Option<String>,
 
-    pub approved_by: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub approved_by: Option<String>,
 
     pub company_id: String,
 
@@ -838,7 +888,8 @@ pub struct VendorInvoice {
 
     pub currency_code: String,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub due_date: String,
 
@@ -872,24 +923,40 @@ pub struct VendorInvoiceLineItem {
 
     pub description: String,
 
-    pub gl_account: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_account: Option<String>,
 
     pub id: String,
 
     pub invoice_id: String,
 
-    pub product_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub product_id: Option<String>,
 
     pub quantity: f64,
 
-    pub tax_code: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub tax_code: Option<String>,
 
     pub unit_price: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct VendorInvoiceWithDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approval_history: Option<Vec<ApprovalRecord>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_items: Option<Vec<VendorInvoiceLineItem>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_history: Option<Vec<VendorPayment>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct VendorPayment {
-    pub actual_payment_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub actual_payment_date: Option<String>,
 
     pub amount: f64,
 
@@ -900,11 +967,13 @@ pub struct VendorPayment {
 
     pub currency_code: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -912,7 +981,8 @@ pub struct VendorPayment {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 

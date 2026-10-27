@@ -8,7 +8,7 @@ use brrtrouter_macros::handler;
 #[handler(VarianceReportController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        breach_threshold: Some(3.14),
+        breach_threshold: Some(1.5),
         budget_id: "example".to_string(),
         budget_name: Some("example".to_string()),
         created_at: Some("example".to_string()),
@@ -18,10 +18,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         lines: Some(vec![]),
         period_end: "example".to_string(),
         period_start: "example".to_string(),
-        total_actual: Some(3.14),
-        total_budgeted: Some(3.14),
-        total_variance: Some(3.14),
-        total_variance_percent: Some(3.14),
-        warning_threshold: Some(3.14),
+        total_actual: Some(1.5),
+        total_budgeted: Some(1.5),
+        total_variance: Some(1.5),
+        total_variance_percent: Some(1.5),
+        warning_threshold: Some(1.5),
     })
 }

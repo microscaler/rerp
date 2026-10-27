@@ -114,7 +114,8 @@ pub struct AutoApplyPaymentResponse {
 pub struct CollectionActivity {
     pub activity_type: String,
 
-    pub assigned_to: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub assigned_to: Option<String>,
 
     pub company_id: String,
 
@@ -127,16 +128,19 @@ pub struct CollectionActivity {
 
     pub id: String,
 
-    pub next_follow_up_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub next_follow_up_date: Option<String>,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CollectionCase {
-    pub assigned_to: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub assigned_to: Option<String>,
 
     pub customer_id: String,
 
@@ -229,7 +233,8 @@ pub struct CreateCollectionActivityRequest {
 pub struct CreateCollectionActivityResponse {
     pub activity_type: String,
 
-    pub assigned_to: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub assigned_to: Option<String>,
 
     pub company_id: String,
 
@@ -242,9 +247,11 @@ pub struct CreateCollectionActivityResponse {
 
     pub id: String,
 
-    pub next_follow_up_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub next_follow_up_date: Option<String>,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub updated_at: String,
 }
@@ -262,7 +269,8 @@ pub struct CreateCollectionCaseRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateCollectionCaseResponse {
-    pub assigned_to: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub assigned_to: Option<String>,
 
     pub customer_id: String,
 
@@ -302,7 +310,8 @@ pub struct CreateCustomerPaymentRequest {
 pub struct CreateCustomerPaymentResponse {
     pub amount: f64,
 
-    pub applied_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub applied_at: Option<String>,
 
     pub company_id: String,
 
@@ -313,11 +322,13 @@ pub struct CreateCustomerPaymentResponse {
 
     pub customer_id: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -325,7 +336,8 @@ pub struct CreateCustomerPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -500,16 +512,6 @@ pub struct CustomerCreditLimit {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteCustomerPaymentResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: String,
 
@@ -586,7 +588,8 @@ pub struct GetArAgingResponse {
 pub struct GetCustomerPaymentResponse {
     pub amount: f64,
 
-    pub applied_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub applied_at: Option<String>,
 
     pub company_id: String,
 
@@ -597,11 +600,13 @@ pub struct GetCustomerPaymentResponse {
 
     pub customer_id: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -609,12 +614,52 @@ pub struct GetCustomerPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetOpenItemResponse {
+    pub aging_bucket: String,
+
+    pub company_id: String,
+
+    pub created_at: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub credit_limit_check: Option<bool>,
+
+    pub currency_code: String,
+
+    pub customer_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_overdue: Option<i32>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub due_date: Option<String>,
+
+    pub id: String,
+
+    pub invoice_id: String,
+
+    pub original_amount: f64,
+
+    pub outstanding_amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_history: Option<Vec<PaymentApplication>>,
+
+    pub status: String,
+
+    pub terms: String,
+
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -700,13 +745,15 @@ pub struct OpenItem {
 
     pub created_at: String,
 
-    pub credit_limit_check: bool,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub credit_limit_check: Option<bool>,
 
     pub currency_code: String,
 
     pub customer_id: String,
 
-    pub due_date: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub due_date: Option<String>,
 
     pub id: String,
 
@@ -721,6 +768,15 @@ pub struct OpenItem {
     pub terms: String,
 
     pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct OpenItemWithDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_overdue: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payment_history: Option<Vec<PaymentApplication>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -806,7 +862,8 @@ pub struct PaginatedResponse {
 pub struct Payment {
     pub amount: f64,
 
-    pub applied_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub applied_at: Option<String>,
 
     pub company_id: String,
 
@@ -817,11 +874,13 @@ pub struct Payment {
 
     pub customer_id: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -829,7 +888,8 @@ pub struct Payment {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 
@@ -930,7 +990,8 @@ pub struct UpdateCustomerPaymentRequest {
 pub struct UpdateCustomerPaymentResponse {
     pub amount: f64,
 
-    pub applied_at: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub applied_at: Option<String>,
 
     pub company_id: String,
 
@@ -941,11 +1002,13 @@ pub struct UpdateCustomerPaymentResponse {
 
     pub customer_id: String,
 
-    pub gl_entry_id: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
 
     pub id: String,
 
-    pub notes: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
 
     pub payment_date: String,
 
@@ -953,7 +1016,8 @@ pub struct UpdateCustomerPaymentResponse {
 
     pub posted_to_gl: bool,
 
-    pub reference_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
 
     pub status: String,
 

@@ -1039,9 +1039,8 @@ components:
           description: Asset name/description
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Detailed description
           example: Primary operating company
         category_id:
@@ -1067,21 +1066,18 @@ components:
           description: Date the asset was acquired
           example: '2024-01-15'
         location:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           description: Current location of the asset
           example: Building A, Floor 3
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Department responsible for the asset
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Person responsible for the asset
           example: 750e8400-e29b-41d4-a716-446655440002
         status:
@@ -1097,9 +1093,8 @@ components:
           description: Asset lifecycle status
           example: active
         acquisition_gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL journal entry created during acquisition
           example: 550e8400-e29b-41d4-a716-446655440000
         net_book_value:
@@ -1123,33 +1118,28 @@ components:
           description: Company this asset belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Original supplier/vendor
           example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           description: Manufacturer serial number
           example: SN-2026-0001
         warranty_expiry:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: Warranty expiration date
           example: '2031-01-01'
         insurance_policy:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           description: Insurance policy reference
           example: POL-2026-0001
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         created_at:
           type: string
@@ -1170,8 +1160,7 @@ components:
               $ref: '#/components/schemas/DepreciationEntry'
             description: Depreciation schedule for this asset
           disposal_record:
-            type: object
-            nullable: true
+            type: [object, 'null']
             description: Disposal record if disposed
           revaluation_history:
             type: array
@@ -1197,9 +1186,8 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
         acquisition_cost:
           type: number
@@ -1217,19 +1205,16 @@ components:
           format: date
           example: '2024-01-15'
         location:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           example: Building A, Floor 3
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 750e8400-e29b-41d4-a716-446655440002
         useful_life_months:
           type: integer
@@ -1250,30 +1235,25 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           example: SN-2026-0001
         warranty_expiry:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           example: '2031-01-01'
         acquisition_gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL entry from acquisition invoice
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         auto_depreciate:
           type: boolean
@@ -1288,24 +1268,20 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
         location:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           example: Building A, Floor 3
         department_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 750e8400-e29b-41d4-a716-446655440002
         status:
           type: string
@@ -1319,9 +1295,8 @@ components:
           - TRANSIT
           example: active
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     DepreciationSchedule:
       type: object
@@ -1449,9 +1424,8 @@ components:
           description: Net book value at this period
           example: 35000.0
         gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL journal entry created for this depreciation
           example: 650e8400-e29b-41d4-a716-446655440001
         posted_to_gl:
@@ -1503,9 +1477,8 @@ components:
           format: date
           example: '2026-01-15'
         monthly_rate:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           description: Custom monthly rate. Auto-calculated from method if not provided.
           example: 1
     CreateDepreciationEntryRequest:
@@ -1572,9 +1545,8 @@ components:
           description: Reason for revaluation
           example: Reclassification of asset category
         gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL journal entry for revaluation
           example: 650e8400-e29b-41d4-a716-446655440001
         created_by:
@@ -1674,21 +1646,18 @@ components:
           description: Gain (positive) or loss (negative) on disposal
           example: 1000.0
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Disposal details
           example: Primary operating company
         approved_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who approved the disposal
           example: 950e8400-e29b-41d4-a716-446655440004
         gl_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: GL journal entry for disposal
           example: 650e8400-e29b-41d4-a716-446655440001
         created_by:
@@ -1737,9 +1706,8 @@ components:
           maxLength: 3
           example: USD
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Primary operating company
     AssetCategory:
       type: object
@@ -1758,9 +1726,8 @@ components:
           description: Category name
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           description: Category description
           example: Primary operating company
         default_depreciation_method:
@@ -1774,27 +1741,23 @@ components:
           description: Default depreciation method for assets in this category
           example: true
         default_useful_life_months:
-          type: integer
+          type: [integer, 'null']
           minimum: 1
-          nullable: true
           description: Default useful life in months
           example: true
         gl_account_debit:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Default debit GL account for acquisitions
           example: GL-DEBIT-2026
         gl_account_credit:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Default credit GL account for depreciation
           example: GL-CREDIT-2026
         parent_category_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Parent category for hierarchical categories
           example: 650e8400-e29b-41d4-a716-446655440031
         company_id:
@@ -1820,9 +1783,8 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           example: Primary operating company
         default_depreciation_method:
           type: string
@@ -1834,24 +1796,20 @@ components:
           - FOREIGN_EXCHANGE_ADJUSTMENT
           example: true
         default_useful_life_months:
-          type: integer
+          type: [integer, 'null']
           minimum: 1
-          nullable: true
           example: true
         gl_account_debit:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: GL-DEBIT-2026
         gl_account_credit:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: GL-CREDIT-2026
         parent_category_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440031
         company_id:
           type: string
@@ -1886,24 +1844,20 @@ components:
           minimum: 1
           example: 60
         residual_value_percent:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         asset_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 750e8400-e29b-41d4-a716-446655440027
         depreciation_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440025
         expense_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440026
     CreateAssetModelRequest:
       type: object
@@ -1929,9 +1883,8 @@ components:
           minimum: 1
           example: 60
         residual_value_percent:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
     ModifyAssetRequest:
       type: object
@@ -1947,18 +1900,15 @@ components:
           type: string
           example: Reclassification of asset category
         new_useful_life_months:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           example: 1
         new_residual_value:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         value_adjustment:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
     PaginatedAssetModels:
       type: object
@@ -2199,8 +2149,7 @@ components:
           type: string
           example: Asset not found
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: sample value
     ValidationError:
       type: object

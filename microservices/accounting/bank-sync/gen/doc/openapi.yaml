@@ -1202,9 +1202,8 @@ components:
           description: Bank account number
           example: 1
         routing_number:
-          type: string
+          type: [string, 'null']
           maxLength: 20
-          nullable: true
           description: Bank routing/SWIFT/IBAN code
           example: 1
         currency_code:
@@ -1219,9 +1218,8 @@ components:
           description: Name of the banking institution
           example: Acme Corporation
         bank_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Linked bank institution record
           example: 850e8400-e29b-41d4-a716-446655440003
         account_type:
@@ -1237,9 +1235,8 @@ components:
           description: Type of bank account
           example: Asset
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Linked GL account for reconciliation
           example: 950e8400-e29b-41d4-a716-446655440024
         opening_balance:
@@ -1268,9 +1265,8 @@ components:
           description: Whether automatic sync is enabled
           example: true
         last_sync_date:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: Last successful sync date
           example: true
         sync_frequency:
@@ -1288,9 +1284,8 @@ components:
           description: Company this account belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
         created_at:
           type: string
@@ -1317,9 +1312,8 @@ components:
           maxLength: 50
           example: 1
         routing_number:
-          type: string
+          type: [string, 'null']
           maxLength: 20
-          nullable: true
           example: 1
         currency_code:
           type: string
@@ -1342,9 +1336,8 @@ components:
           - OTHER
           example: Asset
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 950e8400-e29b-41d4-a716-446655440024
         opening_balance:
           type: number
@@ -1360,9 +1353,8 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     UpdateBankAccountRequest:
       type: object
@@ -1376,9 +1368,8 @@ components:
           maxLength: 50
           example: 1
         routing_number:
-          type: string
+          type: [string, 'null']
           maxLength: 20
-          nullable: true
           example: 1
         bank_name:
           type: string
@@ -1396,9 +1387,8 @@ components:
           - OTHER
           example: Asset
         gl_account_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 950e8400-e29b-41d4-a716-446655440024
         status:
           type: string
@@ -1420,9 +1410,8 @@ components:
           - MANUAL
           example: true
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     BankStatement:
       type: object
@@ -1446,9 +1435,8 @@ components:
           description: Bank account this statement belongs to
           example: 0
         statement_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           description: External statement reference number
           example: 1
         statement_date:
@@ -1501,9 +1489,8 @@ components:
           description: Number of transactions not yet matched
           example: 0
         file_reference:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           description: Reference to the uploaded file
           example: FILE-2026-0001
         imported_at:
@@ -1512,9 +1499,8 @@ components:
           description: When the statement was imported
           example: sample value
         imported_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who imported the statement
           example: sample value
         created_at:
@@ -1537,9 +1523,8 @@ components:
           format: uuid
           example: 0
         statement_number:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           example: 1
         start_date:
           type: string
@@ -1573,9 +1558,8 @@ components:
           description: Transactions in this statement
           example: *id005
         file_reference:
-          type: string
+          type: [string, 'null']
           maxLength: 500
-          nullable: true
           description: Reference to uploaded statement file
           example: FILE-2026-0001
     BankTransaction:
@@ -1609,9 +1593,8 @@ components:
           description: Transaction date
           example: '2026-01-15'
         value_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: Value/settlement date
           example: 1000.0
         amount:
@@ -1630,21 +1613,18 @@ components:
           description: Transaction description/narrative
           example: Primary operating company
         reference:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           description: Transaction reference number
           example: REF-2026-0001
         counterparty_name:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           description: Counterparty name
           example: 0
         counterparty_account:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           description: Counterparty account number
           example: 0
         status:
@@ -1658,44 +1638,39 @@ components:
           description: Transaction reconciliation status
           example: active
         matched_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: Linked GL entry or invoice
           example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_type:
-          type: string
+          type: [string, 'null']
           enum:
           - INVOICE
           - PAYMENT
           - JOURNAL_ENTRY
           - TRANSFER
           - OTHER
-          nullable: true
+          - null
           description: Type of matched entry
           example: standard
         matched_date:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: When the transaction was matched
           example: '2026-01-15'
         matched_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who matched the transaction
           example: sample value
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Notes about this transaction
           example: Approved by CFO on 2026-01-15
         dispute_reason:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Reason for dispute if applicable
           example: sample value
         created_at:
@@ -1718,9 +1693,8 @@ components:
           format: date
           example: '2026-01-15'
         value_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           example: 1000.0
         amount:
           type: number
@@ -1736,24 +1710,20 @@ components:
           maxLength: 500
           example: Primary operating company
         reference:
-          type: string
+          type: [string, 'null']
           maxLength: 100
-          nullable: true
           example: REF-2026-0001
         counterparty_name:
-          type: string
+          type: [string, 'null']
           maxLength: 200
-          nullable: true
           example: 0
         counterparty_account:
-          type: string
+          type: [string, 'null']
           maxLength: 50
-          nullable: true
           example: 0
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     CreateBankTransactionMatchingRequest:
       type: object
@@ -1782,9 +1752,8 @@ components:
           - OTHER
           example: standard
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           description: Matching notes
           example: Approved by CFO on 2026-01-15
     BankReconciliation:
@@ -1864,21 +1833,18 @@ components:
           description: Number of unmatched transactions
           example: 1
         reconciled_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: User who completed the reconciliation
           example: true
         reconciled_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           description: When reconciliation was completed
           example: true
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           description: Reconciliation notes
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -1914,9 +1880,8 @@ components:
           description: Balance per books before reconciliation
           example: 1000.0
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 2000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     PaginatedBankAccounts:
       type: object
@@ -2171,13 +2136,11 @@ components:
           type: boolean
           example: true
         match_tolerance_amount:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         match_tolerance_days:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           example: 0
         created_at:
           type: string
@@ -2216,13 +2179,11 @@ components:
           default: true
           example: true
         match_tolerance_amount:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         match_tolerance_days:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           example: 0
     ReconciliationSuggestion:
       type: object
@@ -2251,9 +2212,8 @@ components:
           maximum: 1
           example: 0.85
         model_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440040
         reason:
           type: string
@@ -2295,14 +2255,12 @@ components:
           - OTHER
           example: standard
         write_off_amount:
-          type: number
+          type: [number, 'null']
           format: double
-          nullable: true
           example: 1000.0
         notes:
-          type: string
+          type: [string, 'null']
           maxLength: 1000
-          nullable: true
           example: Approved by CFO on 2026-01-15
     ReconciliationResult:
       type: object
@@ -2315,9 +2273,8 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         reconciliation_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 650e8400-e29b-41d4-a716-446655440036
         status:
           type: string
@@ -2327,9 +2284,8 @@ components:
           - PARTIALLY_RECONCILED
           example: active
         journal_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440000
     CreateTransactionWriteOffRequest:
       type: object
@@ -2351,8 +2307,7 @@ components:
           maxLength: 500
           example: Reclassification of asset category
         tax_code:
-          type: string
-          nullable: true
+          type: [string, 'null']
           example: VAT-2026
     CreateExchangeDifferenceRequest:
       type: object
@@ -2375,9 +2330,8 @@ components:
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         exchange_rate_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 1000.0
     ReconciliationAdjustment:
       type: object
@@ -2406,9 +2360,8 @@ components:
           format: double
           example: 10000.0
         journal_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           example: 550e8400-e29b-41d4-a716-446655440000
     PaginatedReconciliationModels:
       type: object
@@ -2444,8 +2397,7 @@ components:
           type: string
           example: Bank account not found
         details:
-          type: object
-          nullable: true
+          type: [object, 'null']
           example: sample value
     ValidationError:
       type: object

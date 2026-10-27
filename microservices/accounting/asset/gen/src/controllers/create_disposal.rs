@@ -16,10 +16,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         description: Some("example".to_string()),
         disposal_date: "example".to_string(),
         disposal_type: "example".to_string(),
-        gain_loss: 3.14,
+        gain_loss: 1.5,
         gl_entry_id: Some("example".to_string()),
         id: "example".to_string(),
-        net_book_value: 3.14,
-        proceeds: Some(3.14),
+        net_book_value: 1.5,
+        proceeds: Some(1.5),
     })
 }

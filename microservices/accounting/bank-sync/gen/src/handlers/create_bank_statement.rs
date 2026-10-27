@@ -90,8 +90,9 @@ pub struct Response {
     #[serde(rename = "statement_date")]
     pub statement_date: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "statement_number")]
-    pub statement_number: String,
+    pub statement_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]

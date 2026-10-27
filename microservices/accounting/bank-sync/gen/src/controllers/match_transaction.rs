@@ -8,7 +8,7 @@ use brrtrouter_macros::handler;
 #[handler(MatchTransactionController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        amount: 3.14,
+        amount: 1.5,
         bank_account_id: Some("example".to_string()),
         counterparty_account: Some("example".to_string()),
         counterparty_name: Some("example".to_string()),

@@ -12,7 +12,8 @@ pub struct ApproveLeaseModificationResponse {
 
     pub lease_id: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 
     pub status: String,
 }
@@ -34,7 +35,8 @@ pub struct CreateLeaseModificationResponse {
 
     pub lease_id: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 
     pub status: String,
 }
@@ -54,7 +56,8 @@ pub struct CreateLeasePaymentScheduleRequest {
 pub struct CreateLeasePaymentScheduleResponse {
     pub amount: f64,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
@@ -69,7 +72,8 @@ pub struct CreateLeaseRequest {
 
     pub commencement_date: String,
 
-    pub discount_rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_rate: Option<f64>,
 
     pub lease_number: String,
 }
@@ -80,7 +84,8 @@ pub struct CreateLeaseResponse {
 
     pub commencement_date: String,
 
-    pub discount_rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_rate: Option<f64>,
 
     pub id: String,
 
@@ -88,7 +93,8 @@ pub struct CreateLeaseResponse {
 
     pub status: serde_json::Value,
 
-    pub termination_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub termination_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -104,7 +110,8 @@ pub struct Lease {
 
     pub commencement_date: String,
 
-    pub discount_rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discount_rate: Option<f64>,
 
     pub id: String,
 
@@ -112,7 +119,8 @@ pub struct Lease {
 
     pub status: serde_json::Value,
 
-    pub termination_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub termination_date: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -134,7 +142,8 @@ pub struct LeaseModification {
 
     pub lease_id: String,
 
-    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
 
     pub status: String,
 }
@@ -143,7 +152,8 @@ pub struct LeaseModification {
 pub struct LeasePaymentSchedule {
     pub amount: f64,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
@@ -153,12 +163,102 @@ pub struct LeasePaymentSchedule {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLeaseLiabilitiesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeaseLiability>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLeaseModificationsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeaseModification>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLeasePaymentSchedulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeasePaymentSchedule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLeasesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<Lease>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListRightOfUseAssetsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RightOfUseAsset>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLeaseLiabilities {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeaseLiability>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLeaseModifications {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeaseModification>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLeasePaymentSchedules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LeasePaymentSchedule>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLeases {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<Lease>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedResponse {
     pub limit: i32,
 
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRightOfUseAssets {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RightOfUseAsset>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

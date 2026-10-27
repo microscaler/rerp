@@ -12,7 +12,8 @@ pub struct ApprovalPolicy {
 
     pub id: String,
 
-    pub minimum_approvals: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_approvals: Option<i32>,
 
     pub service_name: String,
 }
@@ -49,7 +50,8 @@ pub struct ControlException {
 pub struct CreateApprovalPolicyRequest {
     pub action_name: String,
 
-    pub minimum_approvals: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_approvals: Option<i32>,
 
     pub service_name: String,
 }
@@ -62,7 +64,8 @@ pub struct CreateApprovalPolicyResponse {
 
     pub id: String,
 
-    pub minimum_approvals: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_approvals: Option<i32>,
 
     pub service_name: String,
 }
@@ -150,12 +153,102 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListApprovalPoliciesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ApprovalPolicy>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListAuditEventsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<AuditEvent>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListControlExceptionsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ControlException>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListSegregationRulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<SegregationRule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListSignatureRequestsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<SignatureRequest>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedApprovalPolicies {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ApprovalPolicy>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAuditEvents {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<AuditEvent>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedControlExceptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ControlException>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedResponse {
     pub limit: i32,
 
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedSegregationRules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<SegregationRule>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedSignatureRequests {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<SignatureRequest>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

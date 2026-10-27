@@ -8,13 +8,13 @@ use brrtrouter_macros::handler;
 #[handler(RunDepreciationController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        accumulated_depreciation: 3.14,
+        accumulated_depreciation: 1.5,
         asset_id: Some("example".to_string()),
         created_at: Some("example".to_string()),
-        depreciation_amount: 3.14,
+        depreciation_amount: 1.5,
         gl_entry_id: Some("example".to_string()),
         id: "example".to_string(),
-        net_book_value: Some(3.14),
+        net_book_value: Some(1.5),
         period: "example".to_string(),
         posted_to_gl: Some(true),
         schedule_id: "example".to_string(),
