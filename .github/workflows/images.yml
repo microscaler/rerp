@@ -48,6 +48,9 @@ jobs:
       # 12 Mbit/s uplink.
       runner: '["self-hosted", "linux", "x64", "microscaler"]'
       sccache: true
+      # Image builds and pushes on GitHub-hosted runners: ~1 GB per run over ms02's ~15 Mbit/s uplink starved
+      # PriceWhisperer's releases (27 Oct). These builds run without sccache.
+      artifacts_runner: ubuntu-24.04
       # Release notes from our own vLLM (Qwen on the Sparks), reachable from the ms02 runners; if it is down
       # the notes fall back to the commit list and the release goes ahead.
       release_notes_provider: openai
