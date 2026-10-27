@@ -1,16 +1,18 @@
 // Implementation stub for handler 'perform_vendor_invoice_three_way_match'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path perform_vendor_invoice_three_way_match --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_accounts_payable_gen::handlers::perform_vendor_invoice_three_way_match::{
     Request, Response,
 };
 
 #[handler(PerformVendorInvoiceThreeWayMatchController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -21,10 +23,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
+    HttpJson::ok(Response {
         matched: true,                            // TODO: Set from your business logic
         variance_count: 42,                       // TODO: Set from your business logic
         variances: None,                          // TODO: Set from your business logic
         vendor_invoice_id: "example".to_string(), // TODO: Set from your business logic
-    }
+    })
 }
