@@ -12,7 +12,7 @@ dependencies = [
     # From git, so CI (and anyone without a BRRTRouter checkout) can install it: the same BRRTRouter revision as the
     # release crates (microservices/Cargo.toml). Developing BRRTRouter's tooling alongside: after installing this,
     # `pip install -e ../../BRRTRouter/tooling` in the same venv replaces it with the sibling checkout.
-    "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@9bcb2db0020fb9d86ea19954ef113b6d8019ece3#subdirectory=tooling",
+    "brrtrouter-tooling @ git+https://github.com/microscaler/BRRTRouter.git@0e8f307c1925158f62df201fe8900bc01c3cc5cf#subdirectory=tooling",
 ]
 
 [project.optional-dependencies]
