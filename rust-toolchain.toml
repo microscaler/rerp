@@ -3,3 +3,6 @@
 # different cache key). Bump it together with the buildpack default.
 [toolchain]
 channel = "1.99.0"
+# rustup installs these with the toolchain; without them a CI step that set up stable with rustfmt/clippy finds
+# `cargo fmt` / `cargo clippy` missing once this file switches it to 1.99.0.
+components = ["rustfmt", "clippy"]
