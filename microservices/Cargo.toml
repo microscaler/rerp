@@ -77,18 +77,18 @@ edition = "2021"
 # Release builds (CI, the buildpack) use these git revisions: the same revs PriceWhisperer pins. Local dev
 # overrides them with sibling checkouts from [workspace.metadata.local-deps] below (RERP_LOCAL_DEPS=1, which Tilt sets).
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
-brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "cbebc84575ce650e3c399a1de4e0e32ead87828f", default-features = false }
-brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "cbebc84575ce650e3c399a1de4e0e32ead87828f" }
-sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "e3c9d7f5ddb61a12dde9ad4178b0fe0590dc7009" }
+brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "9768e3583eebbdca2c7b4fc28b7a4a4963d74286", default-features = false }
+brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "9768e3583eebbdca2c7b4fc28b7a4a4963d74286" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "5dde341dfb7c48601b9956d1457e5a6f49189f72" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }
 http_legacy = { package = "http", version = "0.2" }
 
 # Lifeguard ORM
-lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
-lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
-lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "75e0e5fa57e585b4345f7b0e9da49e381c5bf44f" }
+lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f" }
+lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f" }
+lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f" }
 rerp_entities = { package = "rerp-entities", path = "accounting/entities" }
 
 # Standard dependencies
@@ -123,6 +123,8 @@ lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", path 
 lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", path = "../../lifeguard/lifeguard-migrate" }
 
 [patch.crates-io]
+# may fork master: sub-millisecond timeouts honoured (no rounding to 0 / busy spin), recv_timeout.
+may = { git = "https://github.com/microscaler/may.git", rev = "719a78df9275ca5afc29e68d5b462b54833ef9cc" }
 # sea-query 1.0.2 emits a bounded window-frame offset with no separator
 # ("$1PRECEDING") that Postgres rejects; the fix + regression tests live on
 # the microscaler fork (still version 1.0.2; PR to SeaQL pending). Aligns

@@ -100,7 +100,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -111,7 +111,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -402,7 +402,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cbebc84575ce650e3c399a1de4e0e32ead87828f#cbebc84575ce650e3c399a1de4e0e32ead87828f"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=9768e3583eebbdca2c7b4fc28b7a4a4963d74286#9768e3583eebbdca2c7b4fc28b7a4a4963d74286"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -457,7 +457,7 @@ dependencies = [
 [[package]]
 name = "brrtrouter_macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cbebc84575ce650e3c399a1de4e0e32ead87828f#cbebc84575ce650e3c399a1de4e0e32ead87828f"
+source = "git+https://github.com/microscaler/BRRTRouter.git?rev=9768e3583eebbdca2c7b4fc28b7a4a4963d74286#9768e3583eebbdca2c7b4fc28b7a4a4963d74286"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -1298,7 +1298,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2247,7 +2247,7 @@ checksum = "2e126dda6f34391ab7b444f9922055facc83c07a910da3eb16f1e4d9c45dc777"
 [[package]]
 name = "lifeguard"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=75e0e5fa57e585b4345f7b0e9da49e381c5bf44f#75e0e5fa57e585b4345f7b0e9da49e381c5bf44f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
 dependencies = [
  "bytes 1.12.1",
  "chrono",
@@ -2255,6 +2255,7 @@ dependencies = [
  "crossbeam-channel",
  "csv",
  "fake",
+ "libc",
  "lifeguard-derive",
  "log",
  "may",
@@ -2268,7 +2269,6 @@ dependencies = [
  "postgres-types",
  "prometheus",
  "protobuf",
- "rand 0.8.8",
  "redis",
  "regex",
  "rust_decimal",
@@ -2284,7 +2284,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-derive"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=75e0e5fa57e585b4345f7b0e9da49e381c5bf44f#75e0e5fa57e585b4345f7b0e9da49e381c5bf44f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2294,7 +2294,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=75e0e5fa57e585b4345f7b0e9da49e381c5bf44f#75e0e5fa57e585b4345f7b0e9da49e381c5bf44f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2390,8 +2390,7 @@ checksum = "47e1ffaa40ddd1f3ed91f717a33c8c0ee23fff369e3aa8772b9605cc1d22f4c3"
 [[package]]
 name = "may"
 version = "0.3.51"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a812e25193d07288695d0e12e30ec5cd52f9fefc3c55038b89f1ef906dcab078"
+source = "git+https://github.com/microscaler/may.git?rev=719a78df9275ca5afc29e68d5b462b54833ef9cc#719a78df9275ca5afc29e68d5b462b54833ef9cc"
 dependencies = [
  "cfg-if",
  "core_affinity",
@@ -2400,13 +2399,13 @@ dependencies = [
  "libc",
  "log",
  "may_queue",
- "nix 0.30.1",
+ "nix 0.31.3",
  "num_cpus",
  "parking_lot",
  "rustversion",
  "smallvec",
- "socket2 0.5.10",
- "windows-sys 0.59.0",
+ "socket2 0.6.5",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2426,9 +2425,10 @@ dependencies = [
 [[package]]
 name = "may_minihttp"
 version = "0.1.11"
-source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#0dd8370479935fbaf230d2fe896cea677256bb1c"
+source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#bc9d8f6a18a46e6d032d5f895d92b1d862162e5c"
 dependencies = [
  "bytes 1.12.1",
+ "generator",
  "http 0.2.12",
  "httparse",
  "httpdate",
@@ -2438,13 +2438,14 @@ dependencies = [
  "once_cell",
  "rustls",
  "rustls-platform-verifier",
+ "tracing",
  "url",
 ]
 
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?rev=4cff8ff730fa948b680d3c1f34d158120b205df7#4cff8ff730fa948b680d3c1f34d158120b205df7"
+source = "git+https://github.com/microscaler/may_postgres.git?rev=cb92eff897539ebf5c1ac2b5d533b57b48342fee#cb92eff897539ebf5c1ac2b5d533b57b48342fee"
 dependencies = [
  "byteorder",
  "bytes 1.12.1",
@@ -2465,8 +2466,7 @@ dependencies = [
 [[package]]
 name = "may_queue"
 version = "0.1.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f3e2da6298654847678c5abb39c443e4f1da92ae3bd0cf9736daddb2e7eccba"
+source = "git+https://github.com/microscaler/may.git?rev=719a78df9275ca5afc29e68d5b462b54833ef9cc#719a78df9275ca5afc29e68d5b462b54833ef9cc"
 dependencies = [
  "crossbeam-utils",
  "rustversion",
@@ -2637,9 +2637,9 @@ dependencies = [
 
 [[package]]
 name = "nix"
-version = "0.30.1"
+version = "0.31.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74523f3a35e05aba87a1d978330aef40f67b0304ac79c1c00b294c9830543db6"
+checksum = "cf20d2fde8ff38632c426f1165ed7436270b44f199fc55284c38276f9db47c3d"
 dependencies = [
  "bitflags 2.13.2",
  "cfg-if",
@@ -2691,7 +2691,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3356,7 +3356,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
 dependencies = [
  "bytes 1.12.1",
- "heck 0.5.0",
+ "heck 0.4.1",
  "itertools 0.12.1",
  "log",
  "multimap",
@@ -3636,7 +3636,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rerp-accounting-core"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "chrono",
  "rust_decimal",
@@ -3649,7 +3649,7 @@ dependencies = [
 
 [[package]]
 name = "rerp-entities"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "chrono",
  "lifeguard",
@@ -3664,7 +3664,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_payable"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3711,7 +3711,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_receivable"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3758,7 +3758,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_asset"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3846,7 +3846,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bank_sync"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3893,7 +3893,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bff"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3935,7 +3935,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_budget"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4064,7 +4064,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_edi"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4112,7 +4112,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_financial_reports"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4159,7 +4159,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_general_ledger"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4208,7 +4208,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_invoice"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4531,7 +4531,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_documents_render"
-version = "0.1.21"
+version = "0.1.22"
 dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
@@ -4718,7 +4718,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4784,7 +4784,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5001,7 +5001,7 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=e3c9d7f5ddb61a12dde9ad4178b0fe0590dc7009#e3c9d7f5ddb61a12dde9ad4178b0fe0590dc7009"
+source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=5dde341dfb7c48601b9956d1457e5a6f49189f72#5dde341dfb7c48601b9956d1457e5a6f49189f72"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",
@@ -5009,7 +5009,7 @@ dependencies = [
  "may",
  "serde",
  "serde_json",
- "sha2 0.10.9",
+ "sha2 0.11.1",
  "urlencoding",
  "uuid",
 ]
@@ -5168,7 +5168,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5215,7 +5215,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5409,7 +5409,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6256,7 +6256,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
