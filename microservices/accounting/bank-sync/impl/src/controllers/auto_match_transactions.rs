@@ -1,14 +1,16 @@
 // Implementation stub for handler 'auto_match_transactions'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path auto_match_transactions --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_bank_sync_gen::handlers::auto_match_transactions::{Request, Response};
 
 #[handler(AutoMatchTransactionsController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -19,9 +21,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
+    HttpJson::ok(Response {
         matched_count: None,       // TODO: Set from your business logic
         matches: None,             // TODO: Set from your business logic
         remaining_unmatched: None, // TODO: Set from your business logic
-    }
+    })
 }
