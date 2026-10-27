@@ -40,7 +40,14 @@ jobs:
       actions: write
     uses: octopilot/actions/.github/workflows/pipeline.yml@main
     with:
-      op_version: main
+      # v1.2.2: forwards the shared sccache (OP_SCCACHE) to the buildpack.
+      op_version: v1.2.2
+      # ms02 ARC runners with the shared Rust compile cache. This workflow has no pull_request trigger (main, v* tags,
+      # dispatch: maintainers only); pull requests run checks.yml on GitHub-hosted runners, and outside contributors'
+      # workflow runs need approval. Uploads (integration images to ttl.sh, releases to ghcr.io) go over ms02's
+      # 12 Mbit/s uplink.
+      runner: '["self-hosted", "linux", "x64", "microscaler"]'
+      sccache: true
       # Release notes from our own vLLM (Qwen on the Sparks), reachable from the ms02 runners; if it is down
       # the notes fall back to the commit list and the release goes ahead.
       release_notes_provider: openai

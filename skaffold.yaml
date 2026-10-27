@@ -16,7 +16,7 @@ build:
       buildpacks:
         # octopilot/rust 0.1.17: one cargo invocation for the suite, and processes that launch the binary directly
         # (no bash), which the tiny run image needs.
-        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-ebe9917
+        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-16c038a
         # Distroless-like Ubuntu 22.04 (the build image's release, so the same glibc): glibc, libgcc, CA certificates
         # and tzdata, 11 MB. No shell in the containers: debug with kubectl debug.
         runImage: index.docker.io/paketobuildpacks/run-jammy-tiny:0.2.186
@@ -41,7 +41,7 @@ build:
     - image: ghcr.io/microscaler/rerp-documents
       context: .
       buildpacks:
-        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-ebe9917
+        builder: ghcr.io/octopilot/builder-jammy-base:rust-builder-16c038a
         runImage: index.docker.io/paketobuildpacks/run-jammy-tiny:0.2.186
         env:
           - BP_RUST_BRRTROUTER=1

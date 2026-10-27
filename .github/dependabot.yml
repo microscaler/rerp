@@ -50,7 +50,8 @@ updates:
   # cargo (workspace: root + components; and entities)
   # ---------------------------------------------------------------------------
   - package-ecosystem: "cargo"
-    directory: "/"
+    # The Rust workspace is microservices/ (there is no Cargo.toml at the root).
+    directory: "/microservices"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -63,6 +64,16 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
+      # Same group, patterns and Monday 09:00 UTC slot in every Microscaler Rust repo: the crates they all compile
+      # move to the same versions in the same week, which is what lets the shared sccache on the ms02 CI runners hit
+      # across repos. Majors still arrive one PR each.
+      shared-stack:
+        patterns: ["tokio*", "serde*", "hyper*", "http-body*", "tower*", "tracing*", "opentelemetry*", "prost*",
+                   "tonic*", "rustls*", "ring", "aws-lc*", "cc", "openssl*", "reqwest*", "chrono*", "uuid", "anyhow",
+                   "thiserror*", "clap*", "jsonwebtoken", "redis*", "futures*", "bytes", "regex*", "syn", "quote",
+                   "proc-macro2", "rand*", "base64", "sha2", "hmac", "ed25519*", "time", "url", "once_cell",
+                   "parking_lot*", "dashmap", "smallvec", "itoa", "memchr", "hashbrown", "indexmap", "pyroscope*"]
+        update-types: ["minor", "patch"]
       cargo-minor-patch:
         patterns: ["*"]
         update-types: ["minor", "patch"]

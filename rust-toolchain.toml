@@ -1,0 +1,5 @@
+# One Rust for every Microscaler repo and the octopilot/rust buildpack (its BP_RUST_TOOLCHAIN default), so CI's cargo
+# jobs, the image builds and the shared sccache on the ms02 runners all use the same compiler (a different rustc is a
+# different cache key). Bump it together with the buildpack default.
+[toolchain]
+channel = "1.99.0"
