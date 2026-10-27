@@ -22,9 +22,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        by_type: None,             // TODO: Set from your business logic
-        response_rate: None,       // TODO: Set from your business logic
-        total_activities: None,    // TODO: Set from your business logic
-        upcoming_follow_ups: None, // TODO: Set from your business logic
+        by_type: None,
+        response_rate: None,
+        total_activities: None,
+        upcoming_follow_ups: None,
     })
 }

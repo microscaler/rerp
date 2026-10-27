@@ -22,20 +22,20 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        amount: 1.5,                             // TODO: Set from your business logic
-        applied_at: "example".to_string(),       // TODO: Set from your business logic
-        company_id: "example".to_string(),       // TODO: Set from your business logic
-        created_at: None,                        // TODO: Set from your business logic
-        currency_code: "example".to_string(),    // TODO: Set from your business logic
-        customer_id: "example".to_string(),      // TODO: Set from your business logic
-        gl_entry_id: "example".to_string(),      // TODO: Set from your business logic
-        id: "example".to_string(),               // TODO: Set from your business logic
-        notes: "example".to_string(),            // TODO: Set from your business logic
-        payment_date: "example".to_string(),     // TODO: Set from your business logic
-        payment_method: "example".to_string(),   // TODO: Set from your business logic
-        posted_to_gl: true,                      // TODO: Set from your business logic
-        reference_number: "example".to_string(), // TODO: Set from your business logic
-        status: "example".to_string(),           // TODO: Set from your business logic
-        updated_at: None,                        // TODO: Set from your business logic
+        amount: 1.5,
+        applied_at: None,
+        company_id: "example".to_string(),
+        created_at: None,
+        currency_code: "example".to_string(),
+        customer_id: "example".to_string(),
+        gl_entry_id: None,
+        id: "example".to_string(),
+        notes: None,
+        payment_date: "example".to_string(),
+        payment_method: "example".to_string(),
+        posted_to_gl: true,
+        reference_number: None,
+        status: "example".to_string(),
+        updated_at: None,
     })
 }

@@ -21,5 +21,22 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //
     // Example: Return response
 
-    HttpJson::ok(Response {})
+    HttpJson::ok(Response {
+        aging_bucket: "example".to_string(),
+        company_id: "example".to_string(),
+        created_at: "example".to_string(),
+        credit_limit_check: None,
+        currency_code: "example".to_string(),
+        customer_id: "example".to_string(),
+        days_overdue: None,
+        due_date: None,
+        id: "example".to_string(),
+        invoice_id: "example".to_string(),
+        original_amount: 1.5,
+        outstanding_amount: 1.5,
+        payment_history: None,
+        status: "example".to_string(),
+        terms: "example".to_string(),
+        updated_at: "example".to_string(),
+    })
 }

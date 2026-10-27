@@ -24,11 +24,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        action_type: None,           // TODO: Set from your business logic
-        active: None,                // TODO: Set from your business logic
-        days_overdue: 42,            // TODO: Set from your business logic
-        id: "example".to_string(),   // TODO: Set from your business logic
-        name: "example".to_string(), // TODO: Set from your business logic
-        sequence: 42,                // TODO: Set from your business logic
+        action_type: None,
+        active: None,
+        days_overdue: 42,
+        id: "example".to_string(),
+        name: "example".to_string(),
+        sequence: 42,
     })
 }

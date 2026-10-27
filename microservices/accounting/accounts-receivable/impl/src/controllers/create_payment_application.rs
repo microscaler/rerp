@@ -24,11 +24,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        applied_amount: 1.5,                        // TODO: Set from your business logic
-        created_at: None,                           // TODO: Set from your business logic
-        currency_code: None,                        // TODO: Set from your business logic
-        customer_invoice_id: "example".to_string(), // TODO: Set from your business logic
-        id: "example".to_string(),                  // TODO: Set from your business logic
-        payment_id: "example".to_string(),          // TODO: Set from your business logic
+        applied_amount: 1.5,
+        created_at: None,
+        currency_code: None,
+        customer_invoice_id: "example".to_string(),
+        id: "example".to_string(),
+        payment_id: "example".to_string(),
     })
 }

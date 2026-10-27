@@ -24,15 +24,15 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        activity_type: "example".to_string(), // TODO: Set from your business logic
-        assigned_to: "example".to_string(),   // TODO: Set from your business logic
-        company_id: "example".to_string(),    // TODO: Set from your business logic
-        created_at: None,                     // TODO: Set from your business logic
-        customer_invoice_id: "example".to_string(), // TODO: Set from your business logic
-        date: "example".to_string(),          // TODO: Set from your business logic
-        id: "example".to_string(),            // TODO: Set from your business logic
-        next_follow_up_date: "example".to_string(), // TODO: Set from your business logic
-        notes: "example".to_string(),         // TODO: Set from your business logic
-        updated_at: "example".to_string(),    // TODO: Set from your business logic
+        activity_type: "example".to_string(),
+        assigned_to: None,
+        company_id: "example".to_string(),
+        created_at: None,
+        customer_invoice_id: "example".to_string(),
+        date: "example".to_string(),
+        id: "example".to_string(),
+        next_follow_up_date: None,
+        notes: None,
+        updated_at: "example".to_string(),
     })
 }
