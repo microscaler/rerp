@@ -1,14 +1,16 @@
 // Implementation stub for handler 'generate_cash_flow'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path generate_cash_flow --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_financial_reports_gen::handlers::generate_cash_flow::{Request, Response};
 
 #[handler(GenerateCashFlowController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -19,7 +21,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
+    HttpJson::ok(Response {
         account_details: None,               // TODO: Set from your business logic
         beginning_cash: None,                // TODO: Set from your business logic
         company_id: "example".to_string(),   // TODO: Set from your business logic
@@ -29,9 +31,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
         financing_activities: None,          // TODO: Set from your business logic
         id: None,                            // TODO: Set from your business logic
         investing_activities: None,          // TODO: Set from your business logic
-        net_cash_flow: 3.14,                 // TODO: Set from your business logic
+        net_cash_flow: 1.5,                  // TODO: Set from your business logic
         operating_activities: None,          // TODO: Set from your business logic
         period_end: "example".to_string(),   // TODO: Set from your business logic
         period_start: "example".to_string(), // TODO: Set from your business logic
-    }
+    })
 }
