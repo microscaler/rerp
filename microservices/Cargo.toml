@@ -58,10 +58,47 @@ members = [
     "migrator",
 ]
 resolver = "2"
-# What a bare `cargo build` (the octopilot pipeline's release build) compiles: the services that build today. The
-# accounting crates do not compile on main yet (skaffold.yaml BP_RUST_PACKAGES); add them here when they do.
-# `--workspace` (rerp build workspace, ci.yml) still builds every member.
+# What a bare `cargo build` (the octopilot pipeline's release build) compiles: the services that build today.
+# accounting/bff/impl is excluded: its gen/ predates the current BFF spec and cannot be regenerated until the
+# BFF tooling carries components.responses (see docs/llmwiki/log.md). `--workspace` (rerp build workspace, ci.yml) still builds every member.
 default-members = [
+    # Accounting suite: all gen + impl crates that compile (bff/gen compiles; bff/impl does not — see above).
+    "accounting/core",
+    "accounting/entities",
+    "accounting/general-ledger/gen",
+    "accounting/general-ledger/impl",
+    "accounting/invoice/gen",
+    "accounting/invoice/impl",
+    "accounting/accounts-receivable/gen",
+    "accounting/accounts-receivable/impl",
+    "accounting/accounts-payable/gen",
+    "accounting/accounts-payable/impl",
+    "accounting/bank-sync/gen",
+    "accounting/bank-sync/impl",
+    "accounting/asset/gen",
+    "accounting/asset/impl",
+    "accounting/budget/gen",
+    "accounting/budget/impl",
+    "accounting/edi/gen",
+    "accounting/edi/impl",
+    "accounting/financial-reports/gen",
+    "accounting/financial-reports/impl",
+    "accounting/bff/gen",
+    "accounting/tax-compliance/gen",
+    "accounting/tax-compliance/impl",
+    "accounting/documents-extraction/gen",
+    "accounting/documents-extraction/impl",
+    "accounting/treasury/gen",
+    "accounting/treasury/impl",
+    "accounting/consolidation/gen",
+    "accounting/consolidation/impl",
+    "accounting/revenue-recognition/gen",
+    "accounting/revenue-recognition/impl",
+    "accounting/lease-accounting/gen",
+    "accounting/lease-accounting/impl",
+    "accounting/audit-controls/gen",
+    "accounting/audit-controls/impl",
+
     "crm/pipeline/gen",
     "crm/pipeline/impl",
     "crm/conversion",
