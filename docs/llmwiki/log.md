@@ -594,3 +594,16 @@ ref-rewritten) the whole accounting suite — including
 - Impl: 9 stubs -> honest 501s, 15 orphan controllers removed, registry
   re-synced. Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57,
   `rerp openapi validate` 121 specs valid.
+
+## [2026-10-28] contribute | accounts-payable contract narrowed to the intake-ledger vertical (Epic B2)
+
+- `openapi/accounting/accounts-payable/openapi.yaml`: 20 ops -> 7 (vendor
+  invoices list/create/get, vendor payments list/create/get, invoice
+  payment registration). Dropped approvals, commitments, cash-flow
+  forecast, payment batches (+approve/export), three-way match (needs
+  procurement POs), receipt update/delete. Money + quantity -> decimal
+  strings; ApprovalRecord.threshold_met double -> boolean; 16 orphan
+  schemas pruned.
+- Gen regen (9768e35) touched only accounts-payable; impl: 7 honest 501s,
+  13 orphan controllers removed, registry re-synced.
+- Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57, specs valid 121.
