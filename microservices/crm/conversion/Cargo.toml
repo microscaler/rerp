@@ -12,6 +12,6 @@ serde_json = { workspace = true }
 chrono = { workspace = true }
 uuid = { version = "1.0", features = ["v4", "v5", "serde"] }
 ed25519-dalek = "2"
-base64 = "0.22"
+base64 = "0.23"
 may_minihttp = { workspace = true }
 http_legacy = { workspace = true }
