@@ -13,11 +13,10 @@ use brrtrouter::server::HttpServer;
 use brrtrouter::spec::SecurityScheme;
 use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
 use clap::Parser;
-use rerp_accounting_documents_extraction_gen::handlers::*;
-use rerp_accounting_documents_extraction_gen::registry;
 use rerp_accounting_documents_extraction_gen::*;
 mod controllers;
-use controllers::*;
+mod http_support;
+mod impl_registry;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
@@ -312,9 +311,10 @@ fn main() -> io::Result<()> {
     // Register CORS middleware (all config processed at startup, no runtime work)
     if let Some(ref cors) = cors_middleware {
         dispatcher.add_middleware(cors.clone());
-    }
+    } // Register only implementation controllers. Generated mock handlers
+      // are deliberately not part of any runtime (NFR-DOG-013 contract honesty).
     unsafe {
-        registry::register_from_spec(&mut dispatcher, &routes);
+        impl_registry::register_impl(&mut dispatcher, &routes);
     }
 
     // Start the HTTP server on port 8081 (avoids the very common 8080 conflict
