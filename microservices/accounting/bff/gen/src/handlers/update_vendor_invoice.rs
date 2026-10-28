@@ -55,11 +55,13 @@ pub struct Response {
     #[serde(rename = "approval_status")]
     pub approval_status: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "approved_at")]
-    pub approved_at: String,
+    pub approved_at: Option<String>,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "approved_by")]
-    pub approved_by: String,
+    pub approved_by: Option<String>,
 
     #[serde(rename = "company_id")]
     pub company_id: String,
@@ -70,8 +72,9 @@ pub struct Response {
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "description")]
-    pub description: String,
+    pub description: Option<String>,
 
     #[serde(rename = "due_date")]
     pub due_date: String,
@@ -120,14 +123,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

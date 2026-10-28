@@ -12,44 +12,30 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "page")]
-    pub page: Option<i32>,
+    #[serde(rename = "state")]
+    pub state: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "from_date")]
+    pub from_date: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "to_date")]
+    pub to_date: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "limit")]
     pub limit: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "year")]
-    pub year: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "locked")]
-    pub locked: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "has_more")]
-    pub has_more: Option<bool>,
-
     #[serde(rename = "items")]
     pub items: Vec<GeneralLedgerFiscalPeriod>,
 
     #[serde(rename = "limit")]
     pub limit: i32,
-
-    #[serde(rename = "page")]
-    pub page: i32,
-
-    #[serde(rename = "total")]
-    pub total: i32,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -60,15 +46,40 @@ impl TryFrom<HandlerRequest> for Request {
 
         let mut data_map = Map::new();
 
-        if let Some(v) = req.get_query_param("page") {
+        if let Some(v) = req.get_query_param("state") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["OPEN","CLOSED","HARD_LOCKED"],"type":"string"}),
+            );
             data_map.insert(
-                "page".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
-                    None,
-                    None,
-                ),
+                "state".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("from_date") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
+            data_map.insert(
+                "from_date".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("to_date") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
+            data_map.insert(
+                "to_date".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -76,56 +87,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("limit") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":50,"maximum":100,"minimum":1,"type":"integer"}),
+            );
             data_map.insert(
                 "limit".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("company_id") {
-            data_map.insert(
-                "company_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("year") {
-            data_map.insert(
-                "year".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"type":"integer"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-
-            // optional parameter
-        }
-
-        if let Some(v) = req.get_query_param("locked") {
-            data_map.insert(
-                "locked".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"type":"boolean"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 

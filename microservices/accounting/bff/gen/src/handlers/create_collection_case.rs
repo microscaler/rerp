@@ -25,8 +25,9 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "assigned_to")]
-    pub assigned_to: String,
+    pub assigned_to: Option<String>,
 
     #[serde(rename = "customer_id")]
     pub customer_id: String,

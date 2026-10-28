@@ -5,9 +5,5 @@ use brrtrouter::dispatcher::{HandlerRequest, HandlerResponse};
 use brrtrouter::http::proxy_untyped;
 
 pub fn handle(req: HandlerRequest) -> HandlerResponse {
-    proxy_untyped(
-        &req,
-        "accounts-receivable",
-        "/api/accounts-receivable/customer-invoices",
-    )
+    proxy_untyped(&req, "invoice", "/api/invoice/v1/customer-invoices")
 }

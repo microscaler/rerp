@@ -69,11 +69,13 @@ pub struct Response {
     #[serde(rename = "approval_status")]
     pub approval_status: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "approved_at")]
-    pub approved_at: String,
+    pub approved_at: Option<String>,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "approved_by")]
-    pub approved_by: String,
+    pub approved_by: Option<String>,
 
     #[serde(rename = "company_id")]
     pub company_id: String,
@@ -84,8 +86,9 @@ pub struct Response {
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "description")]
-    pub description: String,
+    pub description: Option<String>,
 
     #[serde(rename = "due_date")]
     pub due_date: String,

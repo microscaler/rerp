@@ -34,8 +34,9 @@ pub struct Response {
     #[serde(rename = "id")]
     pub id: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "reason")]
-    pub reason: String,
+    pub reason: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "requested_by")]

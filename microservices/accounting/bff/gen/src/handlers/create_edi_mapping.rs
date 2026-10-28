@@ -58,8 +58,9 @@ pub struct Response {
     #[serde(rename = "default_values")]
     pub default_values: Option<serde_json::Value>,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "description")]
-    pub description: String,
+    pub description: Option<String>,
 
     #[serde(rename = "document_type")]
     pub document_type: String,
