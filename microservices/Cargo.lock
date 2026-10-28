@@ -2247,7 +2247,7 @@ checksum = "2e126dda6f34391ab7b444f9922055facc83c07a910da3eb16f1e4d9c45dc777"
 [[package]]
 name = "lifeguard"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=869b2c53657659419393d0550d8742f8e9685cfa#869b2c53657659419393d0550d8742f8e9685cfa"
 dependencies = [
  "bytes 1.12.1",
  "chrono",
@@ -2284,7 +2284,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-derive"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=869b2c53657659419393d0550d8742f8e9685cfa#869b2c53657659419393d0550d8742f8e9685cfa"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2294,7 +2294,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f#55ce94d9e3e9c2d49efa92a3d1e1a6a19ad9ed7f"
+source = "git+https://github.com/microscaler/lifeguard.git?rev=869b2c53657659419393d0550d8742f8e9685cfa#869b2c53657659419393d0550d8742f8e9685cfa"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2445,7 +2445,7 @@ dependencies = [
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?rev=cb92eff897539ebf5c1ac2b5d533b57b48342fee#cb92eff897539ebf5c1ac2b5d533b57b48342fee"
+source = "git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork#667201c35773406bf74b55e7ef53978f47f74204"
 dependencies = [
  "byteorder",
  "bytes 1.12.1",
@@ -3356,7 +3356,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
 dependencies = [
  "bytes 1.12.1",
- "heck 0.4.1",
+ "heck 0.5.0",
  "itertools 0.12.1",
  "log",
  "multimap",
@@ -5406,7 +5406,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix",
  "windows-sys 0.59.0",
