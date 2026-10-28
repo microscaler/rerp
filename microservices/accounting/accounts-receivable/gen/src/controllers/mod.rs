@@ -3,33 +3,11 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_ar_agings;
-
-pub mod create_ar_aging;
-
-pub mod get_ar_aging;
-
-pub mod list_collection_cases;
-
-pub mod create_collection_case;
-
-pub mod list_collection_activities;
-
-pub mod create_collection_activity;
-
 pub mod send_customer_statements;
-
-pub mod list_follow_up_levels;
-
-pub mod create_follow_up_level;
-
-pub mod create_follow_up_run;
 
 pub mod list_open_items;
 
 pub mod get_open_item;
-
-pub mod create_payment_promise;
 
 pub mod list_customer_payments;
 
@@ -39,14 +17,6 @@ pub mod create_payment_application;
 
 pub mod get_customer_payment;
 
-pub mod update_customer_payment;
-
-pub mod delete_customer_payment;
-
 pub mod list_payment_applications;
 
-pub mod auto_apply_payment;
-
 pub mod aging_summary;
-
-pub mod collections_summary;

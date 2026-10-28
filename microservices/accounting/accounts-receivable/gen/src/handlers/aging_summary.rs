@@ -29,25 +29,17 @@ pub struct Response {
     #[serde(rename = "as_of_date")]
     pub as_of_date: String,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "bad_debt_reserves")]
-    pub bad_debt_reserves: Option<f64>,
-
     #[serde(rename = "bucket_1_30")]
-    pub bucket_1_30: f64,
+    pub bucket_1_30: String,
 
     #[serde(rename = "bucket_31_60")]
-    pub bucket_31_60: f64,
+    pub bucket_31_60: String,
 
     #[serde(rename = "bucket_61_90")]
-    pub bucket_61_90: f64,
+    pub bucket_61_90: String,
 
     #[serde(rename = "bucket_90_plus")]
-    pub bucket_90_plus: f64,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "collection_efficiency_index")]
-    pub collection_efficiency_index: Option<f64>,
+    pub bucket_90_plus: String,
 
     #[serde(rename = "company_id")]
     pub company_id: String,
@@ -57,14 +49,10 @@ pub struct Response {
     pub currency_code: Option<String>,
 
     #[serde(rename = "current")]
-    pub current: f64,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "days_sales_outstanding")]
-    pub days_sales_outstanding: Option<f64>,
+    pub current: String,
 
     #[serde(rename = "total_outstanding")]
-    pub total_outstanding: f64,
+    pub total_outstanding: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
