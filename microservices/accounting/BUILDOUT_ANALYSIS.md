@@ -169,7 +169,7 @@ with explicit currency; regenerate `gen/` via `rerp gen suite`; re-sync impl
 stubs (`rerp gen stubs --force` after proving every overwritten file is a
 pure stub); commit spec vs gen vs impl separately (enforced convention).
 
-- **B1 — AR contract slice** (M, deps A1): issue-visible ledger query, receipt
+- **B1 — AR contract slice** (M, deps A1) — **DONE 2026-10-28** (PR this slice): issue-visible ledger query, receipt
   record, allocation, allocation reversal, aging (decimal buckets), statement
   request. Drops: DSO, collection-efficiency, predictive analytics.
 - **B2 — AP contract slice** (M, deps A1): bill capture/post, credit note,
