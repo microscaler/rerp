@@ -555,3 +555,26 @@ ref-rewritten) the whole accounting suite — including
 - Verified on the new base: `cargo check --workspace --all-targets --locked`
   0 errors, `cargo test --workspace --lib --no-fail-fast` 21 passed / 0
   failures, `cargo fmt --all --check` clean, `just qa` 29 passed.
+
+## [2026-10-28] contribute | accounting scaffold runtimes made honest (Epic A1/A2)
+
+- `microservices/accounting/BUILDOUT_ANALYSIS.md` added at the suite root:
+  verified current-state delta vs the service-readiness plan plus an
+  11-epic story backlog for the build-out.
+- All 14 scaffold-only accounting services dispatched generated mock
+  handlers (`registry::register_from_spec`), so their HTTP surface served
+  fabricated example payloads while impl controllers were dead code. Wired
+  every `main.rs` to `impl_registry::register_impl` (ADR 0001 Layer 2, the
+  `invoice`/`general-ledger` pattern), rewrote 173 fabricated controller
+  stubs to typed 501s via `http_support::not_implemented`, and removed the
+  dead blanket imports. `bff` untouched — its `register_from_spec` is proxy
+  routing. Note: wiring `mod impl_registry;` makes rustfmt see
+  `impl_registry.rs` for the first time; the generator's whitespace-era
+  drift was formatted in the same commit.
+- `tooling/tests/test_accounting_runtime_honesty.py` (NFR-DOG-013, in
+  `just qa`): scaffold mains must register impl controllers only, and every
+  scaffold controller must use the honest 501 or opt out via the
+  `// BRRTRouter: user-owned` sentinel when a work package delivers it.
+- Verified: `cargo check --workspace --all-targets` 0 errors, lib tests
+  21 passed, `cargo fmt --all --check` clean, `just qa` 57 passed
+  (29 baseline + 28 new). Shipped via PR #111.

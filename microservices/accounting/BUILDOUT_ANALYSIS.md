@@ -136,7 +136,7 @@ by. IDs are stable; reference them in commits.
 
 ### Epic A — Runtime truthfulness (do first, whole-suite, cheap)
 
-- **A1 — Replace mock dispatch with honest 501s** (L)
+- **A1 — Replace mock dispatch with honest 501s** (L) — **DONE 2026-10-28** (PR #111)
   As a future consumer, I want undelivered operations to fail honestly, so
   that no client can ever be fooled by example data.
   Remove `registry::register_from_spec(...)` mock wiring from
@@ -146,7 +146,7 @@ by. IDs are stable; reference them in commits.
   *AC*: `grep -rn register_from_spec microservices/accounting/*/impl/src/main.rs`
   empty; every AR/AP/bank/report route returns 501 with stable error body;
   no controller returns literal example values; tests assert 501 per op group.
-- **A2 — Runtime activation gate** (M, deps A1)
+- **A2 — Runtime activation gate** (M, deps A1) — **DONE 2026-10-28** (PR #111)
   As a maintainer, I want CI to fail if a scaffold-only service ever serves
   business-looking responses again, so that honesty is mechanical, not tribal.
   Add a suite-local check (tooling test): for services not in the delivered
