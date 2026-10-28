@@ -21,65 +21,9 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
     for route in routes {
         match route.handler_name.as_ref() {
-            "create_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_custom_report::CreateCustomReportController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_definition" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_report_definition::CreateReportDefinitionController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_export" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_report_export::CreateReportExportController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_custom_report::DeleteCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "drill_down_report_cell" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::drill_down_report_cell::DrillDownReportCellController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "execute_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::execute_custom_report::ExecuteCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "generate_balance_sheet" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::generate_balance_sheet::GenerateBalanceSheetController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "generate_cash_flow" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::generate_cash_flow::GenerateCashFlowController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
@@ -105,62 +49,6 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::generate_trial_balance::GenerateTrialBalanceController,
                     16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_custom_report::GetCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_custom_reports" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_custom_reports::ListCustomReportsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definition_lines" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_definition_lines::ListReportDefinitionLinesController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definitions" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_definitions::ListReportDefinitionsController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_executions" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_executions::ListReportExecutionsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_statutory_report_packs" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_statutory_report_packs::ListStatutoryReportPacksController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_custom_report::UpdateCustomReportController,
-                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
