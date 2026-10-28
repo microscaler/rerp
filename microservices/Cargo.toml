@@ -124,7 +124,7 @@ lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", path
 
 [patch.crates-io]
 # may fork master: sub-millisecond timeouts honoured (no rounding to 0 / busy spin), recv_timeout.
-may = { git = "https://github.com/microscaler/may.git", rev = "719a78df9275ca5afc29e68d5b462b54833ef9cc" }
+may = { git = "https://github.com/microscaler/may.git", rev = "2156e046291dfd568797f10630ffbc74694d33aa" }
 # sea-query 1.0.2 emits a bounded window-frame offset with no separator
 # ("$1PRECEDING") that Postgres rejects; the fix + regression tests live on
 # the microscaler fork (still version 1.0.2; PR to SeaQL pending). Aligns
