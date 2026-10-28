@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         last_sync_date: Some("example".to_string()),
         name: "example".to_string(),
         notes: Some("example".to_string()),
-        opening_balance: Some(1.5),
+        opening_balance: Some("example".to_string()),
         opening_balance_date: Some("example".to_string()),
         routing_number: Some("example".to_string()),
         status: "example".to_string(),

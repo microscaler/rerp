@@ -22,7 +22,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "write_off_amount")]
-    pub write_off_amount: Option<f64>,
+    pub write_off_amount: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
