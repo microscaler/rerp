@@ -5417,7 +5417,7 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/EdiSubmissionStatus'
+          $ref: '#/components/schemas/EdiEdiSubmissionStatus'
       responses:
         '200':
           description: List of EDI submissions
@@ -6343,13 +6343,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/GeneralLedgerAccountList'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/GeneralLedgerBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/GeneralLedgerUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/GeneralLedgerForbidden'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/GeneralLedgerInternalError'
       x-service: general-ledger
       x-service-base-path: /api/general-ledger
       x-brrtrouter-downstream-path: /api/general-ledger/v1/accounts
@@ -6396,13 +6396,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/GeneralLedgerFiscalPeriodList'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/GeneralLedgerBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/GeneralLedgerUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/GeneralLedgerForbidden'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/GeneralLedgerInternalError'
       x-service: general-ledger
       x-service-base-path: /api/general-ledger
       x-brrtrouter-downstream-path: /api/general-ledger/v1/fiscal-periods
@@ -6423,15 +6423,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/GeneralLedgerJournalEntry'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/GeneralLedgerBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/GeneralLedgerUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/GeneralLedgerForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/GeneralLedgerNotFound'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/GeneralLedgerInternalError'
       x-service: general-ledger
       x-service-base-path: /api/general-ledger
       x-brrtrouter-downstream-path: /api/general-ledger/v1/journal-entries/{id}
@@ -6468,13 +6468,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/GeneralLedgerTrialBalance'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/GeneralLedgerBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/GeneralLedgerUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/GeneralLedgerForbidden'
         '500':
-          $ref: '#/components/responses/InternalError'
+          $ref: '#/components/responses/GeneralLedgerInternalError'
       x-service: general-ledger
       x-service-base-path: /api/general-ledger
       x-brrtrouter-downstream-path: /api/general-ledger/v1/trial-balance
@@ -6531,11 +6531,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoicePaginatedPostedInvoices'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/InvoiceBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices
@@ -6565,15 +6565,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoicePostingResult'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/InvoiceBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/InvoiceConflict'
         '422':
-          $ref: '#/components/responses/Unprocessable'
+          $ref: '#/components/responses/InvoiceUnprocessable'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices
@@ -6594,11 +6594,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoicePostedInvoice'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/InvoiceNotFound'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices/{id}
@@ -6631,17 +6631,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoicePostingResult'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/InvoiceBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/InvoiceNotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/InvoiceConflict'
         '422':
-          $ref: '#/components/responses/Unprocessable'
+          $ref: '#/components/responses/InvoiceUnprocessable'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices/{id}/credit-notes
@@ -6664,13 +6664,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoiceRenderedDocument'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/InvoiceNotFound'
         '503':
-          $ref: '#/components/responses/Unavailable'
+          $ref: '#/components/responses/InvoiceUnavailable'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices/{id}/document
@@ -6691,11 +6691,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/InvoicePostedJournal'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/InvoiceUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/InvoiceForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/InvoiceNotFound'
       x-service: invoice
       x-service-base-path: /api/invoice
       x-brrtrouter-downstream-path: /api/invoice/v1/customer-invoices/{id}/journal
@@ -6795,12 +6795,16 @@ components:
           description: When the action was taken
           example: '2026-01-15'
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Approval/rejection notes
           example: Approved by CFO on 2026-01-15
         threshold_met:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           description: Approval threshold that was met
           example: 1000.0
@@ -6880,7 +6884,9 @@ components:
           - DELEGATE
           example: sample value
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
     AccountsPayableCreateInvoiceLineItemRequest:
@@ -6890,7 +6896,9 @@ components:
       - amount
       properties:
         product_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 850e8400-e29b-41d4-a716-446655440028
         quantity:
@@ -6910,7 +6918,9 @@ components:
           minimum: 0
           example: 10000.0
         tax_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           example: VAT-2026
         description:
@@ -6918,7 +6928,9 @@ components:
           maxLength: 1000
           example: Primary operating company
         gl_account:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: GL-2026-001
     AccountsPayableCreatePaymentBatchRequest:
@@ -7003,7 +7015,9 @@ components:
           default: 0
           example: 1000.0
         due_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: Payment due date. Defaults to invoice_date + terms.
           example: '2026-01-15'
@@ -7018,7 +7032,9 @@ components:
           - CUSTOM
           example: sample value
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
         company_id:
@@ -7046,7 +7062,9 @@ components:
       - payment_date
       properties:
         reference_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           example: REF-2026-0001
         amount:
@@ -7083,7 +7101,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
         auto_disburse:
@@ -7111,7 +7131,9 @@ components:
           type: string
           example: Vendor invoice not found
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     AccountsPayableExportPaymentFileRequest:
       type: object
@@ -7334,7 +7356,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         invoice_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Related approved invoice
           example: 1000.0
@@ -7402,7 +7426,9 @@ components:
           - FAILED
           example: active
         artifact_uri:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: s3://reports/2026-01/balance_sheet.pdf
     AccountsPayableRegisterVendorInvoicePaymentRequest:
       type: object
@@ -7437,7 +7463,9 @@ components:
           format: date
           example: 1000.0
         reference_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: REF-2026-0001
     AccountsPayableThreeWayMatchRequest:
       type: object
@@ -7456,11 +7484,15 @@ components:
             format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         tolerance_amount:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         tolerance_percent:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
     AccountsPayableThreeWayMatchResult:
@@ -7550,7 +7582,9 @@ components:
           - CUSTOM
           example: sample value
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
     AccountsPayableUpdateVendorPaymentRequest:
@@ -7586,7 +7620,9 @@ components:
           - CANCELLED
           example: active
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     AccountsPayableValidationError:
@@ -7742,17 +7778,23 @@ components:
           description: Company this invoice belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         approved_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who approved this invoice
           example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When the invoice was approved
           example: '2026-01-15T10:30:00Z'
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Invoice description/memo
           example: Primary operating company
@@ -7788,7 +7830,9 @@ components:
           description: Parent vendor invoice
           example: 1000.0
         product_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Product this line item relates to
           example: 850e8400-e29b-41d4-a716-446655440028
@@ -7811,7 +7855,9 @@ components:
           description: Line total (quantity * unit_price)
           example: 10000.0
         tax_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           description: Tax code for this line
           example: VAT-2026
@@ -7821,7 +7867,9 @@ components:
           description: Line item description
           example: Primary operating company
         gl_account:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL account for posting
           example: GL-2026-001
@@ -7868,7 +7916,9 @@ components:
           description: Unique identifier for the payment
           example: 550e8400-e29b-41d4-a716-446655440000
         reference_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           description: Payment reference (check number, wire reference)
           example: REF-2026-0001
@@ -7899,7 +7949,9 @@ components:
           description: Scheduled or actual payment date
           example: 1000.0
         actual_payment_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: When payment was actually sent
           example: 1000.0
@@ -7929,12 +7981,16 @@ components:
           description: Whether payment has been posted to general ledger
           example: true
         gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry created for this payment
           example: 650e8400-e29b-41d4-a716-446655440001
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Payment notes
           example: Approved by CFO on 2026-01-15
@@ -8125,15 +8181,21 @@ components:
           format: date
           example: '2026-01-15'
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
         next_follow_up_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2026-01-15'
         assigned_to:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
         company_id:
@@ -8175,7 +8237,9 @@ components:
           - CLOSED
           example: active
         assigned_to:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
         total_due:
@@ -8229,15 +8293,21 @@ components:
           format: date
           example: '2026-01-15'
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
         next_follow_up_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2026-01-15'
         assigned_to:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
         company_id:
@@ -8260,7 +8330,9 @@ components:
             format: uuid
           example: 1000.0
         assigned_to:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
     AccountsReceivableCreateFollowUpLevelRequest:
@@ -8296,7 +8368,9 @@ components:
       type: object
       properties:
         company_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
@@ -8362,7 +8436,9 @@ components:
       - customer_id
       properties:
         reference_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           example: REF-2026-0001
         amount:
@@ -8400,7 +8476,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
         auto_apply:
@@ -8450,7 +8528,9 @@ components:
           default: false
           example: true
         review_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2026-01-15'
         created_at:
@@ -8481,7 +8561,9 @@ components:
           type: string
           example: Customer invoice not found
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     AccountsReceivableFollowUpLevel:
       type: object
@@ -8535,7 +8617,9 @@ components:
           - FAILED
           example: active
         company_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         customer_count:
@@ -8619,7 +8703,9 @@ components:
           description: Company this invoice belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         due_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: Payment due date
           example: '2026-01-15'
@@ -8635,7 +8721,9 @@ components:
           description: Payment terms
           example: sample value
         credit_limit_check:
-          type: [boolean, 'null']
+          type:
+          - boolean
+          - 'null'
           description: Whether this invoice passed credit limit validation
           example: true
         created_at:
@@ -8652,7 +8740,9 @@ components:
       - type: object
         properties:
           days_overdue:
-            type: [integer, 'null']
+            type:
+            - integer
+            - 'null'
             description: Days past due (0 if not overdue)
           payment_history:
             type: array
@@ -8829,7 +8919,9 @@ components:
           description: Unique identifier for the payment
           example: 550e8400-e29b-41d4-a716-446655440000
         reference_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           description: External reference (check number, wire reference, etc.)
           example: REF-2026-0001
@@ -8887,12 +8979,16 @@ components:
           description: Whether payment has been posted to general ledger
           example: true
         gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry created for this payment
           example: 650e8400-e29b-41d4-a716-446655440001
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Payment notes
           example: Approved by CFO on 2026-01-15
@@ -8905,7 +9001,9 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         applied_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When payment was applied to invoices
           example: sample value
@@ -9102,7 +9200,9 @@ components:
           - FAILED
           example: active
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     AccountsReceivableValidationError:
@@ -9165,7 +9265,9 @@ components:
           description: Asset name/description
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Detailed description
           example: Primary operating company
@@ -9192,17 +9294,23 @@ components:
           description: Date the asset was acquired
           example: '2024-01-15'
         location:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           description: Current location of the asset
           example: Building A, Floor 3
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Department responsible for the asset
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Person responsible for the asset
           example: 750e8400-e29b-41d4-a716-446655440002
@@ -9219,7 +9327,9 @@ components:
           description: Asset lifecycle status
           example: active
         acquisition_gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry created during acquisition
           example: 550e8400-e29b-41d4-a716-446655440000
@@ -9244,27 +9354,37 @@ components:
           description: Company this asset belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Original supplier/vendor
           example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           description: Manufacturer serial number
           example: SN-2026-0001
         warranty_expiry:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: Warranty expiration date
           example: '2031-01-01'
         insurance_policy:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           description: Insurance policy reference
           example: POL-2026-0001
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -9292,7 +9412,9 @@ components:
           description: Category name
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           description: Category description
           example: Primary operating company
@@ -9307,22 +9429,30 @@ components:
           description: Default depreciation method for assets in this category
           example: true
         default_useful_life_months:
-          type: [integer, 'null']
+          type:
+          - integer
+          - 'null'
           minimum: 1
           description: Default useful life in months
           example: true
         gl_account_debit:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Default debit GL account for acquisitions
           example: GL-DEBIT-2026
         gl_account_credit:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Default credit GL account for depreciation
           example: GL-CREDIT-2026
         parent_category_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Parent category for hierarchical categories
           example: 650e8400-e29b-41d4-a716-446655440031
@@ -9367,19 +9497,27 @@ components:
           minimum: 1
           example: 60
         residual_value_percent:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         asset_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440027
         depreciation_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440025
         expense_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440026
     AssetAssetSummary:
@@ -9473,7 +9611,9 @@ components:
               $ref: '#/components/schemas/AssetDepreciationEntry'
             description: Depreciation schedule for this asset
           disposal_record:
-            type: [object, 'null']
+            type:
+            - object
+            - 'null'
             description: Disposal record if disposed
           revaluation_history:
             type: array
@@ -9491,7 +9631,9 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           example: Primary operating company
         default_depreciation_method:
@@ -9504,19 +9646,27 @@ components:
           - FOREIGN_EXCHANGE_ADJUSTMENT
           example: true
         default_useful_life_months:
-          type: [integer, 'null']
+          type:
+          - integer
+          - 'null'
           minimum: 1
           example: true
         gl_account_debit:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: GL-DEBIT-2026
         gl_account_credit:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: GL-CREDIT-2026
         parent_category_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440031
         company_id:
@@ -9547,7 +9697,9 @@ components:
           minimum: 1
           example: 60
         residual_value_percent:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
     AssetCreateAssetRequest:
@@ -9569,7 +9721,9 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
         acquisition_cost:
@@ -9588,15 +9742,21 @@ components:
           format: date
           example: '2024-01-15'
         location:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           example: Building A, Floor 3
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         useful_life_months:
@@ -9618,24 +9778,34 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         supplier_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440001
         serial_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           example: SN-2026-0001
         warranty_expiry:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2031-01-01'
         acquisition_gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL entry from acquisition invoice
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
         auto_depreciate:
@@ -9704,7 +9874,9 @@ components:
           format: date
           example: '2026-01-15'
         monthly_rate:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           description: Custom monthly rate. Auto-calculated from method if not provided.
           example: 1
@@ -9745,7 +9917,9 @@ components:
           maxLength: 3
           example: USD
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
     AssetCreateRevaluationRequest:
@@ -9823,7 +9997,9 @@ components:
           description: Net book value at this period
           example: 35000.0
         gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry created for this depreciation
           example: 650e8400-e29b-41d4-a716-446655440001
@@ -9979,17 +10155,23 @@ components:
           description: Gain (positive) or loss (negative) on disposal
           example: 1000.0
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Disposal details
           example: Primary operating company
         approved_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who approved the disposal
           example: 950e8400-e29b-41d4-a716-446655440004
         gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry for disposal
           example: 650e8400-e29b-41d4-a716-446655440001
@@ -10022,7 +10204,9 @@ components:
           type: string
           example: Asset not found
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     AssetModifyAssetRequest:
       type: object
@@ -10038,14 +10222,20 @@ components:
           type: string
           example: Reclassification of asset category
         new_useful_life_months:
-          type: [integer, 'null']
+          type:
+          - integer
+          - 'null'
           example: 1
         new_residual_value:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         value_adjustment:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
     AssetPaginatedAssetCategories:
@@ -10245,7 +10435,9 @@ components:
           description: Reason for revaluation
           example: Reclassification of asset category
         gl_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL journal entry for revaluation
           example: 650e8400-e29b-41d4-a716-446655440001
@@ -10266,19 +10458,27 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
         location:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           example: Building A, Floor 3
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440001
         custodian_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         status:
@@ -10293,7 +10493,9 @@ components:
           - TRANSIT
           example: active
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
     AssetValidationError:
@@ -10353,7 +10555,9 @@ components:
           description: Bank account number
           example: 1
         routing_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 20
           description: Bank routing/SWIFT/IBAN code
           example: 1
@@ -10369,7 +10573,9 @@ components:
           description: Name of the banking institution
           example: Acme Corporation
         bank_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Linked bank institution record
           example: 850e8400-e29b-41d4-a716-446655440003
@@ -10386,7 +10592,9 @@ components:
           description: Type of bank account
           example: Asset
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Linked GL account for reconciliation
           example: 950e8400-e29b-41d4-a716-446655440024
@@ -10416,7 +10624,9 @@ components:
           description: Whether automatic sync is enabled
           example: true
         last_sync_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: Last successful sync date
           example: true
@@ -10435,7 +10645,9 @@ components:
           description: Company this account belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -10523,17 +10735,23 @@ components:
           description: Number of unmatched transactions
           example: 1
         reconciled_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who completed the reconciliation
           example: true
         reconciled_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When reconciliation was completed
           example: true
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Reconciliation notes
           example: Approved by CFO on 2026-01-15
@@ -10631,7 +10849,9 @@ components:
           description: Bank account this statement belongs to
           example: 0
         statement_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           description: External statement reference number
           example: 1
@@ -10685,7 +10905,9 @@ components:
           description: Number of transactions not yet matched
           example: 0
         file_reference:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           description: Reference to the uploaded file
           example: FILE-2026-0001
@@ -10695,7 +10917,9 @@ components:
           description: When the statement was imported
           example: sample value
         imported_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who imported the statement
           example: sample value
@@ -10738,7 +10962,9 @@ components:
           description: Transaction date
           example: '2026-01-15'
         value_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: Value/settlement date
           example: 1000.0
@@ -10758,17 +10984,23 @@ components:
           description: Transaction description/narrative
           example: Primary operating company
         reference:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           description: Transaction reference number
           example: REF-2026-0001
         counterparty_name:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           description: Counterparty name
           example: 0
         counterparty_account:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           description: Counterparty account number
           example: 0
@@ -10783,12 +11015,16 @@ components:
           description: Transaction reconciliation status
           example: active
         matched_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Linked GL entry or invoice
           example: 550e8400-e29b-41d4-a716-446655440000
         matched_entry_type:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           enum:
           - INVOICE
           - PAYMENT
@@ -10799,22 +11035,30 @@ components:
           description: Type of matched entry
           example: standard
         matched_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When the transaction was matched
           example: '2026-01-15'
         matched_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who matched the transaction
           example: sample value
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Notes about this transaction
           example: Approved by CFO on 2026-01-15
         dispute_reason:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Reason for dispute if applicable
           example: sample value
@@ -10898,7 +11142,9 @@ components:
           maxLength: 50
           example: 1
         routing_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 20
           example: 1
         currency_code:
@@ -10922,7 +11168,9 @@ components:
           - OTHER
           example: Asset
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440024
         opening_balance:
@@ -10939,7 +11187,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     BankSyncCreateBankReconciliationRequest:
@@ -10967,7 +11217,9 @@ components:
           description: Balance per books before reconciliation
           example: 1000.0
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
     BankSyncCreateBankStatementRequest:
@@ -10982,7 +11234,9 @@ components:
           format: uuid
           example: 0
         statement_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           example: 1
         start_date:
@@ -11017,7 +11271,9 @@ components:
           description: Transactions in this statement
           example: *id031
         file_reference:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 500
           description: Reference to uploaded statement file
           example: FILE-2026-0001
@@ -11048,7 +11304,9 @@ components:
           - OTHER
           example: standard
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Matching notes
           example: Approved by CFO on 2026-01-15
@@ -11064,7 +11322,9 @@ components:
           format: date
           example: '2026-01-15'
         value_date:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: 1000.0
         amount:
@@ -11081,19 +11341,27 @@ components:
           maxLength: 500
           example: Primary operating company
         reference:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 100
           example: REF-2026-0001
         counterparty_name:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           example: 0
         counterparty_account:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           example: 0
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     BankSyncCreateExchangeDifferenceRequest:
@@ -11117,7 +11385,9 @@ components:
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         exchange_rate_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 1000.0
     BankSyncCreateReconciliationModelRequest:
@@ -11149,11 +11419,15 @@ components:
           default: true
           example: true
         match_tolerance_amount:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         match_tolerance_days:
-          type: [integer, 'null']
+          type:
+          - integer
+          - 'null'
           example: 0
     BankSyncCreateTransactionWriteOffRequest:
       type: object
@@ -11175,7 +11449,9 @@ components:
           maxLength: 500
           example: Reclassification of asset category
         tax_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: VAT-2026
     BankSyncErrorResponse:
       type: object
@@ -11197,7 +11473,9 @@ components:
           type: string
           example: Bank account not found
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     BankSyncPaginatedBankAccounts:
       type: object
@@ -11352,11 +11630,15 @@ components:
           - OTHER
           example: standard
         write_off_amount:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     BankSyncReconciliationAdjustment:
@@ -11386,7 +11668,9 @@ components:
           format: double
           example: 10000.0
         journal_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
     BankSyncReconciliationModel:
@@ -11423,11 +11707,15 @@ components:
           type: boolean
           example: true
         match_tolerance_amount:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           example: 1000.0
         match_tolerance_days:
-          type: [integer, 'null']
+          type:
+          - integer
+          - 'null'
           example: 0
         created_at:
           type: string
@@ -11448,7 +11736,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         reconciliation_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440036
         status:
@@ -11459,7 +11749,9 @@ components:
           - PARTIALLY_RECONCILED
           example: active
         journal_entry_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
     BankSyncReconciliationSuggestion:
@@ -11489,7 +11781,9 @@ components:
           maximum: 1
           example: 0.85
         model_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440040
         reason:
@@ -11524,7 +11818,9 @@ components:
           maxLength: 50
           example: 1
         routing_number:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 20
           example: 1
         bank_name:
@@ -11543,7 +11839,9 @@ components:
           - OTHER
           example: Asset
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440024
         status:
@@ -11566,7 +11864,9 @@ components:
           - MANUAL
           example: true
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     BankSyncValidationError:
@@ -11620,7 +11920,9 @@ components:
           description: Budget name/title
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Budget description
           example: Primary operating company
@@ -11687,27 +11989,37 @@ components:
           description: Company this budget belongs to
           example: 550e8400-e29b-41d4-a716-446655440000
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Department this budget applies to (null = company-wide)
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Cost center this budget applies to
           example: 750e8400-e29b-41d4-a716-446655440002
         approved_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: User who approved the budget
           example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When the budget was approved
           example: '2026-01-15T10:30:00Z'
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           description: Budget notes
           example: Approved by CFO on 2026-01-15
@@ -11725,7 +12037,9 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         submitted_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: When submitted for approval
           example: sample value
@@ -11748,27 +12062,37 @@ components:
           description: Budget this line belongs to
           example: 1000.0
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: GL account this line is for
           example: 950e8400-e29b-41d4-a716-446655440024
         gl_account_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           description: GL account code
           example: GL-ACCT-2026
         gl_account_name:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 200
           description: GL account name
           example: Main Account
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Department for this line
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Cost center for this line
           example: 750e8400-e29b-41d4-a716-446655440002
@@ -11805,12 +12129,16 @@ components:
           description: Variance (amount - actual_amount)
           example: 500.0
         variance_percent:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: double
           description: Variance as percentage of budget
           example: 5.0
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Notes for this budget line
           example: Approved by CFO on 2026-01-15
@@ -11852,10 +12180,14 @@ components:
           - APPLIED
           example: active
         reason:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: Reclassification of asset category
         requested_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
     BudgetBudgetWithLines:
@@ -11869,7 +12201,9 @@ components:
               $ref: '#/components/schemas/BudgetBudgetLine'
             description: Budget line items
           variance_summary:
-            type: [object, 'null']
+            type:
+            - object
+            - 'null'
             description: Summary of budget vs actuals variance
     BudgetCreateBudgetLineRequest:
       type: object
@@ -11878,19 +12212,27 @@ components:
       - amount
       properties:
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440024
         gl_account_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           example: GL-ACCT-2026
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         period:
@@ -11911,7 +12253,9 @@ components:
           maxLength: 3
           example: USD
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
     BudgetCreateBudgetRequest:
@@ -11926,7 +12270,9 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
         fiscal_year:
@@ -11958,11 +12304,15 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         department_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 650e8400-e29b-41d4-a716-446655440001
         cost_center_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 750e8400-e29b-41d4-a716-446655440002
         budget_lines:
@@ -11972,7 +12322,9 @@ components:
           description: Budget line items
           example: 1000.0
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
     BudgetCreateBudgetRevisionRequest:
@@ -12004,7 +12356,9 @@ components:
                 format: double
           example: *id032
         requested_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: sample value
     BudgetCreateForecastRequest:
@@ -12025,7 +12379,9 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Primary operating company
         forecast_type:
@@ -12070,7 +12426,9 @@ components:
           type: string
           example: Budget not found
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     BudgetForecast:
       type: object
@@ -12095,7 +12453,9 @@ components:
           description: Forecast name
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Primary operating company
         forecast_type:
@@ -12182,11 +12542,15 @@ components:
           description: Forecasted amount
           example: 10000.0
         gl_account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440024
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Approved by CFO on 2026-01-15
         created_at:
@@ -12313,11 +12677,15 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Primary operating company
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 2000
           example: Approved by CFO on 2026-01-15
         status:
@@ -12648,30 +13016,44 @@ components:
           - PARTIAL
           example: active
         acknowledgment_content:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: sample value
         acknowledgment_data:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             key: value
         sent_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         received_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         error_codes:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
           - VALIDATION_ERROR
         error_messages:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example:
           - 'Required field missing: amount'
         metadata:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             version: '1.0'
             source: system
@@ -12731,57 +13113,83 @@ components:
           format: date-time
           example: sample value
         parsed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         validated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: '2026-01-15'
         processed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         sender_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 255
           example: 550e8400-e29b-41d4-a716-446655440000
         receiver_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 255
           example: 550e8400-e29b-41d4-a716-446655440000
         raw_content:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: <EDI>0123456789</EDI>
         parsed_data:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             type: invoice
             amount: 10000.0
         related_invoice_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 1000.0
         related_purchase_order_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         document_total_amount:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: decimal
           description: Total amount when document is an invoice or payment order.
           example: 1000.0
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           description: ISO 4217 currency when document has monetary amount.
           example: USD
         error_message:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: 'Failed to generate report: database timeout'
         error_details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             code: VALIDATION_ERROR
             message: Invalid format
@@ -12789,23 +13197,31 @@ components:
           type: integer
           example: 0
         last_retry_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         acknowledgment_sent:
           type: boolean
           example: true
         acknowledgment_sent_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: sample value
         metadata:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             version: '1.0'
             source: system
         company_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         created_at:
@@ -12817,11 +13233,15 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         created_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440004
     EdiEdiError:
@@ -12869,21 +13289,29 @@ components:
           maxLength: 255
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: Primary operating company
         version:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 50
           example: '1.0'
         supported_document_types:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 255
           example:
           - invoice
           - purchase_order
           - credit_memo
         format_config:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             delimiter: ','
             encoding: utf-8
@@ -12936,18 +13364,24 @@ components:
             name: vendor_name
             amount: total_amount
         transformation_rules:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
           - normalize
           - validate
           - transform
         validation_rules:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
           - required
           - max_length:255
         default_values:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example:
             status: pending
             type: standard
@@ -12955,7 +13389,9 @@ components:
           type: boolean
           example: true
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: Primary operating company
         created_at:
           type: string
@@ -12966,11 +13402,15 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         created_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440004
         updated_by:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 950e8400-e29b-41d4-a716-446655440004
     EdiEdiProfile:
@@ -13259,7 +13699,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Additional details
           additionalProperties: true
     FinancialReportsBalanceSheet:
@@ -13469,12 +13911,16 @@ components:
           description: End date of the reporting period
           example: '2026-01-31'
         period_start:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           description: Start date. Defaults to beginning of fiscal year.
           example: '2026-01-01'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           description: Report currency. Defaults to company currency.
@@ -13504,7 +13950,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           example: USD
@@ -13520,7 +13968,9 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Primary operating company
         type:
@@ -13538,7 +13988,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         definition:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Report definition (SQL query, aggregation rules, column mappings)
           example: *id044
         is_shared:
@@ -13565,12 +14017,16 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           example: USD
         account_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Filter by specific account
           example: 750e8400-e29b-41d4-a716-446655440002
@@ -13604,7 +14060,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           example: USD
@@ -13641,7 +14099,9 @@ components:
           - STATUTORY
           example: custom
         company_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         active:
@@ -13685,7 +14145,9 @@ components:
           format: date
           example: '2026-01-31'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           example: USD
@@ -13707,7 +14169,9 @@ components:
           description: Report name
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           description: Report description
           example: Primary operating company
@@ -13727,7 +14191,9 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
         definition:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Report configuration (SQL, aggregation rules, etc.)
           example:
             key: value
@@ -13769,7 +14235,9 @@ components:
           type: string
           example: Report generation failed
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: sample value
     FinancialReportsGeneralLedgerReport:
       type: object
@@ -13834,7 +14302,9 @@ components:
               description:
                 type: string
               reference:
-                type: [string, 'null']
+                type:
+                - string
+                - 'null'
           description: GL entries with running balance
           example:
           - entry_id: 550e8400-e29b-41d4-a716-446655440000
@@ -14159,7 +14629,9 @@ components:
           type: boolean
           example: true
         company_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
     FinancialReportsReportDefinitionLine:
@@ -14190,7 +14662,9 @@ components:
           description: Expression evaluated by the report engine.
           example: revenue
         parent_line_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           example: 1000.0
     FinancialReportsReportExecution:
@@ -14218,25 +14692,35 @@ components:
           - FAILED
           example: active
         data:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Report results data
           example:
             revenue: 200000.0
             expenses: 75000.0
         error_message:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Error if report failed
           example: 'Failed to generate report: database timeout'
         period_start:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2026-01-01'
         period_end:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date
           example: '2026-01-31'
         currency_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           minLength: 3
           maxLength: 3
           example: USD
@@ -14245,7 +14729,9 @@ components:
           format: date-time
           example: '2026-01-15T10:30:00Z'
         completed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           example: '2026-01-15T14:30:00Z'
     FinancialReportsReportExport:
@@ -14272,7 +14758,9 @@ components:
           - FAILED
           example: active
         artifact_uri:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           example: s3://reports/2026-01/balance_sheet.pdf
     FinancialReportsStatutoryReportPack:
       type: object
@@ -14384,11 +14872,15 @@ components:
           maxLength: 200
           example: Acme Corporation
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           maxLength: 1000
           example: Primary operating company
         definition:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           example: *id045
         is_shared:
           type: boolean
@@ -14475,7 +14967,9 @@ components:
           - CLOSED
           - HARD_LOCKED
         closed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     GeneralLedgerFiscalPeriodList:
       type: object
@@ -14593,7 +15087,9 @@ components:
           - DEBIT
           - CREDIT
         control_role:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         currency_code:
           type: string
           pattern: ^[A-Z]{3}$
@@ -14713,8 +15209,9 @@ components:
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           default: '0'
         tax:
-          oneOf:
-          - $ref: '#/components/schemas/InvoiceTaxFact'
+          anyOf:
+          - allOf:
+            - $ref: '#/components/schemas/InvoiceTaxFact'
           - type: 'null'
     InvoiceErrorResponse:
       type: object
@@ -14847,7 +15344,9 @@ components:
           enum:
           - POSTED
         original_document_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         customer_id:
           type: string
@@ -14920,9 +15419,13 @@ components:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         tax_code:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         tax_rate_percent:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         tax_amount:
           type: string
@@ -14954,7 +15457,9 @@ components:
           - CUSTOMER_INVOICE
           - CUSTOMER_CREDIT_NOTE
         original_document_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         customer_id:
           type: string
@@ -15113,3 +15618,76 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT bearer token for authentication. Include in Authorization header as 'Bearer <token>'.
+  responses:
+    GeneralLedgerBadRequest:
+      description: Invalid request parameter
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralLedgerErrorResponse'
+    GeneralLedgerForbidden:
+      description: Authenticated identity lacks permission or cannot establish an accounting scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralLedgerErrorResponse'
+    GeneralLedgerInternalError:
+      description: Accounting query could not be completed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralLedgerErrorResponse'
+    GeneralLedgerNotFound:
+      description: Resource not found in the authenticated accounting scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralLedgerErrorResponse'
+    GeneralLedgerUnauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralLedgerErrorResponse'
+    InvoiceBadRequest:
+      description: Invalid request syntax or value
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceConflict:
+      description: Idempotency key or source reference conflicts with existing facts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceForbidden:
+      description: Authenticated identity context is incomplete or inconsistent
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceNotFound:
+      description: Resource does not exist in the authenticated tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceUnauthorized:
+      description: Authentication is required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceUnavailable:
+      description: Rendered-document storage is temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
+    InvoiceUnprocessable:
+      description: Accounting policy rejected the otherwise valid command
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvoiceErrorResponse'
