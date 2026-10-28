@@ -537,3 +537,21 @@ ref-rewritten) the whole accounting suite — including
 - Verification: `cargo check --workspace --all-targets` 0 errors,
   `cargo test --workspace --lib` 0 failures (21 tests passed),
   `cargo fmt --all --check` clean, `just qa` 29 passed.
+
+## [2026-10-28] maintain | rebase hermes/accounting-build onto main 818c6cb6
+
+- Operator directed a rebase onto `origin/main` (`818c6cb6`: lifeguard
+  `869b2c5`, may_postgres from the fork's `integration/microscaler-fork`).
+  24 accounting commits replayed; the two main pin-bump commits deduplicated
+  automatically. Conflicts were only the `brrtrouter`/`sesame-idam-client`
+  pins in `microservices/Cargo.toml` + `Cargo.lock`, resolved toward main's
+  newer `9768e35` (the branch's `0e8f307c` is its ancestor; the branch tip
+  already agreed with main).
+- Pitfall found: the replayed spec-era commit had silently downgraded
+  `tooling/pyproject.toml`'s brrtrouter-tooling pin below main's
+  (`9bcb2db0`); restored from main in the lock-refresh commit (28644e76).
+  An earlier branch copy was also clobbered back onto the pre-rebase tip by a
+  stale `git pull --rebase -X ours` — history rebuilt from the reflog chain.
+- Verified on the new base: `cargo check --workspace --all-targets --locked`
+  0 errors, `cargo test --workspace --lib --no-fail-fast` 21 passed / 0
+  failures, `cargo fmt --all --check` clean, `just qa` 29 passed.
