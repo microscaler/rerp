@@ -4,7 +4,7 @@
 //! presigned GET. It is not an AWS SDK or general object-storage abstraction.
 
 use chrono::{DateTime, Duration, Utc};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use http_legacy::Method;
 use may_minihttp::client::{Client, RedirectPolicy};
 use sha2::{Digest, Sha256};
