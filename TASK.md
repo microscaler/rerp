@@ -171,6 +171,64 @@ Accounting crates that already compile must stay compiling.
    `cargo fmt --all --check`. Then `just qa` from the root.
 3. Add the `docs/llmwiki/log.md` entry and commit.
 
+### Phase 4 (added 2026-10-28): BFF regeneration and spec fixes
+
+Context: the branch now includes rerp main 6fd81dd (BRRTRouter 9768e35, which
+contains BRRTRouter #533). `bff generate-system` now merges `components.responses`,
+headers, requestBodies and the other component maps from the member specs, with
+the service prefix and `$ref` rewriting. The generator also reports dangling
+response, requestBody and parameter refs, giving the file, operation, ref and
+missing component. `../BRRTRouter` is at 9768e35 and `brrtrouter-gen` has been
+rebuilt.
+
+**Rule change for this phase only (overrides hard rule 2 for `openapi/**`):** you MAY
+edit OpenAPI specs to:
+- add missing component definitions (for example `components.responses.Unauthorized`);
+- fix wrong ref names;
+- fix other spec errors the generator reports.
+
+You may NOT change API behaviour: no changed schemas of existing payloads, no
+renamed operations or operationIds, no removed or added endpoints, no changed
+status codes. When you add a missing response component, model it on the same
+component in a sibling accounting spec that already defines it (for example
+general-ledger), and say which one in the commit message. Every other hard rule
+still applies: never hand-edit `gen/`, no BRRTRouter edits, no pre-commit bypass,
+no push, no `#[allow]` / `todo!()` / `unimplemented!()` workarounds.
+
+Goals, in order:
+1. Record per-crate error counts (`cargo check --workspace --all-targets
+   --keep-going --message-format short`) in the progress log.
+2. Fix the five specs with dangling `#/components/responses/*` refs: consolidation,
+   documents-extraction, revenue-recognition, tax-compliance, treasury. Also fix
+   any dangling parameter or requestBody refs the generator reports in accounting
+   specs. Then regenerate the affected `gen/` crates (`rerp gen suite accounting
+   --service <svc>`), and regenerate or sync their impl stubs if they no longer
+   compile. Commit the spec fixes separately from the regeneration (one commit per
+   service, or one for all the spec fixes and one for all the regeneration).
+3. Regenerate the BFF system spec (`rerp bff generate-system --suite accounting`),
+   then `bff/gen` (`rerp gen suite accounting --service bff`), then the bff impl
+   stubs (`rerp gen stubs accounting bff --force`, or `--sync` where the files carry
+   the user-owned sentinel; first check that every overwritten file is a pure stub).
+   Commit the spec and gen regeneration separately from the impl changes.
+4. Bring `accounting/edi/impl` and any other accounting crate that this branch's
+   merge of main broke back to compiling, the same way as in Phase 2. (The
+   operator's baseline after the merge, a355fdf3, shows edi and every other crate
+   compiling; only bff/impl fails, with 671 errors. Re-check after your
+   regenerations, because step 2 can break crates that compile now.)
+5. If bff/impl now compiles, add `accounting/bff/impl` to `default-members` and
+   update the comment above it.
+6. Verify: `cargo check --workspace --all-targets`, `cargo test --workspace --lib
+   --no-fail-fast`, `cargo fmt --all --check`, `just qa`. Append a
+   `docs/llmwiki/log.md` entry. Use only function and file names you have actually
+   read; check every name you cite with grep before writing it down.
+
+**30-minute stuck rule, mandatory in this phase:** if any one problem (one spec, one
+crate, one generator error) has not improved for 30 minutes, STOP work on it.
+Revert its uncommitted changes, write a "blocked" note in the progress log (what
+fails, the exact error, what you tried, what would unblock it), and move on to the
+next goal, or finish if there is none. Do not search other BRRTRouter branches,
+`git fetch` in `../BRRTRouter`, or look for flags that skip validation.
+
 ## Stopping criteria
 
 Stop and write your final report (as your last message, and in the progress log)
