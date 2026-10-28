@@ -58,11 +58,11 @@ members = [
     "migrator",
 ]
 resolver = "2"
-# What a bare `cargo build` (the octopilot pipeline's release build) compiles: the services that build today.
-# accounting/bff/impl is excluded: its gen/ predates the current BFF spec and cannot be regenerated until the
-# BFF tooling carries components.responses (see docs/llmwiki/log.md). `--workspace` (rerp build workspace, ci.yml) still builds every member.
+# What a bare `cargo build` (the octopilot pipeline's release build) compiles: every suite service.
+# The accounting suite is fully back after the BFF spec/gen regeneration (BRRTRouter 9768e35 carries
+# components.responses through the BFF merge); see docs/llmwiki/log.md.
 default-members = [
-    # Accounting suite: all gen + impl crates that compile (bff/gen compiles; bff/impl does not — see above).
+    # Accounting suite: all gen + impl crates.
     "accounting/core",
     "accounting/entities",
     "accounting/general-ledger/gen",
@@ -84,6 +84,7 @@ default-members = [
     "accounting/financial-reports/gen",
     "accounting/financial-reports/impl",
     "accounting/bff/gen",
+    "accounting/bff/impl",
     "accounting/tax-compliance/gen",
     "accounting/tax-compliance/impl",
     "accounting/documents-extraction/gen",
