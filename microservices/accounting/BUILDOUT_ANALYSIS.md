@@ -174,7 +174,7 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   request. Drops: DSO, collection-efficiency, predictive analytics.
 - **B2 — AP contract slice** (M, deps A1) — **DONE 2026-10-28**: bill capture/post, credit note,
   approval transition, payment record, allocation (+reversal), aging.
-- **B3 — bank-sync contract slice** (M, deps A1): bank-account registry,
+- **B3 — bank-sync contract slice** (M, deps A1) — **DONE 2026-10-28**: bank-account registry,
   statement ingestion (provider-idempotent), transaction list, match/override,
   reconciliation status. Drops: institution-specific ops, FX hedging.
 - **B4 — financial-reports contract slice** (S, deps B1,B2): trial balance,
