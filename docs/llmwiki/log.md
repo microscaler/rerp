@@ -578,3 +578,19 @@ ref-rewritten) the whole accounting suite — including
 - Verified: `cargo check --workspace --all-targets` 0 errors, lib tests
   21 passed, `cargo fmt --all --check` clean, `just qa` 57 passed
   (29 baseline + 28 new). Shipped via PR #111.
+
+## [2026-10-28] contribute | accounts-receivable contract narrowed to the WP3 first vertical (Epic B1)
+
+- `openapi/accounting/accounts-receivable/openapi.yaml`: 24 research-era ops
+  narrowed to 9 (open items, customer payments, payment applications, aging
+  summary, statement send). Collections/follow-ups/promises/aging-snapshot
+  CRUD/auto-apply/receipt-update-delete dropped; 22 orphan schemas pruned;
+  all retained money fields converted from double to the invoice
+  decimal-string pattern, examples quoted. Receipt mutations deferred to
+  explicit reversal ops in the WP3 impl slice (immutability constraint).
+- Regeneration via BRRTRouter 9768e35 (hermes-lab sibling checkout; the
+  microscaler/BRRTRouter sibling is at c9f0884 and must not be used for rerp
+  gen until re-pinned): full-suite regen touched only accounts-receivable.
+- Impl: 9 stubs -> honest 501s, 15 orphan controllers removed, registry
+  re-synced. Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57,
+  `rerp openapi validate` 121 specs valid.
