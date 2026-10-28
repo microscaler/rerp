@@ -22,9 +22,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        company_id: None,              // TODO: Set from your business logic
-        customer_count: None,          // TODO: Set from your business logic
-        id: "example".to_string(),     // TODO: Set from your business logic
-        status: "example".to_string(), // TODO: Set from your business logic
+        company_id: None,
+        customer_count: None,
+        id: "example".to_string(),
+        status: "example".to_string(),
     })
 }

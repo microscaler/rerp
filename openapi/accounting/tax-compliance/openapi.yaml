@@ -74,10 +74,6 @@ paths:
                 $ref: '#/components/schemas/TaxPeriod'
         '400':
           $ref: '#/components/responses/ValidationError'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
@@ -151,10 +147,6 @@ paths:
                 $ref: '#/components/schemas/TaxRule'
         '400':
           $ref: '#/components/responses/ValidationError'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -219,10 +211,6 @@ paths:
                 $ref: '#/components/schemas/TaxReturn'
         '400':
           $ref: '#/components/responses/ValidationError'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: *id001
@@ -288,10 +276,6 @@ paths:
                 $ref: '#/components/schemas/TaxReturnSubmission'
         '409':
           $ref: '#/components/responses/Conflict'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Validation error
           content: *id004
@@ -437,6 +421,31 @@ components:
       schema:
         type: string
         format: uuid
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found in the authenticated accounting scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: "Conflict \u2014 resource already exists or violates business rules"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     TaxPeriod:
       type: object

@@ -5,7 +5,8 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: Audit Controls
   version: 1.0.0
-  description: Cross-service accounting controls service for approval policies, segregation rules, signature requests, audit events, and control exceptions.
+  description: Cross-service accounting controls service for approval policies, segregation rules, signature requests, audit
+    events, and control exceptions.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -54,6 +55,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateApprovalPolicyRequest'
+            example:
+              service_name: Acme Corporation
+              action_name: Acme Corporation
+              minimum_approvals: 1
       responses:
         '201':
           description: Approval policy created
@@ -61,6 +66,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalPolicy'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /segregation-rules:
     get:
       operationId: list_segregation_rules
@@ -85,6 +114,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSegregationRuleRequest'
+            example:
+              service_name: Acme Corporation
+              initiator_role: sample value
+              approver_role: sample value
       responses:
         '201':
           description: Segregation rule created
@@ -92,6 +125,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SegregationRule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /signature-requests:
     get:
       operationId: list_signature_requests
@@ -125,6 +170,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSignatureRequest'
+            example:
+              service_name: Acme Corporation
+              entity_id: 550e8400-e29b-41d4-a716-446655440020
+              requested_by: sample value
       responses:
         '201':
           description: Signature request created
@@ -132,6 +181,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignatureRequest'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /signature-requests/{id}/sign:
     post:
       operationId: sign_signature_request
@@ -145,6 +206,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignRequest'
+            example:
+              signed_by: sample value
+              declaration: sample value
       responses:
         '200':
           description: Signature request signed
@@ -152,6 +216,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignatureRequest'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /audit-events:
     get:
       operationId: list_audit_events
@@ -208,6 +284,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateControlExceptionRequest'
+            example:
+              service_name: Acme Corporation
+              entity_id: 550e8400-e29b-41d4-a716-446655440020
+              reason: Reclassification of asset category
       responses:
         '201':
           description: Control exception created
@@ -215,6 +295,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ControlException'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -244,72 +336,127 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    CompanyId:
+      name: X-Company-ID
+      in: header
+      required: true
+      description: Company identifier for multi-tenant scoping
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Free text search across resources
+      schema:
+        type: string
   schemas:
     ApprovalPolicy:
       type: object
-      required: [id, service_name, action_name, active]
+      required:
+      - id
+      - service_name
+      - action_name
+      - active
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         service_name:
           type: string
+          example: Acme Corporation
         action_name:
           type: string
+          example: Acme Corporation
         active:
           type: boolean
+          example: true
         minimum_approvals:
           type: integer
+          example: 1
     CreateApprovalPolicyRequest:
       type: object
-      required: [service_name, action_name]
+      required:
+      - service_name
+      - action_name
       properties:
         service_name:
           type: string
+          example: Acme Corporation
         action_name:
           type: string
+          example: Acme Corporation
         minimum_approvals:
           type: integer
+          example: 1
     SegregationRule:
       type: object
-      required: [id, service_name, initiator_role, approver_role, active]
+      required:
+      - id
+      - service_name
+      - initiator_role
+      - approver_role
+      - active
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         service_name:
           type: string
+          example: Acme Corporation
         initiator_role:
           type: string
+          example: sample value
         approver_role:
           type: string
+          example: sample value
         active:
           type: boolean
+          example: true
     CreateSegregationRuleRequest:
       type: object
-      required: [service_name, initiator_role, approver_role]
+      required:
+      - service_name
+      - initiator_role
+      - approver_role
       properties:
         service_name:
           type: string
+          example: Acme Corporation
         initiator_role:
           type: string
+          example: sample value
         approver_role:
           type: string
+          example: sample value
     SignatureRequest:
       type: object
-      required: [id, service_name, entity_id, requested_by, status]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - requested_by
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         service_name:
           type: string
+          example: Acme Corporation
         entity_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440020
         requested_by:
           type: string
           format: uuid
+          example: sample value
         status:
           enum:
           - REQUESTED
@@ -317,59 +464,90 @@ components:
           - REJECTED
           - EXPIRED
           - CANCELLED
+          example: active
     CreateSignatureRequest:
       type: object
-      required: [service_name, entity_id, requested_by]
+      required:
+      - service_name
+      - entity_id
+      - requested_by
       properties:
         service_name:
           type: string
+          example: Acme Corporation
         entity_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440020
         requested_by:
           type: string
           format: uuid
+          example: sample value
     SignRequest:
       type: object
-      required: [signed_by, declaration]
+      required:
+      - signed_by
+      - declaration
       properties:
         signed_by:
           type: string
           format: uuid
+          example: sample value
         declaration:
           type: string
+          example: sample value
     AuditEvent:
       type: object
-      required: [id, service_name, entity_id, action, actor_id, occurred_at]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - action
+      - actor_id
+      - occurred_at
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         service_name:
           type: string
+          example: Acme Corporation
         entity_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440020
         action:
           type: string
+          example: sample value
         actor_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         occurred_at:
           type: string
           format: date-time
+          example: 1000.0
     ControlException:
       type: object
-      required: [id, service_name, entity_id, status, reason]
+      required:
+      - id
+      - service_name
+      - entity_id
+      - status
+      - reason
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         service_name:
           type: string
+          example: Acme Corporation
         entity_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440020
         status:
           enum:
           - OPEN
@@ -377,46 +555,99 @@ components:
           - REMEDIATED
           - REJECTED
           - CLOSED
+          example: active
         reason:
           type: string
+          example: Reclassification of asset category
     CreateControlExceptionRequest:
       type: object
-      required: [service_name, entity_id, reason]
+      required:
+      - service_name
+      - entity_id
+      - reason
       properties:
         service_name:
           type: string
+          example: Acme Corporation
         entity_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440020
         reason:
           type: string
+          example: Reclassification of asset category
     PaginatedApprovalPolicies:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ApprovalPolicy' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ApprovalPolicy'
     PaginatedSegregationRules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SegregationRule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/SegregationRule'
     PaginatedSignatureRequests:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/SignatureRequest' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/SignatureRequest'
     PaginatedAuditEvents:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/AuditEvent' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditEvent'
     PaginatedControlExceptions:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/ControlException' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/ControlException'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
 security:
 - bearerAuth: []

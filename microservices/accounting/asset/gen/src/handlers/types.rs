@@ -34,14 +34,16 @@ pub struct Asset {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub department_id: Option<String>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub insurance_policy: Option<String>,
 
-    pub location: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub location: Option<String>,
 
     pub name: String,
 
@@ -187,6 +189,18 @@ pub struct AssetSummaryResponse {
     pub total_assets: Option<i32>,
 
     pub total_net_book_value: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AssetWithDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depreciation_schedule: Option<Vec<DepreciationEntry>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disposal_record: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub revaluation_history: Option<Vec<RevaluationRecord>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -357,6 +371,82 @@ pub struct CreateAssetRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateAssetResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accumulated_depreciation: Option<f64>,
+
+    pub acquisition_cost: f64,
+
+    pub acquisition_date: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acquisition_gl_entry_id: Option<String>,
+
+    pub asset_number: String,
+
+    pub category_id: String,
+
+    pub company_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custodian_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depreciation_schedule: Option<Vec<DepreciationEntry>>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disposal_record: Option<serde_json::Value>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub insurance_policy: Option<String>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub location: Option<String>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub net_book_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub revaluation_history: Option<Vec<RevaluationRecord>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub serial_number: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub supplier_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub useful_life_months: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warranty_expiry: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateDepreciationEntryRequest {
     pub depreciation_amount: f64,
 
@@ -479,16 +569,6 @@ pub struct CreateRevaluationResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteAssetResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DepreciationEntry {
     pub accumulated_depreciation: f64,
 
@@ -598,6 +678,82 @@ pub struct ErrorResponse {
     pub details: Option<serde_json::Value>,
 
     pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetAssetResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accumulated_depreciation: Option<f64>,
+
+    pub acquisition_cost: f64,
+
+    pub acquisition_date: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acquisition_gl_entry_id: Option<String>,
+
+    pub asset_number: String,
+
+    pub category_id: String,
+
+    pub company_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custodian_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub department_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depreciation_schedule: Option<Vec<DepreciationEntry>>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disposal_record: Option<serde_json::Value>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub insurance_policy: Option<String>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub location: Option<String>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub net_book_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub revaluation_history: Option<Vec<RevaluationRecord>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub serial_number: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub supplier_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub useful_life_months: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warranty_expiry: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -723,14 +879,16 @@ pub struct ModifyAssetResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub department_id: Option<String>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub insurance_policy: Option<String>,
 
-    pub location: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub location: Option<String>,
 
     pub name: String,
 
@@ -842,26 +1000,6 @@ pub struct PaginatedRevaluations {
     pub page: i32,
 
     pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PauseAssetDepreciationResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ResumeAssetDepreciationResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -986,14 +1124,16 @@ pub struct UpdateAssetResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub department_id: Option<String>,
 
-    pub description: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub description: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub insurance_policy: Option<String>,
 
-    pub location: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub location: Option<String>,
 
     pub name: String,
 
@@ -1019,16 +1159,6 @@ pub struct UpdateAssetResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warranty_expiry: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ValidateAssetResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

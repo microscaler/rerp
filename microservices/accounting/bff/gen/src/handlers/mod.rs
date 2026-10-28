@@ -59,20 +59,6 @@ pub mod list_collection_activities;
 
 pub mod create_collection_activity;
 
-pub mod list_credit_memos;
-
-pub mod create_credit_memo;
-
-pub mod list_customer_invoices;
-
-pub mod create_customer_invoice;
-
-pub mod get_customer_invoice;
-
-pub mod update_customer_invoice;
-
-pub mod delete_customer_invoice;
-
 pub mod send_customer_statements;
 
 pub mod list_follow_up_levels;
@@ -80,6 +66,10 @@ pub mod list_follow_up_levels;
 pub mod create_follow_up_level;
 
 pub mod create_follow_up_run;
+
+pub mod list_open_items;
+
+pub mod get_open_item;
 
 pub mod create_payment_promise;
 
@@ -305,202 +295,22 @@ pub mod generate_trial_balance;
 
 pub mod list_statutory_report_packs;
 
-pub mod list_accounts;
-
-pub mod create_account;
-
-pub mod get_account;
-
-pub mod update_account;
-
-pub mod delete_account;
-
-pub mod get_account_balance;
-
-pub mod list_chart_of_accounts;
-
-pub mod create_chart_of_account;
-
-pub mod get_chart_of_account;
-
-pub mod update_chart_of_account;
-
-pub mod delete_chart_of_account;
-
-pub mod list_chart_templates;
-
-pub mod create_chart_template;
-
-pub mod get_chart_template;
-
-pub mod update_chart_template;
-
-pub mod delete_chart_template;
-
-pub mod deploy_chart_template;
-
-pub mod create_currency_revaluation;
+pub mod list_ledger_accounts;
 
 pub mod list_fiscal_periods;
 
-pub mod create_fiscal_period;
-
-pub mod get_fiscal_period;
-
-pub mod update_fiscal_period;
-
-pub mod delete_fiscal_period;
-
-pub mod list_fiscal_positions;
-
-pub mod create_fiscal_position;
-
-pub mod get_fiscal_position;
-
-pub mod update_fiscal_position;
-
-pub mod delete_fiscal_position;
-
-pub mod list_fiscal_years;
-
-pub mod create_fiscal_year;
-
-pub mod get_fiscal_year;
-
-pub mod update_fiscal_year;
-
-pub mod delete_fiscal_year;
-
-pub mod close_fiscal_year;
-
-pub mod reopen_fiscal_year;
-
-pub mod list_fiscal_year_periods;
-
-pub mod generate_fiscal_year_periods;
-
-pub mod list_journal_entries;
-
-pub mod create_journal_entry;
-
-pub mod bulk_approve_journal_entries;
-
-pub mod bulk_post_journal_entries;
-
 pub mod get_journal_entry;
 
-pub mod update_journal_entry;
+pub mod get_trial_balance;
 
-pub mod delete_journal_entry;
+pub mod list_customer_invoices;
 
-pub mod approve_journal_entry;
+pub mod post_customer_invoice;
 
-pub mod list_journal_entry_lines;
+pub mod get_customer_invoice;
 
-pub mod post_journal_entry;
+pub mod credit_customer_invoice;
 
-pub mod reverse_journal_entry;
+pub mod get_customer_invoice_document;
 
-pub mod list_journal_items;
-
-pub mod reconcile_journal_items;
-
-pub mod unreconcile_journal_items;
-
-pub mod list_journals;
-
-pub mod create_journal;
-
-pub mod get_journal;
-
-pub mod update_journal;
-
-pub mod delete_journal;
-
-pub mod list_journal_entries_by_journal;
-
-pub mod list_lock_dates;
-
-pub mod create_lock_date;
-
-pub mod list_payment_methods;
-
-pub mod create_payment_method;
-
-pub mod get_payment_method;
-
-pub mod update_payment_method;
-
-pub mod delete_payment_method;
-
-pub mod list_payment_method_journal_mappings;
-
-pub mod list_payment_terms;
-
-pub mod create_payment_term;
-
-pub mod get_payment_term;
-
-pub mod update_payment_term;
-
-pub mod delete_payment_term;
-
-pub mod account_balances_report;
-
-pub mod ledger_report;
-
-pub mod trial_balance;
-
-pub mod list_tax_repartition_lines;
-
-pub mod create_tax_repartition_line;
-
-pub mod get_tax_repartition_line;
-
-pub mod update_tax_repartition_line;
-
-pub mod delete_tax_repartition_line;
-
-pub mod list_invoices;
-
-pub mod create_invoice;
-
-pub mod get_invoice;
-
-pub mod update_invoice;
-
-pub mod delete_invoice;
-
-pub mod approve_invoice;
-
-pub mod cancel_invoice;
-
-pub mod create_invoice_credit_note;
-
-pub mod handoff_invoice_to_deferral;
-
-pub mod handoff_invoice_to_einvoice;
-
-pub mod list_invoice_line_items;
-
-pub mod create_line_item;
-
-pub mod update_line_item;
-
-pub mod delete_line_item;
-
-pub mod list_invoice_payment_matches;
-
-pub mod post_invoice;
-
-pub mod register_invoice_payment;
-
-pub mod void_invoice;
-
-pub mod get_invoice_workflow_history;
-
-pub mod invoice_summary;
-
-pub mod calculate_tax;
-
-pub mod list_tax_rates;
+pub mod get_customer_invoice_journal;

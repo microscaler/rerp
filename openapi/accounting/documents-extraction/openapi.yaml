@@ -89,10 +89,6 @@ paths:
                 $ref: '#/components/schemas/AccountingDocument'
         '400':
           $ref: '#/components/responses/ValidationError'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: "Unauthorized \u2014 invalid or expired token"
           content: &id001
@@ -246,10 +242,6 @@ paths:
                 $ref: '#/components/schemas/ExtractionApproval'
         '409':
           $ref: '#/components/responses/Conflict'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
         '400':
           description: Validation error
           content: *id004
@@ -374,6 +366,31 @@ components:
       description: Free text search across resources
       schema:
         type: string
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found in the authenticated accounting scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: "Conflict \u2014 resource already exists or violates business rules"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     AccountingDocument:
       type: object

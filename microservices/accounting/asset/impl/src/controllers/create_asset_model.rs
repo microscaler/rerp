@@ -1,14 +1,16 @@
 // Implementation stub for handler 'create_asset_model'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path create_asset_model --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_asset_gen::handlers::create_asset_model::{Request, Response};
 
 #[handler(CreateAssetModelController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -19,7 +21,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
+    HttpJson::ok(Response {
         asset_account_id: None,        // TODO: Set from your business logic
         depreciation_account_id: None, // TODO: Set from your business logic
         depreciation_method: "example".to_string(), // TODO: Set from your business logic
@@ -28,5 +30,5 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
         name: "example".to_string(),   // TODO: Set from your business logic
         residual_value_percent: None,  // TODO: Set from your business logic
         useful_life_months: 42,        // TODO: Set from your business logic
-    }
+    })
 }

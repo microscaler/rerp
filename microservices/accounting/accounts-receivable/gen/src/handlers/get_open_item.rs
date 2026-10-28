@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::PaymentApplication;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -16,7 +17,59 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(rename = "aging_bucket")]
+    pub aging_bucket: String,
+
+    #[serde(rename = "company_id")]
+    pub company_id: String,
+
+    #[serde(rename = "created_at")]
+    pub created_at: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "credit_limit_check")]
+    pub credit_limit_check: Option<bool>,
+
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "customer_id")]
+    pub customer_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "days_overdue")]
+    pub days_overdue: Option<i32>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "due_date")]
+    pub due_date: Option<String>,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(rename = "invoice_id")]
+    pub invoice_id: String,
+
+    #[serde(rename = "original_amount")]
+    pub original_amount: f64,
+
+    #[serde(rename = "outstanding_amount")]
+    pub outstanding_amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "payment_history")]
+    pub payment_history: Option<Vec<PaymentApplication>>,
+
+    #[serde(rename = "status")]
+    pub status: String,
+
+    #[serde(rename = "terms")]
+    pub terms: String,
+
+    #[serde(rename = "updated_at")]
+    pub updated_at: String,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -27,14 +80,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

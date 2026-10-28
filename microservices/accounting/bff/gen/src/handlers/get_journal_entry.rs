@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::GeneralLedgerJournalLine;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -16,7 +17,37 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(rename = "entry_date")]
+    pub entry_date: String,
+
+    #[serde(rename = "entry_number")]
+    pub entry_number: String,
+
+    #[serde(rename = "fiscal_period_id")]
+    pub fiscal_period_id: String,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(rename = "lines")]
+    pub lines: Vec<GeneralLedgerJournalLine>,
+
+    #[serde(rename = "posted_at")]
+    pub posted_at: String,
+
+    #[serde(rename = "source_document_id")]
+    pub source_document_id: String,
+
+    #[serde(rename = "total_credit")]
+    pub total_credit: String,
+
+    #[serde(rename = "total_debit")]
+    pub total_debit: String,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -27,14 +58,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

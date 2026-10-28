@@ -3,7 +3,7 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 use brrtrouter::dispatcher::HandlerRequest;
-use brrtrouter::typed::HttpJson;
+use brrtrouter::typed::HttpNoContent;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -16,17 +16,7 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(rename = "code")]
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "details")]
-    pub details: Option<serde_json::Value>,
-
-    #[serde(rename = "message")]
-    pub message: String,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -37,14 +27,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));
@@ -68,6 +56,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpNoContent {
     crate::controllers::delete_vendor_payment::handle(req)
 }

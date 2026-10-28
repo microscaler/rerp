@@ -8,8 +8,8 @@ use brrtrouter_macros::handler;
 #[handler(CreateBudgetLineController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        actual_amount: Some(3.14),
-        amount: 3.14,
+        actual_amount: Some(1.5),
+        amount: 1.5,
         budget_id: "example".to_string(),
         cost_center_id: Some("example".to_string()),
         created_at: Some("example".to_string()),
@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         period: "example".to_string(),
         period_name: Some("example".to_string()),
         updated_at: Some("example".to_string()),
-        variance: Some(3.14),
-        variance_percent: Some(3.14),
+        variance: Some(1.5),
+        variance_percent: Some(1.5),
     })
 }

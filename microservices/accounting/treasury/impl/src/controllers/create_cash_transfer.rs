@@ -1,20 +1,32 @@
 // Implementation stub for handler 'create_cash_transfer'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_treasury_gen::handlers::create_cash_transfer::{Request, Response};
 
 #[handler(CreateCashTransferController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
-    Response {
-        amount: 0.0,
-        currency_code: None,
-        destination_account_id: "".to_string(),
-        id: "".to_string(),
-        source_account_id: "".to_string(),
-        status: serde_json::json!({}),
-    }
+    //
+    // Example: Access request data
+    // let amount = req.inner.amount;// let currency_code = req.inner.currency_code;// let destination_account_id = req.inner.destination_account_id;// let source_account_id = req.inner.source_account_id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
+    HttpJson::ok(Response {
+        amount: 1.5,                                   // TODO: Set from your business logic
+        currency_code: None,                           // TODO: Set from your business logic
+        destination_account_id: "example".to_string(), // TODO: Set from your business logic
+        id: "example".to_string(),                     // TODO: Set from your business logic
+        source_account_id: "example".to_string(),      // TODO: Set from your business logic
+        status: Default::default(),                    // TODO: Set from your business logic
+    })
 }

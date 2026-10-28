@@ -474,3 +474,84 @@ migrations.
 - Replaced duplicate Invoice and General Ledger claim parsers with the shared
   strict parser while retaining RERP's Lifeguard `SessionContext` mapping.
 - Verified both binary identity test suites on ms02 (three tests each).
+
+## [2026-10-27] contribute | accounting crates back in the build; bff blocked on BFF tooling
+
+Brought the accounting suite back into `default-members`
+([`microservices/Cargo.toml`](../../microservices/Cargo.toml)) after
+regenerating every regenerable `gen/` crate with BRRTRouter 0e8f307c
+(PR #530: allOf merge + body-less 2xx fix) and refreshing the `impl/`
+handler stubs (`rerp gen stubs --force`/`--sync`; all failing controllers
+were verified pure generated stubs). All accounting gen and impl crates
+now compile except `accounting/bff/impl`, which stays out of
+`default-members`.
+
+- Known drift: `openapi/accounting/openapi_bff.yaml` references
+  `#/components/responses/*` (copied from general-ledger/invoice member
+  specs) but the BFF generator never carries `components.responses` into
+  the merged spec (`brrtrouter_tooling/bff/merge.py::_merge_components`
+  merges only schemas and parameters). The fix-rev's fail-closed `$ref`
+  validation therefore rejects the BFF spec, so bff's `gen/` (252 stale
+  handler modules vs 155 current spec ops) and its 116 impl stubs cannot
+  be regenerated — 671 errors remain. Unblock path: a BRRTRouter tooling
+  change merging member `components.responses`.
+- Also blocked for regeneration (same fail-closed validation, member
+  specs not affected): consolidation, documents-extraction,
+  revenue-recognition, tax-compliance, treasury specs contain dangling
+  `#/components/responses/{Unauthorized,ValidationError,Conflict,...}`
+  refs with no `components.responses` section; their gen/ crates are
+  stale but still compile.
+- `rerp gen stubs` now emits `impl/src/impl_registry.rs` (ADR-0001 layer-2
+  registry) for budget, asset, edi, bank-sync, accounts-payable,
+  audit-controls, lease-accounting, financial-reports; those are
+  generated but not yet wired into `main.rs` (still `register_from_spec`).
+
+## [2026-10-28] contribute | accounting suite fully green, incl. bff
+
+With BRRTRouter 9768e35 (PR #533 merges member `components.responses`
+and the other component maps into BFF specs, service-prefixed and
+ref-rewritten) the whole accounting suite — including
+`accounting/bff/impl` — compiles and is back in `default-members`
+([`microservices/Cargo.toml`](../../microservices/Cargo.toml)).
+
+- Spec fixes (human-reviewed rule change): the five member specs
+  consolidation, documents-extraction, revenue-recognition,
+  tax-compliance, treasury gained the `components.responses` entries
+  their operations `$ref`'d but never defined (modelled on
+  general-ledger/invoice; `ValidationError` on inventory/stock). No
+  payload schema, operation, operationId, endpoint or status code
+  changed.
+- `openapi/accounting/openapi_bff.yaml` regenerated with
+  `rerp bff generate-system --suite accounting`: `components.responses`
+  now carries the 12 prefixed GeneralLedger*/Invoice* responses;
+  `bff/merge.py::merge_named_components` + `prefix_named_components`
+  are the tooling behind it. All 155 operations are proxy-only
+  (`x-service` + `x-brrtrouter-downstream-path`), so `generate-stubs`
+  skips them ("Skipped proxy-only stub",
+  `brrtrouter/src/generator/project/generate.rs`) and the 115 stale
+  pure-TODO impl controller files were removed; `bff/impl` keeps an
+  empty `controllers/mod.rs` and generated `impl_registry.rs` (0
+  controllers). `main.rs` dispatches gen mock handlers via
+  `register_from_spec` only — unchanged, still the open wiring
+  question for services that gain real impl controllers.
+- Verification: `cargo check --workspace --all-targets` 0 errors,
+  `cargo test --workspace --lib` 0 failures (21 tests passed),
+  `cargo fmt --all --check` clean, `just qa` 29 passed.
+
+## [2026-10-28] maintain | rebase hermes/accounting-build onto main 818c6cb6
+
+- Operator directed a rebase onto `origin/main` (`818c6cb6`: lifeguard
+  `869b2c5`, may_postgres from the fork's `integration/microscaler-fork`).
+  24 accounting commits replayed; the two main pin-bump commits deduplicated
+  automatically. Conflicts were only the `brrtrouter`/`sesame-idam-client`
+  pins in `microservices/Cargo.toml` + `Cargo.lock`, resolved toward main's
+  newer `9768e35` (the branch's `0e8f307c` is its ancestor; the branch tip
+  already agreed with main).
+- Pitfall found: the replayed spec-era commit had silently downgraded
+  `tooling/pyproject.toml`'s brrtrouter-tooling pin below main's
+  (`9bcb2db0`); restored from main in the lock-refresh commit (28644e76).
+  An earlier branch copy was also clobbered back onto the pre-rebase tip by a
+  stale `git pull --rebase -X ours` — history rebuilt from the reflog chain.
+- Verified on the new base: `cargo check --workspace --all-targets --locked`
+  0 errors, `cargo test --workspace --lib --no-fail-fast` 21 passed / 0
+  failures, `cargo fmt --all --check` clean, `just qa` 29 passed.

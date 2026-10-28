@@ -13,11 +13,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         by_status: Some(Default::default()),
         company_id: "example".to_string(),
         currency_code: Some("example".to_string()),
-        depreciation_expense_current_year: Some(3.14),
+        depreciation_expense_current_year: Some(1.5),
         disposals_current_year: Some(42),
-        total_accumulated_depreciation: 3.14,
-        total_acquisition_cost: 3.14,
+        total_accumulated_depreciation: 1.5,
+        total_acquisition_cost: 1.5,
         total_assets: Some(42),
-        total_net_book_value: 3.14,
+        total_net_book_value: 1.5,
     })
 }

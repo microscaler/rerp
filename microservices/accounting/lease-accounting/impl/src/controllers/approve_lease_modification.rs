@@ -1,21 +1,33 @@
 // Implementation stub for handler 'approve_lease_modification'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_lease_accounting_gen::handlers::approve_lease_modification::{
     Request, Response,
 };
 
 #[handler(ApproveLeaseModificationController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
-    Response {
-        effective_date: "".to_string(),
-        id: "".to_string(),
-        lease_id: "".to_string(),
-        reason: None,
-        status: "".to_string(),
-    }
+    //
+    // Example: Access request data
+    // let id = req.inner.id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
+    HttpJson::ok(Response {
+        effective_date: "example".to_string(), // TODO: Set from your business logic
+        id: "example".to_string(),             // TODO: Set from your business logic
+        lease_id: "example".to_string(),       // TODO: Set from your business logic
+        reason: None,                          // TODO: Set from your business logic
+        status: "example".to_string(),         // TODO: Set from your business logic
+    })
 }

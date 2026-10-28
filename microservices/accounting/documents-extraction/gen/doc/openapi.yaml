@@ -5,7 +5,8 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: Documents Extraction
   version: 1.0.0
-  description: Accounting document ingestion and extraction service for OCR, classification, review, approval, and linkage to invoices, bills, bank statements, and EDI documents.
+  description: Accounting document ingestion and extraction service for OCR, classification, review, approval, and linkage
+    to invoices, bills, bank statements, and EDI documents.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -73,6 +74,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccountingDocumentRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              document_type: standard
+              file_name: Acme Corporation
+              content_type: standard
+              source_uri: sample value
       responses:
         '201':
           description: Accounting document created
@@ -82,6 +89,24 @@ paths:
                 $ref: '#/components/schemas/AccountingDocument'
         '400':
           $ref: '#/components/responses/ValidationError'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /accounting-documents/{id}/classify:
     post:
       operationId: classify_accounting_document
@@ -95,6 +120,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClassifyDocumentRequest'
+            example:
+              force_reclassify: true
       responses:
         '200':
           description: Document classification result
@@ -104,6 +131,21 @@ paths:
                 $ref: '#/components/schemas/DocumentClassification'
         '404':
           $ref: '#/components/responses/NotFound'
+        '400':
+          description: Validation error
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /extraction-jobs:
     get:
       operationId: list_extraction_jobs
@@ -133,6 +175,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateExtractionJobRequest'
+            example:
+              document_id: 550e8400-e29b-41d4-a716-446655440000
+              profile: sample value
       responses:
         '202':
           description: Extraction job accepted
@@ -140,6 +185,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExtractionJob'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /extraction-results:
     get:
       operationId: list_extraction_results
@@ -172,6 +229,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApproveExtractionRequest'
+            example:
+              approved_by: 950e8400-e29b-41d4-a716-446655440004
+              corrections: &id005
+                key: value
       responses:
         '200':
           description: Extraction approved
@@ -181,6 +242,15 @@ paths:
                 $ref: '#/components/schemas/ExtractionApproval'
         '409':
           $ref: '#/components/responses/Conflict'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
   /documents/{id}/link-invoice:
     post:
       operationId: link_document_to_invoice
@@ -194,6 +264,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LinkDocumentRequest'
+            example:
+              target_id: 1000.0
+              link_reason: sample value
       responses:
         '200':
           description: Document linked to invoice
@@ -201,6 +274,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentLink'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
   /documents/{id}/link-bank-statement:
     post:
       operationId: link_document_to_bank_statement
@@ -214,6 +299,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LinkDocumentRequest'
+            example:
+              target_id: 1000.0
+              link_reason: sample value
       responses:
         '200':
           description: Document linked to bank statement
@@ -221,6 +309,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DocumentLink'
+        '400':
+          description: Validation error
+          content: *id004
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id001
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id002
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -250,21 +350,25 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    CompanyId:
+      name: X-Company-ID
+      in: header
+      required: true
+      description: Company identifier for multi-tenant scoping
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Free text search across resources
+      schema:
+        type: string
   responses:
     Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: Invalid workflow state
+      description: Missing or invalid authentication
       content:
         application/json:
           schema:
@@ -274,18 +378,37 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ValidationError'
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found in the authenticated accounting scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: "Conflict \u2014 resource already exists or violates business rules"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     AccountingDocument:
       type: object
-      required: [id, document_type, status, file_name, uploaded_at]
+      required:
+      - id
+      - document_type
+      - status
+      - file_name
+      - uploaded_at
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -295,6 +418,7 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         status:
           enum:
           - UPLOADED
@@ -305,22 +429,30 @@ components:
           - LINKED
           - REJECTED
           - ARCHIVED
+          example: active
         file_name:
           type: string
+          example: Acme Corporation
         content_type:
           type: string
+          example: standard
         source_uri:
           type: string
+          example: sample value
         uploaded_at:
           type: string
           format: date-time
+          example: sample value
     CreateAccountingDocumentRequest:
       type: object
-      required: [file_name, source_uri]
+      required:
+      - file_name
+      - source_uri
       properties:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -330,25 +462,34 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         file_name:
           type: string
+          example: Acme Corporation
         content_type:
           type: string
+          example: standard
         source_uri:
           type: string
+          example: sample value
     ClassifyDocumentRequest:
       type: object
       properties:
         force_reclassify:
           type: boolean
           default: false
+          example: true
     DocumentClassification:
       type: object
-      required: [document_id, document_type, confidence]
+      required:
+      - document_id
+      - document_type
+      - confidence
       properties:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_type:
           enum:
           - CUSTOMER_INVOICE
@@ -358,25 +499,35 @@ components:
           - EDI_DOCUMENT
           - TAX_DOCUMENT
           - OTHER
+          example: standard
         confidence:
           type: number
           format: double
+          example: 0.85
         reasons:
           type: array
           items:
             type: string
+          example: sample value
     ExtractionJob:
       type: object
-      required: [id, document_id, status, created_at]
+      required:
+      - id
+      - document_id
+      - status
+      - created_at
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile:
           type: string
+          example: sample value
         status:
           enum:
           - PENDING
@@ -384,87 +535,123 @@ components:
           - COMPLETED
           - FAILED
           - CANCELLED
+          example: active
         created_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
         completed_at:
           type: string
           format: date-time
+          example: '2026-01-15T14:30:00Z'
     CreateExtractionJobRequest:
       type: object
-      required: [document_id]
+      required:
+      - document_id
       properties:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         profile:
           type: string
+          example: sample value
     ExtractionResult:
       type: object
-      required: [id, job_id, document_id, extracted_fields]
+      required:
+      - id
+      - job_id
+      - document_id
+      - extracted_fields
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         job_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         extracted_fields:
           type: object
           additionalProperties: true
+          example:
+            key: value
         confidence:
           type: number
           format: double
+          example: 0.85
     ApproveExtractionRequest:
       type: object
-      required: [approved_by]
+      required:
+      - approved_by
       properties:
         approved_by:
           type: string
           format: uuid
+          example: 950e8400-e29b-41d4-a716-446655440004
         corrections:
           type: object
           additionalProperties: true
+          example: *id005
     ExtractionApproval:
       type: object
-      required: [document_id, approved_by, approved_at]
+      required:
+      - document_id
+      - approved_by
+      - approved_at
       properties:
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         approved_by:
           type: string
           format: uuid
+          example: 950e8400-e29b-41d4-a716-446655440004
         approved_at:
           type: string
           format: date-time
+          example: '2026-01-15T10:30:00Z'
     LinkDocumentRequest:
       type: object
-      required: [target_id]
+      required:
+      - target_id
       properties:
         target_id:
           type: string
           format: uuid
+          example: 1000.0
         link_reason:
           type: string
+          example: sample value
     DocumentLink:
       type: object
-      required: [id, document_id, target_id, target_type]
+      required:
+      - id
+      - document_id
+      - target_id
+      - target_type
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         document_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         target_id:
           type: string
           format: uuid
+          example: 1000.0
         target_type:
           type: string
+          example: 1000.0
     PaginatedAccountingDocuments:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -494,33 +681,50 @@ components:
               $ref: '#/components/schemas/ExtractionResult'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
     ValidationError:
       type: object
-      required: [error, message, fields]
+      required:
+      - error
+      - message
+      - fields
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
         fields:
           type: array
           items:
             type: string
+          example:
+          - sample value
 security:
 - bearerAuth: []

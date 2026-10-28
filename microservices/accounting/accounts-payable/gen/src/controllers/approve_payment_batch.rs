@@ -7,9 +7,5 @@ use brrtrouter_macros::handler;
 
 #[handler(ApprovePaymentBatchController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    HttpJson::ok(Response {
-        code: "example".to_string(),
-        details: Some(Default::default()),
-        message: "example".to_string(),
-    })
+    HttpJson::ok(Response {})
 }

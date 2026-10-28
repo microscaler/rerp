@@ -14,6 +14,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         id: "example".to_string(),
         invoice_id: "example".to_string(),
         notes: Some("example".to_string()),
-        threshold_met: Some(3.14),
+        threshold_met: Some(1.5),
     })
 }

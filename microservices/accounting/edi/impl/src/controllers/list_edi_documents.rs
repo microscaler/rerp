@@ -1,7 +1,9 @@
 // Implementation stub for handler 'list_edi_documents'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path list_edi_documents --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
@@ -24,8 +26,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
 
     Response {
         items: None, // TODO: Set from your business logic
-        limit: None, // TODO: Set from your business logic
-        page: None,  // TODO: Set from your business logic
-        total: None, // TODO: Set from your business logic
+        limit: 42,   // TODO: Set from your business logic
+        page: 42,    // TODO: Set from your business logic
+        total: 42,   // TODO: Set from your business logic
     }
 }

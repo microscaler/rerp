@@ -1,14 +1,16 @@
 // Implementation stub for handler 'modify_asset'
 // This file is a starting point for your implementation.
-// You can modify this file freely - it will NOT be auto-regenerated.
-// To regenerate this stub, use: brrtrouter-gen generate-stubs --path modify_asset --force
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
 
-use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_asset_gen::handlers::modify_asset::{Request, Response};
 
 #[handler(ModifyAssetController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // TODO: Implement your business logic here
     //
     // Example: Access request data
@@ -19,10 +21,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
     //
     // Example: Return response
 
-    Response {
+    HttpJson::ok(Response {
         accumulated_depreciation: None, // TODO: Set from your business logic
-        acquisition_cost: 3.14,         // TODO: Set from your business logic
-        acquisition_date: None,         // TODO: Set from your business logic
+        acquisition_cost: 1.5,          // TODO: Set from your business logic
+        acquisition_date: "example".to_string(), // TODO: Set from your business logic
         acquisition_gl_entry_id: None,  // TODO: Set from your business logic
         asset_number: "example".to_string(), // TODO: Set from your business logic
         category_id: "example".to_string(), // TODO: Set from your business logic
@@ -44,5 +46,5 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> Response {
         updated_at: None,               // TODO: Set from your business logic
         useful_life_months: None,       // TODO: Set from your business logic
         warranty_expiry: None,          // TODO: Set from your business logic
-    }
+    })
 }

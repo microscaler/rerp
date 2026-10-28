@@ -85,14 +85,13 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_query_param("page") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":1,"minimum":1,"type":"integer"}),
+            );
             data_map.insert(
                 "page".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -100,11 +99,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("limit") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"}),
+            );
             data_map.insert(
                 "limit".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -112,14 +113,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("search") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"type":"string"}));
             data_map.insert(
                 "search".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -127,14 +126,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("category_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "category_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -142,11 +139,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("status") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["ACTIVE","DEPRECIATING","FULLY_DEPRECIATED","DISPOSED","SCRAPPED","IN_REPAIR","TRANSIT"],"type":"string"}),
+            );
             data_map.insert(
                 "status".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["ACTIVE","DEPRECIATING","FULLY_DEPRECIATED","DISPOSED","SCRAPPED","IN_REPAIR","TRANSIT"],"type":"string"})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -154,14 +153,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("department_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "department_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -169,14 +166,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("custodian_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "custodian_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -184,14 +179,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("location") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"type":"string"}));
             data_map.insert(
                 "location".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -199,14 +192,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("company_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "company_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -214,14 +205,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("nbv_min") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"double","type":"number"}));
             data_map.insert(
                 "nbv_min".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"double","type":"number"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -229,14 +218,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("nbv_max") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"double","type":"number"}));
             data_map.insert(
                 "nbv_max".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"double","type":"number"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 

@@ -2,6 +2,9 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::AccountsPayableApprovalRecord;
+use crate::handlers::types::AccountsPayableVendorInvoiceLineItem;
+use crate::handlers::types::AccountsPayableVendorPayment;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -16,7 +19,83 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(rename = "amount")]
+    pub amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "approval_history")]
+    pub approval_history: Option<Vec<AccountsPayableApprovalRecord>>,
+
+    #[serde(rename = "approval_status")]
+    pub approval_status: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "approved_at")]
+    pub approved_at: Option<String>,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "approved_by")]
+    pub approved_by: Option<String>,
+
+    #[serde(rename = "company_id")]
+    pub company_id: String,
+
+    #[serde(rename = "created_at")]
+    pub created_at: String,
+
+    #[serde(rename = "currency_code")]
+    pub currency_code: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    #[serde(rename = "description")]
+    pub description: Option<String>,
+
+    #[serde(rename = "due_date")]
+    pub due_date: String,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(rename = "invoice_date")]
+    pub invoice_date: String,
+
+    #[serde(rename = "invoice_id")]
+    pub invoice_id: String,
+
+    #[serde(rename = "invoice_number")]
+    pub invoice_number: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "line_items")]
+    pub line_items: Option<Vec<AccountsPayableVendorInvoiceLineItem>>,
+
+    #[serde(rename = "net_amount")]
+    pub net_amount: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "payment_history")]
+    pub payment_history: Option<Vec<AccountsPayableVendorPayment>>,
+
+    #[serde(rename = "payment_status")]
+    pub payment_status: String,
+
+    #[serde(rename = "status")]
+    pub status: String,
+
+    #[serde(rename = "tax_amount")]
+    pub tax_amount: f64,
+
+    #[serde(rename = "terms")]
+    pub terms: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
+
+    #[serde(rename = "vendor_id")]
+    pub vendor_id: String,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -27,14 +106,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

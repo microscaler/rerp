@@ -5,5 +5,9 @@ use brrtrouter::dispatcher::{HandlerRequest, HandlerResponse};
 use brrtrouter::http::proxy_untyped;
 
 pub fn handle(req: HandlerRequest) -> HandlerResponse {
-    proxy_untyped(&req, "general-ledger", "/api/general-ledger/fiscal-periods")
+    proxy_untyped(
+        &req,
+        "general-ledger",
+        "/api/general-ledger/v1/fiscal-periods",
+    )
 }

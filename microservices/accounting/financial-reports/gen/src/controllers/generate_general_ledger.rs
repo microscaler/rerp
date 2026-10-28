@@ -16,7 +16,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         is_balanced: Some(true),
         period_end: "example".to_string(),
         period_start: "example".to_string(),
-        total_credits: Some(3.14),
-        total_debits: Some(3.14),
+        total_credits: Some(1.5),
+        total_debits: Some(1.5),
     })
 }

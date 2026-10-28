@@ -213,7 +213,8 @@ pub struct BankStatement {
 
     pub statement_date: String,
 
-    pub statement_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub statement_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -537,7 +538,8 @@ pub struct CreateBankStatementResponse {
 
     pub statement_date: String,
 
-    pub statement_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub statement_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -769,16 +771,6 @@ pub struct CreateTransactionWriteOffResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteBankAccountResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: String,
 
@@ -873,7 +865,8 @@ pub struct GetBankStatementResponse {
 
     pub statement_date: String,
 
-    pub statement_number: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub statement_number: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
@@ -1249,16 +1242,6 @@ pub struct TriggerStatementSyncResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sync_status: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UnreconcileTransactionResponse {
-    pub code: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<serde_json::Value>,
-
-    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

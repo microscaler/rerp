@@ -8,7 +8,7 @@ use brrtrouter_macros::handler;
 #[handler(CreateCollectionCaseController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        assigned_to: "example".to_string(),
+        assigned_to: Some("example".to_string()),
         customer_id: "example".to_string(),
         id: "example".to_string(),
         status: "example".to_string(),

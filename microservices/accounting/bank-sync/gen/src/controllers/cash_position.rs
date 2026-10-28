@@ -9,11 +9,11 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         as_of_date: "example".to_string(),
-        available_balance: 3.14,
+        available_balance: 1.5,
         by_account: Some(vec![]),
         company_id: "example".to_string(),
         currency_code: Some("example".to_string()),
-        pending_transactions: Some(3.14),
-        total_cash: 3.14,
+        pending_transactions: Some(1.5),
+        total_cash: 1.5,
     })
 }

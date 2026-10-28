@@ -14,7 +14,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         expense_account_id: Some("example".to_string()),
         id: "example".to_string(),
         name: "example".to_string(),
-        residual_value_percent: Some(3.14),
+        residual_value_percent: Some(1.5),
         useful_life_months: 42,
     })
 }

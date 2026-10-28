@@ -42,8 +42,9 @@ pub struct Response {
     #[serde(rename = "activity_type")]
     pub activity_type: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "assigned_to")]
-    pub assigned_to: String,
+    pub assigned_to: Option<String>,
 
     #[serde(rename = "company_id")]
     pub company_id: String,
@@ -61,11 +62,13 @@ pub struct Response {
     #[serde(rename = "id")]
     pub id: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "next_follow_up_date")]
-    pub next_follow_up_date: String,
+    pub next_follow_up_date: Option<String>,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "notes")]
-    pub notes: String,
+    pub notes: Option<String>,
 
     #[serde(rename = "updated_at")]
     pub updated_at: String,

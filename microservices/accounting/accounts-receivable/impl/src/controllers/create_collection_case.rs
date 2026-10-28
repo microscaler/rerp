@@ -24,10 +24,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        assigned_to: "example".to_string(), // TODO: Set from your business logic
-        customer_id: "example".to_string(), // TODO: Set from your business logic
-        id: "example".to_string(),          // TODO: Set from your business logic
-        status: "example".to_string(),      // TODO: Set from your business logic
-        total_due: 1.5,                     // TODO: Set from your business logic
+        assigned_to: None,
+        customer_id: "example".to_string(),
+        id: "example".to_string(),
+        status: "example".to_string(),
+        total_due: 1.5,
     })
 }

@@ -25,10 +25,10 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        has_more: None, // TODO: Set from your business logic
-        items: vec![],  // TODO: Set from your business logic
-        limit: 42,      // TODO: Set from your business logic
-        page: 42,       // TODO: Set from your business logic
-        total: 42,      // TODO: Set from your business logic
+        has_more: None,
+        items: vec![],
+        limit: 42,
+        page: 42,
+        total: 42,
     })
 }

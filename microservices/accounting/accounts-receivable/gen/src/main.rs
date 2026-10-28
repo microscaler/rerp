@@ -146,6 +146,7 @@ fn main() -> io::Result<()> {
     let config = RuntimeConfig::from_env();
     may::config().set_stack_size(config.stack_size);
     may::config().set_workers(config.may_workers);
+    may::config().set_pool_capacity(config.coroutine_pool_capacity);
     // Load OpenAPI spec and create router
     // Resolve relative specs against the crate directory so launches from other CWDs work
     let spec_path = if args.spec.is_relative() {

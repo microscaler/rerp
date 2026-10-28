@@ -53,6 +53,27 @@ http:
   keep_alive: true
   timeout_secs: 5
   max_requests: 5000
+  # Handler wait deadline in ms (Epic 13.6). Omit / 0 = disabled (legacy wait).
+  # Env override when unset here: BRRTR_HANDLER_DEADLINE_MS. See docs/HANDLER_DEADLINES.md.
+  # handler_deadline_ms: 5000
+
+# Rate limiting (Epic 13.2) — omitted / enabled: false → no-op (safe default).
+# rate_limit:
+#   enabled: true
+#   requests: 100          # tokens per window (global)
+#   window_secs: 60
+#   max_keys: 10000        # soft cap on distinct client keys
+#   key: subject_then_ip   # subject_then_ip | subject | ip
+#   skip_options: false    # true = CORS preflight does not consume tokens
+#   routes:
+#     list_pets: 20        # optional per-handler tighter limit
+
+# Response gzip (Epic 13.8) — omitted / enabled: false → identity (safe default).
+# compression:
+#   enabled: true
+#   min_bytes: 256         # skip smaller bodies
+#   level: 6               # gzip 0–9
+# Never compresses text/event-stream or image/*; requires Accept-Encoding: gzip.
 
 cors:
   # Allowed Origins for browser clients — not listed in openapi.yaml; set here per environment.
@@ -79,6 +100,9 @@ cors:
     - "PUT"
     - "DELETE"
     - "OPTIONS"
+    # RFC 10008 QUERY — required for browser preflight (Epic 11 / Story 11.1).
+    # Do not remove: gen/config is overwritten from this template on every regen.
+    - "QUERY"
   allow_credentials: false
   expose_headers: []
   max_age: null  # Preflight cache duration in seconds (null = no caching)

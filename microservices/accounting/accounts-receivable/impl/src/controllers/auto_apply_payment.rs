@@ -22,9 +22,9 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example: Return response
 
     HttpJson::ok(Response {
-        applications: vec![],              // TODO: Set from your business logic
-        payment_id: "example".to_string(), // TODO: Set from your business logic
-        total_applied: 1.5,                // TODO: Set from your business logic
-        unapplied_amount: 1.5,             // TODO: Set from your business logic
+        applications: vec![],
+        payment_id: "example".to_string(),
+        total_applied: 1.5,
+        unapplied_amount: 1.5,
     })
 }

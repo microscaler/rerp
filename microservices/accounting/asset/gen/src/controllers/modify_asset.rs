@@ -8,8 +8,8 @@ use brrtrouter_macros::handler;
 #[handler(ModifyAssetController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        accumulated_depreciation: Some(3.14),
-        acquisition_cost: 3.14,
+        accumulated_depreciation: Some(1.5),
+        acquisition_cost: 1.5,
         acquisition_date: "example".to_string(),
         acquisition_gl_entry_id: Some("example".to_string()),
         asset_number: "example".to_string(),
@@ -19,12 +19,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         currency_code: Some("example".to_string()),
         custodian_id: Some("example".to_string()),
         department_id: Some("example".to_string()),
-        description: "example".to_string(),
+        description: Some("example".to_string()),
         id: "example".to_string(),
         insurance_policy: Some("example".to_string()),
-        location: "example".to_string(),
+        location: Some("example".to_string()),
         name: "example".to_string(),
-        net_book_value: Some(3.14),
+        net_book_value: Some(1.5),
         notes: Some("example".to_string()),
         serial_number: Some("example".to_string()),
         status: "example".to_string(),

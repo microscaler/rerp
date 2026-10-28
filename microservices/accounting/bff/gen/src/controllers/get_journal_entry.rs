@@ -8,6 +8,6 @@ pub fn handle(req: HandlerRequest) -> HandlerResponse {
     proxy_untyped(
         &req,
         "general-ledger",
-        "/api/general-ledger/journal-entries/{id}",
+        "/api/general-ledger/v1/journal-entries/{id}",
     )
 }

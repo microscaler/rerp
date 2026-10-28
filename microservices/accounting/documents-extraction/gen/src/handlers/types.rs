@@ -6,9 +6,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AccountingDocument {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub content_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
 
     pub document_type: serde_json::Value,
 
@@ -16,7 +18,8 @@ pub struct AccountingDocument {
 
     pub id: String,
 
-    pub source_uri: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_uri: Option<String>,
 
     pub status: serde_json::Value,
 
@@ -27,7 +30,8 @@ pub struct AccountingDocument {
 pub struct ApproveDocumentExtractionRequest {
     pub approved_by: String,
 
-    pub corrections: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub corrections: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -43,12 +47,14 @@ pub struct ApproveDocumentExtractionResponse {
 pub struct ApproveExtractionRequest {
     pub approved_by: String,
 
-    pub corrections: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub corrections: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ClassifyAccountingDocumentRequest {
-    pub force_reclassify: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force_reclassify: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -59,21 +65,26 @@ pub struct ClassifyAccountingDocumentResponse {
 
     pub document_type: serde_json::Value,
 
-    pub reasons: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reasons: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ClassifyDocumentRequest {
-    pub force_reclassify: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force_reclassify: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountingDocumentRequest {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub content_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
 
-    pub document_type: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_type: Option<serde_json::Value>,
 
     pub file_name: String,
 
@@ -82,9 +93,11 @@ pub struct CreateAccountingDocumentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountingDocumentResponse {
-    pub company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
 
-    pub content_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
 
     pub document_type: serde_json::Value,
 
@@ -92,7 +105,8 @@ pub struct CreateAccountingDocumentResponse {
 
     pub id: String,
 
-    pub source_uri: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_uri: Option<String>,
 
     pub status: serde_json::Value,
 
@@ -103,12 +117,14 @@ pub struct CreateAccountingDocumentResponse {
 pub struct CreateExtractionJobRequest {
     pub document_id: String,
 
-    pub profile: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateExtractionJobResponse {
-    pub completed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<String>,
 
     pub created_at: String,
 
@@ -116,7 +132,8 @@ pub struct CreateExtractionJobResponse {
 
     pub id: String,
 
-    pub profile: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<String>,
 
     pub status: serde_json::Value,
 }
@@ -129,7 +146,8 @@ pub struct DocumentClassification {
 
     pub document_type: serde_json::Value,
 
-    pub reasons: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reasons: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -161,7 +179,8 @@ pub struct ExtractionApproval {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ExtractionJob {
-    pub completed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<String>,
 
     pub created_at: String,
 
@@ -169,14 +188,16 @@ pub struct ExtractionJob {
 
     pub id: String,
 
-    pub profile: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<String>,
 
     pub status: serde_json::Value,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ExtractionResult {
-    pub confidence: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub confidence: Option<f64>,
 
     pub document_id: String,
 
@@ -189,14 +210,16 @@ pub struct ExtractionResult {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LinkDocumentRequest {
-    pub link_reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_reason: Option<String>,
 
     pub target_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LinkDocumentToBankStatementRequest {
-    pub link_reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_reason: Option<String>,
 
     pub target_id: String,
 }
@@ -214,7 +237,8 @@ pub struct LinkDocumentToBankStatementResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LinkDocumentToInvoiceRequest {
-    pub link_reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub link_reason: Option<String>,
 
     pub target_id: String,
 }
@@ -228,6 +252,60 @@ pub struct LinkDocumentToInvoiceResponse {
     pub target_id: String,
 
     pub target_type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListAccountingDocumentsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<AccountingDocument>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListExtractionJobsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ExtractionJob>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListExtractionResultsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ExtractionResult>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAccountingDocuments {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<AccountingDocument>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedExtractionJobs {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ExtractionJob>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedExtractionResults {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ExtractionResult>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

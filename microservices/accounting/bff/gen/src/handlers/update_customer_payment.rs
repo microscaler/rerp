@@ -40,8 +40,9 @@ pub struct Response {
     #[serde(rename = "amount")]
     pub amount: f64,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "applied_at")]
-    pub applied_at: String,
+    pub applied_at: Option<String>,
 
     #[serde(rename = "company_id")]
     pub company_id: String,
@@ -56,14 +57,16 @@ pub struct Response {
     #[serde(rename = "customer_id")]
     pub customer_id: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "gl_entry_id")]
-    pub gl_entry_id: String,
+    pub gl_entry_id: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "notes")]
-    pub notes: String,
+    pub notes: Option<String>,
 
     #[serde(rename = "payment_date")]
     pub payment_date: String,
@@ -74,8 +77,9 @@ pub struct Response {
     #[serde(rename = "posted_to_gl")]
     pub posted_to_gl: bool,
 
+    #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "reference_number")]
-    pub reference_number: String,
+    pub reference_number: Option<String>,
 
     #[serde(rename = "status")]
     pub status: String,
@@ -94,14 +98,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));
