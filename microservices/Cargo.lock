@@ -100,7 +100,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -111,7 +111,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -610,15 +610,35 @@ checksum = "68578f196d2a33ff61b27fae256c3164f65e36382648e30666dde05b8cc9dfdf"
 dependencies = [
  "async-trait",
  "convert_case 0.6.0",
- "json5",
+ "json5 0.4.1",
  "nom",
  "pathdiff",
- "ron",
- "rust-ini",
+ "ron 0.8.1",
+ "rust-ini 0.20.0",
  "serde",
  "serde_json",
  "toml 0.8.23",
- "yaml-rust2",
+ "yaml-rust2 0.8.1",
+]
+
+[[package]]
+name = "config"
+version = "0.15.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38e9fbc53afcec54441422f1c596cd054655b32e70e1cbac956651b7b175a404"
+dependencies = [
+ "async-trait",
+ "convert_case 0.6.0",
+ "json5 1.3.6",
+ "pathdiff",
+ "ron 0.12.3",
+ "rust-ini 0.21.3",
+ "serde-untagged",
+ "serde_core",
+ "serde_json",
+ "toml 1.1.8+spec-1.1.0",
+ "winnow 1.0.4",
+ "yaml-rust2 0.11.1",
 ]
 
 [[package]]
@@ -1268,13 +1288,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00d174d5400e5e8fd687ad1049e2f578285fa914201b1af7e8b112a4546bd826"
 
 [[package]]
+name = "erased-serde"
+version = "0.4.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e59b668157f32d3459d4bd634861a06ffa2503a461ca5f0916b9f0252605e66"
+dependencies = [
+ "serde",
+ "serde_core",
+ "typeid",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1594,6 +1625,15 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
+dependencies = [
+ "foldhash",
+]
+
+[[package]]
+name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
@@ -1610,6 +1650,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
 dependencies = [
  "hashbrown 0.14.5",
+]
+
+[[package]]
+name = "hashlink"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "824e001ac4f3012dd16a264bec811403a67ca9deb6c102fc5049b32c4574b35f"
+dependencies = [
+ "hashbrown 0.16.1",
 ]
 
 [[package]]
@@ -2098,6 +2147,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "json5"
+version = "1.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e46128c9fb848c29097da3149e627cce5496d0b2820a9be06d12ee266c09c749"
+dependencies = [
+ "serde",
+ "ucd-trie",
+]
+
+[[package]]
 name = "jsonschema"
 version = "0.49.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2227,7 +2286,7 @@ source = "git+https://github.com/microscaler/lifeguard.git?rev=869b2c53657659419
 dependencies = [
  "bytes",
  "chrono",
- "config",
+ "config 0.14.1",
  "crossbeam-channel",
  "csv",
  "fake",
@@ -2653,7 +2712,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3628,7 +3687,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -3654,7 +3713,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3675,7 +3734,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -3701,7 +3760,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3722,7 +3781,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -3748,7 +3807,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3768,7 +3827,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -3788,7 +3847,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3809,7 +3868,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -3835,7 +3894,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3855,7 +3914,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -3876,7 +3935,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3898,7 +3957,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -3924,7 +3983,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3944,7 +4003,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -3964,7 +4023,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -3984,7 +4043,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -4004,7 +4063,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4025,7 +4084,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -4051,7 +4110,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4073,7 +4132,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -4099,7 +4158,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4120,7 +4179,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "lifeguard",
  "lifeguard-derive",
@@ -4148,7 +4207,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4169,7 +4228,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "hmac 0.12.1",
  "http 0.2.12",
  "http 1.5.0",
@@ -4202,7 +4261,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4222,7 +4281,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -4242,7 +4301,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4262,7 +4321,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -4282,7 +4341,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4302,7 +4361,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -4322,7 +4381,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4342,7 +4401,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 1.5.0",
  "may",
  "may_minihttp",
@@ -4362,7 +4421,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4383,7 +4442,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "lifeguard",
@@ -4409,7 +4468,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4444,7 +4503,7 @@ dependencies = [
  "brrtrouter_macros",
  "chrono",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4467,7 +4526,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4502,7 +4561,7 @@ dependencies = [
  "brrtrouter",
  "brrtrouter_macros",
  "clap",
- "config",
+ "config 0.15.27",
  "http 0.2.12",
  "http 1.5.0",
  "may",
@@ -4570,6 +4629,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ron"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97b3fe97c18ff24299ea56f802c5693eb34266fb0bc8317f4e101debc8a3ceaf"
+dependencies = [
+ "bitflags 2.13.2",
+ "serde",
+ "serde_derive",
+ "typeid",
+ "unicode-ident",
+]
+
+[[package]]
 name = "rsa"
 version = "0.9.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4594,6 +4666,16 @@ name = "rust-ini"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e0698206bcb8882bf2a9ecb4c1e7785db57ff052297085a6efd4fe42302068a"
+dependencies = [
+ "cfg-if",
+ "ordered-multimap",
+]
+
+[[package]]
+name = "rust-ini"
+version = "0.21.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "796e8d2b6696392a43bea58116b667fb4c29727dc5abd27d6acf338bb4f688c7"
 dependencies = [
  "cfg-if",
  "ordered-multimap",
@@ -4658,7 +4740,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4724,7 +4806,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4857,6 +4939,18 @@ checksum = "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
 dependencies = [
  "serde_core",
  "serde_derive",
+]
+
+[[package]]
+name = "serde-untagged"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9faf48a4a2d2693be24c6289dbe26552776eb7737074e6722891fadbe6c5058"
+dependencies = [
+ "erased-serde",
+ "serde",
+ "serde_core",
+ "typeid",
 ]
 
 [[package]]
@@ -5084,7 +5178,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5131,7 +5225,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5253,10 +5347,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5742,6 +5836,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
+name = "typeid"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
+
+[[package]]
 name = "typenum"
 version = "1.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6065,7 +6165,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -6336,7 +6436,18 @@ checksum = "8902160c4e6f2fb145dbe9d6760a75e3c9522d8bf796ed7047c85919ac7115f8"
 dependencies = [
  "arraydeque",
  "encoding_rs",
- "hashlink",
+ "hashlink 0.8.4",
+]
+
+[[package]]
+name = "yaml-rust2"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b36710ce3a279cfce8465dbab826f161675a262950b922cb2c3663852dfe9eb0"
+dependencies = [
+ "arraydeque",
+ "encoding_rs",
+ "hashlink 0.11.1",
 ]
 
 [[package]]
