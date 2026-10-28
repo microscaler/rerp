@@ -1,30 +1,12 @@
-// Implementation stub for handler 'create_follow_up_run'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_accounts_receivable_gen::handlers::create_follow_up_run::{Request, Response};
+use rerp_accounting_accounts_receivable_gen::handlers::create_follow_up_run::Request;
+use serde_json::Value;
 
 #[handler(CreateFollowUpRunController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let as_of_date = req.inner.as_of_date;// let company_id = req.inner.company_id;// let dry_run = req.inner.dry_run;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    HttpJson::ok(Response {
-        company_id: None,
-        customer_count: None,
-        id: "example".to_string(),
-        status: "example".to_string(),
-    })
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("create_follow_up_run")
 }

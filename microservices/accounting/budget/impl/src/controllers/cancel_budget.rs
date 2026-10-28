@@ -1,25 +1,12 @@
-// Implementation stub for handler 'cancel_budget'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::cancel_budget::{Request, Response};
+use rerp_accounting_budget_gen::handlers::cancel_budget::Request;
+use serde_json::Value;
 
 #[handler(CancelBudgetController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let id = req.inner.id;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    HttpJson::ok(Response {})
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("cancel_budget")
 }
