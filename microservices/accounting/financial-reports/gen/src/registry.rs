@@ -18,86 +18,8 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_custom_reports",
-        crate::controllers::list_custom_reports::ListCustomReportsController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_custom_report",
-        crate::controllers::create_custom_report::CreateCustomReportController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "get_custom_report",
-        crate::controllers::get_custom_report::GetCustomReportController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_custom_report",
-        crate::controllers::update_custom_report::UpdateCustomReportController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_custom_report",
-        crate::controllers::delete_custom_report::DeleteCustomReportController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "execute_custom_report",
-        crate::controllers::execute_custom_report::ExecuteCustomReportController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "drill_down_report_cell",
-        crate::controllers::drill_down_report_cell::DrillDownReportCellController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_report_definitions",
-        crate::controllers::list_report_definitions::ListReportDefinitionsController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_report_definition",
-        crate::controllers::create_report_definition::CreateReportDefinitionController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_report_definition_lines",
-        crate::controllers::list_report_definition_lines::ListReportDefinitionLinesController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_report_executions",
-        crate::controllers::list_report_executions::ListReportExecutionsController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_report_export",
-        crate::controllers::create_report_export::CreateReportExportController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "generate_balance_sheet",
         crate::controllers::generate_balance_sheet::GenerateBalanceSheetController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "generate_cash_flow",
-        crate::controllers::generate_cash_flow::GenerateCashFlowController,
         16384,
     );
 
@@ -118,12 +40,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::generate_trial_balance::GenerateTrialBalanceController,
         16384,
     );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_statutory_report_packs",
-        crate::controllers::list_statutory_report_packs::ListStatutoryReportPacksController,
-        16384,
-    );
 }
 
 /// Register gen mock/proxy controllers for routes from the OpenAPI spec (ADR 0001 Layer 1).
@@ -140,113 +56,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
-            "list_custom_reports" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_custom_reports::ListCustomReportsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_custom_report::CreateCustomReportController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_custom_report::GetCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_custom_report::UpdateCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_custom_report::DeleteCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "execute_custom_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::execute_custom_report::ExecuteCustomReportController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "drill_down_report_cell" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::drill_down_report_cell::DrillDownReportCellController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definitions" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_definitions::ListReportDefinitionsController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_definition" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_report_definition::CreateReportDefinitionController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definition_lines" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_definition_lines::ListReportDefinitionLinesController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_executions" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_report_executions::ListReportExecutionsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_export" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_report_export::CreateReportExportController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "generate_balance_sheet" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::generate_balance_sheet::GenerateBalanceSheetController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "generate_cash_flow" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::generate_cash_flow::GenerateCashFlowController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
@@ -271,14 +83,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "generate_trial_balance" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::generate_trial_balance::GenerateTrialBalanceController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_statutory_report_packs" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_statutory_report_packs::ListStatutoryReportPacksController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );

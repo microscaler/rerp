@@ -70,11 +70,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_credits")]
-    pub total_credits: Option<f64>,
+    pub total_credits: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_debits")]
-    pub total_debits: Option<f64>,
+    pub total_debits: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
