@@ -607,3 +607,17 @@ ref-rewritten) the whole accounting suite — including
 - Gen regen (9768e35) touched only accounts-payable; impl: 7 honest 501s,
   13 orphan controllers removed, registry re-synced.
 - Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57, specs valid 121.
+
+## [2026-10-28] contribute | bank-sync contract narrowed to the reconciliation vertical (Epic B3)
+
+- `openapi/accounting/bank-sync/openapi.yaml`: 25 ops -> 15 (registry
+  CRUD minus delete, provider-idempotent statement ingestion, transaction
+  match/auto-match/reconcile/unreconcile, reconciliation lifecycle).
+  Dropped trigger-sync, suggestions, standalone write-off/exchange-
+  difference, both reports (B4 owns reporting), reconciliation models.
+  Added required external_reference as the provider-idempotency anchor;
+  balances/amounts -> decimal strings (write_off_amount nullable); 12
+  orphan schemas pruned.
+- Gen regen (9768e35) touched only bank-sync; impl: 15 honest 501s, 9
+  orphan controllers removed, registry re-synced.
+- Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57, specs valid 121.
