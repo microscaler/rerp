@@ -12,7 +12,7 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "auto_approve")]
@@ -50,7 +50,7 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_amount")]
-    pub tax_amount: Option<f64>,
+    pub tax_amount: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "terms")]
@@ -64,7 +64,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(rename = "approval_status")]
     pub approval_status: String,
@@ -106,7 +106,7 @@ pub struct Response {
     pub invoice_number: String,
 
     #[serde(rename = "net_amount")]
-    pub net_amount: f64,
+    pub net_amount: String,
 
     #[serde(rename = "payment_status")]
     pub payment_status: String,
@@ -115,7 +115,7 @@ pub struct Response {
     pub status: String,
 
     #[serde(rename = "tax_amount")]
-    pub tax_amount: f64,
+    pub tax_amount: String,
 
     #[serde(rename = "terms")]
     pub terms: String,

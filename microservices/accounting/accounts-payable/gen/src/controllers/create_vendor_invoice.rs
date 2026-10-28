@@ -8,7 +8,7 @@ use brrtrouter_macros::handler;
 #[handler(CreateVendorInvoiceController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        amount: 1.5,
+        amount: "example".to_string(),
         approval_status: "example".to_string(),
         approved_at: Some("example".to_string()),
         approved_by: Some("example".to_string()),
@@ -21,10 +21,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         invoice_date: "example".to_string(),
         invoice_id: "example".to_string(),
         invoice_number: "example".to_string(),
-        net_amount: 1.5,
+        net_amount: "example".to_string(),
         payment_status: "example".to_string(),
         status: "example".to_string(),
-        tax_amount: 1.5,
+        tax_amount: "example".to_string(),
         terms: "example".to_string(),
         updated_at: Some("example".to_string()),
         vendor_id: "example".to_string(),

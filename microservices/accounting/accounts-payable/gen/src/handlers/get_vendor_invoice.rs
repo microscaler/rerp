@@ -21,7 +21,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "approval_history")]
@@ -71,7 +71,7 @@ pub struct Response {
     pub line_items: Option<Vec<VendorInvoiceLineItem>>,
 
     #[serde(rename = "net_amount")]
-    pub net_amount: f64,
+    pub net_amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "payment_history")]
@@ -84,7 +84,7 @@ pub struct Response {
     pub status: String,
 
     #[serde(rename = "tax_amount")]
-    pub tax_amount: f64,
+    pub tax_amount: String,
 
     #[serde(rename = "terms")]
     pub terms: String,

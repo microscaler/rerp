@@ -3,31 +3,11 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
-pub mod list_approvals;
-
-pub mod create_approval;
-
-pub mod list_payment_commitments;
-
-pub mod list_payment_batches;
-
-pub mod create_payment_batch;
-
-pub mod approve_payment_batch;
-
-pub mod export_payment_batch_file;
-
 pub mod list_vendor_payments;
 
 pub mod create_vendor_payment;
 
 pub mod get_vendor_payment;
-
-pub mod update_vendor_payment;
-
-pub mod delete_vendor_payment;
-
-pub mod cash_flow_forecast;
 
 pub mod list_vendor_invoices;
 
@@ -35,10 +15,4 @@ pub mod create_vendor_invoice;
 
 pub mod get_vendor_invoice;
 
-pub mod update_vendor_invoice;
-
-pub mod delete_vendor_invoice;
-
 pub mod register_vendor_invoice_payment;
-
-pub mod perform_vendor_invoice_three_way_match;

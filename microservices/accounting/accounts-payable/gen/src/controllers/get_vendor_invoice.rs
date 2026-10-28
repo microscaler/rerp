@@ -15,7 +15,7 @@ use crate::handlers::types::VendorPayment;
 #[handler(GetVendorInvoiceController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        amount: 1.5,
+        amount: "example".to_string(),
         approval_history: Some(vec![]),
         approval_status: "example".to_string(),
         approved_at: Some("example".to_string()),
@@ -30,11 +30,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         invoice_id: "example".to_string(),
         invoice_number: "example".to_string(),
         line_items: Some(vec![]),
-        net_amount: 1.5,
+        net_amount: "example".to_string(),
         payment_history: Some(vec![]),
         payment_status: "example".to_string(),
         status: "example".to_string(),
-        tax_amount: 1.5,
+        tax_amount: "example".to_string(),
         terms: "example".to_string(),
         updated_at: Some("example".to_string()),
         vendor_id: "example".to_string(),

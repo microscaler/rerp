@@ -9,7 +9,7 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         actual_payment_date: Some("example".to_string()),
-        amount: 1.5,
+        amount: "example".to_string(),
         company_id: "example".to_string(),
         created_at: Some("example".to_string()),
         currency_code: "example".to_string(),
