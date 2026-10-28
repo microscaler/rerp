@@ -621,3 +621,18 @@ ref-rewritten) the whole accounting suite — including
 - Gen regen (9768e35) touched only bank-sync; impl: 15 honest 501s, 9
   orphan controllers removed, registry re-synced.
 - Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57, specs valid 121.
+
+## [2026-10-28] contribute | financial-reports narrowed to core statements (Epic B4)
+
+- `openapi/accounting/financial-reports/openapi.yaml`: 18 ops -> 4
+  (trial balance, income statement, balance sheet, general-ledger
+  detail). Custom-report engine, cash-flow statement, exports and
+  statutory packs deferred. currency_code + ISO-4217 pattern; all report
+  numerics -> decimal strings; 19 orphan schemas pruned.
+- Pitfall found: report GET ops embed Create*Request schemas for their
+  query structs — adding duplicate query parameters makes the generator
+  emit duplicate Request fields (E0124). Scoping lives in the request
+  schemas; do not re-declare as parameters.
+- Gen regen touched only financial-reports; impl: 4 honest 501s, 14
+  orphans removed, registry re-synced.
+- Gates: check 0, 21 lib tests, fmt, `just qa` 57, specs valid 121.
