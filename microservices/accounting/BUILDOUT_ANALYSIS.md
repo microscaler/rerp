@@ -172,7 +172,7 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 - **B1 — AR contract slice** (M, deps A1) — **DONE 2026-10-28** (PR this slice): issue-visible ledger query, receipt
   record, allocation, allocation reversal, aging (decimal buckets), statement
   request. Drops: DSO, collection-efficiency, predictive analytics.
-- **B2 — AP contract slice** (M, deps A1): bill capture/post, credit note,
+- **B2 — AP contract slice** (M, deps A1) — **DONE 2026-10-28**: bill capture/post, credit note,
   approval transition, payment record, allocation (+reversal), aging.
 - **B3 — bank-sync contract slice** (M, deps A1): bank-account registry,
   statement ingestion (provider-idempotent), transaction list, match/override,
