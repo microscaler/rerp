@@ -22,8 +22,8 @@ rerp_accounting_invoice_gen = { path = "../gen" }
 
 # Accounting domain kernel and document signing/storage support
 rerp-accounting-core = { path = "../../core" }
-hmac = "0.12"
-sha2 = "0.10"
+hmac = "0.13"
+sha2 = "0.11"
 url = "2"
 http_legacy = { workspace = true }
 
