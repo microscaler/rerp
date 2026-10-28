@@ -61,7 +61,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opening_balance")]
-    pub opening_balance: Option<f64>,
+    pub opening_balance: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opening_balance_date")]

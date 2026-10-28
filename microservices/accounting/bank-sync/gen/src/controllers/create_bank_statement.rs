@@ -9,15 +9,16 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         bank_account_id: "example".to_string(),
-        closing_balance: 1.5,
+        closing_balance: "example".to_string(),
         created_at: Some("example".to_string()),
         currency_code: "example".to_string(),
+        external_reference: Some("example".to_string()),
         file_reference: Some("example".to_string()),
         id: "example".to_string(),
         imported_at: Some("example".to_string()),
         imported_by: Some("example".to_string()),
         matched_count: Some(42),
-        opening_balance: 1.5,
+        opening_balance: "example".to_string(),
         start_date: Some("example".to_string()),
         statement_date: "example".to_string(),
         statement_number: Some("example".to_string()),

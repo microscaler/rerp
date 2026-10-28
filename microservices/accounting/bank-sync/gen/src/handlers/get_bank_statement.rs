@@ -21,7 +21,7 @@ pub struct Response {
     pub bank_account_id: String,
 
     #[serde(rename = "closing_balance")]
-    pub closing_balance: f64,
+    pub closing_balance: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -29,6 +29,10 @@ pub struct Response {
 
     #[serde(rename = "currency_code")]
     pub currency_code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "external_reference")]
+    pub external_reference: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "file_reference")]
@@ -50,7 +54,7 @@ pub struct Response {
     pub matched_count: Option<i32>,
 
     #[serde(rename = "opening_balance")]
-    pub opening_balance: f64,
+    pub opening_balance: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "start_date")]

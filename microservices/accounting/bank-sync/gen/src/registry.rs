@@ -42,24 +42,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "delete_bank_account",
-        crate::controllers::delete_bank_account::DeleteBankAccountController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_reconciliation_models",
-        crate::controllers::list_reconciliation_models::ListReconciliationModelsController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_reconciliation_model",
-        crate::controllers::create_reconciliation_model::CreateReconciliationModelController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "list_reconciliations",
         crate::controllers::list_reconciliations::ListReconciliationsController,
         24576,
@@ -74,18 +56,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "complete_reconciliation",
         crate::controllers::complete_reconciliation::CompleteReconciliationController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "cash_position",
-        crate::controllers::cash_position::CashPositionController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "reconciliation_report",
-        crate::controllers::reconciliation_report::ReconciliationReportController,
         20480,
     );
 
@@ -108,12 +78,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "trigger_statement_sync",
-        crate::controllers::trigger_statement_sync::TriggerStatementSyncController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "list_bank_transactions",
         crate::controllers::list_bank_transactions::ListBankTransactionsController,
         24576,
@@ -123,12 +87,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         "auto_match_transactions",
         crate::controllers::auto_match_transactions::AutoMatchTransactionsController,
         16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_transaction_exchange_difference",
-        crate::controllers::create_transaction_exchange_difference::CreateTransactionExchangeDifferenceController,
-        20480,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -144,20 +102,8 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "get_transaction_reconciliation_suggestions",
-        crate::controllers::get_transaction_reconciliation_suggestions::GetTransactionReconciliationSuggestionsController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "unreconcile_transaction",
         crate::controllers::unreconcile_transaction::UnreconcileTransactionController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_transaction_write_off",
-        crate::controllers::create_transaction_write_off::CreateTransactionWriteOffController,
         20480,
     );
 }
@@ -208,30 +154,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "delete_bank_account" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_bank_account::DeleteBankAccountController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_reconciliation_models" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_reconciliation_models::ListReconciliationModelsController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_reconciliation_model" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_reconciliation_model::CreateReconciliationModelController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_reconciliations" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_reconciliations::ListReconciliationsController,
@@ -251,22 +173,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "complete_reconciliation" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::complete_reconciliation::CompleteReconciliationController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "cash_position" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::cash_position::CashPositionController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "reconciliation_report" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::reconciliation_report::ReconciliationReportController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
@@ -296,14 +202,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "trigger_statement_sync" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::trigger_statement_sync::TriggerStatementSyncController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_bank_transactions" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_bank_transactions::ListBankTransactionsController,
@@ -316,14 +214,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::auto_match_transactions::AutoMatchTransactionsController,
                     16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_transaction_exchange_difference" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_transaction_exchange_difference::CreateTransactionExchangeDifferenceController,
-                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -344,25 +234,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_transaction_reconciliation_suggestions" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_transaction_reconciliation_suggestions::GetTransactionReconciliationSuggestionsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "unreconcile_transaction" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::unreconcile_transaction::UnreconcileTransactionController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_transaction_write_off" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_transaction_write_off::CreateTransactionWriteOffController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
