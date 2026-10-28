@@ -1,26 +1,12 @@
-// Implementation stub for handler 'delete_vendor_invoice'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
-use brrtrouter::typed::{HttpNoContent, TypedHandlerRequest};
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_accounting_accounts_payable_gen::handlers::delete_vendor_invoice::Request;
+use serde_json::Value;
 
 #[handler(DeleteVendorInvoiceController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpNoContent {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let id = req.inner.id;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    let _ = req;
-    HttpNoContent
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("delete_vendor_invoice")
 }

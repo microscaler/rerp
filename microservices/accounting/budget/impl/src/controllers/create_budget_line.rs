@@ -1,43 +1,12 @@
-// Implementation stub for handler 'create_budget_line'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::create_budget_line::{Request, Response};
+use rerp_accounting_budget_gen::handlers::create_budget_line::Request;
+use serde_json::Value;
 
 #[handler(CreateBudgetLineController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let amount = req.inner.amount;// let cost_center_id = req.inner.cost_center_id;// let currency_code = req.inner.currency_code;// let department_id = req.inner.department_id;// let gl_account_code = req.inner.gl_account_code;// let gl_account_id = req.inner.gl_account_id;// let notes = req.inner.notes;// let period = req.inner.period;// let period_name = req.inner.period_name;// let id = req.inner.id;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    HttpJson::ok(Response {
-        actual_amount: None,              // TODO: Set from your business logic
-        amount: 1.5,                      // TODO: Set from your business logic
-        budget_id: "example".to_string(), // TODO: Set from your business logic
-        cost_center_id: None,             // TODO: Set from your business logic
-        created_at: None,                 // TODO: Set from your business logic
-        currency_code: None,              // TODO: Set from your business logic
-        department_id: None,              // TODO: Set from your business logic
-        gl_account_code: None,            // TODO: Set from your business logic
-        gl_account_id: None,              // TODO: Set from your business logic
-        gl_account_name: None,            // TODO: Set from your business logic
-        id: "example".to_string(),        // TODO: Set from your business logic
-        notes: None,                      // TODO: Set from your business logic
-        period: "example".to_string(),    // TODO: Set from your business logic
-        period_name: None,                // TODO: Set from your business logic
-        updated_at: None,                 // TODO: Set from your business logic
-        variance: None,                   // TODO: Set from your business logic
-        variance_percent: None,           // TODO: Set from your business logic
-    })
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("create_budget_line")
 }

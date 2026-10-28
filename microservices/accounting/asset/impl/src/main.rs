@@ -7,12 +7,12 @@
 // ⚠️ To implement business logic, edit the corresponding controller file
 #![allow(clippy::uninlined_format_args)]
 // Use generated code from gen crate
-use rerp_accounting_asset_gen::handlers::*;
-use rerp_accounting_asset_gen::registry::*;
 use rerp_accounting_asset_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
+mod http_support;
+mod impl_registry;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
@@ -23,7 +23,6 @@ use brrtrouter::server::HttpServer;
 use brrtrouter::spec::SecurityScheme;
 use brrtrouter::{BearerJwtProvider, OAuth2Provider, SecurityProvider, SecurityRequest};
 use clap::Parser;
-use controllers::*;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
@@ -311,9 +310,10 @@ fn main() -> io::Result<()> {
         dispatcher.add_middleware(cors.clone());
     }
     // NOTE: This registers controllers from gen crate. We need to register impl controllers instead.
-    // TODO: Update to register impl controllers
+    // Register only implementation controllers. Generated mock handlers
+    // are deliberately not part of any runtime (NFR-DOG-013 contract honesty).
     unsafe {
-        registry::register_from_spec(&mut dispatcher, &routes);
+        impl_registry::register_impl(&mut dispatcher, &routes);
     }
 
     // Start the HTTP server on port 8080, binding to 127.0.0.1 if BRRTR_LOCAL is

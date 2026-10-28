@@ -1,32 +1,12 @@
-// Implementation stub for handler 'create_cash_transfer'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_treasury_gen::handlers::create_cash_transfer::{Request, Response};
+use rerp_accounting_treasury_gen::handlers::create_cash_transfer::Request;
+use serde_json::Value;
 
 #[handler(CreateCashTransferController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let amount = req.inner.amount;// let currency_code = req.inner.currency_code;// let destination_account_id = req.inner.destination_account_id;// let source_account_id = req.inner.source_account_id;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    HttpJson::ok(Response {
-        amount: 1.5,                                   // TODO: Set from your business logic
-        currency_code: None,                           // TODO: Set from your business logic
-        destination_account_id: "example".to_string(), // TODO: Set from your business logic
-        id: "example".to_string(),                     // TODO: Set from your business logic
-        source_account_id: "example".to_string(),      // TODO: Set from your business logic
-        status: Default::default(),                    // TODO: Set from your business logic
-    })
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("create_cash_transfer")
 }

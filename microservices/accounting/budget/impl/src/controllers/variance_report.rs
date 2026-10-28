@@ -1,41 +1,12 @@
-// Implementation stub for handler 'variance_report'
-// This file is a starting point for your implementation.
-// After implementing business logic, add this line at the top to protect from --force regen:
-//   // BRRTRouter: user-owned
-// To create missing stubs only: brrtrouter-gen generate-stubs
-// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
+// Replace this handler body when the owning work package implements the op.
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
-use rerp_accounting_budget_gen::handlers::variance_report::{Request, Response};
+use rerp_accounting_budget_gen::handlers::variance_report::Request;
+use serde_json::Value;
 
 #[handler(VarianceReportController)]
-pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    // TODO: Implement your business logic here
-    //
-    // Example: Access request data
-    // let budget_id = req.inner.budget_id;// let period_start = req.inner.period_start;// let period_end = req.inner.period_end;// let warning_threshold = req.inner.warning_threshold;// let breach_threshold = req.inner.breach_threshold;
-    //
-    // Example: Database query, validation, etc.
-    // let result = your_service.process(&req.inner)?;
-    //
-    // Example: Return response
-
-    HttpJson::ok(Response {
-        breach_threshold: None,              // TODO: Set from your business logic
-        budget_id: "example".to_string(),    // TODO: Set from your business logic
-        budget_name: None,                   // TODO: Set from your business logic
-        created_at: None,                    // TODO: Set from your business logic
-        currency_code: None,                 // TODO: Set from your business logic
-        fiscal_year: None,                   // TODO: Set from your business logic
-        id: None,                            // TODO: Set from your business logic
-        lines: None,                         // TODO: Set from your business logic
-        period_end: "example".to_string(),   // TODO: Set from your business logic
-        period_start: "example".to_string(), // TODO: Set from your business logic
-        total_actual: None,                  // TODO: Set from your business logic
-        total_budgeted: None,                // TODO: Set from your business logic
-        total_variance: None,                // TODO: Set from your business logic
-        total_variance_percent: None,        // TODO: Set from your business logic
-        warning_threshold: None,             // TODO: Set from your business logic
-    })
+pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    crate::http_support::not_implemented("variance_report")
 }
