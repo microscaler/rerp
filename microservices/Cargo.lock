@@ -4170,7 +4170,7 @@ dependencies = [
  "chrono",
  "clap",
  "config",
- "hmac 0.12.1",
+ "hmac 0.13.0",
  "http 0.2.12",
  "http 1.5.0",
  "lifeguard",
