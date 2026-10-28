@@ -535,5 +535,5 @@ ref-rewritten) the whole accounting suite — including
   `register_from_spec` only — unchanged, still the open wiring
   question for services that gain real impl controllers.
 - Verification: `cargo check --workspace --all-targets` 0 errors,
-  `cargo test --workspace --lib` 0 failures (42 tests passed),
+  `cargo test --workspace --lib` 0 failures (21 tests passed),
   `cargo fmt --all --check` clean, `just qa` 29 passed.
