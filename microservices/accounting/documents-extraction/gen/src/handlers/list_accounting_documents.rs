@@ -2,7 +2,9 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::AccountingDocument;
 use brrtrouter::dispatcher::HandlerRequest;
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
@@ -28,7 +30,20 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {}
+pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "items")]
+    pub items: Option<Vec<AccountingDocument>>,
+
+    #[serde(rename = "limit")]
+    pub limit: i32,
+
+    #[serde(rename = "page")]
+    pub page: i32,
+
+    #[serde(rename = "total")]
+    pub total: i32,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -39,14 +54,13 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_query_param("page") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":1,"minimum":1,"type":"integer"}),
+            );
             data_map.insert(
                 "page".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"default":1,"minimum":1,"type":"integer"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -54,11 +68,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("limit") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"}),
+            );
             data_map.insert(
                 "limit".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"default":20,"maximum":100,"minimum":1,"type":"integer"})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -66,11 +82,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("document_type") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["CUSTOMER_INVOICE","VENDOR_BILL","CREDIT_MEMO","BANK_STATEMENT","EDI_DOCUMENT","TAX_DOCUMENT","OTHER"]}),
+            );
             data_map.insert(
                 "document_type".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["CUSTOMER_INVOICE","VENDOR_BILL","CREDIT_MEMO","BANK_STATEMENT","EDI_DOCUMENT","TAX_DOCUMENT","OTHER"]})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -78,11 +96,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("status") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["UPLOADED","CLASSIFIED","EXTRACTING","REVIEW_REQUIRED","APPROVED","LINKED","REJECTED","ARCHIVED"]}),
+            );
             data_map.insert(
                 "status".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["UPLOADED","CLASSIFIED","EXTRACTING","REVIEW_REQUIRED","APPROVED","LINKED","REJECTED","ARCHIVED"]})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -107,6 +127,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     crate::controllers::list_accounting_documents::handle(req)
 }

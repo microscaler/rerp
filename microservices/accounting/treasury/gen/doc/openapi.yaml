@@ -5,7 +5,8 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: Treasury
   version: 1.0.0
-  description: Treasury service for liquidity planning, cash positioning, cash forecasts, bank relationships, and cash transfer planning.
+  description: Treasury service for liquidity planning, cash positioning, cash forecasts, bank relationships, and cash transfer
+    planning.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -80,6 +81,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCashForecastRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              horizon: sample value
+              start_date: '2026-01-15'
+              end_date: '2026-01-15'
       responses:
         '201':
           description: Cash forecast created
@@ -87,6 +93,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CashForecast'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /liquidity-plans:
     get:
       operationId: list_liquidity_plans
@@ -120,6 +150,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateLiquidityPlanRequest'
+            example:
+              company_id: 550e8400-e29b-41d4-a716-446655440000
+              plan_date: '2026-01-15'
+              minimum_cash_threshold: 1000.0
       responses:
         '201':
           description: Liquidity plan created
@@ -127,6 +161,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LiquidityPlan'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /bank-relationships:
     get:
       operationId: list_bank_relationships
@@ -151,6 +197,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBankRelationshipRequest'
+            example:
+              bank_name: Acme Corporation
+              relationship_type: standard
       responses:
         '201':
           description: Bank relationship created
@@ -158,6 +207,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BankRelationship'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /cash-transfers:
     get:
       operationId: list_cash_transfers
@@ -192,6 +253,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCashTransferRequest'
+            example:
+              source_account_id: 0
+              destination_account_id: 0
+              amount: 10000.0
+              currency_code: USD
       responses:
         '201':
           description: Cash transfer created
@@ -199,6 +265,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CashTransfer'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
 components:
   securitySchemes:
     bearerAuth:
@@ -206,30 +284,51 @@ components:
       scheme: bearer
       bearerFormat: JWT
   parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Resource UUID
     Page:
       name: page
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         default: 1
+      description: Page number (1-indexed)
     Limit:
       name: limit
       in: query
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
         default: 20
+      description: Page size (1-100)
+    Search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Full-text search across name and description fields
     CompanyId:
       name: company_id
       in: query
+      required: false
       schema:
         type: string
         format: uuid
+      description: Filter by company UUID
   responses:
     Unauthorized:
-      description: Unauthorized
+      description: Missing or invalid authentication
       content:
         application/json:
           schema:
@@ -237,83 +336,119 @@ components:
   schemas:
     CashPosition:
       type: object
-      required: [id, company_id, as_of_date, currency_code, available_cash]
+      required:
+      - id
+      - company_id
+      - as_of_date
+      - currency_code
+      - available_cash
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         as_of_date:
           type: string
           format: date
+          example: '2026-01-15'
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         available_cash:
           type: number
           format: double
+          example: 1000.0
         restricted_cash:
           type: number
           format: double
+          example: 1000.0
         forecast_net_cash:
           type: number
           format: double
+          example: 1000.0
     CashForecast:
       type: object
-      required: [id, company_id, horizon, status]
+      required:
+      - id
+      - company_id
+      - horizon
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         horizon:
           enum:
           - DAILY_13_WEEK
           - MONTHLY_12_MONTH
           - QUARTERLY_8_QUARTER
           - CUSTOM
+          example: sample value
         status:
           type: string
+          example: active
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
     CreateCashForecastRequest:
       type: object
-      required: [company_id, horizon, start_date, end_date]
+      required:
+      - company_id
+      - horizon
+      - start_date
+      - end_date
       properties:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         horizon:
           enum:
           - DAILY_13_WEEK
           - MONTHLY_12_MONTH
           - QUARTERLY_8_QUARTER
           - CUSTOM
+          example: sample value
         start_date:
           type: string
           format: date
+          example: '2026-01-15'
         end_date:
           type: string
           format: date
+          example: '2026-01-15'
     LiquidityPlan:
       type: object
-      required: [id, company_id, status, plan_date]
+      required:
+      - id
+      - company_id
+      - status
+      - plan_date
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         status:
           enum:
           - DRAFT
@@ -321,67 +456,102 @@ components:
           - ACTIVE
           - COMPLETED
           - CANCELLED
+          example: active
         plan_date:
           type: string
           format: date
+          example: '2026-01-15'
         minimum_cash_threshold:
           type: number
           format: double
+          example: 1000.0
     CreateLiquidityPlanRequest:
       type: object
-      required: [company_id, plan_date]
+      required:
+      - company_id
+      - plan_date
       properties:
         company_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         plan_date:
           type: string
           format: date
+          example: '2026-01-15'
         minimum_cash_threshold:
           type: number
           format: double
+          example: 1000.0
     BankRelationship:
       type: object
-      required: [id, bank_name, relationship_type, active]
+      required:
+      - id
+      - bank_name
+      - relationship_type
+      - active
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         bank_name:
           type: string
+          example: Acme Corporation
         relationship_type:
           type: string
-          enum: [OPERATING, CREDIT_FACILITY, INVESTMENT, CASH_POOL, OTHER]
+          enum:
+          - OPERATING
+          - CREDIT_FACILITY
+          - INVESTMENT
+          - CASH_POOL
+          - OTHER
+          example: standard
         active:
           type: boolean
+          example: true
     CreateBankRelationshipRequest:
       type: object
-      required: [bank_name, relationship_type]
+      required:
+      - bank_name
+      - relationship_type
       properties:
         bank_name:
           type: string
+          example: Acme Corporation
         relationship_type:
           type: string
+          example: standard
     CashTransfer:
       type: object
-      required: [id, source_account_id, destination_account_id, amount, status]
+      required:
+      - id
+      - source_account_id
+      - destination_account_id
+      - amount
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         source_account_id:
           type: string
           format: uuid
+          example: 0
         destination_account_id:
           type: string
           format: uuid
+          example: 0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
         status:
           enum:
           - PLANNED
@@ -390,23 +560,32 @@ components:
           - SETTLED
           - CANCELLED
           - FAILED
+          example: active
     CreateCashTransferRequest:
       type: object
-      required: [source_account_id, destination_account_id, amount, currency_code]
+      required:
+      - source_account_id
+      - destination_account_id
+      - amount
+      - currency_code
       properties:
         source_account_id:
           type: string
           format: uuid
+          example: 0
         destination_account_id:
           type: string
           format: uuid
+          example: 0
         amount:
           type: number
           format: double
+          example: 10000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     PaginatedCashPositions:
       allOf:
       - $ref: '#/components/schemas/PaginatedResponse'
@@ -454,21 +633,31 @@ components:
               $ref: '#/components/schemas/CashTransfer'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
 security:
 - bearerAuth: []

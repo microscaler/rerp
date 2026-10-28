@@ -5,7 +5,8 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: Revenue Recognition
   version: 1.0.0
-  description: Revenue and expense recognition service for deferred revenue, deferred expenses, recognition schedules, recognition rules, and recognition runs.
+  description: Revenue and expense recognition service for deferred revenue, deferred expenses, recognition schedules, recognition
+    rules, and recognition runs.
   contact:
     name: RERP Accounting API Support
     email: accounting-api@rerp.ai
@@ -50,6 +51,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRecognitionRuleRequest'
+            example:
+              name: Acme Corporation
+              method: bank_transfer
       responses:
         '201':
           description: Recognition rule created
@@ -57,6 +61,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionRule'
+        '400':
+          description: Validation error
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: &id002
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: &id003
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: &id004
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /recognition-schedules:
     get:
       operationId: list_recognition_schedules
@@ -86,6 +114,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRecognitionScheduleRequest'
+            example:
+              rule_id: sample value
+              source_invoice_id: 1000.0
+              total_amount: 11000.0
+              currency_code: USD
       responses:
         '201':
           description: Recognition schedule created
@@ -93,6 +126,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionSchedule'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /deferred-revenues:
     get:
       operationId: list_deferred_revenues
@@ -117,6 +162,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDeferredItemRequest'
+            example:
+              schedule_id: 550e8400-e29b-41d4-a716-446655440000
+              balance: 0.0
       responses:
         '201':
           description: Deferred revenue created
@@ -124,6 +172,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredItem'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /deferred-expenses:
     get:
       operationId: list_deferred_expenses
@@ -148,6 +208,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDeferredItemRequest'
+            example:
+              schedule_id: 550e8400-e29b-41d4-a716-446655440000
+              balance: 0.0
       responses:
         '201':
           description: Deferred expense created
@@ -155,6 +218,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredItem'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /recognition-runs:
     get:
       operationId: list_recognition_runs
@@ -188,6 +263,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRecognitionRunRequest'
+            example:
+              fiscal_period_id: 850e8400-e29b-41d4-a716-446655440003
       responses:
         '201':
           description: Recognition run created
@@ -195,6 +272,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecognitionRun'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
+        '409':
+          description: "Conflict \u2014 resource already exists or violates business rules"
+          content: *id004
   /recognition-runs/{id}/post:
     post:
       operationId: post_recognition_run
@@ -211,6 +300,19 @@ paths:
                 $ref: '#/components/schemas/RecognitionRun'
         '409':
           $ref: '#/components/responses/Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Validation error
+          content: *id001
+        '401':
+          description: "Unauthorized \u2014 invalid or expired token"
+          content: *id002
+        '403':
+          description: "Forbidden \u2014 insufficient permissions"
+          content: *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -240,9 +342,25 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    CompanyId:
+      name: X-Company-ID
+      in: header
+      required: true
+      description: Company identifier for multi-tenant scoping
+      schema:
+        type: string
+        format: uuid
+        example: 550e8400-e29b-41d4-a716-446655440000
+    Search:
+      name: search
+      in: query
+      required: false
+      description: Free text search across resources
+      schema:
+        type: string
   responses:
     Conflict:
-      description: Invalid recognition state
+      description: "Conflict \u2014 resource already exists or violates business rules"
       content:
         application/json:
           schema:
@@ -250,13 +368,19 @@ components:
   schemas:
     RecognitionRule:
       type: object
-      required: [id, name, method, active]
+      required:
+      - id
+      - name
+      - method
+      - active
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
+          example: Acme Corporation
         method:
           enum:
           - STRAIGHT_LINE
@@ -264,14 +388,19 @@ components:
           - USAGE_BASED
           - PERCENT_COMPLETE
           - MANUAL
+          example: bank_transfer
         active:
           type: boolean
+          example: true
     CreateRecognitionRuleRequest:
       type: object
-      required: [name, method]
+      required:
+      - name
+      - method
       properties:
         name:
           type: string
+          example: Acme Corporation
         method:
           enum:
           - STRAIGHT_LINE
@@ -279,82 +408,121 @@ components:
           - USAGE_BASED
           - PERCENT_COMPLETE
           - MANUAL
+          example: bank_transfer
     RecognitionSchedule:
       type: object
-      required: [id, rule_id, source_invoice_id, total_amount, recognized_amount]
+      required:
+      - id
+      - rule_id
+      - source_invoice_id
+      - total_amount
+      - recognized_amount
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         rule_id:
           type: string
           format: uuid
+          example: sample value
         source_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         total_amount:
           type: number
           format: double
+          example: 11000.0
         recognized_amount:
           type: number
           format: double
+          example: 1000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     CreateRecognitionScheduleRequest:
       type: object
-      required: [rule_id, source_invoice_id, total_amount, currency_code]
+      required:
+      - rule_id
+      - source_invoice_id
+      - total_amount
+      - currency_code
       properties:
         rule_id:
           type: string
           format: uuid
+          example: sample value
         source_invoice_id:
           type: string
           format: uuid
+          example: 1000.0
         total_amount:
           type: number
           format: double
+          example: 11000.0
         currency_code:
           type: string
           minLength: 3
           maxLength: 3
+          example: USD
     DeferredItem:
       type: object
-      required: [id, schedule_id, item_type, balance]
+      required:
+      - id
+      - schedule_id
+      - item_type
+      - balance
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         schedule_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         item_type:
           type: string
-          enum: [REVENUE, EXPENSE]
+          enum:
+          - REVENUE
+          - EXPENSE
+          example: standard
         balance:
           type: number
           format: double
+          example: 0.0
     CreateDeferredItemRequest:
       type: object
-      required: [schedule_id, balance]
+      required:
+      - schedule_id
+      - balance
       properties:
         schedule_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         balance:
           type: number
           format: double
+          example: 0.0
     RecognitionRun:
       type: object
-      required: [id, fiscal_period_id, status]
+      required:
+      - id
+      - fiscal_period_id
+      - status
       properties:
         id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
         fiscal_period_id:
           type: string
           format: uuid
+          example: 850e8400-e29b-41d4-a716-446655440003
         status:
           enum:
           - DRAFT
@@ -362,43 +530,92 @@ components:
           - POSTED
           - REVERSED
           - FAILED
+          example: active
         posted_journal_entry_id:
           type: string
           format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
     CreateRecognitionRunRequest:
       type: object
-      required: [fiscal_period_id]
+      required:
+      - fiscal_period_id
       properties:
         fiscal_period_id:
           type: string
           format: uuid
+          example: 850e8400-e29b-41d4-a716-446655440003
     PaginatedRecognitionRules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionRule'
     PaginatedRecognitionSchedules:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionSchedule' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionSchedule'
     PaginatedDeferredRevenues:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeferredItem'
     PaginatedDeferredExpenses:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/DeferredItem' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/DeferredItem'
     PaginatedRecognitionRuns:
-      allOf: [{ $ref: '#/components/schemas/PaginatedResponse' }, { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/RecognitionRun' } } } }]
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/RecognitionRun'
     PaginatedResponse:
       type: object
-      required: [total, page, limit]
+      required:
+      - total
+      - page
+      - limit
       properties:
         total:
           type: integer
+          example: 1
         page:
           type: integer
+          example: 1
         limit:
           type: integer
+          example: 1
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+      - error
+      - message
       properties:
         error:
           type: string
+          example: sample value
         message:
           type: string
+          example: sample value
 security:
 - bearerAuth: []

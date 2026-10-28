@@ -10,14 +10,16 @@ pub struct ConsolidationGroup {
 
     pub name: String,
 
-    pub parent_company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_company_id: Option<String>,
 
     pub reporting_currency_code: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ConsolidationRun {
-    pub executed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub executed_at: Option<String>,
 
     pub fiscal_period_id: String,
 
@@ -30,7 +32,8 @@ pub struct ConsolidationRun {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateConsolidationGroupRequest {
-    pub company_ids: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_ids: Option<Vec<String>>,
 
     pub name: String,
 
@@ -43,7 +46,8 @@ pub struct CreateConsolidationGroupResponse {
 
     pub name: String,
 
-    pub parent_company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_company_id: Option<String>,
 
     pub reporting_currency_code: String,
 }
@@ -57,7 +61,8 @@ pub struct CreateConsolidationRunRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateConsolidationRunResponse {
-    pub executed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub executed_at: Option<String>,
 
     pub fiscal_period_id: String,
 
@@ -87,7 +92,8 @@ pub struct CreateEliminationRuleResponse {
 
     pub name: String,
 
-    pub rule_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rule_type: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -116,9 +122,11 @@ pub struct EliminationEntry {
 
     pub run_id: String,
 
-    pub source_company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_company_id: Option<String>,
 
-    pub target_company_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target_company_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -131,7 +139,8 @@ pub struct EliminationRule {
 
     pub name: String,
 
-    pub rule_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rule_type: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -143,7 +152,8 @@ pub struct ErrorResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ExecuteConsolidationRunResponse {
-    pub executed_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub executed_at: Option<String>,
 
     pub fiscal_period_id: String,
 
@@ -163,6 +173,96 @@ pub struct GroupReportingPack {
     pub run_id: String,
 
     pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListConsolidationGroupsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ConsolidationGroup>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListConsolidationRunsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ConsolidationRun>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEliminationEntriesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EliminationEntry>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListEliminationRulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EliminationRule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListGroupReportingPacksResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<GroupReportingPack>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedConsolidationGroups {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ConsolidationGroup>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedConsolidationRuns {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<ConsolidationRun>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEliminationEntries {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EliminationEntry>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedEliminationRules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<EliminationRule>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedGroupReportingPacks {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<GroupReportingPack>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

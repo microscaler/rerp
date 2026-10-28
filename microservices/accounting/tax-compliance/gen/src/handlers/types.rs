@@ -33,7 +33,8 @@ pub struct CreateTaxPaymentResponse {
 
     pub id: String,
 
-    pub paid_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub paid_at: Option<String>,
 
     pub return_id: String,
 
@@ -44,7 +45,8 @@ pub struct CreateTaxPaymentResponse {
 pub struct CreateTaxPeriodRequest {
     pub company_id: String,
 
-    pub due_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub due_date: Option<String>,
 
     pub end_date: String,
 
@@ -59,7 +61,8 @@ pub struct CreateTaxPeriodRequest {
 pub struct CreateTaxPeriodResponse {
     pub company_id: String,
 
-    pub due_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub due_date: Option<String>,
 
     pub end_date: String,
 
@@ -87,7 +90,8 @@ pub struct CreateTaxReturnRequest {
 pub struct CreateTaxReturnResponse {
     pub company_id: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
@@ -97,7 +101,8 @@ pub struct CreateTaxReturnResponse {
 
     pub status: serde_json::Value,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 
     pub total_due: f64,
 }
@@ -106,13 +111,15 @@ pub struct CreateTaxReturnResponse {
 pub struct CreateTaxRuleRequest {
     pub effective_from: String,
 
-    pub effective_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub effective_to: Option<String>,
 
     pub jurisdiction_code: String,
 
     pub name: String,
 
-    pub rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate: Option<f64>,
 
     pub tax_type: serde_json::Value,
 }
@@ -123,7 +130,8 @@ pub struct CreateTaxRuleResponse {
 
     pub effective_from: String,
 
-    pub effective_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub effective_to: Option<String>,
 
     pub id: String,
 
@@ -131,7 +139,8 @@ pub struct CreateTaxRuleResponse {
 
     pub name: String,
 
-    pub rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate: Option<f64>,
 
     pub tax_type: serde_json::Value,
 }
@@ -144,12 +153,102 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxAuditPacksResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxAuditPack>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxPaymentsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxPayment>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxPeriodsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxPeriod>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxReturnsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxReturn>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListTaxRulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxRule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedResponse {
     pub limit: i32,
 
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxAuditPacks {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxAuditPack>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxPayments {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxPayment>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxPeriods {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxPeriod>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxReturns {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxReturn>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedTaxRules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<TaxRule>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -161,7 +260,8 @@ pub struct SubmitTaxReturnRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SubmitTaxReturnResponse {
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -187,7 +287,8 @@ pub struct TaxPayment {
 
     pub id: String,
 
-    pub paid_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub paid_at: Option<String>,
 
     pub return_id: String,
 
@@ -198,7 +299,8 @@ pub struct TaxPayment {
 pub struct TaxPeriod {
     pub company_id: String,
 
-    pub due_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub due_date: Option<String>,
 
     pub end_date: String,
 
@@ -217,7 +319,8 @@ pub struct TaxPeriod {
 pub struct TaxReturn {
     pub company_id: String,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
@@ -227,14 +330,16 @@ pub struct TaxReturn {
 
     pub status: serde_json::Value,
 
-    pub submitted_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<String>,
 
     pub total_due: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TaxReturnSubmission {
-    pub external_reference: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub external_reference: Option<String>,
 
     pub id: String,
 
@@ -258,7 +363,8 @@ pub struct TaxRule {
 
     pub effective_from: String,
 
-    pub effective_to: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub effective_to: Option<String>,
 
     pub id: String,
 
@@ -266,7 +372,8 @@ pub struct TaxRule {
 
     pub name: String,
 
-    pub rate: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate: Option<f64>,
 
     pub tax_type: serde_json::Value,
 }

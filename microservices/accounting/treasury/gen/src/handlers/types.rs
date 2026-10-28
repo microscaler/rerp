@@ -19,13 +19,15 @@ pub struct BankRelationship {
 pub struct CashForecast {
     pub company_id: String,
 
-    pub end_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<String>,
 
     pub horizon: serde_json::Value,
 
     pub id: String,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub status: String,
 }
@@ -40,18 +42,21 @@ pub struct CashPosition {
 
     pub currency_code: String,
 
-    pub forecast_net_cash: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_net_cash: Option<f64>,
 
     pub id: String,
 
-    pub restricted_cash: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restricted_cash: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CashTransfer {
     pub amount: f64,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub destination_account_id: String,
 
@@ -95,13 +100,15 @@ pub struct CreateCashForecastRequest {
 pub struct CreateCashForecastResponse {
     pub company_id: String,
 
-    pub end_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<String>,
 
     pub horizon: serde_json::Value,
 
     pub id: String,
 
-    pub start_date: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<String>,
 
     pub status: String,
 }
@@ -121,7 +128,8 @@ pub struct CreateCashTransferRequest {
 pub struct CreateCashTransferResponse {
     pub amount: f64,
 
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub destination_account_id: String,
 
@@ -136,7 +144,8 @@ pub struct CreateCashTransferResponse {
 pub struct CreateLiquidityPlanRequest {
     pub company_id: String,
 
-    pub minimum_cash_threshold: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_cash_threshold: Option<f64>,
 
     pub plan_date: String,
 }
@@ -147,7 +156,8 @@ pub struct CreateLiquidityPlanResponse {
 
     pub id: String,
 
-    pub minimum_cash_threshold: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_cash_threshold: Option<f64>,
 
     pub plan_date: String,
 
@@ -167,11 +177,102 @@ pub struct LiquidityPlan {
 
     pub id: String,
 
-    pub minimum_cash_threshold: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_cash_threshold: Option<f64>,
 
     pub plan_date: String,
 
     pub status: serde_json::Value,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListBankRelationshipsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<BankRelationship>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListCashForecastsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashForecast>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListCashPositionsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashPosition>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListCashTransfersResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashTransfer>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListLiquidityPlansResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LiquidityPlan>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedBankRelationships {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<BankRelationship>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedCashForecasts {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashForecast>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedCashPositions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashPosition>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedCashTransfers {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<CashTransfer>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedLiquidityPlans {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<LiquidityPlan>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

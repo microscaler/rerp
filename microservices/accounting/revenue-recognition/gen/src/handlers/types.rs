@@ -76,7 +76,8 @@ pub struct CreateRecognitionRunResponse {
 
     pub id: String,
 
-    pub posted_journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_journal_entry_id: Option<String>,
 
     pub status: serde_json::Value,
 }
@@ -94,7 +95,8 @@ pub struct CreateRecognitionScheduleRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateRecognitionScheduleResponse {
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
@@ -126,6 +128,96 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDeferredExpensesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<DeferredItem>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDeferredRevenuesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<DeferredItem>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListRecognitionRulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionRule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListRecognitionRunsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionRun>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListRecognitionSchedulesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionSchedule>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDeferredExpenses {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<DeferredItem>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDeferredRevenues {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<DeferredItem>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRecognitionRules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionRule>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRecognitionRuns {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionRun>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRecognitionSchedules {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<RecognitionSchedule>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedResponse {
     pub limit: i32,
 
@@ -140,7 +232,8 @@ pub struct PostRecognitionRunResponse {
 
     pub id: String,
 
-    pub posted_journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_journal_entry_id: Option<String>,
 
     pub status: serde_json::Value,
 }
@@ -162,14 +255,16 @@ pub struct RecognitionRun {
 
     pub id: String,
 
-    pub posted_journal_entry_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posted_journal_entry_id: Option<String>,
 
     pub status: serde_json::Value,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct RecognitionSchedule {
-    pub currency_code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
 
     pub id: String,
 
