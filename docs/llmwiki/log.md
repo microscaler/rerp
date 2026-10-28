@@ -505,3 +505,35 @@ now compile except `accounting/bff/impl`, which stays out of
   registry) for budget, asset, edi, bank-sync, accounts-payable,
   audit-controls, lease-accounting, financial-reports; those are
   generated but not yet wired into `main.rs` (still `register_from_spec`).
+
+## [2026-10-28] contribute | accounting suite fully green, incl. bff
+
+With BRRTRouter 9768e35 (PR #533 merges member `components.responses`
+and the other component maps into BFF specs, service-prefixed and
+ref-rewritten) the whole accounting suite — including
+`accounting/bff/impl` — compiles and is back in `default-members`
+([`microservices/Cargo.toml`](../../microservices/Cargo.toml)).
+
+- Spec fixes (human-reviewed rule change): the five member specs
+  consolidation, documents-extraction, revenue-recognition,
+  tax-compliance, treasury gained the `components.responses` entries
+  their operations `$ref`'d but never defined (modelled on
+  general-ledger/invoice; `ValidationError` on inventory/stock). No
+  payload schema, operation, operationId, endpoint or status code
+  changed.
+- `openapi/accounting/openapi_bff.yaml` regenerated with
+  `rerp bff generate-system --suite accounting`: `components.responses`
+  now carries the 12 prefixed GeneralLedger*/Invoice* responses;
+  `bff/merge.py::merge_named_components` + `prefix_named_components`
+  are the tooling behind it. All 155 operations are proxy-only
+  (`x-service` + `x-brrtrouter-downstream-path`), so `generate-stubs`
+  skips them ("Skipped proxy-only stub",
+  `brrtrouter/src/generator/project/generate.rs`) and the 115 stale
+  pure-TODO impl controller files were removed; `bff/impl` keeps an
+  empty `controllers/mod.rs` and generated `impl_registry.rs` (0
+  controllers). `main.rs` dispatches gen mock handlers via
+  `register_from_spec` only — unchanged, still the open wiring
+  question for services that gain real impl controllers.
+- Verification: `cargo check --workspace --all-targets` 0 errors,
+  `cargo test --workspace --lib` 0 failures (42 tests passed),
+  `cargo fmt --all --check` clean, `just qa` 29 passed.
