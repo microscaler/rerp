@@ -2,26 +2,11 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 
 pub mod aging_summary;
-pub mod auto_apply_payment;
-pub mod collections_summary;
-pub mod create_ar_aging;
-pub mod create_collection_activity;
-pub mod create_collection_case;
 pub mod create_customer_payment;
-pub mod create_follow_up_level;
-pub mod create_follow_up_run;
 pub mod create_payment_application;
-pub mod create_payment_promise;
-pub mod delete_customer_payment;
-pub mod get_ar_aging;
 pub mod get_customer_payment;
 pub mod get_open_item;
-pub mod list_ar_agings;
-pub mod list_collection_activities;
-pub mod list_collection_cases;
 pub mod list_customer_payments;
-pub mod list_follow_up_levels;
 pub mod list_open_items;
 pub mod list_payment_applications;
 pub mod send_customer_statements;
-pub mod update_customer_payment;

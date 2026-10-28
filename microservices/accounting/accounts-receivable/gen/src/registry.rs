@@ -18,68 +18,8 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_ar_agings",
-        crate::controllers::list_ar_agings::ListArAgingsController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_ar_aging",
-        crate::controllers::create_ar_aging::CreateArAgingController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "get_ar_aging",
-        crate::controllers::get_ar_aging::GetArAgingController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_collection_cases",
-        crate::controllers::list_collection_cases::ListCollectionCasesController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_collection_case",
-        crate::controllers::create_collection_case::CreateCollectionCaseController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_collection_activities",
-        crate::controllers::list_collection_activities::ListCollectionActivitiesController,
-        24576,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_collection_activity",
-        crate::controllers::create_collection_activity::CreateCollectionActivityController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "send_customer_statements",
         crate::controllers::send_customer_statements::SendCustomerStatementsController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_follow_up_levels",
-        crate::controllers::list_follow_up_levels::ListFollowUpLevelsController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_follow_up_level",
-        crate::controllers::create_follow_up_level::CreateFollowUpLevelController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_follow_up_run",
-        crate::controllers::create_follow_up_run::CreateFollowUpRunController,
         16384,
     );
 
@@ -93,12 +33,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         "get_open_item",
         crate::controllers::get_open_item::GetOpenItemController,
         20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_payment_promise",
-        crate::controllers::create_payment_promise::CreatePaymentPromiseController,
-        16384,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -126,38 +60,14 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "update_customer_payment",
-        crate::controllers::update_customer_payment::UpdateCustomerPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_customer_payment",
-        crate::controllers::delete_customer_payment::DeleteCustomerPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "list_payment_applications",
         crate::controllers::list_payment_applications::ListPaymentApplicationsController,
         20480,
     );
 
     dispatcher.register_typed_with_stack_size(
-        "auto_apply_payment",
-        crate::controllers::auto_apply_payment::AutoApplyPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "aging_summary",
         crate::controllers::aging_summary::AgingSummaryController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "collections_summary",
-        crate::controllers::collections_summary::CollectionsSummaryController,
         20480,
     );
 }
@@ -176,89 +86,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
-            "list_ar_agings" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_ar_agings::ListArAgingsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_ar_aging" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_ar_aging::CreateArAgingController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_ar_aging" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::get_ar_aging::GetArAgingController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_collection_cases" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_collection_cases::ListCollectionCasesController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_collection_case" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_collection_case::CreateCollectionCaseController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_collection_activities" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_collection_activities::ListCollectionActivitiesController,
-                    24576,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_collection_activity" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_collection_activity::CreateCollectionActivityController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "send_customer_statements" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::send_customer_statements::SendCustomerStatementsController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_follow_up_levels" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_follow_up_levels::ListFollowUpLevelsController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_follow_up_level" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_follow_up_level::CreateFollowUpLevelController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_follow_up_run" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_follow_up_run::CreateFollowUpRunController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );
@@ -276,14 +106,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_open_item::GetOpenItemController,
                     20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_payment_promise" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_payment_promise::CreatePaymentPromiseController,
-                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -320,22 +142,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_customer_payment" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_customer_payment::UpdateCustomerPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_customer_payment" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_customer_payment::DeleteCustomerPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_payment_applications" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_payment_applications::ListPaymentApplicationsController,
@@ -344,25 +150,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "auto_apply_payment" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::auto_apply_payment::AutoApplyPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "aging_summary" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::aging_summary::AgingSummaryController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "collections_summary" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::collections_summary::CollectionsSummaryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

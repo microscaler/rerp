@@ -52,10 +52,10 @@ pub struct Response {
     pub invoice_id: String,
 
     #[serde(rename = "original_amount")]
-    pub original_amount: f64,
+    pub original_amount: String,
 
     #[serde(rename = "outstanding_amount")]
-    pub outstanding_amount: f64,
+    pub outstanding_amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "payment_history")]
