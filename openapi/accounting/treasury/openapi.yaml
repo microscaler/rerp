@@ -326,6 +326,13 @@ components:
         type: string
         format: uuid
       description: Filter by company UUID
+  responses:
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     CashPosition:
       type: object
