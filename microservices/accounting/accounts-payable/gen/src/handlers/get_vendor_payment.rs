@@ -22,7 +22,7 @@ pub struct Response {
     pub actual_payment_date: Option<String>,
 
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(rename = "company_id")]
     pub company_id: String,

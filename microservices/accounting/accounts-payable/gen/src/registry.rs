@@ -18,48 +18,6 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
-        "list_approvals",
-        crate::controllers::list_approvals::ListApprovalsController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_approval",
-        crate::controllers::create_approval::CreateApprovalController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_payment_commitments",
-        crate::controllers::list_payment_commitments::ListPaymentCommitmentsController,
-        24576,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "list_payment_batches",
-        crate::controllers::list_payment_batches::ListPaymentBatchesController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "create_payment_batch",
-        crate::controllers::create_payment_batch::CreatePaymentBatchController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "approve_payment_batch",
-        crate::controllers::approve_payment_batch::ApprovePaymentBatchController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "export_payment_batch_file",
-        crate::controllers::export_payment_batch_file::ExportPaymentBatchFileController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "list_vendor_payments",
         crate::controllers::list_vendor_payments::ListVendorPaymentsController,
         24576,
@@ -74,24 +32,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "get_vendor_payment",
         crate::controllers::get_vendor_payment::GetVendorPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "update_vendor_payment",
-        crate::controllers::update_vendor_payment::UpdateVendorPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_vendor_payment",
-        crate::controllers::delete_vendor_payment::DeleteVendorPaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "cash_flow_forecast",
-        crate::controllers::cash_flow_forecast::CashFlowForecastController,
         20480,
     );
 
@@ -114,26 +54,8 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "update_vendor_invoice",
-        crate::controllers::update_vendor_invoice::UpdateVendorInvoiceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "delete_vendor_invoice",
-        crate::controllers::delete_vendor_invoice::DeleteVendorInvoiceController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "register_vendor_invoice_payment",
         crate::controllers::register_vendor_invoice_payment::RegisterVendorInvoicePaymentController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "perform_vendor_invoice_three_way_match",
-        crate::controllers::perform_vendor_invoice_three_way_match::PerformVendorInvoiceThreeWayMatchController,
         20480,
     );
 }
@@ -152,62 +74,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
-            "list_approvals" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_approvals::ListApprovalsController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_approval" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_approval::CreateApprovalController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_payment_commitments" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_payment_commitments::ListPaymentCommitmentsController,
-                    24576,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_payment_batches" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::list_payment_batches::ListPaymentBatchesController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_payment_batch" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::create_payment_batch::CreatePaymentBatchController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "approve_payment_batch" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::approve_payment_batch::ApprovePaymentBatchController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "export_payment_batch_file" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::export_payment_batch_file::ExportPaymentBatchFileController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_vendor_payments" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_vendor_payments::ListVendorPaymentsController,
@@ -227,30 +93,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_vendor_payment" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_vendor_payment::GetVendorPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_vendor_payment" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_vendor_payment::UpdateVendorPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_vendor_payment" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_vendor_payment::DeleteVendorPaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "cash_flow_forecast" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::cash_flow_forecast::CashFlowForecastController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
@@ -280,33 +122,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_vendor_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::update_vendor_invoice::UpdateVendorInvoiceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_vendor_invoice" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::delete_vendor_invoice::DeleteVendorInvoiceController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
             "register_vendor_invoice_payment" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::register_vendor_invoice_payment::RegisterVendorInvoicePaymentController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "perform_vendor_invoice_three_way_match" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::perform_vendor_invoice_three_way_match::PerformVendorInvoiceThreeWayMatchController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
