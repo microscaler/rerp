@@ -61,6 +61,14 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "update_ledger_account" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_ledger_account::UpdateLedgerAccountController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             _ => {}
         }
     }

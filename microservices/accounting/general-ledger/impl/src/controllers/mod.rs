@@ -6,3 +6,4 @@ pub mod get_journal_entry;
 pub mod get_trial_balance;
 pub mod list_fiscal_periods;
 pub mod list_ledger_accounts;
+pub mod update_ledger_account;

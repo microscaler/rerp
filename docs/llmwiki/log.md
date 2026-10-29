@@ -668,3 +668,13 @@ ref-rewritten) the whole accounting suite — including
 - Live acceptance (#[ignore]) mirrors invoice pattern incl. replay and
   both conflict kinds. Gates: fmt, workspace check 0, GL 14 pass + 1
   ignored, just qa 74, 121 specs valid.
+
+## [2026-10-29] contribute | account mutation lifecycle closes Epic D1 (D1a+D1b)
+
+- D1a (#118): POST /v1/accounts. D1b: PATCH /v1/accounts/{id} — control
+  protection (403 for control_role accounts), posted-field freeze
+  (journal-line check -> 409 posted_account_immutable), update fingerprint
+  binds operation+account+fields (no create/update replay collision),
+  Lifeguard Record dirty-field update, ACCOUNT_UPDATED audit fact.
+- GL now at 6 ops, all wiring/honesty/money gates green; qa 106, GL tests
+  16 pass + 1 ignored live. Next: D2 fiscal-period state machine.
