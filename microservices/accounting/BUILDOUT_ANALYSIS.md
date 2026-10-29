@@ -186,9 +186,15 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 
 ### Epic C — WP0 structural close-out (parallel, small)
 
-- **C1 — Impl anatomy completion** (M): create services/validators/config/
-  seeds/tests scaffolding per the canonical layout in CONTRIBUTING for the four
-  scaffold services, so Epic F–I code lands in the right places.
+- **C1 — Impl anatomy completion** (M) — **RESCOPED + DONE 2026-10-28**: the
+  services/validators/config/seeds layout it cites does not exist in
+  CONTRIBUTING; the canonical anatomy there is feature modules + inline
+  `#[cfg(test)]` tests + suite-level `core/ entities/ migrations/ sql/ tests/`,
+  which the scaffold services already have. What Epic F–I actually needs is a
+  guard that contract and dispatch never drift, delivered instead as
+  `tooling/tests/test_accounting_registry_wiring.py` (spec operationIds ==
+  registry arms == controller files, all 16 impl services, bff excluded as
+  proxy).
 - **C2 — Platform-vs-accounting SQL separation** (M): split shared platform
   prerequisites from Accounting-specific controls in the DB setup path.
 - **C3 — Suite-install isolation tests** (M, deps C2): fresh-install tests for
