@@ -21,6 +21,14 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
     for route in routes {
         match route.handler_name.as_ref() {
+            "create_ledger_account" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_ledger_account::CreateLedgerAccountController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "get_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_journal_entry::GetJournalEntryController,

@@ -32,11 +32,35 @@ pub fn identity_context(claims: Option<&Value>) -> Result<SessionContext, HttpJs
     Ok(context)
 }
 
+/// Identity gate for ledger mutations: read permission is still required
+/// (a writer that cannot read could not verify its own writes), and the
+/// exact write permission must be granted separately.
+pub fn identity_write_context(claims: Option<&Value>) -> Result<SessionContext, HttpJson<Value>> {
+    let context = identity_context(claims)?;
+    if !can_write_ledger(&context) {
+        return Err(HttpJson::new(
+            403,
+            json!({
+                "code": "insufficient_permission",
+                "message": "The authenticated identity cannot modify the General Ledger"
+            }),
+        ));
+    }
+    Ok(context)
+}
+
 fn can_read_ledger(context: &SessionContext) -> bool {
     context
         .permissions
         .iter()
         .any(|permission| permission == "accounting:ledger:read")
+}
+
+fn can_write_ledger(context: &SessionContext) -> bool {
+    context
+        .permissions
+        .iter()
+        .any(|permission| permission == "accounting:ledger:write")
 }
 
 pub fn with_accounting_transaction<T>(
@@ -80,6 +104,7 @@ pub fn ledger_error(error: LedgerError) -> HttpJson<Value> {
             "not_found",
             "The ledger resource was not found".to_string(),
         ),
+        LedgerError::Conflict(code, message) => (409, code.as_str(), message.clone()),
         LedgerError::Database(_) => {
             eprintln!("General Ledger database failure: {error}");
             (
@@ -118,5 +143,16 @@ mod tests {
         assert!(can_read_ledger(&context(&["accounting:ledger:read"])));
         assert!(!can_read_ledger(&context(&["accounting:invoice:write"])));
         assert!(!can_read_ledger(&context(&[])));
+    }
+
+    #[test]
+    fn write_permission_is_exact_and_separate_from_read() {
+        assert!(can_write_ledger(&context(&["accounting:ledger:write"])));
+        assert!(!can_write_ledger(&context(&["accounting:ledger:read"])));
+        assert!(can_write_ledger(&context(&[
+            "accounting:ledger:read",
+            "accounting:ledger:write"
+        ])));
+        assert!(!can_write_ledger(&context(&[])));
     }
 }
