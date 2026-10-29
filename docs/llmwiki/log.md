@@ -678,3 +678,14 @@ ref-rewritten) the whole accounting suite — including
   Lifeguard Record dirty-field update, ACCOUNT_UPDATED audit fact.
 - GL now at 6 ops, all wiring/honesty/money gates green; qa 106, GL tests
   16 pass + 1 ignored live. Next: D2 fiscal-period state machine.
+
+## [2026-10-29] fix | PATCH /v1/accounts mount bug from D1b + repo-wide gate
+
+- D1b mounted PATCH under /v1/accounts with a phantom 'id' path param;
+  route generated as PATCH /v1/accounts, parameter never binds. Schema
+  validation does not check parameter/template agreement — CI missed it.
+- Fixed contract + regenerated; new tooling gate
+  test_openapi_path_parameters.py asserts every in:path param appears as
+  {name} in its template across all 121 specs (GL was the only violation).
+- qa now 227. Lesson: hand-patched OpenAPI YAML must round-trip through a
+  parameter-declaration check, not just schema validation.

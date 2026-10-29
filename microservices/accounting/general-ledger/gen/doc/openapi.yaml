@@ -1,53 +1,55 @@
 openapi: 3.0.3
-# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
-# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
 x-brrtrouter-stack-size: 128KiB
 info:
   title: RERP General Ledger API
   version: 0.2.0
-  description: >-
-    Phase 1 read-only General Ledger contract over RERP's authoritative
-    accounting foundation. Tenant, organization, and legal-entity scope come
-    only from the validated Sesame identity, which must carry the
-    accounting:ledger:read permission. This API does not expose generic journal
-    posting or mutable ledger records.
+  description: Phase 1 read-only General Ledger contract over RERP's authoritative accounting foundation.
+    Tenant, organization, and legal-entity scope come only from the validated Sesame identity, which must
+    carry the accounting:ledger:read permission. This API does not expose generic journal posting or mutable
+    ledger records.
 servers:
-  - url: /
+- url: /
 security:
-  - bearerAuth: []
+- bearerAuth: []
 tags:
-  - name: ledger
-    description: Tenant-safe inspection of the authoritative accounting books
+- name: ledger
+  description: Tenant-safe inspection of the authoritative accounting books
 paths:
   /v1/accounts:
     get:
       operationId: list_ledger_accounts
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: List configured posting accounts
       parameters:
-        - name: account_type
-          in: query
-          schema:
-            type: string
-            enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
-        - name: currency_code
-          in: query
-          schema:
-            type: string
-            pattern: '^[A-Z]{3}$'
-        - name: active
-          in: query
-          schema:
-            type: boolean
-            default: true
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 50
+      - name: account_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+      - name: currency_code
+        in: query
+        schema:
+          type: string
+          pattern: ^[A-Z]{3}$
+      - name: active
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
       responses:
         '200':
           description: Accounts visible to the authenticated legal entity
@@ -66,17 +68,15 @@ paths:
     post:
       operationId: create_ledger_account
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: Create a chart-of-accounts posting account
-      description: >-
-        Creates a tenant-scoped posting account for the caller's active legal
-        entity. Control accounts (AR/AP/bank/tax/retained-earnings roles) are
-        system-managed: the request schema has no control_role field, so such
-        roles can neither be requested nor reassigned through this operation.
-        Requests are idempotent per (legal entity, idempotency_key): replaying
-        an identical body returns the original account with 200; a different
-        body under a used key returns 409 idempotency_conflict; a duplicate
-        account code for the legal entity returns 409 duplicate_account_code.
+      description: 'Creates a tenant-scoped posting account for the caller''s active legal entity. Control
+        accounts (AR/AP/bank/tax/retained-earnings roles) are system-managed: the request schema has no
+        control_role field, so such roles can neither be requested nor reassigned through this operation.
+        Requests are idempotent per (legal entity, idempotency_key): replaying an identical body returns
+        the original account with 200; a different body under a used key returns 409 idempotency_conflict;
+        a duplicate account code for the legal entity returns 409 duplicate_account_code.'
       requestBody:
         required: true
         content:
@@ -106,30 +106,28 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/accounts/{id}:
     patch:
       operationId: update_ledger_account
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: Update a chart-of-accounts posting account
-      description: >-
-        Mutates a tenant-scoped posting account. Identity fields
-        (code, normal_side) and control roles are immutable through this
-        API - the request schema omits them. Accounts carrying a
-        control_role are system-managed and cannot be modified here at
-        all (403). account_type and currency_code may only change while
-        no journal line references the account; once posted they are
-        immutable (409 posted_account_immutable). Requests are idempotent
-        per (legal entity, idempotency_key): a replay of an identical
-        body returns the current account with 200; a different body under
-        a used key returns 409 idempotency_conflict.
+      description: 'Mutates a tenant-scoped posting account. Identity fields (code, normal_side) and control
+        roles are immutable through this API - the request schema omits them. Accounts carrying a control_role
+        are system-managed and cannot be modified here at all (403). account_type and currency_code may
+        only change while no journal line references the account; once posted they are immutable (409
+        posted_account_immutable). Requests are idempotent per (legal entity, idempotency_key): a replay
+        of an identical body returns the current account with 200; a different body under a used key returns
+        409 idempotency_conflict.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: Account identifier within the authenticated accounting scope.
-          schema:
-            type: string
-            format: uuid
+      - name: id
+        in: path
+        required: true
+        description: Account identifier within the authenticated accounting scope.
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -159,33 +157,37 @@ paths:
     get:
       operationId: list_fiscal_periods
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: List fiscal periods
       parameters:
-        - name: state
-          in: query
-          schema:
-            type: string
-            enum: [OPEN, CLOSED, HARD_LOCKED]
-        - name: from_date
-          in: query
-          description: Return periods ending on or after this date
-          schema:
-            type: string
-            format: date
-        - name: to_date
-          in: query
-          description: Return periods starting on or before this date
-          schema:
-            type: string
-            format: date
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 50
+      - name: state
+        in: query
+        schema:
+          type: string
+          enum:
+          - OPEN
+          - CLOSED
+          - HARD_LOCKED
+      - name: from_date
+        in: query
+        description: Return periods ending on or after this date
+        schema:
+          type: string
+          format: date
+      - name: to_date
+        in: query
+        description: Return periods starting on or before this date
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
       responses:
         '200':
           description: Fiscal periods visible to the authenticated legal entity
@@ -205,10 +207,11 @@ paths:
     get:
       operationId: get_journal_entry
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: Retrieve one immutable posted journal
       parameters:
-        - $ref: '#/components/parameters/JournalEntryId'
+      - $ref: '#/components/parameters/JournalEntryId'
       responses:
         '200':
           description: Posted journal and its one-sided lines
@@ -230,26 +233,27 @@ paths:
     get:
       operationId: get_trial_balance
       x-brrtrouter-impl: true
-      tags: [ledger]
+      tags:
+      - ledger
       summary: Derive a trial balance from immutable posted journal lines
       parameters:
-        - name: as_of_date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-        - name: currency_code
-          in: query
-          required: true
-          schema:
-            type: string
-            pattern: '^[A-Z]{3}$'
-        - name: include_zero_balance
-          in: query
-          schema:
-            type: boolean
-            default: false
+      - name: as_of_date
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: currency_code
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Z]{3}$
+      - name: include_zero_balance
+        in: query
+        schema:
+          type: boolean
+          default: false
       responses:
         '200':
           description: Trial balance derived at the requested accounting date
@@ -320,7 +324,9 @@ components:
   schemas:
     ErrorResponse:
       type: object
-      required: [code, message]
+      required:
+      - code
+      - message
       additionalProperties: false
       properties:
         code:
@@ -330,13 +336,13 @@ components:
     LedgerAccount:
       type: object
       required:
-        - id
-        - code
-        - name
-        - account_type
-        - normal_side
-        - currency_code
-        - active
+      - id
+      - code
+      - name
+      - account_type
+      - normal_side
+      - currency_code
+      - active
       additionalProperties: false
       properties:
         id:
@@ -348,21 +354,30 @@ components:
           type: string
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         normal_side:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         control_role:
           type: string
           nullable: true
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
         active:
           type: boolean
     AccountList:
       type: object
-      required: [items, limit]
+      required:
+      - items
+      - limit
       additionalProperties: false
       properties:
         items:
@@ -374,19 +389,25 @@ components:
     CreateLedgerAccountRequest:
       type: object
       additionalProperties: false
-      required: [idempotency_key, code, name, account_type, normal_side, currency_code]
+      required:
+      - idempotency_key
+      - code
+      - name
+      - account_type
+      - normal_side
+      - currency_code
       properties:
         idempotency_key:
           type: string
           minLength: 8
           maxLength: 200
-          pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
           description: Client-generated key; replays of an identical body return the original account.
         code:
           type: string
           minLength: 1
           maxLength: 50
-          pattern: '^[0-9][0-9A-Za-z._-]*$'
+          pattern: ^[0-9][0-9A-Za-z._-]*$
           description: Account code, unique per legal entity (DB-enforced).
         name:
           type: string
@@ -394,24 +415,32 @@ components:
           maxLength: 255
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         normal_side:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
     UpdateLedgerAccountRequest:
       type: object
       additionalProperties: false
-      required: [idempotency_key]
+      required:
+      - idempotency_key
       minProperties: 2
       properties:
         idempotency_key:
           type: string
           minLength: 8
           maxLength: 200
-          pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
           description: Client-generated key; replays of an identical body return the current account.
         name:
           type: string
@@ -421,13 +450,23 @@ components:
           type: boolean
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
     FiscalPeriod:
       type: object
-      required: [id, name, start_date, end_date, state]
+      required:
+      - id
+      - name
+      - start_date
+      - end_date
+      - state
       additionalProperties: false
       properties:
         id:
@@ -443,14 +482,19 @@ components:
           format: date
         state:
           type: string
-          enum: [OPEN, CLOSED, HARD_LOCKED]
+          enum:
+          - OPEN
+          - CLOSED
+          - HARD_LOCKED
         closed_at:
           type: string
           format: date-time
           nullable: true
     FiscalPeriodList:
       type: object
-      required: [items, limit]
+      required:
+      - items
+      - limit
       additionalProperties: false
       properties:
         items:
@@ -461,7 +505,12 @@ components:
           type: integer
     JournalLine:
       type: object
-      required: [line_number, account_id, side, amount, description]
+      required:
+      - line_number
+      - account_id
+      - side
+      - amount
+      - description
       additionalProperties: false
       properties:
         line_number:
@@ -471,25 +520,27 @@ components:
           format: uuid
         side:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         amount:
           type: string
-          pattern: '^[0-9]+(\.[0-9]+)?$'
+          pattern: ^[0-9]+(\.[0-9]+)?$
         description:
           type: string
     JournalEntry:
       type: object
       required:
-        - id
-        - entry_number
-        - entry_date
-        - fiscal_period_id
-        - source_document_id
-        - currency_code
-        - total_debit
-        - total_credit
-        - posted_at
-        - lines
+      - id
+      - entry_number
+      - entry_date
+      - fiscal_period_id
+      - source_document_id
+      - currency_code
+      - total_debit
+      - total_credit
+      - posted_at
+      - lines
       additionalProperties: false
       properties:
         id:
@@ -508,13 +559,13 @@ components:
           format: uuid
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
         total_debit:
           type: string
-          pattern: '^[0-9]+(\.[0-9]+)?$'
+          pattern: ^[0-9]+(\.[0-9]+)?$
         total_credit:
           type: string
-          pattern: '^[0-9]+(\.[0-9]+)?$'
+          pattern: ^[0-9]+(\.[0-9]+)?$
         posted_at:
           type: string
           format: date-time
@@ -525,14 +576,14 @@ components:
     TrialBalanceLine:
       type: object
       required:
-        - account_id
-        - account_code
-        - account_name
-        - account_type
-        - normal_side
-        - debit
-        - credit
-        - balance
+      - account_id
+      - account_code
+      - account_name
+      - account_type
+      - normal_side
+      - debit
+      - credit
+      - balance
       additionalProperties: false
       properties:
         account_id:
@@ -544,29 +595,36 @@ components:
           type: string
         account_type:
           type: string
-          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+          enum:
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
         normal_side:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         debit:
           type: string
-          pattern: '^-?[0-9]+(\.[0-9]+)?$'
+          pattern: ^-?[0-9]+(\.[0-9]+)?$
         credit:
           type: string
-          pattern: '^-?[0-9]+(\.[0-9]+)?$'
+          pattern: ^-?[0-9]+(\.[0-9]+)?$
         balance:
           type: string
-          pattern: '^-?[0-9]+(\.[0-9]+)?$'
+          pattern: ^-?[0-9]+(\.[0-9]+)?$
     TrialBalance:
       type: object
       required:
-        - as_of_date
-        - currency_code
-        - total_debit
-        - total_credit
-        - difference
-        - balanced
-        - lines
+      - as_of_date
+      - currency_code
+      - total_debit
+      - total_credit
+      - difference
+      - balanced
+      - lines
       additionalProperties: false
       properties:
         as_of_date:
@@ -574,16 +632,16 @@ components:
           format: date
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
         total_debit:
           type: string
-          pattern: '^[0-9]+(\.[0-9]+)?$'
+          pattern: ^[0-9]+(\.[0-9]+)?$
         total_credit:
           type: string
-          pattern: '^[0-9]+(\.[0-9]+)?$'
+          pattern: ^[0-9]+(\.[0-9]+)?$
         difference:
           type: string
-          pattern: '^-?[0-9]+(\.[0-9]+)?$'
+          pattern: ^-?[0-9]+(\.[0-9]+)?$
         balanced:
           type: boolean
         lines:
