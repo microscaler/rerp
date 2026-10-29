@@ -15,10 +15,10 @@ pub struct AutoMatchTransactionsRequest {
     pub date_range_to: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description_similarity_threshold: Option<f64>,
+    pub description_similarity_threshold: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub match_tolerance: Option<f64>,
+    pub match_tolerance: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

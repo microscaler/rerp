@@ -452,14 +452,14 @@ paths:
         - name: min_amount
           in: query
           schema:
-            type: number
-            format: double
+            type: string
+            pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           description: Minimum amount
         - name: max_amount
           in: query
           schema:
-            type: number
-            format: double
+            type: string
+            pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           description: Maximum amount
       responses:
         '200':
@@ -566,12 +566,12 @@ paths:
                   type: string
                   format: date
                 match_tolerance:
-                  type: number
-                  format: double
+                  type: string
+                  pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
                   description: Amount match tolerance in seconds
                 description_similarity_threshold:
-                  type: number
-                  format: double
+                  type: string
+                  pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
                   description: 0-1 threshold for description matching
       responses:
         '200':
