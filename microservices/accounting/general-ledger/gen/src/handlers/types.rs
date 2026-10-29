@@ -12,6 +12,41 @@ pub struct AccountList {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateLedgerAccountRequest {
+    pub account_type: String,
+
+    pub code: String,
+
+    pub currency_code: String,
+
+    pub idempotency_key: String,
+
+    pub name: String,
+
+    pub normal_side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateLedgerAccountResponse {
+    pub account_type: String,
+
+    pub active: bool,
+
+    pub code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub control_role: Option<String>,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub normal_side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: String,
 
