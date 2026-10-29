@@ -9,6 +9,8 @@ pub mod list_ledger_accounts;
 
 pub mod create_ledger_account;
 
+pub mod update_ledger_account;
+
 pub mod list_fiscal_periods;
 
 pub mod get_journal_entry;

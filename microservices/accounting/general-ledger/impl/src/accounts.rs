@@ -10,6 +10,7 @@ use chrono::Utc;
 use lifeguard::active_model::ActiveModelTrait;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, SessionContext};
 use rerp_accounting_general_ledger_gen::handlers::create_ledger_account::Request;
+use rerp_accounting_general_ledger_gen::handlers::update_ledger_account::Request as UpdateRequest;
 use rerp_entities::accounting::foundation::account::{
     AccountingAccountRecord, Column as AccountColumn, Entity as AccountEntity,
 };
@@ -17,11 +18,14 @@ use rerp_entities::accounting::foundation::audit_event::AccountingAuditEventReco
 use rerp_entities::accounting::foundation::idempotency_record::{
     AccountingIdempotencyRecordRecord, Column as IdempotencyColumn, Entity as IdempotencyEntity,
 };
+use rerp_entities::accounting::foundation::journal_line::{
+    Column as JournalLineColumn, Entity as JournalLineEntity,
+};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
-use crate::ledger::{account_json, currency, resolve_legal_entity, LedgerError};
+use crate::ledger::{account_json, currency, parse_uuid, resolve_legal_entity, LedgerError};
 
 const SOURCE_SYSTEM: &str = "rerp-accounting";
 const SOURCE_TYPE: &str = "ledger_account";
@@ -241,6 +245,213 @@ fn hex_digest(bytes: &[u8]) -> String {
     output
 }
 
+/// Apply a chart-of-accounts mutation (Epic D1b). Identity fields
+/// (code, normal_side) and control roles are contractually absent from
+/// the request; control accounts are wholly system-managed; type/currency
+/// freeze once journal lines exist.
+pub fn update_ledger_account<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    request: &UpdateRequest,
+) -> Result<AccountCreation, LedgerError> {
+    let account_id = parse_uuid(&request.id, "id")?;
+    validate_update(request)?;
+    let legal_entity = resolve_legal_entity(executor, session)?;
+
+    if let Some(record) = find_idempotency(executor, legal_entity.id, &request.idempotency_key)? {
+        let fingerprint = update_fingerprint(session.tenant_id.as_str(), legal_entity.id, request);
+        if record.request_fingerprint != fingerprint {
+            return Err(LedgerError::Conflict(
+                "idempotency_conflict".to_string(),
+                "the idempotency key was already used with a different request body".to_string(),
+            ));
+        }
+        return load_account(executor, legal_entity.id, account_id).map(|account| {
+            AccountCreation {
+                account: account_json(&account),
+                created: false,
+            }
+        });
+    }
+
+    let account = load_account(executor, legal_entity.id, account_id)?;
+    if account.control_role.is_some() {
+        return Err(LedgerError::Policy(
+            "control accounts are system-managed and cannot be modified through this API"
+                .to_string(),
+        ));
+    }
+    let changes_type = request
+        .account_type
+        .as_ref()
+        .is_some_and(|value| value != &account.account_type);
+    let changes_currency = request
+        .currency_code
+        .as_ref()
+        .is_some_and(|value| value != &account.currency_code);
+    if changes_type || changes_currency {
+        let postings = JournalLineEntity::find()
+            .filter(JournalLineColumn::AccountId.eq(account_id))
+            .count()
+            .one(executor)
+            .map_err(|error| LedgerError::Database(error.to_string()))?;
+        if postings > 0 {
+            return Err(LedgerError::Conflict(
+                "posted_account_immutable".to_string(),
+                "account_type and currency_code are immutable once journal lines reference the account"
+                    .to_string(),
+            ));
+        }
+    }
+
+    let now = Utc::now().naive_utc();
+    let fingerprint = update_fingerprint(session.tenant_id.as_str(), legal_entity.id, request);
+    let mut changes = AccountingAccountRecord::new();
+    changes.set_id(account_id).set_updated_at(now);
+    if let Some(name) = &request.name {
+        changes.set_name(name.trim().to_string());
+    }
+    if let Some(active) = request.is_active {
+        changes.set_is_active(active);
+    }
+    if let Some(account_type) = &request.account_type {
+        changes.set_account_type(account_type.clone());
+    }
+    if let Some(currency_code) = &request.currency_code {
+        changes.set_currency_code(currency_code.clone());
+    }
+    changes
+        .update(executor)
+        .map_err(|error| LedgerError::Database(format!("ledger account update: {error}")))?;
+
+    let mut audit = AccountingAuditEventRecord::new();
+    audit
+        .set_id(Uuid::new_v4())
+        .set_tenant_id(session.tenant_id.clone())
+        .set_legal_entity_id(legal_entity.id)
+        .set_subject_id(session.subject_id)
+        .set_action("ACCOUNT_UPDATED".to_string())
+        .set_document_id(account_id)
+        .set_source_system(SOURCE_SYSTEM.to_string())
+        .set_request_fingerprint(fingerprint.clone())
+        .set_occurred_at(now);
+    insert(&mut audit, executor, "audit event")?;
+
+    let mut idempotency = AccountingIdempotencyRecordRecord::new();
+    idempotency
+        .set_id(Uuid::new_v4())
+        .set_tenant_id(session.tenant_id.clone())
+        .set_legal_entity_id(legal_entity.id)
+        .set_idempotency_key(request.idempotency_key.clone())
+        .set_request_fingerprint(fingerprint)
+        .set_status("COMPLETED".to_string())
+        .set_source_system(SOURCE_SYSTEM.to_string())
+        .set_source_type(SOURCE_TYPE.to_string())
+        .set_source_id(account.code)
+        .set_document_id(Some(account_id))
+        .set_created_at(now)
+        .set_completed_at(Some(now));
+    insert(&mut idempotency, executor, "idempotency record")?;
+
+    let updated = load_account(executor, legal_entity.id, account_id)?;
+    Ok(AccountCreation {
+        account: account_json(&updated),
+        created: false,
+    })
+}
+
+fn load_account<E: LifeExecutor>(
+    executor: &E,
+    legal_entity_id: Uuid,
+    account_id: Uuid,
+) -> Result<rerp_entities::accounting::foundation::account::AccountingAccountModel, LedgerError> {
+    AccountEntity::find()
+        .filter(AccountColumn::LegalEntityId.eq(legal_entity_id))
+        .filter(AccountColumn::Id.eq(account_id))
+        .find_one(executor)
+        .map_err(|error| LedgerError::Database(error.to_string()))?
+        .ok_or(LedgerError::NotFound)
+}
+
+fn validate_update(request: &UpdateRequest) -> Result<(), LedgerError> {
+    let key = request.idempotency_key.trim();
+    if key.len() < 8
+        || key.len() > 200
+        || !key
+            .bytes()
+            .next()
+            .is_some_and(|byte| byte.is_ascii_alphanumeric())
+        || !key
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b':' | b'-'))
+    {
+        return Err(LedgerError::Validation(
+            "idempotency_key must be 8-200 characters of [A-Za-z0-9._:-]".to_string(),
+        ));
+    }
+    let mut any_change = false;
+    if let Some(name) = &request.name {
+        any_change = true;
+        if name.trim().is_empty() || name.trim().len() > 255 {
+            return Err(LedgerError::Validation(
+                "name must be 1-255 characters".to_string(),
+            ));
+        }
+    }
+    if request.is_active.is_some() {
+        any_change = true;
+    }
+    if let Some(account_type) = &request.account_type {
+        any_change = true;
+        if !ACCOUNT_TYPES.contains(&account_type.as_str()) {
+            return Err(LedgerError::Validation(
+                "account_type is not a supported accounting classification".to_string(),
+            ));
+        }
+    }
+    if request.currency_code.is_some() {
+        any_change = true;
+    }
+    if !any_change {
+        return Err(LedgerError::Validation(
+            "at least one mutable field (name, is_active, account_type, currency_code) is required"
+                .to_string(),
+        ));
+    }
+    if let Some(currency_code) = &request.currency_code {
+        currency(currency_code).map(|_| ())?;
+    }
+    Ok(())
+}
+
+fn update_fingerprint(tenant_id: &str, legal_entity_id: Uuid, request: &UpdateRequest) -> String {
+    let mut parts: Vec<Vec<u8>> = vec![
+        tenant_id.as_bytes().to_vec(),
+        legal_entity_id.as_bytes().to_vec(),
+        b"UPDATE_ACCOUNT".to_vec(),
+        request.id.trim().as_bytes().to_vec(),
+    ];
+    for part in [
+        request.name.as_deref().map(str::trim),
+        request
+            .is_active
+            .map(|active| if active { "true" } else { "false" }),
+        request.account_type.as_deref(),
+        request.currency_code.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        parts.push(part.as_bytes().to_vec());
+    }
+    let mut hasher = Sha256::new();
+    for part in parts {
+        hasher.update((part.len() as u64).to_be_bytes());
+        hasher.update(part);
+    }
+    hex_digest(&hasher.finalize())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -322,6 +533,71 @@ mod tests {
         for leaked in ["tenant_id", "legal_entity_id", "created_at", "updated_at"] {
             assert!(creation_account.get(leaked).is_none());
         }
+    }
+
+    #[test]
+    fn update_validation_requires_a_mutable_field() {
+        let mut bare = UpdateRequest {
+            idempotency_key: "acct-update-0001".to_string(),
+            id: Uuid::new_v4().to_string(),
+            name: None,
+            is_active: None,
+            account_type: None,
+            currency_code: None,
+        };
+        assert!(matches!(
+            validate_update(&bare),
+            Err(LedgerError::Validation(_))
+        ));
+        bare.is_active = Some(false);
+        assert!(validate_update(&bare).is_ok());
+        bare.currency_code = Some("eur".to_string());
+        assert!(matches!(
+            validate_update(&bare),
+            Err(LedgerError::Validation(_))
+        ));
+        bare.currency_code = Some("EUR".to_string());
+        bare.account_type = Some("CONTROL".to_string());
+        assert!(matches!(
+            validate_update(&bare),
+            Err(LedgerError::Validation(_))
+        ));
+    }
+
+    #[test]
+    fn update_fingerprint_binds_operation_account_and_fields() {
+        fn update_request(
+            account: Uuid,
+            name: Option<&str>,
+            active: Option<bool>,
+        ) -> UpdateRequest {
+            UpdateRequest {
+                idempotency_key: "acct-update-0001".to_string(),
+                id: account.to_string(),
+                name: name.map(str::to_string),
+                is_active: active,
+                account_type: None,
+                currency_code: None,
+            }
+        }
+        let entity = Uuid::new_v4();
+        let account = Uuid::new_v4();
+        let base = update_request(account, Some("Renamed"), Some(true));
+        let other_account = update_request(Uuid::new_v4(), Some("Renamed"), Some(true));
+        let fewer_fields = update_request(account, Some("Renamed"), None);
+        assert_ne!(
+            update_fingerprint("hauliage", entity, &base),
+            update_fingerprint("hauliage", entity, &other_account),
+        );
+        assert_ne!(
+            update_fingerprint("hauliage", entity, &base),
+            update_fingerprint("hauliage", entity, &fewer_fields),
+        );
+        // An update fingerprint must never collide with a create fingerprint.
+        assert_ne!(
+            update_fingerprint("hauliage", entity, &base),
+            request_fingerprint("hauliage", entity, &request()),
+        );
     }
 
     #[test]

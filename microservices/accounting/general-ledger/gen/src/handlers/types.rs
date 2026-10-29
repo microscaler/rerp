@@ -221,3 +221,40 @@ pub struct TrialBalanceLine {
 
     pub normal_side: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateLedgerAccountRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency_code: Option<String>,
+
+    pub idempotency_key: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateLedgerAccountResponse {
+    pub account_type: String,
+
+    pub active: bool,
+
+    pub code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub control_role: Option<String>,
+
+    pub currency_code: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub normal_side: String,
+}

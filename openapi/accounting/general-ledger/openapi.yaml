@@ -106,6 +106,55 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalError'
+    patch:
+      operationId: update_ledger_account
+      x-brrtrouter-impl: true
+      tags: [ledger]
+      summary: Update a chart-of-accounts posting account
+      description: >-
+        Mutates a tenant-scoped posting account. Identity fields
+        (code, normal_side) and control roles are immutable through this
+        API - the request schema omits them. Accounts carrying a
+        control_role are system-managed and cannot be modified here at
+        all (403). account_type and currency_code may only change while
+        no journal line references the account; once posted they are
+        immutable (409 posted_account_immutable). Requests are idempotent
+        per (legal entity, idempotency_key): a replay of an identical
+        body returns the current account with 200; a different body under
+        a used key returns 409 idempotency_conflict.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Account identifier within the authenticated accounting scope.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLedgerAccountRequest'
+      responses:
+        '200':
+          description: Updated account (also returned for idempotent replays)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /v1/fiscal-periods:
     get:
       operationId: list_fiscal_periods
@@ -349,6 +398,30 @@ components:
         normal_side:
           type: string
           enum: [DEBIT, CREDIT]
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+    UpdateLedgerAccountRequest:
+      type: object
+      additionalProperties: false
+      required: [idempotency_key]
+      minProperties: 2
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+          description: Client-generated key; replays of an identical body return the current account.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        is_active:
+          type: boolean
+        account_type:
+          type: string
+          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
         currency_code:
           type: string
           pattern: '^[A-Z]{3}$'
