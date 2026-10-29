@@ -180,7 +180,7 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 - **B4 — financial-reports contract slice** (S, deps B1,B2) — **DONE 2026-10-28**: trial balance,
   P&L, balance sheet, AR/AP aging reports — each with explicit tenant/legal
   entity/currency/period semantics in the schema.
-- **B5 — Decimal-money sweep** (S, rides B1–B4): `grep` audit of all accounting
+- **B5 — Decimal-money sweep** (S, rides B1–B4) — **DONE 2026-10-28**: `grep` audit of all accounting
   specs for `format: float|double`/`number` on money paths; zero results is the
   gate; add to A2's tooling check.
 
