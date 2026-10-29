@@ -205,9 +205,12 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 
 ### Epic D — GL mutation breadth (WP1 remainder)
 
-- **D1 — Chart of accounts lifecycle** (L): account create/type/currency/
-  posting-control mutations with tenant-scoped authorization; control-account
-  protection for AR/AP/bank/tax/retained-earnings.
+- **D1 — Chart of accounts lifecycle** (L) — **DONE 2026-10-29** (D1a create +
+  D1b update): account create/mutate with tenant-scoped authorization;
+  control-account protection is contract-level (request schemas omit
+  control_role) plus server-side 403 for control accounts; type/currency
+  freeze once journal lines reference the account; fingerprint-gated
+  idempotency on both ops.
 - **D2 — Fiscal period state machine** (M): open/close/reopen/hard-lock;
   *AC*: concurrent posting into closed period rejected deterministically
   (live RLS acceptance pattern).
