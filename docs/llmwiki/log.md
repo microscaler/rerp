@@ -649,3 +649,10 @@ ref-rewritten) the whole accounting suite — including
   rejects `test(...)` type; the tooling gate commit rides `fix(...)`.
   Commit hygiene note: files staged from an aborted round got absorbed
   by the next commit - always `git reset HEAD -- .` + fresh staging.
+
+## [2026-10-28] contribute | registry-wiring gate closes C1 (rescoped)
+
+- `tooling/tests/test_accounting_registry_wiring.py`: spec operationIds ==
+  impl_registry arms == controller files for all 16 impl services (bff
+  excluded as proxy). Epic B + C1 done; next: Epic D1 (chart of
+  accounts lifecycle) pending user go-ahead; C2-C4 untouched.
