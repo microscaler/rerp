@@ -63,6 +63,49 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
+    post:
+      operationId: create_ledger_account
+      x-brrtrouter-impl: true
+      tags: [ledger]
+      summary: Create a chart-of-accounts posting account
+      description: >-
+        Creates a tenant-scoped posting account for the caller's active legal
+        entity. Control accounts (AR/AP/bank/tax/retained-earnings roles) are
+        system-managed: the request schema has no control_role field, so such
+        roles can neither be requested nor reassigned through this operation.
+        Requests are idempotent per (legal entity, idempotency_key): replaying
+        an identical body returns the original account with 200; a different
+        body under a used key returns 409 idempotency_conflict; a duplicate
+        account code for the legal entity returns 409 duplicate_account_code.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLedgerAccountRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerAccount'
+        '200':
+          description: Replay of an earlier identical request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /v1/fiscal-periods:
     get:
       operationId: list_fiscal_periods
@@ -213,6 +256,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Idempotency payload conflict or duplicate account code
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     InternalError:
       description: Accounting query could not be completed
       content:
@@ -273,6 +322,36 @@ components:
             $ref: '#/components/schemas/LedgerAccount'
         limit:
           type: integer
+    CreateLedgerAccountRequest:
+      type: object
+      additionalProperties: false
+      required: [idempotency_key, code, name, account_type, normal_side, currency_code]
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]*$'
+          description: Client-generated key; replays of an identical body return the original account.
+        code:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: '^[0-9][0-9A-Za-z._-]*$'
+          description: Account code, unique per legal entity (DB-enforced).
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        account_type:
+          type: string
+          enum: [ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE]
+        normal_side:
+          type: string
+          enum: [DEBIT, CREDIT]
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
     FiscalPeriod:
       type: object
       required: [id, name, start_date, end_date, state]
