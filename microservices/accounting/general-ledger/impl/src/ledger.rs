@@ -31,6 +31,7 @@ pub enum LedgerError {
     Validation(String),
     Policy(String),
     NotFound,
+    Conflict(String, String),
     Database(String),
 }
 
@@ -42,6 +43,9 @@ impl std::fmt::Display for LedgerError {
                 write!(formatter, "accounting policy rejected query: {message}")
             }
             Self::NotFound => formatter.write_str("ledger resource not found"),
+            Self::Conflict(code, message) => {
+                write!(formatter, "conflict ({code}): {message}")
+            }
             Self::Database(message) => write!(formatter, "database operation failed: {message}"),
         }
     }
@@ -59,7 +63,7 @@ fn parse_date(value: &str, field: &str) -> Result<NaiveDate, LedgerError> {
         .map_err(|_| LedgerError::Validation(format!("{field} must be an ISO 8601 date")))
 }
 
-fn currency(value: &str) -> Result<String, LedgerError> {
+pub(crate) fn currency(value: &str) -> Result<String, LedgerError> {
     let value = value.trim();
     if value.len() != 3 || !value.bytes().all(|byte| byte.is_ascii_uppercase()) {
         return Err(LedgerError::Validation(
@@ -79,7 +83,7 @@ fn limit(value: Option<i32>) -> Result<i32, LedgerError> {
     Ok(value)
 }
 
-fn resolve_legal_entity<E: LifeExecutor>(
+pub(crate) fn resolve_legal_entity<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
 ) -> Result<AccountingLegalEntityModel, LedgerError> {
@@ -295,7 +299,7 @@ pub fn get_trial_balance<E: LifeExecutor>(
     }))
 }
 
-fn account_json(account: &AccountingAccountModel) -> Value {
+pub(crate) fn account_json(account: &AccountingAccountModel) -> Value {
     json!({
         "id": account.id,
         "code": account.code,

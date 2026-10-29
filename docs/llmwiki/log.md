@@ -656,3 +656,15 @@ ref-rewritten) the whole accounting suite — including
   impl_registry arms == controller files for all 16 impl services (bff
   excluded as proxy). Epic B + C1 done; next: Epic D1 (chart of
   accounts lifecycle) pending user go-ahead; C2-C4 untouched.
+
+## [2026-10-28] contribute | first GL write path: create_ledger_account (Epic D1a)
+
+- POST /v1/accounts with contract-level control-account protection (no
+  control_role in request schema), body idempotency (replay 200 /
+  payload-conflict 409 idempotency_conflict / duplicate code 409
+  duplicate_account_code via the DB unique constraint), audit fact
+  ACCOUNT_CREATED, exact accounting:ledger:write gate on top of read.
+- Foundation entities/migrations sufficed - zero SQL changes needed.
+- Live acceptance (#[ignore]) mirrors invoice pattern incl. replay and
+  both conflict kinds. Gates: fmt, workspace check 0, GL 14 pass + 1
+  ignored, just qa 74, 121 specs valid.

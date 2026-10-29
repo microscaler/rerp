@@ -22,6 +22,7 @@ use rerp_accounting_general_ledger_gen::handlers::*;
 use rerp_accounting_general_ledger_gen::*;
 
 // Import implementation controllers (business logic)
+mod accounts;
 mod controllers;
 mod database;
 mod http_support;

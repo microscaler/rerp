@@ -4238,6 +4238,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "sesame-idam-client",
+ "sha2 0.11.1",
  "tikv-jemallocator",
  "uuid",
 ]
