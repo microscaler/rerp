@@ -177,7 +177,7 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 - **B3 — bank-sync contract slice** (M, deps A1) — **DONE 2026-10-28**: bank-account registry,
   statement ingestion (provider-idempotent), transaction list, match/override,
   reconciliation status. Drops: institution-specific ops, FX hedging.
-- **B4 — financial-reports contract slice** (S, deps B1,B2): trial balance,
+- **B4 — financial-reports contract slice** (S, deps B1,B2) — **DONE 2026-10-28**: trial balance,
   P&L, balance sheet, AR/AP aging reports — each with explicit tenant/legal
   entity/currency/period semantics in the schema.
 - **B5 — Decimal-money sweep** (S, rides B1–B4): `grep` audit of all accounting

@@ -44,7 +44,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "cost_of_goods_sold")]
-    pub cost_of_goods_sold: Option<f64>,
+    pub cost_of_goods_sold: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -56,18 +56,18 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "gross_profit")]
-    pub gross_profit: Option<f64>,
+    pub gross_profit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "id")]
     pub id: Option<String>,
 
     #[serde(rename = "net_income")]
-    pub net_income: f64,
+    pub net_income: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "net_margin")]
-    pub net_margin: Option<f64>,
+    pub net_margin: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "operating_expenses")]
@@ -75,11 +75,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "operating_income")]
-    pub operating_income: Option<f64>,
+    pub operating_income: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "other_income_expense")]
-    pub other_income_expense: Option<f64>,
+    pub other_income_expense: Option<String>,
 
     #[serde(rename = "period_end")]
     pub period_end: String,
@@ -93,7 +93,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tax_expense")]
-    pub tax_expense: Option<f64>,
+    pub tax_expense: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
