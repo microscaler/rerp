@@ -636,3 +636,16 @@ ref-rewritten) the whole accounting suite — including
 - Gen regen touched only financial-reports; impl: 4 honest 501s, 14
   orphans removed, registry re-synced.
 - Gates: check 0, 21 lib tests, fmt, `just qa` 57, specs valid 121.
+
+## [2026-10-28] contribute | decimal-money contract gate closes Epic B (B5)
+
+- `tooling/tests/test_accounting_money_types.py`: every accounting
+  contract classified STRICT (float-free) or DEFERRED (shrink-only
+  list); unclassified fails. Epic B is now complete (B1-B5).
+- Gate caught 4 inline floats B3's component-scope sweep missed in
+  bank-sync (query filters + auto-match tolerances) -> decimal strings,
+  gen regenerated.
+- Pitfall: rerp pre-commit runs `just qa` and conventional-commit lint
+  rejects `test(...)` type; the tooling gate commit rides `fix(...)`.
+  Commit hygiene note: files staged from an aborted round got absorbed
+  by the next commit - always `git reset HEAD -- .` + fresh staging.
