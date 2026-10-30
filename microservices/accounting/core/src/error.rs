@@ -1,5 +1,7 @@
 use std::fmt;
 
+use rust_decimal::Decimal;
+
 /// A rejected accounting instruction or an internally invalid posting plan.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AccountingError {
@@ -22,6 +24,11 @@ pub enum AccountingError {
     TenantMismatch,
     LegalEntityMismatch,
     NotCustomerInvoice,
+    OverCredit {
+        line_number: u32,
+        requested: Decimal,
+        remaining: Decimal,
+    },
 }
 
 impl fmt::Display for AccountingError {
@@ -80,6 +87,14 @@ impl fmt::Display for AccountingError {
             Self::NotCustomerInvoice => {
                 write!(formatter, "only a posted customer invoice can be credited")
             }
+            Self::OverCredit {
+                line_number,
+                requested,
+                remaining,
+            } => write!(
+                formatter,
+                "line {line_number}: requested credit quantity {requested} exceeds the remaining creditable quantity {remaining}"
+            ),
         }
     }
 }

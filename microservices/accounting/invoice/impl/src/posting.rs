@@ -4,8 +4,10 @@ use chrono::{Datelike, NaiveDate, Utc};
 use lifeguard::active_model::ActiveModelTrait;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, Order, SessionContext};
 use rerp_accounting_core::{
-    credit_customer_invoice as build_credit, post_customer_invoice as build_invoice,
-    AccountingDocumentStatus, AccountingDocumentType, AuditAction, AuditEvent, CurrencyCode,
+    credit_customer_invoice as build_credit,
+    partial_credit_customer_invoice as build_partial_credit,
+    post_customer_invoice as build_invoice, AccountingDocumentStatus, AccountingDocumentType,
+    AccountingError, AuditAction, AuditEvent, CreditLineSelection, CurrencyCode,
     CustomerInvoiceInstruction, FiscalPeriodState, IdempotencyKey, InvoiceLineInput,
     InvoiceLineSnapshot, InvoiceSnapshot, JournalEntry, JournalLine, JournalSide, PostingContext,
     PostingIdentifiers, PostingPlan, RoundingPolicy, SourceReference, TaxInput,
@@ -193,6 +195,7 @@ pub fn credit_customer_invoice<E: LifeExecutor>(
         credit_date,
         AccountingDocumentType::CustomerCreditNote,
     )?;
+    let rounding_minor_units = original.invoice.rounding_minor_units;
     let original_plan = PostingPlan {
         idempotency_key: IdempotencyKey::try_from("loaded-original")
             .map_err(|error| PostingError::Database(error.to_string()))?,
@@ -209,6 +212,41 @@ pub fn credit_customer_invoice<E: LifeExecutor>(
             occurred_at: Utc::now().naive_utc(),
         },
     };
+    if let Some(selections) = request.lines.as_ref().filter(|lines| !lines.is_empty()) {
+        // Explicit partial-credit workflow (Epic E2): the original stays
+        // immutable; quantities are validated against the remaining
+        // creditable balance across all prior credit notes.
+        let selections = parse_credit_selections(selections)?;
+        let rounding = RoundingPolicy::new(
+            u32::try_from(rounding_minor_units)
+                .map_err(|_| PostingError::Validation("invalid rounding precision".to_string()))?,
+        )
+        .map_err(|error| PostingError::Validation(error.to_string()))?;
+        let receivable = resolve_control_account(executor, legal_entity.id, AR_ROLE)?;
+        let credited = credited_quantities(executor, original_document_id)?;
+        let plan = build_partial_credit(
+            &context,
+            &identifiers,
+            IdempotencyKey::try_from(request.idempotency_key.as_str())
+                .map_err(|error| PostingError::Validation(error.to_string()))?,
+            source_reference(
+                &request.source.system,
+                &request.source.resource_type,
+                &request.source.resource_id,
+            ),
+            receivable.id,
+            rounding,
+            &credited,
+            &original_plan,
+            &request.reason,
+            &selections,
+        )
+        .map_err(|error| match error {
+            AccountingError::OverCredit { .. } => PostingError::Policy(error.to_string()),
+            other => PostingError::Validation(other.to_string()),
+        })?;
+        return complete_or_persist(executor, plan, rounding_minor_units);
+    }
     let plan = build_credit(
         &context,
         &identifiers,
@@ -855,6 +893,70 @@ fn parse_tax(
     }))
 }
 
+/// Parse the explicit partial-credit selection rows.
+fn parse_credit_selections(
+    lines: &[rerp_accounting_invoice_gen::handlers::types::CreditLineInput],
+) -> Result<Vec<CreditLineSelection>, PostingError> {
+    lines
+        .iter()
+        .enumerate()
+        .map(|(index, line)| {
+            if line.original_line_number < 1 {
+                return Err(PostingError::Validation(format!(
+                    "lines {}: original_line_number must be at least 1",
+                    index + 1
+                )));
+            }
+            Ok(CreditLineSelection {
+                original_line_number: line.original_line_number as u32,
+                quantity: parse_decimal(
+                    &line.quantity,
+                    &format!("lines[{}].quantity", index + 1),
+                    index + 1,
+                )?,
+            })
+        })
+        .collect()
+}
+
+/// Quantities already consumed per original line across all credit notes
+/// (full or partial) linked to the original document.
+fn credited_quantities<E: LifeExecutor>(
+    executor: &E,
+    original_document_id: Uuid,
+) -> Result<std::collections::BTreeMap<u32, Decimal>, PostingError> {
+    let credits = DocumentEntity::find()
+        .filter(DocumentColumn::OriginalDocumentId.eq(original_document_id))
+        .all(executor)
+        .map_err(|error| PostingError::Database(error.to_string()))?;
+    let credit_ids: Vec<Uuid> = credits.iter().map(|document| document.id).collect();
+    if credit_ids.is_empty() {
+        return Ok(Default::default());
+    }
+    let lines = DocumentLineEntity::find()
+        .filter(DocumentLineColumn::DocumentId.is_in(credit_ids))
+        .all(executor)
+        .map_err(|error| PostingError::Database(error.to_string()))?;
+    Ok(fold_credited_quantities(
+        &lines
+            .iter()
+            .map(|line| (line.line_number, line.quantity))
+            .collect::<Vec<_>>(),
+    ))
+}
+
+fn fold_credited_quantities(
+    entries: &[(i32, Decimal)],
+) -> std::collections::BTreeMap<u32, Decimal> {
+    let mut credited: std::collections::BTreeMap<u32, Decimal> = Default::default();
+    for (line_number, quantity) in entries {
+        if *line_number >= 1 {
+            *credited.entry(*line_number as u32).or_insert(Decimal::ZERO) += *quantity;
+        }
+    }
+    credited
+}
+
 fn parse_decimal(value: &str, field: &str, line: usize) -> Result<Decimal, PostingError> {
     Decimal::from_str(value).map_err(|_| {
         PostingError::Validation(format!("line {line} field {field} is not a decimal"))
@@ -1119,6 +1221,7 @@ mod tests {
                 resource_id: "delivery-acceptance-credit".to_string(),
             },
             id: first.invoice.snapshot.id.to_string(),
+            lines: None,
         };
         let credit = crate::http_support::with_accounting_transaction(&session, |executor| {
             credit_customer_invoice(
@@ -1177,5 +1280,35 @@ mod tests {
                 resource_id: format!("delivery-{idempotency_key}"),
             },
         }
+    }
+
+    #[test]
+    fn credited_quantities_fold_per_line_and_skip_nonpositive_numbers() {
+        let credited = fold_credited_quantities(&[
+            (1, Decimal::ONE),
+            (2, Decimal::TWO),
+            (1, Decimal::ONE),
+            (0, Decimal::TWO),
+        ]);
+        assert_eq!(credited.get(&1), Some(&Decimal::from(2)));
+        assert_eq!(credited.get(&2), Some(&Decimal::TWO));
+        assert!(!credited.contains_key(&0));
+    }
+
+    #[test]
+    fn credit_selection_rows_are_parsed_and_validated() {
+        let line = |number: i32, quantity: &str| {
+            rerp_accounting_invoice_gen::handlers::types::CreditLineInput {
+                original_line_number: number,
+                quantity: quantity.to_string(),
+            }
+        };
+        let selections =
+            parse_credit_selections(&[line(3, "1.500000"), line(1, "1")]).expect("valid rows");
+        assert_eq!(selections.len(), 2);
+        assert_eq!(selections[0].original_line_number, 3);
+        assert_eq!(selections[0].quantity, Decimal::new(15, 1));
+        assert!(parse_credit_selections(&[line(0, "1")]).is_err());
+        assert!(parse_credit_selections(&[line(1, "nope")]).is_err());
     }
 }

@@ -8,6 +8,9 @@ use serde::{Deserialize, Serialize};
 pub struct CreditCustomerInvoiceRequest {
     pub idempotency_key: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lines: Option<Vec<CreditLineInput>>,
+
     pub reason: String,
 
     pub source: SourceReference,
@@ -22,6 +25,13 @@ pub struct CreditCustomerInvoiceResponse {
     pub journal: PostedJournal,
 
     pub request_fingerprint: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreditLineInput {
+    pub original_line_number: i32,
+
+    pub quantity: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

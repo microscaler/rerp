@@ -755,3 +755,15 @@ ref-rewritten) the whole accounting suite — including
   documents render from DB and backfill DONE. GET /v1/render-outbox =
   operator queue surface. Claim race is benign (content-addressed
   render + artifact unique).
+
+## [2026-10-31] contribute | partial credit notes (E2a)
+
+- credit-notes POST gained optional explicit `lines` (original_line_number
+  + quantity). Core partial_credit_customer_invoice runs the same
+  pipeline, flips journal sides for selected quantities, preserves
+  original line numbers, binds selection into the fingerprint.
+  Remaining = original qty - fold(prior credit note document lines);
+  over-credit incl. merged duplicate rows -> 422 OverCredit.
+  Full credit blocks further credits automatically.
+- E2b (debit notes) deferred: needs AccountingDocumentType + DB check
+  widening; recorded in BUILDOUT_ANALYSIS.
