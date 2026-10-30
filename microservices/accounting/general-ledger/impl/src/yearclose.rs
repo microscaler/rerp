@@ -34,7 +34,9 @@ use rerp_entities::accounting::foundation::posted_document::{
 };
 
 use crate::accounts::{find_idempotency, hex_digest};
-use crate::journals::{allocate_identifiers, persist_posting, posting_period, JournalDraftLine};
+use crate::journals::{
+    allocate_identifiers, lock_and_revalidate_period, persist_posting, JournalDraftLine,
+};
 use crate::ledger::{parse_uuid, resolve_legal_entity, LedgerError};
 
 const DOCUMENT_TYPE_CLOSE: &str = "YEAR_CLOSE";
@@ -99,8 +101,10 @@ pub fn close_fiscal_year<E: LifeExecutor>(
     let period_ids: Vec<Uuid> = periods.iter().map(|period| period.id).collect();
 
     // The close entry itself must be postable: the period covering
-    // December 31 must be OPEN or REOPENED.
-    let period = posting_period(executor, legal_entity.id, year_end)?;
+    // December 31 must be open for posting (OPEN or REOPENED), checked
+    // under the per-period posting lock together with the once-per-year
+    // eligibility checks below.
+    let period = lock_and_revalidate_period(executor, legal_entity.id, year_end)?;
 
     if DocumentEntity::find()
         .filter(DocumentColumn::LegalEntityId.eq(legal_entity.id))

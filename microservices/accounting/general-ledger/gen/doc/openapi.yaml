@@ -455,7 +455,8 @@ paths:
       operationId: set_opening_balances
       summary: Set opening balances for a fiscal year
       description: 'Posts the opening-balances journal entry for the fiscal year: one balanced entry dated
-        at the start of the period covering January 1 of the fiscal year. It must be the FIRST posting
+        January 1 of the fiscal year (never the period start, which may fall in the prior calendar
+        year). It must be the FIRST posting
         in that period (any prior journal entry is 409) and can be set only once per period (a second
         opening-balances attempt is 409 opening_balances_already_set). Every account must be active in
         the caller''s legal entity with matching currency. Shares the transaction-scoped numbering lock

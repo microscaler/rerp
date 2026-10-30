@@ -235,9 +235,10 @@ paths:
       tags:
       - render-outbox
       summary: Inspect durable render instructions (operator surface)
-      description: Lists render-outbox instructions with status and attempt history for operator inspection
-        and recovery. The immutable render model itself is captured at posting time but not returned here;
-        entries exclude it to keep the surface small.
+      description: Lists render-outbox instructions with status, attempt counts and last
+        error for operator inspection and recovery. The immutable render model itself is
+        captured at posting time but not returned here; entries exclude it to keep the
+        surface small.
       x-brrtrouter-impl: true
       parameters:
       - name: status

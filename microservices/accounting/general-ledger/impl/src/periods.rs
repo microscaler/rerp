@@ -161,6 +161,10 @@ pub fn transition_fiscal_period<E: LifeExecutor>(
         });
     }
 
+    // Take the per-period posting lock BEFORE reading state: posting
+    // paths hold the same lock across their eligibility check and
+    // persist, so a close and a posting can never both believe they won.
+    crate::journals::period_posting_lock(executor, period_id)?;
     let period = load_period(executor, legal_entity.id, period_id)?;
     if request.target_state == "REOPENED" {
         let reason = request.reason.as_deref().unwrap_or("").trim();

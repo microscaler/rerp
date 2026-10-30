@@ -24,7 +24,8 @@ use rerp_entities::accounting::foundation::posted_document::{
 
 use crate::accounts::{find_idempotency, hex_digest, SOURCE_SYSTEM};
 use crate::journals::{
-    allocate_identifiers, parse_amount, persist_posting, posting_period, JournalDraftLine,
+    allocate_identifiers, check_totals_within_numeric_range, lock_and_revalidate_period,
+    parse_amount, persist_posting, JournalDraftLine,
 };
 use crate::ledger::{currency, parse_uuid, resolve_legal_entity, LedgerError};
 
@@ -87,7 +88,10 @@ pub fn set_opening_balances<E: LifeExecutor>(
     let year_start = NaiveDate::from_ymd_opt(request.fiscal_year, 1, 1).ok_or_else(|| {
         LedgerError::Validation("fiscal_year is outside the supported range".to_string())
     })?;
-    let period = posting_period(executor, legal_entity.id, year_start)?;
+    // Eligibility (state, once-per-period, first-posting-only) is checked
+    // under the per-period posting lock so a concurrent transition or
+    // posting can never slip between check and persist.
+    let period = lock_and_revalidate_period(executor, legal_entity.id, year_start)?;
 
     if already_set(executor, legal_entity.id, period.id)? {
         return Err(LedgerError::Conflict(
@@ -111,10 +115,14 @@ pub fn set_opening_balances<E: LifeExecutor>(
     }
 
     let lines = validate_balances(executor, legal_entity.id, &currency_code, request)?;
+    // Numbering and entry date follow the fiscal year (Jan 1), not the
+    // period start: a period may legitimately begin in the prior calendar
+    // year, and an opening entry must not leak into the prior year's
+    // trial balance. Jan 1 is inside the period by construction.
     let ids = allocate_identifiers(
         executor,
         legal_entity.id,
-        period.start_date,
+        year_start,
         DOCUMENT_TYPE_OPENING,
         "OPB",
     )?;
@@ -125,7 +133,7 @@ pub fn set_opening_balances<E: LifeExecutor>(
         legal_entity.id,
         &ids,
         &lines,
-        period.start_date,
+        year_start,
         &currency_code,
         &period,
         now,
@@ -230,6 +238,7 @@ fn validate_balances<E: LifeExecutor>(
             "opening balances are unbalanced: debits {debit} != credits {credit}"
         )));
     }
+    check_totals_within_numeric_range(debit, credit)?;
     Ok(lines)
 }
 

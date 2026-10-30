@@ -337,7 +337,7 @@ fn resolve_open_period<E: LifeExecutor>(
     // Posting is allowed exactly when a covering period is OPEN or REOPENED
     // (Epic D2 state machine). A CLOSED/locked period rejects postings
     // deterministically; a re-opened period accepts them again.
-    required_model(
+    let candidate = required_model(
         PeriodEntity::find()
             .filter(PeriodColumn::LegalEntityId.eq(legal_entity_id))
             .filter(PeriodColumn::State.is_in(["OPEN", "REOPENED"]))
@@ -345,7 +345,45 @@ fn resolve_open_period<E: LifeExecutor>(
             .filter(PeriodColumn::EndDate.gte(date))
             .find_one(executor),
         "open fiscal period",
-    )
+    )?;
+    // Cross-service serialization: GL's transition endpoint takes the same
+    // advisory lock (same key derivation), so a close committed concurrently
+    // can never slip between this eligibility check and the caller's insert.
+    period_posting_lock(executor, candidate.id)?;
+    let locked = required_model(
+        PeriodEntity::find()
+            .filter(PeriodColumn::Id.eq(candidate.id))
+            .find_one(executor),
+        "open fiscal period",
+    )?;
+    if locked.state != "OPEN" && locked.state != "REOPENED" {
+        eprintln!(
+            "[gl-posting] period {} transitioned to {} concurrently; posting rejected",
+            locked.id, locked.state
+        );
+        return Err(PostingError::Conflict);
+    }
+    Ok(locked)
+}
+
+/// Must match `general_ledger::journals::period_posting_lock` exactly: the
+/// two services share one Postgres and must contend on one lock key.
+fn period_posting_lock<E: LifeExecutor>(
+    executor: &E,
+    period_id: uuid::Uuid,
+) -> Result<(), PostingError> {
+    const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+    const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+    let mut hash = FNV_OFFSET;
+    for byte in b"period-posting".iter().chain(period_id.as_bytes().iter()) {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(FNV_PRIME);
+    }
+    let lock_key = i64::from_be_bytes(hash.to_be_bytes());
+    executor
+        .query_one(&format!("SELECT pg_advisory_xact_lock({lock_key})"), &[])
+        .map_err(|error| PostingError::Database(format!("period posting lock: {error}")))?;
+    Ok(())
 }
 
 fn resolve_control_account<E: LifeExecutor>(

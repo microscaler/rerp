@@ -18,7 +18,13 @@ const PDF_MEDIA_TYPE: &str = "application/pdf";
 pub fn retrieve(context: &SessionContext, document_id: Uuid) -> Result<Value, PostingError> {
     let object_store = store().map_err(PostingError::Unavailable)?;
     let existing = crate::http_support::with_accounting_transaction(context, |executor| {
-        load_artifact(executor, document_id)
+        let artifact = load_artifact(executor, document_id)?;
+        if artifact.is_some() {
+            // Documents rendered before the outbox existed gain their
+            // queue entry lazily, so the ledger never shows gaps.
+            crate::outbox::ensure_entry_for_artifact(executor, document_id)?;
+        }
+        Ok(artifact)
     })?;
     let artifact = match existing {
         Some(artifact) => artifact,
@@ -85,14 +91,22 @@ fn materialize(
     {
         if let Some(id) = outbox_id {
             let note = error.to_string();
-            let _ = crate::http_support::with_accounting_transaction(context, |executor| {
-                crate::outbox::record_failure(executor, id, &note)
-            });
+            if let Err(failure_note) =
+                crate::http_support::with_accounting_transaction(context, |executor| {
+                    crate::outbox::record_failure(executor, id, &note)
+                })
+            {
+                // The queue must not silently swallow its own bookkeeping
+                // failures; the lease makes the strand reclaimable anyway.
+                eprintln!(
+                    "[render-outbox] failure record for {id} failed: {failure_note}; instruction stays reclaimable"
+                );
+            }
         }
         return Err(error);
     }
     let rendered_at = Utc::now().naive_utc();
-    crate::http_support::with_accounting_transaction(context, |executor| {
+    let persist = crate::http_support::with_accounting_transaction(context, |executor| {
         if let Some(existing) = load_artifact(executor, document_id)? {
             if let Some(id) = outbox_id {
                 crate::outbox::mark_done(executor, id)?;
@@ -144,7 +158,24 @@ fn materialize(
             None => crate::outbox::backfill_done(executor, snapshot, invoice.rounding_minor_units)?,
         }
         Ok(artifact)
-    })
+    });
+    if let Err(error) = &persist {
+        if let Some(id) = outbox_id {
+            // A post-claim persistence failure must be recorded, not just
+            // left for the lease; the failure-write itself is logged if lost.
+            let note = error.to_string();
+            if let Err(record_error) =
+                crate::http_support::with_accounting_transaction(context, |executor| {
+                    crate::outbox::record_failure(executor, id, &note)
+                })
+            {
+                eprintln!(
+                    "[render-outbox] failure record for {id} failed: {record_error}; instruction stays reclaimable"
+                );
+            }
+        }
+    }
+    persist
 }
 
 fn load_artifact<E: LifeExecutor>(

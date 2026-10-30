@@ -10,7 +10,7 @@
 use chrono::Utc;
 use lifeguard::active_model::ActiveModelTrait;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, Order, SessionContext};
-use rerp_entities::accounting::foundation::render_outbox::{
+use rerp_accounting_invoice::models::render_outbox::{
     AccountingRenderOutboxModel, AccountingRenderOutboxRecord, Column as OutboxColumn,
     Entity as OutboxEntity,
 };
@@ -25,6 +25,9 @@ pub const STATUS_PENDING: &str = "PENDING";
 pub const STATUS_IN_PROGRESS: &str = "IN_PROGRESS";
 pub const STATUS_DONE: &str = "DONE";
 const MAX_ERROR_CHARS: usize = 480;
+/// A crashed claimant must not strand an instruction forever: IN_PROGRESS
+/// rows become reclaimable once their lease expires.
+pub const CLAIM_LEASE_SECONDS: i64 = 300;
 
 /// Snapshot everything the deterministic renderer needs, so the queued
 /// instruction is self-contained for inspection and recovery.
@@ -62,9 +65,17 @@ pub fn stored_from_render_model(model: &Value) -> Result<StoredInvoice, PostingE
 }
 
 /// True when an instruction may be (re)attempted. A DONE instruction with
-/// a missing artifact is legitimately re-claimable (self-heal).
-pub fn claimable(status: &str) -> bool {
-    status != STATUS_IN_PROGRESS
+/// a missing artifact is legitimately re-claimable (self-heal). A
+/// stranded IN_PROGRESS instruction becomes reclaimable once its lease
+/// expires (crashed claimant, lost failure write).
+pub fn claimable(status: &str, lease_expired: bool) -> bool {
+    status != STATUS_IN_PROGRESS || lease_expired
+}
+
+/// Pure lease decision: IN_PROGRESS rows whose `updated_at` is older than
+/// the lease may be reclaimed.
+pub fn lease_expired(updated_at: chrono::NaiveDateTime, now: chrono::NaiveDateTime) -> bool {
+    (now - updated_at).num_seconds() > CLAIM_LEASE_SECONDS
 }
 
 /// Truncating, single-line error note for the operator-visible column.
@@ -114,6 +125,23 @@ pub fn enqueue<E: LifeExecutor>(
             }
         }
     }
+}
+
+/// Documents rendered before the outbox existed still deserve a queue
+/// entry: create the DONE instruction whenever an artifact has none.
+pub fn ensure_entry_for_artifact<E: LifeExecutor>(
+    executor: &E,
+    document_id: Uuid,
+) -> Result<(), PostingError> {
+    let existing = OutboxEntity::find()
+        .filter(OutboxColumn::DocumentId.eq(document_id))
+        .find_one(executor)
+        .map_err(database)?;
+    if existing.is_some() {
+        return Ok(());
+    }
+    let invoice = crate::posting::get_invoice(executor, document_id)?;
+    backfill_done(executor, &invoice.snapshot, invoice.rounding_minor_units)
 }
 
 /// Pre-outbox documents render from the database; record a DONE
@@ -175,7 +203,8 @@ pub fn claim<E: LifeExecutor>(
     let Some(entry) = query.find_one(executor).map_err(database)? else {
         return Ok(Claim::Legacy);
     };
-    if !claimable(&entry.status) {
+    let expired = lease_expired(entry.updated_at, Utc::now().naive_utc());
+    if !claimable(&entry.status, expired) {
         return Ok(Claim::InProgress);
     }
     let mut changes = AccountingRenderOutboxRecord::new();
@@ -278,11 +307,13 @@ pub fn list_outbox<E: LifeExecutor>(
         query = query.filter(OutboxColumn::DocumentId.eq(document_id));
     }
     let total = query.clone().count().one(executor).map_err(database)?;
-    let offset = i64::from((filter.page - 1) * filter.limit);
+    // i64 math: page*limit can overflow u32 for large valid pages.
+    let offset = i64::from(filter.page - 1) * i64::from(filter.limit);
     let entries = query
         .order_by(OutboxColumn::CreatedAt, Order::Asc)
+        .order_by(OutboxColumn::Id, Order::Asc)
         .limit(u64::from(filter.limit))
-        .offset(u64::try_from(offset).unwrap_or(0))
+        .offset(u64::try_from(offset).unwrap_or(u64::MAX))
         .all(executor)
         .map_err(database)?;
     let items: Vec<Value> = entries.iter().map(entry_json).collect();
@@ -320,10 +351,27 @@ mod tests {
     use super::*;
 
     #[test]
-    fn claim_state_machine_rejects_in_progress_only() {
-        assert!(claimable(STATUS_PENDING));
-        assert!(claimable(STATUS_DONE));
-        assert!(!claimable(STATUS_IN_PROGRESS));
+    fn claim_state_machine_rejects_fresh_in_progress_only() {
+        assert!(claimable(STATUS_PENDING, false));
+        assert!(claimable(STATUS_DONE, false));
+        assert!(!claimable(STATUS_IN_PROGRESS, false));
+        // A stranded claim becomes reclaimable once the lease expires.
+        assert!(claimable(STATUS_IN_PROGRESS, true));
+    }
+
+    #[test]
+    fn claim_lease_boundary_is_strictly_after_the_window() {
+        let base = chrono::DateTime::from_timestamp(1_700_000_000, 0)
+            .expect("time")
+            .naive_utc();
+        assert!(!lease_expired(
+            base,
+            base + chrono::Duration::seconds(CLAIM_LEASE_SECONDS)
+        ));
+        assert!(lease_expired(
+            base,
+            base + chrono::Duration::seconds(CLAIM_LEASE_SECONDS + 1)
+        ));
     }
 
     #[test]
