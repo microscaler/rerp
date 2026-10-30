@@ -11,10 +11,10 @@ mod types;
 
 pub use error::AccountingError;
 pub use invoice::{
-    credit_customer_invoice, post_customer_invoice, AccountingDocumentStatus,
-    AccountingDocumentType, AuditAction, AuditEvent, CustomerInvoiceInstruction, InvoiceLineInput,
-    InvoiceLineSnapshot, InvoiceSnapshot, JournalEntry, JournalLine, JournalSide, PostingPlan,
-    TaxInput,
+    credit_customer_invoice, partial_credit_customer_invoice, post_customer_invoice,
+    AccountingDocumentStatus, AccountingDocumentType, AuditAction, AuditEvent, CreditLineSelection,
+    CustomerInvoiceInstruction, InvoiceLineInput, InvoiceLineSnapshot, InvoiceSnapshot,
+    JournalEntry, JournalLine, JournalSide, PostingPlan, TaxInput,
 };
 pub use trial_balance::{derive_trial_balance, TrialBalance, TrialBalanceAccount};
 pub use types::{
@@ -361,6 +361,176 @@ mod tests {
         assert!(CurrencyCode::try_from("USDT").is_err());
         assert!(IdempotencyKey::try_from("").is_err());
         assert!(IdempotencyKey::try_from(" padded ").is_err());
+    }
+
+    #[test]
+    fn partial_credit_reverses_only_selected_quantity() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("valid posting");
+        let credit_identifiers = PostingIdentifiers {
+            invoice_id: Uuid::new_v4(),
+            journal_entry_id: Uuid::new_v4(),
+            invoice_number: "CRN-2026-000001".to_owned(),
+            journal_entry_number: "JRN-2026-000002".to_owned(),
+        };
+
+        let plan = partial_credit_customer_invoice(
+            &fixture.context,
+            &credit_identifiers,
+            IdempotencyKey::try_from("delivery:123:credit:partial-one").expect("valid key"),
+            SourceReference {
+                system: "hauliage".to_owned(),
+                resource_type: "delivery".to_owned(),
+                resource_id: "123".to_owned(),
+            },
+            fixture.receivable,
+            RoundingPolicy::new(2).expect("valid precision"),
+            &Default::default(),
+            &original,
+            "One unit damaged",
+            &[CreditLineSelection {
+                original_line_number: 1,
+                quantity: dec!(1),
+            }],
+        )
+        .expect("partial credit");
+
+        assert_eq!(
+            plan.invoice.document_type,
+            AccountingDocumentType::CustomerCreditNote
+        );
+        assert_eq!(plan.invoice.original_document_id, Some(original.invoice.id));
+        assert_eq!(plan.invoice.lines.len(), 1);
+        assert_eq!(plan.invoice.lines[0].line_number, 1);
+        assert_eq!(plan.invoice.total_amount, dec!(135.59));
+        // AR is credited, revenue and tax debited: sides reversed only for
+        // the selected quantity; the original plan is untouched.
+        let ar_line = plan
+            .journal
+            .lines
+            .iter()
+            .find(|line| line.account_id == fixture.receivable)
+            .expect("receivable line");
+        assert_eq!(ar_line.side, JournalSide::Credit);
+        assert_eq!(ar_line.amount, dec!(135.59));
+        assert_eq!(plan.journal.total_debit, dec!(135.59));
+        assert_eq!(plan.journal.total_credit, dec!(135.59));
+        assert_eq!(original.invoice.total_amount, dec!(271.19));
+    }
+
+    #[test]
+    fn partial_credit_blocks_over_credit_including_duplicate_rows() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("valid posting");
+        let mut credited = std::collections::BTreeMap::new();
+        credited.insert(1u32, dec!(1));
+        let build = |selections: Vec<CreditLineSelection>| {
+            partial_credit_customer_invoice(
+                &fixture.context,
+                &PostingIdentifiers {
+                    invoice_id: Uuid::new_v4(),
+                    journal_entry_id: Uuid::new_v4(),
+                    invoice_number: "CRN-2026-000002".to_owned(),
+                    journal_entry_number: "JRN-2026-000003".to_owned(),
+                },
+                IdempotencyKey::try_from("delivery:123:credit:partial-two").expect("valid key"),
+                SourceReference {
+                    system: "hauliage".to_owned(),
+                    resource_type: "delivery".to_owned(),
+                    resource_id: "123".to_owned(),
+                },
+                fixture.receivable,
+                RoundingPolicy::new(2).expect("valid precision"),
+                &credited,
+                &original,
+                "more",
+                &selections,
+            )
+        };
+
+        let error = build(vec![CreditLineSelection {
+            original_line_number: 1,
+            quantity: dec!(1.5),
+        }])
+        .err()
+        .expect("remaining quantity is 1");
+        assert!(matches!(
+            error,
+            AccountingError::OverCredit { line_number: 1, requested, remaining }
+                if requested == dec!(1.5) && remaining == dec!(1)
+        ));
+
+        // Duplicate rows for one line merge before the remainder check.
+        let error = build(vec![
+            CreditLineSelection {
+                original_line_number: 1,
+                quantity: dec!(0.6),
+            },
+            CreditLineSelection {
+                original_line_number: 1,
+                quantity: dec!(0.6),
+            },
+        ])
+        .err()
+        .expect("merged 1.2 exceeds remaining 1");
+        assert!(matches!(error, AccountingError::OverCredit { .. }));
+    }
+
+    #[test]
+    fn partial_credit_fingerprint_binds_the_selection() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("valid posting");
+        let build = |quantity: rust_decimal::Decimal| {
+            partial_credit_customer_invoice(
+                &fixture.context,
+                &PostingIdentifiers {
+                    invoice_id: Uuid::new_v4(),
+                    journal_entry_id: Uuid::new_v4(),
+                    invoice_number: "CRN-2026-000003".to_owned(),
+                    journal_entry_number: "JRN-2026-000004".to_owned(),
+                },
+                IdempotencyKey::try_from("delivery:123:credit:same-key").expect("valid key"),
+                SourceReference {
+                    system: "hauliage".to_owned(),
+                    resource_type: "delivery".to_owned(),
+                    resource_id: "123".to_owned(),
+                },
+                fixture.receivable,
+                RoundingPolicy::new(2).expect("valid precision"),
+                &Default::default(),
+                &original,
+                "reason",
+                &[CreditLineSelection {
+                    original_line_number: 1,
+                    quantity,
+                }],
+            )
+            .expect("within remaining")
+        };
+
+        assert_eq!(
+            build(dec!(1)).request_fingerprint,
+            build(dec!(1)).request_fingerprint
+        );
+        assert_ne!(
+            build(dec!(1)).request_fingerprint,
+            build(dec!(0.5)).request_fingerprint
+        );
     }
 
     fn date(year: i32, month: u32, day: u32) -> NaiveDate {

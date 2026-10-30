@@ -353,6 +353,185 @@ pub fn credit_customer_invoice(
     })
 }
 
+/// One explicit partial-credit selection against an original line.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CreditLineSelection {
+    pub original_line_number: u32,
+    pub quantity: Decimal,
+}
+
+/// Create a PARTIAL credit note for explicitly selected original lines.
+///
+/// The original document is never modified: the credit note is its own
+/// posted document linked via `original_document_id`. Quantities are
+/// validated against `credited_quantities` (what previous credit notes —
+/// full or partial — already consumed per original line), so repeated
+/// partial credits accumulate deterministically and an over-credit is
+/// rejected with [`AccountingError::OverCredit`]. Selected original line
+/// numbers are preserved on the credit note lines so the creditable
+/// balance remains computable.
+#[allow(clippy::too_many_arguments)]
+pub fn partial_credit_customer_invoice(
+    context: &PostingContext,
+    identifiers: &PostingIdentifiers,
+    idempotency_key: IdempotencyKey,
+    source: SourceReference,
+    receivable_account_id: Uuid,
+    rounding: RoundingPolicy,
+    credited_quantities: &std::collections::BTreeMap<u32, Decimal>,
+    original: &PostingPlan,
+    reason: &str,
+    selections: &[CreditLineSelection],
+) -> Result<PostingPlan, AccountingError> {
+    let credit_date = context.posted_at.date();
+    context.validate(credit_date)?;
+    identifiers.validate()?;
+    source.validate()?;
+    if reason.trim().is_empty() {
+        return Err(AccountingError::EmptyField("credit_reason"));
+    }
+    if original.invoice.document_type != AccountingDocumentType::CustomerInvoice {
+        return Err(AccountingError::NotCustomerInvoice);
+    }
+    if original.invoice.tenant_id != context.tenant_id {
+        return Err(AccountingError::TenantMismatch);
+    }
+    if original.invoice.legal_entity_id != context.legal_entity_id {
+        return Err(AccountingError::LegalEntityMismatch);
+    }
+    if selections.is_empty() {
+        return Err(AccountingError::NoInvoiceLines);
+    }
+
+    // Merge duplicate selections per original line before validation so
+    // repeated rows for one line can never smuggle past the remainder.
+    let mut requested: std::collections::BTreeMap<u32, Decimal> = Default::default();
+    for selection in selections {
+        if selection.quantity <= Decimal::ZERO {
+            return Err(AccountingError::NonPositiveQuantity(
+                selection.original_line_number as usize,
+            ));
+        }
+        *requested
+            .entry(selection.original_line_number)
+            .or_insert(Decimal::ZERO) += selection.quantity;
+    }
+
+    let mut lines = Vec::with_capacity(requested.len());
+    for (line_number, quantity) in &requested {
+        let original_line = original
+            .invoice
+            .lines
+            .iter()
+            .find(|line| line.line_number == *line_number)
+            .ok_or(AccountingError::InvalidJournalLine(*line_number as usize))?;
+        let remaining = original_line.quantity
+            - credited_quantities
+                .get(line_number)
+                .copied()
+                .unwrap_or_default();
+        if *quantity > remaining {
+            return Err(AccountingError::OverCredit {
+                line_number: *line_number,
+                requested: *quantity,
+                remaining,
+            });
+        }
+        let tax = match (
+            original_line.tax_code.clone(),
+            original_line.tax_rate_percent,
+            original_line.tax_liability_account_id,
+        ) {
+            (Some(code), Some(rate_percent), Some(liability_account_id)) => Some(TaxInput {
+                code,
+                rate_percent,
+                liability_account_id,
+            }),
+            _ => None,
+        };
+        lines.push(InvoiceLineInput {
+            description: original_line.description.clone(),
+            quantity: *quantity,
+            unit_price: original_line.unit_price,
+            discount_percent: original_line.discount_percent,
+            revenue_account_id: original_line.revenue_account_id,
+            tax,
+        });
+    }
+
+    let instruction = CustomerInvoiceInstruction {
+        idempotency_key: idempotency_key.clone(),
+        source,
+        customer_id: original.invoice.customer_id,
+        invoice_date: credit_date,
+        due_date: credit_date,
+        currency: original.invoice.currency.clone(),
+        rounding,
+        receivable_account_id,
+        lines,
+    };
+    let mut plan = post_customer_invoice(context, identifiers, &instruction)?;
+
+    // Re-tag the computed plan as a credit note: same arithmetic, sides
+    // reversed, original linkage added, selection line numbers preserved.
+    plan.invoice.document_type = AccountingDocumentType::CustomerCreditNote;
+    plan.invoice.original_document_id = Some(original.invoice.id);
+    for (line, line_number) in plan.invoice.lines.iter_mut().zip(requested.keys().copied()) {
+        line.line_number = line_number;
+    }
+    let credit_note_description = format!("Credit {}: {reason}", original.invoice.document_number);
+    for line in &mut plan.journal.lines {
+        line.side = match line.side {
+            JournalSide::Debit => JournalSide::Credit,
+            JournalSide::Credit => JournalSide::Debit,
+        };
+        if line.account_id == instruction.receivable_account_id {
+            line.description = credit_note_description.clone();
+        }
+    }
+    let debit = plan.journal.total_credit;
+    let credit = plan.journal.total_debit;
+    plan.journal.total_debit = debit;
+    plan.journal.total_credit = credit;
+    plan.journal.validate()?;
+
+    plan.request_fingerprint =
+        partial_credit_fingerprint(context, &idempotency_key, &plan.invoice, reason);
+    plan.audit_event.original_document_id = Some(original.invoice.id);
+    Ok(plan)
+}
+
+fn partial_credit_fingerprint(
+    context: &PostingContext,
+    idempotency_key: &IdempotencyKey,
+    invoice: &InvoiceSnapshot,
+    reason: &str,
+) -> String {
+    let mut hasher = Sha256::new();
+    hash_part(&mut hasher, context.tenant_id.as_bytes());
+    hash_part(&mut hasher, context.legal_entity_id.as_bytes());
+    hash_part(&mut hasher, idempotency_key.as_str().as_bytes());
+    hash_part(
+        &mut hasher,
+        invoice.original_document_id.unwrap_or_default().as_bytes(),
+    );
+    hash_part(&mut hasher, reason.as_bytes());
+    // Unlike a full reversal, the selected quantities ARE the request:
+    // bind them into the fingerprint so a replayed key with a different
+    // selection can never be accepted as identical.
+    for line in &invoice.lines {
+        let part = format!(
+            "{}|{}|{}",
+            line.line_number,
+            line.quantity.normalize(),
+            line.total_amount.normalize()
+        );
+        hash_part(&mut hasher, part.as_bytes());
+    }
+    let digest = hasher.finalize();
+    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
 fn validate_instruction(instruction: &CustomerInvoiceInstruction) -> Result<(), AccountingError> {
     if instruction.due_date < instruction.invoice_date {
         return Err(AccountingError::DueDateBeforeInvoiceDate);
