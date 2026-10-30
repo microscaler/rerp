@@ -212,8 +212,6 @@ paths:
       x-brrtrouter-impl: true
       tags:
       - fiscal-periods
-      security:
-      - bearerJwt: []
       requestBody:
         required: true
         content:
@@ -314,8 +312,6 @@ paths:
       x-brrtrouter-impl: true
       tags:
       - fiscal-periods
-      security:
-      - bearerJwt: []
       parameters:
       - name: id
         in: path
