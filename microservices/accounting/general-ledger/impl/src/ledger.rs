@@ -248,23 +248,47 @@ pub fn get_journal_entry<E: LifeExecutor>(
     }))
 }
 
+pub const ACCOUNT_TYPES: [&str; 5] = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
+
+#[allow(clippy::too_many_arguments)]
 pub fn get_trial_balance<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     as_of_date: &str,
     currency_code: &str,
     include_zero_balance: Option<bool>,
+    fiscal_period_id: Option<&str>,
+    account_type: Option<&str>,
+    group_by_account_type: Option<bool>,
 ) -> Result<Value, LedgerError> {
     let legal_entity = resolve_legal_entity(executor, session)?;
     let as_of_date = parse_date(as_of_date, "as_of_date")?;
     let currency_code = currency(currency_code)?;
     let include_zero_balance = include_zero_balance.unwrap_or(false);
+    let period_filter = match fiscal_period_id {
+        Some(value) => Some(parse_uuid(value, "fiscal_period_id")?),
+        None => None,
+    };
+    let account_type_filter = match account_type {
+        Some(value) if ACCOUNT_TYPES.contains(&value) => Some(value),
+        Some(value) => {
+            return Err(LedgerError::Validation(format!(
+                "account_type '{value}' must be one of {}",
+                ACCOUNT_TYPES.join(", ")
+            )))
+        }
+        None => None,
+    };
 
-    let entries = JournalEntity::find()
+    let mut journals = JournalEntity::find()
         .filter(JournalColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(JournalColumn::LegalEntityId.eq(legal_entity.id))
         .filter(JournalColumn::EntryDate.lte(as_of_date))
-        .filter(JournalColumn::CurrencyCode.eq(currency_code.clone()))
+        .filter(JournalColumn::CurrencyCode.eq(currency_code.clone()));
+    if let Some(period_id) = period_filter {
+        journals = journals.filter(JournalColumn::FiscalPeriodId.eq(period_id));
+    }
+    let entries = journals
         .all(executor)
         .map_err(|error| LedgerError::Database(error.to_string()))?;
     let entry_ids = entries.iter().map(|entry| entry.id).collect::<Vec<_>>();
@@ -285,18 +309,94 @@ pub fn get_trial_balance<E: LifeExecutor>(
         .order_by(AccountColumn::Code, Order::Asc)
         .all(executor)
         .map_err(|error| LedgerError::Database(error.to_string()))?;
+    // Integrity pre-validation always runs against the FULL selected
+    // source, before any dimension filter narrows the report.
     validate_trial_balance_source(&entries, &lines)?;
-    let trial_balance = derive_trial_balance(&accounts, &lines, include_zero_balance)?;
+    let source_totals = line_totals(&lines)?;
 
-    Ok(json!({
+    let reported_accounts: Vec<_> = match account_type_filter {
+        Some(account_type) => accounts
+            .iter()
+            .filter(|account| account.account_type == account_type)
+            .cloned()
+            .collect(),
+        None => accounts.clone(),
+    };
+    let reported: Vec<AccountingJournalLineModel> = if account_type_filter.is_some() {
+        let scoped: HashMap<_, _> = reported_accounts
+            .iter()
+            .map(|account| (account.id, ()))
+            .collect();
+        lines
+            .iter()
+            .filter(|line| scoped.contains_key(&line.account_id))
+            .cloned()
+            .collect()
+    } else {
+        lines.clone()
+    };
+    let trial_balance = derive_trial_balance(&reported_accounts, &reported, include_zero_balance)?;
+
+    let mut payload = json!({
         "as_of_date": as_of_date,
         "currency_code": currency_code,
         "total_debit": decimal(trial_balance.total_debit),
         "total_credit": decimal(trial_balance.total_credit),
         "difference": decimal(trial_balance.total_debit - trial_balance.total_credit),
-        "balanced": trial_balance.total_debit == trial_balance.total_credit,
+        // 'balanced' describes the full pre-validated source set, not the
+        // possibly-filtered slice: a single-dimension slice is not expected
+        // to net to zero.
+        "balanced": source_totals.0 == source_totals.1,
         "lines": trial_balance.lines,
-    }))
+    });
+    if let Some(period_id) = period_filter {
+        payload["fiscal_period_id"] = json!(period_id.to_string());
+    }
+    if let Some(account_type) = account_type_filter {
+        payload["account_type"] = json!(account_type);
+    }
+    if group_by_account_type.unwrap_or(false) {
+        payload["by_account_type"] = json!(account_type_rollup(&accounts, &lines));
+    }
+    Ok(payload)
+}
+
+/// Rollup of the source lines per account type, in fixed enum order,
+/// omitting types without activity.
+fn account_type_rollup(
+    accounts: &[AccountingAccountModel],
+    lines: &[AccountingJournalLineModel],
+) -> Vec<Value> {
+    let type_by_account: HashMap<Uuid, &str> = accounts
+        .iter()
+        .map(|account| (account.id, account.account_type.as_str()))
+        .collect();
+    let mut totals: HashMap<&str, (Decimal, Decimal)> = HashMap::new();
+    for line in lines {
+        let Some(account_type) = type_by_account.get(&line.account_id).copied() else {
+            continue;
+        };
+        let total = totals
+            .entry(account_type)
+            .or_insert((Decimal::ZERO, Decimal::ZERO));
+        if line.side == "DEBIT" {
+            total.0 += line.amount;
+        } else {
+            total.1 += line.amount;
+        }
+    }
+    ACCOUNT_TYPES
+        .iter()
+        .filter_map(|account_type| {
+            totals.get(*account_type).map(|(debit, credit)| {
+                json!({
+                    "account_type": account_type,
+                    "total_debit": decimal(*debit),
+                    "total_credit": decimal(*credit),
+                })
+            })
+        })
+        .collect()
 }
 
 pub(crate) fn account_json(account: &AccountingAccountModel) -> Value {
@@ -399,7 +499,7 @@ fn derive_trial_balance(
 ) -> Result<DerivedTrialBalance, LedgerError> {
     let accounts_by_id = accounts
         .iter()
-        .map(|account| (account.id, account))
+        .map(|account| (account.id, ()))
         .collect::<HashMap<_, _>>();
     let mut balances = BTreeMap::<Uuid, (Decimal, Decimal)>::new();
     let (total_debit, total_credit) = line_totals(lines)?;
@@ -613,5 +713,55 @@ mod tests {
         assert!(parse_date("16/07/2026", "date").is_err());
         assert!(limit(Some(0)).is_err());
         assert_eq!(limit(None).expect("default limit"), DEFAULT_LIMIT);
+    }
+
+    #[test]
+    fn rollup_is_fixed_enum_order_and_skips_inactive_types() {
+        let cash = typed_account("1100", "DEBIT", "ASSET");
+        let revenue = typed_account("4000", "CREDIT", "REVENUE");
+        let lines = vec![
+            line(cash.id, "DEBIT", 100, 1),
+            line(revenue.id, "CREDIT", 100, 2),
+        ];
+
+        let rollup = account_type_rollup(&[cash, revenue], &lines);
+
+        assert_eq!(rollup.len(), 2);
+        assert_eq!(rollup[0]["account_type"], "ASSET");
+        assert_eq!(rollup[0]["total_debit"], "100");
+        assert_eq!(rollup[0]["total_credit"], "0");
+        assert_eq!(rollup[1]["account_type"], "REVENUE");
+        assert_eq!(rollup[1]["total_debit"], "0");
+        assert_eq!(rollup[1]["total_credit"], "100");
+    }
+
+    #[test]
+    fn account_type_slice_reports_only_that_dimension() {
+        let cash = typed_account("1100", "DEBIT", "ASSET");
+        let revenue = typed_account("4000", "CREDIT", "REVENUE");
+        let all_lines = vec![
+            line(cash.id, "DEBIT", 100, 1),
+            line(revenue.id, "CREDIT", 100, 2),
+        ];
+        let revenue_lines: Vec<_> = all_lines
+            .iter()
+            .filter(|line| line.account_id == revenue.id)
+            .cloned()
+            .collect();
+
+        let slice = derive_trial_balance(&[revenue], &revenue_lines, false)
+            .expect("revenue dimension slice");
+
+        assert_eq!(slice.total_debit, Decimal::ZERO);
+        assert_eq!(slice.total_credit, Decimal::new(100, 0));
+        assert_eq!(slice.lines.len(), 1);
+        assert_eq!(slice.lines[0]["account_code"], "4000");
+    }
+
+    fn typed_account(code: &str, normal_side: &str, account_type: &str) -> AccountingAccountModel {
+        AccountingAccountModel {
+            account_type: account_type.to_string(),
+            ..account(code, normal_side)
+        }
     }
 }

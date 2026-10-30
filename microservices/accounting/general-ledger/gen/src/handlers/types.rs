@@ -12,6 +12,15 @@ pub struct AccountList {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AccountTypeRollup {
+    pub account_type: String,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CloseFiscalYearRequest {
     pub fiscal_year: i32,
 
@@ -160,13 +169,22 @@ pub struct GetJournalEntryResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetTrialBalanceResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
+
     pub as_of_date: String,
 
     pub balanced: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_account_type: Option<Vec<AccountTypeRollup>>,
+
     pub currency_code: String,
 
     pub difference: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_period_id: Option<String>,
 
     pub lines: Vec<TrialBalanceLine>,
 
@@ -449,13 +467,22 @@ pub struct TransitionFiscalPeriodResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrialBalance {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<String>,
+
     pub as_of_date: String,
 
     pub balanced: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_account_type: Option<Vec<AccountTypeRollup>>,
+
     pub currency_code: String,
 
     pub difference: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fiscal_period_id: Option<String>,
 
     pub lines: Vec<TrialBalanceLine>,
 
