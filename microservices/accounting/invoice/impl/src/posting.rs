@@ -555,7 +555,11 @@ fn persist_plan<E: LifeExecutor>(
         .set_journal_entry_id(Some(journal.id))
         .set_created_at(invoice.posted_at)
         .set_completed_at(Some(invoice.posted_at));
-    insert(&mut idempotency, executor, "idempotency record")
+    insert(&mut idempotency, executor, "idempotency record")?;
+
+    // Epic E1 / NFR-DOG-010: queue the durable render instruction with
+    // the immutable render model, atomically with the posting itself.
+    crate::outbox::enqueue(executor, invoice, rounding_minor_units)
 }
 
 fn insert<R: ActiveModelTrait, E: LifeExecutor>(

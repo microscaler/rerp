@@ -1,64 +1,62 @@
 openapi: 3.0.3
-# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
-# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
 x-brrtrouter-stack-size: 128KiB
 info:
   title: RERP Customer Invoicing API
   version: 0.2.0
-  description: >-
-    Canonical Phase 1 customer invoicing contract. Commands accept commercial facts only;
-    authenticated tenant, legal entity, fiscal period, numbering, and GL account
-    policy are resolved inside RERP.
+  description: Canonical Phase 1 customer invoicing contract. Commands accept commercial facts only; authenticated
+    tenant, legal entity, fiscal period, numbering, and GL account policy are resolved inside RERP.
 servers:
-  - url: /
+- url: /
 security:
-  - bearerAuth: []
+- bearerAuth: []
 tags:
-  - name: customer-invoices
+- name: customer-invoices
 paths:
   /v1/customer-invoices:
     get:
       operationId: list_customer_invoices
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: List posted customer invoices and credit notes
-      description: >-
-        The invoice service owns customer invoices and credit notes. Accounts
-        receivable tracks their open balances (open items) by invoice id.
+      description: The invoice service owns customer invoices and credit notes. Accounts receivable tracks
+        their open balances (open items) by invoice id.
       x-brrtrouter-impl: true
       parameters:
-        - name: customer_id
-          in: query
-          schema:
-            type: string
-            format: uuid
-        - name: document_type
-          in: query
-          schema:
-            type: string
-            enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
-        - name: invoice_date_from
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: invoice_date_to
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: page
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 20
+      - name: customer_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: document_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - CUSTOMER_INVOICE
+          - CUSTOMER_CREDIT_NOTE
+      - name: invoice_date_from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: invoice_date_to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
       responses:
         '200':
           description: Posted invoices, newest first
@@ -66,15 +64,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedPostedInvoices'
-        '400':
+        '400': &id003
           $ref: '#/components/responses/BadRequest'
-        '401':
+        '401': &id001
           $ref: '#/components/responses/Unauthorized'
-        '403':
+        '403': &id002
           $ref: '#/components/responses/Forbidden'
     post:
       operationId: post_customer_invoice
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: Issue and post a customer invoice atomically
       x-brrtrouter-impl: true
       requestBody:
@@ -106,12 +105,16 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Unprocessable'
+      description: 'Posting atomically stores a durable render-outbox instruction with the immutable render
+        model (NFR-DOG-010): posting succeeds while the render pipeline or object storage is down and
+        rendering remains durable, retryable and inspectable via GET /v1/render-outbox.'
   /v1/customer-invoices/{id}:
     parameters:
-      - $ref: '#/components/parameters/DocumentId'
+    - $ref: '#/components/parameters/DocumentId'
     get:
       operationId: get_customer_invoice
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: Retrieve a posted customer invoice
       x-brrtrouter-impl: true
       responses:
@@ -129,10 +132,11 @@ paths:
           $ref: '#/components/responses/NotFound'
   /v1/customer-invoices/{id}/journal:
     parameters:
-      - $ref: '#/components/parameters/DocumentId'
+    - $ref: '#/components/parameters/DocumentId'
     get:
       operationId: get_customer_invoice_journal
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: Retrieve the balanced journal produced for an invoice
       x-brrtrouter-impl: true
       responses:
@@ -150,14 +154,17 @@ paths:
           $ref: '#/components/responses/NotFound'
   /v1/customer-invoices/{id}/document:
     parameters:
-      - $ref: '#/components/parameters/DocumentId'
+    - $ref: '#/components/parameters/DocumentId'
     get:
       operationId: get_customer_invoice_document
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: Retrieve immutable PDF metadata and a short-lived download URL
-      description: >-
-        Materialises the deterministic PDF on first access, stores it in private
-        content-addressed object storage and returns a five-minute signed URL.
+      description: 'Materialises the deterministic PDF on first access, stores it in private content-addressed
+        object storage and returns a five-minute signed URL. Rendering is driven by the durable render-outbox
+        instruction captured at posting: the attempt counter and last error are recorded on the instruction,
+        and if the render pipeline or object storage is unavailable the instruction stays durably queued
+        for a later attempt (503 now, retry later).'
       x-brrtrouter-impl: true
       responses:
         '200':
@@ -176,10 +183,11 @@ paths:
           $ref: '#/components/responses/Unavailable'
   /v1/customer-invoices/{id}/credit-notes:
     parameters:
-      - $ref: '#/components/parameters/DocumentId'
+    - $ref: '#/components/parameters/DocumentId'
     post:
       operationId: credit_customer_invoice
-      tags: [customer-invoices]
+      tags:
+      - customer-invoices
       summary: Post a full credit note which reverses a customer invoice
       x-brrtrouter-impl: true
       requestBody:
@@ -213,6 +221,55 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Unprocessable'
+      description: The credit-note document is queued for rendering through the same durable render outbox
+        as customer invoices.
+  /v1/render-outbox:
+    get:
+      operationId: list_render_outbox
+      tags:
+      - render-outbox
+      summary: Inspect durable render instructions (operator surface)
+      description: Lists render-outbox instructions with status and attempt history for operator inspection
+        and recovery. The immutable render model itself is captured at posting time but not returned here;
+        entries exclude it to keep the surface small.
+      x-brrtrouter-impl: true
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - IN_PROGRESS
+          - DONE
+      - name: document_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Render-outbox instructions, oldest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRenderOutbox'
+        '401': *id001
+        '403': *id002
+        '400': *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -274,7 +331,10 @@ components:
   schemas:
     SourceReference:
       type: object
-      required: [system, resource_type, resource_id]
+      required:
+      - system
+      - resource_type
+      - resource_id
       properties:
         system:
           type: string
@@ -293,7 +353,9 @@ components:
           example: delivery-123
     TaxFact:
       type: object
-      required: [code, rate_percent]
+      required:
+      - code
+      - rate_percent
       properties:
         code:
           type: string
@@ -301,10 +363,13 @@ components:
           maxLength: 100
         rate_percent:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
     CustomerInvoiceLine:
       type: object
-      required: [description, quantity, unit_price]
+      required:
+      - description
+      - quantity
+      - unit_price
       properties:
         description:
           type: string
@@ -312,28 +377,28 @@ components:
           maxLength: 1000
         quantity:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         unit_price:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         discount_percent:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           default: '0'
         tax:
           allOf:
-            - $ref: '#/components/schemas/TaxFact'
+          - $ref: '#/components/schemas/TaxFact'
           nullable: true
     PostCustomerInvoiceRequest:
       type: object
       required:
-        - idempotency_key
-        - source
-        - customer_id
-        - invoice_date
-        - due_date
-        - currency_code
-        - lines
+      - idempotency_key
+      - source
+      - customer_id
+      - invoice_date
+      - due_date
+      - currency_code
+      - lines
       properties:
         idempotency_key:
           type: string
@@ -352,7 +417,7 @@ components:
           format: date
         currency_code:
           type: string
-          pattern: '^[A-Z]{3}$'
+          pattern: ^[A-Z]{3}$
         rounding_minor_units:
           type: integer
           minimum: 0
@@ -366,7 +431,10 @@ components:
             $ref: '#/components/schemas/CustomerInvoiceLine'
     CreditCustomerInvoiceRequest:
       type: object
-      required: [idempotency_key, source, reason]
+      required:
+      - idempotency_key
+      - source
+      - reason
       properties:
         idempotency_key:
           type: string
@@ -381,16 +449,16 @@ components:
     PostedInvoiceLine:
       type: object
       required:
-        - line_number
-        - description
-        - quantity
-        - unit_price
-        - discount_percent
-        - gross_amount
-        - discount_amount
-        - net_amount
-        - tax_amount
-        - total_amount
+      - line_number
+      - description
+      - quantity
+      - unit_price
+      - discount_percent
+      - gross_amount
+      - discount_amount
+      - net_amount
+      - tax_amount
+      - total_amount
       properties:
         line_number:
           type: integer
@@ -398,54 +466,54 @@ components:
           type: string
         quantity:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         unit_price:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         discount_percent:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         gross_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         discount_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         net_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         tax_code:
           type: string
           nullable: true
         tax_rate_percent:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           nullable: true
         tax_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         total_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
     PostedInvoice:
       type: object
       required:
-        - id
-        - document_number
-        - document_type
-        - status
-        - customer_id
-        - source
-        - invoice_date
-        - due_date
-        - currency_code
-        - rounding_minor_units
-        - subtotal
-        - discount_amount
-        - tax_amount
-        - total_amount
-        - posted_at
-        - lines
+      - id
+      - document_number
+      - document_type
+      - status
+      - customer_id
+      - source
+      - invoice_date
+      - due_date
+      - currency_code
+      - rounding_minor_units
+      - subtotal
+      - discount_amount
+      - tax_amount
+      - total_amount
+      - posted_at
+      - lines
       properties:
         id:
           type: string
@@ -454,10 +522,13 @@ components:
           type: string
         document_type:
           type: string
-          enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
+          enum:
+          - CUSTOMER_INVOICE
+          - CUSTOMER_CREDIT_NOTE
         status:
           type: string
-          enum: [POSTED]
+          enum:
+          - POSTED
         original_document_id:
           type: string
           format: uuid
@@ -479,16 +550,16 @@ components:
           type: integer
         subtotal:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         discount_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         tax_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         total_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         posted_at:
           type: string
           format: date-time
@@ -499,15 +570,15 @@ components:
     PostedInvoiceSummary:
       type: object
       required:
-        - id
-        - document_number
-        - document_type
-        - customer_id
-        - invoice_date
-        - due_date
-        - currency_code
-        - total_amount
-        - posted_at
+      - id
+      - document_number
+      - document_type
+      - customer_id
+      - invoice_date
+      - due_date
+      - currency_code
+      - total_amount
+      - posted_at
       properties:
         id:
           type: string
@@ -516,7 +587,9 @@ components:
           type: string
         document_type:
           type: string
-          enum: [CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE]
+          enum:
+          - CUSTOMER_INVOICE
+          - CUSTOMER_CREDIT_NOTE
         original_document_id:
           type: string
           format: uuid
@@ -534,16 +607,20 @@ components:
           type: string
         tax_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         total_amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         posted_at:
           type: string
           format: date-time
     PaginatedPostedInvoices:
       type: object
-      required: [items, total, page, limit]
+      required:
+      - items
+      - total
+      - page
+      - limit
       properties:
         items:
           type: array
@@ -559,7 +636,12 @@ components:
           type: boolean
     JournalLine:
       type: object
-      required: [line_number, account_id, description, side, amount]
+      required:
+      - line_number
+      - account_id
+      - description
+      - side
+      - amount
       properties:
         line_number:
           type: integer
@@ -570,22 +652,24 @@ components:
           type: string
         side:
           type: string
-          enum: [DEBIT, CREDIT]
+          enum:
+          - DEBIT
+          - CREDIT
         amount:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
     PostedJournal:
       type: object
       required:
-        - id
-        - entry_number
-        - entry_date
-        - source_document_id
-        - currency_code
-        - total_debit
-        - total_credit
-        - posted_at
-        - lines
+      - id
+      - entry_number
+      - entry_date
+      - source_document_id
+      - currency_code
+      - total_debit
+      - total_credit
+      - posted_at
+      - lines
       properties:
         id:
           type: string
@@ -602,10 +686,10 @@ components:
           type: string
         total_debit:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         total_credit:
           type: string
-          pattern: '^-?[0-9]+(?:\.[0-9]{1,6})?$'
+          pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         posted_at:
           type: string
           format: date-time
@@ -615,13 +699,17 @@ components:
             $ref: '#/components/schemas/JournalLine'
     PostingResult:
       type: object
-      required: [idempotency_key, request_fingerprint, invoice, journal]
+      required:
+      - idempotency_key
+      - request_fingerprint
+      - invoice
+      - journal
       properties:
         idempotency_key:
           type: string
         request_fingerprint:
           type: string
-          pattern: '^[a-f0-9]{64}$'
+          pattern: ^[a-f0-9]{64}$
         invoice:
           $ref: '#/components/schemas/PostedInvoice'
         journal:
@@ -629,25 +717,26 @@ components:
     RenderedDocument:
       type: object
       required:
-        - document_id
-        - media_type
-        - sha256
-        - size_bytes
-        - renderer
-        - renderer_version
-        - rendered_at
-        - download_url
-        - expires_at
+      - document_id
+      - media_type
+      - sha256
+      - size_bytes
+      - renderer
+      - renderer_version
+      - rendered_at
+      - download_url
+      - expires_at
       properties:
         document_id:
           type: string
           format: uuid
         media_type:
           type: string
-          enum: [application/pdf]
+          enum:
+          - application/pdf
         sha256:
           type: string
-          pattern: '^[a-f0-9]{64}$'
+          pattern: ^[a-f0-9]{64}$
         size_bytes:
           type: integer
           format: int64
@@ -667,7 +756,9 @@ components:
           format: date-time
     ErrorResponse:
       type: object
-      required: [code, message]
+      required:
+      - code
+      - message
       properties:
         code:
           type: string
@@ -675,3 +766,72 @@ components:
           type: string
         request_id:
           type: string
+    RenderOutboxEntry:
+      type: object
+      required:
+      - id
+      - document_id
+      - media_type
+      - renderer
+      - renderer_version
+      - status
+      - attempts
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        media_type:
+          type: string
+          enum:
+          - application/pdf
+        renderer:
+          type: string
+        renderer_version:
+          type: string
+        status:
+          type: string
+          enum:
+          - PENDING
+          - IN_PROGRESS
+          - DONE
+        attempts:
+          type: integer
+          minimum: 0
+        last_error:
+          type: string
+          nullable: true
+          description: Most recent render/storage failure, truncated; the instruction stays durably queued
+            after every failure
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    PaginatedRenderOutbox:
+      type: object
+      required:
+      - items
+      - page
+      - limit
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenderOutboxEntry'
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0

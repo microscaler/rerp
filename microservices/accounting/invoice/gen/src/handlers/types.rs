@@ -157,11 +157,33 @@ pub struct ListCustomerInvoicesResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListRenderOutboxResponse {
+    pub items: Vec<RenderOutboxEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedPostedInvoices {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_more: Option<bool>,
 
     pub items: Vec<PostedInvoiceSummary>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedRenderOutbox {
+    pub items: Vec<RenderOutboxEntry>,
 
     pub limit: i32,
 
@@ -325,6 +347,30 @@ pub struct PostingResult {
     pub journal: PostedJournal,
 
     pub request_fingerprint: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct RenderOutboxEntry {
+    pub attempts: i32,
+
+    pub created_at: String,
+
+    pub document_id: String,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_error: Option<String>,
+
+    pub media_type: String,
+
+    pub renderer: String,
+
+    pub renderer_version: String,
+
+    pub status: String,
+
+    pub updated_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

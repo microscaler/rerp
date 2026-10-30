@@ -6,4 +6,5 @@ pub mod get_customer_invoice;
 pub mod get_customer_invoice_document;
 pub mod get_customer_invoice_journal;
 pub mod list_customer_invoices;
+pub mod list_render_outbox;
 pub mod post_customer_invoice;

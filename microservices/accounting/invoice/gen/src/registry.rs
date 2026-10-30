@@ -52,6 +52,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::get_customer_invoice_journal::GetCustomerInvoiceJournalController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_render_outbox",
+        crate::controllers::list_render_outbox::ListRenderOutboxController,
+        20480,
+    );
 }
 
 /// Register gen mock/proxy controllers for routes from the OpenAPI spec (ADR 0001 Layer 1).
@@ -111,6 +117,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_customer_invoice_journal" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_customer_invoice_journal::GetCustomerInvoiceJournalController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_render_outbox" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_render_outbox::ListRenderOutboxController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

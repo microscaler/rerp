@@ -20,6 +20,7 @@ mod http_support;
 mod identity;
 mod impl_registry;
 mod object_store;
+mod outbox;
 mod pdf;
 mod posting;
 use brrtrouter::dispatcher::Dispatcher;

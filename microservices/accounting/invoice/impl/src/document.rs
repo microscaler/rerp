@@ -50,20 +50,53 @@ fn materialize(
     document_id: Uuid,
     object_store: &crate::object_store::ObjectStore,
 ) -> Result<AccountingDocumentArtifactModel, PostingError> {
-    // Load and commit before rendering: network I/O must never hold a database
-    // transaction or a Lifeguard pool slot open.
-    let invoice = crate::http_support::with_accounting_transaction(context, |executor| {
-        crate::posting::get_invoice(executor, document_id)
+    // Claim the durable render instruction first (Epic E1): the attempt
+    // counter and last error are recorded on the outbox entry, so a
+    // render/storage failure stays durable and retryable (NFR-DOG-010).
+    let claim = crate::http_support::with_accounting_transaction(context, |executor| {
+        crate::outbox::claim(executor, None, document_id)
     })?;
+    let (outbox_id, invoice) = match claim {
+        crate::outbox::Claim::InProgress => {
+            return Err(PostingError::Unavailable(
+                "a render attempt for this document is already in progress".to_string(),
+            ));
+        }
+        crate::outbox::Claim::Claimed { id, render_model } => (
+            Some(id),
+            crate::outbox::stored_from_render_model(&render_model)?,
+        ),
+        crate::outbox::Claim::Legacy => {
+            // Pre-outbox document: the database rows are the render model.
+            (
+                None,
+                crate::http_support::with_accounting_transaction(context, |executor| {
+                    crate::posting::get_invoice(executor, document_id)
+                })?,
+            )
+        }
+    };
     let pdf = crate::pdf::render(&invoice);
     let checksum = sha256_hex(&pdf);
     let key = object_key(&invoice, &checksum);
-    object_store
+    if let Err(error) = object_store
         .put_immutable(&key, &pdf, &checksum)
-        .map_err(PostingError::Unavailable)?;
+        .map_err(PostingError::Unavailable)
+    {
+        if let Some(id) = outbox_id {
+            let note = error.to_string();
+            let _ = crate::http_support::with_accounting_transaction(context, |executor| {
+                crate::outbox::record_failure(executor, id, &note)
+            });
+        }
+        return Err(error);
+    }
     let rendered_at = Utc::now().naive_utc();
     crate::http_support::with_accounting_transaction(context, |executor| {
         if let Some(existing) = load_artifact(executor, document_id)? {
+            if let Some(id) = outbox_id {
+                crate::outbox::mark_done(executor, id)?;
+            }
             return compatible(existing, &checksum, pdf.len());
         }
         let snapshot = &invoice.snapshot;
@@ -86,19 +119,31 @@ fn materialize(
             .set_rendered_at(rendered_at)
             .set_rendered_by(context.subject_id)
             .set_created_at(rendered_at);
-        match record.insert(executor) {
-            Ok(model) => Ok(model),
+        let artifact = match record.insert(executor) {
+            Ok(model) => model,
             Err(error) => {
                 // A concurrent request may have won the unique document/format
                 // insert after both uploaded the same content-addressed object.
                 match load_artifact(executor, document_id)? {
-                    Some(existing) => compatible(existing, &checksum, pdf.len()),
-                    None => Err(PostingError::Database(format!(
-                        "document artifact metadata: {error}"
-                    ))),
+                    Some(existing) => {
+                        if let Some(id) = outbox_id {
+                            crate::outbox::mark_done(executor, id)?;
+                        }
+                        return compatible(existing, &checksum, pdf.len());
+                    }
+                    None => {
+                        return Err(PostingError::Database(format!(
+                            "document artifact metadata: {error}"
+                        )))
+                    }
                 }
             }
+        };
+        match outbox_id {
+            Some(id) => crate::outbox::mark_done(executor, id)?,
+            None => crate::outbox::backfill_done(executor, snapshot, invoice.rounding_minor_units)?,
         }
+        Ok(artifact)
     })
 }
 
