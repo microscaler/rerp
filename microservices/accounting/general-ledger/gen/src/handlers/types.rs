@@ -173,6 +173,43 @@ pub struct JournalEntry {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JournalEntryLine {
+    pub account_id: String,
+
+    pub amount: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub line_number: i32,
+
+    pub side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JournalEntryResponse {
+    pub currency_code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+
+    pub entry_date: String,
+
+    pub entry_number: String,
+
+    pub id: String,
+
+    pub lines: Vec<JournalEntryLine>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reverses_entry_id: Option<String>,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct JournalLine {
     pub account_id: String,
 
@@ -181,6 +218,18 @@ pub struct JournalLine {
     pub description: String,
 
     pub line_number: i32,
+
+    pub side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JournalLineInput {
+    pub account_id: String,
+
+    pub amount: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
     pub side: String,
 }
@@ -217,6 +266,71 @@ pub struct ListLedgerAccountsResponse {
     pub items: Vec<LedgerAccount>,
 
     pub limit: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PostJournalEntryRequest {
+    pub currency_code: String,
+
+    pub entry_date: String,
+
+    pub idempotency_key: String,
+
+    pub lines: Vec<JournalLineInput>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PostJournalEntryResponse {
+    pub currency_code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+
+    pub entry_date: String,
+
+    pub entry_number: String,
+
+    pub id: String,
+
+    pub lines: Vec<JournalEntryLine>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reverses_entry_id: Option<String>,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReverseJournalEntryRequest {
+    pub idempotency_key: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReverseJournalEntryResponse {
+    pub currency_code: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+
+    pub entry_date: String,
+
+    pub entry_number: String,
+
+    pub id: String,
+
+    pub lines: Vec<JournalEntryLine>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reverses_entry_id: Option<String>,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

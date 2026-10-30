@@ -7,5 +7,7 @@ pub mod get_journal_entry;
 pub mod get_trial_balance;
 pub mod list_fiscal_periods;
 pub mod list_ledger_accounts;
+pub mod post_journal_entry;
+pub mod reverse_journal_entry;
 pub mod transition_fiscal_period;
 pub mod update_ledger_account;
