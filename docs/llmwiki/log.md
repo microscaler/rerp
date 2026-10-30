@@ -736,3 +736,12 @@ ref-rewritten) the whole accounting suite — including
   (year_already_closed); no P&L activity → nothing_to_close; Dec-31
   period must be OPEN/REOPENED. Lifeguard range ops are gte/lte/
   between — there is no ge/le.
+
+## [2026-10-30] contribute | trial balance dimensions (D5); Epic D complete
+
+- /v1/trial-balance now takes fiscal_period_id, account_type and
+  group_by_account_type. Integrity pre-validation runs on the FULL
+  selected source BEFORE dimension filters; 'balanced' = source set,
+  totals = reported slice. Deref-generics don't work for owned-slice
+  callers (Model: Deref unsatisfied) — slices are cloned before the
+  pure derive helpers. Epic D (General Ledger) now complete.
