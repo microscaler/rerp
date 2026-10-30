@@ -28,6 +28,7 @@ mod database;
 mod http_support;
 mod identity;
 mod impl_registry;
+mod journals;
 mod ledger;
 mod periods;
 use controllers::*;

@@ -343,6 +343,83 @@ paths:
           $ref: '#/components/responses/TransitionFiscalPeriodConflictResponse'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/journal-entries:
+    post:
+      operationId: post_journal_entry
+      summary: Post a manual balanced journal entry
+      description: 'Posts a manual journal entry: at least two lines, total debits must equal total credits,
+        the entry date must fall in a period that is OPEN or REOPENED. Every line account must be active
+        in the caller''s legal entity. Entry numbers are deterministic per legal entity and calendar year
+        (JE-{year}-{n}), allocated under the same transaction-scoped advisory lock the invoice service
+        uses, so numbering is collision-free across services. Idempotent per (legal entity, idempotency_key):
+        replaying the identical payload returns the stored entry; a changed payload returns 409.'
+      x-brrtrouter-impl: true
+      tags:
+      - journal-entries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostJournalEntryRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/PostJournalEntryResponse'
+        '200':
+          $ref: '#/components/responses/PostJournalEntryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/PostJournalEntryConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /v1/journal-entries/{id}/reversals:
+    post:
+      operationId: reverse_journal_entry
+      summary: Reverse a posted journal entry
+      description: Creates a NEW balanced journal entry whose lines mirror the original with sides swapped;
+        the original is never modified. Both audit histories are preserved and the reversal is linked
+        via the original document id. The reversal is dated today and must land in an OPEN or REOPENED
+        period. Reversing an entry that is already reversed is 409. Idempotent per (legal entity, idempotency_key)
+        with the standard replay rules.
+      x-brrtrouter-impl: true
+      tags:
+      - journal-entries
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Journal entry being reversed
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverseJournalEntryRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/ReverseJournalEntryResponse'
+        '200':
+          $ref: '#/components/responses/ReverseJournalEntryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ReverseJournalEntryConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     bearerAuth:
@@ -417,6 +494,32 @@ components:
     TransitionFiscalPeriodConflictResponse:
       description: Idempotency key already used with a different payload, or the write violates a period
         invariant (overlap, illegal transition)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    PostJournalEntryResponse:
+      description: The journal entry after the write
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JournalEntryResponse'
+    PostJournalEntryConflictResponse:
+      description: Idempotency key already used with a different payload, or the write violates a posting
+        invariant (unbalanced, no open period, already reversed)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ReverseJournalEntryResponse:
+      description: The journal entry after the write
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JournalEntryResponse'
+    ReverseJournalEntryConflictResponse:
+      description: Idempotency key already used with a different payload, or the write violates a posting
+        invariant (unbalanced, no open period, already reversed)
       content:
         application/json:
           schema:
@@ -805,3 +908,129 @@ components:
           maxLength: 500
           description: Required when target_state is REOPENED; an explicit policy override of a prior
             close.
+    JournalLineInput:
+      type: object
+      required:
+      - account_id
+      - side
+      - amount
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        side:
+          type: string
+          enum:
+          - DEBIT
+          - CREDIT
+        amount:
+          type: string
+          pattern: ^-?\d{1,13}\.\d{1,6}$
+          description: Positive line amount as a NUMERIC(19,6) decimal string
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+    PostJournalEntryRequest:
+      type: object
+      required:
+      - idempotency_key
+      - entry_date
+      - currency_code
+      - lines
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for manual journal posts.
+        entry_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+        lines:
+          type: array
+          minItems: 2
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/JournalLineInput'
+    JournalEntryLine:
+      type: object
+      required:
+      - line_number
+      - account_id
+      - side
+      - amount
+      properties:
+        line_number:
+          type: integer
+        account_id:
+          type: string
+          format: uuid
+        side:
+          type: string
+          enum:
+          - DEBIT
+          - CREDIT
+        amount: &id001
+          type: string
+          pattern: ^-?\d{1,13}\.\d{1,6}$
+          description: Decimal string with exactly 1-6 fractional digits (NUMERIC(19,6)); no floats, no
+            scientific notation
+        description:
+          type: string
+    JournalEntryResponse:
+      type: object
+      required:
+      - id
+      - entry_number
+      - entry_date
+      - currency_code
+      - total_debit
+      - total_credit
+      - lines
+      properties:
+        id:
+          type: string
+          format: uuid
+        entry_number:
+          type: string
+          description: JE-{year}-{sequence}, unique per legal entity and calendar year across all posting
+            services
+        document_number:
+          type: string
+          description: Source document number (MJE/MJR prefixed)
+        entry_date:
+          type: string
+          format: date
+        currency_code:
+          type: string
+        total_debit: *id001
+        total_credit: *id001
+        reverses_entry_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'For reversals: the journal entry being reversed'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalEntryLine'
+    ReverseJournalEntryRequest:
+      type: object
+      required:
+      - idempotency_key
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for reversals.
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500

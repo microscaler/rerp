@@ -703,3 +703,16 @@ ref-rewritten) the whole accounting suite — including
   path-parameter gate caught nothing new here because the transition op's
   parameters were authored correctly after the idem_param mixup was
   removed.
+
+## [2026-10-30] contribute | manual journal post + reversal closes Epic D3
+
+- GL now 10 ops. journals.rs: post_journal_entry / reverse_journal_entry.
+  Balance + active-account + currency-match + OPEN/REOPENED-period gates;
+  strict decimal-string amounts; mirrored NEW reversal (originals
+  immutable), linked via posted_documents.original_document_id;
+  double-reversal 409.
+- Advisory-lock numbering shared with invoice (same FNV key space) —
+  first cross-service use of invoice's scheme; JE numbering is one
+  sequence per entity/year across manual and invoice postings.
+- Nil-UUID counterparty sentinel on manual posted_documents (customer_id
+  NOT NULL, no FK — documented, not abused).

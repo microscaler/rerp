@@ -15,6 +15,10 @@ pub mod create_fiscal_period;
 
 pub mod transition_fiscal_period;
 
+pub mod post_journal_entry;
+
 pub mod get_journal_entry;
+
+pub mod reverse_journal_entry;
 
 pub mod get_trial_balance;

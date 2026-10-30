@@ -54,8 +54,20 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "post_journal_entry",
+        crate::controllers::post_journal_entry::PostJournalEntryController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "get_journal_entry",
         crate::controllers::get_journal_entry::GetJournalEntryController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "reverse_journal_entry",
+        crate::controllers::reverse_journal_entry::ReverseJournalEntryController,
         20480,
     );
 
@@ -128,9 +140,25 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "post_journal_entry" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::post_journal_entry::PostJournalEntryController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "get_journal_entry" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_journal_entry::GetJournalEntryController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "reverse_journal_entry" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reverse_journal_entry::ReverseJournalEntryController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );
