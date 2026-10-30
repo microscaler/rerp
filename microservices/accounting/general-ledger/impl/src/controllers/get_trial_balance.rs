@@ -18,6 +18,9 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             &request.data.as_of_date,
             &request.data.currency_code,
             request.data.include_zero_balance,
+            request.data.fiscal_period_id.as_deref(),
+            request.data.account_type.as_deref(),
+            request.data.group_by_account_type,
         )
     }) {
         Ok(trial_balance) => HttpJson::new(200, trial_balance),

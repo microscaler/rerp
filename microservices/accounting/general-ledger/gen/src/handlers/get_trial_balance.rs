@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::AccountTypeRollup;
 use crate::handlers::types::TrialBalanceLine;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
@@ -20,22 +21,46 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "include_zero_balance")]
     pub include_zero_balance: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fiscal_period_id")]
+    pub fiscal_period_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_type")]
+    pub account_type: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "group_by_account_type")]
+    pub group_by_account_type: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_type")]
+    pub account_type: Option<String>,
+
     #[serde(rename = "as_of_date")]
     pub as_of_date: String,
 
     #[serde(rename = "balanced")]
     pub balanced: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "by_account_type")]
+    pub by_account_type: Option<Vec<AccountTypeRollup>>,
+
     #[serde(rename = "currency_code")]
     pub currency_code: String,
 
     #[serde(rename = "difference")]
     pub difference: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fiscal_period_id")]
+    pub fiscal_period_id: Option<String>,
 
     #[serde(rename = "lines")]
     pub lines: Vec<TrialBalanceLine>,
@@ -88,6 +113,46 @@ impl TryFrom<HandlerRequest> for Request {
                 std::sync::LazyLock::new(|| serde_json::json!({"default":false,"type":"boolean"}));
             data_map.insert(
                 "include_zero_balance".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("fiscal_period_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
+            data_map.insert(
+                "fiscal_period_id".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("account_type") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE"],"type":"string"}),
+            );
+            data_map.insert(
+                "account_type".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("group_by_account_type") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"default":false,"type":"boolean"}));
+            data_map.insert(
+                "group_by_account_type".to_string(),
                 brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {

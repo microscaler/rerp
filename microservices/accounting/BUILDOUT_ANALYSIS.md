@@ -230,8 +230,10 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   **D4b DONE 2026-10-30** (retained-earnings year close: once per year,
   P&L netting into an EQUITY account, closing entries excluded from
   their own aggregation, Dec-31 period must be open for posting).
-- **D5 — Trial balance dimensions** (M, deps D3): by period, currency,
-  supported dimensions; keeps the existing integrity pre-validation.
+- **D5 — Trial balance dimensions** (M, deps D3) — **DONE 2026-10-30**:
+  fiscal_period_id + account_type dimensions and per-type rollup on the
+  trial balance; integrity pre-validation still runs on the FULL source
+  before filtering; 'balanced' describes the source set, totals the slice.
 
 ### Epic E — Invoice hardening (WP2 remainder)
 

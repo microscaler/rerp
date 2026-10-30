@@ -56,7 +56,7 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
             "get_trial_balance" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_trial_balance::GetTrialBalanceController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

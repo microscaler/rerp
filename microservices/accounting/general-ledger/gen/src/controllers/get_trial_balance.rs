@@ -6,15 +6,20 @@ use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
 #[allow(unused_imports)]
+use crate::handlers::types::AccountTypeRollup;
+#[allow(unused_imports)]
 use crate::handlers::types::TrialBalanceLine;
 
 #[handler(GetTrialBalanceController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
+        account_type: Some("example".to_string()),
         as_of_date: "example".to_string(),
         balanced: true,
+        by_account_type: Some(vec![]),
         currency_code: "example".to_string(),
         difference: "example".to_string(),
+        fiscal_period_id: Some("example".to_string()),
         lines: vec![],
         total_credit: "example".to_string(),
         total_debit: "example".to_string(),

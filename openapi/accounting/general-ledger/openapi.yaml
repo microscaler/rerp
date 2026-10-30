@@ -284,6 +284,30 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: fiscal_period_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Restrict the journal entries considered to one fiscal period (a supported reporting
+          dimension).
+      - name: account_type
+        in: query
+        schema:
+          type: string
+          enum: &id001
+          - ASSET
+          - LIABILITY
+          - EQUITY
+          - REVENUE
+          - EXPENSE
+        description: Restrict the reported accounts to one account type (a supported reporting dimension).
+      - name: group_by_account_type
+        in: query
+        schema:
+          type: boolean
+          default: false
+        description: Add a per-account-type rollup of the reported lines.
       responses:
         '200':
           description: Trial balance derived at the requested accounting date
@@ -299,6 +323,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
+      description: 'Derive a trial balance from immutable posted journal lines as of a date, in one currency.
+        The full selected source is always integrity-pre-validated (every journal balanced, line-consistent)
+        before any dimension filter is applied. Optional dimensions: fiscal_period_id restricts journals
+        to one period; account_type restricts the reported accounts. When dimension filters are active,
+        total_debit/total_credit/difference describe the reported slice and are not expected to net to
+        zero; ''balanced'' still reports whether the full pre-validated source set nets to zero.'
   /v1/fiscal-periods/{id}/transitions:
     post:
       operationId: transition_fiscal_period
@@ -959,6 +989,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TrialBalanceLine'
+        fiscal_period_id:
+          type: string
+          format: uuid
+          description: Echo of the period dimension filter, when requested
+        account_type:
+          type: string
+          enum: *id001
+          description: Echo of the account-type dimension filter, when requested
+        by_account_type:
+          type: array
+          description: Per-account-type rollup; present only when group_by_account_type is requested
+          items:
+            $ref: '#/components/schemas/AccountTypeRollup'
     CreateFiscalPeriodRequest:
       type: object
       required:
@@ -1075,7 +1118,7 @@ components:
           enum:
           - DEBIT
           - CREDIT
-        amount: &id001
+        amount: &id002
           type: string
           pattern: ^-?\d{1,13}\.\d{1,6}$
           description: Decimal string with exactly 1-6 fractional digits (NUMERIC(19,6)); no floats, no
@@ -1108,8 +1151,8 @@ components:
           format: date
         currency_code:
           type: string
-        total_debit: *id001
-        total_credit: *id001
+        total_debit: *id002
+        total_credit: *id002
         reverses_entry_id:
           type: string
           format: uuid
@@ -1207,10 +1250,10 @@ components:
         document_number:
           type: string
           description: OPB-{year}-{sequence}
-        total_debit: &id002
+        total_debit: &id003
           type: string
           pattern: ^-?\d{1,13}\.\d{1,6}$
-        total_credit: *id002
+        total_credit: *id003
     CloseFiscalYearRequest:
       type: object
       required:
@@ -1263,3 +1306,19 @@ components:
         line_count:
           type: integer
           minimum: 2
+    AccountTypeRollup:
+      type: object
+      required:
+      - account_type
+      - total_debit
+      - total_credit
+      properties:
+        account_type:
+          type: string
+          enum: *id001
+        total_debit:
+          type: string
+          pattern: ^[0-9]+(\.[0-9]+)?$
+        total_credit:
+          type: string
+          pattern: ^[0-9]+(\.[0-9]+)?$
