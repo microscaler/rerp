@@ -242,8 +242,11 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   immutable render model; materialiser claims/attempts/records errors,
   DONE only with the artifact row; GET /v1/render-outbox is the operator
   surface (NFR-DOG-010).
-- **E2 — Partial credit/debit notes** (M): explicit workflows only; original
-  stays immutable.
+- **E2 — Partial credit/debit notes** (M) — **E2a DONE 2026-10-31**
+  (partial credit notes: explicit line selections, remainder tracked
+  across prior credit notes, over-credit 422, selection bound into the
+  idempotency fingerprint; original immutable). **E2b TODO**: customer
+  debit notes (new document type — needs enum + DB check widening).
 - **E3 — Generated rustls client proof** (M): generated HTTPS consumer covers
   post/retrieve/credit incl. retry + payload-conflict paths (goal 6 close).
 
