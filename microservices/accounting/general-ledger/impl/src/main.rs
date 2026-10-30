@@ -32,6 +32,7 @@ mod journals;
 mod ledger;
 mod opening;
 mod periods;
+mod yearclose;
 use controllers::*;
 use std::fs;
 use std::io;

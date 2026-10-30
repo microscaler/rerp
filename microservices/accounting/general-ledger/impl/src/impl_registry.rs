@@ -21,6 +21,14 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
     for route in routes {
         match route.handler_name.as_ref() {
+            "close_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::close_fiscal_year::CloseFiscalYearController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "create_fiscal_period" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_fiscal_period::CreateFiscalPeriodController,

@@ -456,6 +456,43 @@ paths:
           $ref: '#/components/responses/SetOpeningBalancesConflictResponse'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/year-closes:
+    post:
+      operationId: close_fiscal_year
+      summary: Close a fiscal year to retained earnings
+      description: 'Posts the retained-earnings closing journal entry for a fiscal year: one balanced
+        entry dated December 31 that moves the net result of every REVENUE and EXPENSE account posted
+        in the calendar-year periods back to the designated EQUITY-role retained-earnings account (profit
+        credits it, losses debit it). Aggregation covers journal entries in periods starting within the
+        fiscal year and excludes prior closing entries. The period covering December 31 must be open for
+        posting (OPEN or REOPENED). A year can be closed once (409 year_already_closed); a year without
+        P&L activity cannot be closed (409 nothing_to_close). All touched accounts must share the retained-earnings
+        account currency. Shares the transaction-scoped numbering lock with all other posting services.
+        Idempotent per (legal entity, idempotency_key) with the standard replay rules.'
+      x-brrtrouter-impl: true
+      tags:
+      - year-close
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseFiscalYearRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/YearCloseResponse'
+        '200':
+          $ref: '#/components/responses/YearCloseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/YearCloseConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     bearerAuth:
@@ -569,6 +606,20 @@ components:
     SetOpeningBalancesConflictResponse:
       description: Idempotency key already used with a different payload, opening balances already set
         for the period, the period already contains postings, or a period invariant failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    YearCloseResponse:
+      description: The retained-earnings closing journal entry
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/YearCloseResponse'
+    YearCloseConflictResponse:
+      description: Idempotency key already used with a different payload, the year is already closed,
+        the year has no profit and loss postings, the period covering December 31 is not open for posting,
+        or a close invariant failed
       content:
         application/json:
           schema:
@@ -1160,3 +1211,55 @@ components:
           type: string
           pattern: ^-?\d{1,13}\.\d{1,6}$
         total_credit: *id002
+    CloseFiscalYearRequest:
+      type: object
+      required:
+      - idempotency_key
+      - fiscal_year
+      - retained_earnings_account_id
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for the year close.
+        fiscal_year:
+          type: integer
+          minimum: 2000
+          maximum: 2100
+        retained_earnings_account_id:
+          type: string
+          format: uuid
+          description: Active EQUITY-role account receiving the net result of the year.
+    YearCloseResponse:
+      type: object
+      required:
+      - fiscal_year
+      - journal_entry_id
+      - entry_number
+      - document_number
+      - retained_earnings_account_id
+      - net_income
+      - line_count
+      properties:
+        fiscal_year:
+          type: integer
+        journal_entry_id:
+          type: string
+          format: uuid
+        entry_number:
+          type: string
+        document_number:
+          type: string
+          description: YCL-{year}-{sequence}
+        retained_earnings_account_id:
+          type: string
+          format: uuid
+        net_income:
+          type: string
+          pattern: ^-?\d{1,13}\.\d{1,6}$
+          description: Positive for profit, negative for loss, as a NUMERIC(19,6) decimal string
+        line_count:
+          type: integer
+          minimum: 2

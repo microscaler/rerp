@@ -12,6 +12,32 @@ pub struct AccountList {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CloseFiscalYearRequest {
+    pub fiscal_year: i32,
+
+    pub idempotency_key: String,
+
+    pub retained_earnings_account_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CloseFiscalYearResponse {
+    pub document_number: String,
+
+    pub entry_number: String,
+
+    pub fiscal_year: i32,
+
+    pub journal_entry_id: String,
+
+    pub line_count: i32,
+
+    pub net_income: String,
+
+    pub retained_earnings_account_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPeriodRequest {
     pub end_date: String,
 
@@ -492,4 +518,21 @@ pub struct UpdateLedgerAccountResponse {
     pub name: String,
 
     pub normal_side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct YearCloseResponse {
+    pub document_number: String,
+
+    pub entry_number: String,
+
+    pub fiscal_year: i32,
+
+    pub journal_entry_id: String,
+
+    pub line_count: i32,
+
+    pub net_income: String,
+
+    pub retained_earnings_account_id: String,
 }
