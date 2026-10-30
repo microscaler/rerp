@@ -224,7 +224,11 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   entry; original untouched, both audit histories preserved; numbering
   (MJE/MJR/JE-{year}-{n}) under invoice's advisory lock on
   (legal entity, calendar year) - collision-free across services.
-- **D4 — Opening balances & year transition policy** (M, deps D3).
+- **D4 — Opening balances & year transition policy** (M, deps D3) —
+  **D4a DONE 2026-10-30** (opening balances: first-posting-only,
+  once-per-period, balanced, shared numbering/audit machinery). **D4b
+  TODO**: retained-earnings close / year-transition policy — explicitly
+  not implied by the opening-balances endpoint.
 - **D5 — Trial balance dimensions** (M, deps D3): by period, currency,
   supported dimensions; keeps the existing integrity pre-validation.
 
