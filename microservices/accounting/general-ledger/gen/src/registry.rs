@@ -72,6 +72,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "set_opening_balances",
+        crate::controllers::set_opening_balances::SetOpeningBalancesController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "get_trial_balance",
         crate::controllers::get_trial_balance::GetTrialBalanceController,
         20480,
@@ -160,6 +166,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::reverse_journal_entry::ReverseJournalEntryController,
                     20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "set_opening_balances" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::set_opening_balances::SetOpeningBalancesController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

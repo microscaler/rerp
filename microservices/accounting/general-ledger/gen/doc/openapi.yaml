@@ -420,6 +420,42 @@ paths:
           $ref: '#/components/responses/ReverseJournalEntryConflictResponse'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/opening-balances:
+    post:
+      operationId: set_opening_balances
+      summary: Set opening balances for a fiscal year
+      description: 'Posts the opening-balances journal entry for the fiscal year: one balanced entry dated
+        at the start of the period covering January 1 of the fiscal year. It must be the FIRST posting
+        in that period (any prior journal entry is 409) and can be set only once per period (a second
+        opening-balances attempt is 409 opening_balances_already_set). Every account must be active in
+        the caller''s legal entity with matching currency. Shares the transaction-scoped numbering lock
+        with all other posting services. Idempotent per (legal entity, idempotency_key) with the standard
+        replay rules. The retained-earnings close for year transition is a separate operation and is not
+        implied by this endpoint.'
+      x-brrtrouter-impl: true
+      tags:
+      - opening-balances
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetOpeningBalancesRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/SetOpeningBalancesResponse'
+        '200':
+          $ref: '#/components/responses/SetOpeningBalancesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/SetOpeningBalancesConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     bearerAuth:
@@ -520,6 +556,19 @@ components:
     ReverseJournalEntryConflictResponse:
       description: Idempotency key already used with a different payload, or the write violates a posting
         invariant (unbalanced, no open period, already reversed)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    SetOpeningBalancesResponse:
+      description: The opening-balances journal entry
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OpeningBalancesResponse'
+    SetOpeningBalancesConflictResponse:
+      description: Idempotency key already used with a different payload, opening balances already set
+        for the period, the period already contains postings, or a period invariant failed
       content:
         application/json:
           schema:
@@ -1034,3 +1083,80 @@ components:
           type: string
           minLength: 3
           maxLength: 500
+    OpeningBalanceInput:
+      type: object
+      required:
+      - account_id
+      - side
+      - amount
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        side:
+          type: string
+          enum:
+          - DEBIT
+          - CREDIT
+        amount:
+          type: string
+          pattern: ^-?\d{1,13}\.\d{1,6}$
+          description: Positive opening amount as a NUMERIC(19,6) decimal string
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+    SetOpeningBalancesRequest:
+      type: object
+      required:
+      - idempotency_key
+      - fiscal_year
+      - currency_code
+      - balances
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for opening balances.
+        fiscal_year:
+          type: integer
+          minimum: 2000
+          maximum: 2100
+        currency_code:
+          type: string
+          pattern: ^[A-Z]{3}$
+        balances:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/OpeningBalanceInput'
+    OpeningBalancesResponse:
+      type: object
+      required:
+      - fiscal_year
+      - fiscal_period_id
+      - journal_entry_id
+      - entry_number
+      - total_debit
+      - total_credit
+      properties:
+        fiscal_year:
+          type: integer
+        fiscal_period_id:
+          type: string
+          format: uuid
+        journal_entry_id:
+          type: string
+          format: uuid
+        entry_number:
+          type: string
+        document_number:
+          type: string
+          description: OPB-{year}-{sequence}
+        total_debit: &id002
+          type: string
+          pattern: ^-?\d{1,13}\.\d{1,6}$
+        total_credit: *id002

@@ -716,3 +716,13 @@ ref-rewritten) the whole accounting suite — including
   sequence per entity/year across manual and invoice postings.
 - Nil-UUID counterparty sentinel on manual posted_documents (customer_id
   NOT NULL, no FK — documented, not abused).
+
+## [2026-10-30] contribute | opening balances (D4a); D4b deferred explicitly
+
+- GL now 11 ops. opening.rs: POST /v1/opening-balances — must be the
+  FIRST posting in the period covering Jan 1 of the year (409
+  period_has_postings) and once per period (409
+  opening_balances_already_set); OPB numbering + OPENING_BALANCES_SET
+  audit via the now-shared journals machinery (persist_posting gained
+  an explicit audit_action parameter).
+- Retained-earnings close deliberately NOT bundled here: D4b slice.

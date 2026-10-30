@@ -9,5 +9,6 @@ pub mod list_fiscal_periods;
 pub mod list_ledger_accounts;
 pub mod post_journal_entry;
 pub mod reverse_journal_entry;
+pub mod set_opening_balances;
 pub mod transition_fiscal_period;
 pub mod update_ledger_account;

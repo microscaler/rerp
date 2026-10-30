@@ -85,6 +85,14 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "set_opening_balances" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::set_opening_balances::SetOpeningBalancesController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "transition_fiscal_period" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::transition_fiscal_period::TransitionFiscalPeriodController,

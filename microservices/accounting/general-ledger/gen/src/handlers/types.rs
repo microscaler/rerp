@@ -269,6 +269,36 @@ pub struct ListLedgerAccountsResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct OpeningBalanceInput {
+    pub account_id: String,
+
+    pub amount: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub side: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct OpeningBalancesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+
+    pub entry_number: String,
+
+    pub fiscal_period_id: String,
+
+    pub fiscal_year: i32,
+
+    pub journal_entry_id: String,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PostJournalEntryRequest {
     pub currency_code: String,
 
@@ -327,6 +357,35 @@ pub struct ReverseJournalEntryResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reverses_entry_id: Option<String>,
+
+    pub total_credit: String,
+
+    pub total_debit: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SetOpeningBalancesRequest {
+    pub balances: Vec<OpeningBalanceInput>,
+
+    pub currency_code: String,
+
+    pub fiscal_year: i32,
+
+    pub idempotency_key: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SetOpeningBalancesResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+
+    pub entry_number: String,
+
+    pub fiscal_period_id: String,
+
+    pub fiscal_year: i32,
+
+    pub journal_entry_id: String,
 
     pub total_credit: String,
 
