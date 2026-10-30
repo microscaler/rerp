@@ -42,6 +42,18 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "create_fiscal_period",
+        crate::controllers::create_fiscal_period::CreateFiscalPeriodController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "transition_fiscal_period",
+        crate::controllers::transition_fiscal_period::TransitionFiscalPeriodController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "get_journal_entry",
         crate::controllers::get_journal_entry::GetJournalEntryController,
         20480,
@@ -95,6 +107,22 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_fiscal_periods" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_fiscal_periods::ListFiscalPeriodsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_fiscal_period" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_fiscal_period::CreateFiscalPeriodController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "transition_fiscal_period" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::transition_fiscal_period::TransitionFiscalPeriodController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

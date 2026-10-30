@@ -12,6 +12,36 @@ pub struct AccountList {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalPeriodRequest {
+    pub end_date: String,
+
+    pub idempotency_key: String,
+
+    pub name: String,
+
+    pub start_date: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateFiscalPeriodResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub start_date: String,
+
+    pub state: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateLedgerAccountRequest {
     pub account_type: String,
 
@@ -57,6 +87,9 @@ pub struct ErrorResponse {
 pub struct FiscalPeriod {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub closed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
 
     pub end_date: String,
 
@@ -184,6 +217,35 @@ pub struct ListLedgerAccountsResponse {
     pub items: Vec<LedgerAccount>,
 
     pub limit: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TransitionFiscalPeriodRequest {
+    pub idempotency_key: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+
+    pub target_state: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TransitionFiscalPeriodResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub closed_by: Option<String>,
+
+    pub end_date: String,
+
+    pub id: String,
+
+    pub name: String,
+
+    pub start_date: String,
+
+    pub state: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

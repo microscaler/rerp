@@ -21,6 +21,14 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
     for route in routes {
         match route.handler_name.as_ref() {
+            "create_fiscal_period" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_fiscal_period::CreateFiscalPeriodController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "create_ledger_account" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_ledger_account::CreateLedgerAccountController,
@@ -56,6 +64,14 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
             "list_ledger_accounts" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_ledger_accounts::ListLedgerAccountsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "transition_fiscal_period" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::transition_fiscal_period::TransitionFiscalPeriodController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

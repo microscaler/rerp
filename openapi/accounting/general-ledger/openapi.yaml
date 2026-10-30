@@ -203,6 +203,36 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
+    post:
+      operationId: create_fiscal_period
+      summary: Create a fiscal period
+      description: 'Creates a fiscal period in state OPEN. The date range must not overlap any existing
+        period of the legal entity; names are unique per legal entity. Idempotent per (legal entity, idempotency_key):
+        replaying the identical payload returns the existing period, a changed payload returns 409.'
+      x-brrtrouter-impl: true
+      tags:
+      - fiscal-periods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFiscalPeriodRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateFiscalPeriodCreatedResponse'
+        '200':
+          $ref: '#/components/responses/CreateFiscalPeriodCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/CreateFiscalPeriodConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /v1/journal-entries/{id}:
     get:
       operationId: get_journal_entry
@@ -269,6 +299,50 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
+  /v1/fiscal-periods/{id}/transitions:
+    post:
+      operationId: transition_fiscal_period
+      summary: Advance a fiscal period's lifecycle state
+      description: 'Applies one transition of the period state machine: OPEN->CLOSED; CLOSED->REOPENED
+        or POSTING_LOCKED; REOPENED->CLOSED or POSTING_LOCKED; POSTING_LOCKED->PERMANENTLY_CLOSED. Any
+        other transition is 409. REOPENED additionally requires an explicit reason (policy override of
+        a prior close). Posting into a period is allowed exactly when it is OPEN or REOPENED; every transition
+        is an accounting audit fact. Idempotent per (legal entity, idempotency_key) with the same replay
+        rules as creation.'
+      x-brrtrouter-impl: true
+      tags:
+      - fiscal-periods
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Fiscal period identifier
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionFiscalPeriodRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/TransitionFiscalPeriodCreatedResponse'
+        '200':
+          $ref: '#/components/responses/TransitionFiscalPeriodCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/TransitionFiscalPeriodConflictResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     bearerAuth:
@@ -317,6 +391,32 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
     InternalError:
       description: Accounting query could not be completed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    CreateFiscalPeriodCreatedResponse:
+      description: The fiscal period after the write
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FiscalPeriod'
+    CreateFiscalPeriodConflictResponse:
+      description: Idempotency key already used with a different payload, or the write violates a period
+        invariant (overlap, illegal transition)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TransitionFiscalPeriodCreatedResponse:
+      description: The fiscal period after the write
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FiscalPeriod'
+    TransitionFiscalPeriodConflictResponse:
+      description: Idempotency key already used with a different payload, or the write violates a period
+        invariant (overlap, illegal transition)
       content:
         application/json:
           schema:
@@ -485,10 +585,18 @@ components:
           enum:
           - OPEN
           - CLOSED
-          - HARD_LOCKED
+          - POSTING_LOCKED
+          - REOPENED
+          - PERMANENTLY_CLOSED
+          description: Period lifecycle state; posting into a period is allowed exactly when it is OPEN
+            or REOPENED
         closed_at:
           type: string
           format: date-time
+          nullable: true
+        closed_by:
+          type: string
+          format: uuid
           nullable: true
     FiscalPeriodList:
       type: object
@@ -648,3 +756,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TrialBalanceLine'
+    CreateFiscalPeriodRequest:
+      type: object
+      required:
+      - idempotency_key
+      - name
+      - start_date
+      - end_date
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for period creation.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+    TransitionFiscalPeriodRequest:
+      type: object
+      required:
+      - idempotency_key
+      - target_state
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for period transitions.
+        target_state:
+          type: string
+          enum:
+          - CLOSED
+          - REOPENED
+          - POSTING_LOCKED
+          - PERMANENTLY_CLOSED
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: Required when target_state is REOPENED; an explicit policy override of a prior
+            close.

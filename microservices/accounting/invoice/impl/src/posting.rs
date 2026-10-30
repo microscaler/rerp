@@ -296,10 +296,13 @@ fn resolve_open_period<E: LifeExecutor>(
     legal_entity_id: Uuid,
     date: NaiveDate,
 ) -> Result<AccountingFiscalPeriodModel, PostingError> {
+    // Posting is allowed exactly when a covering period is OPEN or REOPENED
+    // (Epic D2 state machine). A CLOSED/locked period rejects postings
+    // deterministically; a re-opened period accepts them again.
     required_model(
         PeriodEntity::find()
             .filter(PeriodColumn::LegalEntityId.eq(legal_entity_id))
-            .filter(PeriodColumn::State.eq("OPEN"))
+            .filter(PeriodColumn::State.is_in(["OPEN", "REOPENED"]))
             .filter(PeriodColumn::StartDate.lte(date))
             .filter(PeriodColumn::EndDate.gte(date))
             .find_one(executor),

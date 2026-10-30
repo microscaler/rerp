@@ -27,7 +27,7 @@ use uuid::Uuid;
 
 use crate::ledger::{account_json, currency, parse_uuid, resolve_legal_entity, LedgerError};
 
-const SOURCE_SYSTEM: &str = "rerp-accounting";
+pub(crate) const SOURCE_SYSTEM: &str = "rerp-accounting";
 const SOURCE_TYPE: &str = "ledger_account";
 const ACCOUNT_TYPES: [&str; 5] = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
 const NORMAL_SIDES: [&str; 2] = ["DEBIT", "CREDIT"];
@@ -187,7 +187,7 @@ fn validate(request: &Request) -> Result<(), LedgerError> {
     Ok(())
 }
 
-fn find_idempotency<E: LifeExecutor>(
+pub(crate) fn find_idempotency<E: LifeExecutor>(
     executor: &E,
     legal_entity_id: Uuid,
     key: &str,
@@ -207,7 +207,7 @@ fn find_idempotency<E: LifeExecutor>(
     }
 }
 
-fn insert<R: ActiveModelTrait, E: LifeExecutor>(
+pub(crate) fn insert<R: ActiveModelTrait, E: LifeExecutor>(
     record: &mut R,
     executor: &E,
     resource: &str,
@@ -235,7 +235,7 @@ fn request_fingerprint(tenant_id: &str, legal_entity_id: Uuid, request: &Request
     hex_digest(&hasher.finalize())
 }
 
-fn hex_digest(bytes: &[u8]) -> String {
+pub(crate) fn hex_digest(bytes: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut output = String::with_capacity(bytes.len() * 2);
     for byte in bytes {

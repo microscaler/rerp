@@ -211,9 +211,13 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   control_role) plus server-side 403 for control accounts; type/currency
   freeze once journal lines reference the account; fingerprint-gated
   idempotency on both ops.
-- **D2 — Fiscal period state machine** (M): open/close/reopen/hard-lock;
-  *AC*: concurrent posting into closed period rejected deterministically
-  (live RLS acceptance pattern).
+- **D2 — Fiscal period state machine** (M) — **DONE 2026-10-30**: create +
+  closed transition matrix (OPEN→CLOSED→{REOPENED,POSTING_LOCKED}→
+  PERMANENTLY_CLOSED; reopen requires an explicit reason); posting into a
+  period allowed exactly when OPEN or REOPENED — invoice's
+  resolve_open_period corrected from `state='OPEN'` to
+  `state IN (OPEN, REOPENED)`; every transition an audit fact; live-DB
+  acceptance test (ignored in CI) covers replay/overlap/close/reopen.
 - **D3 — Posting & reversal service** (L, deps D1,D2): generic balanced journal
   post + linked reversal preserving both audit histories; deterministic
   legal-entity/year numbering extended from invoice's advisory-lock scheme.
