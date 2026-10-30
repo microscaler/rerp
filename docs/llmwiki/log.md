@@ -726,3 +726,13 @@ ref-rewritten) the whole accounting suite — including
   audit via the now-shared journals machinery (persist_posting gained
   an explicit audit_action parameter).
 - Retained-earnings close deliberately NOT bundled here: D4b slice.
+
+## [2026-10-30] contribute | retained-earnings year close (D4b); Epic D4 complete
+
+- GL now 12 ops. yearclose.rs: POST /v1/year-closes nets REVENUE/EXPENSE
+  accounts of the calendar-year periods into an EQUITY RE account
+  (YCL-{year}-{n}, FISCAL_YEAR_CLOSED audit). Closing entries are
+  excluded from their own aggregation; year closes once
+  (year_already_closed); no P&L activity → nothing_to_close; Dec-31
+  period must be OPEN/REOPENED. Lifeguard range ops are gte/lte/
+  between — there is no ge/le.
