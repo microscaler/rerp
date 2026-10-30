@@ -689,3 +689,17 @@ ref-rewritten) the whole accounting suite — including
   {name} in its template across all 121 specs (GL was the only violation).
 - qa now 227. Lesson: hand-patched OpenAPI YAML must round-trip through a
   parameter-declaration check, not just schema validation.
+
+## [2026-10-30] contribute | fiscal-period state machine closes Epic D2
+
+- GL now 8 ops: create_fiscal_period + transition_fiscal_period. Closed
+  transition matrix; REOPENED requires explicit reason; overlap 409 at
+  creation; fingerprints bind operation markers so create/transition/
+  account replay namespaces can never collide.
+- Corrected invoice resolve_open_period: accepted ONLY state='OPEN', so a
+  properly REOPENED period silently rejected postings. Now
+  IN (OPEN, REOPENED) — posting-allowed is exactly the D2 contract.
+- D2 spec work also surfaced (and #120 fixed) the D1b mount bug; the
+  path-parameter gate caught nothing new here because the transition op's
+  parameters were authored correctly after the idem_param mixup was
+  removed.
