@@ -237,9 +237,11 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 
 ### Epic E — Invoice hardening (WP2 remainder)
 
-- **E1 — Durable render outbox** (M): atomically store immutable render model +
-  Documents-Render outbox instruction at posting; posting succeeds while
-  rendering is down (NFR-DOG-010).
+- **E1 — Durable render outbox** (M) — **DONE 2026-10-31**: posting
+  atomically queues `accounting_render_outbox` (migration 0004) with the
+  immutable render model; materialiser claims/attempts/records errors,
+  DONE only with the artifact row; GET /v1/render-outbox is the operator
+  surface (NFR-DOG-010).
 - **E2 — Partial credit/debit notes** (M): explicit workflows only; original
   stays immutable.
 - **E3 — Generated rustls client proof** (M): generated HTTPS consumer covers

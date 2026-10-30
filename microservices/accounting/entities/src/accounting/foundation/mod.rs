@@ -14,6 +14,7 @@ pub mod journal_line;
 pub mod legal_entity;
 pub mod posted_document;
 pub mod posted_document_line;
+pub mod render_outbox;
 
 pub use account::AccountingAccount;
 pub use audit_event::AccountingAuditEvent;
@@ -25,3 +26,4 @@ pub use journal_line::AccountingJournalLine;
 pub use legal_entity::AccountingLegalEntity;
 pub use posted_document::AccountingPostedDocument;
 pub use posted_document_line::AccountingPostedDocumentLine;
+pub use render_outbox::AccountingRenderOutbox;
