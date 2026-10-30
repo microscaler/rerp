@@ -218,9 +218,12 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   resolve_open_period corrected from `state='OPEN'` to
   `state IN (OPEN, REOPENED)`; every transition an audit fact; live-DB
   acceptance test (ignored in CI) covers replay/overlap/close/reopen.
-- **D3 — Posting & reversal service** (L, deps D1,D2): generic balanced journal
-  post + linked reversal preserving both audit histories; deterministic
-  legal-entity/year numbering extended from invoice's advisory-lock scheme.
+- **D3 — Posting & reversal service** (L, deps D1,D2) — **DONE 2026-10-30**:
+  manual balanced journal post (decimal-string amounts, active-account and
+  OPEN/REOPENED period gates) + linked reversal creating a mirrored NEW
+  entry; original untouched, both audit histories preserved; numbering
+  (MJE/MJR/JE-{year}-{n}) under invoice's advisory lock on
+  (legal entity, calendar year) - collision-free across services.
 - **D4 — Opening balances & year transition policy** (M, deps D3).
 - **D5 — Trial balance dimensions** (M, deps D3): by period, currency,
   supported dimensions; keeps the existing integrity pre-validation.
