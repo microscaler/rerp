@@ -745,3 +745,13 @@ ref-rewritten) the whole accounting suite — including
   totals = reported slice. Deref-generics don't work for owned-slice
   callers (Model: Deref unsatisfied) — slices are cloned before the
   pure derive helpers. Epic D (General Ledger) now complete.
+
+## [2026-10-31] contribute | durable render outbox (E1)
+
+- Invoice posting atomically enqueues accounting_render_outbox (0004,
+  RLS) with the immutable render model; NFR-DOG-010. Materialiser:
+  claim (attempt+, IN_PROGRESS blocks), render from model, failure ->
+  PENDING + truncated error; DONE in the artifact transaction. Legacy
+  documents render from DB and backfill DONE. GET /v1/render-outbox =
+  operator queue surface. Claim race is benign (content-addressed
+  render + artifact unique).
