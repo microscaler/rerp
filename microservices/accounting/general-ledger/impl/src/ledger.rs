@@ -58,7 +58,7 @@ pub fn parse_uuid(value: &str, field: &str) -> Result<Uuid, LedgerError> {
         .map_err(|_| LedgerError::Validation(format!("{field} must be a UUID")))
 }
 
-fn parse_date(value: &str, field: &str) -> Result<NaiveDate, LedgerError> {
+pub(crate) fn parse_date(value: &str, field: &str) -> Result<NaiveDate, LedgerError> {
     NaiveDate::parse_from_str(value.trim(), "%Y-%m-%d")
         .map_err(|_| LedgerError::Validation(format!("{field} must be an ISO 8601 date")))
 }

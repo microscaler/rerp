@@ -29,6 +29,7 @@ mod http_support;
 mod identity;
 mod impl_registry;
 mod ledger;
+mod periods;
 use controllers::*;
 use std::fs;
 use std::io;
