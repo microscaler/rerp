@@ -82,6 +82,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         crate::controllers::get_trial_balance::GetTrialBalanceController,
         20480,
     );
+
+    dispatcher.register_typed_with_stack_size(
+        "close_fiscal_year",
+        crate::controllers::close_fiscal_year::CloseFiscalYearController,
+        16384,
+    );
 }
 
 /// Register gen mock/proxy controllers for routes from the OpenAPI spec (ADR 0001 Layer 1).
@@ -182,6 +188,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_trial_balance::GetTrialBalanceController,
                     20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "close_fiscal_year" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::close_fiscal_year::CloseFiscalYearController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

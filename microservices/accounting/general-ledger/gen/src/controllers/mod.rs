@@ -24,3 +24,5 @@ pub mod reverse_journal_entry;
 pub mod set_opening_balances;
 
 pub mod get_trial_balance;
+
+pub mod close_fiscal_year;
