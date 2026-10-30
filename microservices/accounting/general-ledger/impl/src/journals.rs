@@ -80,7 +80,7 @@ pub fn post_journal_entry<E: LifeExecutor>(
 
     let date = parse_date(&request.entry_date, "entry_date")?;
     let currency_code = currency(&request.currency_code)?;
-    let period = posting_period(executor, legal_entity.id, date)?;
+    let period = lock_and_revalidate_period(executor, legal_entity.id, date)?;
     let lines = validate_lines(executor, legal_entity.id, &currency_code, &request.lines)?;
 
     let ids = allocate_identifiers(executor, legal_entity.id, date, DOCUMENT_TYPE_MANUAL, "MJE")?;
@@ -141,7 +141,7 @@ pub fn reverse_journal_entry<E: LifeExecutor>(
     }
 
     let date = Utc::now().date_naive();
-    let period = posting_period(executor, legal_entity.id, date)?;
+    let period = lock_and_revalidate_period(executor, legal_entity.id, date)?;
     let original_lines = JournalLineEntity::find()
         .filter(JournalLineColumn::JournalEntryId.eq(original_id))
         .all(executor)
@@ -245,6 +245,7 @@ fn validate_lines<E: LifeExecutor>(
             "journal entry is unbalanced: debits {debit} != credits {credit}"
         )));
     }
+    check_totals_within_numeric_range(debit, credit)?;
     Ok(validated)
 }
 
@@ -314,6 +315,70 @@ pub(crate) fn posting_period<E: LifeExecutor>(
                 "no OPEN or REOPENED fiscal period covers the posting date".to_string(),
             )
         })
+}
+
+/// Serialize the "period eligibility + posting" pair per period. The
+/// transition endpoint takes the same lock before reading state, so a
+/// concurrent close cannot commit between the check and the persist.
+pub(crate) fn period_posting_lock<E: LifeExecutor>(
+    executor: &E,
+    period_id: Uuid,
+) -> Result<(), LedgerError> {
+    const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+    const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+    let mut hash = FNV_OFFSET;
+    for byte in b"period-posting".iter().chain(period_id.as_bytes().iter()) {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(FNV_PRIME);
+    }
+    let lock_key = i64::from_be_bytes(hash.to_be_bytes());
+    executor
+        .query_one(&format!("SELECT pg_advisory_xact_lock({lock_key})"), &[])
+        .map_err(|error| LedgerError::Database(format!("period posting lock: {error}")))?;
+    Ok(())
+}
+
+/// Locate the eligible posting period, take the per-period lock, then
+/// re-verify its state under that lock before any caller persists.
+pub(crate) fn lock_and_revalidate_period<E: LifeExecutor>(
+    executor: &E,
+    legal_entity_id: Uuid,
+    date: NaiveDate,
+) -> Result<FiscalPeriodModel, LedgerError> {
+    let period = posting_period(executor, legal_entity_id, date)?;
+    period_posting_lock(executor, period.id)?;
+    let locked = FiscalPeriodEntity::find()
+        .filter(FiscalPeriodColumn::Id.eq(period.id))
+        .find_one(executor)
+        .map_err(|error| LedgerError::Database(error.to_string()))?
+        .ok_or(LedgerError::NotFound)?;
+    if locked.state != "OPEN" && locked.state != "REOPENED" {
+        return Err(LedgerError::Conflict(
+            "period_not_open".to_string(),
+            format!(
+                "the fiscal period transitioned to {} concurrently; the posting was rejected",
+                locked.state
+            ),
+        ));
+    }
+    Ok(locked)
+}
+
+/// Entry totals must fit the NUMERIC(19,6) storage: individual amounts
+/// pass the pattern, but sums of many max-size amounts can overflow the
+/// column and fail at insert.
+pub(crate) fn check_totals_within_numeric_range(
+    debit: Decimal,
+    credit: Decimal,
+) -> Result<(), LedgerError> {
+    let limit: Decimal = Decimal::from_str("9999999999999.999999")
+        .map_err(|error| LedgerError::Database(format!("numeric limit: {error}")))?;
+    if debit > limit || credit > limit {
+        return Err(LedgerError::Validation(format!(
+            "entry totals (debits {debit}, credits {credit}) exceed the NUMERIC(19,6) limit {limit}"
+        )));
+    }
+    Ok(())
 }
 
 pub(crate) fn allocate_identifiers<E: LifeExecutor>(
@@ -819,5 +884,14 @@ mod tests {
             conflict,
             Err(LedgerError::Conflict(ref code, _)) if code == "journal_entry_reversed"
         ));
+    }
+
+    #[test]
+    fn entry_totals_beyond_numeric_storage_are_rejected_before_insert() {
+        let at_limit = Decimal::from_str("9999999999999.999999").expect("limit");
+        let over_limit = Decimal::from_str("9999999999999.9999999").expect("over");
+        assert!(check_totals_within_numeric_range(at_limit, at_limit).is_ok());
+        assert!(check_totals_within_numeric_range(over_limit, at_limit).is_err());
+        assert!(check_totals_within_numeric_range(at_limit, over_limit).is_err());
     }
 }
