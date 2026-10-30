@@ -53,18 +53,18 @@ pub struct JournalChange {
     pub created: bool,
 }
 
-struct PostingIds {
-    document_id: Uuid,
-    journal_id: Uuid,
-    document_number: String,
-    entry_number: String,
+pub(crate) struct PostingIds {
+    pub(crate) document_id: Uuid,
+    pub(crate) journal_id: Uuid,
+    pub(crate) document_number: String,
+    pub(crate) entry_number: String,
 }
 
-struct JournalDraftLine {
-    account_id: Uuid,
-    side: String,
-    amount: Decimal,
-    description: String,
+pub(crate) struct JournalDraftLine {
+    pub(crate) account_id: Uuid,
+    pub(crate) side: String,
+    pub(crate) amount: Decimal,
+    pub(crate) description: String,
 }
 
 pub fn post_journal_entry<E: LifeExecutor>(
@@ -83,7 +83,7 @@ pub fn post_journal_entry<E: LifeExecutor>(
     let period = posting_period(executor, legal_entity.id, date)?;
     let lines = validate_lines(executor, legal_entity.id, &currency_code, &request.lines)?;
 
-    let ids = allocate_identifiers(executor, legal_entity.id, date, DOCUMENT_TYPE_MANUAL)?;
+    let ids = allocate_identifiers(executor, legal_entity.id, date, DOCUMENT_TYPE_MANUAL, "MJE")?;
     let now = Utc::now().naive_utc();
     persist_posting(
         executor,
@@ -100,6 +100,7 @@ pub fn post_journal_entry<E: LifeExecutor>(
         DOCUMENT_TYPE_MANUAL,
         SOURCE_TYPE_MANUAL,
         None,
+        "JOURNAL_ENTRY_POSTED",
     )?;
     Ok(JournalChange {
         entry: entry_json(executor, legal_entity.id, &ids)?,
@@ -147,7 +148,13 @@ pub fn reverse_journal_entry<E: LifeExecutor>(
         .map_err(|error| LedgerError::Database(error.to_string()))?;
     let lines = mirror_lines(&original, &original_lines);
 
-    let ids = allocate_identifiers(executor, legal_entity.id, date, DOCUMENT_TYPE_REVERSAL)?;
+    let ids = allocate_identifiers(
+        executor,
+        legal_entity.id,
+        date,
+        DOCUMENT_TYPE_REVERSAL,
+        "MJR",
+    )?;
     let now = Utc::now().naive_utc();
     persist_posting(
         executor,
@@ -164,6 +171,7 @@ pub fn reverse_journal_entry<E: LifeExecutor>(
         DOCUMENT_TYPE_REVERSAL,
         SOURCE_TYPE_REVERSAL,
         Some(original.source_document_id),
+        "JOURNAL_ENTRY_REVERSED",
     )?;
     Ok(JournalChange {
         entry: entry_json(executor, legal_entity.id, &ids)?,
@@ -259,7 +267,7 @@ fn mirror_lines(
         .collect()
 }
 
-fn parse_amount(value: &str, line: usize) -> Result<Decimal, LedgerError> {
+pub(crate) fn parse_amount(value: &str, line: usize) -> Result<Decimal, LedgerError> {
     if !is_decimal_string(value) {
         return Err(LedgerError::Validation(format!(
             "line {line} amount must be a positive decimal with 1-6 fractional digits"
@@ -288,7 +296,7 @@ fn is_decimal_string(value: &str) -> bool {
         && fraction.bytes().all(|byte| byte.is_ascii_digit())
 }
 
-fn posting_period<E: LifeExecutor>(
+pub(crate) fn posting_period<E: LifeExecutor>(
     executor: &E,
     legal_entity_id: Uuid,
     date: NaiveDate,
@@ -308,11 +316,12 @@ fn posting_period<E: LifeExecutor>(
         })
 }
 
-fn allocate_identifiers<E: LifeExecutor>(
+pub(crate) fn allocate_identifiers<E: LifeExecutor>(
     executor: &E,
     legal_entity_id: Uuid,
     date: NaiveDate,
     document_type: &str,
+    document_prefix: &str,
 ) -> Result<PostingIds, LedgerError> {
     // Same lock key function and namespace as the invoice service: all
     // document and journal sequences for one legal entity and calendar year
@@ -341,11 +350,7 @@ fn allocate_identifiers<E: LifeExecutor>(
         .count()
         .one(executor)
         .map_err(|error| LedgerError::Database(error.to_string()))?;
-    let prefix = if document_type == DOCUMENT_TYPE_REVERSAL {
-        "MJR"
-    } else {
-        "MJE"
-    };
+    let prefix = document_prefix;
     Ok(PostingIds {
         document_id: Uuid::new_v4(),
         journal_id: Uuid::new_v4(),
@@ -371,7 +376,7 @@ fn sequence_lock_key(legal_entity_id: Uuid, year: i32) -> i64 {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn persist_posting<E: LifeExecutor>(
+pub(crate) fn persist_posting<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entity_id: Uuid,
@@ -386,6 +391,7 @@ fn persist_posting<E: LifeExecutor>(
     document_type: &str,
     source_type: &str,
     original_document_id: Option<Uuid>,
+    audit_action: &str,
 ) -> Result<(), LedgerError> {
     let mut debit = Decimal::ZERO;
     let mut credit = Decimal::ZERO;
@@ -465,11 +471,7 @@ fn persist_posting<E: LifeExecutor>(
         .set_tenant_id(session.tenant_id.clone())
         .set_legal_entity_id(legal_entity_id)
         .set_subject_id(session.subject_id)
-        .set_action(if original_document_id.is_some() {
-            "JOURNAL_ENTRY_REVERSED".to_string()
-        } else {
-            "JOURNAL_ENTRY_POSTED".to_string()
-        })
+        .set_action(audit_action.to_string())
         .set_document_id(ids.document_id)
         .set_original_document_id(original_document_id)
         .set_source_system(SOURCE_SYSTEM.to_string())

@@ -30,6 +30,7 @@ mod identity;
 mod impl_registry;
 mod journals;
 mod ledger;
+mod opening;
 mod periods;
 use controllers::*;
 use std::fs;
