@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 
 pub mod credit_customer_invoice;
+pub mod debit_customer_invoice;
 pub mod get_customer_invoice;
 pub mod get_customer_invoice_document;
 pub mod get_customer_invoice_journal;

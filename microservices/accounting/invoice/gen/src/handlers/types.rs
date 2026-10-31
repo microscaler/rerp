@@ -50,6 +50,35 @@ pub struct CustomerInvoiceLine {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DebitCustomerInvoiceRequest {
+    pub idempotency_key: String,
+
+    pub lines: Vec<DebitLineInput>,
+
+    pub reason: String,
+
+    pub source: SourceReference,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DebitCustomerInvoiceResponse {
+    pub idempotency_key: String,
+
+    pub invoice: PostedInvoice,
+
+    pub journal: PostedJournal,
+
+    pub request_fingerprint: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DebitLineInput {
+    pub original_line_number: i32,
+
+    pub quantity: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: String,
 

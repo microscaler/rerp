@@ -6,6 +6,8 @@ Apply these files in lexical order after the vendored Sesame RLS contract:
 2. `0001_generated_entities.sql`
 3. `0002_controls_and_rls.sql`
 4. `0003_document_artifacts.sql`
+5. `0004_render_outbox.sql`
+6. `0005_debit_notes.sql`
 
 `0001` is generated from the typed models in
 `microservices/accounting/entities/src/accounting/foundation/`. `0002`
@@ -13,6 +15,8 @@ contains database behavior that Lifeguard entity metadata does not yet express:
 tenant-consistent composite
 foreign keys, detailed accounting checks, immutable posted/audit records and
 forced tenant RLS. `0003` adds immutable, RLS-scoped rendered-document metadata.
+`0004` adds the durable render outbox (NFR-DOG-010). `0005` widens the
+posted-document type CHECK for customer debit notes (Epic E2b).
 
 The runtime database role requires `USAGE` on the schema, table privileges and
 `EXECUTE` on the Sesame RLS functions. Role creation/grants belong to deployment
@@ -35,6 +39,10 @@ psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
   -f microservices/accounting/migrations/foundation/0002_controls_and_rls.sql
 psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
   -f microservices/accounting/migrations/foundation/0003_document_artifacts.sql
+psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
+  -f microservices/accounting/migrations/foundation/0004_render_outbox.sql
+psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
+  -f microservices/accounting/migrations/foundation/0005_debit_notes.sql
 psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
   -f microservices/accounting/tests/sql/accounting_foundation_acceptance.sql
 dropdb -h 127.0.0.1 -U postgres rerp_phase1_test

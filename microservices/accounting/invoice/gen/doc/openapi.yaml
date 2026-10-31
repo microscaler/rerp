@@ -17,9 +17,9 @@ paths:
       operationId: list_customer_invoices
       tags:
       - customer-invoices
-      summary: List posted customer invoices and credit notes
-      description: The invoice service owns customer invoices and credit notes. Accounts receivable tracks
-        their open balances (open items) by invoice id.
+      summary: List posted customer invoices, credit notes and debit notes
+      description: The invoice service owns customer invoices, credit notes and debit notes. Accounts
+        receivable tracks their open balances (open items) by invoice id.
       x-brrtrouter-impl: true
       parameters:
       - name: customer_id
@@ -34,6 +34,7 @@ paths:
           enum:
           - CUSTOMER_INVOICE
           - CUSTOMER_CREDIT_NOTE
+          - CUSTOMER_DEBIT_NOTE
       - name: invoice_date_from
         in: query
         schema:
@@ -229,6 +230,58 @@ paths:
         line numbers so the remaining creditable balance stays computable. Idempotent per (legal entity,
         idempotency_key): replaying the same key with a different selection is 409. The credit-note document
         is queued for rendering through the same durable render outbox as customer invoices.'
+  /v1/customer-invoices/{id}/debit-notes:
+    parameters:
+    - $ref: '#/components/parameters/DocumentId'
+    post:
+      operationId: debit_customer_invoice
+      tags:
+      - customer-invoices
+      summary: Issue a debit note charging additional quantities against a posted invoice
+      x-brrtrouter-impl: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DebitCustomerInvoiceRequest'
+      responses:
+        '201':
+          description: Debit note and additional-receivable journal committed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingResult'
+        '200':
+          description: Identical idempotent retry returned the committed result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: 'Issues a debit note as its own immutable posted document linked to the original
+        invoice; the original is never modified. A debit note ADDS to what the customer owes: the
+        journal keeps the invoice direction (receivable debited, revenue and tax credited) and is
+        priced from the explicitly selected original lines — unit price, discount and tax rates are
+        inherited and amounts are recomputed with the invoice''s rounding policy. Additional charges
+        are intentionally NOT capped by the original invoice quantities; quantities must simply be
+        positive and reference existing original lines, and must round to a positive charge at the
+        invoice precision — a positive quantity that prices to zero is rejected. Idempotent per (legal entity, idempotency_key):
+        the selection is bound into the request fingerprint and a replay of the same key with a
+        different selection is 409; a debit note can never fingerprint-collide with a credit note on
+        the same key. The debit-note document is queued for rendering through the same durable render
+        outbox as customer invoices.'
   /v1/render-outbox:
     get:
       operationId: list_render_outbox
@@ -545,6 +598,7 @@ components:
           enum:
           - CUSTOMER_INVOICE
           - CUSTOMER_CREDIT_NOTE
+          - CUSTOMER_DEBIT_NOTE
         status:
           type: string
           enum:
@@ -610,6 +664,7 @@ components:
           enum:
           - CUSTOMER_INVOICE
           - CUSTOMER_CREDIT_NOTE
+          - CUSTOMER_DEBIT_NOTE
         original_document_id:
           type: string
           format: uuid
@@ -867,5 +922,53 @@ components:
           description: Line number on the original customer invoice
         quantity:
           type: string
-          pattern: ^[0-9]{1,13}\.[0-9]{1,6}$
-          description: Positive quantity to credit for this line as a NUMERIC(19,6) decimal string
+          pattern: ^(?:[1-9][0-9]{0,12}\.[0-9]{1,6}|0\.(?:[1-9][0-9]{0,5}|0[1-9][0-9]{0,4}|00[1-9][0-9]{0,3}|000[1-9][0-9]{0,2}|0000[1-9][0-9]?|00000[1-9]))$
+          description: Positive quantity to credit for this line as a NUMERIC(19,6) decimal string.
+            The pattern rejects all-zero values (0.000000) so the published schema cannot admit a
+            quantity the core would reject.
+    DebitCustomerInvoiceRequest:
+      type: object
+      required:
+      - idempotency_key
+      - source
+      - reason
+      - lines
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 1
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceReference'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        lines:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/DebitLineInput'
+          description: 'Explicit debit selection (Epic E2b). Exactly these quantities of these original
+            lines are additionally charged: unit price, discount and tax rates are inherited from the
+            original line and amounts are recomputed with the invoice''s rounding policy. Additional
+            charges are NOT capped by the original quantities; quantities must be positive and
+            reference existing original lines. The original document is never modified.'
+    DebitLineInput:
+      type: object
+      required:
+      - original_line_number
+      - quantity
+      properties:
+        original_line_number:
+          type: integer
+          minimum: 1
+          description: Line number on the original customer invoice
+        quantity:
+          type: string
+          pattern: ^(?:[1-9][0-9]{0,12}\.[0-9]{1,6}|0\.(?:[1-9][0-9]{0,5}|0[1-9][0-9]{0,4}|00[1-9][0-9]{0,3}|000[1-9][0-9]{0,2}|0000[1-9][0-9]?|00000[1-9]))$
+          description: Positive quantity to additionally charge for this line as a NUMERIC(19,6)
+            decimal string. The pattern rejects all-zero values (0.000000) so the published schema
+            cannot admit a quantity the core would reject. Duplicate rows for one line merge, and a
+            merged total beyond 13 integer digits is rejected before posting.

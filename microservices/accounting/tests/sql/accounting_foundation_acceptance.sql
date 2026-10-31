@@ -295,6 +295,62 @@ BEGIN
     ) THEN
         RAISE EXCEPTION 'failed posting left a partial document';
     END IF;
+
+    -- 0005 widened the type CHECK: a customer debit note must be insertable.
+    -- The insert runs in a subtransaction that is rolled back on purpose
+    -- (accounting_documents_immutable rejects DELETE, so cleanup-by-DELETE
+    -- would abort the block); the marker exception proves the insert itself
+    -- succeeded.
+    BEGIN
+        INSERT INTO accounting_posted_documents (
+            id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
+            document_type, status, customer_id, source_system, source_type,
+            source_id, document_date, due_date, currency_code,
+            rounding_minor_units, subtotal, discount_amount, tax_amount,
+            total_amount, posted_at, posted_by, original_document_id
+        ) VALUES (
+            'aaaaaaaa-4000-0000-0000-000000000097', 'alpha',
+            'aaaaaaaa-1000-0000-0000-000000000001',
+            'aaaaaaaa-2000-0000-0000-000000000001', 'DBN-ACCEPT',
+            'CUSTOMER_DEBIT_NOTE', 'POSTED',
+            'aaaaaaaa-5000-0000-0000-000000000001', 'hauliage', 'delivery_debit',
+            'acceptance', '2026-07-14', '2026-07-14', 'GBP', 2,
+            10, 0, 0, 10, '2026-07-14 10:00:00',
+            'aaaaaaaa-0000-0000-0000-000000000001',
+            'aaaaaaaa-4000-0000-0000-000000000001'
+        );
+        RAISE EXCEPTION 'debit-note-insert-verified';
+    EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLERRM = 'debit-note-insert-verified' THEN
+                NULL; -- insert succeeded; subtransaction rollback removed it
+            ELSE
+                RAISE EXCEPTION 'CUSTOMER_DEBIT_NOTE must be accepted after 0005: %', SQLERRM;
+            END IF;
+    END;
+
+    -- ... and an unknown type must still be rejected by the same CHECK.
+    BEGIN
+        INSERT INTO accounting_posted_documents (
+            id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
+            document_type, status, customer_id, source_system, source_type,
+            source_id, document_date, due_date, currency_code,
+            rounding_minor_units, subtotal, discount_amount, tax_amount,
+            total_amount, posted_at, posted_by
+        ) VALUES (
+            'aaaaaaaa-4000-0000-0000-000000000096', 'alpha',
+            'aaaaaaaa-1000-0000-0000-000000000001',
+            'aaaaaaaa-2000-0000-0000-000000000001', 'BAD-TYPE',
+            'CUSTOMER_PROFORMA', 'POSTED',
+            'aaaaaaaa-5000-0000-0000-000000000001', 'hauliage', 'delivery',
+            'acceptance', '2026-07-14', '2026-07-14', 'GBP', 2,
+            10, 0, 0, 10, '2026-07-14 10:00:00',
+            'aaaaaaaa-0000-0000-0000-000000000001'
+        );
+        RAISE EXCEPTION 'unknown document type unexpectedly accepted';
+    EXCEPTION WHEN check_violation THEN
+        NULL;
+    END;
 END
 $$;
 COMMIT;

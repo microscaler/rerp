@@ -4,7 +4,7 @@ use chrono::{Datelike, NaiveDate, Utc};
 use lifeguard::active_model::ActiveModelTrait;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, Order, SessionContext};
 use rerp_accounting_core::{
-    credit_customer_invoice as build_credit,
+    credit_customer_invoice as build_credit, debit_customer_invoice as build_debit,
     partial_credit_customer_invoice as build_partial_credit,
     post_customer_invoice as build_invoice, AccountingDocumentStatus, AccountingDocumentType,
     AccountingError, AuditAction, AuditEvent, CreditLineSelection, CurrencyCode,
@@ -13,6 +13,7 @@ use rerp_accounting_core::{
     PostingIdentifiers, PostingPlan, RoundingPolicy, SourceReference, TaxInput,
 };
 use rerp_accounting_invoice_gen::handlers::credit_customer_invoice::Request as CreditRequest;
+use rerp_accounting_invoice_gen::handlers::debit_customer_invoice::Request as DebitRequest;
 use rerp_accounting_invoice_gen::handlers::post_customer_invoice::Request as PostRequest;
 use rerp_accounting_invoice_gen::handlers::types::TaxFact;
 use rerp_entities::accounting::foundation::account::{
@@ -162,7 +163,7 @@ pub fn post_customer_invoice<E: LifeExecutor>(
         receivable_account_id: receivable.id,
         lines,
     };
-    let context = posting_context(session, &legal_entity, &fiscal_period);
+    let context = posting_context(session, &legal_entity, &fiscal_period, Utc::now());
     let identifiers = allocate_identifiers(
         executor,
         legal_entity.id,
@@ -186,9 +187,10 @@ pub fn credit_customer_invoice<E: LifeExecutor>(
     if original.invoice.snapshot.legal_entity_id != legal_entity.id {
         return Err(PostingError::NotFound);
     }
-    let credit_date = Utc::now().date_naive();
+    let now = Utc::now();
+    let credit_date = now.date_naive();
     let fiscal_period = resolve_open_period(executor, legal_entity.id, credit_date)?;
-    let context = posting_context(session, &legal_entity, &fiscal_period);
+    let context = posting_context(session, &legal_entity, &fiscal_period, now);
     let identifiers = allocate_identifiers(
         executor,
         legal_entity.id,
@@ -270,6 +272,74 @@ pub fn get_invoice<E: LifeExecutor>(
     document_id: Uuid,
 ) -> Result<StoredInvoice, PostingError> {
     load_invoice(executor, document_id)
+}
+
+pub fn debit_customer_invoice<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    original_document_id: Uuid,
+    request: &DebitRequest,
+) -> Result<StoredPosting, PostingError> {
+    let legal_entity = resolve_legal_entity(executor, session)?;
+    let original = load_posting_plan(executor, original_document_id)?;
+    if original.invoice.snapshot.legal_entity_id != legal_entity.id {
+        return Err(PostingError::NotFound);
+    }
+    let now = Utc::now();
+    let debit_date = now.date_naive();
+    let fiscal_period = resolve_open_period(executor, legal_entity.id, debit_date)?;
+    let context = posting_context(session, &legal_entity, &fiscal_period, now);
+    let identifiers = allocate_identifiers(
+        executor,
+        legal_entity.id,
+        debit_date,
+        AccountingDocumentType::CustomerDebitNote,
+    )?;
+    let rounding_minor_units = original.invoice.rounding_minor_units;
+    let original_plan = PostingPlan {
+        idempotency_key: IdempotencyKey::try_from("loaded-original")
+            .map_err(|error| PostingError::Database(error.to_string()))?,
+        request_fingerprint: String::new(),
+        invoice: original.invoice.snapshot,
+        journal: original.journal,
+        audit_event: AuditEvent {
+            tenant_id: session.tenant_id.clone(),
+            legal_entity_id: legal_entity.id,
+            subject_id: session.subject_id,
+            action: AuditAction::InvoicePosted,
+            document_id: original_document_id,
+            original_document_id: None,
+            occurred_at: Utc::now().naive_utc(),
+        },
+    };
+    // A debit note is always an explicit additional charge against selected
+    // original lines; there is no "full debit" mode and no quantity cap.
+    let selections = parse_debit_selections(&request.lines)?;
+    let rounding = RoundingPolicy::new(
+        u32::try_from(rounding_minor_units)
+            .map_err(|_| PostingError::Validation("invalid rounding precision".to_string()))?,
+    )
+    .map_err(|error| PostingError::Validation(error.to_string()))?;
+    let receivable = resolve_control_account(executor, legal_entity.id, AR_ROLE)?;
+    let plan = build_debit(
+        &context,
+        &identifiers,
+        IdempotencyKey::try_from(request.idempotency_key.as_str())
+            .map_err(|error| PostingError::Validation(error.to_string()))?,
+        source_reference(
+            &request.source.system,
+            &request.source.resource_type,
+            &request.source.resource_id,
+        ),
+        receivable.id,
+        rounding,
+        &original_plan,
+        &request.reason,
+        &selections,
+    )
+    .map_err(|error| PostingError::Validation(error.to_string()))?;
+
+    complete_or_persist(executor, plan, rounding_minor_units)
 }
 
 pub fn get_journal<E: LifeExecutor>(
@@ -418,6 +488,7 @@ fn posting_context(
     session: &SessionContext,
     legal_entity: &AccountingLegalEntityModel,
     period: &AccountingFiscalPeriodModel,
+    now: chrono::DateTime<Utc>,
 ) -> PostingContext {
     PostingContext {
         tenant_id: session.tenant_id.clone(),
@@ -427,7 +498,7 @@ fn posting_context(
         fiscal_period_start: period.start_date,
         fiscal_period_end: period.end_date,
         fiscal_period_state: FiscalPeriodState::Open,
-        posted_at: Utc::now().naive_utc(),
+        posted_at: now.naive_utc(),
     }
 }
 
@@ -468,6 +539,7 @@ fn allocate_identifiers<E: LifeExecutor>(
     let prefix = match document_type {
         AccountingDocumentType::CustomerInvoice => "INV",
         AccountingDocumentType::CustomerCreditNote => "CRN",
+        AccountingDocumentType::CustomerDebitNote => "DBN",
     };
     Ok(PostingIdentifiers {
         invoice_id: Uuid::new_v4(),
@@ -701,7 +773,7 @@ impl InvoiceListFilter {
             .map(|value| {
                 parse_document_type(value).map_err(|_| {
                     PostingError::Validation(
-                        "document_type must be CUSTOMER_INVOICE or CUSTOMER_CREDIT_NOTE"
+                        "document_type must be CUSTOMER_INVOICE, CUSTOMER_CREDIT_NOTE or CUSTOMER_DEBIT_NOTE"
                             .to_string(),
                     )
                 })
@@ -957,14 +1029,45 @@ fn parse_credit_selections(
         .collect()
 }
 
+fn parse_debit_selections(
+    lines: &[rerp_accounting_invoice_gen::handlers::types::DebitLineInput],
+) -> Result<Vec<CreditLineSelection>, PostingError> {
+    lines
+        .iter()
+        .enumerate()
+        .map(|(index, line)| {
+            if line.original_line_number < 1 {
+                return Err(PostingError::Validation(format!(
+                    "lines {}: original_line_number must be at least 1",
+                    index + 1
+                )));
+            }
+            Ok(CreditLineSelection {
+                original_line_number: line.original_line_number as u32,
+                quantity: parse_decimal(
+                    &line.quantity,
+                    &format!("lines[{}].quantity", index + 1),
+                    index + 1,
+                )?,
+            })
+        })
+        .collect()
+}
+
 /// Quantities already consumed per original line across all credit notes
-/// (full or partial) linked to the original document.
+/// (full or partial) linked to the original document. Debit notes link the
+/// SAME way but are additional charges, not consumption: the fold must
+/// filter to credit-note documents or a debit would silently shrink the
+/// creditable balance and reject valid credits with OverCredit.
 fn credited_quantities<E: LifeExecutor>(
     executor: &E,
     original_document_id: Uuid,
 ) -> Result<std::collections::BTreeMap<u32, Decimal>, PostingError> {
     let credits = DocumentEntity::find()
         .filter(DocumentColumn::OriginalDocumentId.eq(original_document_id))
+        .filter(DocumentColumn::DocumentType.eq(document_type_name(
+            AccountingDocumentType::CustomerCreditNote,
+        )))
         .all(executor)
         .map_err(|error| PostingError::Database(error.to_string()))?;
     let credit_ids: Vec<Uuid> = credits.iter().map(|document| document.id).collect();
@@ -1022,6 +1125,7 @@ fn document_type_name(document_type: AccountingDocumentType) -> &'static str {
     match document_type {
         AccountingDocumentType::CustomerInvoice => "CUSTOMER_INVOICE",
         AccountingDocumentType::CustomerCreditNote => "CUSTOMER_CREDIT_NOTE",
+        AccountingDocumentType::CustomerDebitNote => "CUSTOMER_DEBIT_NOTE",
     }
 }
 
@@ -1029,6 +1133,7 @@ fn parse_document_type(value: &str) -> Result<AccountingDocumentType, PostingErr
     match value {
         "CUSTOMER_INVOICE" => Ok(AccountingDocumentType::CustomerInvoice),
         "CUSTOMER_CREDIT_NOTE" => Ok(AccountingDocumentType::CustomerCreditNote),
+        "CUSTOMER_DEBIT_NOTE" => Ok(AccountingDocumentType::CustomerDebitNote),
         _ => Err(PostingError::Database("unknown document type".to_string())),
     }
 }
@@ -1052,6 +1157,7 @@ fn audit_action_name(action: AuditAction) -> &'static str {
     match action {
         AuditAction::InvoicePosted => "INVOICE_POSTED",
         AuditAction::CreditNotePosted => "CREDIT_NOTE_POSTED",
+        AuditAction::DebitNotePosted => "DEBIT_NOTE_POSTED",
     }
 }
 
