@@ -591,8 +591,9 @@ ref-rewritten) the whole accounting suite — including
 - Regeneration via BRRTRouter 9768e35 (hermes-lab sibling checkout; the
   microscaler/BRRTRouter sibling is at c9f0884 and must not be used for rerp
   gen until re-pinned): full-suite regen touched only accounts-receivable.
-- Impl: 9 stubs -> honest 501s, 15 orphan controllers removed, registry
-  re-synced. Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57,
+- Impl: 15 orphan controllers removed, registry re-synced. The 9 retained
+  stubs already returned honest 501s from #111. Gates: check 0 errors,
+  21 lib tests, fmt, `just qa` 57,
   `rerp openapi validate` 121 specs valid.
 
 ## [2026-10-28] contribute | accounts-payable contract narrowed to the intake-ledger vertical (Epic B2)
