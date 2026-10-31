@@ -9,7 +9,7 @@ mod invoice;
 mod trial_balance;
 mod types;
 
-pub use error::AccountingError;
+pub use error::{AccountingError, MAX_NOTE_DESCRIPTION_LEN, MAX_QUANTITY_SUM};
 pub use invoice::{
     credit_customer_invoice, debit_customer_invoice, partial_credit_customer_invoice,
     post_customer_invoice, AccountingDocumentStatus, AccountingDocumentType, AuditAction,
@@ -778,6 +778,110 @@ mod tests {
         )
         .expect("partial credit");
         assert_eq!(credit.audit_event.action, AuditAction::CreditNotePosted);
+    }
+
+    #[test]
+    fn merged_debit_quantity_beyond_numeric_storage_is_rejected() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("original");
+        // Two rows that each fit the 13-digit per-row pattern but merge
+        // past NUMERIC(19,6): must fail as a request error, not a DB overflow.
+        let merged = debit_customer_invoice(
+            &fixture.context,
+            &PostingIdentifiers {
+                invoice_id: Uuid::new_v4(),
+                journal_entry_id: Uuid::new_v4(),
+                invoice_number: "DBN-2026-000004".to_owned(),
+                journal_entry_number: "JRN-2026-000008".to_owned(),
+            },
+            IdempotencyKey::try_from("delivery:123:debit:overflow").expect("valid key"),
+            SourceReference {
+                system: "hauliage".to_owned(),
+                resource_type: "delivery_debit".to_owned(),
+                resource_id: "123-debit".to_owned(),
+            },
+            fixture.receivable,
+            RoundingPolicy::new(2).expect("valid precision"),
+            &original,
+            "reason",
+            &[
+                CreditLineSelection {
+                    original_line_number: 1,
+                    quantity: Decimal::from(7_000_000_000_000i64),
+                },
+                CreditLineSelection {
+                    original_line_number: 1,
+                    quantity: Decimal::from(7_000_000_000_000i64),
+                },
+            ],
+        );
+        assert!(matches!(
+            merged,
+            Err(AccountingError::TotalQuantityTooLarge { line_number: 1 })
+        ));
+    }
+
+    #[test]
+    fn derived_note_description_must_fit_the_journal_column() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("original");
+        // "Debit DBN-2026-000002: " is 23 chars; 978 more exceeds VARCHAR(1000).
+        assert!(matches!(
+            build_debit(&fixture, &original, &"x".repeat(978), 1, dec!(1)),
+            Err(AccountingError::DescriptionTooLong)
+        ));
+        // Exactly 1000 characters still posts.
+        assert!(build_debit(&fixture, &original, &"x".repeat(977), 1, dec!(1)).is_ok());
+    }
+
+    #[test]
+    fn debit_fingerprint_binds_the_source_reference() {
+        let fixture = Fixture::new();
+        let original = post_customer_invoice(
+            &fixture.context,
+            &fixture.identifiers,
+            &fixture.instruction(),
+        )
+        .expect("original");
+        let build = |resource_id: &str| {
+            debit_customer_invoice(
+                &fixture.context,
+                &PostingIdentifiers {
+                    invoice_id: Uuid::new_v4(),
+                    journal_entry_id: Uuid::new_v4(),
+                    invoice_number: "DBN-2026-000005".to_owned(),
+                    journal_entry_number: "JRN-2026-000009".to_owned(),
+                },
+                IdempotencyKey::try_from("delivery:123:debit:source").expect("valid key"),
+                SourceReference {
+                    system: "hauliage".to_owned(),
+                    resource_type: "delivery_debit".to_owned(),
+                    resource_id: resource_id.to_owned(),
+                },
+                fixture.receivable,
+                RoundingPolicy::new(2).expect("valid precision"),
+                &original,
+                "reason",
+                &[CreditLineSelection {
+                    original_line_number: 1,
+                    quantity: dec!(1),
+                }],
+            )
+            .expect("debit")
+            .request_fingerprint
+        };
+        assert_eq!(build("same"), build("same"));
+        assert_ne!(build("same"), build("changed"));
     }
 
     fn date(year: i32, month: u32, day: u32) -> NaiveDate {

@@ -163,7 +163,7 @@ pub fn post_customer_invoice<E: LifeExecutor>(
         receivable_account_id: receivable.id,
         lines,
     };
-    let context = posting_context(session, &legal_entity, &fiscal_period);
+    let context = posting_context(session, &legal_entity, &fiscal_period, Utc::now());
     let identifiers = allocate_identifiers(
         executor,
         legal_entity.id,
@@ -187,9 +187,10 @@ pub fn credit_customer_invoice<E: LifeExecutor>(
     if original.invoice.snapshot.legal_entity_id != legal_entity.id {
         return Err(PostingError::NotFound);
     }
-    let credit_date = Utc::now().date_naive();
+    let now = Utc::now();
+    let credit_date = now.date_naive();
     let fiscal_period = resolve_open_period(executor, legal_entity.id, credit_date)?;
-    let context = posting_context(session, &legal_entity, &fiscal_period);
+    let context = posting_context(session, &legal_entity, &fiscal_period, now);
     let identifiers = allocate_identifiers(
         executor,
         legal_entity.id,
@@ -284,9 +285,10 @@ pub fn debit_customer_invoice<E: LifeExecutor>(
     if original.invoice.snapshot.legal_entity_id != legal_entity.id {
         return Err(PostingError::NotFound);
     }
-    let debit_date = Utc::now().date_naive();
+    let now = Utc::now();
+    let debit_date = now.date_naive();
     let fiscal_period = resolve_open_period(executor, legal_entity.id, debit_date)?;
-    let context = posting_context(session, &legal_entity, &fiscal_period);
+    let context = posting_context(session, &legal_entity, &fiscal_period, now);
     let identifiers = allocate_identifiers(
         executor,
         legal_entity.id,
@@ -486,6 +488,7 @@ fn posting_context(
     session: &SessionContext,
     legal_entity: &AccountingLegalEntityModel,
     period: &AccountingFiscalPeriodModel,
+    now: chrono::DateTime<Utc>,
 ) -> PostingContext {
     PostingContext {
         tenant_id: session.tenant_id.clone(),
@@ -495,7 +498,7 @@ fn posting_context(
         fiscal_period_start: period.start_date,
         fiscal_period_end: period.end_date,
         fiscal_period_state: FiscalPeriodState::Open,
-        posted_at: Utc::now().naive_utc(),
+        posted_at: now.naive_utc(),
     }
 }
 
@@ -1052,13 +1055,19 @@ fn parse_debit_selections(
 }
 
 /// Quantities already consumed per original line across all credit notes
-/// (full or partial) linked to the original document.
+/// (full or partial) linked to the original document. Debit notes link the
+/// SAME way but are additional charges, not consumption: the fold must
+/// filter to credit-note documents or a debit would silently shrink the
+/// creditable balance and reject valid credits with OverCredit.
 fn credited_quantities<E: LifeExecutor>(
     executor: &E,
     original_document_id: Uuid,
 ) -> Result<std::collections::BTreeMap<u32, Decimal>, PostingError> {
     let credits = DocumentEntity::find()
         .filter(DocumentColumn::OriginalDocumentId.eq(original_document_id))
+        .filter(DocumentColumn::DocumentType.eq(document_type_name(
+            AccountingDocumentType::CustomerCreditNote,
+        )))
         .all(executor)
         .map_err(|error| PostingError::Database(error.to_string()))?;
     let credit_ids: Vec<Uuid> = credits.iter().map(|document| document.id).collect();

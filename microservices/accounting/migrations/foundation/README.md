@@ -40,6 +40,10 @@ psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
 psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
   -f microservices/accounting/migrations/foundation/0003_document_artifacts.sql
 psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
+  -f microservices/accounting/migrations/foundation/0004_render_outbox.sql
+psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
+  -f microservices/accounting/migrations/foundation/0005_debit_notes.sql
+psql -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d rerp_phase1_test \
   -f microservices/accounting/tests/sql/accounting_foundation_acceptance.sql
 dropdb -h 127.0.0.1 -U postgres rerp_phase1_test
 psql -h 127.0.0.1 -U postgres -d postgres \

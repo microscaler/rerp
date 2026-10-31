@@ -297,6 +297,10 @@ BEGIN
     END IF;
 
     -- 0005 widened the type CHECK: a customer debit note must be insertable.
+    -- The insert runs in a subtransaction that is rolled back on purpose
+    -- (accounting_documents_immutable rejects DELETE, so cleanup-by-DELETE
+    -- would abort the block); the marker exception proves the insert itself
+    -- succeeded.
     BEGIN
         INSERT INTO accounting_posted_documents (
             id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
@@ -315,11 +319,15 @@ BEGIN
             'aaaaaaaa-0000-0000-0000-000000000001',
             'aaaaaaaa-4000-0000-0000-000000000001'
         );
-    EXCEPTION WHEN OTHERS THEN
-        RAISE EXCEPTION 'CUSTOMER_DEBIT_NOTE must be accepted after 0005: %', SQLERRM;
+        RAISE EXCEPTION 'debit-note-insert-verified';
+    EXCEPTION
+        WHEN OTHERS THEN
+            IF SQLERRM = 'debit-note-insert-verified' THEN
+                NULL; -- insert succeeded; subtransaction rollback removed it
+            ELSE
+                RAISE EXCEPTION 'CUSTOMER_DEBIT_NOTE must be accepted after 0005: %', SQLERRM;
+            END IF;
     END;
-    DELETE FROM accounting_posted_documents
-    WHERE id = 'aaaaaaaa-4000-0000-0000-000000000097';
 
     -- ... and an unknown type must still be rejected by the same CHECK.
     BEGIN

@@ -276,7 +276,8 @@ paths:
         priced from the explicitly selected original lines — unit price, discount and tax rates are
         inherited and amounts are recomputed with the invoice''s rounding policy. Additional charges
         are intentionally NOT capped by the original invoice quantities; quantities must simply be
-        positive and reference existing original lines. Idempotent per (legal entity, idempotency_key):
+        positive and reference existing original lines, and must round to a positive charge at the
+        invoice precision — a positive quantity that prices to zero is rejected. Idempotent per (legal entity, idempotency_key):
         the selection is bound into the request fingerprint and a replay of the same key with a
         different selection is 409; a debit note can never fingerprint-collide with a credit note on
         the same key. The debit-note document is queued for rendering through the same durable render
@@ -921,8 +922,10 @@ components:
           description: Line number on the original customer invoice
         quantity:
           type: string
-          pattern: ^[0-9]{1,13}\.[0-9]{1,6}$
-          description: Positive quantity to credit for this line as a NUMERIC(19,6) decimal string
+          pattern: ^(?:[1-9][0-9]{0,12}\.[0-9]{1,6}|0\.(?:[1-9][0-9]{0,5}|0[1-9][0-9]{0,4}|00[1-9][0-9]{0,3}|000[1-9][0-9]{0,2}|0000[1-9][0-9]?|00000[1-9]))$
+          description: Positive quantity to credit for this line as a NUMERIC(19,6) decimal string.
+            The pattern rejects all-zero values (0.000000) so the published schema cannot admit a
+            quantity the core would reject.
     DebitCustomerInvoiceRequest:
       type: object
       required:
@@ -964,5 +967,8 @@ components:
           description: Line number on the original customer invoice
         quantity:
           type: string
-          pattern: ^[0-9]{1,13}\.[0-9]{1,6}$
-          description: Positive quantity to additionally charge for this line as a NUMERIC(19,6) decimal string
+          pattern: ^(?:[1-9][0-9]{0,12}\.[0-9]{1,6}|0\.(?:[1-9][0-9]{0,5}|0[1-9][0-9]{0,4}|00[1-9][0-9]{0,3}|000[1-9][0-9]{0,2}|0000[1-9][0-9]?|00000[1-9]))$
+          description: Positive quantity to additionally charge for this line as a NUMERIC(19,6)
+            decimal string. The pattern rejects all-zero values (0.000000) so the published schema
+            cannot admit a quantity the core would reject. Duplicate rows for one line merge, and a
+            merged total beyond 13 integer digits is rejected before posting.
