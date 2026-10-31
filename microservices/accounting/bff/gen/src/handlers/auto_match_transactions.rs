@@ -23,11 +23,11 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description_similarity_threshold")]
-    pub description_similarity_threshold: Option<f64>,
+    pub description_similarity_threshold: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "match_tolerance")]
-    pub match_tolerance: Option<f64>,
+    pub match_tolerance: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

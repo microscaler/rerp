@@ -11,7 +11,7 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(rename = "applied_amount")]
-    pub applied_amount: f64,
+    pub applied_amount: String,
 
     #[serde(rename = "customer_invoice_id")]
     pub customer_invoice_id: String,
@@ -24,7 +24,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "applied_amount")]
-    pub applied_amount: f64,
+    pub applied_amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]

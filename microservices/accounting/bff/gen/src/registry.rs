@@ -18,76 +18,6 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.handlers.insert(
-        "list_approvals".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_approvals::handle,
-            20480,
-            Some("list_approvals"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_approval".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_approval::handle,
-            16384,
-            Some("create_approval"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_payment_commitments".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_payment_commitments::handle,
-            24576,
-            Some("list_payment_commitments"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_payment_batches".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_payment_batches::handle,
-            16384,
-            Some("list_payment_batches"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_payment_batch".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_payment_batch::handle,
-            16384,
-            Some("create_payment_batch"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "approve_payment_batch".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::approve_payment_batch::handle,
-            20480,
-            Some("approve_payment_batch"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "export_payment_batch_file".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::export_payment_batch_file::handle,
-            20480,
-            Some("export_payment_batch_file"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "list_vendor_payments".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::list_vendor_payments::handle,
@@ -113,36 +43,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
             crate::controllers::get_vendor_payment::handle,
             20480,
             Some("get_vendor_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "update_vendor_payment".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::update_vendor_payment::handle,
-            20480,
-            Some("update_vendor_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "delete_vendor_payment".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::delete_vendor_payment::handle,
-            20480,
-            Some("delete_vendor_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "cash_flow_forecast".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::cash_flow_forecast::handle,
-            20480,
-            Some("cash_flow_forecast"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -178,26 +78,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "update_vendor_invoice".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::update_vendor_invoice::handle,
-            20480,
-            Some("update_vendor_invoice"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "delete_vendor_invoice".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::delete_vendor_invoice::handle,
-            20480,
-            Some("delete_vendor_invoice"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "register_vendor_invoice_payment".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::register_vendor_invoice_payment::handle,
@@ -208,121 +88,11 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "perform_vendor_invoice_three_way_match".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::perform_vendor_invoice_three_way_match::handle,
-            20480,
-            Some("perform_vendor_invoice_three_way_match"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_ar_agings".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_ar_agings::handle,
-            20480,
-            Some("list_ar_agings"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_ar_aging".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_ar_aging::handle,
-            16384,
-            Some("create_ar_aging"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "get_ar_aging".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::get_ar_aging::handle,
-            20480,
-            Some("get_ar_aging"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_collection_cases".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_collection_cases::handle,
-            16384,
-            Some("list_collection_cases"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_collection_case".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_collection_case::handle,
-            16384,
-            Some("create_collection_case"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_collection_activities".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_collection_activities::handle,
-            24576,
-            Some("list_collection_activities"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_collection_activity".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_collection_activity::handle,
-            16384,
-            Some("create_collection_activity"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "send_customer_statements".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::send_customer_statements::handle,
             16384,
             Some("send_customer_statements"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_follow_up_levels".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_follow_up_levels::handle,
-            16384,
-            Some("list_follow_up_levels"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_follow_up_level".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_follow_up_level::handle,
-            16384,
-            Some("create_follow_up_level"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_follow_up_run".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_follow_up_run::handle,
-            16384,
-            Some("create_follow_up_run"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -343,16 +113,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
             crate::controllers::get_open_item::handle,
             20480,
             Some("get_open_item"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_payment_promise".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_payment_promise::handle,
-            16384,
-            Some("create_payment_promise"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -398,26 +158,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "update_customer_payment".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::update_customer_payment::handle,
-            20480,
-            Some("update_customer_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "delete_customer_payment".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::delete_customer_payment::handle,
-            20480,
-            Some("delete_customer_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "list_payment_applications".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::list_payment_applications::handle,
@@ -428,31 +168,11 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "auto_apply_payment".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::auto_apply_payment::handle,
-            20480,
-            Some("auto_apply_payment"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "aging_summary".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::aging_summary::handle,
             20480,
             Some("aging_summary"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "collections_summary".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::collections_summary::handle,
-            20480,
-            Some("collections_summary"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -708,36 +428,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "delete_bank_account".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::delete_bank_account::handle,
-            20480,
-            Some("delete_bank_account"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_reconciliation_models".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_reconciliation_models::handle,
-            16384,
-            Some("list_reconciliation_models"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_reconciliation_model".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_reconciliation_model::handle,
-            16384,
-            Some("create_reconciliation_model"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "list_reconciliations".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::list_reconciliations::handle,
@@ -763,26 +453,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
             crate::controllers::complete_reconciliation::handle,
             20480,
             Some("complete_reconciliation"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "cash_position".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::cash_position::handle,
-            20480,
-            Some("cash_position"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "reconciliation_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::reconciliation_report::handle,
-            20480,
-            Some("reconciliation_report"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -818,16 +488,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "trigger_statement_sync".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::trigger_statement_sync::handle,
-            20480,
-            Some("trigger_statement_sync"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "list_bank_transactions".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::list_bank_transactions::handle,
@@ -843,16 +503,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
             crate::controllers::auto_match_transactions::handle,
             16384,
             Some("auto_match_transactions"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_transaction_exchange_difference".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_transaction_exchange_difference::handle,
-            20480,
-            Some("create_transaction_exchange_difference"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -878,31 +528,11 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "get_transaction_reconciliation_suggestions".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::get_transaction_reconciliation_suggestions::handle,
-            20480,
-            Some("get_transaction_reconciliation_suggestions"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "unreconcile_transaction".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::unreconcile_transaction::handle,
             20480,
             Some("unreconcile_transaction"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_transaction_write_off".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_transaction_write_off::handle,
-            20480,
-            Some("create_transaction_write_off"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -1288,141 +918,11 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "list_custom_reports".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_custom_reports::handle,
-            20480,
-            Some("list_custom_reports"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_custom_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_custom_report::handle,
-            16384,
-            Some("create_custom_report"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "get_custom_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::get_custom_report::handle,
-            20480,
-            Some("get_custom_report"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "update_custom_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::update_custom_report::handle,
-            20480,
-            Some("update_custom_report"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "delete_custom_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::delete_custom_report::handle,
-            20480,
-            Some("delete_custom_report"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "execute_custom_report".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::execute_custom_report::handle,
-            20480,
-            Some("execute_custom_report"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "drill_down_report_cell".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::drill_down_report_cell::handle,
-            20480,
-            Some("drill_down_report_cell"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_report_definitions".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_report_definitions::handle,
-            16384,
-            Some("list_report_definitions"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_report_definition".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_report_definition::handle,
-            16384,
-            Some("create_report_definition"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_report_definition_lines".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_report_definition_lines::handle,
-            20480,
-            Some("list_report_definition_lines"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "list_report_executions".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_report_executions::handle,
-            20480,
-            Some("list_report_executions"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "create_report_export".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::create_report_export::handle,
-            16384,
-            Some("create_report_export"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "generate_balance_sheet".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::generate_balance_sheet::handle,
             16384,
             Some("generate_balance_sheet"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
-        "generate_cash_flow".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::generate_cash_flow::handle,
-            16384,
-            Some("generate_cash_flow"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -1458,21 +958,31 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
-        "list_statutory_report_packs".to_string(),
-        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-            crate::controllers::list_statutory_report_packs::handle,
-            16384,
-            Some("list_statutory_report_packs"),
-        )
-        .expect("failed to spawn untyped proxy handler coroutine"),
-    );
-
-    dispatcher.handlers.insert(
         "list_ledger_accounts".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::list_ledger_accounts::handle,
             20480,
             Some("list_ledger_accounts"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "create_ledger_account".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::create_ledger_account::handle,
+            16384,
+            Some("create_ledger_account"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "update_ledger_account".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::update_ledger_account::handle,
+            20480,
+            Some("update_ledger_account"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -1488,6 +998,36 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
+        "create_fiscal_period".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::create_fiscal_period::handle,
+            16384,
+            Some("create_fiscal_period"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "transition_fiscal_period".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::transition_fiscal_period::handle,
+            20480,
+            Some("transition_fiscal_period"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "post_journal_entry".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::post_journal_entry::handle,
+            16384,
+            Some("post_journal_entry"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
         "get_journal_entry".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::get_journal_entry::handle,
@@ -1498,11 +1038,41 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
+        "reverse_journal_entry".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::reverse_journal_entry::handle,
+            20480,
+            Some("reverse_journal_entry"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "set_opening_balances".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::set_opening_balances::handle,
+            16384,
+            Some("set_opening_balances"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
         "get_trial_balance".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::get_trial_balance::handle,
-            20480,
+            24576,
             Some("get_trial_balance"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
+        "close_fiscal_year".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::close_fiscal_year::handle,
+            16384,
+            Some("close_fiscal_year"),
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
@@ -1566,6 +1136,16 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
         )
         .expect("failed to spawn untyped proxy handler coroutine"),
     );
+
+    dispatcher.handlers.insert(
+        "list_render_outbox".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::list_render_outbox::handle,
+            20480,
+            Some("list_render_outbox"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
 }
 
 /// Register gen mock/proxy controllers for routes from the OpenAPI spec (ADR 0001 Layer 1).
@@ -1582,69 +1162,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
-            "list_approvals" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_approvals::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_approval" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_approval::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_payment_commitments" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_payment_commitments::handle,
-                    24576,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_payment_batches" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_payment_batches::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_payment_batch" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_payment_batch::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "approve_payment_batch" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::approve_payment_batch::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "export_payment_batch_file" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::export_payment_batch_file::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_vendor_payments" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::list_vendor_payments::handle,
@@ -1666,33 +1183,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_vendor_payment" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::get_vendor_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_vendor_payment" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::update_vendor_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_vendor_payment" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::delete_vendor_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "cash_flow_forecast" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::cash_flow_forecast::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )
@@ -1726,24 +1216,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_vendor_invoice" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::update_vendor_invoice::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_vendor_invoice" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::delete_vendor_invoice::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "register_vendor_invoice_payment" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::register_vendor_invoice_payment::handle,
@@ -1753,108 +1225,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "perform_vendor_invoice_three_way_match" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::perform_vendor_invoice_three_way_match::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_ar_agings" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_ar_agings::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_ar_aging" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_ar_aging::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_ar_aging" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::get_ar_aging::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_collection_cases" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_collection_cases::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_collection_case" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_collection_case::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_collection_activities" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_collection_activities::handle,
-                    24576,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_collection_activity" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_collection_activity::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "send_customer_statements" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::send_customer_statements::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_follow_up_levels" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_follow_up_levels::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_follow_up_level" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_follow_up_level::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_follow_up_run" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_follow_up_run::handle,
                     16384,
                     Some(route.handler_name.as_ref()),
                 )
@@ -1874,15 +1247,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::get_open_item::handle,
                     20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_payment_promise" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_payment_promise::handle,
-                    16384,
                     Some(route.handler_name.as_ref()),
                 )
                 .expect("failed to spawn untyped proxy handler coroutine");
@@ -1924,24 +1288,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "update_customer_payment" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::update_customer_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_customer_payment" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::delete_customer_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_payment_applications" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::list_payment_applications::handle,
@@ -1951,27 +1297,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "auto_apply_payment" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::auto_apply_payment::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "aging_summary" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::aging_summary::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "collections_summary" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::collections_summary::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )
@@ -2203,33 +1531,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "delete_bank_account" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::delete_bank_account::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_reconciliation_models" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_reconciliation_models::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_reconciliation_model" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_reconciliation_model::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_reconciliations" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::list_reconciliations::handle,
@@ -2251,24 +1552,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "complete_reconciliation" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::complete_reconciliation::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "cash_position" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::cash_position::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "reconciliation_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::reconciliation_report::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )
@@ -2302,15 +1585,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "trigger_statement_sync" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::trigger_statement_sync::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "list_bank_transactions" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::list_bank_transactions::handle,
@@ -2324,15 +1598,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::auto_match_transactions::handle,
                     16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_transaction_exchange_difference" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_transaction_exchange_difference::handle,
-                    20480,
                     Some(route.handler_name.as_ref()),
                 )
                 .expect("failed to spawn untyped proxy handler coroutine");
@@ -2356,27 +1621,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "get_transaction_reconciliation_suggestions" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::get_transaction_reconciliation_suggestions::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "unreconcile_transaction" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::unreconcile_transaction::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_transaction_write_off" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_transaction_write_off::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )
@@ -2725,126 +1972,9 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "list_custom_reports" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_custom_reports::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_custom_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_custom_report::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "get_custom_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::get_custom_report::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "update_custom_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::update_custom_report::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "delete_custom_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::delete_custom_report::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "execute_custom_report" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::execute_custom_report::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "drill_down_report_cell" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::drill_down_report_cell::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definitions" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_report_definitions::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_definition" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_report_definition::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_definition_lines" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_report_definition_lines::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "list_report_executions" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_report_executions::handle,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "create_report_export" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::create_report_export::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
             "generate_balance_sheet" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::generate_balance_sheet::handle,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                )
-                .expect("failed to spawn untyped proxy handler coroutine");
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "generate_cash_flow" => {
-                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::generate_cash_flow::handle,
                     16384,
                     Some(route.handler_name.as_ref()),
                 )
@@ -2878,18 +2008,27 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "list_statutory_report_packs" => {
+            "list_ledger_accounts" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_statutory_report_packs::handle,
+                    crate::controllers::list_ledger_accounts::handle,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_ledger_account" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::create_ledger_account::handle,
                     16384,
                     Some(route.handler_name.as_ref()),
                 )
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
-            "list_ledger_accounts" => {
+            "update_ledger_account" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
-                    crate::controllers::list_ledger_accounts::handle,
+                    crate::controllers::update_ledger_account::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )
@@ -2905,6 +2044,33 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
+            "create_fiscal_period" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::create_fiscal_period::handle,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "transition_fiscal_period" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::transition_fiscal_period::handle,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "post_journal_entry" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::post_journal_entry::handle,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
             "get_journal_entry" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::get_journal_entry::handle,
@@ -2914,10 +2080,37 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 .expect("failed to spawn untyped proxy handler coroutine");
                 dispatcher.add_route(route.clone(), tx);
             }
+            "reverse_journal_entry" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::reverse_journal_entry::handle,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "set_opening_balances" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::set_opening_balances::handle,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
             "get_trial_balance" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::get_trial_balance::handle,
-                    20480,
+                    24576,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "close_fiscal_year" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::close_fiscal_year::handle,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 )
                 .expect("failed to spawn untyped proxy handler coroutine");
@@ -2971,6 +2164,15 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_customer_invoice_journal" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::get_customer_invoice_journal::handle,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_render_outbox" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::list_render_outbox::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )

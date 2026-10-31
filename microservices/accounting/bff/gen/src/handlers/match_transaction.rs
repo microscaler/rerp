@@ -31,7 +31,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "bank_account_id")]

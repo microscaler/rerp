@@ -41,11 +41,11 @@ pub struct Request {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "min_amount")]
-    pub min_amount: Option<f64>,
+    pub min_amount: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "max_amount")]
-    pub max_amount: Option<f64>,
+    pub max_amount: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -172,8 +172,9 @@ impl TryFrom<HandlerRequest> for Request {
 
         if let Some(v) = req.get_query_param("min_amount") {
             // Built once, not per request: decode_param_value reads only its types.
-            static SCHEMA: std::sync::LazyLock<Value> =
-                std::sync::LazyLock::new(|| serde_json::json!({"format":"double","type":"number"}));
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"pattern":"^-?[0-9]+(?:\\.[0-9]{1,6})?$","type":"string"}),
+            );
             data_map.insert(
                 "min_amount".to_string(),
                 brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
@@ -185,8 +186,9 @@ impl TryFrom<HandlerRequest> for Request {
 
         if let Some(v) = req.get_query_param("max_amount") {
             // Built once, not per request: decode_param_value reads only its types.
-            static SCHEMA: std::sync::LazyLock<Value> =
-                std::sync::LazyLock::new(|| serde_json::json!({"format":"double","type":"number"}));
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"pattern":"^-?[0-9]+(?:\\.[0-9]{1,6})?$","type":"string"}),
+            );
             data_map.insert(
                 "max_amount".to_string(),
                 brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),

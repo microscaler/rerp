@@ -19,14 +19,14 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "adjusted_balance")]
-    pub adjusted_balance: Option<f64>,
+    pub adjusted_balance: Option<String>,
 
     #[serde(rename = "bank_account_id")]
     pub bank_account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "book_balance")]
-    pub book_balance: Option<f64>,
+    pub book_balance: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "created_at")]
@@ -34,7 +34,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "difference")]
-    pub difference: Option<f64>,
+    pub difference: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -60,7 +60,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "statement_balance")]
-    pub statement_balance: Option<f64>,
+    pub statement_balance: Option<String>,
 
     #[serde(rename = "statement_id")]
     pub statement_id: String,
@@ -71,11 +71,11 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_matched")]
-    pub total_matched: Option<f64>,
+    pub total_matched: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_unmatched")]
-    pub total_unmatched: Option<f64>,
+    pub total_unmatched: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "unmatched_transactions")]

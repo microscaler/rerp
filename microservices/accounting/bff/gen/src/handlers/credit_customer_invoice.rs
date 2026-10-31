@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::InvoiceCreditLineInput;
 use crate::handlers::types::InvoicePostedInvoice;
 use crate::handlers::types::InvoicePostedJournal;
 use crate::handlers::types::InvoiceSourceReference;
@@ -15,6 +16,10 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(rename = "idempotency_key")]
     pub idempotency_key: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "lines")]
+    pub lines: Option<Vec<InvoiceCreditLineInput>>,
 
     #[serde(rename = "reason")]
     pub reason: String,
