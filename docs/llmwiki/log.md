@@ -591,9 +591,8 @@ ref-rewritten) the whole accounting suite — including
 - Regeneration via BRRTRouter 9768e35 (hermes-lab sibling checkout; the
   microscaler/BRRTRouter sibling is at c9f0884 and must not be used for rerp
   gen until re-pinned): full-suite regen touched only accounts-receivable.
-- Impl: 15 orphan controllers removed, registry re-synced. The 9 retained
-  stubs already returned honest 501s from #111. Gates: check 0 errors,
-  21 lib tests, fmt, `just qa` 57,
+- Impl: 9 stubs -> honest 501s, 15 orphan controllers removed, registry
+  re-synced. Gates: check 0 errors, 21 lib tests, fmt, `just qa` 57,
   `rerp openapi validate` 121 specs valid.
 
 ## [2026-10-28] contribute | accounts-payable contract narrowed to the intake-ledger vertical (Epic B2)
@@ -785,3 +784,25 @@ ref-rewritten) the whole accounting suite — including
   so the idempotency layer cannot replay the wrong document kind.
 - Consistency fix: partial credits now record CREDIT_NOTE_POSTED (they
   previously logged INVOICE_POSTED while full credits logged the note).
+
+## [2026-10-31] correction | accounts-receivable impl attribution (PR #129 review)
+
+- PR #129 rewrote the 2026-10-28 accounts-receivable entry in place, breaking
+  the append-only rule; the bullet is restored verbatim by this change. The
+  correction it intended to record: the 9 retained stubs already returned
+  honest 501s from #111, so the #112 gen-sync commit removed orphan
+  controllers rather than authoring 501s.
+
+## [2026-10-31] process | PR review comments are a merge gate (PR #129 review)
+
+- Gate: every review comment on a PR (inline + issue + review-body surfaces)
+  must be fixed or answered on that PR before merge; CI green is necessary,
+  not sufficient. Applies to review-backlog PRs themselves — #129 merged with
+  two unresolved findings on itself (vacuous DEFERRED baseline copy; log.md
+  rewritten in place), both fixed by this change.
+- Codified: `CONTRIBUTING.md` PR checklist, new topic
+  `docs/llmwiki/topics/pr-review-merge-gate.md` (registered in index), and
+  prerequisite 8 in `microservices/accounting/BUILDOUT_ANALYSIS.md`.
+- Gate fix: `DEFERRED_BASELINE` in `tooling/tests/test_accounting_money_types.py`
+  is now a literal 9-name snapshot instead of `frozenset(DEFERRED)`, so a
+  STRICT→DEFERRED relabelling actually fails `test_deferred_set_never_grows`.
