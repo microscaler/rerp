@@ -245,8 +245,11 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 - **E2 — Partial credit/debit notes** (M) — **E2a DONE 2026-10-31**
   (partial credit notes: explicit line selections, remainder tracked
   across prior credit notes, over-credit 422, selection bound into the
-  idempotency fingerprint; original immutable). **E2b TODO**: customer
-  debit notes (new document type — needs enum + DB check widening).
+  idempotency fingerprint; original immutable). **E2b DONE 2026-10-31**
+  (customer debit notes: new CUSTOMER_DEBIT_NOTE type via enum + 0005
+  CHECK widening; priced from selected original lines, invoice-direction
+  journal, uncapped additional charges, discriminated fingerprint
+  separates debit/credit replays on one key).
 - **E3 — Generated rustls client proof** (M): generated HTTPS consumer covers
   post/retrieve/credit incl. retry + payload-conflict paths (goal 6 close).
 

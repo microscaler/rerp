@@ -768,3 +768,20 @@ ref-rewritten) the whole accounting suite — including
   Full credit blocks further credits automatically.
 - E2b (debit notes) deferred: needs AccountingDocumentType + DB check
   widening; recorded in BUILDOUT_ANALYSIS.
+
+## [2026-10-31] contribute | customer debit notes (E2b)
+
+- New posted-document type CUSTOMER_DEBIT_NOTE (enum + 0005 widens the
+  0002 type CHECK; acceptance SQL proves debit-note insert + unknown-type
+  rejection). POST /v1/customer-invoices/{id}/debit-notes: explicit line
+  selections priced from the original (unit price/discount/tax inherited),
+  invoice-direction journal (receivable DEBITED — debit ADDS to what the
+  customer owes), original immutable, line numbers preserved, DBN- number
+  series under the same advisory sequence lock, render-outbox queued.
+- Deliberately NO quantity cap (additional charges are not bounded by the
+  original quantities, unlike credits); selections required.
+- Debit fingerprint carries a document-type discriminator: same
+  key/original/selection as a credit note can never fingerprint-collide,
+  so the idempotency layer cannot replay the wrong document kind.
+- Consistency fix: partial credits now record CREDIT_NOTE_POSTED (they
+  previously logged INVOICE_POSTED while full credits logged the note).
