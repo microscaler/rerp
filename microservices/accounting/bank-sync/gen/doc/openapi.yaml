@@ -568,7 +568,7 @@ paths:
                 match_tolerance:
                   type: string
                   pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
-                  description: Amount match tolerance in seconds
+                  description: Amount match tolerance
                 description_similarity_threshold:
                   type: string
                   pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$

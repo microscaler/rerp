@@ -5,31 +5,11 @@
 
 pub mod types;
 
-pub mod list_approvals;
-
-pub mod create_approval;
-
-pub mod list_payment_commitments;
-
-pub mod list_payment_batches;
-
-pub mod create_payment_batch;
-
-pub mod approve_payment_batch;
-
-pub mod export_payment_batch_file;
-
 pub mod list_vendor_payments;
 
 pub mod create_vendor_payment;
 
 pub mod get_vendor_payment;
-
-pub mod update_vendor_payment;
-
-pub mod delete_vendor_payment;
-
-pub mod cash_flow_forecast;
 
 pub mod list_vendor_invoices;
 
@@ -37,41 +17,13 @@ pub mod create_vendor_invoice;
 
 pub mod get_vendor_invoice;
 
-pub mod update_vendor_invoice;
-
-pub mod delete_vendor_invoice;
-
 pub mod register_vendor_invoice_payment;
 
-pub mod perform_vendor_invoice_three_way_match;
-
-pub mod list_ar_agings;
-
-pub mod create_ar_aging;
-
-pub mod get_ar_aging;
-
-pub mod list_collection_cases;
-
-pub mod create_collection_case;
-
-pub mod list_collection_activities;
-
-pub mod create_collection_activity;
-
 pub mod send_customer_statements;
-
-pub mod list_follow_up_levels;
-
-pub mod create_follow_up_level;
-
-pub mod create_follow_up_run;
 
 pub mod list_open_items;
 
 pub mod get_open_item;
-
-pub mod create_payment_promise;
 
 pub mod list_customer_payments;
 
@@ -81,17 +33,9 @@ pub mod create_payment_application;
 
 pub mod get_customer_payment;
 
-pub mod update_customer_payment;
-
-pub mod delete_customer_payment;
-
 pub mod list_payment_applications;
 
-pub mod auto_apply_payment;
-
 pub mod aging_summary;
-
-pub mod collections_summary;
 
 pub mod list_asset_models;
 
@@ -143,21 +87,11 @@ pub mod get_bank_account;
 
 pub mod update_bank_account;
 
-pub mod delete_bank_account;
-
-pub mod list_reconciliation_models;
-
-pub mod create_reconciliation_model;
-
 pub mod list_reconciliations;
 
 pub mod create_reconciliation;
 
 pub mod complete_reconciliation;
-
-pub mod cash_position;
-
-pub mod reconciliation_report;
 
 pub mod list_bank_statements;
 
@@ -165,23 +99,15 @@ pub mod create_bank_statement;
 
 pub mod get_bank_statement;
 
-pub mod trigger_statement_sync;
-
 pub mod list_bank_transactions;
 
 pub mod auto_match_transactions;
-
-pub mod create_transaction_exchange_difference;
 
 pub mod match_transaction;
 
 pub mod reconcile_transaction;
 
-pub mod get_transaction_reconciliation_suggestions;
-
 pub mod unreconcile_transaction;
-
-pub mod create_transaction_write_off;
 
 pub mod list_budget_revisions;
 
@@ -259,33 +185,7 @@ pub mod list_edi_validation_profiles;
 
 pub mod create_edi_validation_profile;
 
-pub mod list_custom_reports;
-
-pub mod create_custom_report;
-
-pub mod get_custom_report;
-
-pub mod update_custom_report;
-
-pub mod delete_custom_report;
-
-pub mod execute_custom_report;
-
-pub mod drill_down_report_cell;
-
-pub mod list_report_definitions;
-
-pub mod create_report_definition;
-
-pub mod list_report_definition_lines;
-
-pub mod list_report_executions;
-
-pub mod create_report_export;
-
 pub mod generate_balance_sheet;
-
-pub mod generate_cash_flow;
 
 pub mod generate_general_ledger;
 
@@ -293,15 +193,29 @@ pub mod generate_income_statement;
 
 pub mod generate_trial_balance;
 
-pub mod list_statutory_report_packs;
-
 pub mod list_ledger_accounts;
+
+pub mod create_ledger_account;
+
+pub mod update_ledger_account;
 
 pub mod list_fiscal_periods;
 
+pub mod create_fiscal_period;
+
+pub mod transition_fiscal_period;
+
+pub mod post_journal_entry;
+
 pub mod get_journal_entry;
 
+pub mod reverse_journal_entry;
+
+pub mod set_opening_balances;
+
 pub mod get_trial_balance;
+
+pub mod close_fiscal_year;
 
 pub mod list_customer_invoices;
 
@@ -314,3 +228,5 @@ pub mod credit_customer_invoice;
 pub mod get_customer_invoice_document;
 
 pub mod get_customer_invoice_journal;
+
+pub mod list_render_outbox;

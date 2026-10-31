@@ -51,10 +51,10 @@ pub struct Response {
     pub period_end: String,
 
     #[serde(rename = "total_credits")]
-    pub total_credits: f64,
+    pub total_credits: String,
 
     #[serde(rename = "total_debits")]
-    pub total_debits: f64,
+    pub total_debits: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {

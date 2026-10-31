@@ -18,7 +18,7 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "amount")]
-    pub amount: f64,
+    pub amount: String,
 
     #[serde(deserialize_with = "Option::deserialize")]
     #[serde(rename = "applied_at")]
