@@ -26,13 +26,14 @@ Bot reviews split findings across three surfaces; fetching only one silently
 misses findings:
 
 ```bash
-# inline review comments (with file/line anchors)
-gh api repos/microscaler/rerp/pulls/<n>/comments
+# inline review comments (with file/line anchors) — --paginate because a
+# multi-page comment list would otherwise hide unanswered findings
+gh api --paginate repos/microscaler/rerp/pulls/<n>/comments
 # PR conversation comments
-gh api repos/microscaler/rerp/issues/<n>/comments
+gh api --paginate repos/microscaler/rerp/issues/<n>/comments
 # review bodies — "Follow-up findings (not blocking merge)" style sections
 # live here and have no thread to reply into
-gh api repos/microscaler/rerp/pulls/<n>/reviews --jq '.[].body'
+gh api --paginate repos/microscaler/rerp/pulls/<n>/reviews --jq '.[].body'
 ```
 
 - Body-only findings get a PR issue comment as the reply surface.
