@@ -20,6 +20,7 @@ pub fn render(invoice: &StoredInvoice) -> Vec<u8> {
     let kind = match snapshot.document_type {
         AccountingDocumentType::CustomerInvoice => "CUSTOMER INVOICE",
         AccountingDocumentType::CustomerCreditNote => "CUSTOMER CREDIT NOTE",
+        AccountingDocumentType::CustomerDebitNote => "CUSTOMER DEBIT NOTE",
     };
     let mut lines = vec![
         "RERP ACCOUNTING".to_string(),

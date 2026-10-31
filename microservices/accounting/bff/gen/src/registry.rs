@@ -1118,6 +1118,16 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.handlers.insert(
+        "debit_customer_invoice".to_string(),
+        brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+            crate::controllers::debit_customer_invoice::handle,
+            20480,
+            Some("debit_customer_invoice"),
+        )
+        .expect("failed to spawn untyped proxy handler coroutine"),
+    );
+
+    dispatcher.handlers.insert(
         "get_customer_invoice_document".to_string(),
         brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
             crate::controllers::get_customer_invoice_document::handle,
@@ -2146,6 +2156,15 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "credit_customer_invoice" => {
                 let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
                     crate::controllers::credit_customer_invoice::handle,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                )
+                .expect("failed to spawn untyped proxy handler coroutine");
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "debit_customer_invoice" => {
+                let tx = brrtrouter::dispatcher::spawn_untyped_with_stack_size_and_name(
+                    crate::controllers::debit_customer_invoice::handle,
                     20480,
                     Some(route.handler_name.as_ref()),
                 )

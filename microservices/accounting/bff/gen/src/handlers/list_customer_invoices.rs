@@ -80,7 +80,7 @@ impl TryFrom<HandlerRequest> for Request {
         if let Some(v) = req.get_query_param("document_type") {
             // Built once, not per request: decode_param_value reads only its types.
             static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
-                || serde_json::json!({"enum":["CUSTOMER_INVOICE","CUSTOMER_CREDIT_NOTE"],"type":"string"}),
+                || serde_json::json!({"enum":["CUSTOMER_INVOICE","CUSTOMER_CREDIT_NOTE","CUSTOMER_DEBIT_NOTE"],"type":"string"}),
             );
             data_map.insert(
                 "document_type".to_string(),

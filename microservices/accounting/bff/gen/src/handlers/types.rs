@@ -3549,6 +3549,28 @@ pub struct CreditCustomerInvoiceResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DebitCustomerInvoiceRequest {
+    pub idempotency_key: String,
+
+    pub lines: Vec<InvoiceDebitLineInput>,
+
+    pub reason: String,
+
+    pub source: InvoiceSourceReference,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DebitCustomerInvoiceResponse {
+    pub idempotency_key: String,
+
+    pub invoice: InvoicePostedInvoice,
+
+    pub journal: InvoicePostedJournal,
+
+    pub request_fingerprint: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EdiCreateEdiDocumentRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub company_id: Option<String>,
@@ -5531,6 +5553,24 @@ pub struct InvoiceCustomerInvoiceLine {
     pub tax: Option<serde_json::Value>,
 
     pub unit_price: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceDebitCustomerInvoiceRequest {
+    pub idempotency_key: String,
+
+    pub lines: Vec<InvoiceDebitLineInput>,
+
+    pub reason: String,
+
+    pub source: InvoiceSourceReference,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct InvoiceDebitLineInput {
+    pub original_line_number: i32,
+
+    pub quantity: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
