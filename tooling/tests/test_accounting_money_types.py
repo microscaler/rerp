@@ -41,8 +41,22 @@ DEFERRED = {
 }
 # Frozen baseline of the deferred set (Epic B5 close). The set may only
 # SHRINK as services are narrowed into STRICT; moving a service out of
-# STRICT unnoticed is a gate bypass and fails.
-DEFERRED_BASELINE = frozenset(DEFERRED)
+# STRICT unnoticed is a gate bypass and fails. This is a LITERAL snapshot
+# on purpose (PR #129 review): copying live DEFERRED at import time would
+# make the never-grows assertion vacuously true.
+DEFERRED_BASELINE = frozenset(
+    {
+        "asset",
+        "budget",
+        "consolidation",
+        "documents-extraction",
+        "edi",
+        "lease-accounting",
+        "revenue-recognition",
+        "tax-compliance",
+        "treasury",
+    }
+)
 
 # The aggregate BFF is generated from all service contracts, so deferred
 # services legitimately contribute float fields there. Scoped honesty:

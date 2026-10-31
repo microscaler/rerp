@@ -103,6 +103,12 @@ To validate before pushing: `npx commitlint --from HEAD~1` (requires Node; or re
 - Create a pull request with a clear description
 - Reference any related issues
 - Ensure CI checks pass
+- Resolve every review comment on the PR before merging — CI green is not
+  sufficient. Fetch inline comments, issue comments, and review bodies (bots
+  hide findings in review-body sections); fix or reply to each thread, then
+  merge. This applies to every PR, including PRs that exist to resolve review
+  comments on other PRs. See
+  [`docs/llmwiki/topics/pr-review-merge-gate.md`](docs/llmwiki/topics/pr-review-merge-gate.md).
 
 ---
 

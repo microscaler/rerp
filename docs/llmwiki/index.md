@@ -5,7 +5,7 @@
 
 ---
 
-## Topics (7 pages)
+## Topics (8 pages)
 
 ### Accounting
 - [[hauliage-accounting-dogfood.md]] — Immediate seven-goal execution overlay proving RERP's public invoice-to-GL accounting core through Hauliage
@@ -18,6 +18,7 @@
 
 ### Other
 - [[hauliage-reference-operating-model.md]] — Hauliage reference patterns adapted for RERP
+- [[pr-review-merge-gate.md]] — Every review comment (inline, issue, review-body) must be resolved before merge; applies to review-fix PRs themselves
 
 ## Reference (0 pages)
 

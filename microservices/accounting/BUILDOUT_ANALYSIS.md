@@ -126,6 +126,12 @@ violating constraint #10 (no binary floats for money) at the contract layer.
    (services/validators/seeds/tests per service), platform-vs-accounting SQL
    separation, suite-install isolation tests, migration generation idempotency
    (re-run = no drift).
+8. **PR review comments are a merge gate, stronger than CI green.** Every
+   review comment on a PR — inline, issue comment, or review-body section —
+   must be fixed or answered on that PR before it merges. The gate applies
+   to every PR, including review-backlog PRs (#129 merged while carrying two
+   unresolved findings on itself; fixed in its follow-up). Procedure:
+   `docs/llmwiki/topics/pr-review-merge-gate.md`.
 
 ---
 
