@@ -59,5 +59,14 @@ tikv-jemallocator = { workspace = true, optional = true }
 chrono = { workspace = true }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 
+[dev-dependencies]
+# E3 live-HTTPS consumer proof (tests/e2e_https.rs): boots the real invoice
+# binary, drives it through a test-only rustls edge with jsonwebtoken-minted
+# Sesame-shaped HS256 tokens served by a mock JWKS endpoint.
+base64 = "0.22"
+jsonwebtoken = "11.1"
+rcgen = "0.14"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
 [build-dependencies]
 lifeguard-migrate = { workspace = true }

@@ -258,6 +258,18 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
   separates debit/credit replays on one key).
 - **E3 — Generated rustls client proof** (M): generated HTTPS consumer covers
   post/retrieve/credit incl. retry + payload-conflict paths (goal 6 close).
+  **DONE 2026-11-01** (`microservices/accounting/invoice/impl/tests/e2e_https.rs`):
+  real invoice binary + test-only rustls/rcgen edge + config-registered
+  JwksBearerProvider (HS256 `at+jwt`); `may_minihttp` typed client journey
+  post 201 / replay 200 / conflict 409 / typed retrieve / credit 201 /
+  additional-receivable DBN 201 / original immutable. Surfaced and fixed a
+  real contract bug: `nullable: true` (OAS 3.0 keyword) is ignored by the
+  response validator, so every genuinely-null response field 500'd —
+  invoice+GL canonical specs now use the `type: [x, 'null']` convention
+  (asset/budget/edi precedent). Host note: on rustc 1.99 Linux the debug
+  build of the service aborts via generator's coroutine stack guard on some
+  request paths; the ignored test takes `RERP_E2E_BIN` to run a
+  `--release` binary.
 
 ### Epic F — AR vertical (first real subledger; deps D3, B1, C1)
 
