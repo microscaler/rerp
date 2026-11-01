@@ -246,8 +246,10 @@ VALUES ('{le}', '{tenant}', '{org}', 'E2E HTTPS Test Legal Entity', 'GBP', true,
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_fiscal_periods
     (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
-VALUES ('e8000000-0000-4000-8000-{year:012}', '{tenant}', '{le}', 'FY{year}',
-        '{year}-01-01', '{year}-12-31', 'OPEN', now(), now())
+SELECT 'e8000000-0000-4000-8000-{year:012}', '{tenant}', '{le}', 'FY{year}',
+       '{year}-01-01', '{year}-12-31', 'OPEN', now(), now()
+WHERE NOT EXISTS (SELECT 1 FROM rerp.accounting_fiscal_periods
+                  WHERE tenant_id = '{tenant}' AND legal_entity_id = '{le}' AND name = 'FY{year}')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_accounts
     (id, tenant_id, legal_entity_id, code, name, account_type, normal_side, control_role, currency_code, is_active, created_at, updated_at)
