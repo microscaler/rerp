@@ -846,3 +846,24 @@ ref-rewritten) the whole accounting suite — including
   write_off_amount) is gone, the BFF aggregate + gen crate were
   regenerated, and CodeRabbit's three review passes' findings were all
   resolved before merge. E2E green fresh-database and same-database rerun.
+
+## [2026-11-01] delivered | F1a AR overlay entities + migration 0006 + live RLS
+
+- Epic F starts: the four AR scaffold models (customer_invoices,
+  ar_payments, ar_payment_applications, ar_agings) were re-anchored —
+  phantom invoices/customers FKs replaced by a tenant-scoped composite FK
+  onto accounting_posted_documents, plain customer_id, tenant/legal-entity
+  columns, NUMERIC(19,6) money matching the posted facts; derived drift
+  columns (days_overdue, aging_bucket, credit_limit/used,
+  collection_status) dropped (aging derives at read; F3 snapshots).
+- migrations/foundation/0006_ar_overlay.sql: 4 tables, FORCE RLS tenant
+  policies with the policy-as-completion-marker guard (re-apply skip
+  verified live), status/terms CHECKs, composite-scope FKs. Appended to
+  apply_order.txt; setup-db grant_rerp_dml covers new tables.
+- Live acceptance (impl/tests/ar_overlay_rls.rs, ignored): all four
+  tables cross-tenant-invisible through rls_set_session (transaction-local
+  GUC — reads must run inside BEGIN), no-session sees nothing and cannot
+  write, cross-tenant document anchor FK-rejected; run-unique fixture ids
+  (rerun-safe, passed twice).
+- Slice plan recorded at docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md;
+  BUILDOUT Epic F links it. F1b = open items over posted facts.
