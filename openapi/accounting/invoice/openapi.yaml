@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 x-brrtrouter-stack-size: 128KiB
 info:
   title: RERP Customer Invoicing API
@@ -446,9 +446,9 @@ components:
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
           default: '0'
         tax:
-          allOf:
+          anyOf:
           - $ref: '#/components/schemas/TaxFact'
-          nullable: true
+          - type: 'null'
     PostCustomerInvoiceRequest:
       type: object
       required:

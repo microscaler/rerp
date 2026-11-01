@@ -11822,8 +11822,7 @@ components:
           default: '0'
         tax:
           anyOf:
-          - allOf:
-            - $ref: '#/components/schemas/InvoiceTaxFact'
+          - $ref: '#/components/schemas/InvoiceTaxFact'
           - type: 'null'
     InvoiceDebitCustomerInvoiceRequest:
       type: object
