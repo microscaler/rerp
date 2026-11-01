@@ -1,62 +1,62 @@
-//! AR Aging entity
+//! Aging snapshot row (as-of reproducible aggregates).
 //!
-//! Aging analysis snapshot for accounts receivable.
+//! Producers land in F3 (aging & statements); this slice delivers only the
+//! storage contract. Buckets derive from open-item due dates at snapshot
+//! time — never a live-cache substitute for read-time derivation.
 
-use lifeguard_derive::LifeModel;
+use lifeguard_derive::{LifeModel, LifeRecord};
 
-#[derive(LifeModel)]
+#[derive(Debug, Clone, LifeModel, LifeRecord)]
 #[table_name = "ar_agings"]
-#[skip_from_row]
-#[table_comment = "AR aging analysis snapshots"]
-#[index = "idx_ar_agings_customer_id(customer_id)"]
+#[table_comment = "As-of AR aging snapshots per customer and legal entity"]
+#[composite_unique = "tenant_id, legal_entity_id, customer_id, aging_date"]
+#[composite_unique = "tenant_id, legal_entity_id, id"]
+#[index = "idx_ar_agings_scope(tenant_id, legal_entity_id)"]
+#[index = "idx_ar_agings_customer(customer_id)"]
 #[index = "idx_ar_agings_aging_date(aging_date)"]
-#[composite_unique = "customer_id, aging_date"]
 pub struct ArAging {
     #[primary_key]
     pub id: uuid::Uuid,
 
-    // Customer reference
-    #[foreign_key = "customers(id) ON DELETE CASCADE"]
+    #[indexed]
+    #[column_type = "VARCHAR(200)"]
+    pub tenant_id: String,
+
+    #[indexed]
+    pub legal_entity_id: uuid::Uuid,
+
     #[indexed]
     pub customer_id: uuid::Uuid,
 
-    // Aging snapshot date
-    #[indexed]
     pub aging_date: chrono::NaiveDate,
 
-    // Aging buckets
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
-    pub current: rust_decimal::Decimal, // 0-30 days
+    #[column_type = "NUMERIC(19, 6)"]
+    pub current: rust_decimal::Decimal,
 
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub days_31_60: rust_decimal::Decimal,
 
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub days_61_90: rust_decimal::Decimal,
 
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub days_91_120: rust_decimal::Decimal,
 
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub over_120: rust_decimal::Decimal,
 
-    // Total
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub total_outstanding: rust_decimal::Decimal,
 
-    // Currency
     #[default_value = "'USD'"]
     #[column_type = "VARCHAR(3)"]
     pub currency_code: String,
-
-    // Multi-company
-    pub company_id: Option<uuid::Uuid>,
 
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub created_at: chrono::NaiveDateTime,

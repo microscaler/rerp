@@ -1,42 +1,44 @@
-//! AR Payment Application entity
+//! Allocation linking one payment to one AR overlay row.
 //!
-//! Links payments to specific invoices with applied amounts.
+//! Write path and reversal semantics land in F2; this slice delivers only
+//! the storage contract with tenant-scoped identity.
 
-use lifeguard_derive::LifeModel;
+use lifeguard_derive::{LifeModel, LifeRecord};
 
-#[derive(LifeModel)]
+#[derive(Debug, Clone, LifeModel, LifeRecord)]
 #[table_name = "ar_payment_applications"]
-#[skip_from_row]
-#[table_comment = "Links AR payments to customer invoices"]
-#[index = "idx_ar_payment_applications_payment_id(payment_id)"]
-#[index = "idx_ar_payment_applications_invoice_id(invoice_id)"]
-#[composite_unique = "payment_id, invoice_id"]
+#[table_comment = "Links AR payments to customer-invoice overlay rows"]
+#[composite_unique = "tenant_id, legal_entity_id, payment_id, invoice_id"]
+#[composite_unique = "tenant_id, legal_entity_id, id"]
+#[index = "idx_ar_payment_applications_scope(tenant_id, legal_entity_id)"]
+#[index = "idx_ar_payment_applications_payment(payment_id)"]
+#[index = "idx_ar_payment_applications_invoice(invoice_id)"]
 pub struct ArPaymentApplication {
     #[primary_key]
     pub id: uuid::Uuid,
 
-    // Payment reference
-    #[foreign_key = "ar_payments(id) ON DELETE CASCADE"]
+    #[indexed]
+    #[column_type = "VARCHAR(200)"]
+    pub tenant_id: String,
+
+    #[indexed]
+    pub legal_entity_id: uuid::Uuid,
+
     #[indexed]
     pub payment_id: uuid::Uuid,
 
-    // Invoice reference
-    #[foreign_key = "customer_invoices(id) ON DELETE CASCADE"]
     #[indexed]
     pub invoice_id: uuid::Uuid,
 
-    // Applied amount
     #[default_value = "0"]
-    #[column_type = "NUMERIC(19, 4)"]
+    #[column_type = "NUMERIC(19, 6)"]
     pub applied_amount: rust_decimal::Decimal,
 
-    // Application date
     #[default_expr = "CURRENT_TIMESTAMP"]
     pub applied_at: chrono::NaiveDateTime,
 
     pub applied_by: Option<uuid::Uuid>,
 
-    // Notes
     pub notes: Option<String>,
 
     #[default_expr = "CURRENT_TIMESTAMP"]
