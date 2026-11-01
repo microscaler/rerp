@@ -832,3 +832,17 @@ ref-rewritten) the whole accounting suite — including
 - Consumer-side keep-alive on this may_minihttp build resets second
   requests; harness sends `Connection: close` (matches what worked in the
   live manual curl session).
+
+## [2026-11-01] correction | E3 entry: nullability landed as a full 3.1.0 migration
+
+- Superseding detail for today's E3 entry (PR #132, merged b64cadda): the
+  two documents were the repo's last `openapi: 3.0.3` declarations (123
+  specs already on 3.1.0, and BRRTRouter is built for 3.1 semantics —
+  that is why `nullable` was ignored). The fix is not a convention
+  transplant into a 3.0.3 document (type arrays are invalid there); both
+  documents now declare 3.1.0, `tax` is an `anyOf [$ref, null]` union
+  (codegen maps it to the same Option<serde_json::Value>, zero impl
+  churn), the last dead `nullable` repo-wide (bank-sync
+  write_off_amount) is gone, the BFF aggregate + gen crate were
+  regenerated, and CodeRabbit's three review passes' findings were all
+  resolved before merge. E2E green fresh-database and same-database rerun.
