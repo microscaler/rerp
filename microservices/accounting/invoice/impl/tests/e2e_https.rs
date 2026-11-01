@@ -228,9 +228,13 @@ fn spawn_tls_edge(server_config: rustls::ServerConfig, service: SocketAddr) -> u
 }
 
 /// Seed the fixture tenant through the app's own RLS session contract.
-/// Idempotent (ON CONFLICT DO NOTHING) so reruns are safe.
-fn seed_fixture() {
-    let year = chrono::Utc::now().date_naive().year();
+/// Fixture rows are idempotent (ON CONFLICT DO NOTHING); the document keys
+/// the journey uses are run-unique, so reruns against the same database are
+/// safe. `today` is the run's single clock reading so the seeded fiscal
+/// period always contains the journey's invoice date (PR #132 review: two
+/// clock reads could straddle midnight on 31 December).
+fn seed_fixture(today: chrono::NaiveDate) {
+    let year = today.year();
     let sql = format!(
         "BEGIN;
 SELECT public.rls_set_session('{tenant}', '{subject}'::uuid, '{org}'::uuid,
@@ -260,7 +264,9 @@ COMMIT;",
         year = year
     );
     let mut script = std::env::temp_dir();
-    script.push(format!("rerp-e2e-seed-{year}.sql"));
+    // Unique per process: concurrent runs must not truncate each other's
+    // file while psql is still reading it.
+    script.push(format!("rerp-e2e-seed-{}.sql", std::process::id()));
     std::fs::write(&script, sql).expect("write seed SQL");
     let status = Command::new("psql")
         .env("PGHOST", env_or("DB_HOST", "localhost"))
@@ -272,7 +278,18 @@ COMMIT;",
         .arg(&script)
         .status()
         .expect("psql on PATH");
+    let _ = std::fs::remove_file(&script);
     assert!(status.success(), "fixture seed failed: {script:?}");
+}
+
+/// Per-run tag for idempotency keys and source ids: a rerun against the
+/// same database must not collide with its predecessor's documents.
+fn run_tag() -> String {
+    format!(
+        "{}-{}",
+        std::process::id(),
+        chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default()
+    )
 }
 
 /// Boots the real invoice binary against the disposable database with
@@ -403,7 +420,9 @@ fn run_consumer_flow(
     client_config: Arc<rustls::ClientConfig>,
     token: &str,
     date: &str,
+    run: &str,
 ) -> Result<(u16, u16, u16, u16, u16, String), String> {
+    let post_key = format!("e2e-post-{run}");
     let client = Client::builder()
         .tls_config(client_config)
         .request_timeout(Duration::from_secs(20))
@@ -433,7 +452,7 @@ fn run_consumer_flow(
         Method::POST,
         &invoices,
         token,
-        Some(&post_body(date, "e2e-post-1", "100.00")),
+        Some(&post_body(date, &post_key, "100.00")),
     )?;
     if post_status != 201 {
         return Err(format!("post returned {post_status}: {post_json}"));
@@ -454,7 +473,7 @@ fn run_consumer_flow(
         Method::POST,
         &invoices,
         token,
-        Some(&post_body(date, "e2e-post-1", "100.00")),
+        Some(&post_body(date, &post_key, "100.00")),
     )?;
     let replay: post_customer_invoice::Response =
         serde_json::from_value(replay_json).map_err(|error| format!("replay envelope: {error}"))?;
@@ -468,7 +487,7 @@ fn run_consumer_flow(
         Method::POST,
         &invoices,
         token,
-        Some(&post_body(date, "e2e-post-1", "101.00")),
+        Some(&post_body(date, &post_key, "101.00")),
     )?;
 
     // 4. Typed retrieve of the original.
@@ -490,13 +509,13 @@ fn run_consumer_flow(
 
     // 5. Full credit note against the original.
     let credit = CreditCustomerInvoiceRequest {
-        idempotency_key: "e2e-credit-1".to_string(),
+        idempotency_key: format!("e2e-credit-{run}"),
         lines: None,
         reason: "E2E HTTPS cancellation".to_string(),
         source: SourceReference {
             system: "e2e-https".to_string(),
             resource_type: "https_probe_credit".to_string(),
-            resource_id: "https-probe-credit-1".to_string(),
+            resource_id: format!("https-probe-credit-{run}"),
         },
     };
     let (credit_status, credit_json) = consumer_send(
@@ -514,7 +533,7 @@ fn run_consumer_flow(
 
     // 6. Additional-receivable debit note (uncapped by design: 2 x 100 + VAT).
     let debit = DebitCustomerInvoiceRequest {
-        idempotency_key: "e2e-debit-1".to_string(),
+        idempotency_key: format!("e2e-debit-{run}"),
         lines: vec![DebitLineInput {
             original_line_number: 1,
             quantity: "2.000000".to_string(),
@@ -523,7 +542,7 @@ fn run_consumer_flow(
         source: SourceReference {
             system: "e2e-https".to_string(),
             resource_type: "https_probe_debit".to_string(),
-            resource_id: "https-probe-debit-1".to_string(),
+            resource_id: format!("https-probe-debit-{run}"),
         },
     };
     let (debit_status, debit_json) = consumer_send(
@@ -568,7 +587,8 @@ fn run_consumer_flow(
 #[test]
 #[ignore = "requires a disposable PostgreSQL database (with foundation migrations), psql on PATH, and the built invoice binary"]
 fn live_https_consumer_full_journey() {
-    seed_fixture();
+    let today = chrono::Utc::now().date_naive();
+    seed_fixture(today);
     let jwks_port = spawn_mock_jwks();
     let (server_config, client_config) = build_tls_configs();
     let (service, service_port) = spawn_service(jwks_port);
@@ -578,7 +598,8 @@ fn live_https_consumer_full_journey() {
     );
 
     let token = mint_token();
-    let date = chrono::Utc::now().date_naive().to_string();
+    let date = today.to_string();
+    let run = run_tag();
     let base = format!("https://localhost:{edge_port}");
 
     // The may_minihttp client performs coroutine I/O: run the journey inside
@@ -586,7 +607,7 @@ fn live_https_consumer_full_journey() {
     let outcome = unsafe {
         CoroutineBuilder::new()
             .stack_size(2 * 1024 * 1024)
-            .spawn(move || run_consumer_flow(&base, client_config, &token, &date))
+            .spawn(move || run_consumer_flow(&base, client_config, &token, &date, &run))
     }
     .expect("spawn consumer coroutine")
     .join()
