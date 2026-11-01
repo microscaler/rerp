@@ -806,3 +806,29 @@ ref-rewritten) the whole accounting suite — including
 - Gate fix: `DEFERRED_BASELINE` in `tooling/tests/test_accounting_money_types.py`
   is now a literal 9-name snapshot instead of `frozenset(DEFERRED)`, so a
   STRICT→DEFERRED relabelling actually fails `test_deferred_set_never_grows`.
+
+## [2026-11-01] delivered | Epic E3 live-HTTPS consumer proof (goal 6 close)
+
+- `microservices/accounting/invoice/impl/tests/e2e_https.rs` (ignored,
+  disposable-DB like the tests/sql acceptance harness): boots the REAL
+  invoice binary with config-registered `JwksBearerProvider` (HS256
+  `at+jwt`, mock JWKS endpoint), terminates TLS at a test-only rustls/rcgen
+  edge, and drives the generated contract types over `may_minihttp`'s
+  rustls client in a coroutine: post 201 (120.00, balanced journal),
+  replay 200 same doc, changed-payload 409, typed retrieve, full credit
+  note 201, additional-receivable debit note 201 (DBN-, 240.00), original
+  immutable. `RERP_E2E_BIN` overrides the binary path.
+- Contract bug fixed en route: `nullable: true` is an OAS 3.0 keyword the
+  response validator ignores, so genuinely-null response fields failed
+  validation with 500 (POST /v1/customer-invoices had never passed
+  response validation over HTTP). invoice + general-ledger canonical specs
+  converted (10 sites) to the `type: [x, 'null']` convention already used
+  by asset/budget/edi; regen is doc-only + zero impl churn.
+- Host finding for the platform backlog: with the may fork (2156e04) +
+  generator 0.8.11 on rustc 1.99 Linux, DEBUG builds of rerp services abort
+  via generator's coroutine stack guard on some request paths (repro: any
+  POST after the first; persists at BRRTR_STACK_SIZE=2MiB; release builds
+  clean; same-stack isolate crates pass).
+- Consumer-side keep-alive on this may_minihttp build resets second
+  requests; harness sends `Connection: close` (matches what worked in the
+  live manual curl session).
