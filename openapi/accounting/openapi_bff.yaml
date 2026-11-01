@@ -8599,9 +8599,10 @@ components:
           - OTHER
           example: standard
         write_off_amount:
-          type: string
+          type:
+          - string
+          - 'null'
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
-          nullable: true
         notes:
           type:
           - string

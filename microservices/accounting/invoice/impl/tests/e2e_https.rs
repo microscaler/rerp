@@ -246,7 +246,7 @@ VALUES ('{le}', '{tenant}', '{org}', 'E2E HTTPS Test Legal Entity', 'GBP', true,
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_fiscal_periods
     (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
-VALUES ('e8000000-0000-4000-8000-0000000000e8', '{tenant}', '{le}', 'FY{year}',
+VALUES ('e8000000-0000-4000-8000-{year:012}', '{tenant}', '{le}', 'FY{year}',
         '{year}-01-01', '{year}-12-31', 'OPEN', now(), now())
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_accounts
@@ -479,6 +479,12 @@ fn run_consumer_flow(
         serde_json::from_value(replay_json).map_err(|error| format!("replay envelope: {error}"))?;
     if replay.invoice.id != invoice_id {
         return Err("idempotent replay returned a different document".to_string());
+    }
+    if !money_eq(&replay.invoice.total_amount, &created.invoice.total_amount) {
+        return Err(format!(
+            "replay envelope total {} differs from post {}",
+            replay.invoice.total_amount, created.invoice.total_amount
+        ));
     }
 
     // 3. Changed payload on the same key is a 409 conflict.
