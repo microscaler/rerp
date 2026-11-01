@@ -700,8 +700,7 @@ components:
           - DEBIT
           - CREDIT
         control_role:
-          type: string
-          nullable: true
+          type: [string, 'null']
         currency_code:
           type: string
           pattern: ^[A-Z]{3}$
@@ -825,13 +824,11 @@ components:
           description: Period lifecycle state; posting into a period is allowed exactly when it is OPEN
             or REOPENED
         closed_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
         closed_by:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
     FiscalPeriodList:
       type: object
       required:
@@ -1155,9 +1152,8 @@ components:
         total_debit: *id002
         total_credit: *id002
         reverses_entry_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
           description: 'For reversals: the journal entry being reversed'
         lines:
           type: array

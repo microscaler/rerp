@@ -556,12 +556,10 @@ components:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
         tax_code:
-          type: string
-          nullable: true
+          type: [string, 'null']
         tax_rate_percent:
-          type: string
+          type: [string, 'null']
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
-          nullable: true
         tax_amount:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
@@ -604,9 +602,8 @@ components:
           enum:
           - POSTED
         original_document_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         customer_id:
           type: string
           format: uuid
@@ -666,9 +663,8 @@ components:
           - CUSTOMER_CREDIT_NOTE
           - CUSTOMER_DEBIT_NOTE
         original_document_id:
-          type: string
+          type: [string, 'null']
           format: uuid
-          nullable: true
         customer_id:
           type: string
           format: uuid
@@ -878,8 +874,7 @@ components:
           type: integer
           minimum: 0
         last_error:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Most recent render/storage failure, truncated; the instruction stays durably queued
             after every failure
         created_at:
