@@ -27,6 +27,7 @@ paths:
       operationId: list_open_items
       summary: List open items
       description: Paginated outstanding balances of posted customer invoices, with aging bucket and days overdue.
+      x-brrtrouter-impl: true
       parameters:
         - name: page
           in: query
@@ -583,7 +584,7 @@ components:
             - WRITTEN_OFF
             - DISPUTED
           description: Settlement status of the open item
-          example: active
+          example: CONFIRMED
         aging_bucket:
           type: string
           enum:
@@ -594,7 +595,7 @@ components:
             - 90+
             - INVALID
           description: Aging bucket calculated from due date and current date
-          example: sample value
+          example: CURRENT
         company_id:
           type: string
           format: uuid
@@ -617,7 +618,7 @@ components:
             - DUE_ON_RECEIPT
             - CUSTOM
           description: Payment terms
-          example: sample value
+          example: NET_30
         credit_limit_check:
           type:
             - boolean
@@ -710,7 +711,7 @@ components:
             - APPLIED_PARTIAL
             - REFUNDED
             - FAILED
-          example: active
+          example: APPLIED
         customer_id:
           type: string
           format: uuid
@@ -754,7 +755,7 @@ components:
             - 'null'
           format: date-time
           description: When payment was applied to invoices
-          example: sample value
+          example: '2026-01-16T09:00:00Z'
     CreatePaymentRequest:
       type: object
       required:
@@ -907,7 +908,7 @@ components:
             - SENDING
             - COMPLETED
             - FAILED
-          example: active
+          example: QUEUED
         statement_count:
           type: integer
           example: 0
@@ -984,7 +985,7 @@ components:
           type:
             - object
             - 'null'
-          example: sample value
+          example: {}
     AgingSummary:
       type: object
       required:

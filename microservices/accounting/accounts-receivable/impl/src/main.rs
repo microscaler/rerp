@@ -11,8 +11,11 @@ use rerp_accounting_accounts_receivable_gen::*;
 
 // Import implementation controllers (business logic)
 mod controllers;
+mod database;
 mod http_support;
+mod identity;
 mod impl_registry;
+mod ledger;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
@@ -152,6 +155,9 @@ fn main() -> io::Result<()> {
     // configure coroutine stack size
     let config = RuntimeConfig::from_env();
     may::config().set_stack_size(config.stack_size);
+    // Fail fast if the accounting database is unreachable (same contract
+    // as the invoice/general-ledger runtimes).
+    database::initialize().map_err(io::Error::other)?;
     // Load OpenAPI spec and create router
     // Resolve relative specs against the crate directory so launches from other CWDs work
     let spec_path = if args.spec.is_relative() {
