@@ -32,6 +32,7 @@ use rerp_accounting_accounts_receivable::models::customer_invoice::{
 const DEFAULT_LIMIT: i32 = 20;
 const MAX_LIMIT: i32 = 100;
 const CHARGEBACK_TYPES: [&str; 2] = ["CUSTOMER_INVOICE", "CUSTOMER_DEBIT_NOTE"];
+const MAX_SOURCE_DOCUMENTS: i64 = 50_000;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ArError {
@@ -103,7 +104,7 @@ pub fn derive_terms(document_date: NaiveDate, due_date: NaiveDate) -> &'static s
 fn derive_status(
     overlay: Option<&CustomerInvoiceModel>,
     outstanding: Decimal,
-    applied: Decimal,
+    settled: Decimal,
 ) -> String {
     if let Some(state) = overlay.map(|row| row.status.as_str()) {
         if matches!(state, "WRITTEN_OFF" | "DISPUTED") {
@@ -113,7 +114,7 @@ fn derive_status(
     if outstanding <= Decimal::ZERO {
         return "PAID".to_string();
     }
-    if applied > Decimal::ZERO {
+    if settled > Decimal::ZERO {
         return "PARTIAL".to_string();
     }
     "CONFIRMED".to_string()
@@ -138,7 +139,11 @@ pub fn compose_item(facts: &ItemFacts<'_>) -> Value {
         "original_amount": money(document.total_amount - facts.credit_notes),
         "outstanding_amount": money(outstanding),
         "currency_code": document.currency_code,
-        "status": derive_status(facts.overlay, raw_outstanding, facts.applied),
+        "status": derive_status(
+            facts.overlay,
+            raw_outstanding,
+            facts.applied + facts.credit_notes,
+        ),
         "aging_bucket": aging_bucket(document.due_date, facts.today),
         "company_id": document.legal_entity_id.to_string(),
         "due_date": document.due_date.to_string(),
@@ -147,6 +152,15 @@ pub fn compose_item(facts: &ItemFacts<'_>) -> Value {
         "created_at": rfc3339(document.created_at),
         "updated_at": rfc3339(updated_at),
     })
+}
+
+/// Net outstanding before clamping (negative = over-collected).
+#[must_use]
+pub fn raw_outstanding(facts: &ItemFacts<'_>) -> Decimal {
+    let write_off = facts.overlay.map_or(Decimal::ZERO, |row| {
+        row.write_off_amount.unwrap_or(Decimal::ZERO)
+    });
+    facts.document.total_amount - facts.credit_notes - facts.applied - write_off
 }
 
 fn rfc3339(value: NaiveDateTime) -> String {
@@ -231,13 +245,14 @@ fn resolve_legal_entity<E: LifeExecutor>(
     session: &SessionContext,
     company_id: Option<Uuid>,
 ) -> Result<AccountingLegalEntityModel, ArError> {
+    // Both paths bind the entity to the CALLER'S organization: an explicit
+    // company_id narrows within the org, it never escapes it.
     let mut query = LegalEntityEntity::find()
         .filter(LegalEntityColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(LegalEntityColumn::OrganizationId.eq(session.organization_id))
         .filter(LegalEntityColumn::IsActive.eq(true));
     if let Some(company) = company_id {
         query = query.filter(LegalEntityColumn::Id.eq(company));
-    } else {
-        query = query.filter(LegalEntityColumn::OrganizationId.eq(session.organization_id));
     }
     match query.find_one(executor) {
         Ok(Some(value)) => Ok(value),
@@ -267,16 +282,41 @@ fn chargeback_documents<E: LifeExecutor>(
         .map_err(|error| ArError::Database(error.to_string()))
 }
 
+fn chargeback_documents_count<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity: Uuid,
+    currency_code: Option<&str>,
+) -> Result<i64, ArError> {
+    let mut query = DocumentEntity::find()
+        .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(DocumentColumn::LegalEntityId.eq(legal_entity))
+        .filter(DocumentColumn::Status.eq("POSTED".to_string()))
+        .filter(DocumentColumn::DocumentType.is_in(CHARGEBACK_TYPES));
+    if let Some(currency) = currency_code {
+        query = query.filter(DocumentColumn::CurrencyCode.eq(currency.to_string()));
+    }
+    query
+        .count()
+        .one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))
+}
+
 fn credit_note_totals<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entity: Uuid,
+    document_ids: Vec<Uuid>,
 ) -> Result<HashMap<Uuid, Decimal>, ArError> {
+    if document_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
     let notes = DocumentEntity::find()
         .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(DocumentColumn::LegalEntityId.eq(legal_entity))
         .filter(DocumentColumn::Status.eq("POSTED".to_string()))
         .filter(DocumentColumn::DocumentType.eq("CUSTOMER_CREDIT_NOTE".to_string()))
+        .filter(DocumentColumn::OriginalDocumentId.is_in(document_ids))
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
     let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
@@ -329,7 +369,12 @@ fn overlay_state<E: LifeExecutor>(
         .collect())
 }
 
-fn matches_filters(item: &Value, document_number: &str, filters: &ListFilters) -> bool {
+fn matches_filters(
+    item: &Value,
+    document_number: &str,
+    filters: &ListFilters,
+    today: NaiveDate,
+) -> bool {
     if let Some(status) = &filters.status {
         if item["status"] != json!(status) {
             return false;
@@ -346,12 +391,12 @@ fn matches_filters(item: &Value, document_number: &str, filters: &ListFilters) -
         }
     }
     if let Some(min) = filters.days_overdue_min {
-        if days_from_item(item) < min {
+        if days_from_item(item, today) < min {
             return false;
         }
     }
     if let Some(max) = filters.days_overdue_max {
-        if days_from_item(item) > max {
+        if days_from_item(item, today) > max {
             return false;
         }
     }
@@ -368,9 +413,9 @@ fn matches_filters(item: &Value, document_number: &str, filters: &ListFilters) -
     true
 }
 
-fn days_from_item(item: &Value) -> i64 {
+fn days_from_item(item: &Value, today: NaiveDate) -> i64 {
     NaiveDate::parse_from_str(item["due_date"].as_str().unwrap_or_default(), "%Y-%m-%d")
-        .map(|due| days_overdue(due, Utc::now().date_naive()))
+        .map(|due| days_overdue(due, today))
         .unwrap_or(0)
 }
 
@@ -380,6 +425,20 @@ pub fn list_open_items<E: LifeExecutor>(
     filters: &ListFilters,
 ) -> Result<Value, ArError> {
     let legal_entity = resolve_legal_entity(executor, session, filters.company_id)?;
+    // Bounded source guard until the F1c overlay projection provides SQL
+    // paging: refuse reads over MAX_SOURCE_DOCUMENTS instead of loading
+    // an unbounded result into memory.
+    let probe = chargeback_documents_count(
+        executor,
+        session,
+        legal_entity.id,
+        filters.currency_code.as_deref(),
+    )?;
+    if probe > MAX_SOURCE_DOCUMENTS {
+        return Err(ArError::Validation(format!(
+            "open-item source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow with currency_code (SQL paging arrives with the F1c projection)"
+        )));
+    }
     let documents = chargeback_documents(
         executor,
         session,
@@ -387,7 +446,7 @@ pub fn list_open_items<E: LifeExecutor>(
         filters.currency_code.as_deref(),
     )?;
     let document_ids: Vec<Uuid> = documents.iter().map(|row| row.id).collect();
-    let credits = credit_note_totals(executor, session, legal_entity.id)?;
+    let credits = credit_note_totals(executor, session, legal_entity.id, document_ids.clone())?;
     let overlays = overlay_state(executor, session, legal_entity.id, document_ids)?;
     let today = Utc::now().date_naive();
 
@@ -403,14 +462,20 @@ pub fn list_open_items<E: LifeExecutor>(
             today,
         };
         let item = compose_item(&facts);
-        if matches_filters(&item, &document.document_number, filters) {
+        if filters.status.is_none() && raw_outstanding(&facts) <= Decimal::ZERO {
+            // Default view is the ledger of UNPAID balances; an explicit
+            // status filter still sees PAID/WRITTEN_OFF rows.
+            continue;
+        }
+        if matches_filters(&item, &document.document_number, filters, today) {
             items.push((document.due_date, document.document_number.clone(), item));
         }
     }
     items.sort_by(|left, right| left.0.cmp(&right.0).then_with(|| left.1.cmp(&right.1)));
 
     let total = items.len();
-    let offset = usize::try_from((filters.page - 1) * filters.limit).unwrap_or(usize::MAX);
+    let offset = usize::try_from(i64::from(filters.page - 1) * i64::from(filters.limit))
+        .unwrap_or(usize::MAX);
     let page_items: Vec<Value> = items
         .into_iter()
         .skip(offset)
@@ -433,14 +498,25 @@ pub fn get_open_item<E: LifeExecutor>(
 ) -> Result<Value, ArError> {
     let id =
         Uuid::parse_str(id).map_err(|_| ArError::Validation("id must be a UUID".to_string()))?;
+    // The detail path binds to the caller's organization too: the legal
+    // entity must belong to the session's org, else NotFound (no leak of
+    // whether the id exists elsewhere).
+    let entity = match resolve_legal_entity(executor, session, None) {
+        Ok(entity) => entity,
+        Err(ArError::Policy(_)) => return Err(ArError::NotFound),
+        Err(error) => return Err(error),
+    };
     let document = DocumentEntity::find()
         .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(DocumentColumn::Id.eq(id))
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?
-        .filter(|row| CHARGEBACK_TYPES.contains(&row.document_type.as_str()))
+        .filter(|row| {
+            CHARGEBACK_TYPES.contains(&row.document_type.as_str())
+                && row.legal_entity_id == entity.id
+        })
         .ok_or(ArError::NotFound)?;
-    let credits = credit_note_totals(executor, session, document.legal_entity_id)?;
+    let credits = credit_note_totals(executor, session, document.legal_entity_id, vec![id])?;
     let overlays = overlay_state(executor, session, document.legal_entity_id, vec![id])?;
     let today = Utc::now().date_naive();
     let facts = ItemFacts {
@@ -453,7 +529,7 @@ pub fn get_open_item<E: LifeExecutor>(
     let mut item = compose_item(&facts);
     let history: Vec<Value> = overlays
         .get(&id)
-        .map(|(overlay, _)| application_rows(executor, session, overlay.id))
+        .map(|(overlay, _)| application_rows(executor, session, overlay.id, id))
         .transpose()?
         .unwrap_or_default();
     item["days_overdue"] = json!(days_overdue(document.due_date, today));
@@ -465,6 +541,7 @@ fn application_rows<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     overlay_id: Uuid,
+    document_id: Uuid,
 ) -> Result<Vec<Value>, ArError> {
     ApplicationEntity::find()
         .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
@@ -476,7 +553,9 @@ fn application_rows<E: LifeExecutor>(
                     json!({
                         "id": row.id.to_string(),
                         "payment_id": row.payment_id.to_string(),
-                        "customer_invoice_id": row.invoice_id.to_string(),
+                        // Public contract has no overlay id: echo the
+                        // posted document id, matching the item's invoice_id.
+                        "customer_invoice_id": document_id.to_string(),
                         "applied_amount": money(row.applied_amount),
                     })
                 })
@@ -521,6 +600,23 @@ mod tests {
         assert_eq!(derive_terms(start, date("2026-02-15")), "NET_45");
         assert_eq!(derive_terms(start, date("2026-03-02")), "NET_60");
         assert_eq!(derive_terms(start, date("2026-02-20")), "CUSTOM");
+    }
+
+    #[test]
+    fn credit_only_netting_is_partial_not_confirmed() {
+        // UC-AR-08: a linked credit note counts as settlement.
+        assert_eq!(
+            derive_status(None, Decimal::new(40, 0), Decimal::new(20, 0)),
+            "PARTIAL"
+        );
+        assert_eq!(
+            derive_status(None, Decimal::new(40, 0), Decimal::ZERO),
+            "CONFIRMED"
+        );
+        assert_eq!(
+            derive_status(None, Decimal::ZERO, Decimal::new(120, 0)),
+            "PAID"
+        );
     }
 
     #[test]

@@ -24,11 +24,11 @@ pub fn identity_context(claims: Option<&Value>) -> Result<SessionContext, HttpJs
     crate::identity::from_validated_claims(claims).map_err(|error| {
         let (status, code, message) = match error {
             crate::identity::IdentityError::MissingValidatedClaims => {
-                (401, "unauthorized", "Authentication is required")
+                (401, "UNAUTHORIZED", "Authentication is required")
             }
             _ => (
                 403,
-                "invalid_identity_context",
+                "FORBIDDEN",
                 "The authenticated identity context is incomplete or inconsistent",
             ),
         };

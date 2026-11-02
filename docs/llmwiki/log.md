@@ -886,3 +886,12 @@ ref-rewritten) the whole accounting suite — including
   filters, payment_history, cross-tenant NotFound), live HTTP smoke on
   the release binary (200/404 NOT_FOUND/400 enum codes/search/limit).
 - Honesty gates pass for the remaining 7 scaffold ops (F2/F3 territory).
+
+## [2026-11-01] correction | F1b log entry overstated example cleanup
+
+- The F1b entry claimed every AR example is enum-valid. True only for the
+  open-item/aging examples touched by F1b; the repo-wide placeholder
+  examples (`example: 1000.0`, `delivery_method: bank_transfer`) still sit
+  in the AR spec plus nine other scaffold specs. Tracked as a dedicated
+  sweep in docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md (surfaced by the
+  PR #135 review).

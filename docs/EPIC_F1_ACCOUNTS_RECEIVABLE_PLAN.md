@@ -1,6 +1,6 @@
 # Epic F1 — AR customer ledger from posted facts: slice plan
 
-**Status: ACTIVE (F1a delivered, F1b/F1c to follow). Date: 2026-11-01.**
+**Status: ACTIVE (F1a + F1b delivered 2026-11-01; F1c next).**
 Depends on: D3 (posting/reversal), B1, C1 — all merged. Entry point stays
 `microservices/accounting/BUILDOUT_ANALYSIS.md`; this file carries the
 slice breakdown and evidence for F1.
@@ -77,3 +77,7 @@ slice breakdown and evidence for F1.
 - Credit subtraction scoped to tenant+legal_entity (no FK on the link).
 - Registry atomicity for F1b; gen from the pinned BRRTRouter checkout.
 - `apply_order.txt` append-only + guarded idempotent DDL.
+
+- Deferred sweep: placeholder `example: 1000.0` / `bank_transfer` values sit in
+  scaffold specs repo-wide (AR, AP, treasury, documents-extraction, ...); they
+  predate F1 and need a dedicated all-specs cleanup PR, not an epic-scoped edit.
