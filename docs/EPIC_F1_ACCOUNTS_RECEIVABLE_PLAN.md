@@ -1,6 +1,6 @@
 # Epic F1 — AR customer ledger from posted facts: slice plan
 
-**Status: ACTIVE (F1a delivered, F1b/F1c to follow). Date: 2026-11-01.**
+**Status: ACTIVE (F1a + F1b delivered 2026-11-01; F1c next).**
 Depends on: D3 (posting/reversal), B1, C1 — all merged. Entry point stays
 `microservices/accounting/BUILDOUT_ANALYSIS.md`; this file carries the
 slice breakdown and evidence for F1.
@@ -26,7 +26,7 @@ slice breakdown and evidence for F1.
 
 ## Slices (one PR each)
 
-### F1a — entity rework + overlay migration + RLS (this slice)
+### F1a — entity rework + overlay migration + RLS (DONE 2026-11-01, PR #134)
 - Models re-anchored: `invoice_id` → posted documents via tenant-scoped
   composite FK; plain `customer_id`; tenant/legal-entity columns;
   NUMERIC(19,6); scaffold drift columns dropped (days_overdue,
@@ -43,21 +43,30 @@ slice breakdown and evidence for F1.
   document anchor rejected by the composite FK; run-unique fixture ids
   make reruns safe (verified twice).
 
-### F1b — open items from posted facts (next PR)
-- `list_open_items` + `get_open_item` live: outstanding =
-  Σ(INVOICE + DEBIT_NOTE) − Σ(CREDIT_NOTE linked via original_document_id),
-  tenant+legal-entity scoped; aging bucket/days derived at read;
-  `company_id` ↔ `resolve_legal_entity`; terms derived from the
-  document/due-date gap (NET_15/30/45/60, DUE_ON_RECEIPT, else CUSTOM);
-  `credit_limit_check` = null until customer credit data exists.
-- Contract: add `x-brrtrouter-impl: true` to the two flagless read ops
-  (+ regen, atomic commit). Fix OpenItem `status.example: active`
-  (violates its own enum). BFF aggregate + gen regen LAST, after all
-  spec edits.
-- Acceptance: unit derivation combos + live ledger test through the real
-  posting machinery.
+### F1b — open items from posted facts (DONE 2026-11-01, partial epic: 2 of 9 ops live)
+- `list_open_items` + `get_open_item` live in the AR runtime (was honest 501):
+  outstanding = Σ(INVOICE + DEBIT_NOTE) − Σ(CREDIT_NOTE linked via
+  original_document_id) − Σ(F2 allocations) − overlay write-offs;
+  aging bucket/days_overdue/terms derived at read; `company_id` filter or
+  org-resolved legal entity; search over document number/status (customer
+  name is not an AR-owned fact — documented deviation from the blurb).
+- Runtime gained the invoice-shaped database/identity plumbing
+  (pool env config, fail-fast init, `rls_set_session` context).
+- Error bodies speak the contract's `ErrorResponse` enum codes
+  (NOT_FOUND/FORBIDDEN/SERVER_ERROR/UNKNOWN) — the response validator
+  rejects anything else with a 500 wrap.
+- OpenItem id IS the posted document id (stable in list and get).
+- Spec: `x-brrtrouter-impl: true` on `list_open_items`; dead examples
+  (`active`, `sample value`) replaced with enum-valid values across the
+  AR spec; BFF aggregate + gen regenerated.
+- Proof: 8 unit tests; live-DB derivation test (credits netted, PARTIAL
+  status, filters, payment_history, cross-tenant NotFound); live HTTP
+  smoke on the release binary (200 list/get, 404 NOT_FOUND, 400 enum
+  codes, search, limit-range rejection).
+- Remaining AR ops stay honest 501: payments/applications (F2), aging
+  summary + statements (F3).
 
-### F1c — overlay projection + agreement suite
+### F1c — overlay projection + agreement suite (next)
 - Rebuildable projection populating `customer_invoices` from posted
   facts; reconciliation test vs from-scratch recompute; AR
   control-account agreement via journal lines. May fold into F1b.
@@ -68,3 +77,7 @@ slice breakdown and evidence for F1.
 - Credit subtraction scoped to tenant+legal_entity (no FK on the link).
 - Registry atomicity for F1b; gen from the pinned BRRTRouter checkout.
 - `apply_order.txt` append-only + guarded idempotent DDL.
+
+- Deferred sweep: placeholder `example: 1000.0` / `bank_transfer` values sit in
+  scaffold specs repo-wide (AR, AP, treasury, documents-extraction, ...); they
+  predate F1 and need a dedicated all-specs cleanup PR, not an epic-scoped edit.

@@ -538,7 +538,9 @@ paths:
     get:
       operationId: list_open_items
       summary: List open items
-      description: Paginated outstanding balances of posted customer invoices, with aging bucket and days overdue.
+      description: Paginated outstanding balances (unpaid by default) of posted customer invoices and customer debit notes,
+        with aging bucket; days overdue is reported by the detail endpoint.
+      x-brrtrouter-impl: false
       parameters:
       - name: page
         in: query
@@ -557,7 +559,7 @@ paths:
         in: query
         schema:
           type: string
-        description: Search by customer name, invoice reference, or status
+        description: Search by document number or status
       - name: status
         in: query
         schema:
@@ -628,7 +630,6 @@ paths:
       x-service: accounts-receivable
       x-service-base-path: /api/accounts-receivable
       x-brrtrouter-downstream-path: /api/accounts-receivable/open-items
-      x-brrtrouter-impl: false
   /accounts-receivable/open-items/{id}:
     get:
       operationId: get_open_item
@@ -6104,7 +6105,7 @@ components:
           type:
           - object
           - 'null'
-          example: sample value
+          example: {}
     AccountsReceivableOpenItem:
       type: object
       required:
@@ -6161,7 +6162,7 @@ components:
           - WRITTEN_OFF
           - DISPUTED
           description: Settlement status of the open item
-          example: active
+          example: CONFIRMED
         aging_bucket:
           type: string
           enum:
@@ -6172,7 +6173,7 @@ components:
           - 90+
           - INVALID
           description: Aging bucket calculated from due date and current date
-          example: sample value
+          example: CURRENT
         company_id:
           type: string
           format: uuid
@@ -6195,7 +6196,7 @@ components:
           - DUE_ON_RECEIPT
           - CUSTOM
           description: Payment terms
-          example: sample value
+          example: NET_30
         credit_limit_check:
           type:
           - boolean
@@ -6338,7 +6339,7 @@ components:
           - APPLIED_PARTIAL
           - REFUNDED
           - FAILED
-          example: active
+          example: APPLIED
         customer_id:
           type: string
           format: uuid
@@ -6382,7 +6383,7 @@ components:
           - 'null'
           format: date-time
           description: When payment was applied to invoices
-          example: sample value
+          example: '2026-01-16T09:00:00Z'
     AccountsReceivablePaymentApplication:
       type: object
       required:
@@ -6459,7 +6460,7 @@ components:
           - SENDING
           - COMPLETED
           - FAILED
-          example: active
+          example: QUEUED
         statement_count:
           type: integer
           example: 0

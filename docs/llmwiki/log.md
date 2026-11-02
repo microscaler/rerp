@@ -867,3 +867,31 @@ ref-rewritten) the whole accounting suite — including
   (rerun-safe, passed twice).
 - Slice plan recorded at docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md;
   BUILDOUT Epic F links it. F1b = open items over posted facts.
+
+## [2026-11-01] delivered | F1b open items derived from posted facts (2 of 9 AR ops live)
+
+- accounts-receivable runtime went from scaffold-only to real for
+  list_open_items/get_open_item: open items derived at read from
+  accounting_posted_documents (invoices + debit notes netted by credit
+  notes linked via original_document_id, minus F2 allocations and overlay
+  write-offs); aging bucket, days_overdue and payment terms computed from
+  due_date/document_date at read; OpenItem id is the posted document id.
+- Runtime gained the invoice-shaped plumbing: environment-configured
+  Lifeguard pool with fail-fast init, sesame claims -> rls_set_session
+  context, contract-shaped error bodies (ErrorResponse enum codes —
+  custom strings get validator-wrapped into 500s).
+- Spec: x-brrtrouter-impl true on list_open_items; every AR example now
+  enum-valid; BFF aggregate + gen regenerated.
+- Proof: 8 unit tests, live-DB derivation acceptance (netting, PARTIAL,
+  filters, payment_history, cross-tenant NotFound), live HTTP smoke on
+  the release binary (200/404 NOT_FOUND/400 enum codes/search/limit).
+- Honesty gates pass for the remaining 7 scaffold ops (F2/F3 territory).
+
+## [2026-11-01] correction | F1b log entry overstated example cleanup
+
+- The F1b entry claimed every AR example is enum-valid. True only for the
+  open-item/aging examples touched by F1b; the repo-wide placeholder
+  examples (`example: 1000.0`, `delivery_method: bank_transfer`) still sit
+  in the AR spec plus nine other scaffold specs. Tracked as a dedicated
+  sweep in docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md (surfaced by the
+  PR #135 review).

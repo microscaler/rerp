@@ -27,7 +27,11 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
 
     let mut url = format!("host={host} port={port} user={user} dbname={database}");
     if !password.is_empty() {
-        url.push_str(&format!(" password={password}"));
+        // The libpq-style key/value parser terminates values on whitespace
+        // and honours backslash escapes inside single quotes: quote and
+        // escape so passwords with spaces/backslashes connect verbatim.
+        let escaped = password.replace('\\', "\\\\").replace('\'', "\\'");
+        url.push_str(&format!(" password='{escaped}'"));
     }
     let config = DatabaseConfig {
         url,

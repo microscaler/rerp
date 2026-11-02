@@ -3790,7 +3790,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rerp-accounting-core"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "chrono",
  "rust_decimal",
@@ -3803,7 +3803,7 @@ dependencies = [
 
 [[package]]
 name = "rerp-entities"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "chrono",
  "lifeguard",
@@ -3818,7 +3818,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_payable"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3865,7 +3865,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_accounts_receivable"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3880,12 +3880,14 @@ dependencies = [
  "lifeguard-migrate",
  "may",
  "may_minihttp",
+ "rerp-entities",
  "rerp_accounting_accounts_receivable_gen",
  "rust_decimal",
  "sea-query",
  "serde",
  "serde_json",
  "serde_yaml",
+ "sesame-idam-client",
  "tikv-jemallocator",
  "uuid",
 ]
@@ -3912,7 +3914,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_asset"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -3999,7 +4001,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bank_sync"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4046,7 +4048,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_bff"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4088,7 +4090,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_budget"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4215,7 +4217,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_edi"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4263,7 +4265,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_financial_reports"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4310,7 +4312,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_general_ledger"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4360,7 +4362,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_accounting_invoice"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -4683,7 +4685,7 @@ dependencies = [
 
 [[package]]
 name = "rerp_documents_render"
-version = "0.1.22"
+version = "0.1.23"
 dependencies = [
  "brrtrouter",
  "brrtrouter_macros",

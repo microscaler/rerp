@@ -23,6 +23,7 @@ rerp_accounting_accounts_receivable_gen = { path = "../gen" }
 # Lifeguard ORM
 lifeguard = { workspace = true }
 lifeguard-derive = { workspace = true }
+rerp_entities = { workspace = true }
 
 # lifeguard-migrate used by generated entity_registry.rs
 lifeguard-migrate = { workspace = true }
@@ -37,6 +38,7 @@ sea-query = { version = "1.0.0-rc.29", features = ["with-json"] }
 # Standard dependencies
 serde = { workspace = true }
 serde_json = { workspace = true }
+sesame-idam-client = { workspace = true }
 serde_yaml = { workspace = true }
 config = { workspace = true }
 http = { workspace = true }
