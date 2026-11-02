@@ -85,6 +85,12 @@ pub fn derive_payment_status(db_status: &str, applied: Decimal, amount: Decimal)
 /// Contract `Payment` object over one stored receipt.
 #[must_use]
 pub fn payment_json(row: &ArPaymentModel) -> Value {
+    payment_json_stamped(row, None)
+}
+
+/// `applied_at` is the last time an allocation touched this receipt
+/// (F2b applications); the read axis derives it rather than storing it.
+pub fn payment_json_stamped(row: &ArPaymentModel, applied_at: Option<NaiveDateTime>) -> Value {
     json!({
         "id": row.id.to_string(),
         "reference_number": row.payment_reference.clone(),
@@ -100,8 +106,35 @@ pub fn payment_json(row: &ArPaymentModel) -> Value {
         "notes": row.notes.clone(),
         "created_at": rfc3339(row.created_at),
         "updated_at": rfc3339(row.updated_at),
-        "applied_at": Value::Null,
+        "applied_at": applied_at.map_or(Value::Null, |stamp| json!(rfc3339(stamp))),
     })
+}
+
+/// Last application instant per receipt, one query per page/batch.
+pub fn last_applied_stamps<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    payment_ids: &[Uuid],
+) -> Result<std::collections::HashMap<Uuid, NaiveDateTime>, ArError> {
+    use rerp_accounting_accounts_receivable::models::ar_payment_application::{
+        Column as ApplicationColumn, Entity as ApplicationEntity,
+    };
+    let mut stamps = std::collections::HashMap::new();
+    if payment_ids.is_empty() {
+        return Ok(stamps);
+    }
+    let rows = ApplicationEntity::find()
+        .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(ApplicationColumn::PaymentId.is_in(payment_ids.iter().copied()))
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    for row in rows {
+        stamps
+            .entry(row.payment_id)
+            .and_modify(|seen| *seen = (*seen).max(row.applied_at))
+            .or_insert(row.applied_at);
+    }
+    Ok(stamps)
 }
 
 struct ParsedCreate {
@@ -117,6 +150,7 @@ struct ParsedCreate {
 
 /// Validates the create request into typed fields (defense in depth —
 /// the dispatcher already schema-checks enums and patterns).
+#[allow(clippy::too_many_arguments)] // validated contract fields, kept explicit per slice style
 fn parse_create(
     amount: &str,
     currency_code: &str,
@@ -476,25 +510,27 @@ pub fn list_payments<E: LifeExecutor>(
             "result set exceeds the read bound; narrow the filters".to_string(),
         ));
     }
-    let mut items: Vec<(NaiveDate, String, Value)> = Vec::new();
+    let mut items: Vec<(NaiveDate, String, ArPaymentModel)> = Vec::new();
     for row in &rows {
         if matches_payment(row, filters) {
-            items.push((
-                row.payment_date,
-                row.payment_number.clone(),
-                payment_json(row),
-            ));
+            items.push((row.payment_date, row.payment_number.clone(), row.clone()));
         }
     }
     items.sort_by(|left, right| left.0.cmp(&right.0).then_with(|| left.1.cmp(&right.1)));
     let total = items.len();
     let offset = usize::try_from(i64::from(filters.page - 1) * i64::from(filters.limit))
         .unwrap_or(usize::MAX);
-    let page_items: Vec<Value> = items
+    let page_rows: Vec<ArPaymentModel> = items
         .into_iter()
         .skip(offset)
         .take(usize::try_from(filters.limit).unwrap_or(usize::MAX))
-        .map(|(_, _, item)| item)
+        .map(|(_, _, row)| row)
+        .collect();
+    let page_ids: Vec<Uuid> = page_rows.iter().map(|row| row.id).collect();
+    let stamps = last_applied_stamps(executor, session, &page_ids)?;
+    let page_items: Vec<Value> = page_rows
+        .iter()
+        .map(|row| payment_json_stamped(row, stamps.get(&row.id).copied()))
         .collect();
     Ok(json!({
         "items": page_items,
@@ -523,7 +559,8 @@ pub fn get_payment<E: LifeExecutor>(
         .map_err(|error| ArError::Database(error.to_string()))?
         .filter(|row| scope.contains(&row.legal_entity_id))
         .ok_or(ArError::NotFound)?;
-    Ok(payment_json(&row))
+    let stamps = last_applied_stamps(executor, session, &[row.id])?;
+    Ok(payment_json_stamped(&row, stamps.get(&row.id).copied()))
 }
 
 #[cfg(test)]

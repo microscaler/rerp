@@ -12,13 +12,9 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         Err(response) => return response,
     };
     let query = &request.data;
-    // FIFO auto-apply needs the F2b allocation machinery; refuse honestly
-    // rather than silently dropping the caller's intent.
-    if query.auto_apply.unwrap_or(false) {
-        return crate::http_support::not_implemented("create_customer_payment:auto_apply");
-    }
+    let auto_apply = query.auto_apply.unwrap_or(false);
     let result = crate::http_support::with_ar_transaction(&context, |executor| {
-        crate::payments::create_payment(
+        let payment = crate::payments::create_payment(
             executor,
             &context,
             &query.amount,
@@ -29,7 +25,17 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             query.company_id.as_deref(),
             query.reference_number.as_deref(),
             query.notes.as_deref(),
-        )
+        )?;
+        if auto_apply {
+            // FIFO allocation over the customer's open items, contract axis.
+            crate::applications::auto_apply_fifo(
+                executor,
+                &context,
+                payment["id"].as_str().unwrap_or_default(),
+            )
+        } else {
+            Ok(payment)
+        }
     });
     match result {
         Ok(payment) => HttpJson::new(201, payment),

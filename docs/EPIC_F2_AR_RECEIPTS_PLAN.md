@@ -24,8 +24,9 @@ open items, and the overlay projection/agreement suite this epic builds on.
   contract `reference_number` ↔ DB `payment_reference`; contract status enum
   (`PENDING|APPLIED|APPLIED_PARTIAL|REFUNDED|FAILED`) is a different axis from
   DB status — F1b precedent: derive the contract status from facts
-  (see F2a); `applied_at` is derived (MAX application time when fully applied,
-  else null — contract allows null).
+  (see F2a); `applied_at` is derived (the last allocation instant once any
+  application exists, else null — refined from the original "fully applied"
+  rule when F2b shipped; contract allows null).
 - `posted_to_gl`/`gl_entry_id` are required in the contract `Payment` object but
   cash-side GL posting belongs to Epic H (banking). F2 returns
   `posted_to_gl=false`, `gl_entry_id=null` (overlay-level receipts only).
@@ -63,17 +64,25 @@ open items, and the overlay projection/agreement suite this epic builds on.
 ### F2b — applications live (create / list, auto_apply)
 - Guards from F1b's fact-derived balance: application may not exceed the
   document's derived outstanding (409), nor the payment's remaining unapplied
-  (409); target overlay row must exist and payment must be `POSTED`.
+  (409); a missing overlay row is HEALED through F1c's projection refresh (the
+  application never hand-patches cache columns); payment must be internally
+  `POSTED` (fresh F2a receipts qualify; CANCELLED rejected).
+- Id space: the contract `customer_invoice_id` is the OPEN-ITEM (posted
+  document) id — the one F1b echoes — while `ar_payment_applications.invoice_id`
+  FKs the overlay row; the flow maps document→overlay internally and list
+  re-maps back, so clients never see overlay row ids.
 - Pair semantics: repeat application to the same (payment, invoice) accumulates
   into the UNIQUE pair row; every delta is journaled to the new
   `ar_payment_application_events` table (kind `APPLIED`, amount, actor, time) —
   this is also F2c's audit spine.
-- Maintains in one transaction (advisory lock on the payment — same FNV pattern
-  as the F1c projection lock): payment `applied_amount`/`unapplied_amount`,
-  overlay row `applied_amount`/`outstanding_amount` cache refresh (manual
-  states preserved per F1c rules; `PAID` transition derived), and the payment
-  `applied_at` derivation.
-- `auto_apply=true` on create = FIFO by due date over the customer's open items.
+- Maintains in one transaction (advisory lock on the payment taken BEFORE any
+  document lock — same FNV pattern as the F1c projection lock): payment
+  `applied_amount`/`unapplied_amount`, overlay row refresh (manual states
+  preserved per F1c rules; `PAID` transition derived), and the payment
+  `applied_at` read-axis derivation (last allocation instant, batched per
+  page — never stored).
+- `auto_apply=true` on create = FIFO by due date over the customer's open items
+  (same-currency, capacity-aware; nothing to allocate is a successful no-op).
 
 ### F2c — allocation reversal with audit linkage
 - Contract addition (separate spec commit first, then regen):
