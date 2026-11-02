@@ -634,30 +634,40 @@ COMMIT;",
         })
         .expect("list open items");
         assert_eq!(listed["total"], 5);
-        let item = |doc: &str| -> Value {
+        // `label` is a static fixture name: CodeQL (cleartext-logging)
+        // forbids interpolating uid()-derived ids into panic messages.
+        let item = |doc: &str, label: &str| -> Value {
             listed["items"]
                 .as_array()
                 .expect("items array")
                 .iter()
                 .find(|row| row["invoice_id"] == json!(doc))
                 .cloned()
-                .unwrap_or_else(|| panic!("item {doc} missing"))
+                .unwrap_or_else(|| panic!("open item {label} missing"))
         };
-        assert_eq!(item(&inv1)["status"], "CONFIRMED");
-        assert_eq!(item(&inv1)["outstanding_amount"], "100");
-        assert_eq!(item(&inv1)["terms"], "NET_30");
-        assert_eq!(item(&inv2)["status"], "PARTIAL");
-        assert_eq!(item(&inv2)["outstanding_amount"], "40");
-        assert_eq!(item(&inv2)["original_amount"], "40", "nets the credit note");
+        assert_eq!(item(&inv1, "inv1")["status"], "CONFIRMED");
+        assert_eq!(item(&inv1, "inv1")["outstanding_amount"], "100");
+        assert_eq!(item(&inv1, "inv1")["terms"], "NET_30");
+        assert_eq!(item(&inv2, "inv2")["status"], "PARTIAL");
+        assert_eq!(item(&inv2, "inv2")["outstanding_amount"], "40");
+        assert_eq!(
+            item(&inv2, "inv2")["original_amount"],
+            "40",
+            "nets the credit note"
+        );
         // The read path honours the manual status but derives money from
         // the facts; the cache stays frozen at the write-off moment.
-        assert_eq!(item(&inv3)["status"], "WRITTEN_OFF");
-        assert_eq!(item(&inv3)["outstanding_amount"], "40");
-        assert_eq!(item(&inv4)["status"], "CONFIRMED");
-        assert_eq!(item(&inv4)["outstanding_amount"], "44");
-        assert_eq!(item(&inv4)["terms"], "NET_30", "stale NET_15 was refreshed");
-        assert_eq!(item(&inv5)["status"], "DISPUTED");
-        assert_eq!(item(&inv5)["outstanding_amount"], "30");
+        assert_eq!(item(&inv3, "inv3")["status"], "WRITTEN_OFF");
+        assert_eq!(item(&inv3, "inv3")["outstanding_amount"], "40");
+        assert_eq!(item(&inv4, "inv4")["status"], "CONFIRMED");
+        assert_eq!(item(&inv4, "inv4")["outstanding_amount"], "44");
+        assert_eq!(
+            item(&inv4, "inv4")["terms"],
+            "NET_30",
+            "stale NET_15 was refreshed"
+        );
+        assert_eq!(item(&inv5, "inv5")["status"], "DISPUTED");
+        assert_eq!(item(&inv5, "inv5")["outstanding_amount"], "30");
 
         // Idempotence: nothing left to write.
         let report2 = with_ar_transaction(&session, |executor| {
