@@ -51,6 +51,8 @@ pub struct ArPayment {
     pub payment_method: String,
 
     /// External provider reference (authoritative, F2 duplicate guard).
+    /// Partial unique (tenant, legal_entity_id) lands as hand-written
+    /// foundation/0007_ar_receipts.sql — the generator has no partial index.
     #[column_type = "VARCHAR(100)"]
     pub payment_reference: Option<String>,
 

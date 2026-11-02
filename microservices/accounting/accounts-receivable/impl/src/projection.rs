@@ -147,7 +147,7 @@ pub fn ar_control_drift<E: LifeExecutor>(
     if credit_notes.len() as i64 > MAX_CREDIT_NOTE_DOCS {
         return Ok(None);
     }
-    let documents = ledger::chargeback_documents(executor, session, legal_entity, None)?;
+    let documents = ledger::chargeback_documents(executor, session, &[legal_entity], None)?;
     let chargeback_total: Decimal = documents.iter().map(|doc| doc.total_amount).sum();
     let credit_total: Decimal = credit_notes.iter().map(|doc| doc.total_amount).sum();
     let expected = chargeback_total - credit_total;
@@ -189,11 +189,11 @@ pub fn project_settlement_state<E: LifeExecutor>(
 ) -> Result<ProjectionReport, ArError> {
     overlay_projection_lock(executor, legal_entity)?;
     let today = Utc::now().date_naive();
-    let documents = ledger::chargeback_documents(executor, session, legal_entity, None)?;
+    let documents = ledger::chargeback_documents(executor, session, &[legal_entity], None)?;
     let document_ids: Vec<Uuid> = documents.iter().map(|doc| doc.id).collect();
     let credits =
-        ledger::credit_note_totals(executor, session, legal_entity, document_ids.clone())?;
-    let overlays = ledger::overlay_state(executor, session, legal_entity, document_ids)?;
+        ledger::credit_note_totals(executor, session, &[legal_entity], document_ids.clone())?;
+    let overlays = ledger::overlay_state(executor, session, &[legal_entity], document_ids)?;
 
     let mut report = ProjectionReport {
         documents: documents.len(),
