@@ -924,3 +924,15 @@ ref-rewritten) the whole accounting suite — including
   public (name-scoped, idempotent) plus ALTER DEFAULT PRIVILEGES for
   future re-applies. Verified against a fresh dockerized disposable DB
   (revoke, re-run the block, has_function_privilege -> t).
+
+## [2026-11-02] added | Epic F2 slice plan (receipts + allocations)
+
+- docs/EPIC_F2_AR_RECEIPTS_PLAN.md: F2a payments live (external-reference
+  unique via migration 0007, derived contract status axis, auto_apply 501
+  until F2b), F2b applications (fact-derived balance guards, pair-accumulate
+  under the 0006 UNIQUE constraint, event journal, advisory locks), F2c
+  contract addition POST /payments/applications/{id}/reverse (no reversal op
+  exists today), F2d live acceptance incl. the
+  invoice+credit+receipt+allocation+outstanding identity.
+- Contract-vs-0006 vocabulary mismatches recorded as mapping decisions;
+  payment-op example placeholders flagged for the F2a spec commit.

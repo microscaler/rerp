@@ -274,6 +274,7 @@ pure stub); commit spec vs gen vs impl separately (enforced convention).
 ### Epic F — AR vertical (first real subledger; deps D3, B1, C1)
 
 Slice plan and evidence: [`docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md`](../../docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md).
+F2 slice plan: [`docs/EPIC_F2_AR_RECEIPTS_PLAN.md`](../../docs/EPIC_F2_AR_RECEIPTS_PLAN.md).
 
 - **F1 — Customer ledger from posted facts** (L, deps D3): open items sourced
   from invoice postings + credit notes; entity migrations for AR's 4 models
