@@ -957,3 +957,26 @@ ref-rewritten) the whole accounting suite — including
 - Next: F2b applications (balance guards, pair-accumulate, events
   journal), F2c contract additions (idempotency key + reversal op),
   F2d acceptance suite.
+
+## [2026-11-02] contribute | F2b applications live (Epic F2 2/4)
+
+- PR #145 (feat/accounting-f2b-applications): create/list payment
+  applications + real auto_apply FIFO (F2a's honest 501 retired).
+- Id-space decision: contract customer_invoice_id stays the OPEN-ITEM
+  (posted document) id; applications FK the overlay row, so the flow
+  heals a missing overlay row through F1c's projection refresh and maps
+  ids internally — clients never see overlay row ids, cache is never
+  hand-patched.
+- Guards: derived document capacity and payment unapplied both 409;
+  cross-customer/foreign-document 404; CANCELLED receipts rejected.
+  Payment advisory lock always before document lock (no cycle).
+- Pair row accumulates per (payment, document); every delta journaled to
+  new ar_payment_application_events (0008, RLS, amount>0, kind carries
+  sign; REVERSED reserved for F2c). Payment applied_at now derived on
+  read (last allocation instant, batched per page) instead of null.
+- Proof: 18 units + live acceptance (accumulation, journal counts via
+  psql-through-RLS, healed overlays 60/20, FIFO due-date order, RLS-
+  bounded journal); ledger/projection/payments live suites rerun green;
+  clippy -D warnings all-targets clean.
+- Next: F2c reversal (spec commit first, then regen) + idempotency-key
+  discussion, F2d receipts identity acceptance suite.

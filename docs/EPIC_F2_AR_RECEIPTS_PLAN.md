@@ -63,17 +63,25 @@ open items, and the overlay projection/agreement suite this epic builds on.
 ### F2b — applications live (create / list, auto_apply)
 - Guards from F1b's fact-derived balance: application may not exceed the
   document's derived outstanding (409), nor the payment's remaining unapplied
-  (409); target overlay row must exist and payment must be `POSTED`.
+  (409); a missing overlay row is HEALED through F1c's projection refresh (the
+  application never hand-patches cache columns); payment must be internally
+  `POSTED` (fresh F2a receipts qualify; CANCELLED rejected).
+- Id space: the contract `customer_invoice_id` is the OPEN-ITEM (posted
+  document) id — the one F1b echoes — while `ar_payment_applications.invoice_id`
+  FKs the overlay row; the flow maps document→overlay internally and list
+  re-maps back, so clients never see overlay row ids.
 - Pair semantics: repeat application to the same (payment, invoice) accumulates
   into the UNIQUE pair row; every delta is journaled to the new
   `ar_payment_application_events` table (kind `APPLIED`, amount, actor, time) —
   this is also F2c's audit spine.
-- Maintains in one transaction (advisory lock on the payment — same FNV pattern
-  as the F1c projection lock): payment `applied_amount`/`unapplied_amount`,
-  overlay row `applied_amount`/`outstanding_amount` cache refresh (manual
-  states preserved per F1c rules; `PAID` transition derived), and the payment
-  `applied_at` derivation.
-- `auto_apply=true` on create = FIFO by due date over the customer's open items.
+- Maintains in one transaction (advisory lock on the payment taken BEFORE any
+  document lock — same FNV pattern as the F1c projection lock): payment
+  `applied_amount`/`unapplied_amount`, overlay row refresh (manual states
+  preserved per F1c rules; `PAID` transition derived), and the payment
+  `applied_at` read-axis derivation (last allocation instant, batched per
+  page — never stored).
+- `auto_apply=true` on create = FIFO by due date over the customer's open items
+  (same-currency, capacity-aware; nothing to allocate is a successful no-op).
 
 ### F2c — allocation reversal with audit linkage
 - Contract addition (separate spec commit first, then regen):
