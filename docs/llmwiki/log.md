@@ -895,3 +895,19 @@ ref-rewritten) the whole accounting suite — including
   in the AR spec plus nine other scaffold specs. Tracked as a dedicated
   sweep in docs/EPIC_F1_ACCOUNTS_RECEIVABLE_PLAN.md (surfaced by the
   PR #135 review).
+
+## [2026-11-02] delivered | F1c overlay projection + AR control-account agreement
+
+- projection.rs lands the rebuildable cache: project_settlement_state
+  writes one customer_invoices row per posted customer document with
+  values exactly equal to compose_item (cached original_amount is the
+  CREDIT-NETTED original like the read path; gross would have disagreed).
+  Idempotent; manual WRITTEN_OFF / DISPUTED rows preserved verbatim.
+  ar_control_drift compares ACCOUNTS_RECEIVABLE journal movement against
+  signed document totals and degrades to None over read bounds.
+- Live acceptance: create 2 / refresh 1 / preserve 1 with drift 0; stored
+  dump agrees value-for-value with list_open_items; from-scratch rebuild
+  byte-identical; stray control-account DEBIT reads drift +7; tenant B
+  invisible. Rerun-safe. Runtime consumer arrives with F3 (documented
+  allow(dead_code) until then).
+- Plan status -> F2 next (receipts + allocations). PR #141.
