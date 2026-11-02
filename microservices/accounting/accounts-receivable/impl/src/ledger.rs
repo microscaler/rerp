@@ -33,6 +33,7 @@ const DEFAULT_LIMIT: i32 = 20;
 const MAX_LIMIT: i32 = 100;
 const CHARGEBACK_TYPES: [&str; 2] = ["CUSTOMER_INVOICE", "CUSTOMER_DEBIT_NOTE"];
 const MAX_SOURCE_DOCUMENTS: i64 = 50_000;
+const MAX_CREDIT_NOTES: i64 = 50_000;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ArError {
@@ -277,29 +278,19 @@ fn chargeback_documents<E: LifeExecutor>(
     if let Some(currency) = currency_code {
         query = query.filter(DocumentColumn::CurrencyCode.eq(currency.to_string()));
     }
-    query
+    // One bounded statement: read MAX+1 rows and reject over the limit, so
+    // READ COMMITTED races cannot smuggle extra rows past the guard
+    // (SQL paging arrives with the F1c projection).
+    let documents = query
+        .limit((MAX_SOURCE_DOCUMENTS + 1) as u64)
         .all(executor)
-        .map_err(|error| ArError::Database(error.to_string()))
-}
-
-fn chargeback_documents_count<E: LifeExecutor>(
-    executor: &E,
-    session: &SessionContext,
-    legal_entity: Uuid,
-    currency_code: Option<&str>,
-) -> Result<i64, ArError> {
-    let mut query = DocumentEntity::find()
-        .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(DocumentColumn::LegalEntityId.eq(legal_entity))
-        .filter(DocumentColumn::Status.eq("POSTED".to_string()))
-        .filter(DocumentColumn::DocumentType.is_in(CHARGEBACK_TYPES));
-    if let Some(currency) = currency_code {
-        query = query.filter(DocumentColumn::CurrencyCode.eq(currency.to_string()));
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    if documents.len() as i64 > MAX_SOURCE_DOCUMENTS {
+        return Err(ArError::Validation(format!(
+            "open-item source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow with currency_code"
+        )));
     }
-    query
-        .count()
-        .one(executor)
-        .map_err(|error| ArError::Database(error.to_string()))
+    Ok(documents)
 }
 
 fn credit_note_totals<E: LifeExecutor>(
@@ -317,8 +308,14 @@ fn credit_note_totals<E: LifeExecutor>(
         .filter(DocumentColumn::Status.eq("POSTED".to_string()))
         .filter(DocumentColumn::DocumentType.eq("CUSTOMER_CREDIT_NOTE".to_string()))
         .filter(DocumentColumn::OriginalDocumentId.is_in(document_ids))
+        .limit((MAX_CREDIT_NOTES + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
+    if notes.len() as i64 > MAX_CREDIT_NOTES {
+        return Err(ArError::Validation(format!(
+            "linked credit notes exceed the {MAX_CREDIT_NOTES}-row read bound"
+        )));
+    }
     let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
     for note in notes {
         if let Some(original) = note.original_document_id {
@@ -425,20 +422,6 @@ pub fn list_open_items<E: LifeExecutor>(
     filters: &ListFilters,
 ) -> Result<Value, ArError> {
     let legal_entity = resolve_legal_entity(executor, session, filters.company_id)?;
-    // Bounded source guard until the F1c overlay projection provides SQL
-    // paging: refuse reads over MAX_SOURCE_DOCUMENTS instead of loading
-    // an unbounded result into memory.
-    let probe = chargeback_documents_count(
-        executor,
-        session,
-        legal_entity.id,
-        filters.currency_code.as_deref(),
-    )?;
-    if probe > MAX_SOURCE_DOCUMENTS {
-        return Err(ArError::Validation(format!(
-            "open-item source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow with currency_code (SQL paging arrives with the F1c projection)"
-        )));
-    }
     let documents = chargeback_documents(
         executor,
         session,
@@ -721,7 +704,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires the disposable accounting DB (migrations 0001..0006) and psql on PATH"]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0006) and psql on PATH; run live tests serially (--test-threads=1)"]
     fn live_open_items_derive_from_posted_facts() {
         // Two invoices for one tenant: one untouched (CONFIRMED, CURRENT),
         // one carrying a credit note, an overlay, a payment application and
@@ -737,6 +720,8 @@ mod tests {
         let clean = uid("d", &run);
         let mixed = uid("e", &run);
         let credit = uid("c", &run);
+        let lone = uid("3", &run);
+        let lone_credit = uid("2", &run);
         let overlay = uid("f", &run);
         let payment = uid("a", &run);
         let application = uid("b", &run);
@@ -776,7 +761,15 @@ VALUES
     ('{credit}', '{tenant}', '{entity}', '{period}', '{tenant}-CRN-1',
      'CUSTOMER_CREDIT_NOTE', '{payment}', 'ledger-test', 'fixture', 'credit',
      '2026-01-07', '{overdue}', 'GBP', 2, 16, 0, 4, 20.000000, now(),
-     '{subject}'::uuid, '{mixed}');
+     '{subject}'::uuid, '{mixed}'),
+    ('{lone}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-3',
+     'CUSTOMER_INVOICE', '{payment}', 'ledger-test', 'fixture', 'three',
+     '2026-01-09', '2099-01-01', 'GBP', 2, 33, 0, 7, 40.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{lone_credit}', '{tenant}', '{entity}', '{period}', '{tenant}-CRN-2',
+     'CUSTOMER_CREDIT_NOTE', '{payment}', 'ledger-test', 'fixture', 'credit2',
+     '2026-01-10', '2099-01-01', 'GBP', 2, 12, 0, 3, 15.000000, now(),
+     '{subject}'::uuid, '{lone}');
 INSERT INTO customer_invoices
     (id, tenant_id, legal_entity_id, invoice_id, customer_id, original_amount,
      outstanding_amount, currency_code, due_date, terms, updated_at)
@@ -832,7 +825,7 @@ COMMIT;"
         })
         .expect("list open items");
         assert_eq!(
-            listed["total"], 2,
+            listed["total"], 3,
             "credit notes are not open items themselves"
         );
         let clean_row = listed["items"]
@@ -859,6 +852,18 @@ COMMIT;"
         );
         assert_eq!(mixed_row["aging_bucket"], "1-30");
 
+        // Credit-only settlement with NO payment application must reach
+        // PARTIAL through the compose_item wiring (not just derive_status).
+        let lone_row = listed["items"]
+            .as_array()
+            .expect("items array")
+            .iter()
+            .find(|row| row["invoice_id"] == json!(lone.to_string()))
+            .expect("credit-only invoice");
+        assert_eq!(lone_row["status"], "PARTIAL");
+        assert_eq!(lone_row["outstanding_amount"], "25");
+        assert_eq!(lone_row["original_amount"], "25");
+
         let partial_only = ListFilters {
             status: Some("PARTIAL".to_string()),
             ..Default::default()
@@ -867,8 +872,7 @@ COMMIT;"
             list_open_items(executor, &session, &partial_only)
         })
         .expect("filtered list");
-        assert_eq!(filtered["total"], 1);
-        assert_eq!(filtered["items"][0]["invoice_id"], json!(mixed.to_string()));
+        assert_eq!(filtered["total"], 2, "credit-only row is PARTIAL too");
 
         let detail = crate::http_support::with_ar_transaction(&session, |executor| {
             get_open_item(executor, &session, &mixed.to_string())

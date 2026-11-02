@@ -26,7 +26,7 @@ paths:
     get:
       operationId: list_open_items
       summary: List open items
-      description: Paginated outstanding balances (unpaid by default) of posted customer invoices, with aging bucket; days overdue is reported by the detail endpoint.
+      description: Paginated outstanding balances (unpaid by default) of posted customer invoices and customer debit notes, with aging bucket; days overdue is reported by the detail endpoint.
       x-brrtrouter-impl: true
       parameters:
         - name: page

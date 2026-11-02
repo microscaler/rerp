@@ -8,7 +8,9 @@
 //! Requires the disposable database from
 //! `microservices/accounting/scripts/setup-db.sh` (or the scratch reset
 //! harness) with migrations 0001..0006 applied and DML granted to the
-//! `rerp` role; `psql` must be on PATH.
+//! `rerp` role; `psql` must be on PATH. These live tests share one
+//! database and must run serially: `cargo test -- --ignored
+//! --test-threads=1`.
 
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
