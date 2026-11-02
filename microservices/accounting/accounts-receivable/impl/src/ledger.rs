@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use chrono::{NaiveDate, NaiveDateTime, Utc};
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, SessionContext};
 use rerp_entities::accounting::foundation::legal_entity::{
-    AccountingLegalEntityModel, Column as LegalEntityColumn, Entity as LegalEntityEntity,
+    Column as LegalEntityColumn, Entity as LegalEntityEntity,
 };
 use rerp_entities::accounting::foundation::posted_document::{
     AccountingPostedDocumentModel, Column as DocumentColumn, Entity as DocumentEntity,
@@ -40,6 +40,7 @@ pub enum ArError {
     Validation(String),
     Policy(String),
     NotFound,
+    Conflict(String),
     Database(String),
 }
 
@@ -49,6 +50,7 @@ impl std::fmt::Display for ArError {
             Self::Validation(message) => write!(formatter, "validation failed: {message}"),
             Self::Policy(message) => write!(formatter, "accounting scope rejected: {message}"),
             Self::NotFound => write!(formatter, "resource not found"),
+            Self::Conflict(message) => write!(formatter, "conflict: {message}"),
             Self::Database(message) => write!(formatter, "database failure: {message}"),
         }
     }
@@ -241,13 +243,15 @@ pub fn parse_list_filters(
     })
 }
 
-fn resolve_legal_entity<E: LifeExecutor>(
+/// The caller's active legal entities within their organization. An
+/// explicit company_id narrows inside the org, never escapes it; an
+/// unscoped read covers ALL org entities — never an arbitrary one when
+/// the org has several.
+pub(crate) fn resolve_scope_entities<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     company_id: Option<Uuid>,
-) -> Result<AccountingLegalEntityModel, ArError> {
-    // Both paths bind the entity to the CALLER'S organization: an explicit
-    // company_id narrows within the org, it never escapes it.
+) -> Result<Vec<Uuid>, ArError> {
     let mut query = LegalEntityEntity::find()
         .filter(LegalEntityColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(LegalEntityColumn::OrganizationId.eq(session.organization_id))
@@ -255,24 +259,28 @@ fn resolve_legal_entity<E: LifeExecutor>(
     if let Some(company) = company_id {
         query = query.filter(LegalEntityColumn::Id.eq(company));
     }
-    match query.find_one(executor) {
-        Ok(Some(value)) => Ok(value),
-        Ok(None) => Err(ArError::Policy(
+    let entities = query
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    if entities.is_empty() {
+        return Err(ArError::Policy(
             "no active legal entity matches this scope".to_string(),
-        )),
-        Err(error) => Err(ArError::Database(error.to_string())),
+        ));
     }
+    let mut ids: Vec<Uuid> = entities.into_iter().map(|row| row.id).collect();
+    ids.sort();
+    Ok(ids)
 }
 
 pub(crate) fn chargeback_documents<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
-    legal_entity: Uuid,
+    legal_entities: &[Uuid],
     currency_code: Option<&str>,
 ) -> Result<Vec<AccountingPostedDocumentModel>, ArError> {
     let mut query = DocumentEntity::find()
         .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(DocumentColumn::LegalEntityId.eq(legal_entity))
+        .filter(DocumentColumn::LegalEntityId.is_in(legal_entities.to_vec()))
         .filter(DocumentColumn::Status.eq("POSTED".to_string()))
         .filter(DocumentColumn::DocumentType.is_in(CHARGEBACK_TYPES));
     if let Some(currency) = currency_code {
@@ -296,7 +304,7 @@ pub(crate) fn chargeback_documents<E: LifeExecutor>(
 pub(crate) fn credit_note_totals<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
-    legal_entity: Uuid,
+    legal_entities: &[Uuid],
     document_ids: Vec<Uuid>,
 ) -> Result<HashMap<Uuid, Decimal>, ArError> {
     if document_ids.is_empty() {
@@ -304,7 +312,7 @@ pub(crate) fn credit_note_totals<E: LifeExecutor>(
     }
     let notes = DocumentEntity::find()
         .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(DocumentColumn::LegalEntityId.eq(legal_entity))
+        .filter(DocumentColumn::LegalEntityId.is_in(legal_entities.to_vec()))
         .filter(DocumentColumn::Status.eq("POSTED".to_string()))
         .filter(DocumentColumn::DocumentType.eq("CUSTOMER_CREDIT_NOTE".to_string()))
         .filter(DocumentColumn::OriginalDocumentId.is_in(document_ids))
@@ -328,7 +336,7 @@ pub(crate) fn credit_note_totals<E: LifeExecutor>(
 pub(crate) fn overlay_state<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
-    legal_entity: Uuid,
+    legal_entities: &[Uuid],
     document_ids: Vec<Uuid>,
 ) -> Result<HashMap<Uuid, (CustomerInvoiceModel, Decimal)>, ArError> {
     if document_ids.is_empty() {
@@ -336,7 +344,7 @@ pub(crate) fn overlay_state<E: LifeExecutor>(
     }
     let overlays = OverlayEntity::find()
         .filter(OverlayColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(OverlayColumn::LegalEntityId.eq(legal_entity))
+        .filter(OverlayColumn::LegalEntityId.is_in(legal_entities.to_vec()))
         .filter(OverlayColumn::InvoiceId.is_in(document_ids))
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
@@ -346,7 +354,7 @@ pub(crate) fn overlay_state<E: LifeExecutor>(
     } else {
         ApplicationEntity::find()
             .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
-            .filter(ApplicationColumn::LegalEntityId.eq(legal_entity))
+            .filter(ApplicationColumn::LegalEntityId.is_in(legal_entities.to_vec()))
             .filter(ApplicationColumn::InvoiceId.is_in(overlay_ids))
             .all(executor)
             .map_err(|error| ArError::Database(error.to_string()))?
@@ -421,16 +429,16 @@ pub fn list_open_items<E: LifeExecutor>(
     session: &SessionContext,
     filters: &ListFilters,
 ) -> Result<Value, ArError> {
-    let legal_entity = resolve_legal_entity(executor, session, filters.company_id)?;
+    let entities = resolve_scope_entities(executor, session, filters.company_id)?;
     let documents = chargeback_documents(
         executor,
         session,
-        legal_entity.id,
+        &entities,
         filters.currency_code.as_deref(),
     )?;
     let document_ids: Vec<Uuid> = documents.iter().map(|row| row.id).collect();
-    let credits = credit_note_totals(executor, session, legal_entity.id, document_ids.clone())?;
-    let overlays = overlay_state(executor, session, legal_entity.id, document_ids)?;
+    let credits = credit_note_totals(executor, session, &entities, document_ids.clone())?;
+    let overlays = overlay_state(executor, session, &entities, document_ids)?;
     let today = Utc::now().date_naive();
 
     let mut items: Vec<(NaiveDate, String, Value)> = Vec::with_capacity(documents.len());
@@ -481,11 +489,12 @@ pub fn get_open_item<E: LifeExecutor>(
 ) -> Result<Value, ArError> {
     let id =
         Uuid::parse_str(id).map_err(|_| ArError::Validation("id must be a UUID".to_string()))?;
-    // The detail path binds to the caller's organization too: the legal
-    // entity must belong to the session's org, else NotFound (no leak of
-    // whether the id exists elsewhere).
-    let entity = match resolve_legal_entity(executor, session, None) {
-        Ok(entity) => entity,
+    // The detail path binds to the caller's organization: the row's legal
+    // entity must be one of the org's active entities, else NotFound (no
+    // leak of whether the id exists elsewhere). This never picks an
+    // arbitrary entity for a multi-entity org.
+    let scope = match resolve_scope_entities(executor, session, None) {
+        Ok(scope) => scope,
         Err(ArError::Policy(_)) => return Err(ArError::NotFound),
         Err(error) => return Err(error),
     };
@@ -496,11 +505,12 @@ pub fn get_open_item<E: LifeExecutor>(
         .map_err(|error| ArError::Database(error.to_string()))?
         .filter(|row| {
             CHARGEBACK_TYPES.contains(&row.document_type.as_str())
-                && row.legal_entity_id == entity.id
+                && scope.contains(&row.legal_entity_id)
         })
         .ok_or(ArError::NotFound)?;
-    let credits = credit_note_totals(executor, session, document.legal_entity_id, vec![id])?;
-    let overlays = overlay_state(executor, session, document.legal_entity_id, vec![id])?;
+    let entity_scope = [document.legal_entity_id];
+    let credits = credit_note_totals(executor, session, &entity_scope, vec![id])?;
+    let overlays = overlay_state(executor, session, &entity_scope, vec![id])?;
     let today = Utc::now().date_naive();
     let facts = ItemFacts {
         document: &document,

@@ -766,8 +766,8 @@ paths:
               reference_number: REF-2026-0001
               amount: '10000.00'
               currency_code: USD
-              payment_method: 1000.0
-              payment_date: 1000.0
+              payment_method: WIRE
+              payment_date: '2026-01-15'
               customer_id: 650e8400-e29b-41d4-a716-446655440001
               company_id: 550e8400-e29b-41d4-a716-446655440000
               notes: Approved by CFO on 2026-01-15
@@ -819,8 +819,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AccountsReceivableCreatePaymentApplicationRequest'
             example:
-              payment_id: 1000.0
-              customer_invoice_id: 1000.0
+              payment_id: 550e8400-e29b-41d4-a716-446655440000
+              customer_invoice_id: 650e8400-e29b-41d4-a716-446655440001
               applied_amount: '1000.00'
       responses:
         '201':
@@ -6016,11 +6016,11 @@ components:
         payment_id:
           type: string
           format: uuid
-          example: 1000.0
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_invoice_id:
           type: string
           format: uuid
-          example: 1000.0
+          example: 650e8400-e29b-41d4-a716-446655440001
         applied_amount:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
@@ -6058,11 +6058,11 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
-          example: 1000.0
+          example: CHECK
         payment_date:
           type: string
           format: date
-          example: 1000.0
+          example: '2026-01-10'
         customer_id:
           type: string
           format: uuid
@@ -6325,12 +6325,12 @@ components:
           - BANK_TRANSFER
           - PAYMENT_GATEWAY
           - COUNTER_SERVICE
-          example: 1000.0
+          example: WIRE
         payment_date:
           type: string
           format: date
           description: Date the payment was received
-          example: 1000.0
+          example: '2026-01-15'
         status:
           type: string
           enum:
@@ -6401,12 +6401,12 @@ components:
           type: string
           format: uuid
           description: Payment being applied
-          example: 1000.0
+          example: 550e8400-e29b-41d4-a716-446655440000
         customer_invoice_id:
           type: string
           format: uuid
           description: Customer invoice being paid
-          example: 1000.0
+          example: 650e8400-e29b-41d4-a716-446655440001
         applied_amount:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$

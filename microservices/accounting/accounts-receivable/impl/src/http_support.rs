@@ -74,7 +74,8 @@ pub fn ar_error(error: ArError) -> HttpJson<Value> {
     let (status, code, message) = match &error {
         ArError::Validation(_) => (400, "UNKNOWN", error.to_string()),
         ArError::Policy(_) => (403, "FORBIDDEN", error.to_string()),
-        ArError::NotFound => (404, "NOT_FOUND", "Open item not found".to_string()),
+        ArError::NotFound => (404, "NOT_FOUND", "Resource not found".to_string()),
+        ArError::Conflict(_) => (409, "CONFLICT", error.to_string()),
         ArError::Database(_) => {
             eprintln!("accounts-receivable runtime database failure: {error}");
             (

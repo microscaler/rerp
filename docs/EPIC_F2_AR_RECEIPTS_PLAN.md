@@ -42,17 +42,23 @@ open items, and the overlay projection/agreement suite this epic builds on.
   `(tenant_id, legal_entity_id, payment_reference) WHERE payment_reference IS
   NOT NULL` — the epic's "authoritative external payment reference".
   Append-only to `apply_order.txt` (append-only rule; never renumber).
-- `create_customer_payment`: server-generated `payment_number` (match the
-  invoice number generator's pattern), initial `applied=0`,
-  `unapplied=payment_amount`, status `POSTED` (payments arrive as facts; DRAFT
-  is unreachable via the API); duplicate external reference → 409; full
-  F1b-style idempotent replay on the request hash. `auto_apply=true` is an
+- `create_customer_payment`: server-generated `payment_number` (`PAY-<year>-
+  <seq>` under the GL's advisory-lock sequence discipline), initial
+  `applied=0`, `unapplied=payment_amount`, status `POSTED` (payments arrive
+  as facts; DRAFT is unreachable via the API); duplicate external reference
+  → 409 (the 0007 partial-unique index is the duplicate guard — the contract
+  carries no request-level idempotency key, unlike GL, so key-bearing replay
+  is tracked with F2c's contract additions). `auto_apply=true` is an
   honest 501 until F2b delivers the allocation machinery.
 - Status derivation (contract axis): `applied=0` → `PENDING`;
   `0<applied<amount` → `APPLIED_PARTIAL`; `applied=amount` → `APPLIED`;
   DB `CANCELLED` → `FAILED`; `REFUNDED` reserved for Epic H.
 - `company_id` in the request is optional and, when present, must equal the
   session legal entity (400 on mismatch) — same treatment F1b gave open items.
+- Scope-class fix surfaced by the F2a fixture: unscoped `list`/`get` now
+  cover ALL of the caller org's active entities (F1b's `resolve_legal_entity`
+  picked an arbitrary one for multi-entity orgs), and a write in an ambiguous
+  scope is rejected rather than guessed.
 
 ### F2b — applications live (create / list, auto_apply)
 - Guards from F1b's fact-derived balance: application may not exceed the

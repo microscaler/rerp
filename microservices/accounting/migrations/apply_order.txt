@@ -6,3 +6,4 @@ foundation/0003_document_artifacts.sql
 foundation/0004_render_outbox.sql
 foundation/0005_debit_notes.sql
 foundation/0006_ar_overlay.sql
+foundation/0007_ar_receipts.sql
