@@ -16,6 +16,7 @@ mod http_support;
 mod identity;
 mod impl_registry;
 mod ledger;
+mod projection;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
