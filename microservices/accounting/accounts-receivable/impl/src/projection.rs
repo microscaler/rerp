@@ -154,6 +154,32 @@ pub fn ar_control_drift<E: LifeExecutor>(
     Ok(Some(journal_net - expected))
 }
 
+/// Serialize overlay projections per legal entity with a
+/// transaction-scoped advisory lock — the same FNV pattern as GL's
+/// posting lock. Concurrent runs for one entity must not both take the
+/// create path for the same document and abort on
+/// `customer_invoices_document_unique`.
+fn overlay_projection_lock<E: LifeExecutor>(
+    executor: &E,
+    legal_entity: Uuid,
+) -> Result<(), ArError> {
+    const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
+    const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+    let mut hash = FNV_OFFSET;
+    for byte in b"ar-overlay-projection"
+        .iter()
+        .chain(legal_entity.as_bytes().iter())
+    {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(FNV_PRIME);
+    }
+    let lock_key = i64::from_be_bytes(hash.to_be_bytes());
+    executor
+        .query_one(&format!("SELECT pg_advisory_xact_lock({lock_key})"), &[])
+        .map_err(|error| ArError::Database(format!("overlay projection lock: {error}")))?;
+    Ok(())
+}
+
 /// Rebuild the overlay for one legal entity from the posted facts.
 /// Idempotent; manual WRITTEN_OFF / DISPUTED states are preserved.
 pub fn project_settlement_state<E: LifeExecutor>(
@@ -161,6 +187,7 @@ pub fn project_settlement_state<E: LifeExecutor>(
     session: &SessionContext,
     legal_entity: Uuid,
 ) -> Result<ProjectionReport, ArError> {
+    overlay_projection_lock(executor, legal_entity)?;
     let today = Utc::now().date_naive();
     let documents = ledger::chargeback_documents(executor, session, legal_entity, None)?;
     let document_ids: Vec<Uuid> = documents.iter().map(|doc| doc.id).collect();
@@ -317,21 +344,37 @@ mod tests {
         .args(["-v", "ON_ERROR_STOP=1", "-q", "-At"]);
     }
 
-    /// Runs SQL as the superuser bootstrap path (same shape as the ledger
-    /// suite: session GUC is set inside the seed transaction itself).
-    fn psql_exec(sql: &str) {
-        let mut path = std::env::temp_dir();
-        path.push(format!("rerp-ar-projection-{}.sql", std::process::id()));
-        std::fs::write(&path, sql).expect("write sql");
+    /// Seeds via STDIN (CodeQL: never write constructed SQL text to a temp
+    /// file — that counts as logging sensitive data), same session shape as
+    /// the ledger suite: the GUC lives inside the seed transaction.
+    fn psql_run(sql: &str) -> (bool, String, String) {
+        use std::io::Write;
+        use std::process::Stdio;
         let mut cmd = std::process::Command::new("psql");
         psql_env(&mut cmd);
-        let output = cmd.arg("-f").arg(&path).output().expect("psql on PATH");
-        let _ = std::fs::remove_file(&path);
-        assert!(
+        cmd.stdin(Stdio::piped());
+        // wait_with_output() only captures what was explicitly piped —
+        // without these, result rows inherit the parent's stdout instead.
+        cmd.stdout(Stdio::piped());
+        cmd.stderr(Stdio::piped());
+        let mut child = cmd.spawn().expect("psql on PATH");
+        child
+            .stdin
+            .as_mut()
+            .expect("piped stdin")
+            .write_all(sql.as_bytes())
+            .expect("pipe sql");
+        let output = child.wait_with_output().expect("psql on PATH");
+        (
             output.status.success(),
-            "seed failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+            String::from_utf8_lossy(&output.stdout).to_string(),
+            String::from_utf8_lossy(&output.stderr).to_string(),
+        )
+    }
+
+    fn psql_exec(sql: &str) {
+        let (ok, _stdout, stderr) = psql_run(sql);
+        assert!(ok, "seed failed: {stderr}");
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -347,19 +390,9 @@ mod tests {
     /// query, so the read runs inside the same psql session.
     fn psql_session_query(session_sql: &str, body_sql: &str) -> String {
         let sql = format!("BEGIN;\n{session_sql}\n{body_sql};\nCOMMIT;");
-        let mut path = std::env::temp_dir();
-        path.push(format!("rerp-ar-proj-q-{}.sql", std::process::id()));
-        std::fs::write(&path, sql).expect("write sql");
-        let mut cmd = std::process::Command::new("psql");
-        psql_env(&mut cmd);
-        let output = cmd.arg("-f").arg(&path).output().expect("psql on PATH");
-        let _ = std::fs::remove_file(&path);
-        assert!(
-            output.status.success(),
-            "query failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-        String::from_utf8_lossy(&output.stdout).trim().to_string()
+        let (ok, stdout, stderr) = psql_run(&sql);
+        assert!(ok, "query failed: {stderr}");
+        stdout.trim().to_string()
     }
 
     #[test]
@@ -371,10 +404,12 @@ mod tests {
         //   inv3 minus credit note 10   -> manual WRITTEN_OFF row must be
         //                                  preserved verbatim (frozen cache)
         //   inv4 with a STALE overlay   -> refreshed (terms NET_15 -> NET_30)
-        // Balanced journals put AR 224 on the control account, matching the
+        //   inv5 with a DISPUTED overlay-> preserved (manual_state must gate
+        //                                 the refresh branch, not just create)
+        // Balanced journals put AR 254 on the control account, matching the
         // signed document totals; a stray DEBIT line afterwards must read as
         // drift +7. Tenant B's single invoice must stay invisible (documents
-        // stays 4).
+        // stays 5).
         let run = run_hex();
         let tenant = format!("ar-proj-{run}");
         let other = format!("ar-proj-x-{run}");
@@ -389,6 +424,7 @@ mod tests {
         let inv2 = uid("b2", &run);
         let inv3 = uid("b3", &run);
         let inv4 = uid("b4", &run);
+        let inv5 = uid("b5", &run);
         let cr1 = uid("c1", &run);
         let cr2 = uid("c2", &run);
         let je1 = uid("a1", &run);
@@ -397,8 +433,10 @@ mod tests {
         let je4 = uid("a4", &run);
         let je5 = uid("a5", &run);
         let je6 = uid("a6", &run);
+        let je7 = uid("a7", &run);
         let overlay3 = uid("c3", &run);
         let overlay4 = uid("c4", &run);
+        let overlay5 = uid("c5", &run);
         let b_entity = uid("b0", &run);
         let b_period = uid("bb", &run);
         let b_doc = uid("bd", &run);
@@ -451,7 +489,10 @@ VALUES
      '{d0}', '{d30}', 'GBP', 2, 10, 0, 0, 10.000000, now(), '{subject}'::uuid, '{inv3}'),
     ('{inv4}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-4',
      'CUSTOMER_INVOICE', '{customer}', 'proj-test', 'fixture', 'four',
-     '{dm30}', '{d0}', 'GBP', 2, 44, 0, 0, 44.000000, now(), '{subject}'::uuid, NULL);
+     '{dm30}', '{d0}', 'GBP', 2, 44, 0, 0, 44.000000, now(), '{subject}'::uuid, NULL),
+    ('{inv5}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-5',
+     'CUSTOMER_INVOICE', '{customer}', 'proj-test', 'fixture', 'five',
+     '{d0}', '{d30}', 'GBP', 2, 30, 0, 0, 30.000000, now(), '{subject}'::uuid, NULL);
 INSERT INTO accounting_journal_entries
     (id, tenant_id, legal_entity_id, fiscal_period_id, entry_number, entry_date,
      source_document_id, currency_code, total_debit, total_credit, posted_at, posted_by)
@@ -467,7 +508,9 @@ VALUES
     ('{je5}', '{tenant}', '{entity}', '{period}', '{tenant}-JE-5', '{d0}',
      '{cr2}', 'GBP', 10, 10, now(), '{subject}'::uuid),
     ('{je6}', '{tenant}', '{entity}', '{period}', '{tenant}-JE-6', '{d0}',
-     '{inv4}', 'GBP', 44, 44, now(), '{subject}'::uuid);
+     '{inv4}', 'GBP', 44, 44, now(), '{subject}'::uuid),
+    ('{je7}', '{tenant}', '{entity}', '{period}', '{tenant}-JE-7', '{d0}',
+     '{inv5}', 'GBP', 30, 30, now(), '{subject}'::uuid);
 INSERT INTO accounting_journal_lines
     (tenant_id, legal_entity_id, journal_entry_id, line_number, account_id, side,
      amount, description)
@@ -483,7 +526,9 @@ VALUES
     ('{tenant}', '{entity}', '{je5}',   1, '{rev_account}', 'DEBIT',  10,  'cr2 rev'),
     ('{tenant}', '{entity}', '{je5}',   2, '{ar_account}',  'CREDIT', 10,  'cr2 ar'),
     ('{tenant}', '{entity}', '{je6}',   1, '{ar_account}',  'DEBIT',  44,  'inv4 ar'),
-    ('{tenant}', '{entity}', '{je6}',   2, '{rev_account}', 'CREDIT', 44,  'inv4 rev');
+    ('{tenant}', '{entity}', '{je6}',   2, '{rev_account}', 'CREDIT', 44,  'inv4 rev'),
+    ('{tenant}', '{entity}', '{je7}',   1, '{ar_account}',  'DEBIT',  30,  'inv5 ar'),
+    ('{tenant}', '{entity}', '{je7}',   2, '{rev_account}', 'CREDIT', 30,  'inv5 rev');
 INSERT INTO customer_invoices
     (id, tenant_id, legal_entity_id, invoice_id, customer_id, original_amount,
      outstanding_amount, currency_code, due_date, terms, status, updated_at)
@@ -491,7 +536,9 @@ VALUES
     ('{overlay3}', '{tenant}', '{entity}', '{inv3}', '{customer}',
      50.000000, 50.000000, 'GBP', '{d30}', 'NET_30', 'WRITTEN_OFF', now()),
     ('{overlay4}', '{tenant}', '{entity}', '{inv4}', '{customer}',
-     44.000000, 999.000000, 'GBP', '{d0}', 'NET_15', 'CONFIRMED', now());
+     44.000000, 999.000000, 'GBP', '{d0}', 'NET_15', 'CONFIRMED', now()),
+    ('{overlay5}', '{tenant}', '{entity}', '{inv5}', '{customer}',
+     30.000000, 30.000000, 'GBP', '{d30}', 'NET_30', 'DISPUTED', now());
 COMMIT;
 BEGIN;
 {guc_b}
@@ -538,10 +585,13 @@ COMMIT;",
             project_settlement_state(executor, &session, entity_uuid)
         })
         .expect("projection run 1");
-        assert_eq!(report1.documents, 4, "tenant B's document is invisible");
+        assert_eq!(report1.documents, 5, "tenant B's document is invisible");
         assert_eq!(report1.created, 2, "inv1 + inv2 rows created");
         assert_eq!(report1.refreshed, 1, "inv4 stale row rewritten");
-        assert_eq!(report1.preserved_manual, 1, "inv3 WRITTEN_OFF untouched");
+        assert_eq!(
+            report1.preserved_manual, 2,
+            "inv3 WRITTEN_OFF and inv5 DISPUTED untouched"
+        );
         assert_eq!(report1.ar_control_drift, Some(Decimal::ZERO));
 
         // The overlay dump is the projection's cached truth. Reads run
@@ -565,7 +615,8 @@ COMMIT;",
             "{inv1}|100.000000|100.000000|CONFIRMED|NET_30\n\
              {inv2}|40.000000|40.000000|PARTIAL|NET_30\n\
              {inv3}|50.000000|50.000000|WRITTEN_OFF|NET_30\n\
-             {inv4}|44.000000|44.000000|CONFIRMED|NET_30"
+             {inv4}|44.000000|44.000000|CONFIRMED|NET_30\n\
+             {inv5}|30.000000|30.000000|DISPUTED|NET_30"
         );
         assert_eq!(dump1, expected_dump, "projection cached values");
         assert!(
@@ -582,7 +633,7 @@ COMMIT;",
             list_open_items(executor, &session, &filters)
         })
         .expect("list open items");
-        assert_eq!(listed["total"], 4);
+        assert_eq!(listed["total"], 5);
         let item = |doc: &str| -> Value {
             listed["items"]
                 .as_array()
@@ -605,6 +656,8 @@ COMMIT;",
         assert_eq!(item(&inv4)["status"], "CONFIRMED");
         assert_eq!(item(&inv4)["outstanding_amount"], "44");
         assert_eq!(item(&inv4)["terms"], "NET_30", "stale NET_15 was refreshed");
+        assert_eq!(item(&inv5)["status"], "DISPUTED");
+        assert_eq!(item(&inv5)["outstanding_amount"], "30");
 
         // Idempotence: nothing left to write.
         let report2 = with_ar_transaction(&session, |executor| {
@@ -613,7 +666,7 @@ COMMIT;",
         .expect("projection run 2");
         assert_eq!(report2.created, 0);
         assert_eq!(report2.refreshed, 0);
-        assert_eq!(report2.preserved_manual, 1);
+        assert_eq!(report2.preserved_manual, 2);
         assert_eq!(report2.ar_control_drift, Some(Decimal::ZERO));
 
         // From-scratch rebuild: drop every derived row, keep the manual one.
@@ -637,7 +690,7 @@ COMMIT;",
         .expect("projection run 3");
         assert_eq!(report3.created, 3, "inv1 + inv2 + inv4 rebuilt from facts");
         assert_eq!(report3.refreshed, 0);
-        assert_eq!(report3.preserved_manual, 1);
+        assert_eq!(report3.preserved_manual, 2);
         assert_eq!(report3.ar_control_drift, Some(Decimal::ZERO));
         let dump3 = psql_session_query(&read_guc, &dump_sql(&tenant));
         assert_eq!(
