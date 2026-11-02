@@ -264,7 +264,7 @@ fn resolve_legal_entity<E: LifeExecutor>(
     }
 }
 
-fn chargeback_documents<E: LifeExecutor>(
+pub(crate) fn chargeback_documents<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entity: Uuid,
@@ -293,7 +293,7 @@ fn chargeback_documents<E: LifeExecutor>(
     Ok(documents)
 }
 
-fn credit_note_totals<E: LifeExecutor>(
+pub(crate) fn credit_note_totals<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entity: Uuid,
@@ -325,7 +325,7 @@ fn credit_note_totals<E: LifeExecutor>(
     Ok(totals)
 }
 
-fn overlay_state<E: LifeExecutor>(
+pub(crate) fn overlay_state<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entity: Uuid,

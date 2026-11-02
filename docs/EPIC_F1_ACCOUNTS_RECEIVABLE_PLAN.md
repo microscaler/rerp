@@ -1,6 +1,7 @@
 # Epic F1 — AR customer ledger from posted facts: slice plan
 
-**Status: ACTIVE (F1a + F1b delivered 2026-11-01; F1c next).**
+**Status: ACTIVE (F1a + F1b + F1c delivered; next: F2 receipts +
+allocations).**
 Depends on: D3 (posting/reversal), B1, C1 — all merged. Entry point stays
 `microservices/accounting/BUILDOUT_ANALYSIS.md`; this file carries the
 slice breakdown and evidence for F1.
@@ -66,10 +67,28 @@ slice breakdown and evidence for F1.
 - Remaining AR ops stay honest 501: payments/applications (F2), aging
   summary + statements (F3).
 
-### F1c — overlay projection + agreement suite (next)
-- Rebuildable projection populating `customer_invoices` from posted
-  facts; reconciliation test vs from-scratch recompute; AR
-  control-account agreement via journal lines. May fold into F1b.
+### F1c — overlay projection + agreement suite (DONE 2026-11-02, PR #141)
+- `projection.rs` (impl): `project_settlement_state` materializes the F1b
+  derivation into `customer_invoices` — one row per posted customer
+  document, values equal to `compose_item` (cached `original_amount` is
+  the CREDIT-NETTED original, matching the read path). Idempotent
+  (re-run writes nothing); LOSSLESS (manual WRITTEN_OFF / DISPUTED rows
+  are never rewritten).
+- `ar_control_drift`: journal-line movement on the ACCOUNTS_RECEIVABLE
+  control account minus signed posted-document totals; `Ok(None)` when
+  unconfigured or over the read bounds (degrades, never fails a
+  projection).
+- Live acceptance (`projection::tests`, ignored, disposable DB): run 1
+  creates 2, refreshes 1 stale row, preserves 1 manual row, drift 0;
+  cached dump agrees value-for-value with `list_open_items` over the
+  same facts (manual row: read honors WRITTEN_OFF status while money
+  stays derived from facts, cache frozen); run 2 is a no-op; a
+  from-scratch rebuild (all derived rows deleted) is byte-identical to
+  the first build; a stray control-account debit reads as drift +7.
+  Tenant B's document invisible throughout (documents stays 4).
+- The runtime consumer arrives with F3 (aging snapshots); module carries
+  a documented `allow(dead_code)` until then — acceptance test is the
+  caller, same proof-first pattern as F1b.
 
 ## Risks carried per PR
 - Derived truth stays in the posted facts; the overlay is cache-like and
