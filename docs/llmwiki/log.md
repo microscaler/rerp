@@ -911,3 +911,16 @@ ref-rewritten) the whole accounting suite — including
   invisible. Rerun-safe. Runtime consumer arrives with F3 (documented
   allow(dead_code) until then).
 - Plan status -> F2 next (receipts + allocations). PR #141.
+
+## [2026-11-02] fixed | setup-db.sh must grant the RLS contract to the app role
+
+- sql/rls/v1/install.sql REVOKEs EXECUTE from PUBLIC on every
+  sesame_*/rls_* function; grant_rerp_dml only covered tables and
+  sequences, so a DB provisioned purely by setup-db.sh left the rerp
+  role unable to call rls_set_session (live DB suites die with
+  "permission denied for function sesame_current_tenant_id"). Cluster
+  provisioning had been covering the gap out-of-band.
+- grant_rerp_dml now loops GRANT EXECUTE over the contract functions in
+  public (name-scoped, idempotent) plus ALTER DEFAULT PRIVILEGES for
+  future re-applies. Verified against a fresh dockerized disposable DB
+  (revoke, re-run the block, has_function_privilege -> t).
