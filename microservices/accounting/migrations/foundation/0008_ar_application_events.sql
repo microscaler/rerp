@@ -43,6 +43,12 @@ CREATE INDEX idx_ar_payment_application_events_scope
 CREATE INDEX idx_ar_payment_application_events_application
     ON ar_payment_application_events(application_id);
 
+-- The journal is append-only: the runtime role must not be able to edit
+-- history (same discipline as the other accounting journals).
+CREATE TRIGGER ar_payment_application_events_immutable
+BEFORE UPDATE OR DELETE ON ar_payment_application_events
+FOR EACH ROW EXECUTE FUNCTION public.accounting_reject_immutable_mutation();
+
 ALTER TABLE ar_payment_application_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ar_payment_application_events FORCE ROW LEVEL SECURITY;
 CREATE POLICY ar_payment_application_events_tenant ON ar_payment_application_events

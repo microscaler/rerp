@@ -303,6 +303,7 @@ pub fn create_payment_application<E: LifeExecutor>(
     let document = DocumentEntity::find()
         .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(DocumentColumn::Id.eq(document_id))
+        .filter(DocumentColumn::DocumentType.is_in(["CUSTOMER_INVOICE", "CUSTOMER_DEBIT_NOTE"]))
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?
         .filter(|row| {
@@ -365,7 +366,7 @@ pub fn list_payment_applications<E: LifeExecutor>(
             ))
         })
         .collect();
-    items.sort_by_key(|(applied_at, _)| *applied_at);
+    items.sort_by_key(|(applied_at, item)| (*applied_at, item["customer_invoice_id"].to_string()));
     Ok(json!(items
         .into_iter()
         .map(|(_, item)| item)
@@ -406,6 +407,8 @@ pub fn auto_apply_fifo<E: LifeExecutor>(
         if remaining <= Decimal::ZERO {
             break;
         }
+        // Same lock order as the manual path: payment first, then document.
+        document_lock(executor, document.id)?;
         let overlay = heal_overlay_row(executor, session, document)?;
         let capacity = document_capacity(executor, session, document)?;
         if capacity <= Decimal::ZERO {
@@ -644,6 +647,7 @@ mod tests {
         let doc_b = uid("b", &run);
         let doc_c = uid("c", &run);
         let doc_x = uid("d", &run);
+        let credit_c = uid("e", &run);
         let cust = Uuid::new_v4().to_string();
         let cust2 = Uuid::new_v4().to_string();
         let guc = session_guc(&tenant, &subject.to_string(), &org.to_string(), "ar-app-a");
@@ -683,7 +687,11 @@ VALUES
     ('{doc_c}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-C',
      'CUSTOMER_INVOICE', '{cust2}', 'app-test', 'fixture', 'c',
      '2026-02-03', '{day_at_10}', 'USD', 2, 40, 0, 0, 40.000000, now(),
-     '{subject}'::uuid, NULL);
+     '{subject}'::uuid, NULL),
+    ('{credit_c}', '{tenant}', '{entity}', '{period}', '{tenant}-CRN-1',
+     'CUSTOMER_CREDIT_NOTE', '{cust2}', 'app-test', 'fixture', 'credit-c',
+     '2026-02-05', '{day_at_10}', 'USD', 2, 10, 0, 0, 10.000000, now(),
+     '{subject}'::uuid, '{doc_c}');
 COMMIT;",
             day_at_20 = day(20),
             due_b = day(-15),
@@ -748,6 +756,11 @@ COMMIT;",
             ),
         );
         assert_eq!(journal, "2|40.000000");
+        // The journal is append-only at the SCHEMA level, not by convention.
+        let (mutated, _, _) = psql_run(&format!(
+            "BEGIN;\n{guc}\nUPDATE ar_payment_application_events SET amount = amount;\nROLLBACK;"
+        ));
+        assert!(!mutated, "runtime role must not edit journal rows");
 
         // Payment totals + contract status follow the allocations. The
         // contract Payment carries no allocation columns — probe storage
@@ -803,9 +816,18 @@ COMMIT;",
             apply(&session, p1["id"].as_str().unwrap(), &doc_c, "5"),
             Err(ArError::NotFound)
         ));
+        // Credit notes net invoices; they are not allocation targets (same
+        // chargeback-type rule as the open-item read axis).
+        assert!(
+            matches!(
+                apply(&session, p1["id"].as_str().unwrap(), &credit_c, "5"),
+                Err(ArError::NotFound)
+            ),
+            "credit notes are not chargeback documents"
+        );
 
         // Capacity guard on its own axis: cust2's receipt has ample
-        // unapplied but doc C only has 40 to give.
+        // unapplied but doc C nets to 40 − 10 (credit) = 30.
         let p2 = pay(&session, "200", &cust2, &entity).expect("p2");
         assert!(
             matches!(
@@ -814,7 +836,7 @@ COMMIT;",
             ),
             "exceeds document capacity"
         );
-        apply(&session, p2["id"].as_str().unwrap(), &doc_c, "40").expect("doc c full");
+        apply(&session, p2["id"].as_str().unwrap(), &doc_c, "30").expect("doc c full");
         // Doc C is now paid — a further allocation is a capacity conflict.
         assert!(matches!(
             apply(&session, p2["id"].as_str().unwrap(), &doc_c, "1"),
@@ -869,15 +891,22 @@ COMMIT;",
         assert_eq!(auto["status"], "APPLIED");
         assert!(auto["applied_at"].is_string());
         let list3 = apps(&session, p3["id"].as_str().unwrap()).expect("list p3");
-        assert_eq!(
-            list3.as_array().map(Vec::len),
-            Some(2),
-            "B then A, due date order"
-        );
-        assert_eq!(list3[0]["customer_invoice_id"], doc_b);
-        assert_eq!(list3[0]["applied_amount"], "20");
-        assert_eq!(list3[1]["customer_invoice_id"], doc_a);
-        assert_eq!(list3[1]["applied_amount"], "30");
+        assert_eq!(list3.as_array().map(Vec::len), Some(2));
+        // Both FIFO rows share one applied_at, so match by document — never
+        // by list position.
+        let by_doc: std::collections::HashMap<&str, &str> = list3
+            .as_array()
+            .expect("array")
+            .iter()
+            .map(|row| {
+                (
+                    row["customer_invoice_id"].as_str().unwrap_or_default(),
+                    row["applied_amount"].as_str().unwrap_or_default(),
+                )
+            })
+            .collect();
+        assert_eq!(by_doc.get(doc_b.as_str()), Some(&"20"));
+        assert_eq!(by_doc.get(doc_a.as_str()), Some(&"30"));
         // One pair row per (payment, document): p1's row carries its
         // accumulated 30+10 = 40; p3's is a separate 30.
         let pair_a = psql_session_query(

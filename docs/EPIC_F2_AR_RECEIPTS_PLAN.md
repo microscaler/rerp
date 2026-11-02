@@ -24,8 +24,9 @@ open items, and the overlay projection/agreement suite this epic builds on.
   contract `reference_number` ↔ DB `payment_reference`; contract status enum
   (`PENDING|APPLIED|APPLIED_PARTIAL|REFUNDED|FAILED`) is a different axis from
   DB status — F1b precedent: derive the contract status from facts
-  (see F2a); `applied_at` is derived (MAX application time when fully applied,
-  else null — contract allows null).
+  (see F2a); `applied_at` is derived (the last allocation instant once any
+  application exists, else null — refined from the original "fully applied"
+  rule when F2b shipped; contract allows null).
 - `posted_to_gl`/`gl_entry_id` are required in the contract `Payment` object but
   cash-side GL posting belongs to Epic H (banking). F2 returns
   `posted_to_gl=false`, `gl_entry_id=null` (overlay-level receipts only).
