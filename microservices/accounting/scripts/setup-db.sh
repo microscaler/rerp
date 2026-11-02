@@ -246,13 +246,33 @@ grant_rerp_dml() {
   # Migrations run as superuser (postgres); tables are owned by postgres. The app role rerp
   # has schema USAGE/CREATE but not automatic DML on those tables — without GRANT, microservices
   # get Postgres errors that tokio-postgres surfaces as Display "db error".
-  echo "🔐 GRANT DML on rerp schema objects to role rerp..."
+  # The Sesame RLS contract also REVOKEs EXECUTE from PUBLIC on every
+  # sesame_*/rls_* function (sql/rls/v1/install.sql); without re-granting to
+  # rerp here, the RLS policies deny every statement for the app role and the
+  # live DB test suites cannot seed or read through rls_set_session.
+  echo "🔐 GRANT DML on rerp schema objects + RLS contract EXECUTE to role rerp..."
   postgres_psql rerp <<'EOF'
 SET search_path TO rerp;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA rerp TO rerp;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA rerp TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO rerp;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA rerp GRANT USAGE, SELECT ON SEQUENCES TO rerp;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO rerp;
+DO $body$
+DECLARE fn oid;
+BEGIN
+  FOR fn IN
+    SELECT p.oid
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+     WHERE n.nspname = 'public'
+       AND p.prokind = 'f'
+       AND (p.proname LIKE 'sesame\_%' OR p.proname LIKE 'rls\_%')
+  LOOP
+    EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO rerp', fn::regprocedure);
+  END LOOP;
+END
+$body$;
 EOF
 }
 
