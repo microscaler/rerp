@@ -1,5 +1,4 @@
-// Scaffold-only: honest 501 until product behavior is delivered (NFR-DOG-013).
-// Replace this handler body when the owning work package implements the op.
+// BRRTRouter: user-owned
 
 use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
@@ -7,6 +6,23 @@ use rerp_accounting_accounts_receivable_gen::handlers::create_payment_applicatio
 use serde_json::Value;
 
 #[handler(CreatePaymentApplicationController)]
-pub fn handle(_request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
-    crate::http_support::not_implemented("create_payment_application")
+pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
+    let context = match crate::http_support::identity_context(request.jwt_claims.as_ref()) {
+        Ok(context) => context,
+        Err(response) => return response,
+    };
+    let query = &request.data;
+    let result = crate::http_support::with_ar_transaction(&context, |executor| {
+        crate::applications::create_payment_application(
+            executor,
+            &context,
+            &query.payment_id,
+            &query.customer_invoice_id,
+            &query.applied_amount,
+        )
+    });
+    match result {
+        Ok(application) => HttpJson::new(201, application),
+        Err(error) => crate::http_support::ar_error(error),
+    }
 }

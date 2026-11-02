@@ -38,6 +38,9 @@ use std::str::FromStr;
 use uuid::Uuid;
 
 use crate::ledger::{self, ArError, ItemFacts};
+use rerp_accounting_accounts_receivable::models::ar_payment_application::{
+    Column as ApplicationColumn, Entity as ApplicationEntity,
+};
 use rerp_accounting_accounts_receivable::models::customer_invoice::{
     CustomerInvoiceModel, CustomerInvoiceRecord,
 };
@@ -208,7 +211,7 @@ pub fn project_settlement_state<E: LifeExecutor>(
             Some((row, applied)) => (Some(row), *applied),
             None => (None, Decimal::ZERO),
         };
-        if overlay.is_some_and(|row| manual_state(row)) {
+        if overlay.is_some_and(manual_state) {
             report.preserved_manual += 1;
             continue;
         }
@@ -271,6 +274,113 @@ pub fn project_settlement_state<E: LifeExecutor>(
 
     report.ar_control_drift = ar_control_drift(executor, session, legal_entity)?;
     Ok(report)
+}
+
+/// Latest-application stamp: (date, amount) of the most recent journal-less
+/// application on an overlay row; the F2b cache contract for
+/// `last_payment_date` / `last_payment_amount`.
+fn last_payment_stamp<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    overlay_row_id: Uuid,
+) -> Result<(Option<NaiveDate>, Option<Decimal>), ArError> {
+    let rows = ApplicationEntity::find()
+        .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(ApplicationColumn::InvoiceId.eq(overlay_row_id))
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    let latest = rows.into_iter().max_by_key(|row| (row.applied_at, row.id));
+    Ok(latest.map_or((None, None), |row| {
+        (Some(row.applied_at.date()), Some(row.applied_amount))
+    }))
+}
+
+/// Refresh ONE document's overlay row with the bulk projection's
+/// create/refresh semantics; manual states stay preserved (F1c rule).
+/// The F2b application flow calls this after mutating application facts,
+/// so cache maintenance always routes through the same derivation instead
+/// of hand-patched columns.
+pub(crate) fn refresh_overlay_row<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity: Uuid,
+    document: &AccountingPostedDocumentModel,
+) -> Result<(), ArError> {
+    let document_ids = vec![document.id];
+    let credits =
+        ledger::credit_note_totals(executor, session, &[legal_entity], document_ids.clone())?;
+    let overlays = ledger::overlay_state(executor, session, &[legal_entity], document_ids)?;
+    let (overlay, applied) = match overlays.get(&document.id) {
+        Some((row, applied)) => (Some(row), *applied),
+        None => (None, Decimal::ZERO),
+    };
+    if overlay.is_some_and(manual_state) {
+        return Ok(());
+    }
+    let stamp = overlay
+        .map(|row| last_payment_stamp(executor, session, row.id))
+        .transpose()?;
+    let facts = ItemFacts {
+        document,
+        credit_notes: credits.get(&document.id).copied().unwrap_or(Decimal::ZERO),
+        overlay,
+        applied,
+        today: Utc::now().date_naive(),
+    };
+    let item = ledger::compose_item(&facts);
+    let (outstanding, status, terms, original, due_date) = derived_row(document, &item);
+    match overlay {
+        None => {
+            let mut record = CustomerInvoiceRecord::new();
+            record
+                .set_id(Uuid::new_v4())
+                .set_tenant_id(session.tenant_id.clone())
+                .set_legal_entity_id(legal_entity)
+                .set_invoice_id(document.id)
+                .set_customer_id(document.customer_id)
+                .set_original_amount(original)
+                .set_outstanding_amount(outstanding)
+                .set_currency_code(document.currency_code.clone())
+                .set_due_date(due_date)
+                .set_terms(terms)
+                .set_status(status)
+                .set_created_at(Utc::now().naive_utc())
+                .set_updated_at(Utc::now().naive_utc());
+            if let Some((stamp_date, stamp_amount)) = stamp {
+                record
+                    .set_last_payment_date(stamp_date)
+                    .set_last_payment_amount(stamp_amount);
+            }
+            record
+                .insert(executor)
+                .map_err(|error| ArError::Database(error.to_string()))?;
+        }
+        Some(row) => {
+            let (stamp_date, stamp_amount) = stamp.unwrap_or((None, None));
+            let drifted = row.outstanding_amount != outstanding
+                || row.status != status
+                || row.terms != terms
+                || row.original_amount != original
+                || row.last_payment_date != stamp_date
+                || row.last_payment_amount != stamp_amount;
+            if drifted {
+                let mut changes = CustomerInvoiceRecord::new();
+                changes
+                    .set_id(row.id)
+                    .set_outstanding_amount(outstanding)
+                    .set_status(status)
+                    .set_terms(terms)
+                    .set_original_amount(original)
+                    .set_last_payment_date(stamp_date)
+                    .set_last_payment_amount(stamp_amount)
+                    .set_updated_at(Utc::now().naive_utc());
+                changes
+                    .update(executor)
+                    .map_err(|error| ArError::Database(error.to_string()))?;
+            }
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

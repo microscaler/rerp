@@ -10,6 +10,7 @@
 use rerp_accounting_accounts_receivable_gen::*;
 
 // Import implementation controllers (business logic)
+mod applications;
 mod controllers;
 mod database;
 mod http_support;
