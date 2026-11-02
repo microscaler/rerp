@@ -936,3 +936,24 @@ ref-rewritten) the whole accounting suite — including
   invoice+credit+receipt+allocation+outstanding identity.
 - Contract-vs-0006 vocabulary mismatches recorded as mapping decisions;
   payment-op example placeholders flagged for the F2a spec commit.
+
+## [2026-11-02] contribute | F2a receipts live (Epic F2 1/4)
+
+- PR #144 (feat/accounting-f2a-payments): create/list/get customer
+  payments over ar_payments. Server PAY-<year>-<seq> under the
+  ar-payment-sequence advisory lock; migration 0007 partial-unique
+  external reference (tenant, entity, reference WHERE NOT NULL) is the
+  duplicate guard (409); contract status derived from allocation facts
+  (PENDING/APPLIED_PARTIAL/APPLIED, CANCELLED->FAILED); auto_apply=true
+  honest 501 until F2b; posted_to_gl/gl_entry_id honest until Epic H.
+- Scope-class fix: resolve_scope_entities replaces F1b\u2019s arbitrary-
+  entity resolve_legal_entity; unscoped list/get cover all org entities,
+  ambiguous writes rejected. payment-op example placeholders fixed
+  (statement ops wait for F3).
+- Proof: 15 units + live acceptance (two orgs one tenant, duplicate
+  guard, per-entity sequences via psql-through-RLS, derived axis,
+  filters/pagination, cross-org/tenant denials); ledger+projection live
+  suites rerun green; qa 230; fmt+workspace check clean.
+- Next: F2b applications (balance guards, pair-accumulate, events
+  journal), F2c contract additions (idempotency key + reversal op),
+  F2d acceptance suite.
