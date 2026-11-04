@@ -117,7 +117,7 @@ edition = "2021"
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
 brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "645d03774886bb9ef740b2f9a656ee7bc7bad77a", default-features = false }
 brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "645d03774886bb9ef740b2f9a656ee7bc7bad77a" }
-sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "5dde341dfb7c48601b9956d1457e5a6f49189f72" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "2e0ef6fcfc2892ecb4fb34acb9335d92511a238d" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }
