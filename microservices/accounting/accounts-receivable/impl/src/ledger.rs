@@ -542,6 +542,9 @@ fn application_rows<E: LifeExecutor>(
         .all(executor)
         .map(|rows| {
             rows.into_iter()
+                // A reversed pair row (applied 0) leaves the history view;
+                // the immutable event journal keeps the full story.
+                .filter(|row| row.applied_amount > rust_decimal::Decimal::ZERO)
                 .map(|row| {
                     json!({
                         "id": row.id.to_string(),

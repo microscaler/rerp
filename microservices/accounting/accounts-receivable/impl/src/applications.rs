@@ -346,7 +346,11 @@ pub fn list_payment_applications<E: LifeExecutor>(
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
     // Rows FK the overlay; the contract speaks open-item (document) ids.
-    let overlay_ids: Vec<Uuid> = rows.iter().map(|row| row.invoice_id).collect();
+    let overlay_ids: Vec<Uuid> = rows
+        .iter()
+        .filter(|row| row.applied_amount > Decimal::ZERO)
+        .map(|row| row.invoice_id)
+        .collect();
     let overlay_rows = OverlayEntity::find()
         .filter(OverlayColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(OverlayColumn::Id.is_in(overlay_ids))
@@ -358,6 +362,7 @@ pub fn list_payment_applications<E: LifeExecutor>(
         .collect();
     let mut items: Vec<(NaiveDateTime, Value)> = rows
         .into_iter()
+        .filter(|row| row.applied_amount > Decimal::ZERO)
         .filter_map(|row| {
             let document_id = *document_of.get(&row.invoice_id)?;
             Some((
@@ -428,6 +433,107 @@ pub fn auto_apply_fifo<E: LifeExecutor>(
     Ok(crate::payments::payment_json_stamped(
         &updated,
         (allocated > Decimal::ZERO).then_some(now),
+    ))
+}
+
+/// Contract reversal: the pair row's applied amount returns IN FULL to the
+/// payment's unapplied balance and the document's outstanding. The pair row
+/// itself survives at zero (migration 0009) because the event journal FKs
+/// it — history is immutable, state is in-place. Reversal is journaled as
+/// a REVERSED event (actor, time, reason) and is itself replayable under
+/// the GL idempotency discipline.
+pub fn reverse_payment_application<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    application_id: &str,
+    idempotency_key: &str,
+    reason: &str,
+) -> Result<Value, ArError> {
+    let id = parse_uuid(application_id, "id")?;
+    let scope = ledger::resolve_scope_entities(executor, session, None)?;
+    let row = ApplicationEntity::find()
+        .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(ApplicationColumn::Id.eq(id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .filter(|row| scope.contains(&row.legal_entity_id))
+        .ok_or(ArError::NotFound)?;
+    let payment = PaymentEntity::find()
+        .filter(PaymentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(PaymentColumn::Id.eq(row.payment_id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    let fingerprint = crate::payments::reverse_fingerprint(
+        session.tenant_id.as_str(),
+        row.legal_entity_id,
+        id,
+        reason,
+    );
+    if let Some(record) =
+        crate::payments::find_idempotency(executor, session, row.legal_entity_id, idempotency_key)?
+    {
+        return crate::payments::replay_payment(executor, session, &record, &fingerprint);
+    }
+    payment_lock(executor, payment.id)?;
+    let overlay = OverlayEntity::find()
+        .filter(OverlayColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(OverlayColumn::Id.eq(row.invoice_id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    let document = DocumentEntity::find()
+        .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(DocumentColumn::Id.eq(overlay.invoice_id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    document_lock(executor, document.id)?;
+    require_applicable(&payment)?;
+    if row.applied_amount <= Decimal::ZERO {
+        return Err(ArError::Conflict(
+            "application is already reversed".to_string(),
+        ));
+    }
+    let now = Utc::now().naive_utc();
+    let mut changes = ArPaymentApplicationRecord::new();
+    changes
+        .set_id(row.id)
+        .set_applied_amount(Decimal::ZERO)
+        .set_updated_at(now);
+    changes
+        .update(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    let mut event = ArPaymentApplicationEventRecord::new();
+    event
+        .set_id(Uuid::new_v4())
+        .set_tenant_id(session.tenant_id.clone())
+        .set_legal_entity_id(row.legal_entity_id)
+        .set_application_id(row.id)
+        .set_kind("REVERSED".to_string())
+        .set_amount(row.applied_amount)
+        .set_actor_id(Some(session.subject_id))
+        .set_occurred_at(now)
+        .set_reason(Some(reason.to_string()));
+    event
+        .insert(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    let updated = persist_payment_totals(executor, session, &payment, -row.applied_amount, now)?;
+    refresh_overlay_row(executor, session, row.legal_entity_id, &document)?;
+    crate::payments::record_completed(
+        executor,
+        session,
+        row.legal_entity_id,
+        idempotency_key,
+        &fingerprint,
+        "application_reversal",
+        payment.id,
+        now,
+    )?;
+    let stamps = crate::payments::last_applied_stamps(executor, session, &[updated.id])?;
+    Ok(crate::payments::payment_json_stamped(
+        &updated,
+        stamps.get(&updated.id).copied(),
     ))
 }
 
@@ -594,10 +700,17 @@ mod tests {
         entity: &str,
     ) -> Result<Value, ArError> {
         let today = Utc::now().date_naive().format("%Y-%m-%d").to_string();
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let key = format!(
+            "app-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+        );
         crate::http_support::with_ar_transaction(session, |executor| {
             crate::payments::create_payment(
                 executor,
                 session,
+                &key,
                 amount,
                 "usd",
                 "cash",
@@ -925,6 +1038,127 @@ COMMIT;",
             ),
         );
         assert_eq!(a_stored, "40.000000", "p1 row holds the accumulated 30+10");
+
+        // Reversal (F2c): take p3's 30 back off doc A.
+        let app_a3 = list3
+            .as_array()
+            .expect("array")
+            .iter()
+            .find(|row| row["customer_invoice_id"].as_str() == Some(doc_a.as_str()))
+            .and_then(|row| row["id"].as_str())
+            .expect("p3 row for A")
+            .to_string();
+        let rev_key = |n: u64| format!("rev-{run}-{n}");
+        let reason = "customer returned goods";
+        let rev1 = crate::http_support::with_ar_transaction(&session, |executor| {
+            reverse_payment_application(executor, &session, &app_a3, &rev_key(1), reason)
+        })
+        .expect("reverse p3/A");
+        assert_eq!(rev1["id"], p3["id"], "reversal answers with the payment");
+        assert_eq!(rev1["status"], "APPLIED_PARTIAL");
+        let list3b = apps(&session, p3["id"].as_str().unwrap()).expect("list p3 after reverse");
+        assert_eq!(list3b.as_array().map(Vec::len), Some(1));
+        assert_eq!(list3b[0]["customer_invoice_id"], doc_b, "only B survives");
+        let p3_totals = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT applied_amount, unapplied_amount FROM ar_payments WHERE id = '{}'",
+                p3["id"].as_str().unwrap()
+            ),
+        );
+        assert_eq!(
+            p3_totals, "20.000000|30.000000",
+            "money returned to the receipt"
+        );
+        let journal_a3 = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT string_agg(kind || ':' || amount::text, ',' ORDER BY occurred_at, id)
+                   FROM ar_payment_application_events WHERE application_id = '{app_a3}'"
+            ),
+        );
+        assert_eq!(journal_a3, "APPLIED:30.000000,REVERSED:30.000000");
+        let overlay_a_after = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT outstanding_amount FROM customer_invoices WHERE invoice_id = '{doc_a}'"
+            ),
+        );
+        assert_eq!(overlay_a_after, "60.000000", "100 - only p1's 40 remains");
+
+        // Guards: double reverse conflicts; replay of the identical body
+        // re-serves without touching balances; key reuse with a different
+        // reason is a fingerprint conflict; foreign sessions get 404.
+        assert!(
+            matches!(
+                crate::http_support::with_ar_transaction(&session, |executor| {
+                    reverse_payment_application(executor, &session, &app_a3, &rev_key(2), reason)
+                }),
+                Err(ArError::Conflict(_))
+            ),
+            "already reversed"
+        );
+        let replay = crate::http_support::with_ar_transaction(&session, |executor| {
+            reverse_payment_application(executor, &session, &app_a3, &rev_key(1), reason)
+        })
+        .expect("replay");
+        assert_eq!(replay["status"], "APPLIED_PARTIAL");
+        let p3_after_replay = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT applied_amount, unapplied_amount FROM ar_payments WHERE id = '{}'",
+                p3["id"].as_str().unwrap()
+            ),
+        );
+        assert_eq!(p3_after_replay, p3_totals, "replay moved nothing");
+        assert!(
+            matches!(
+                crate::http_support::with_ar_transaction(&session, |executor| {
+                    reverse_payment_application(
+                        executor,
+                        &session,
+                        &app_a3,
+                        &rev_key(1),
+                        "a different story entirely",
+                    )
+                }),
+                Err(ArError::Conflict(_))
+            ),
+            "reason is part of the fingerprint"
+        );
+        assert!(matches!(
+            crate::http_support::with_ar_transaction(&foreign, |executor| {
+                reverse_payment_application(executor, &foreign, &app_a3, &rev_key(3), reason)
+            }),
+            Err(ArError::NotFound)
+        ));
+
+        // Re-apply accumulates onto the SAME (reversed) pair row and is
+        // journaled as a fresh APPLIED event; history stays intact.
+        let reappled = apply(&session, p3["id"].as_str().unwrap(), &doc_a, "15").expect("re-apply");
+        assert_eq!(
+            reappled["id"], app_a3,
+            "pair row identity survives reversal"
+        );
+        assert_eq!(reappled["applied_amount"], "15");
+        let journal_a3b = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT string_agg(kind || ':' || amount::text, ',' ORDER BY occurred_at, id)
+                   FROM ar_payment_application_events WHERE application_id = '{app_a3}'"
+            ),
+        );
+        assert_eq!(
+            journal_a3b,
+            "APPLIED:30.000000,REVERSED:30.000000,APPLIED:15.000000"
+        );
+        let overlay_a_final = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT outstanding_amount FROM customer_invoices WHERE invoice_id = '{doc_a}'"
+            ),
+        );
+        assert_eq!(overlay_a_final, "45.000000", "100 - 40 - 15");
 
         // Nothing left for a fresh cust2 receipt: FIFO is a no-op, not an error.
         let p4 = pay(&session, "10", &cust2, &entity).expect("p4");

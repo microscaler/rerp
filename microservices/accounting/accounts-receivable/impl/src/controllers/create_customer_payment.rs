@@ -17,6 +17,7 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         let payment = crate::payments::create_payment(
             executor,
             &context,
+            &query.idempotency_key,
             &query.amount,
             &query.currency_code,
             &query.payment_method,

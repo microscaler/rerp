@@ -88,6 +88,161 @@ pub fn payment_json(row: &ArPaymentModel) -> Value {
     payment_json_stamped(row, None)
 }
 
+// ---------------------------------------------------------------------------
+// Command idempotency (Epic F2c) — the suite foundation table
+// `accounting_idempotency_records` under GL's replay discipline: the
+// fingerprint covers the tenant, entity, action, and every body field;
+// replay of an identical body re-serves the stored result, key reuse with
+// a different payload is a conflict.
+// ---------------------------------------------------------------------------
+
+pub(crate) const SOURCE_SYSTEM: &str = "accounts-receivable";
+
+fn digest(parts: &[&[u8]]) -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    for part in parts {
+        hasher.update((part.len() as u64).to_be_bytes());
+        hasher.update(part);
+    }
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut output = String::with_capacity(64);
+    for byte in hasher.finalize() {
+        output.push(HEX[usize::from(byte >> 4)] as char);
+        output.push(HEX[usize::from(byte & 0x0f)] as char);
+    }
+    output
+}
+
+fn optional_bytes(value: Option<&String>) -> &[u8] {
+    value.map_or(b"", String::as_bytes)
+}
+
+fn create_fingerprint(tenant_id: &str, legal_entity_id: Uuid, parsed: &ParsedCreate) -> String {
+    let company = parsed
+        .company_id
+        .map(|id| id.as_bytes().to_vec())
+        .unwrap_or_default();
+    digest(&[
+        b"create_payment",
+        tenant_id.as_bytes(),
+        legal_entity_id.as_bytes(),
+        parsed.amount.to_string().as_bytes(),
+        parsed.currency_code.as_bytes(),
+        parsed.method.as_bytes(),
+        parsed.payment_date.to_string().as_bytes(),
+        parsed.customer_id.as_bytes(),
+        &company,
+        optional_bytes(parsed.reference_number.as_ref()),
+        optional_bytes(parsed.notes.as_ref()),
+    ])
+}
+
+pub(crate) fn reverse_fingerprint(
+    tenant_id: &str,
+    legal_entity_id: Uuid,
+    application_id: Uuid,
+    reason: &str,
+) -> String {
+    digest(&[
+        b"reverse_payment_application",
+        tenant_id.as_bytes(),
+        legal_entity_id.as_bytes(),
+        application_id.as_bytes(),
+        reason.as_bytes(),
+    ])
+}
+
+pub(crate) fn find_idempotency<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity_id: Uuid,
+    key: &str,
+) -> Result<
+    Option<
+        rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordModel,
+    >,
+    ArError,
+> {
+    use rerp_entities::accounting::foundation::idempotency_record::{
+        Column as IdempotencyColumn, Entity as IdempotencyEntity,
+    };
+    IdempotencyEntity::find()
+        .filter(IdempotencyColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(IdempotencyColumn::LegalEntityId.eq(legal_entity_id))
+        .filter(IdempotencyColumn::IdempotencyKey.eq(key))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))
+}
+
+/// Journal a completed command for replay. Public so the applications
+/// module records reversals through the same discipline.
+#[allow(clippy::too_many_arguments)] // one flat argument per record fact, slice style
+pub(crate) fn record_completed<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity_id: Uuid,
+    key: &str,
+    fingerprint: &str,
+    source_type: &str,
+    subject_id: Uuid,
+    now: NaiveDateTime,
+) -> Result<(), ArError> {
+    use rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordRecord;
+    let mut record = AccountingIdempotencyRecordRecord::new();
+    record
+        .set_id(Uuid::new_v4())
+        .set_tenant_id(session.tenant_id.clone())
+        .set_legal_entity_id(legal_entity_id)
+        .set_idempotency_key(key.to_string())
+        .set_request_fingerprint(fingerprint.to_string())
+        .set_status("COMPLETED".to_string())
+        .set_source_system(SOURCE_SYSTEM.to_string())
+        .set_source_type(source_type.to_string())
+        .set_source_id(subject_id.to_string())
+        .set_created_at(now)
+        .set_completed_at(Some(now));
+    record.insert(executor).map_err(|error| {
+        let text = error.to_string();
+        // A racing replay under the same key loses on the UNIQUE index —
+        // the survivor's record is authoritative for the replay.
+        if text.contains("duplicate key") {
+            ArError::Conflict(
+                "the idempotency key was already used with a different request body".to_string(),
+            )
+        } else {
+            ArError::Database(text)
+        }
+    })?;
+    Ok(())
+}
+
+/// Replay an identical body; a fingerprint mismatch is a key conflict.
+/// The re-served payment still passes the read scope (invisible -> 404).
+pub(crate) fn replay_payment<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    record: &rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordModel,
+    fingerprint: &str,
+) -> Result<Value, ArError> {
+    if record.request_fingerprint != fingerprint {
+        return Err(ArError::Conflict(
+            "the idempotency key was already used with a different request body".to_string(),
+        ));
+    }
+    let payment_id = Uuid::parse_str(&record.source_id).map_err(|_| {
+        ArError::Database("idempotency record carries a bad payment id".to_string())
+    })?;
+    let row = PaymentEntity::find()
+        .filter(PaymentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(PaymentColumn::Id.eq(payment_id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    let stamps = last_applied_stamps(executor, session, &[row.id])?;
+    Ok(payment_json_stamped(&row, stamps.get(&row.id).copied()))
+}
+
 /// `applied_at` is the last time an allocation touched this receipt
 /// (F2b applications); the read axis derives it rather than storing it.
 pub fn payment_json_stamped(row: &ArPaymentModel, applied_at: Option<NaiveDateTime>) -> Value {
@@ -129,6 +284,10 @@ pub fn last_applied_stamps<E: LifeExecutor>(
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
     for row in rows {
+        // A reversed pair row (applied 0) is not an allocation instant.
+        if row.applied_amount <= Decimal::ZERO {
+            continue;
+        }
         stamps
             .entry(row.payment_id)
             .and_modify(|seen| *seen = (*seen).max(row.applied_at))
@@ -259,6 +418,7 @@ fn duplicate_payment_reference<E: LifeExecutor>(
 pub fn create_payment<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
+    idempotency_key: &str,
     amount: &str,
     currency_code: &str,
     payment_method: &str,
@@ -294,6 +454,13 @@ pub fn create_payment<E: LifeExecutor>(
             ))
         }
     };
+    // Replay discipline before any write-side guard: an identical body
+    // under a known key re-serves the stored payment, never a 409 from
+    // the duplicate-reference check.
+    let fingerprint = create_fingerprint(session.tenant_id.as_str(), legal_entity, &parsed);
+    if let Some(record) = find_idempotency(executor, session, legal_entity, idempotency_key)? {
+        return replay_payment(executor, session, &record, &fingerprint);
+    }
     if let Some(reference) = &parsed.reference_number {
         if duplicate_payment_reference(executor, session, legal_entity, reference)? {
             return Err(ArError::Conflict(
@@ -346,6 +513,16 @@ pub fn create_payment<E: LifeExecutor>(
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?
         .ok_or_else(|| ArError::Database("payment vanished after insert".to_string()))?;
+    record_completed(
+        executor,
+        session,
+        legal_entity,
+        idempotency_key,
+        &fingerprint,
+        "customer_payment",
+        stored.id,
+        now,
+    )?;
     Ok(payment_json(&stored))
 }
 
@@ -907,10 +1084,19 @@ mod tests {
         company: Option<&str>,
         reference: Option<&str>,
     ) -> Result<Value, ArError> {
+        // Fresh idempotency key per call: this helper exercises the write
+        // path, not replay (replay has its own live test).
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let key = format!(
+            "acc-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+        );
         crate::http_support::with_ar_transaction(session, |executor| {
             create_payment(
                 executor,
                 session,
+                &key,
                 amount,
                 "usd",
                 method,
@@ -1210,5 +1396,89 @@ COMMIT;"
             }),
             Err(ArError::Policy(_))
         ));
+    }
+
+    #[test]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
+    fn live_payment_creation_is_idempotent() {
+        // One tenant, one entity. The idempotency key replays an identical
+        // body onto the stored payment — never a duplicate row, never a
+        // duplicate-reference 409 — while key reuse with a different body
+        // is a conflict. Keys are per-entity, so a sibling org may reuse
+        // the same key for its own receipt.
+        let run = run_hex();
+        let tenant = format!("ar-idem-{run}");
+        let org1 = Uuid::new_v4();
+        let subject = Uuid::new_v4();
+        let entity = uid("c1", &run);
+        let cust = Uuid::new_v4().to_string();
+        let guc = session_guc(
+            &tenant,
+            &subject.to_string(),
+            &org1.to_string(),
+            "ar-idem-a",
+        );
+        psql_exec(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+{guc}
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active, created_at, updated_at)
+VALUES ('{entity}', '{tenant}', '{org1}', 'Idem Entity', 'USD', true, now(), now());
+COMMIT;"
+        ));
+        let session = session_for(tenant.clone(), subject, org1);
+        let today = Utc::now().date_naive().format("%Y-%m-%d").to_string();
+        let key = format!("idem-{run}-k1");
+        let reference = format!("IDEM-{run}");
+
+        let create_with = |amount: &str, key: &str, reference: &str| {
+            crate::http_support::with_ar_transaction(&session, |executor| {
+                create_payment(
+                    executor,
+                    &session,
+                    key,
+                    amount,
+                    "usd",
+                    "cash",
+                    &today,
+                    &cust,
+                    Some(&entity),
+                    Some(reference),
+                    Some("idempotent"),
+                )
+            })
+        };
+        let first = create_with("42", &key, &reference).expect("first create");
+
+        // Identical replay: same payment, no second row, and the reference
+        // duplicate guard never fires for the replay itself.
+        let replay = create_with("42", &key, &reference).expect("replay");
+        assert_eq!(replay, first, "identical body replays value-for-value");
+        let rows = psql_session_query(
+            &guc,
+            &format!("SELECT count(*) FROM ar_payments WHERE payment_reference = '{reference}'"),
+        );
+        assert_eq!(rows, "1", "replay stored nothing new");
+
+        // Key reuse with a different payload is a conflict, not a second
+        // receipt, and not silent overwrite.
+        assert!(
+            matches!(
+                create_with("43", &key, &reference),
+                Err(ArError::Conflict(_))
+            ),
+            "fingerprint mismatch must conflict"
+        );
+
+        // A fresh key carries the same body to a real duplicate-reference
+        // 409 — the replay short-circuit did not paper over the guard.
+        assert!(
+            matches!(
+                create_with("42", &format!("idem-{run}-k2"), &reference),
+                Err(ArError::Conflict(_))
+            ),
+            "different key, same reference: 0007 guard still rules"
+        );
     }
 }
