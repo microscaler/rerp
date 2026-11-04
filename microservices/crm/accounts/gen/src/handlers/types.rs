@@ -156,6 +156,12 @@ pub struct AccountReport {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Accountcontactsummarys {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<AccountContactSummary>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annual_revenue: Option<f64>,
@@ -302,16 +308,6 @@ pub struct CreateAccountResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteAccountResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    pub message: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ErrorResponse {
     pub code: i32,
 
@@ -451,6 +447,24 @@ pub struct GetAccountsReportResponse {
     pub page: i32,
 
     pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListAccountsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<Account>>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAccount {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<Account>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

@@ -1,6 +1,7 @@
 // User-owned controller for handler 'retire_document_template_version'.
 
 use crate::handlers::retire_document_template_version::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
@@ -8,8 +9,8 @@ use brrtrouter_macros::handler;
 use crate::handlers::types::TemplateStatus;
 
 #[handler(RetireDocumentTemplateVersionController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         bundle_sha256: Some("example".to_string()),
         created_at: "example".to_string(),
         engine: "example".to_string(),
@@ -21,5 +22,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         template_contract: "example".to_string(),
         template_id: "example".to_string(),
         version_number: 42,
-    }
+    })
 }

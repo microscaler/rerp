@@ -9,6 +9,7 @@ use crate::handlers::types::RenditionStatus;
 use crate::handlers::types::SourceReference;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HandlerResponseOutput, HttpJson};
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
@@ -96,6 +97,27 @@ pub struct Response {
     pub template_version_id: Option<String>,
 }
 
+/// OpenAPI multi-status success envelope (Epic 13.9).
+pub enum ApiResponse {
+    /// HTTP 200
+    Ok(Response),
+
+    /// HTTP 202
+    Accepted(Response),
+}
+
+impl HandlerResponseOutput for ApiResponse {
+    fn into_handler_response(
+        self,
+    ) -> Result<brrtrouter::dispatcher::HandlerResponse, serde_json::Error> {
+        match self {
+            Self::Ok(body) => HttpJson::new(200, body).into_handler_response(),
+
+            Self::Accepted(body) => HttpJson::new(202, body).into_handler_response(),
+        }
+    }
+}
+
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
 
@@ -105,14 +127,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("rendition_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "rendition_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'rendition_id'"));
@@ -136,6 +156,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> ApiResponse {
     crate::controllers::create_document_rendition_copy::handle(req)
 }

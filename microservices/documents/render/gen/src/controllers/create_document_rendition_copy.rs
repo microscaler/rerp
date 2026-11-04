@@ -1,6 +1,6 @@
 // User-owned controller for handler 'create_document_rendition_copy'.
 
-use crate::handlers::create_document_rendition_copy::{Request, Response};
+use crate::handlers::create_document_rendition_copy::{ApiResponse, Request, Response};
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
@@ -16,8 +16,8 @@ use crate::handlers::types::RenditionStatus;
 use crate::handlers::types::SourceReference;
 
 #[handler(CreateDocumentRenditionCopyController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
+    ApiResponse::Ok(Response {
         created_at: "example".to_string(),
         document_id: Some("example".to_string()),
         failure_code: Some("example".to_string()),
@@ -36,5 +36,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         source_rendition_id: Some("example".to_string()),
         status: Default::default(),
         template_version_id: Some("example".to_string()),
-    }
+    })
 }

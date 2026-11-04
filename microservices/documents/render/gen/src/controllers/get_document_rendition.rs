@@ -1,6 +1,7 @@
 // User-owned controller for handler 'get_document_rendition'.
 
 use crate::handlers::get_document_rendition::{Request, Response};
+use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
 use brrtrouter_macros::handler;
 
@@ -16,8 +17,8 @@ use crate::handlers::types::RenditionStatus;
 use crate::handlers::types::SourceReference;
 
 #[handler(GetDocumentRenditionController)]
-pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
-    Response {
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    HttpJson::ok(Response {
         created_at: "example".to_string(),
         document_id: Some("example".to_string()),
         failure_code: Some("example".to_string()),
@@ -36,5 +37,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> Response {
         source_rendition_id: Some("example".to_string()),
         status: Default::default(),
         template_version_id: Some("example".to_string()),
-    }
+    })
 }

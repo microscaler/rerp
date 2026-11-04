@@ -10,6 +10,7 @@ use crate::handlers::types::SourceReference;
 use crate::handlers::types::TemplateSelector;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::TypedHandlerRequest;
+use brrtrouter::typed::{HandlerResponseOutput, HttpJson};
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
@@ -109,6 +110,27 @@ pub struct Response {
     pub template_version_id: Option<String>,
 }
 
+/// OpenAPI multi-status success envelope (Epic 13.9).
+pub enum ApiResponse {
+    /// HTTP 200
+    Ok(Response),
+
+    /// HTTP 202
+    Accepted(Response),
+}
+
+impl HandlerResponseOutput for ApiResponse {
+    fn into_handler_response(
+        self,
+    ) -> Result<brrtrouter::dispatcher::HandlerResponse, serde_json::Error> {
+        match self {
+            Self::Ok(body) => HttpJson::new(200, body).into_handler_response(),
+
+            Self::Accepted(body) => HttpJson::new(202, body).into_handler_response(),
+        }
+    }
+}
+
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
 
@@ -135,6 +157,6 @@ impl TryFrom<HandlerRequest> for Request {
 }
 
 #[allow(dead_code)]
-pub fn handler(req: TypedHandlerRequest<Request>) -> Response {
+pub fn handler(req: TypedHandlerRequest<Request>) -> ApiResponse {
     crate::controllers::create_document_rendition::handle(req)
 }

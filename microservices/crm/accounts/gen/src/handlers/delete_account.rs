@@ -16,17 +16,7 @@ pub struct Request {
 
 #[derive(Debug, Deserialize, Serialize)]
 
-pub struct Response {
-    #[serde(rename = "code")]
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "details")]
-    pub details: Option<String>,
-
-    #[serde(rename = "message")]
-    pub message: String,
-}
+pub struct Response {}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
