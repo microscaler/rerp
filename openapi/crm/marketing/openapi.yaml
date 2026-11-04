@@ -775,8 +775,10 @@ paths:
                     format: double
                   total_opportunities:
                     type: integer
+                    format: int32
                   total_won_deals:
                     type: integer
+                    format: int32
                   average_deal_size:
                     type: number
                     format: double
@@ -945,6 +947,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -953,6 +956,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -989,6 +993,7 @@ components:
           default: true
         sequence:
           type: integer
+          format: int32
         company_id:
           type: string
           format: uuid
@@ -1004,6 +1009,7 @@ components:
           type: boolean
         sequence:
           type: integer
+          format: int32
       description: Request body for creating a new UTM campaign
     UpdateUTMCampaignRequest:
       type: object
@@ -1014,6 +1020,7 @@ components:
           type: boolean
         sequence:
           type: integer
+          format: int32
       required:
       - name
       - active
@@ -1194,6 +1201,7 @@ components:
           format: date-time
         pages_viewed:
           type: integer
+          format: int32
         converted_to_lead:
           type: boolean
         lead_id:
@@ -1343,10 +1351,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     ErrorResponse:
@@ -1357,6 +1368,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string

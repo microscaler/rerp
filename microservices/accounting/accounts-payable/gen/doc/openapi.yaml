@@ -34,12 +34,14 @@ paths:
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             default: 1
         - name: limit
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             maximum: 100
             default: 20
@@ -216,12 +218,14 @@ paths:
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             default: 1
         - name: limit
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             maximum: 100
             default: 20
@@ -442,6 +446,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -451,6 +456,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1069,12 +1075,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -1094,12 +1103,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean

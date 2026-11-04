@@ -106,7 +106,7 @@ pub struct GetCustomerInvoiceDocumentResponse {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -192,7 +192,7 @@ pub struct ListCustomerInvoicesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -203,7 +203,7 @@ pub struct ListRenderOutboxResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -217,7 +217,7 @@ pub struct PaginatedPostedInvoices {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -228,7 +228,7 @@ pub struct PaginatedRenderOutbox {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -430,7 +430,7 @@ pub struct RenderedDocument {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

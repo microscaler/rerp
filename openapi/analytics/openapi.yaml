@@ -54,10 +54,13 @@ paths:
                       $ref: '#/components/schemas/Dashboard'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
@@ -168,10 +171,13 @@ paths:
                       $ref: '#/components/schemas/Dataset'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
@@ -282,10 +288,13 @@ paths:
                       $ref: '#/components/schemas/Kpi'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
@@ -396,10 +405,13 @@ paths:
                       $ref: '#/components/schemas/Query'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
@@ -510,10 +522,13 @@ paths:
                       $ref: '#/components/schemas/ReportTemplate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
@@ -624,10 +639,13 @@ paths:
                       $ref: '#/components/schemas/Report'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
@@ -738,10 +756,13 @@ paths:
                       $ref: '#/components/schemas/Schedule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: reporting
       x-service-base-path: /api/v1/analytics/reporting
     post:
@@ -852,10 +873,13 @@ paths:
                       $ref: '#/components/schemas/Visualization'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: bi
       x-service-base-path: /api/v1/analytics/bi
     post:
@@ -966,10 +990,13 @@ paths:
                       $ref: '#/components/schemas/Widget'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: dashboards
       x-service-base-path: /api/v1/analytics/dashboards
     post:
@@ -1065,6 +1092,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1072,6 +1100,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

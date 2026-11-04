@@ -207,6 +207,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -214,6 +215,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -278,9 +280,11 @@ components:
           description: What to do if confidence < threshold (e.g. manual_review)
         retry_count:
           type: integer
+          format: int32
           default: 3
         retry_delay:
           type: integer
+          format: int32
           default: 60
           description: Seconds between retries
         created_at:
@@ -335,9 +339,11 @@ components:
           type: [string, 'null']
         retry_count:
           type: integer
+          format: int32
           default: 3
         retry_delay:
           type: integer
+          format: int32
           default: 60
     RoutesListResponse:
       type: object
@@ -353,10 +359,13 @@ components:
             $ref: '#/components/schemas/Route'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     TestRouteRequest:
       type: object
       required:
@@ -410,8 +419,10 @@ components:
       properties:
         imported:
           type: integer
+          format: int32
         failed:
           type: integer
+          format: int32
         errors:
           type: array
           items:

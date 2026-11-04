@@ -43,10 +43,13 @@ paths:
                       $ref: '#/components/schemas/Appointment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 default:
                   items:
@@ -279,10 +282,13 @@ paths:
                       $ref: '#/components/schemas/Availability'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 default:
                   items:
@@ -507,10 +513,13 @@ paths:
                       $ref: '#/components/schemas/Calendar'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 default:
                   items:
@@ -720,6 +729,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -727,6 +737,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

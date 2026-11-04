@@ -253,6 +253,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -260,6 +261,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -389,6 +391,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
           description: Page numbers to split (if omitted, splits by separator detection)
     SplitResult:
       type: object
@@ -408,6 +411,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
     MergeRequest:
       type: object
       required:
@@ -462,10 +466,13 @@ components:
             $ref: '#/components/schemas/Confirmation'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     BatchApproveRequest:
       type: object
       required:
@@ -486,10 +493,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         success:
           type: integer
+          format: int32
         failed:
           type: integer
+          format: int32
         results:
           type: array
           items:
@@ -576,10 +586,13 @@ components:
             $ref: '#/components/schemas/AutoApproveRule'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     Error:
       type: object
       required:

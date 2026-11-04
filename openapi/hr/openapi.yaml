@@ -62,10 +62,13 @@ paths:
                       $ref: '#/components/schemas/Applicant'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
@@ -176,10 +179,13 @@ paths:
                       $ref: '#/components/schemas/Appraisal'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
@@ -290,10 +296,13 @@ paths:
                       $ref: '#/components/schemas/Attendance'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     post:
@@ -404,10 +413,13 @@ paths:
                       $ref: '#/components/schemas/Deduction'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
@@ -518,10 +530,13 @@ paths:
                       $ref: '#/components/schemas/Department'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
@@ -632,10 +647,13 @@ paths:
                       $ref: '#/components/schemas/Employee'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
@@ -746,10 +764,13 @@ paths:
                       $ref: '#/components/schemas/Goal'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
@@ -860,10 +881,13 @@ paths:
                       $ref: '#/components/schemas/HolidayCalendar'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
@@ -974,10 +998,13 @@ paths:
                       $ref: '#/components/schemas/Interview'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
@@ -1088,10 +1115,13 @@ paths:
                       $ref: '#/components/schemas/JobPosting'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: recruitment
       x-service-base-path: /api/v1/hr/recruitment
     post:
@@ -1202,10 +1232,13 @@ paths:
                       $ref: '#/components/schemas/LeaveBalance'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
@@ -1316,10 +1349,13 @@ paths:
                       $ref: '#/components/schemas/LeaveRequest'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: leave
       x-service-base-path: /api/v1/hr/leave
     post:
@@ -1430,10 +1466,13 @@ paths:
                       $ref: '#/components/schemas/Payslip'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
@@ -1544,10 +1583,13 @@ paths:
                       $ref: '#/components/schemas/Position'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/hr/core
     post:
@@ -1658,10 +1700,13 @@ paths:
                       $ref: '#/components/schemas/Review'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: appraisal
       x-service-base-path: /api/v1/hr/appraisal
     post:
@@ -1772,10 +1817,13 @@ paths:
                       $ref: '#/components/schemas/SalaryRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: payroll
       x-service-base-path: /api/v1/hr/payroll
     post:
@@ -1886,10 +1934,13 @@ paths:
                       $ref: '#/components/schemas/SkillAssessment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
@@ -2000,10 +2051,13 @@ paths:
                       $ref: '#/components/schemas/SkillRequirement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
@@ -2114,10 +2168,13 @@ paths:
                       $ref: '#/components/schemas/Skill'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: skills
       x-service-base-path: /api/v1/hr/skills
     post:
@@ -2228,10 +2285,13 @@ paths:
                       $ref: '#/components/schemas/Timesheet'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: attendance
       x-service-base-path: /api/v1/hr/attendance
     post:
@@ -2327,6 +2387,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -2334,6 +2395,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

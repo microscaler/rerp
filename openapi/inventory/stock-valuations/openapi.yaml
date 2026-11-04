@@ -36,10 +36,13 @@ paths:
                       $ref: '#/components/schemas/StockValuation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '400':
           description: Invalid request
           $ref: '#/components/responses/ValidationError'
@@ -306,6 +309,7 @@ components:
       description: Page number for pagination
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -315,6 +319,7 @@ components:
       description: Number of items per page
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -359,6 +364,7 @@ components:
           description: Total inventory value (quantity × cost)
         quantity_on_hand:
           type: integer
+          format: int32
           description: Current quantity on hand
         currency:
           type: string
@@ -392,6 +398,7 @@ components:
           description: Last recorded unit cost
         quantity_on_hand:
           type: integer
+          format: int32
           description: Current quantity on hand
         currency:
           type: string
@@ -409,6 +416,7 @@ components:
           description: Last recorded unit cost
         quantity_on_hand:
           type: integer
+          format: int32
           description: Current quantity on hand
         currency:
           type: string
@@ -443,6 +451,7 @@ components:
           description: Valuation method used
         quantity_on_hand:
           type: integer
+          format: int32
           description: Current quantity on hand
         currency:
           type: string

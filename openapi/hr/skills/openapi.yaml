@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/Skill'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_skill
       summary: Create skill
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/SkillAssessment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_skill_assessment
       summary: Create skill-assessment
@@ -241,10 +247,13 @@ paths:
                       $ref: '#/components/schemas/SkillRequirement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_skill_requirement
       summary: Create skill-requirement
@@ -330,6 +339,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -337,6 +347,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

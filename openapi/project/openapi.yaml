@@ -52,10 +52,13 @@ paths:
                       $ref: '#/components/schemas/Milestone'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
@@ -166,10 +169,13 @@ paths:
                       $ref: '#/components/schemas/Project'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
@@ -280,10 +286,13 @@ paths:
                       $ref: '#/components/schemas/Task'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/project/core
     post:
@@ -394,10 +403,13 @@ paths:
                       $ref: '#/components/schemas/TimesheetLine'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     post:
@@ -508,10 +520,13 @@ paths:
                       $ref: '#/components/schemas/Timesheet'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: timesheet
       x-service-base-path: /api/v1/project/timesheet
     post:
@@ -607,6 +622,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -614,6 +630,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

@@ -34,10 +34,13 @@ paths:
                       $ref: '#/components/schemas/TaxRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_tax_rule
       summary: Create tax-rule
@@ -138,10 +141,13 @@ paths:
                       $ref: '#/components/schemas/TaxRate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_tax_rate
       summary: Create tax-rate
@@ -260,6 +266,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -267,6 +274,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

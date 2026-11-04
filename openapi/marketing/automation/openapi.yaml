@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/AutomationWorkflow'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_automation_workflow
       summary: Create automation-workflow
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/Trigger'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_trigger
       summary: Create trigger
@@ -241,10 +247,13 @@ paths:
                       $ref: '#/components/schemas/Action'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_action
       summary: Create action
@@ -330,6 +339,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -337,6 +347,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

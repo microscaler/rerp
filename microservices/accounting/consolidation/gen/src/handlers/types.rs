@@ -184,7 +184,7 @@ pub struct ListConsolidationGroupsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -196,7 +196,7 @@ pub struct ListConsolidationRunsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -208,7 +208,7 @@ pub struct ListEliminationEntriesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -220,7 +220,7 @@ pub struct ListEliminationRulesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -232,7 +232,7 @@ pub struct ListGroupReportingPacksResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -271,5 +271,5 @@ pub struct PaginatedResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }

@@ -62,10 +62,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Large enterprise accounts
@@ -449,10 +452,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccountsPayableApAging'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - AP aging analysis
@@ -797,10 +803,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccountsReceivableArAging'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - AR aging analysis
@@ -1145,10 +1154,13 @@ paths:
                       $ref: '#/components/schemas/AssetAssetRegister'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Asset registers
@@ -1418,10 +1430,13 @@ paths:
                       $ref: '#/components/schemas/AssetAsset'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Fixed assets
@@ -1805,10 +1820,13 @@ paths:
                       $ref: '#/components/schemas/BankSyncBankAccount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Bank accounts
@@ -2147,10 +2165,13 @@ paths:
                       $ref: '#/components/schemas/BankSyncBankStatement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Bank statements
@@ -2477,10 +2498,13 @@ paths:
                       $ref: '#/components/schemas/BudgetBudgetLine'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Budget line items
@@ -2792,10 +2816,13 @@ paths:
                       $ref: '#/components/schemas/BudgetBudgetVariance'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Budget variances
@@ -3146,10 +3173,13 @@ paths:
                       $ref: '#/components/schemas/BudgetBudget'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Budgets
@@ -3473,10 +3503,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerChartOfAccount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Large enterprise chart of accounts
@@ -3812,10 +3845,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccountsReceivableCustomerInvoice'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Customer invoices
@@ -4145,10 +4181,13 @@ paths:
                       $ref: '#/components/schemas/AssetDepreciation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: asset
       x-service-base-path: /api/v1/accounting/asset
     post:
@@ -4441,10 +4480,13 @@ paths:
                       $ref: '#/components/schemas/EdiEdiDocument'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: edi
       x-service-base-path: /api/v1/accounting/edi
     post:
@@ -4555,10 +4597,13 @@ paths:
                       $ref: '#/components/schemas/EdiEdiMapping'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: edi
       x-service-base-path: /api/v1/accounting/edi
     post:
@@ -4669,10 +4714,13 @@ paths:
                       $ref: '#/components/schemas/FinancialReportsFinancialStatement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: financial-reports
       x-service-base-path: /api/v1/accounting/financial-reports
     post:
@@ -4783,10 +4831,13 @@ paths:
                       $ref: '#/components/schemas/InvoiceInvoiceLine'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Invoice line items
@@ -5164,10 +5215,13 @@ paths:
                       $ref: '#/components/schemas/InvoiceInvoice'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Large enterprise invoices
@@ -5621,10 +5675,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerJournalEntry'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Large enterprise journal entries
@@ -6015,10 +6072,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccountsReceivablePayment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - AR payments
@@ -6375,10 +6435,13 @@ paths:
                       $ref: '#/components/schemas/BankSyncReconciliation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Bank reconciliations
@@ -6714,10 +6777,13 @@ paths:
                       $ref: '#/components/schemas/FinancialReportsReport'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: financial-reports
       x-service-base-path: /api/v1/accounting/financial-reports
     post:
@@ -6828,10 +6894,13 @@ paths:
                       $ref: '#/components/schemas/GeneralLedgerAccountsPayableVendorInvoice'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
               examples:
                 acmeCorporationExample:
                   summary: Acme Corporation - Vendor invoices
@@ -7146,6 +7215,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -7153,6 +7223,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -7531,6 +7602,7 @@ components:
           format: decimal
         days_until_due:
           type: integer
+          format: int32
         aging_bucket:
           type: [string, 'null']
           enum:
@@ -7754,6 +7826,7 @@ components:
           format: decimal
         days_overdue:
           type: integer
+          format: int32
         aging_bucket:
           type: [string, 'null']
           enum:
@@ -8060,6 +8133,7 @@ components:
           - null
         useful_life_months:
           type: integer
+          format: int32
         depreciation_rate:
           type: number
           format: decimal
@@ -8136,6 +8210,7 @@ components:
           - null
         default_useful_life_months:
           type: [integer, 'null']
+          format: int32
         is_active:
           type: boolean
         created_at:
@@ -8246,6 +8321,7 @@ components:
           - SUM_OF_YEARS
         default_useful_life_months:
           type: integer
+          format: int32
         is_active:
           type: boolean
     AssetCreateAssetRequest:
@@ -8289,6 +8365,7 @@ components:
           - SUM_OF_YEARS
         useful_life_months:
           type: integer
+          format: int32
         location:
           type: string
           maxLength: 255
@@ -8407,6 +8484,7 @@ components:
           - SUM_OF_YEARS
         default_useful_life_months:
           type: integer
+          format: int32
         is_active:
           type: boolean
     AssetUpdateAssetRequest:
@@ -8561,6 +8639,7 @@ components:
           format: decimal
         transaction_count:
           type: integer
+          format: int32
         status:
           type: string
           enum:
@@ -8677,6 +8756,7 @@ components:
           format: uuid
         statement_line_number:
           type: [integer, 'null']
+          format: int32
         currency_code:
           type: string
           minLength: 3
@@ -8875,11 +8955,13 @@ components:
           format: decimal
         outstanding_deposits_count:
           type: integer
+          format: int32
         outstanding_deposits_amount:
           type: number
           format: decimal
         outstanding_withdrawals_count:
           type: integer
+          format: int32
         outstanding_withdrawals_amount:
           type: number
           format: decimal
@@ -9028,6 +9110,7 @@ components:
           type: [string, 'null']
         fiscal_year:
           type: integer
+          format: int32
         period_start:
           type: string
           format: date
@@ -9236,6 +9319,7 @@ components:
           type: string
         fiscal_year:
           type: integer
+          format: int32
         period_start:
           type: string
           format: date
@@ -9505,6 +9589,7 @@ components:
           type: [object, 'null']
         retry_count:
           type: integer
+          format: int32
         last_retry_at:
           type: [string, 'null']
           format: date-time
@@ -9775,6 +9860,7 @@ components:
           format: uuid
         data_version:
           type: integer
+          format: int32
         currency_code:
           type: string
           minLength: 3
@@ -9915,6 +10001,7 @@ components:
           format: date-time
         run_count:
           type: integer
+          format: int32
         status:
           type: string
           enum:
@@ -9997,6 +10084,7 @@ components:
           type: boolean
         version:
           type: integer
+          format: int32
         created_at:
           type: string
           format: date-time
@@ -10018,6 +10106,7 @@ components:
           type: object
         data_version:
           type: integer
+          format: int32
     FinancialReportsUpdateReportRequest:
       type: object
       properties:
@@ -10125,6 +10214,7 @@ components:
           format: uuid
         level:
           type: integer
+          format: int32
         is_active:
           type: boolean
         description:
@@ -10397,6 +10487,7 @@ components:
           format: uuid
         line_number:
           type: integer
+          format: int32
         product_id:
           type: string
           format: uuid
@@ -10606,6 +10697,7 @@ components:
           format: uuid
         line_number:
           type: integer
+          format: int32
         product_id:
           type: [string, 'null']
           format: uuid

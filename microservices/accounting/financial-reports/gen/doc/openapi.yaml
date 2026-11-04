@@ -190,6 +190,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -199,6 +200,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

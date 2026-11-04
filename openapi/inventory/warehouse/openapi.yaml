@@ -39,10 +39,13 @@ paths:
                       $ref: '#/components/schemas/Warehouse'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Unauthorized - invalid or missing authentication token
         '409':
@@ -228,10 +231,13 @@ paths:
                       $ref: '#/components/schemas/Location'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Unauthorized - invalid or missing authentication token
         '409':
@@ -417,10 +423,13 @@ paths:
                       $ref: '#/components/schemas/Transfer'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Unauthorized - invalid or missing authentication token
         '409':
@@ -591,6 +600,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -598,6 +608,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -653,6 +664,7 @@ components:
             description: Postal or ZIP code
           capacity:
             type: [integer, 'null']
+            format: int32
             description: Total capacity in cubic meters
           status:
             type: string
@@ -694,6 +706,7 @@ components:
           description: Postal or ZIP code
         capacity:
           type: [integer, 'null']
+          format: int32
           description: Total capacity in cubic meters
         status:
           type: string
@@ -729,6 +742,7 @@ components:
           description: Postal or ZIP code
         capacity:
           type: [integer, 'null']
+          format: int32
           description: Total capacity in cubic meters
         status:
           type: string
@@ -772,6 +786,7 @@ components:
             description: Hierarchical parent location
           capacity:
             type: [integer, 'null']
+            format: int32
             description: Capacity in cubic meters or units
           is_active:
             type: boolean
@@ -812,6 +827,7 @@ components:
           description: Parent location for hierarchy
         capacity:
           type: [integer, 'null']
+          format: int32
           description: Capacity
         is_active:
           type: boolean
@@ -837,6 +853,7 @@ components:
           description: Location type
         capacity:
           type: [integer, 'null']
+          format: int32
           description: Capacity
         is_active:
           type: boolean

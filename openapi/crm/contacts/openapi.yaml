@@ -50,12 +50,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -391,12 +393,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -608,6 +612,7 @@ components:
           default: true
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         create_date:
@@ -626,9 +631,11 @@ components:
           readOnly: true
         lead_count:
           type: integer
+          format: int32
           readOnly: true
         opportunity_count:
           type: integer
+          format: int32
           readOnly: true
       description: An individual person associated with an account or lead
     CreateContactRequest:
@@ -790,8 +797,10 @@ components:
           format: uuid
         merged_lead_count:
           type: integer
+          format: int32
         merged_account_count:
           type: integer
+          format: int32
       required:
       - kept_id
       - removed_id
@@ -806,6 +815,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -823,10 +833,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     PaginatedContact:
@@ -858,6 +871,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -866,6 +880,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

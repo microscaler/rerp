@@ -54,10 +54,13 @@ paths:
                       $ref: '#/components/schemas/Action'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
@@ -168,10 +171,13 @@ paths:
                       $ref: '#/components/schemas/AutomationWorkflow'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
@@ -282,10 +288,13 @@ paths:
                       $ref: '#/components/schemas/Campaign'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
@@ -396,10 +405,13 @@ paths:
                       $ref: '#/components/schemas/EmailTemplate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
@@ -510,10 +522,13 @@ paths:
                       $ref: '#/components/schemas/Engagement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
@@ -624,10 +639,13 @@ paths:
                       $ref: '#/components/schemas/MailingList'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: email
       x-service-base-path: /api/v1/marketing/email
     post:
@@ -738,10 +756,13 @@ paths:
                       $ref: '#/components/schemas/SocialAccount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
@@ -852,10 +873,13 @@ paths:
                       $ref: '#/components/schemas/SocialPost'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: social-media
       x-service-base-path: /api/v1/marketing/social-media
     post:
@@ -966,10 +990,13 @@ paths:
                       $ref: '#/components/schemas/Trigger'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/marketing/automation
     post:
@@ -1065,6 +1092,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1072,6 +1100,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

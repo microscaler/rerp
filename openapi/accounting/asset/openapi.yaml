@@ -39,12 +39,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -401,10 +403,12 @@ paths:
                 properties:
                   total_entries:
                     type: integer
+                    format: int32
                   total_depreciation:
                     type: number
                   assets_processed:
                     type: integer
+                    format: int32
                   errors:
                     type: array
                     items:
@@ -435,12 +439,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -532,12 +538,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -652,12 +660,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -955,6 +965,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -964,6 +975,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -999,14 +1011,17 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           description: Total number of records
           example: 1
         page:
           type: integer
+          format: int32
           description: Current page number
           example: 1
         limit:
           type: integer
+          format: int32
           description: Page size limit
           example: 1
     Asset:
@@ -1109,6 +1124,7 @@ components:
           example: 15000.0
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           description: Useful life in months
           example: 60
@@ -1218,6 +1234,7 @@ components:
           example: 750e8400-e29b-41d4-a716-446655440002
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           example: 60
         depreciation_method:
@@ -1342,6 +1359,7 @@ components:
           example: 5000.0
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           example: 60
         monthly_rate:
@@ -1470,6 +1488,7 @@ components:
           example: 5000.0
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           example: 60
         start_date:
@@ -1742,6 +1761,7 @@ components:
           example: true
         default_useful_life_months:
           type: [integer, 'null']
+          format: int32
           minimum: 1
           description: Default useful life in months
           example: true
@@ -1797,6 +1817,7 @@ components:
           example: true
         default_useful_life_months:
           type: [integer, 'null']
+          format: int32
           minimum: 1
           example: true
         gl_account_debit:
@@ -1841,6 +1862,7 @@ components:
           example: straight_line
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           example: 60
         residual_value_percent:
@@ -1880,6 +1902,7 @@ components:
           example: straight_line
         useful_life_months:
           type: integer
+          format: int32
           minimum: 1
           example: 60
         residual_value_percent:
@@ -1901,6 +1924,7 @@ components:
           example: Reclassification of asset category
         new_useful_life_months:
           type: [integer, 'null']
+          format: int32
           example: 1
         new_residual_value:
           type: [number, 'null']
@@ -1923,6 +1947,7 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
     PaginatedAssets:
       type: object
@@ -1939,12 +1964,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -1964,12 +1992,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -1989,12 +2020,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -2014,12 +2048,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -2039,12 +2076,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -2072,6 +2112,7 @@ components:
           example: USD
         total_assets:
           type: integer
+          format: int32
           description: Count of active assets
           example: 500000.0
         total_acquisition_cost:
@@ -2101,6 +2142,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               acquisition_cost:
                 type: number
                 format: double
@@ -2127,6 +2169,7 @@ components:
           example: 10000.0
         disposals_current_year:
           type: integer
+          format: int32
           description: Number of assets disposed this year
           example: 5000.0
     ErrorResponse:

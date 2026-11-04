@@ -52,10 +52,13 @@ paths:
                       $ref: '#/components/schemas/ApiKey'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
@@ -181,10 +184,13 @@ paths:
                       $ref: '#/components/schemas/Integration'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
@@ -339,10 +345,13 @@ paths:
                       $ref: '#/components/schemas/Policy'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     post:
@@ -453,10 +462,13 @@ paths:
                       $ref: '#/components/schemas/Route'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: gateway
       x-service-base-path: /api/v1/infrastructure/gateway
     post:
@@ -596,10 +608,13 @@ paths:
                       $ref: '#/components/schemas/Webhook'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: integration-platform
       x-service-base-path: /api/v1/infrastructure/integration-platform
     post:
@@ -746,6 +761,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -753,6 +769,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

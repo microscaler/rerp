@@ -36,10 +36,13 @@ paths:
                       $ref: '#/components/schemas/StockMovement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '400':
           description: Invalid request
           $ref: '#/components/responses/ValidationError'
@@ -247,6 +250,7 @@ components:
       description: Page number for pagination
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -256,6 +260,7 @@ components:
       description: Number of items per page
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -392,6 +397,7 @@ components:
           description: Stock item ID
         quantity:
           type: integer
+          format: int32
           description: Quantity involved in this movement
         unit_cost:
           type: number
@@ -413,9 +419,11 @@ components:
           description: Name of the warehouse location
         quantity:
           type: integer
+          format: int32
           description: Quantity at this location
         reserved_quantity:
           type: integer
+          format: int32
           description: Reserved quantity at this location
     UpdateStockAvailabilityRequest:
       type: object
@@ -439,9 +447,11 @@ components:
           description: Warehouse location identifier
         quantity:
           type: integer
+          format: int32
           description: New quantity at this location
         reserved_quantity:
           type: integer
+          format: int32
           description: New reserved quantity at this location
   responses:
     ValidationError:

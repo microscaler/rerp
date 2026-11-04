@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/Locale'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_locale
       summary: Create locale
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/Translation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_translation
       summary: Create translation
@@ -241,10 +247,13 @@ paths:
                       $ref: '#/components/schemas/Currency'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_currency
       summary: Create currency
@@ -330,6 +339,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -337,6 +347,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

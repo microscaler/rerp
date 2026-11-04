@@ -34,10 +34,13 @@ paths:
                       $ref: '#/components/schemas/Product'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_product
       summary: Create product
@@ -138,10 +141,13 @@ paths:
                       $ref: '#/components/schemas/Category'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_category
       summary: Create category
@@ -242,10 +248,13 @@ paths:
                       $ref: '#/components/schemas/Attribute'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_attribute
       summary: Create attribute
@@ -346,10 +355,13 @@ paths:
                       $ref: '#/components/schemas/Variant'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_variant
       summary: Create variant
@@ -501,6 +513,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -508,6 +521,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

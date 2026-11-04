@@ -54,10 +54,13 @@ paths:
                       $ref: '#/components/schemas/Agent'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
@@ -168,10 +171,13 @@ paths:
                       $ref: '#/components/schemas/Chat'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
@@ -282,10 +288,13 @@ paths:
                       $ref: '#/components/schemas/Contact'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
@@ -396,10 +405,13 @@ paths:
                       $ref: '#/components/schemas/Lead'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
@@ -510,10 +522,13 @@ paths:
                       $ref: '#/components/schemas/Message'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: livechat
       x-service-base-path: /api/v1/crm/livechat
     post:
@@ -624,10 +639,13 @@ paths:
                       $ref: '#/components/schemas/Opportunity'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/crm/core
     post:
@@ -738,10 +756,13 @@ paths:
                       $ref: '#/components/schemas/Rule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
@@ -852,10 +873,13 @@ paths:
                       $ref: '#/components/schemas/Trigger'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
@@ -966,10 +990,13 @@ paths:
                       $ref: '#/components/schemas/Workflow'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: automation
       x-service-base-path: /api/v1/crm/automation
     post:
@@ -1065,6 +1092,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1072,6 +1100,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

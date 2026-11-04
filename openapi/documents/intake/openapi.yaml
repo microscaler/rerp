@@ -230,10 +230,13 @@ paths:
                       $ref: '#/components/schemas/EmailAlias'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Authentication required
           content:
@@ -333,6 +336,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -340,6 +344,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -451,12 +456,15 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           description: Total number of documents in the batch
         successful:
           type: integer
+          format: int32
           description: Number of documents successfully uploaded
         failed:
           type: integer
+          format: int32
           description: Number of documents that failed
         items:
           type: array
@@ -468,6 +476,7 @@ components:
             properties:
               index:
                 type: integer
+                format: int32
                 description: Zero-based index in the original files array
               status:
                 type: string
@@ -619,12 +628,15 @@ components:
           description: Timestamp of the last successful sync
         pending_count:
           type: integer
+          format: int32
           description: Number of documents pending upload from the mobile device
         processing_count:
           type: integer
+          format: int32
           description: Number of documents currently being processed (extract, classify, route)
         failed_count:
           type: integer
+          format: int32
           description: Number of documents that failed processing and need user attention
         sync_errors:
           type: [array, 'null']

@@ -922,12 +922,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -969,6 +971,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -977,6 +980,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1031,6 +1035,7 @@ components:
           format: date-time
         duration_seconds:
           type: integer
+          format: int32
           readOnly: true
           description: Session duration in seconds
         transcript:
@@ -1038,6 +1043,7 @@ components:
           description: Full chat message history (JSON array of messages)
         satisfaction_rating:
           type: integer
+          format: int32
           minimum: 1
           maximum: 5
           description: Visitor satisfaction rating
@@ -1152,6 +1158,7 @@ components:
           format: date-time
         duration_seconds:
           type: integer
+          format: int32
       required:
       - session_id
       - messages
@@ -1224,12 +1231,15 @@ components:
           type: boolean
         active_sessions:
           type: integer
+          format: int32
           readOnly: true
         max_concurrent:
           type: integer
+          format: int32
           description: 'Max concurrent chats (default: 3)'
         total_chats_today:
           type: integer
+          format: int32
           readOnly: true
         avg_response_time_seconds:
           type: number
@@ -1241,6 +1251,7 @@ components:
           readOnly: true
         queue_position:
           type: integer
+          format: int32
           readOnly: true
         skills:
           type: array
@@ -1262,6 +1273,7 @@ components:
           format: uuid
         max_concurrent:
           type: integer
+          format: int32
           default: 3
         skills:
           type: array
@@ -1273,6 +1285,7 @@ components:
       properties:
         max_concurrent:
           type: integer
+          format: int32
         skills:
           type: array
           items:
@@ -1300,6 +1313,7 @@ components:
           format: uuid
         total_chats:
           type: integer
+          format: int32
         avg_duration_seconds:
           type: number
           format: float
@@ -1311,8 +1325,10 @@ components:
           format: float
         chats_today:
           type: integer
+          format: int32
         chats_this_week:
           type: integer
+          format: int32
       required:
       - agent_id
       - total_chats
@@ -1346,10 +1362,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     ErrorResponse:
@@ -1360,6 +1379,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -1410,6 +1430,7 @@ components:
           type: boolean
         active_sessions:
           type: integer
+          format: int32
       required:
       - name
       - is_online
@@ -1426,6 +1447,7 @@ components:
           type: string
         page_views:
           type: integer
+          format: int64
         waiting_since:
           type: string
           format: date-time

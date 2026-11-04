@@ -42,7 +42,7 @@ pub struct Response {
     pub sha256: String,
 
     #[serde(rename = "size_bytes")]
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 impl TryFrom<HandlerRequest> for Request {

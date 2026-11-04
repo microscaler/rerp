@@ -129,7 +129,7 @@ pub struct AccountsPayablePaginatedVendorInvoices {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -143,7 +143,7 @@ pub struct AccountsPayablePaginatedVendorPayments {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -401,7 +401,7 @@ pub struct AccountsReceivablePaginatedOpenItems {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -415,7 +415,7 @@ pub struct AccountsReceivablePaginatedPayments {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -971,14 +971,14 @@ pub struct AssetPaginatedAssetCategories {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AssetPaginatedAssetModels {
     pub items: Vec<AssetAssetModel>,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -992,7 +992,7 @@ pub struct AssetPaginatedAssets {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1006,7 +1006,7 @@ pub struct AssetPaginatedDepreciationEntries {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1020,7 +1020,7 @@ pub struct AssetPaginatedDisposals {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1029,7 +1029,7 @@ pub struct AssetPaginatedResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1043,7 +1043,7 @@ pub struct AssetPaginatedRevaluations {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1515,7 +1515,7 @@ pub struct BankSyncPaginatedBankAccounts {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1529,7 +1529,7 @@ pub struct BankSyncPaginatedBankStatements {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1543,7 +1543,7 @@ pub struct BankSyncPaginatedBankTransactions {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1557,7 +1557,7 @@ pub struct BankSyncPaginatedReconciliations {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1934,14 +1934,14 @@ pub struct BudgetPaginatedBudgetLines {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BudgetPaginatedBudgetRevisions {
     pub items: Vec<BudgetBudgetRevision>,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1955,7 +1955,7 @@ pub struct BudgetPaginatedBudgets {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1969,7 +1969,7 @@ pub struct BudgetPaginatedForecasts {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1978,7 +1978,7 @@ pub struct BudgetPaginatedResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -4015,7 +4015,7 @@ pub struct EdiPaginatedResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5099,7 +5099,7 @@ pub struct GetCustomerInvoiceDocumentResponse {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5607,7 +5607,7 @@ pub struct InvoicePaginatedPostedInvoices {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5618,7 +5618,7 @@ pub struct InvoicePaginatedRenderOutbox {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5809,7 +5809,7 @@ pub struct InvoiceRenderedDocument {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5839,14 +5839,14 @@ pub struct ListAssetCategoriesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListAssetModelsResponse {
     pub items: Vec<AssetAssetModel>,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5860,7 +5860,7 @@ pub struct ListAssetsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5874,7 +5874,7 @@ pub struct ListBankAccountsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5888,7 +5888,7 @@ pub struct ListBankStatementsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5902,7 +5902,7 @@ pub struct ListBankTransactionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5916,14 +5916,14 @@ pub struct ListBudgetLinesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListBudgetRevisionsResponse {
     pub items: Vec<BudgetBudgetRevision>,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5937,7 +5937,7 @@ pub struct ListBudgetsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5951,7 +5951,7 @@ pub struct ListCustomerInvoicesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5965,7 +5965,7 @@ pub struct ListCustomerPaymentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5979,7 +5979,7 @@ pub struct ListDepreciationEntriesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -5993,7 +5993,7 @@ pub struct ListDisposalsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6005,7 +6005,7 @@ pub struct ListEdiAcknowledgmentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6017,7 +6017,7 @@ pub struct ListEdiDocumentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6029,7 +6029,7 @@ pub struct ListEdiErrorsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6041,7 +6041,7 @@ pub struct ListEdiMappingsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6053,7 +6053,7 @@ pub struct ListEdiProfilesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6065,7 +6065,7 @@ pub struct ListEdiSubmissionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6077,7 +6077,7 @@ pub struct ListEdiValidationProfilesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6098,7 +6098,7 @@ pub struct ListForecastsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6119,7 +6119,7 @@ pub struct ListOpenItemsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6138,7 +6138,7 @@ pub struct ListReconciliationsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6149,7 +6149,7 @@ pub struct ListRenderOutboxResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6163,7 +6163,7 @@ pub struct ListRevaluationsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6177,7 +6177,7 @@ pub struct ListVendorInvoicesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -6191,7 +6191,7 @@ pub struct ListVendorPaymentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

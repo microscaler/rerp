@@ -54,6 +54,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
               description: Seconds to wait before retrying
           content:
             application/json:
@@ -139,6 +140,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
           content:
             application/json:
               schema:
@@ -152,6 +154,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -159,6 +162,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -187,10 +191,12 @@ components:
           description: Optional model override
         context_window:
           type: integer
+          format: int32
           default: 4000
           description: Token context window size
         max_tokens:
           type: integer
+          format: int32
           default: 2000
           description: Maximum tokens in the response
     AnalyzeBulkRequest:
@@ -246,6 +252,7 @@ components:
             properties:
               page:
                 type: integer
+                format: int32
               text:
                 type: string
               confidence:
@@ -257,10 +264,13 @@ components:
           properties:
             prompt_tokens:
               type: integer
+              format: int32
             completion_tokens:
               type: integer
+              format: int32
             total_tokens:
               type: integer
+              format: int32
         model:
           type: string
         created_at:

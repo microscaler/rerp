@@ -18,7 +18,7 @@ pub struct Response {
     pub items: Vec<BudgetBudgetRevision>,
 
     #[serde(rename = "total")]
-    pub total: i32,
+    pub total: i64,
 }
 
 impl TryFrom<HandlerRequest> for Request {

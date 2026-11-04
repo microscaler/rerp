@@ -67,7 +67,7 @@ pub struct CreateDocumentRenditionCopyResponse {
     pub sha256: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size_bytes: Option<i32>,
+    pub size_bytes: Option<i64>,
 
     pub source: SourceReference,
 
@@ -143,7 +143,7 @@ pub struct CreateDocumentRenditionResponse {
     pub sha256: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size_bytes: Option<i32>,
+    pub size_bytes: Option<i64>,
 
     pub source: SourceReference,
 
@@ -350,7 +350,7 @@ pub struct DocumentRendition {
     pub sha256: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size_bytes: Option<i32>,
+    pub size_bytes: Option<i64>,
 
     pub source: SourceReference,
 
@@ -462,7 +462,7 @@ pub struct GetDocumentRenditionResponse {
     pub sha256: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size_bytes: Option<i32>,
+    pub size_bytes: Option<i64>,
 
     pub source: SourceReference,
 
@@ -533,7 +533,7 @@ pub struct ListDocumentTemplateVersionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -544,7 +544,7 @@ pub struct ListDocumentTemplatesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -555,7 +555,7 @@ pub struct ListSourceDocumentRenditionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -577,7 +577,7 @@ pub struct PreviewDocumentTemplateVersionResponse {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -590,7 +590,7 @@ pub struct PreviewResult {
 
     pub sha256: String,
 
-    pub size_bytes: i32,
+    pub size_bytes: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -638,7 +638,7 @@ pub struct RenditionPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -727,7 +727,7 @@ pub struct TemplatePage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -775,7 +775,7 @@ pub struct TemplateVersionPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

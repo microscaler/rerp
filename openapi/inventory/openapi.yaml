@@ -56,10 +56,13 @@ paths:
                       $ref: '#/components/schemas/Carrier'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
@@ -170,10 +173,13 @@ paths:
                       $ref: '#/components/schemas/DropshipOrder'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     post:
@@ -284,10 +290,13 @@ paths:
                       $ref: '#/components/schemas/Location'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
@@ -398,10 +407,13 @@ paths:
                       $ref: '#/components/schemas/Shipment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
@@ -512,10 +524,13 @@ paths:
                       $ref: '#/components/schemas/ShippingRate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: logistics
       x-service-base-path: /api/v1/inventory/logistics
     post:
@@ -626,10 +641,13 @@ paths:
                       $ref: '#/components/schemas/StockMovement'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
@@ -740,10 +758,13 @@ paths:
                       $ref: '#/components/schemas/StockValuation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
@@ -854,10 +875,13 @@ paths:
                       $ref: '#/components/schemas/Stock'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/inventory/core
     post:
@@ -968,10 +992,13 @@ paths:
                       $ref: '#/components/schemas/Transfer'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
@@ -1082,10 +1109,13 @@ paths:
                       $ref: '#/components/schemas/VendorOrder'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: dropshipping
       x-service-base-path: /api/v1/inventory/dropshipping
     post:
@@ -1196,10 +1226,13 @@ paths:
                       $ref: '#/components/schemas/Warehouse'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: warehouse
       x-service-base-path: /api/v1/inventory/warehouse
     post:
@@ -1295,6 +1328,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1302,6 +1336,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

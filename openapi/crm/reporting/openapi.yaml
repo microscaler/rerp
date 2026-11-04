@@ -1096,6 +1096,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -1104,6 +1105,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1138,6 +1140,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               weighted_revenue:
                 type: number
                 format: double
@@ -1165,12 +1168,16 @@ components:
           type: string
         leads_created:
           type: integer
+          format: int32
         opportunities_created:
           type: integer
+          format: int32
         opportunities_won:
           type: integer
+          format: int32
         opportunities_lost:
           type: integer
+          format: int32
         lead_to_opp_rate:
           type: number
           format: float
@@ -1206,6 +1213,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               revenue:
                 type: number
                 format: double
@@ -1230,12 +1238,16 @@ components:
           type: string
         leads_created:
           type: integer
+          format: int32
         opportunities_active:
           type: integer
+          format: int32
         opportunities_won:
           type: integer
+          format: int32
         opportunities_lost:
           type: integer
+          format: int32
         revenue_expected:
           type: number
           format: double
@@ -1256,6 +1268,7 @@ components:
           format: float
         activity_count:
           type: integer
+          format: int32
       required:
       - user_id
       - user_name
@@ -1283,8 +1296,10 @@ components:
           type: string
         member_count:
           type: integer
+          format: int32
         total_opportunities:
           type: integer
+          format: int32
         total_revenue:
           type: number
           format: double
@@ -1310,10 +1325,13 @@ components:
           type: string
         total_closed:
           type: integer
+          format: int32
         won_count:
           type: integer
+          format: int32
         lost_count:
           type: integer
+          format: int32
         win_rate:
           type: number
           format: float
@@ -1329,6 +1347,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               percentage:
                 type: number
                 format: float
@@ -1510,10 +1529,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     ErrorResponse:
@@ -1524,6 +1546,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -1542,6 +1565,7 @@ components:
       properties:
         total_opportunities:
           type: integer
+          format: int32
         total_revenue:
           type: number
           format: double
@@ -1560,6 +1584,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               total_revenue:
                 type: number
                 format: double
@@ -1608,10 +1633,13 @@ components:
           type: string
         lead_count:
           type: integer
+          format: int32
         opportunities:
           type: integer
+          format: int32
         won_deals:
           type: integer
+          format: int32
         revenue:
           type: number
           format: double
@@ -1634,6 +1662,7 @@ components:
           type: string
         rank:
           type: integer
+          format: int32
         value:
           type: number
           format: double

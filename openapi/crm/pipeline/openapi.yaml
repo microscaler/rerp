@@ -52,12 +52,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -643,12 +645,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 50
@@ -944,6 +948,7 @@ components:
           type: boolean
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         stage_id:
@@ -1048,6 +1053,7 @@ components:
             format: uuid
         duplicate_lead_count:
           type: integer
+          format: int32
         create_date:
           type: string
           format: date-time
@@ -1064,9 +1070,11 @@ components:
           readOnly: true
         stage_probability:
           type: integer
+          format: int32
           readOnly: true
         stage_color:
           type: integer
+          format: int32
           readOnly: true
         is_rotting:
           type: boolean
@@ -1277,10 +1285,12 @@ components:
           maxLength: 128
         sequence:
           type: integer
+          format: int32
           minimum: 1
           description: Order in pipeline
         probability:
           type: integer
+          format: int32
           minimum: 0
           maximum: 100
           description: Win probability for this stage
@@ -1292,6 +1302,7 @@ components:
           description: Marks a Lost stage
         rotting_threshold_days:
           type: integer
+          format: int32
           minimum: 1
           description: Days before stage shows as stale
         requirements:
@@ -1307,12 +1318,14 @@ components:
           description: Folded in Kanban when no deals
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         description:
           type: string
         lead_count:
           type: integer
+          format: int32
           readOnly: true
       description: A pipeline stage representing a step in the sales process
     CreateStageRequest:
@@ -1327,9 +1340,11 @@ components:
           maxLength: 128
         sequence:
           type: integer
+          format: int32
           minimum: 1
         probability:
           type: integer
+          format: int32
           minimum: 0
           maximum: 100
         is_won:
@@ -1338,6 +1353,7 @@ components:
           type: boolean
         rotting_threshold_days:
           type: integer
+          format: int32
           minimum: 1
         requirements:
           type: string
@@ -1350,6 +1366,7 @@ components:
           type: boolean
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         description:
@@ -1362,14 +1379,17 @@ components:
           type: string
         sequence:
           type: integer
+          format: int32
         probability:
           type: integer
+          format: int32
         is_won:
           type: boolean
         is_lost:
           type: boolean
         rotting_threshold_days:
           type: integer
+          format: int32
         requirements:
           type: string
         team_ids:
@@ -1381,6 +1401,7 @@ components:
           type: boolean
         color:
           type: integer
+          format: int32
         description:
           type: string
       required:
@@ -1511,8 +1532,10 @@ components:
           format: uuid
         merged_tag_count:
           type: integer
+          format: int32
         merged_description_additions:
           type: integer
+          format: int32
       required:
       - kept_id
       - merged_id
@@ -1528,10 +1551,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination metadata
     ErrorResponse:
       type: object
@@ -1541,6 +1567,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -1567,10 +1594,13 @@ components:
             $ref: '#/components/schemas/Lead'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: Paginated list of Lead records
     PaginatedStage:
       type: object
@@ -1586,10 +1616,13 @@ components:
             $ref: '#/components/schemas/Stage'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: Paginated list of Stage records
     PaginatedPipelineSummary:
       type: object
@@ -1601,6 +1634,7 @@ components:
       properties:
         total_opportunities:
           type: integer
+          format: int32
         total_revenue:
           type: number
           format: double
@@ -1619,6 +1653,7 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               total_revenue:
                 type: number
                 format: double
@@ -1712,6 +1747,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -1720,6 +1756,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

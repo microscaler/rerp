@@ -33,12 +33,14 @@ paths:
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             default: 1
         - name: limit
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             maximum: 100
             default: 20
@@ -89,11 +91,13 @@ paths:
           in: query
           schema:
             type: integer
+            format: int32
           description: Minimum days overdue filter
         - name: days_overdue_max
           in: query
           schema:
             type: integer
+            format: int32
           description: Maximum days overdue filter
       responses:
         '200':
@@ -150,12 +154,14 @@ paths:
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             default: 1
         - name: limit
           in: query
           schema:
             type: integer
+            format: int32
             minimum: 1
             maximum: 100
             default: 20
@@ -493,6 +499,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -502,6 +509,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -642,6 +650,7 @@ components:
               type:
                 - integer
                 - 'null'
+              format: int32
               description: Days past due (0 if not overdue)
             payment_history:
               type: array
@@ -911,6 +920,7 @@ components:
           example: QUEUED
         statement_count:
           type: integer
+          format: int32
           example: 0
     PaginatedOpenItems:
       type: object
@@ -927,12 +937,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -952,12 +965,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean

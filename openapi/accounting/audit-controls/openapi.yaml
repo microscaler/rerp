@@ -326,6 +326,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -333,6 +334,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -376,6 +378,7 @@ components:
           example: true
         minimum_approvals:
           type: integer
+          format: int32
           example: 1
     CreateApprovalPolicyRequest:
       type: object
@@ -391,6 +394,7 @@ components:
           example: Acme Corporation
         minimum_approvals:
           type: integer
+          format: int32
           example: 1
     SegregationRule:
       type: object
@@ -630,12 +634,15 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
     ErrorResponse:
       type: object

@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/Connector'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_connector
       summary: Create connector
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/IntegrationTemplate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_integration_template
       summary: Create integration-template
@@ -226,6 +232,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -233,6 +240,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

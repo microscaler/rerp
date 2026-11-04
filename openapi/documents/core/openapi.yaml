@@ -540,6 +540,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -547,6 +548,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -693,10 +695,13 @@ components:
             $ref: '#/components/schemas/Folder'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     Version:
       type: object
       required:
@@ -713,6 +718,7 @@ components:
           format: uuid
         version_number:
           type: integer
+          format: int32
           description: Sequential version number (1, 2, ...)
         org_id:
           type: string
@@ -776,10 +782,13 @@ components:
             $ref: '#/components/schemas/Document'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     PaginatedVersions:
       type: object
       required:
@@ -794,10 +803,13 @@ components:
             $ref: '#/components/schemas/Version'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     Error:
       type: object
       required:

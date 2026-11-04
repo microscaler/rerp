@@ -47,12 +47,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -289,12 +291,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -434,12 +438,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -565,6 +571,7 @@ components:
           type: boolean
         assignment_max:
           type: integer
+          format: int32
           readOnly: true
           description: Monthly capacity (sum of members' max)
         assignment_domain:
@@ -587,9 +594,11 @@ components:
           readOnly: true
         member_count:
           type: integer
+          format: int32
           readOnly: true
         active_lead_count:
           type: integer
+          format: int32
           readOnly: true
         total_revenue:
           type: number
@@ -692,12 +701,15 @@ components:
           maxLength: 64
         assignment_max:
           type: integer
+          format: int32
           description: 30-day lead capacity
         lead_day_count:
           type: integer
+          format: int32
           readOnly: true
         lead_month_count:
           type: integer
+          format: int32
           readOnly: true
         quota_monthly:
           type: number
@@ -710,6 +722,7 @@ components:
           format: double
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         user_name:
@@ -726,6 +739,7 @@ components:
           format: uuid
         assignment_max:
           type: integer
+          format: int32
         assignment_domain:
           type: string
         quota_monthly:
@@ -737,8 +751,10 @@ components:
       properties:
         assigned_count:
           type: integer
+          format: int32
         failed_count:
           type: integer
+          format: int32
         details:
           type: array
           items:
@@ -766,10 +782,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     TeamMembers:
@@ -790,6 +809,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -854,6 +874,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -862,6 +883,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

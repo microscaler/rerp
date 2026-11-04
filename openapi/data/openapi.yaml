@@ -50,10 +50,13 @@ paths:
                       $ref: '#/components/schemas/DataRecord'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cleaning
       x-service-base-path: /api/v1/data/cleaning
     post:
@@ -164,10 +167,13 @@ paths:
                       $ref: '#/components/schemas/Duplicate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cleaning
       x-service-base-path: /api/v1/data/cleaning
     post:
@@ -278,10 +284,13 @@ paths:
                       $ref: '#/components/schemas/Merge'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cleaning
       x-service-base-path: /api/v1/data/cleaning
     post:
@@ -377,6 +386,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -384,6 +394,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

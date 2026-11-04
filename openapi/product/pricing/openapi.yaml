@@ -34,10 +34,13 @@ paths:
                       $ref: '#/components/schemas/PriceList'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_price_list
       summary: Create price-list
@@ -138,10 +141,13 @@ paths:
                       $ref: '#/components/schemas/PriceRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_price_rule
       summary: Create price-rule
@@ -242,10 +248,13 @@ paths:
                       $ref: '#/components/schemas/Discount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_discount
       summary: Create discount
@@ -371,6 +380,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -378,6 +388,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

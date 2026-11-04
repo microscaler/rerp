@@ -38,12 +38,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -56,6 +58,7 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
         description: Filter by fiscal year
       - name: status
         in: query
@@ -471,12 +474,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -732,6 +737,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -741,6 +747,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -776,14 +783,17 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           description: Total number of records
           example: 1
         page:
           type: integer
+          format: int32
           description: Current page number
           example: 1
         limit:
           type: integer
+          format: int32
           description: Page size limit
           example: 1
     Budget:
@@ -813,12 +823,14 @@ components:
           example: Primary operating company
         fiscal_year:
           type: integer
+          format: int32
           minimum: 2000
           maximum: 2100
           description: Fiscal year this budget covers
           example: '2026'
         version:
           type: integer
+          format: int32
           minimum: 1
           default: 1
           description: Budget version number
@@ -946,11 +958,13 @@ components:
           example: Primary operating company
         fiscal_year:
           type: integer
+          format: int32
           minimum: 2000
           maximum: 2100
           example: '2026'
         version:
           type: integer
+          format: int32
           minimum: 1
           default: 1
           example: '1.0'
@@ -1178,6 +1192,7 @@ components:
           example: Q1 2026 Budget
         fiscal_year:
           type: integer
+          format: int32
           example: '2026'
         currency_code:
           type: string
@@ -1452,6 +1467,7 @@ components:
           example: 1000.0
         revision_number:
           type: integer
+          format: int32
           example: 1
         status:
           type: string
@@ -1514,6 +1530,7 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
     PaginatedBudgets:
       type: object
@@ -1530,12 +1547,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -1555,12 +1575,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean
@@ -1580,12 +1603,15 @@ components:
           example: []
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
         has_more:
           type: boolean

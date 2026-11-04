@@ -47,6 +47,7 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 50
@@ -185,6 +186,7 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 50
@@ -719,6 +721,7 @@ components:
             $ref: '#/components/schemas/LedgerAccount'
         limit:
           type: integer
+          format: int32
     CreateLedgerAccountRequest:
       type: object
       additionalProperties: false
@@ -842,6 +845,7 @@ components:
             $ref: '#/components/schemas/FiscalPeriod'
         limit:
           type: integer
+          format: int32
     JournalLine:
       type: object
       required:
@@ -854,6 +858,7 @@ components:
       properties:
         line_number:
           type: integer
+          format: int32
         account_id:
           type: string
           format: uuid
@@ -1108,6 +1113,7 @@ components:
       properties:
         line_number:
           type: integer
+          format: int32
         account_id:
           type: string
           format: uuid
@@ -1213,6 +1219,7 @@ components:
           description: Unique per legal entity for opening balances.
         fiscal_year:
           type: integer
+          format: int32
           minimum: 2000
           maximum: 2100
         currency_code:
@@ -1236,6 +1243,7 @@ components:
       properties:
         fiscal_year:
           type: integer
+          format: int32
         fiscal_period_id:
           type: string
           format: uuid
@@ -1266,6 +1274,7 @@ components:
           description: Unique per legal entity for the year close.
         fiscal_year:
           type: integer
+          format: int32
           minimum: 2000
           maximum: 2100
         retained_earnings_account_id:
@@ -1285,6 +1294,7 @@ components:
       properties:
         fiscal_year:
           type: integer
+          format: int32
         journal_entry_id:
           type: string
           format: uuid
@@ -1302,6 +1312,7 @@ components:
           description: Positive for profit, negative for loss, as a NUMERIC(19,6) decimal string
         line_count:
           type: integer
+          format: int32
           minimum: 2
     AccountTypeRollup:
       type: object

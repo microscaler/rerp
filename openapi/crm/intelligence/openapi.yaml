@@ -76,8 +76,10 @@ paths:
                 properties:
                   scores_computed:
                     type: integer
+                    format: int32
                   time_ms:
                     type: integer
+                    format: int32
               examples:
                 default: &id001
                   scores_computed: 5
@@ -346,8 +348,10 @@ paths:
                 properties:
                   records_processed:
                     type: integer
+                    format: int32
                   frequencies_updated:
                     type: integer
+                    format: int32
               examples:
                 default:
                   success: true
@@ -768,10 +772,13 @@ paths:
                 properties:
                   processed:
                     type: integer
+                    format: int32
                   successful:
                     type: integer
+                    format: int32
                   failed:
                     type: integer
+                    format: int32
                   results:
                     type: array
                     items:
@@ -1023,10 +1030,13 @@ paths:
                 properties:
                   total:
                     type: integer
+                    format: int64
                   valid:
                     type: integer
+                    format: int32
                   invalid:
                     type: integer
+                    format: int32
                   results:
                     type: array
                     items:
@@ -1167,6 +1177,7 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+                    format: int64
               examples:
                 default: &id007
                   total_matches: 150
@@ -1232,6 +1243,7 @@ paths:
                       $ref: '#/components/schemas/DiscoveredLead'
                   total:
                     type: integer
+                    format: int64
               examples:
                 default: &id008
                   total_matches: 50
@@ -1277,6 +1289,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -1285,6 +1298,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1346,6 +1360,7 @@ components:
           readOnly: true
         total_records:
           type: integer
+          format: int64
           readOnly: true
       description: A lead score with its calculated value and level
     ScoreExplanation:
@@ -1377,6 +1392,7 @@ components:
                 description: Positive pushes up, negative pushes down
         total_records:
           type: integer
+          format: int64
       required:
       - lead_id
       - probability
@@ -1402,13 +1418,16 @@ components:
           maxLength: 255
         won_count:
           type: integer
+          format: int32
         lost_count:
           type: integer
+          format: int32
         team_id:
           type: string
           format: uuid
         total:
           type: integer
+          format: int64
           readOnly: true
       description: Configuration for how often lead scores should be recalculated
     ScoringThresholds:
@@ -1423,6 +1442,7 @@ components:
           properties:
             min:
               type: integer
+              format: int32
             label:
               type: string
             color:
@@ -1432,8 +1452,10 @@ components:
           properties:
             min:
               type: integer
+              format: int32
             max:
               type: integer
+              format: int32
             label:
               type: string
             color:
@@ -1443,6 +1465,7 @@ components:
           properties:
             max:
               type: integer
+              format: int32
             label:
               type: string
             color:
@@ -1453,8 +1476,10 @@ components:
       properties:
         hot_threshold:
           type: integer
+          format: int32
         warm_threshold:
           type: integer
+          format: int32
       required:
       - hot_threshold
       - warm_threshold
@@ -1533,6 +1558,7 @@ components:
               type: string
             employee_count:
               type: integer
+              format: int32
             annual_revenue:
               type: number
               format: double
@@ -1648,6 +1674,7 @@ components:
           - LINKEDIN
         limit:
           type: integer
+          format: int32
           default: 50
       description: Request body for searching ICP-matched leads
     ICPMatchRequest:
@@ -1660,6 +1687,7 @@ components:
           description: Ideal Customer Profile definition
         limit:
           type: integer
+          format: int32
           default: 50
       description: Request body for matching leads against ideal customer profile
     DiscoveredLead:
@@ -1761,10 +1789,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     ErrorResponse:
@@ -1775,6 +1806,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -1824,6 +1856,7 @@ components:
           type: string
         rank:
           type: integer
+          format: int32
         score:
           type: number
           format: float

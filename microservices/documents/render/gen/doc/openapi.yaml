@@ -438,6 +438,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -445,6 +446,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -651,6 +653,7 @@ components:
           format: uuid
         version_number:
           type: integer
+          format: int32
           minimum: 1
         template_contract:
           type: string
@@ -901,8 +904,10 @@ components:
             $ref: '#/components/schemas/DocumentTemplate'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64
@@ -916,8 +921,10 @@ components:
             $ref: '#/components/schemas/DocumentTemplateVersion'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64
@@ -931,8 +938,10 @@ components:
             $ref: '#/components/schemas/DocumentRendition'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64

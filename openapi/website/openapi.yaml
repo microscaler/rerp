@@ -54,10 +54,13 @@ paths:
                       $ref: '#/components/schemas/Cart'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
@@ -168,10 +171,13 @@ paths:
                       $ref: '#/components/schemas/Checkout'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
@@ -282,10 +288,13 @@ paths:
                       $ref: '#/components/schemas/Content'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
@@ -396,10 +405,13 @@ paths:
                       $ref: '#/components/schemas/Media'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
@@ -510,10 +522,13 @@ paths:
                       $ref: '#/components/schemas/Page'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
@@ -624,10 +639,13 @@ paths:
                       $ref: '#/components/schemas/Seo'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: cms
       x-service-base-path: /api/v1/website/cms
     post:
@@ -738,10 +756,13 @@ paths:
                       $ref: '#/components/schemas/Store'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: ecommerce
       x-service-base-path: /api/v1/website/ecommerce
     post:
@@ -852,10 +873,13 @@ paths:
                       $ref: '#/components/schemas/Template'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
@@ -966,10 +990,13 @@ paths:
                       $ref: '#/components/schemas/Widget'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: builder
       x-service-base-path: /api/v1/website/builder
     post:
@@ -1065,6 +1092,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1072,6 +1100,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

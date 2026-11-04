@@ -58,10 +58,13 @@ paths:
                       $ref: '#/components/schemas/Fulfillment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
@@ -172,10 +175,13 @@ paths:
                       $ref: '#/components/schemas/LoyaltyProgram'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
@@ -286,10 +292,13 @@ paths:
                       $ref: '#/components/schemas/OrderLine'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
@@ -400,10 +409,13 @@ paths:
                       $ref: '#/components/schemas/Order'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: order
       x-service-base-path: /api/v1/sales/order
     post:
@@ -514,10 +526,13 @@ paths:
                       $ref: '#/components/schemas/Plan'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
@@ -628,10 +643,13 @@ paths:
                       $ref: '#/components/schemas/PointsTransaction'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
@@ -742,10 +760,13 @@ paths:
                       $ref: '#/components/schemas/Quotation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     post:
@@ -856,10 +877,13 @@ paths:
                       $ref: '#/components/schemas/QuoteLine'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: quotation
       x-service-base-path: /api/v1/sales/quotation
     post:
@@ -970,10 +994,13 @@ paths:
                       $ref: '#/components/schemas/Quote'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/sales/core
     post:
@@ -1084,10 +1111,13 @@ paths:
                       $ref: '#/components/schemas/Renewal'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
@@ -1198,10 +1228,13 @@ paths:
                       $ref: '#/components/schemas/Reward'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: loyalty
       x-service-base-path: /api/v1/sales/loyalty
     post:
@@ -1312,10 +1345,13 @@ paths:
                       $ref: '#/components/schemas/Sale'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/sales/core
     post:
@@ -1426,10 +1462,13 @@ paths:
                       $ref: '#/components/schemas/Subscription'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: subscription
       x-service-base-path: /api/v1/sales/subscription
     post:
@@ -1525,6 +1564,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1532,6 +1572,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

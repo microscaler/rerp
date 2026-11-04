@@ -153,6 +153,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -160,6 +161,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -246,10 +248,13 @@ components:
           properties:
             total:
               type: integer
+              format: int64
             completed:
               type: integer
+              format: int32
             failed:
               type: integer
+              format: int32
         result_json:
           type: [object, 'null']
         created_at:
@@ -310,6 +315,7 @@ components:
           type: [string, 'null']
         retry_count:
           type: integer
+          format: int32
           default: 0
         started_at:
           type: string
@@ -402,6 +408,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
           description: Page numbers to split (if omitted, splits by separator detection)
     SplitResult:
       type: object
@@ -421,6 +428,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
     MergeRequest:
       type: object
       required:
@@ -472,10 +480,13 @@ components:
             $ref: '#/components/schemas/ExecutionDetail'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     Error:
       type: object
       required:

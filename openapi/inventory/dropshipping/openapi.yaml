@@ -37,10 +37,13 @@ paths:
                       $ref: '#/components/schemas/DropshipOrder'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Unauthorized - invalid or missing authentication token
         '409':
@@ -221,10 +224,13 @@ paths:
                       $ref: '#/components/schemas/VendorOrder'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Unauthorized - invalid or missing authentication token
         '409':
@@ -390,6 +396,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -397,6 +404,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

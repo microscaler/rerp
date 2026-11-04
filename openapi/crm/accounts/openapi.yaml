@@ -50,12 +50,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -346,12 +348,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -397,12 +401,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -503,6 +509,7 @@ components:
           - ENTERPRISE
         employees:
           type: integer
+          format: int32
         annual_revenue:
           type: number
           format: double
@@ -544,6 +551,7 @@ components:
           default: true
         color:
           type: integer
+          format: int32
           minimum: 1
           maximum: 16
         create_date:
@@ -556,9 +564,11 @@ components:
           readOnly: true
         contact_count:
           type: integer
+          format: int32
           readOnly: true
         active_lead_count:
           type: integer
+          format: int32
           readOnly: true
         total_revenue:
           type: number
@@ -613,6 +623,7 @@ components:
           - ENTERPRISE
         employees:
           type: integer
+          format: int32
         annual_revenue:
           type: number
           format: double
@@ -659,6 +670,7 @@ components:
           - ENTERPRISE
         employees:
           type: integer
+          format: int32
         annual_revenue:
           type: number
         description:
@@ -760,8 +772,10 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
               active_leads:
                 type: integer
+                format: int32
         by_size:
           type: array
           items:
@@ -771,10 +785,13 @@ components:
                 type: string
               count:
                 type: integer
+                format: int32
         total_accounts:
           type: integer
+          format: int32
         total_employees:
           type: integer
+          format: int32
       required:
       - by_industry
       - by_size
@@ -799,6 +816,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -816,10 +834,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination metadata
     PaginatedAccount:
       allOf:
@@ -881,6 +902,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -889,6 +911,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

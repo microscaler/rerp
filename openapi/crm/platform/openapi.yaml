@@ -573,6 +573,7 @@ paths:
                     type: boolean
                   response_code:
                     type: integer
+                    format: int32
               examples:
                 default:
                   success: true
@@ -754,6 +755,7 @@ paths:
                       $ref: '#/components/schemas/AuditLogEntry'
                   total:
                     type: integer
+                    format: int64
               examples:
                 default:
                   entity: lead
@@ -904,6 +906,8 @@ paths:
                     type: object
                   rate_limit_remaining:
                     type: integer
+                    format: int32
+                    format: int32
               examples: &id006
                 default:
                   valid: true
@@ -1121,6 +1125,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -1129,6 +1134,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1285,6 +1291,7 @@ components:
           description: Custom HTTP headers (JSON)
         retry_count:
           type: integer
+          format: int32
           default: 3
         last_triggered:
           type: string
@@ -1319,6 +1326,7 @@ components:
           type: object
         retry_count:
           type: integer
+          format: int32
       description: Request body for creating a webhook endpoint
     UpdateWebhookRequest:
       type: object
@@ -1339,6 +1347,7 @@ components:
           type: object
         retry_count:
           type: integer
+          format: int32
       required:
       - name
       - url
@@ -1362,6 +1371,7 @@ components:
           type: object
         response_status:
           type: integer
+          format: int32
         response_body:
           type: string
         delivered_at:
@@ -1369,6 +1379,7 @@ components:
           format: date-time
         retry_count:
           type: integer
+          format: int32
       required:
       - webhook_id
       - event
@@ -1433,6 +1444,7 @@ components:
           description: Allowed scopes per entity
         rate_limit:
           type: integer
+          format: int32
         ip_whitelist:
           type: array
           items:
@@ -1463,6 +1475,7 @@ components:
           description: Permissions object
         rate_limit:
           type: integer
+          format: int32
         ip_whitelist:
           type: array
           items:
@@ -1598,10 +1611,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     ErrorResponse:
@@ -1612,6 +1628,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string

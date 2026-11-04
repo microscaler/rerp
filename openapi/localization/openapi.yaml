@@ -52,10 +52,13 @@ paths:
                       $ref: '#/components/schemas/AuditLog'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
@@ -166,10 +169,13 @@ paths:
                       $ref: '#/components/schemas/ComplianceRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
@@ -280,10 +286,13 @@ paths:
                       $ref: '#/components/schemas/Currency'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
@@ -394,10 +403,13 @@ paths:
                       $ref: '#/components/schemas/Locale'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
@@ -508,10 +520,13 @@ paths:
                       $ref: '#/components/schemas/Policy'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: compliance
       x-service-base-path: /api/v1/localization/compliance
     post:
@@ -622,10 +637,13 @@ paths:
                       $ref: '#/components/schemas/Translation'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: core
       x-service-base-path: /api/v1/localization/core
     post:
@@ -721,6 +739,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -728,6 +747,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

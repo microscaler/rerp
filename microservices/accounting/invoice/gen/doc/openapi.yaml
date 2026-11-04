@@ -49,12 +49,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -311,12 +313,14 @@ paths:
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           default: 1
       - name: limit
         in: query
         schema:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
           default: 20
@@ -480,6 +484,7 @@ components:
           pattern: ^[A-Z]{3}$
         rounding_minor_units:
           type: integer
+          format: int32
           minimum: 0
           maximum: 6
           default: 2
@@ -535,6 +540,7 @@ components:
       properties:
         line_number:
           type: integer
+          format: int32
         description:
           type: string
         quantity:
@@ -619,6 +625,7 @@ components:
           type: string
         rounding_minor_units:
           type: integer
+          format: int32
         subtotal:
           type: string
           pattern: ^-?[0-9]+(?:\.[0-9]{1,6})?$
@@ -699,10 +706,13 @@ components:
             $ref: '#/components/schemas/PostedInvoiceSummary'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         has_more:
           type: boolean
     JournalLine:
@@ -716,6 +726,7 @@ components:
       properties:
         line_number:
           type: integer
+          format: int32
         account_id:
           type: string
           format: uuid
@@ -872,6 +883,7 @@ components:
           - DONE
         attempts:
           type: integer
+          format: int32
           minimum: 0
         last_error:
           type: [string, 'null']
@@ -897,13 +909,16 @@ components:
             $ref: '#/components/schemas/RenderOutboxEntry'
         page:
           type: integer
+          format: int32
           minimum: 1
         limit:
           type: integer
+          format: int32
           minimum: 1
           maximum: 100
         total:
           type: integer
+          format: int64
           minimum: 0
     CreditLineInput:
       type: object
@@ -913,6 +928,7 @@ components:
       properties:
         original_line_number:
           type: integer
+          format: int32
           minimum: 1
           description: Line number on the original customer invoice
         quantity:
@@ -958,6 +974,7 @@ components:
       properties:
         original_line_number:
           type: integer
+          format: int32
           minimum: 1
           description: Line number on the original customer invoice
         quantity:

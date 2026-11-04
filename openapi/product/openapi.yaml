@@ -54,10 +54,13 @@ paths:
                       $ref: '#/components/schemas/Attribute'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
@@ -212,10 +215,13 @@ paths:
                       $ref: '#/components/schemas/Category'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
@@ -326,10 +332,13 @@ paths:
                       $ref: '#/components/schemas/Discount'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
@@ -440,10 +449,13 @@ paths:
                       $ref: '#/components/schemas/PriceList'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
@@ -576,10 +588,13 @@ paths:
                       $ref: '#/components/schemas/PriceRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: pricing
       x-service-base-path: /api/v1/product/pricing
     post:
@@ -690,10 +705,13 @@ paths:
                       $ref: '#/components/schemas/Product'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
@@ -869,10 +887,13 @@ paths:
                       $ref: '#/components/schemas/TaxRate'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     post:
@@ -983,10 +1004,13 @@ paths:
                       $ref: '#/components/schemas/TaxRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: tax
       x-service-base-path: /api/v1/product/tax
     post:
@@ -1097,10 +1121,13 @@ paths:
                       $ref: '#/components/schemas/Variant'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
       x-service: catalog
       x-service-base-path: /api/v1/product/catalog
     post:
@@ -1196,6 +1223,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -1203,6 +1231,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

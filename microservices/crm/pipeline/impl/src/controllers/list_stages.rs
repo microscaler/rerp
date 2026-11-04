@@ -23,7 +23,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             })
         })
         .collect();
-    let total = items.len() as i32;
+    let total = items.len();
     HttpJson::new(
         200,
         json!({ "items": items, "total": total, "page": 1, "limit": total.max(1) }),

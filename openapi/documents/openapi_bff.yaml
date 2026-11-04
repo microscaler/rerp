@@ -84,15 +84,21 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: [string, 'null']
+                  type:
+                  - string
+                  - 'null'
                   format: uuid
                   description: Target folder ID for all documents
                 metadata:
-                  type: [object, 'null']
+                  type:
+                  - object
+                  - 'null'
                   description: Shared metadata applied to all documents
                   additionalProperties: true
                 per_file_metadata:
-                  type: [array, 'null']
+                  type:
+                  - array
+                  - 'null'
                   items:
                     type: object
                     additionalProperties: true
@@ -167,6 +173,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
           content:
             application/json:
               schema:
@@ -201,6 +208,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
           content:
             application/json:
               schema:
@@ -391,14 +399,18 @@ paths:
         in: query
         required: false
         schema:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         description: Filter by folder
       - name: document_type
         in: query
         required: false
         schema:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         description: Filter by document type
       responses:
         '200':
@@ -446,9 +458,13 @@ paths:
                 title:
                   type: string
                 document_type:
-                  type: [string, 'null']
+                  type:
+                  - string
+                  - 'null'
                 folder_id:
-                  type: [string, 'null']
+                  type:
+                  - string
+                  - 'null'
                   format: uuid
                 tags:
                   type: array
@@ -521,6 +537,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
           content:
             application/json:
               schema:
@@ -723,6 +740,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
               description: Seconds to wait before retrying
           content:
             application/json:
@@ -804,6 +822,7 @@ paths:
             Retry-After:
               schema:
                 type: integer
+                format: int32
               description: Seconds to wait before retrying
           content:
             application/json:
@@ -991,7 +1010,9 @@ paths:
         in: query
         required: false
         schema:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
       responses:
         '200':
@@ -1174,7 +1195,9 @@ paths:
                   type: string
                   format: binary
                 note:
-                  type: [string, 'null']
+                  type:
+                  - string
+                  - 'null'
                 metadata:
                   type: object
                   additionalProperties: true
@@ -1268,10 +1291,13 @@ paths:
                       $ref: '#/components/schemas/IntakeEmailAlias'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
         '401':
           description: Authentication required
           content:
@@ -1716,15 +1742,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentRendition'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/RenderBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
         '422':
-          $ref: '#/components/responses/Unprocessable'
+          $ref: '#/components/responses/RenderUnprocessable'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/renditions
@@ -1745,11 +1771,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentRendition'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}
@@ -1783,15 +1809,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentRendition'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/RenderBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}/copies
@@ -1813,13 +1839,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderAuthorizedDownload'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/renditions/{rendition_id}/download
@@ -2195,9 +2221,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderRenditionPage'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/sources/{source_suite}/{source_type}/{source_id}/renditions
@@ -2218,11 +2244,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplateVersion'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}
@@ -2250,15 +2276,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderPreviewResult'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/RenderBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
         '422':
-          $ref: '#/components/responses/Unprocessable'
+          $ref: '#/components/responses/RenderUnprocessable'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/preview
@@ -2280,15 +2306,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplateVersion'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
         '422':
-          $ref: '#/components/responses/Unprocessable'
+          $ref: '#/components/responses/RenderUnprocessable'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/publish
@@ -2310,13 +2336,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplateVersion'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/retire
@@ -2338,11 +2364,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderTemplateValidationResult'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/template-versions/{version_id}/validate
@@ -2363,7 +2389,7 @@ paths:
       - name: status
         in: query
         schema:
-          $ref: '#/components/schemas/TemplateStatus'
+          $ref: '#/components/schemas/RenderTemplateStatus'
       responses:
         '200':
           description: Paginated templates
@@ -2372,9 +2398,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderTemplatePage'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/templates
@@ -2399,13 +2425,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplate'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/RenderBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '409':
-          $ref: '#/components/responses/Conflict'
+          $ref: '#/components/responses/RenderConflict'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/templates
@@ -2426,11 +2452,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplate'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}
@@ -2453,11 +2479,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderTemplateVersionPage'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}/versions
@@ -2484,13 +2510,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/RenderDocumentTemplateVersion'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: '#/components/responses/RenderBadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/RenderUnauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/RenderForbidden'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/RenderNotFound'
       x-service: render
       x-service-base-path: /api/documents/render
       x-brrtrouter-downstream-path: /api/documents/render/templates/{template_id}/versions
@@ -2519,11 +2545,15 @@ paths:
                   format: uuid
                   description: Organization ID (RLS-scoped)
                 folder_id:
-                  type: [string, 'null']
+                  type:
+                  - string
+                  - 'null'
                   format: uuid
                   description: Target folder ID
                 metadata:
-                  type: [object, 'null']
+                  type:
+                  - object
+                  - 'null'
                   description: Arbitrary metadata (source, tags, sender_email)
                   additionalProperties: true
       responses:
@@ -2596,6 +2626,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -2603,6 +2634,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -2646,7 +2678,9 @@ components:
           format: uuid
           description: Job ID for polling via GET /analysis/{id}
         document_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Null if bulk analysis
         query:
@@ -2667,7 +2701,9 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     AnalyzeAnalysisResult:
       type: object
@@ -2681,7 +2717,9 @@ components:
           type: string
           format: uuid
         document_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Null if bulk analysis
         query:
@@ -2696,6 +2734,7 @@ components:
             properties:
               page:
                 type: integer
+                format: int32
               text:
                 type: string
               confidence:
@@ -2707,10 +2746,13 @@ components:
           properties:
             prompt_tokens:
               type: integer
+              format: int32
             completion_tokens:
               type: integer
+              format: int32
             total_tokens:
               type: integer
+              format: int32
         model:
           type: string
         created_at:
@@ -2740,7 +2782,9 @@ components:
           maxItems: 20
           description: Document UUIDs to analyze (max 20)
         model:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Optional model override
     AnalyzeAnalyzeRequest:
       type: object
@@ -2757,14 +2801,18 @@ components:
           maxLength: 2000
           description: Free-text question about the document
         model:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Optional model override
         context_window:
           type: integer
+          format: int32
           default: 4000
           description: Token context window size
         max_tokens:
           type: integer
+          format: int32
           default: 2000
           description: Maximum tokens in the response
     AnalyzeError:
@@ -2780,7 +2828,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     ClassifyClassification:
       type: object
@@ -2805,11 +2855,15 @@ components:
           format: decimal
           description: Classification confidence (0.0-1.0)
         classifier_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Classifier used
         rerp_module:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Target RERP module (e.g. accounts-payable, hr-recruitment)
         created_at:
           type: string
@@ -2837,7 +2891,9 @@ components:
           - complete
           - failed
         classifier_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         result:
           oneOf:
@@ -2848,7 +2904,9 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     ClassifyClassifier:
       type: object
@@ -2875,13 +2933,17 @@ components:
             type: string
           description: Supported document type labels
         model_params:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Model configuration parameters
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     ClassifyClassifierDef:
       type: object
@@ -2890,7 +2952,9 @@ components:
       - name
       properties:
         id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Omitted to create new; include to update
         org_id:
@@ -2905,7 +2969,9 @@ components:
           items:
             type: string
         model_params:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
     ClassifyClassifiersListResponse:
       type: object
       required:
@@ -2920,10 +2986,13 @@ components:
             $ref: '#/components/schemas/ClassifyClassifier'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     ClassifyClassifyRequest:
       type: object
       properties:
@@ -2932,7 +3001,9 @@ components:
           format: uuid
           description: Organization ID for RLS
         classifier_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Optional custom classifier ID; if omitted uses default
     ClassifyError:
@@ -2948,7 +3019,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     ConfirmationAutoApproveRule:
       type: object
@@ -2991,7 +3064,9 @@ components:
       - min_confidence
       properties:
         id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Omitted to create new; include to update
         org_id:
@@ -3024,10 +3099,13 @@ components:
             $ref: '#/components/schemas/ConfirmationAutoApproveRule'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     ConfirmationBatchApproveRequest:
       type: object
       required:
@@ -3048,10 +3126,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         success:
           type: integer
+          format: int32
         failed:
           type: integer
+          format: int32
         results:
           type: array
           items:
@@ -3063,7 +3144,9 @@ components:
               success:
                 type: boolean
               error:
-                type: [string, 'null']
+                type:
+                - string
+                - 'null'
     ConfirmationConfirmation:
       type: object
       required:
@@ -3081,7 +3164,9 @@ components:
           type: string
           format: uuid
         execution_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Associated pipeline execution
         status:
@@ -3099,20 +3184,30 @@ components:
           type: object
           description: Extraction results awaiting review
         extracted_data:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Structured extracted fields
         confidence:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: decimal
         target_module:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         target_endpoint:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         created_at:
           type: string
           format: date-time
         confirmed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     ConfirmationConfirmationApproved:
       type: object
@@ -3142,7 +3237,9 @@ components:
           enum:
           - approved
         created_record_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Record ID created in target module
         target_module:
@@ -3166,10 +3263,13 @@ components:
             $ref: '#/components/schemas/ConfirmationConfirmation'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     ConfirmationCorrectRequest:
       type: object
       required:
@@ -3195,7 +3295,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     ConfirmationMergeRequest:
       type: object
@@ -3264,6 +3366,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
           description: Page numbers to split (if omitted, splits by separator detection)
     ConfirmationSplitResult:
       type: object
@@ -3283,6 +3386,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
     CoreCreateFolderRequest:
       type: object
       required:
@@ -3295,7 +3399,9 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
     CoreCreateVersionRequest:
       type: object
@@ -3310,7 +3416,9 @@ components:
           format: binary
           description: New file content for the version
         note:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
     CoreDocument:
       type: object
       required:
@@ -3330,10 +3438,14 @@ components:
         title:
           type: string
         document_type:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: e.g., invoice, contract, resume
         folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Parent folder
         file_name:
@@ -3350,11 +3462,15 @@ components:
           type: string
           description: S3 storage path for the file
         current_version_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Latest version ID
         tags:
-          type: [array, 'null']
+          type:
+          - array
+          - 'null'
           items:
             type: string
         status:
@@ -3368,7 +3484,9 @@ components:
           type: string
           format: date-time
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     CoreError:
       type: object
@@ -3383,7 +3501,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
           description: Additional context for debugging
     CoreFolder:
@@ -3403,11 +3523,15 @@ components:
         name:
           type: string
         parent_folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Parent folder, null for root
         path:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Full path (e.g., /finance/invoices/2024)
         created_at:
           type: string
@@ -3426,10 +3550,13 @@ components:
             $ref: '#/components/schemas/CoreFolder'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     CorePaginatedDocuments:
       type: object
       required:
@@ -3444,10 +3571,13 @@ components:
             $ref: '#/components/schemas/CoreDocument'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     CorePaginatedVersions:
       type: object
       required:
@@ -3462,10 +3592,13 @@ components:
             $ref: '#/components/schemas/CoreVersion'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     CorePresignedUrl:
       type: object
       required:
@@ -3494,14 +3627,22 @@ components:
           type: string
           format: uuid
         title:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         document_type:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         tags:
-          type: [array, 'null']
+          type:
+          - array
+          - 'null'
           items:
             type: string
     CoreUpdateFolderRequest:
@@ -3513,9 +3654,13 @@ components:
           type: string
           format: uuid
         name:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         parent_folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
     CoreVersion:
       type: object
@@ -3533,6 +3678,7 @@ components:
           format: uuid
         version_number:
           type: integer
+          format: int32
           description: Sequential version number (1, 2, ...)
         org_id:
           type: string
@@ -3547,7 +3693,9 @@ components:
         content_type:
           type: string
         note:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         created_at:
           type: string
           format: date-time
@@ -3564,7 +3712,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Additional details
           additionalProperties: true
     ExtractError:
@@ -3580,7 +3730,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     ExtractExtractionJob:
       type: object
@@ -3605,13 +3757,17 @@ components:
           - complete
           - failed
         schema_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         created_at:
           type: string
           format: date-time
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     ExtractExtractionResult:
       type: object
@@ -3630,7 +3786,9 @@ components:
           type: string
           format: uuid
         schema_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         result_json:
           type: object
@@ -3681,6 +3839,7 @@ components:
           type: string
         page:
           type: integer
+          format: int32
         x:
           type: number
           format: float
@@ -3773,7 +3932,9 @@ components:
       - schema_def
       properties:
         id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Omitted to create new; include to update
         name:
@@ -3796,10 +3957,13 @@ components:
             $ref: '#/components/schemas/ExtractSchema'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     ExtractStandardizeRequest:
       type: object
       required:
@@ -3825,12 +3989,15 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           description: Total number of documents in the batch
         successful:
           type: integer
+          format: int32
           description: Number of documents successfully uploaded
         failed:
           type: integer
+          format: int32
           description: Number of documents that failed
         items:
           type: array
@@ -3842,6 +4009,7 @@ components:
             properties:
               index:
                 type: integer
+                format: int32
                 description: Zero-based index in the original files array
               status:
                 type: string
@@ -3850,11 +4018,15 @@ components:
                 - failed
                 description: Per-document status
               document_id:
-                type: [string, 'null']
+                type:
+                - string
+                - 'null'
                 format: uuid
                 description: Document ID if successful
               error:
-                type: [string, 'null']
+                type:
+                - string
+                - 'null'
                 description: Error message if failed
               filename:
                 type: string
@@ -3874,11 +4046,15 @@ components:
           format: uuid
           description: Organization ID (RLS-scoped)
         folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Target folder ID
         metadata:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Document metadata — source, tags, sender_email
           additionalProperties: true
     IntakeDocument:
@@ -3920,7 +4096,9 @@ components:
           type: string
           description: S3/MinIO storage path (s3://bucket/path/uuid.pdf)
         folder_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Target folder ID
         status:
@@ -3932,7 +4110,9 @@ components:
           - extracted
           - failed
         metadata:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: JSONB metadata — source (email/camera/webhook), tags, sender_email, etc.
           additionalProperties: true
         search_vector:
@@ -3947,7 +4127,9 @@ components:
           format: date-time
           description: Last update timestamp
         extraction_result:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: JSONB extraction result when available (schema-agnostic fields)
           additionalProperties: true
     IntakeEmailAlias:
@@ -3977,10 +4159,14 @@ components:
           type: string
           description: Target RERP suite (e.g., accounts, crm, hr, inventory)
         module:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Optional module within the suite (e.g., ap, ar)
         auto_approve:
-          type: [boolean, 'null']
+          type:
+          - boolean
+          - 'null'
           default: false
           description: Whether documents arriving via this alias should auto-approve
         created_at:
@@ -3988,7 +4174,9 @@ components:
           format: date-time
           description: Alias creation timestamp
         updated_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: Last update timestamp
     IntakeEmailAttachment:
@@ -4013,7 +4201,9 @@ components:
           format: int64
           description: File size in bytes
         metadata:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
           description: Optional additional metadata (e.g., checksum, encoding)
     IntakeEmailPayload:
@@ -4038,13 +4228,17 @@ components:
           format: email
           description: Sender email address
         cc:
-          type: [array, 'null']
+          type:
+          - array
+          - 'null'
           items:
             type: string
             format: email
           description: CC recipients
         bcc:
-          type: [array, 'null']
+          type:
+          - array
+          - 'null'
           items:
             type: string
             format: email
@@ -4056,7 +4250,9 @@ components:
           type: string
           description: Email body text
         body_html:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Email body in HTML format
         received_at:
           type: string
@@ -4068,7 +4264,9 @@ components:
             $ref: '#/components/schemas/IntakeEmailAttachment'
           description: List of file attachments from the email
         headers:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties:
             type: string
           description: Raw email headers (for debugging/trace)
@@ -4085,7 +4283,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Additional error details
           additionalProperties: true
     IntakeMobileStatus:
@@ -4098,20 +4298,27 @@ components:
       - processing_count
       properties:
         last_sync:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
           description: Timestamp of the last successful sync
         pending_count:
           type: integer
+          format: int32
           description: Number of documents pending upload from the mobile device
         processing_count:
           type: integer
+          format: int32
           description: Number of documents currently being processed (extract, classify, route)
         failed_count:
           type: integer
+          format: int32
           description: Number of documents that failed processing and need user attention
         sync_errors:
-          type: [array, 'null']
+          type:
+          - array
+          - 'null'
           items:
             type: object
             properties:
@@ -4128,7 +4335,9 @@ components:
                 description: When the error was recorded
           description: List of recent sync errors (up to last 10)
         device_info:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           properties:
             platform:
               type: string
@@ -4156,7 +4365,9 @@ components:
           - approve
           - reject
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
     PipelineConfirmation:
       type: object
       required:
@@ -4181,9 +4392,13 @@ components:
           - reject
           - correct
         notes:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         corrected_data:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         created_at:
           type: string
           format: date-time
@@ -4212,7 +4427,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     PipelineExecuteRequest:
       type: object
@@ -4229,11 +4446,15 @@ components:
             type: string
             format: uuid
         pipeline_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Optional custom pipeline; uses default if omitted
         pipeline_name:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: Alternative to pipeline_id — lookup by name within org
     PipelineExecutionDetail:
       type: object
@@ -4251,7 +4472,9 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         stage:
           type: string
@@ -4277,17 +4500,24 @@ components:
           - failed
           - skipped
         result_json:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         error_msg:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         retry_count:
           type: integer
+          format: int32
           default: 0
         started_at:
           type: string
           format: date-time
         completed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     PipelineExecutionsListResponse:
       type: object
@@ -4303,10 +4533,13 @@ components:
             $ref: '#/components/schemas/PipelineExecutionDetail'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     PipelineMergeRequest:
       type: object
       required:
@@ -4358,7 +4591,9 @@ components:
         name:
           type: string
         description:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         stages:
           type: array
           items:
@@ -4374,7 +4609,9 @@ components:
             - notify
           description: Ordered pipeline stages
         rules:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           description: Pipeline-level configuration overrides
         created_at:
           type: string
@@ -4386,7 +4623,9 @@ components:
       - stages
       properties:
         id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Omitted to create new; include to update
         name:
@@ -4407,7 +4646,9 @@ components:
             - create
             - notify
         rules:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
     PipelinePipelineJob:
       type: object
       required:
@@ -4420,7 +4661,9 @@ components:
           type: string
           format: uuid
         pipeline_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         document_ids:
           type: array
@@ -4436,23 +4679,32 @@ components:
           - failed
           - cancelled
         current_stage:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         progress:
           type: object
           properties:
             total:
               type: integer
+              format: int64
             completed:
               type: integer
+              format: int32
             failed:
               type: integer
+              format: int32
         result_json:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         created_at:
           type: string
           format: date-time
         completed_at:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: date-time
     PipelinePipelineResult:
       type: object
@@ -4461,15 +4713,23 @@ components:
           type: string
           format: uuid
         extraction:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         classification:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         routing:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
         confirmed:
           type: boolean
         created_record:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
     PipelineSplitRequest:
       type: object
       required:
@@ -4486,6 +4746,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
           description: Page numbers to split (if omitted, splits by separator detection)
     PipelineSplitResult:
       type: object
@@ -4505,6 +4766,7 @@ components:
           type: array
           items:
             type: integer
+            format: int32
     RenderAuthorizedDownload:
       type: object
       required:
@@ -4768,6 +5030,7 @@ components:
           format: uuid
         version_number:
           type: integer
+          format: int32
           minimum: 1
         template_contract:
           type: string
@@ -4859,8 +5122,10 @@ components:
             $ref: '#/components/schemas/RenderDocumentRendition'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64
@@ -4939,8 +5204,10 @@ components:
             $ref: '#/components/schemas/RenderDocumentTemplate'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64
@@ -4997,8 +5264,10 @@ components:
             $ref: '#/components/schemas/RenderDocumentTemplateVersion'
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
         total:
           type: integer
           format: int64
@@ -5033,7 +5302,9 @@ components:
           type: string
           description: Human-readable error message
         details:
-          type: [object, 'null']
+          type:
+          - object
+          - 'null'
           additionalProperties: true
     RoutesImportResult:
       type: object
@@ -5043,8 +5314,10 @@ components:
       properties:
         imported:
           type: integer
+          format: int32
         failed:
           type: integer
+          format: int32
         errors:
           type: array
           items:
@@ -5100,7 +5373,9 @@ components:
           type: string
           description: API endpoint to create/update record (e.g. /api/v1/accounts-payable/invoices)
         schema_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Extraction schema to use
         auto_approve:
@@ -5117,13 +5392,17 @@ components:
             type: string
           description: User roles or user IDs to notify
         fallback_route:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           description: What to do if confidence < threshold (e.g. manual_review)
         retry_count:
           type: integer
+          format: int32
           default: 3
         retry_delay:
           type: integer
+          format: int32
           default: 60
           description: Seconds between retries
         created_at:
@@ -5139,7 +5418,9 @@ components:
       - target_endpoint
       properties:
         id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
           description: Omitted to create new; include to update
         org_id:
@@ -5164,7 +5445,9 @@ components:
         target_endpoint:
           type: string
         schema_id:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
           format: uuid
         auto_approve:
           type: boolean
@@ -5179,12 +5462,16 @@ components:
             type: string
           default: []
         fallback_route:
-          type: [string, 'null']
+          type:
+          - string
+          - 'null'
         retry_count:
           type: integer
+          format: int32
           default: 3
         retry_delay:
           type: integer
+          format: int32
           default: 60
     RoutesRoutesListResponse:
       type: object
@@ -5200,10 +5487,13 @@ components:
             $ref: '#/components/schemas/RoutesRoute'
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
     RoutesTestResult:
       type: object
       required:
@@ -5217,7 +5507,9 @@ components:
           - $ref: '#/components/schemas/RoutesRoute'
           - type: 'null'
         confidence:
-          type: [number, 'null']
+          type:
+          - number
+          - 'null'
           format: decimal
         auto_approved:
           type: boolean
@@ -5242,3 +5534,40 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Sesame-issued bearer token validated by BRRTRouter
+  responses:
+    RenderBadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'
+    RenderConflict:
+      description: State or idempotency conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'
+    RenderForbidden:
+      description: Authenticated identity lacks permission in the derived tenant scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'
+    RenderNotFound:
+      description: Resource not found in the authenticated tenant scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'
+    RenderUnauthorized:
+      description: Missing or invalid Sesame identity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'
+    RenderUnprocessable:
+      description: Template, render-model, or policy validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RenderErrorResponse'

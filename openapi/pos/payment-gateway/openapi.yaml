@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/Payment'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_payment
       summary: Create payment
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/PaymentMethod'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_payment_method
       summary: Create payment-method
@@ -241,10 +247,13 @@ paths:
                       $ref: '#/components/schemas/Transaction'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_transaction
       summary: Create transaction
@@ -330,6 +339,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -337,6 +347,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

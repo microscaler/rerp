@@ -50,7 +50,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         })
         .collect();
 
-    let total = filtered.len() as i32;
+    let total = filtered.len();
     let page = data.page.unwrap_or(1).max(1);
     let limit = data.limit.unwrap_or(50).clamp(1, 100);
     let start = ((page - 1) * limit) as usize;

@@ -609,6 +609,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number (1-indexed)
@@ -618,6 +619,7 @@ components:
       required: false
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -921,6 +923,7 @@ components:
             message: Invalid format
         retry_count:
           type: integer
+          format: int32
           example: 0
         last_retry_at:
           type: [string, 'null']
@@ -1381,12 +1384,15 @@ components:
       properties:
         total:
           type: integer
+          format: int64
           example: 1
         page:
           type: integer
+          format: int32
           example: 1
         limit:
           type: integer
+          format: int32
           example: 1
     ErrorResponse:
       type: object
@@ -1396,6 +1402,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           example: '001'
         message:
           type: string

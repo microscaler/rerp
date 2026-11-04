@@ -33,10 +33,13 @@ paths:
                       $ref: '#/components/schemas/ComplianceRule'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_compliance_rule
       summary: Create compliance-rule
@@ -137,10 +140,13 @@ paths:
                       $ref: '#/components/schemas/AuditLog'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_audit_log
       summary: Create audit-log
@@ -241,10 +247,13 @@ paths:
                       $ref: '#/components/schemas/Policy'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_policy
       summary: Create policy
@@ -330,6 +339,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -337,6 +347,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

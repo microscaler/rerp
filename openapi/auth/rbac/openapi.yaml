@@ -34,10 +34,13 @@ paths:
                       $ref: '#/components/schemas/Role'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_role
       summary: Create role
@@ -138,10 +141,13 @@ paths:
                       $ref: '#/components/schemas/Permission'
                   total:
                     type: integer
+                    format: int64
                   page:
                     type: integer
+                    format: int32
                   limit:
                     type: integer
+                    format: int32
     post:
       operationId: create_permission
       summary: Create permission
@@ -391,6 +397,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
     Limit:
@@ -398,6 +405,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20

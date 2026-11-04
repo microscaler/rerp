@@ -70,7 +70,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "size_bytes")]
-    pub size_bytes: Option<i32>,
+    pub size_bytes: Option<i64>,
 
     #[serde(rename = "source")]
     pub source: SourceReference,

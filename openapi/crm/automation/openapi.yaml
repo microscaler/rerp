@@ -1006,6 +1006,7 @@ paths:
                     type: boolean
                   workflows_fired:
                     type: integer
+                    format: int32
               examples:
                 default:
                   success: true
@@ -1163,6 +1164,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         default: 1
       description: Page number for pagination (1-indexed)
@@ -1171,6 +1173,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
@@ -1228,6 +1231,7 @@ components:
           description: Additional AND/OR conditions (JSON)
         sequence:
           type: integer
+          format: int32
           description: Execution order (lower = earlier)
         created_at:
           type: string
@@ -1238,6 +1242,7 @@ components:
           format: date-time
         run_count:
           type: integer
+          format: int32
           readOnly: true
         last_run:
           type: string
@@ -1270,6 +1275,7 @@ components:
           type: object
         sequence:
           type: integer
+          format: int32
         is_active:
           type: boolean
           default: true
@@ -1293,6 +1299,7 @@ components:
           type: object
         sequence:
           type: integer
+          format: int32
         is_active:
           type: boolean
       required:
@@ -1335,6 +1342,7 @@ components:
           type: boolean
         sequence:
           type: integer
+          format: int32
         created_at:
           type: string
           format: date-time
@@ -1370,6 +1378,7 @@ components:
           type: boolean
         sequence:
           type: integer
+          format: int32
       description: Request body for creating a new workflow rule
     UpdateRuleRequest:
       type: object
@@ -1390,6 +1399,7 @@ components:
           type: boolean
         sequence:
           type: integer
+          format: int32
       required:
       - condition_field
       - condition_value
@@ -1516,6 +1526,7 @@ components:
           type: boolean
         actions_ran:
           type: integer
+          format: int32
         errors:
           type: array
           items:
@@ -1692,6 +1703,7 @@ components:
       properties:
         code:
           type: integer
+          format: int32
           description: HTTP error code
         message:
           type: string
@@ -1709,10 +1721,13 @@ components:
       properties:
         total:
           type: integer
+          format: int64
         page:
           type: integer
+          format: int32
         limit:
           type: integer
+          format: int32
       description: A generic paginated response wrapper with items and pagination
         metadata
     PaginatedWorkflow:
