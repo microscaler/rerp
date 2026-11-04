@@ -54,6 +54,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "reverse_payment_application",
+        crate::controllers::reverse_payment_application::ReversePaymentApplicationController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "get_customer_payment",
         crate::controllers::get_customer_payment::GetCustomerPaymentController,
         20480,
@@ -130,6 +136,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_payment_application::CreatePaymentApplicationController,
                     16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "reverse_payment_application" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reverse_payment_application::ReversePaymentApplicationController,
+                    20480,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

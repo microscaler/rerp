@@ -15,6 +15,8 @@ pub mod create_customer_payment;
 
 pub mod create_payment_application;
 
+pub mod reverse_payment_application;
+
 pub mod get_customer_payment;
 
 pub mod list_payment_applications;
