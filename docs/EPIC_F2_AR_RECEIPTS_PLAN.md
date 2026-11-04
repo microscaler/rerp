@@ -87,10 +87,21 @@ open items, and the overlay projection/agreement suite this epic builds on.
 ### F2c — allocation reversal with audit linkage
 - Contract addition (separate spec commit first, then regen):
   `POST /payments/applications/{id}/reverse` → reverses the pair row's applied
-  amount in full, journaling a `REVERSED` event with actor + reason (audit
-  linkage without violating the `applied_amount > 0` CHECK).
-- Re-application after reversal resets the pair row and is journaled as a fresh
-  `APPLIED` event (history lives in the events table).
+  amount in full, journaling a `REVERSED` event with actor + reason. Delivered
+  via DELIBERATE constraint change (migration 0009): the 0006 inline
+  `applied_amount > 0` becomes a named `>= 0` — deleting the pair row would
+  CASCADE the event journal, so the row survives at zero and the CHECK now
+  permits exactly that. The journal remains immutable (0008 trigger).
+- Re-application after reversal accumulates onto the SAME pair row from zero
+  and is journaled as a fresh `APPLIED` event (pair identity survives).
+- Idempotency (also a contract addition): `POST /payments` requires
+  `idempotency_key` (per legal entity, GL fingerprint discipline over every
+  body field including `reason` for reversals); identical-body replay
+  re-serves the stored payment before any duplicate guard fires; fingerprint
+  mismatch is 409. AR records carry the subject id in `source_id` and leave
+  `document_id` NULL (it FKs posted documents).
+- Read axis hides reversed rows (`applied = 0`): application list, open-item
+  payment history, and the payment `applied_at` stamp all filter `> 0`.
 
 ### F2d — receipts acceptance suite
 - Live (disposable-DB pattern from F1c, never the farm's scaled-down shared

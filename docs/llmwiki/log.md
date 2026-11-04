@@ -980,3 +980,27 @@ ref-rewritten) the whole accounting suite — including
   clippy -D warnings all-targets clean.
 - Next: F2c reversal (spec commit first, then regen) + idempotency-key
   discussion, F2d receipts identity acceptance suite.
+
+## [2026-11-02] contribute | F2c reversal + idempotency live (Epic F2 3/4)
+
+- PR #146 (feat/accounting-f2c-reversal), spec-first commits: contract
+  (required idempotency_key on POST /payments; POST
+  /payments/applications/{id}/reverse), disposable regen, behavior.
+- Reversal semantics: the pair row SURVIVES at applied_amount 0 —
+  migration 0009 replaces the 0006 inline CHECK (>0) with a named >= 0,
+  because the events journal FKs the pair row and CASCADE would destroy
+  the audit trail. Money returns in full to payment + overlay (F1c
+  refresh); a REVERSED event carries actor, time, required reason;
+  re-apply accumulates on the same pair row as a fresh APPLIED event.
+- Idempotency rides accounting_idempotency_records with GL fingerprints
+  (tenant+entity+action+every body field; reason included on reversals);
+  replay re-serves value-for-value before the duplicate-reference guard;
+  mismatch is 409. AR leaves document_id NULL — it FKs posted documents
+  (live test caught the violation).
+- Read axis filters applied > 0 in application list, open-item history,
+  and applied_at stamps.
+- Proof: 18 units + 7 live (idempotent replay/conflict suite; reversal
+  balances, journal agg APPLIED|REVERSED|APPLIED on one pair row, replay
+  moves nothing, double-reverse + reason-fingerprint 409, foreign 404);
+  rerun-safe; clippy + pre-commit clean.
+- Next: F2d receipts identity acceptance suite (epic closer).
