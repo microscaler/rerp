@@ -85,6 +85,14 @@ pub unsafe fn register_impl(dispatcher: &mut Dispatcher, routes: &[RouteMeta]) {
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "reverse_payment_application" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::reverse_payment_application::ReversePaymentApplicationController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "send_customer_statements" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::send_customer_statements::SendCustomerStatementsController,
