@@ -88,6 +88,187 @@ pub fn payment_json(row: &ArPaymentModel) -> Value {
     payment_json_stamped(row, None)
 }
 
+// ---------------------------------------------------------------------------
+// Command idempotency (Epic F2c) — the suite foundation table
+// `accounting_idempotency_records` under GL's replay discipline: the
+// fingerprint covers the tenant, entity, action, and every body field;
+// replay of an identical body re-serves the stored result, key reuse with
+// a different payload is a conflict.
+// ---------------------------------------------------------------------------
+
+pub(crate) const SOURCE_SYSTEM: &str = "accounts-receivable";
+
+fn digest(parts: &[&[u8]]) -> String {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    for part in parts {
+        hasher.update((part.len() as u64).to_be_bytes());
+        hasher.update(part);
+    }
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut output = String::with_capacity(64);
+    for byte in hasher.finalize() {
+        output.push(HEX[usize::from(byte >> 4)] as char);
+        output.push(HEX[usize::from(byte & 0x0f)] as char);
+    }
+    output
+}
+
+/// Fingerprint over the RAW request fields (not their normalized forms)
+/// plus the `auto_apply` axis: a key reused with any body difference —
+/// even one normalization would hide, or only `auto_apply` flipped — is a
+/// 409, never a silent replay.
+/// Field presence is hashed SEPARATELY from field value: an omitted
+/// optional must never collide with the same field sent empty.
+const PRESENT: &[u8] = b"\x01";
+const ABSENT: &[u8] = b"\x00";
+
+fn presence(value: Option<&str>) -> &'static [u8] {
+    if value.is_some() {
+        PRESENT
+    } else {
+        ABSENT
+    }
+}
+
+#[allow(clippy::too_many_arguments)] // one flat argument per contract body field
+fn create_fingerprint(
+    tenant_id: &str,
+    legal_entity_id: Uuid,
+    amount: &str,
+    currency_code: &str,
+    payment_method: &str,
+    payment_date: &str,
+    customer_id: &str,
+    company_id: Option<&str>,
+    reference_number: Option<&str>,
+    notes: Option<&str>,
+    auto_apply: bool,
+) -> String {
+    digest(&[
+        b"create_payment",
+        tenant_id.as_bytes(),
+        legal_entity_id.as_bytes(),
+        amount.as_bytes(),
+        currency_code.as_bytes(),
+        payment_method.as_bytes(),
+        payment_date.as_bytes(),
+        customer_id.as_bytes(),
+        presence(company_id),
+        company_id.unwrap_or("").as_bytes(),
+        presence(reference_number),
+        reference_number.unwrap_or("").as_bytes(),
+        presence(notes),
+        notes.unwrap_or("").as_bytes(),
+        if auto_apply { b"auto-apply" } else { b"" },
+    ])
+}
+
+pub(crate) fn reverse_fingerprint(
+    tenant_id: &str,
+    legal_entity_id: Uuid,
+    application_id: Uuid,
+    reason: &str,
+) -> String {
+    digest(&[
+        b"reverse_payment_application",
+        tenant_id.as_bytes(),
+        legal_entity_id.as_bytes(),
+        application_id.as_bytes(),
+        reason.as_bytes(),
+    ])
+}
+
+pub(crate) fn find_idempotency<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity_id: Uuid,
+    key: &str,
+) -> Result<
+    Option<
+        rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordModel,
+    >,
+    ArError,
+> {
+    use rerp_entities::accounting::foundation::idempotency_record::{
+        Column as IdempotencyColumn, Entity as IdempotencyEntity,
+    };
+    IdempotencyEntity::find()
+        .filter(IdempotencyColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(IdempotencyColumn::LegalEntityId.eq(legal_entity_id))
+        .filter(IdempotencyColumn::IdempotencyKey.eq(key))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))
+}
+
+/// Journal a completed command for replay. Public so the applications
+/// module records reversals through the same discipline.
+#[allow(clippy::too_many_arguments)] // one flat argument per record fact, slice style
+pub(crate) fn record_completed<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entity_id: Uuid,
+    key: &str,
+    fingerprint: &str,
+    source_type: &str,
+    subject_id: Uuid,
+    now: NaiveDateTime,
+) -> Result<(), ArError> {
+    use rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordRecord;
+    let mut record = AccountingIdempotencyRecordRecord::new();
+    record
+        .set_id(Uuid::new_v4())
+        .set_tenant_id(session.tenant_id.clone())
+        .set_legal_entity_id(legal_entity_id)
+        .set_idempotency_key(key.to_string())
+        .set_request_fingerprint(fingerprint.to_string())
+        .set_status("COMPLETED".to_string())
+        .set_source_system(SOURCE_SYSTEM.to_string())
+        .set_source_type(source_type.to_string())
+        .set_source_id(subject_id.to_string())
+        .set_created_at(now)
+        .set_completed_at(Some(now));
+    record.insert(executor).map_err(|error| {
+        let text = error.to_string();
+        // A racing replay under the same key loses on the UNIQUE index —
+        // the survivor's record is authoritative for the replay.
+        if text.contains("duplicate key") {
+            ArError::Conflict(
+                "the idempotency key was already used with a different request body".to_string(),
+            )
+        } else {
+            ArError::Database(text)
+        }
+    })?;
+    Ok(())
+}
+
+/// Replay an identical body; a fingerprint mismatch is a key conflict.
+/// The re-served payment still passes the read scope (invisible -> 404).
+pub(crate) fn replay_payment<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    record: &rerp_entities::accounting::foundation::idempotency_record::AccountingIdempotencyRecordModel,
+    fingerprint: &str,
+) -> Result<Value, ArError> {
+    if record.request_fingerprint != fingerprint {
+        return Err(ArError::Conflict(
+            "the idempotency key was already used with a different request body".to_string(),
+        ));
+    }
+    let payment_id = Uuid::parse_str(&record.source_id).map_err(|_| {
+        ArError::Database("idempotency record carries a bad payment id".to_string())
+    })?;
+    let row = PaymentEntity::find()
+        .filter(PaymentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(PaymentColumn::Id.eq(payment_id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    let stamps = last_applied_stamps(executor, session, &[row.id])?;
+    Ok(payment_json_stamped(&row, stamps.get(&row.id).copied()))
+}
+
 /// `applied_at` is the last time an allocation touched this receipt
 /// (F2b applications); the read axis derives it rather than storing it.
 pub fn payment_json_stamped(row: &ArPaymentModel, applied_at: Option<NaiveDateTime>) -> Value {
@@ -129,6 +310,10 @@ pub fn last_applied_stamps<E: LifeExecutor>(
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
     for row in rows {
+        // A reversed pair row (applied 0) is not an allocation instant.
+        if row.applied_amount <= Decimal::ZERO {
+            continue;
+        }
         stamps
             .entry(row.payment_id)
             .and_modify(|seen| *seen = (*seen).max(row.applied_at))
@@ -214,6 +399,21 @@ fn payment_sequence_lock_key(legal_entity_id: Uuid, year: i32) -> i64 {
     hash as i64
 }
 
+/// Transaction-scoped payment-number serialization, entity+year. Advisory
+/// locks are re-entrant within a transaction, so this may be taken early
+/// (idempotency window) and again inside `allocate_payment_number`.
+fn lock_payment_sequence<E: LifeExecutor>(
+    executor: &E,
+    legal_entity_id: Uuid,
+    year: i32,
+) -> Result<(), ArError> {
+    let lock_key = payment_sequence_lock_key(legal_entity_id, year);
+    executor
+        .query_one(&format!("SELECT pg_advisory_xact_lock({lock_key})"), &[])
+        .map_err(|error| ArError::Database(format!("payment sequence lock: {error}")))?;
+    Ok(())
+}
+
 /// `PAY-<year>-<seq>` under a transaction-scoped advisory lock, the same
 /// serialization discipline as the GL document/journal sequences.
 fn allocate_payment_number<E: LifeExecutor>(
@@ -221,10 +421,7 @@ fn allocate_payment_number<E: LifeExecutor>(
     legal_entity_id: Uuid,
     date: NaiveDate,
 ) -> Result<String, ArError> {
-    let lock_key = payment_sequence_lock_key(legal_entity_id, date.year());
-    executor
-        .query_one(&format!("SELECT pg_advisory_xact_lock({lock_key})"), &[])
-        .map_err(|error| ArError::Database(format!("payment sequence lock: {error}")))?;
+    lock_payment_sequence(executor, legal_entity_id, date.year())?;
     let start = NaiveDate::from_ymd_opt(date.year(), 1, 1)
         .ok_or_else(|| ArError::Validation("invalid payment year".to_string()))?;
     let end = NaiveDate::from_ymd_opt(date.year(), 12, 31)
@@ -259,6 +456,7 @@ fn duplicate_payment_reference<E: LifeExecutor>(
 pub fn create_payment<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
+    idempotency_key: &str,
     amount: &str,
     currency_code: &str,
     payment_method: &str,
@@ -267,6 +465,7 @@ pub fn create_payment<E: LifeExecutor>(
     company_id: Option<&str>,
     reference_number: Option<&str>,
     notes: Option<&str>,
+    auto_apply: bool,
 ) -> Result<Value, ArError> {
     let parsed = parse_create(
         amount,
@@ -294,6 +493,30 @@ pub fn create_payment<E: LifeExecutor>(
             ))
         }
     };
+    // Replay discipline before any write-side guard: an identical body
+    // under a known key re-serves the stored payment, never a 409 from
+    // the duplicate-reference check. The entity+year sequence lock is
+    // taken FIRST: a concurrent retry of the same key queues behind the
+    // winner here, then sees its committed record on the post-lock
+    // lookup and replays it — instead of tripping a unique index with a
+    // misleading conflict after the winner commits.
+    let fingerprint = create_fingerprint(
+        session.tenant_id.as_str(),
+        legal_entity,
+        amount,
+        currency_code,
+        payment_method,
+        payment_date,
+        customer_id,
+        company_id,
+        reference_number,
+        notes,
+        auto_apply,
+    );
+    lock_payment_sequence(executor, legal_entity, parsed.payment_date.year())?;
+    if let Some(record) = find_idempotency(executor, session, legal_entity, idempotency_key)? {
+        return replay_payment(executor, session, &record, &fingerprint);
+    }
     if let Some(reference) = &parsed.reference_number {
         if duplicate_payment_reference(executor, session, legal_entity, reference)? {
             return Err(ArError::Conflict(
@@ -346,6 +569,23 @@ pub fn create_payment<E: LifeExecutor>(
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?
         .ok_or_else(|| ArError::Database("payment vanished after insert".to_string()))?;
+    record_completed(
+        executor,
+        session,
+        legal_entity,
+        idempotency_key,
+        &fingerprint,
+        "customer_payment",
+        stored.id,
+        now,
+    )?;
+    // FIFO allocation is part of the CREATE command, not an afterthought:
+    // it runs only on a fresh creation. A replay re-serves the stored
+    // receipt and NEVER re-allocates (newly opened items must not be
+    // silently consumed by a retry).
+    if auto_apply {
+        return crate::applications::auto_apply_fifo(executor, session, &stored.id.to_string());
+    }
     Ok(payment_json(&stored))
 }
 
@@ -789,7 +1029,87 @@ mod tests {
         assert_ne!(payment_sequence_lock_key(entity, 2026), overlay_hash as i64);
     }
 
-    // ---- live acceptance (disposable accounting DB, migrations 0001..0007) ----
+    #[test]
+    fn create_fingerprint_covers_raw_fields_and_auto_apply() {
+        // Normalization-visible differences must NOT collide: "10.00" vs
+        // "10.0" and " R " vs "R" parse equal but are different bodies.
+        let base = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            Some(" R "),
+            Some(""),
+            false,
+        );
+        let normalized_twin = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.0",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            Some("R"),
+            Some(""),
+            false,
+        );
+        assert_ne!(base, normalized_twin, "raw fields are hashed");
+        let with_auto = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            Some(" R "),
+            Some(""),
+            true,
+        );
+        assert_ne!(base, with_auto, "auto_apply participates");
+        // An omitted optional is NOT the same body as that field sent empty
+        // (regression from PR #146 second-pass review).
+        let notes_absent = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            Some(" R "),
+            None,
+            false,
+        );
+        assert_ne!(base, notes_absent, "presence hashes separately from value");
+        let reference_absent = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            None,
+            Some(""),
+            false,
+        );
+        assert_ne!(
+            base, reference_absent,
+            "presence hashes separately from value"
+        );
+    }
+
+    // ---- live acceptance (disposable accounting DB, migrations 0001..0009) ----
 
     fn run_hex() -> String {
         static TAG: std::sync::OnceLock<String> = std::sync::OnceLock::new();
@@ -907,10 +1227,19 @@ mod tests {
         company: Option<&str>,
         reference: Option<&str>,
     ) -> Result<Value, ArError> {
+        // Fresh idempotency key per call: this helper exercises the write
+        // path, not replay (replay has its own live test).
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let key = format!(
+            "acc-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+        );
         crate::http_support::with_ar_transaction(session, |executor| {
             create_payment(
                 executor,
                 session,
+                &key,
                 amount,
                 "usd",
                 method,
@@ -919,12 +1248,13 @@ mod tests {
                 company,
                 reference,
                 Some("acceptance"),
+                false,
             )
         })
     }
 
     #[test]
-    #[ignore = "requires the disposable accounting DB (migrations 0001..0007) and psql on PATH; run live tests serially (--test-threads=1)"]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
     fn live_receipts_are_scoped_duplicate_guarded_and_derived() {
         // Tenant A holds two ORGs (the foundation pins one entity per
         // tenant+org): org 1 owns entity1 and three receipts, org 2 owns
@@ -1210,5 +1540,157 @@ COMMIT;"
             }),
             Err(ArError::Policy(_))
         ));
+    }
+
+    #[test]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
+    fn live_payment_creation_is_idempotent() {
+        // One tenant, one entity. The idempotency key replays an identical
+        // body onto the stored payment — never a duplicate row, never a
+        // duplicate-reference 409 — while key reuse with a different body
+        // is a conflict. Keys are per-entity, so a sibling org may reuse
+        // the same key for its own receipt.
+        let run = run_hex();
+        let tenant = format!("ar-idem-{run}");
+        let org1 = Uuid::new_v4();
+        let subject = Uuid::new_v4();
+        let entity = uid("c1", &run);
+        let cust = Uuid::new_v4().to_string();
+        let guc = session_guc(
+            &tenant,
+            &subject.to_string(),
+            &org1.to_string(),
+            "ar-idem-a",
+        );
+        psql_exec(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+{guc}
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active, created_at, updated_at)
+VALUES ('{entity}', '{tenant}', '{org1}', 'Idem Entity', 'USD', true, now(), now());
+COMMIT;"
+        ));
+        let session = session_for(tenant.clone(), subject, org1);
+        let today = Utc::now().date_naive().format("%Y-%m-%d").to_string();
+        let key = format!("idem-{run}-k1");
+        let reference = format!("IDEM-{run}");
+
+        let create_with = |amount: &str, key: &str, reference: &str, auto_apply: bool| {
+            crate::http_support::with_ar_transaction(&session, |executor| {
+                create_payment(
+                    executor,
+                    &session,
+                    key,
+                    amount,
+                    "usd",
+                    "cash",
+                    &today,
+                    &cust,
+                    Some(&entity),
+                    Some(reference),
+                    Some("idempotent"),
+                    auto_apply,
+                )
+            })
+        };
+        let first = create_with("42", &key, &reference, false).expect("first create");
+
+        // Identical replay: same payment, no second row, and the reference
+        // duplicate guard never fires for the replay itself.
+        let replay = create_with("42", &key, &reference, false).expect("replay");
+        assert_eq!(replay, first, "identical body replays value-for-value");
+        let rows = psql_session_query(
+            &guc,
+            &format!("SELECT count(*) FROM ar_payments WHERE payment_reference = '{reference}'"),
+        );
+        assert_eq!(rows, "1", "replay stored nothing new");
+
+        // Key reuse with a different payload is a conflict, not a second
+        // receipt, and not silent overwrite.
+        assert!(
+            matches!(
+                create_with("43", &key, &reference, false),
+                Err(ArError::Conflict(_))
+            ),
+            "fingerprint mismatch must conflict"
+        );
+        // `auto_apply` is part of the command — flipping ONLY it is a body
+        // change, so the key cannot be reused to smuggle in an allocation.
+        assert!(
+            matches!(
+                create_with("42", &key, &reference, true),
+                Err(ArError::Conflict(_))
+            ),
+            "auto_apply participates in the fingerprint"
+        );
+
+        // A fresh key carries the same body to a real duplicate-reference
+        // 409 — the replay short-circuit did not paper over the guard.
+        assert!(
+            matches!(
+                create_with("42", &format!("idem-{run}-k2"), &reference, false),
+                Err(ArError::Conflict(_))
+            ),
+            "different key, same reference: 0007 guard still rules"
+        );
+
+        // An open item for the SAME customer appears only now, after the
+        // stored receipt. Replaying the original body must NOT run FIFO
+        // against it — a retry may not silently consume new inventory.
+        let period = uid("f1", &run);
+        let doc_open = uid("d1", &run);
+        psql_exec(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+{guc}
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
+VALUES ('{period}', '{tenant}', '{entity}', 'FY2026', '2026-01-01', '2026-12-31',
+    'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number, document_type,
+     customer_id, source_system, source_type, source_id, document_date, due_date,
+     currency_code, rounding_minor_units, subtotal, discount_amount, tax_amount,
+     total_amount, posted_at, posted_by, original_document_id)
+VALUES
+    ('{doc_open}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-LATE',
+     'CUSTOMER_INVOICE', '{cust}', 'app-test', 'fixture', 'late',
+     '2026-02-01', '2026-03-01', 'USD', 2, 70, 0, 0, 70.000000, now(),
+     '{subject}'::uuid, NULL);
+COMMIT;"
+        ));
+        let replay_late =
+            create_with("42", &key, &reference, false).expect("replay after late item");
+        assert_eq!(replay_late, first, "replay never re-allocates");
+        let allocations = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT count(*) FROM ar_payment_applications WHERE payment_id =
+                     (SELECT id FROM ar_payments WHERE payment_reference = '{reference}')"
+            ),
+        );
+        assert_eq!(allocations, "0", "replay consumed nothing");
+
+        // A FRESH create with auto_apply=true does allocate, inside the
+        // command; its own replay then touches nothing further.
+        let reference2 = format!("IDEM2-{run}");
+        let applied = create_with("30", &format!("idem-{run}-k3"), &reference2, true)
+            .expect("auto-apply create");
+        assert_eq!(applied["status"], "APPLIED");
+        assert_eq!(applied["amount"], "30");
+        let replayed_auto = create_with("30", &format!("idem-{run}-k3"), &reference2, true)
+            .expect("auto-apply replay");
+        assert_eq!(replayed_auto, applied);
+        let totals = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT applied_amount, unapplied_amount FROM ar_payments WHERE payment_reference = '{reference2}'"
+            ),
+        );
+        assert_eq!(
+            totals, "30.000000|0.000000",
+            "replay allocated a second time"
+        );
     }
 }

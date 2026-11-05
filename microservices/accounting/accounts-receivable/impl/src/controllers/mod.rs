@@ -9,4 +9,5 @@ pub mod get_open_item;
 pub mod list_customer_payments;
 pub mod list_open_items;
 pub mod list_payment_applications;
+pub mod reverse_payment_application;
 pub mod send_customer_statements;

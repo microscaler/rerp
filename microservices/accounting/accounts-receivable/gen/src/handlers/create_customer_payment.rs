@@ -27,6 +27,9 @@ pub struct Request {
     #[serde(rename = "customer_id")]
     pub customer_id: String,
 
+    #[serde(rename = "idempotency_key")]
+    pub idempotency_key: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "notes")]
     pub notes: Option<String>,

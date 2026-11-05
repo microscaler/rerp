@@ -393,6 +393,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /payments/applications/{id}/reverse:
+    post:
+      operationId: reverse_payment_application
+      summary: Reverse a payment application
+      description: >-
+        Reverses a payment application IN FULL: the pair row's applied amount
+        returns to the payment's unapplied balance and the document's
+        outstanding, and a REVERSED event (actor, time, reason) is journaled
+        next to the original APPLIED events. Reversing an already-reversed
+        application is a 409. Requests are idempotent per (legal entity,
+        idempotency_key) with the standard replay rules.
+      x-brrtrouter-impl: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReversePaymentApplicationRequest'
+            example:
+              idempotency_key: rev-2026-01-20-0001
+              reason: Customer returned goods; reallocated to credit memo
+      responses:
+        '200':
+          description: Application reversed; updated payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Already reversed, payment not applicable, or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized — invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /reports/aging-summary:
     get:
       operationId: aging_summary
@@ -773,7 +838,18 @@ components:
         - payment_method
         - payment_date
         - customer_id
+        - idempotency_key
       properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: >-
+            Unique per legal entity. Replaying an identical body under the same
+            key returns the stored payment; the same key with a different body
+            is a 409 (standard accounting replay rules).
+          example: pay-2026-01-15-0001
         reference_number:
           type:
             - string
@@ -859,6 +935,23 @@ components:
           type: string
           format: date-time
           example: '2026-01-15T10:30:00Z'
+    ReversePaymentApplicationRequest:
+      type: object
+      required:
+        - idempotency_key
+        - reason
+      properties:
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 200
+          pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+          description: Unique per legal entity for reversals.
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: Why the allocation is being reversed (journaled with the event).
     CreatePaymentApplicationRequest:
       type: object
       required:

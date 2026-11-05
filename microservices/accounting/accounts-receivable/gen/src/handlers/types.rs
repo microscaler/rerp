@@ -62,6 +62,8 @@ pub struct CreateCustomerPaymentRequest {
 
     pub customer_id: String,
 
+    pub idempotency_key: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
 
@@ -151,6 +153,8 @@ pub struct CreatePaymentRequest {
     pub currency_code: String,
 
     pub customer_id: String,
+
+    pub idempotency_key: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
@@ -408,6 +412,52 @@ pub struct PaymentApplication {
     pub id: String,
 
     pub payment_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReversePaymentApplicationRequest {
+    pub idempotency_key: String,
+
+    pub reason: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ReversePaymentApplicationResponse {
+    pub amount: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub applied_at: Option<String>,
+
+    pub company_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+
+    pub currency_code: String,
+
+    pub customer_id: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub gl_entry_id: Option<String>,
+
+    pub id: String,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub notes: Option<String>,
+
+    pub payment_date: String,
+
+    pub payment_method: String,
+
+    pub posted_to_gl: bool,
+
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub reference_number: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
