@@ -20,6 +20,7 @@ This document is organized into modular design documents. Use this table of cont
 | 3 | [03-data-flow.md](docs/03-data-flow.md) | CRUD flows, event-driven patterns, CDC, batch processing | Sequence diagrams, flow charts |
 | 4 | [04-automation-engine.md](docs/04-automation-engine.md) | Workflow trigger-execution model, rule engine, cron | Flow charts, sequence diagrams, state diagrams |
 | 5 | [05-graph-database.md](docs/05-graph-database.md) | Hierarchical trees, relationship graphs, scoring models | Graph diagrams, state diagrams |
+| 6 | [06-marketing-feature-map.md](docs/06-marketing-feature-map.md) | Marketing platform feature map reverse-engineered from a market leader; v1 curation and reference tenant | Tables |
 
 ---
 
