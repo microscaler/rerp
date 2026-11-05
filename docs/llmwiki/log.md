@@ -1027,3 +1027,15 @@ ref-rewritten) the whole accounting suite — including
 - Epic F2 merged state: contracts + migrations 0007-0009 + live suites
   (21 units + 8 live, serial). Next per BUILDOUT: Epic F3 (aging +
   statements) or Epic G; awaiting priority.
+
+## [2026-11-05] plan | Epic F3 aging & statements planned (Epic F3 0/4)
+
+- Epic F2 closed (PR #147 merged 20b2eec2; plan header COMPLETE).
+- New plan docs/EPIC_F3_AGING_STATEMENTS_PLAN.md (PR pending): F3a
+  fact-derived as-of-reproducible aging_summary (never reads the overlay
+  cache; buckets == ledger::aging_bucket; per (entity, currency)); F3b
+  statement jobs = Epic E1 invoice outbox precedent — AR owns job +
+  frozen render model + durable instruction, honest QUEUED only (render
+  scaffold must not be wired; no fake SENDING/COMPLETED); F3c acceptance
+  suite. Spec example defects (statement_date 1000.0, delivery_method
+  bank_transfer) fixed in F3b's spec commit.
