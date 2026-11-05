@@ -1219,9 +1219,16 @@ COMMIT;",
         // through full, partial, and multi-document receipts, over-balance
         // and over-payment rejections, a reversal, cross-tenant probes,
         // and idempotent replays.
-        // Distinct run suffix so uuid slots never collide with the F2b
-        // scenario sharing this module's process-wide run tag.
-        let run = format!("{}f", &run_hex()[..5]);
+        // Distinct run tag so uuid slots never collide with the F2b
+        // scenario sharing this module's process-wide run_hex(): keep the
+        // first five digits and force the sixth to a value that differs
+        // from run_hex()'s own, making identity collision impossible.
+        let hex = run_hex();
+        let run = format!(
+            "{}{}",
+            &hex[..5],
+            if hex.ends_with('f') { 'e' } else { 'f' }
+        );
         let tenant = format!("ar-f2d-{run}");
         let other = format!("ar-f2d-x-{run}");
         let org = Uuid::new_v4();
@@ -1465,7 +1472,8 @@ COMMIT;",
             "F2DA:400.000000:400.000000:400.000000:0.000000:400.000000,\
              F2DB:300.000000:300.000000:300.000000:0.000000:300.000000,\
              F2DC:60.000000:60.000000:60.000000:0.000000:60.000000",
-            "invoice - credit == applied + outstanding == journal net"
+            "invoice - credit == applied + outstanding; \
+             journal net (APPLIED - REVERSED) == applied"
         );
         assert_eq!(
             psql_session_query(
