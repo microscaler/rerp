@@ -1057,7 +1057,7 @@ ref-rewritten) the whole accounting suite — including
   open-items value-for-value with poisoned overlay cache; EUR/GBP
   separation; rerun-safe on the disposable DB.
 
-## 2026-11-05 — PR #149 review round: snapshot aging reads, bounded replay
+## [2026-11-05] contribute | PR #149 review round: snapshot aging reads, bounded replay
 
 - CodeRabbit round on the F3a aging summary: the aggregate now reads
   inside ONE REPEATABLE READ transaction via the new lifeguard
