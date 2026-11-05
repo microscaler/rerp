@@ -749,6 +749,7 @@ fn as_of_applied_totals<E: LifeExecutor>(
         let applications = ApplicationEntity::find()
             .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
             .filter(ApplicationColumn::InvoiceId.is_in(chunk.to_vec()))
+            .limit((MAX_AGE_APPLICATIONS + 1) as u64)
             .all(executor)
             .map_err(|error| ArError::Database(error.to_string()))?;
         for row in applications {
@@ -769,19 +770,24 @@ fn as_of_applied_totals<E: LifeExecutor>(
     let mut seen_events: i64 = 0;
     let application_ids: Vec<Uuid> = application_to_document.keys().copied().collect();
     for chunk in application_ids.chunks(ID_CHUNK) {
+        // Fetch at most the REMAINING event budget: the database stops scanning
+        // at the LIMIT, so an over-budget history is rejected without ever
+        // materializing more rows than the bound allows.
+        let remaining = MAX_AGE_EVENTS - seen_events;
         let events = EventEntity::find()
             .filter(EventColumn::TenantId.eq(session.tenant_id.clone()))
             .filter(EventColumn::ApplicationId.is_in(chunk.to_vec()))
             .filter(EventColumn::Kind.is_in(["APPLIED".to_string(), "REVERSED".to_string()]))
             .filter(EventColumn::OccurredAt.lt(occurred_before))
+            .limit((remaining + 1) as u64)
             .all(executor)
             .map_err(|error| ArError::Database(error.to_string()))?;
-        seen_events += events.len() as i64;
-        if seen_events > MAX_AGE_EVENTS {
+        if events.len() as i64 > remaining {
             return Err(ArError::Validation(format!(
                 "application events exceed the {MAX_AGE_EVENTS}-row read bound; narrow the scope"
             )));
         }
+        seen_events += events.len() as i64;
         for event in &events {
             let Some(document_id) = application_to_document.get(&event.application_id) else {
                 continue;
