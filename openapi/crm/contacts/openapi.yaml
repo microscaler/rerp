@@ -26,6 +26,10 @@ servers:
 - url: /api/v1/crm/contacts
   description: Contacts API
 tags:
+- name: tags
+  description: Tags on contacts
+- name: segments
+  description: Saved condition trees that select contacts
 - name: contacts
   description: Contact CRUD
 - name: contacts-accounts
@@ -535,6 +539,478 @@ paths:
       x-operation-id: post_merge
       x-controller: rerp_crm::contacts::controller::contacts::merge
       x-handler-name: contacts_merge
+  /tags:
+    get:
+      operationId: list_tags
+      summary: Tags with contact counts
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTag'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_tag
+      summary: Create a tag
+      tags:
+      - tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '409':
+          description: Tag exists
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /tags/{id}:
+    put:
+      operationId: update_tag
+      summary: Rename or recolour a tag
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_tag
+      summary: Delete a tag (removed from every contact)
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Tag is referenced by an active automation trigger
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/{id}/tags:
+    post:
+      operationId: add_contact_tags
+      summary: Add tags to a contact
+      description: Emits TAG_ADDED for each tag newly present, which crm/automation listens for.
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagNames'
+      responses:
+        '200':
+          description: Contact with its tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: remove_contact_tags
+      summary: Remove tags from a contact
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagNames'
+      responses:
+        '200':
+          description: Contact with its tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/{id}/activity:
+    get:
+      operationId: get_contact_activity
+      summary: The contact's timeline
+      description: Merged, newest first, from every CRM service - sends and opens (outreach), enrolment steps (automation), form submissions and page views (marketing), stage changes (pipeline), notes and tag changes.
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: kinds
+        in: query
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityKind'
+        style: form
+        explode: false
+      responses:
+        '200':
+          description: Activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivity'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /contacts/{id}/notes:
+    post:
+      operationId: add_contact_note
+      summary: Add a note to the timeline
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+      responses:
+        '201':
+          description: Note added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/import:
+    post:
+      operationId: import_contacts
+      summary: Bulk import from CSV
+      description: Multipart CSV with a column mapping. Rows are validated and deduplicated by email; the response is a job the client polls. Consent for list subscription is recorded as IMPORT with the stated source.
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              - mapping
+              properties:
+                file:
+                  type: string
+                  format: binary
+                mapping:
+                  type: string
+                  description: JSON object column -> contact field or custom field key
+                tag_names:
+                  type: string
+                  description: JSON array of tags to add to every imported contact
+                list_id:
+                  type: string
+                  format: uuid
+                consent_note:
+                  type: string
+                update_existing:
+                  type: boolean
+      responses:
+        '202':
+          description: Import job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '400':
+          description: Invalid file or mapping
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/import/{id}:
+    get:
+      operationId: get_import_job
+      summary: Import job progress
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /contacts/export:
+    post:
+      operationId: export_contacts
+      summary: Export contacts matching a segment as CSV
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                segment_id:
+                  type: string
+                  format: uuid
+                conditions:
+                  type: object
+                fields:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '202':
+          description: Export job started; the job carries the download URL when done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /segments:
+    get:
+      operationId: list_segments
+      summary: Saved segments
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Segments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSegment'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_segment
+      summary: Save a segment
+      tags:
+      - segments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '400':
+          description: Invalid conditions
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /segments/{id}:
+    get:
+      operationId: get_segment
+      summary: Get a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Segment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: update_segment
+      summary: Update a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_segment
+      summary: Delete a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Segment is used by a scheduled campaign
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /segments/evaluate:
+    post:
+      operationId: evaluate_segment
+      summary: Count and sample the contacts a condition tree matches
+      tags:
+      - segments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - conditions
+              properties:
+                conditions:
+                  $ref: '#/components/schemas/ConditionGroup'
+      responses:
+        '200':
+          description: Match count and sample
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - count
+                properties:
+                  count:
+                    type: integer
+                    format: int64
+                  sample:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid conditions
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
 components:
   schemas:
     Contact:
@@ -544,6 +1020,27 @@ components:
       - name
       - create_date
       properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names (see /tags)
+        custom_fields:
+          type: object
+          additionalProperties: true
+          description: Values for crm/platform custom fields, keyed by field key
+        score:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Current crm/intelligence score
+        timezone:
+          type: string
+          description: IANA zone, for send-in-contact-timezone and send windows
+        last_activity_at:
+          type: string
+          format: date-time
+          readOnly: true
         id:
           type: string
           format: uuid
@@ -807,6 +1304,294 @@ components:
       - merged_lead_count
       - merged_account_count
       description: Result of merging multiple records together
+    Tag:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 64
+        color:
+          type: string
+          description: Hex colour for the chip
+        description:
+          type: string
+        contact_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateTagRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        color:
+          type: string
+        description:
+          type: string
+    TagNames:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names; unknown names are created
+    ActivityKind:
+      type: string
+      enum:
+      - MESSAGE_SENT
+      - MESSAGE_OPENED
+      - MESSAGE_CLICKED
+      - MESSAGE_BOUNCED
+      - UNSUBSCRIBED
+      - SUBSCRIBED
+      - FORM_SUBMITTED
+      - PAGE_VIEW
+      - SITE_EVENT
+      - WORKFLOW_ENTERED
+      - WORKFLOW_STEP
+      - WORKFLOW_ENDED
+      - TAG_ADDED
+      - TAG_REMOVED
+      - FIELD_CHANGED
+      - SCORE_CHANGED
+      - DEAL_CREATED
+      - DEAL_STAGE_CHANGED
+      - NOTE
+      - CHAT
+    Activity:
+      type: object
+      required:
+      - id
+      - contact_id
+      - kind
+      - at
+      - summary
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ActivityKind'
+        at:
+          type: string
+          format: date-time
+        summary:
+          type: string
+          description: One line for the timeline
+        actor:
+          type: string
+          description: Staff user id, workflow id, 'contact' or 'system'
+        ref_service:
+          type: string
+          description: Which CRM service owns the underlying record
+        ref_id:
+          type: string
+          format: uuid
+        data:
+          type: object
+          description: Kind-specific detail (template name, link url, form fields, from/to stage)
+    ConditionGroup:
+      type: object
+      required:
+      - op
+      - items
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/ConditionGroup'
+            - $ref: '#/components/schemas/Condition'
+      description: Recursive AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences
+    Condition:
+      type: object
+      required:
+      - subject
+      - operator
+      properties:
+        subject:
+          type: string
+          description: |
+            What is tested: field:<name>, custom:<key>, tag, list:<id>, score, engagement:opened:<days>,
+            engagement:clicked:<days>, engagement:any:<days>, deal:stage, deal:value, site:visited:<path>,
+            event:<name>, form:<id>, created_at, last_activity_at, timezone, country
+        operator:
+          type: string
+          enum:
+          - EQ
+          - NEQ
+          - CONTAINS
+          - NOT_CONTAINS
+          - STARTS_WITH
+          - GT
+          - GTE
+          - LT
+          - LTE
+          - IN
+          - NOT_IN
+          - IS_SET
+          - IS_NOT_SET
+          - HAS
+          - HAS_NOT
+          - BEFORE
+          - AFTER
+          - WITHIN_DAYS
+          - NOT_WITHIN_DAYS
+        value:
+          description: String, number, boolean, ISO date or array as the operator requires
+    Segment:
+      type: object
+      required:
+      - id
+      - name
+      - conditions
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        conditions:
+          $ref: '#/components/schemas/ConditionGroup'
+        contact_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Evaluated at last save or refresh
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+    CreateSegmentRequest:
+      type: object
+      required:
+      - name
+      - conditions
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        conditions:
+          $ref: '#/components/schemas/ConditionGroup'
+    ImportJob:
+      type: object
+      required:
+      - id
+      - kind
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - IMPORT
+          - EXPORT
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+          - FAILED
+        total_rows:
+          type: integer
+          format: int64
+        processed_rows:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+        skipped:
+          type: integer
+          format: int64
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+                format: int64
+              message:
+                type: string
+        download_url:
+          type: string
+          format: uri
+          description: EXPORT when DONE; expires
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        finished_at:
+          type: string
+          format: date-time
+    PaginatedTag:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Tag'
+    PaginatedActivity:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Activity'
+    PaginatedSegment:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Segment'
     ErrorResponse:
       type: object
       required:

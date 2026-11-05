@@ -22,6 +22,8 @@
 | auth | identity | `openapi/auth/identity/openapi.yaml` | Active |
 | automation | rules-engine | `openapi/automation/rules-engine/openapi.yaml` | Active |
 | crm | contacts | `openapi/crm/contacts/openapi.yaml` | Active |
+| crm | outreach | `openapi/crm/outreach/openapi.yaml` | Active |
+| crm | social | `openapi/crm/social/openapi.yaml` | Active |
 | data | etl | `openapi/data/etl/openapi.yaml` | Active |
 | documents | storage | `openapi/documents/storage/openapi.yaml` | Active |
 | esg | sustainability | `openapi/esg/sustainability/openapi.yaml` | Active |
@@ -33,7 +35,6 @@
 | iot | sensor | `openapi/iot/sensor/openapi.yaml` | Active |
 | localization | i18n | `openapi/localization/i18n/openapi.yaml` | Active |
 | manufacturing | production | `openapi/manufacturing/production/openapi.yaml` | Active |
-| marketing | campaigns | `openapi/marketing/campaigns/openapi.yaml` | Active |
 | marketplace | integration | `openapi/marketplace/integration/openapi.yaml` | Active |
 | pos | register | `openapi/pos/register/openapi.yaml` | Active |
 | product | catalog | `openapi/product/catalog/openapi.yaml` | Active |

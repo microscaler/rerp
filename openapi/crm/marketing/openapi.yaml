@@ -496,6 +496,35 @@ paths:
       x-operation-id: post_id_by_id
       x-controller: rerp_crm::marketing::controller::forms::id
       x-handler-name: forms_id
+    put:
+      operationId: update_form
+      summary: Update a form's fields, style and actions
+      tags:
+      - marketing-forms
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebFormRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebForm'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
   /forms/{id}/config:
     get:
       operationId: get_form_config
@@ -940,6 +969,329 @@ paths:
       x-operation-id: post_submit
       x-controller: rerp_crm::marketing::controller::surveys::submit
       x-handler-name: surveys_submit
+  /forms:
+    get:
+      operationId: list_forms
+      summary: List web forms
+      tags:
+      - marketing-forms
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Forms with submission counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebForm'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_form
+      summary: Create a web form
+      tags:
+      - marketing-forms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebFormRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebForm'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /forms/{id}/archive:
+    post:
+      operationId: archive_form
+      summary: Archive a form (its public endpoint stops accepting submissions)
+      tags:
+      - marketing-forms
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebForm'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /forms/{id}/submissions:
+    get:
+      operationId: list_form_submissions
+      summary: Submissions to a form
+      tags:
+      - marketing-forms
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFormSubmission'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /forms/{id}/embed:
+    get:
+      operationId: get_form_embed
+      summary: Embed code for the form
+      description: A script tag for the inline/floating/modal variants and the hosted page URL.
+      tags:
+      - marketing-forms
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Embed options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormEmbed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /tracking/sites:
+    get:
+      operationId: list_tracked_sites
+      summary: Sites allowed to post tracking events
+      tags:
+      - marketing-analytics
+      responses:
+        '200':
+          description: Sites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TrackedSite'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_tracked_site
+      summary: Allow a site origin
+      tags:
+      - marketing-analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - origin
+              properties:
+                origin:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Site with its tracking snippet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackedSite'
+        '400':
+          description: Invalid origin
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /tracking/sites/{id}:
+    delete:
+      operationId: delete_tracked_site
+      summary: Stop accepting events from a site
+      tags:
+      - marketing-analytics
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /tracking/event-types:
+    get:
+      operationId: list_event_types
+      summary: Custom event names seen or declared
+      tags:
+      - marketing-analytics
+      responses:
+        '200':
+          description: Event types with counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventTypeDef'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: declare_event_type
+      summary: Declare a custom event (so automations can trigger on it before it is first seen)
+      tags:
+      - marketing-analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 64
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Declared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventTypeDef'
+        '400':
+          description: Invalid name
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /analytics/event:
+    post:
+      operationId: track_custom_event
+      summary: Record a custom event for a visitor or contact
+      description: Public, keyed by the site's tracking key and origin check. Fires the automation EVENT trigger.
+      tags:
+      - marketing-analytics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackEventRequest'
+      responses:
+        '202':
+          description: Recorded
+        '400':
+          description: Invalid request
+        '403':
+          description: Origin not allowed
+      security: []
+      x-brrtrouter-impl: true
+  /contacts/{id}/visits:
+    get:
+      operationId: list_contact_visits
+      summary: Page views and events for an identified contact
+      tags:
+      - marketing-analytics
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Visits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitorTracking'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /attribution/overview:
+    get:
+      operationId: get_attribution_overview
+      summary: Leads and revenue by source, medium and campaign over a period
+      tags:
+      - marketing-campaigns
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: group_by
+        in: query
+        schema:
+          type: string
+          enum:
+          - SOURCE
+          - MEDIUM
+          - CAMPAIGN
+          - FORM
+          - CHANNEL
+          default: SOURCE
+      responses:
+        '200':
+          description: Attribution rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributionOverview'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
 components:
   parameters:
     Page:
@@ -1097,6 +1449,39 @@ components:
         name:
           type: string
           maxLength: 128
+        description:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormFieldDef'
+          description: Ordered field definitions; supersedes capture_fields
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormAction'
+        style:
+          $ref: '#/components/schemas/FormStyle'
+        double_opt_in:
+          type: boolean
+        allowed_origins:
+          type: array
+          items:
+            type: string
+            format: uri
+        submission_count:
+          type: integer
+          format: int64
+          readOnly: true
+        conversion_rate:
+          type: number
+          format: double
+          readOnly: true
+          description: Submissions / views where views are tracked
+        public_url:
+          type: string
+          format: uri
+          readOnly: true
         redirect_url:
           type: string
         is_active:
@@ -1342,6 +1727,310 @@ components:
           type: string
           format: date-time
       description: A survey response with answers and feedback
+    FormFieldDef:
+      type: object
+      required:
+      - key
+      - label
+      - kind
+      properties:
+        key:
+          type: string
+          description: Contact field (email, first_name, phone...) or custom:<key>
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+          - TEXT
+          - EMAIL
+          - PHONE
+          - TEXTAREA
+          - SELECT
+          - MULTISELECT
+          - CHECKBOX
+          - RADIO
+          - DATE
+          - NUMBER
+          - HIDDEN
+          - CONSENT
+        required:
+          type: boolean
+          default: false
+        placeholder:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        default_value:
+          type: string
+        consent_text:
+          type: string
+          description: CONSENT kind; the exact wording stored on the subscription
+    FormAction:
+      type: object
+      required:
+      - kind
+      properties:
+        kind:
+          type: string
+          enum:
+          - SUBSCRIBE_LIST
+          - ADD_TAG
+          - START_WORKFLOW
+          - CREATE_LEAD
+          - NOTIFY
+          - WEBHOOK
+        list_id:
+          type: string
+          format: uuid
+        tag:
+          type: string
+        workflow_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+    FormStyle:
+      type: object
+      properties:
+        layout:
+          type: string
+          enum:
+          - INLINE
+          - FLOATING_BOX
+          - FLOATING_BAR
+          - MODAL
+          - HOSTED_PAGE
+        theme:
+          type: object
+          description: Colours, fonts, radius; opaque to the service
+        submit_label:
+          type: string
+        success_message:
+          type: string
+        trigger:
+          type: object
+          description: MODAL/FLOATING only - on load, after N seconds, on scroll %, on exit intent
+    CreateWebFormRequest:
+      type: object
+      required:
+      - name
+      - fields
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        fields:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/FormFieldDef'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormAction'
+        style:
+          $ref: '#/components/schemas/FormStyle'
+        redirect_url:
+          type: string
+          format: uri
+        double_opt_in:
+          type: boolean
+        utm_campaign_id:
+          type: string
+          format: uuid
+        allowed_origins:
+          type: array
+          items:
+            type: string
+            format: uri
+    FormSubmission:
+      type: object
+      required:
+      - id
+      - form_id
+      - submitted_at
+      - values
+      properties:
+        id:
+          type: string
+          format: uuid
+        form_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        lead_id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        values:
+          type: object
+          additionalProperties:
+            type: string
+        attribution:
+          type: object
+          description: utm_*, referrer, landing_path, first_touch_at captured with the submission
+        ip:
+          type: string
+        user_agent:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+    FormEmbed:
+      type: object
+      required:
+      - form_id
+      - hosted_url
+      - script_tag
+      properties:
+        form_id:
+          type: string
+          format: uuid
+        hosted_url:
+          type: string
+          format: uri
+        script_tag:
+          type: string
+        inline_html:
+          type: string
+          description: Plain HTML form posting to the public submit endpoint, for sites that do not run the script
+    TrackedSite:
+      type: object
+      required:
+      - id
+      - origin
+      - tracking_key
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        origin:
+          type: string
+          format: uri
+        name:
+          type: string
+        tracking_key:
+          type: string
+          description: Public key embedded in the snippet; the origin check is the real guard
+        snippet:
+          type: string
+          readOnly: true
+        last_event_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    EventTypeDef:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        declared:
+          type: boolean
+        count_30d:
+          type: integer
+          format: int64
+        last_seen_at:
+          type: string
+          format: date-time
+    TrackEventRequest:
+      type: object
+      required:
+      - tracking_key
+      - event
+      properties:
+        tracking_key:
+          type: string
+        event:
+          type: string
+          maxLength: 64
+        visitor_id:
+          type: string
+        email:
+          type: string
+          format: email
+          description: Identifies the visitor as a contact when known
+        value:
+          type: number
+          format: double
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        url:
+          type: string
+          format: uri
+        at:
+          type: string
+          format: date-time
+    AttributionOverview:
+      type: object
+      required:
+      - rows
+      properties:
+        rows:
+          type: array
+          items:
+            type: object
+            required:
+            - key
+            - leads
+            properties:
+              key:
+                type: string
+              leads:
+                type: integer
+                format: int64
+              contacts:
+                type: integer
+                format: int64
+              converted:
+                type: integer
+                format: int64
+              revenue:
+                type: number
+                format: double
+    PaginatedWebForm:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/WebForm'
+    PaginatedFormSubmission:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/FormSubmission'
     PaginatedResponse:
       type: object
       required:

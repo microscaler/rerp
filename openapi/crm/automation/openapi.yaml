@@ -27,6 +27,10 @@ servers:
 - url: /api/v1/crm/automation
   description: Automation API
 tags:
+- name: enrolments
+  description: Contacts moving through workflows
+- name: workflow-steps
+  description: The step graph of a workflow (wait, if/else, split, goal)
 - name: actions
   description: Scheduled and manual actions
 - name: automation-execution
@@ -1157,6 +1161,375 @@ paths:
       x-operation-id: get_upcoming
       x-controller: rerp_crm::automation::controller::actions::upcoming
       x-handler-name: actions_upcoming
+  /workflows/{id}/steps:
+    get:
+      operationId: get_workflow_steps
+      summary: The workflow's step graph
+      tags:
+      - workflow-steps
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Ordered steps with branches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSteps'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: replace_workflow_steps
+      summary: Replace the step graph
+      description: |
+        The whole graph is replaced atomically and validated (every branch reaches an END or a GOAL, no
+        orphan steps, every SEND_MESSAGE names an AUTOMATION template). Contacts mid-way keep their
+        current step by id; a removed step moves them to its successor.
+      tags:
+      - workflow-steps
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSteps'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSteps'
+        '400':
+          description: Graph invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepGraphValidation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /workflows/{id}/activate:
+    post:
+      operationId: activate_workflow
+      summary: Set the workflow live
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '400':
+          description: Graph invalid or no trigger
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /workflows/{id}/pause:
+    post:
+      operationId: pause_workflow
+      summary: Pause the workflow (enrolments hold at their step)
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /workflows/{id}/duplicate:
+    post:
+      operationId: duplicate_workflow
+      summary: Copy a workflow and its steps as a new inactive workflow
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /workflows/{id}/map:
+    get:
+      operationId: get_workflow_map
+      summary: Contacts at each step, and step outcomes
+      description: The live view behind an automations map - how many contacts sit at each step now, how many have passed through, and per-step send/open/click counts.
+      tags:
+      - automation-execution
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowMap'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /workflows/{id}/enrolments:
+    get:
+      operationId: list_workflow_enrolments
+      summary: Contacts enrolled in a workflow
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/EnrolmentStatus'
+      - name: step_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Enrolments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrolment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    post:
+      operationId: enrol_contacts
+      summary: Enrol contacts by hand
+      description: Bypasses the trigger. Honors the workflow's re-entry rule; contacts already active are reported, not re-enrolled.
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrolRequest'
+      responses:
+        '201':
+          description: Enrolment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrolResult'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /enrolments/{id}:
+    get:
+      operationId: get_enrolment
+      summary: One contact's progress through a workflow
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Enrolment with its step history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /enrolments/{id}/stop:
+    post:
+      operationId: stop_enrolment
+      summary: Remove a contact from the workflow
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /enrolments/{id}/jump:
+    post:
+      operationId: jump_enrolment
+      summary: Move a contact to a given step now
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - step_id
+              properties:
+                step_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+        '400':
+          description: Unknown step
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/{id}/enrolments:
+    get:
+      operationId: list_contact_enrolments
+      summary: Every workflow a contact is or was in
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Enrolments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Enrolment'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /recipes:
+    get:
+      operationId: list_workflow_recipes
+      summary: Starter workflows (welcome series, abandoned signup, re-engagement, post-purchase)
+      tags:
+      - workflows
+      responses:
+        '200':
+          description: Recipes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkflowRecipe'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /recipes/{id}/instantiate:
+    post:
+      operationId: instantiate_workflow_recipe
+      summary: Create an inactive workflow from a recipe
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                list_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Workflow created from the recipe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
 components:
   parameters:
     Page:
@@ -1229,6 +1602,27 @@ components:
         conditions:
           type: object
           description: Additional AND/OR conditions (JSON)
+        entry_step_id:
+          type: string
+          format: uuid
+          description: First step of the graph (see /workflows/{id}/steps); absent for single-action workflows
+        reentry:
+          $ref: '#/components/schemas/ReentryRule'
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - ACTIVE
+          - PAUSED
+          readOnly: true
+        active_enrolments:
+          type: integer
+          format: int64
+          readOnly: true
+        completed_enrolments:
+          type: integer
+          format: int64
+          readOnly: true
         sequence:
           type: integer
           format: int32
@@ -1629,11 +2023,30 @@ components:
       - ON_CREATE
       - ON_UPDATE
       - ON_DELETE
+      - SUBSCRIBED_TO_LIST
+      - UNSUBSCRIBED_FROM_LIST
+      - TAG_ADDED
+      - TAG_REMOVED
+      - FORM_SUBMITTED
+      - MESSAGE_OPENED
+      - MESSAGE_CLICKED
+      - MESSAGE_REPLIED
+      - MESSAGE_BOUNCED
+      - SITE_VISIT
+      - CUSTOM_EVENT
+      - SCORE_CHANGED
+      - DATE_FIELD
+      - DEAL_CREATED
+      - DEAL_STAGE_CHANGE
+      - DEAL_WON
+      - DEAL_LOST
+      - GOAL_REACHED
       description: Enum of trigger types (event-based, schedule-based, webhook-based)
     ActionType:
       type: string
       enum:
       - SEND_EMAIL
+      - SEND_MESSAGE
       - CREATE_TASK
       - UPDATE_FIELD
       - ASSIGN_LEAD
@@ -1641,6 +2054,18 @@ components:
       - CREATE_RECORD
       - SET_VALUE
       - ESCALATE
+      - ADD_TAG
+      - REMOVE_TAG
+      - SUBSCRIBE_LIST
+      - UNSUBSCRIBE_LIST
+      - ADJUST_SCORE
+      - NOTIFY
+      - CREATE_DEAL
+      - UPDATE_DEAL_STAGE
+      - ADD_NOTE
+      - START_WORKFLOW
+      - STOP_WORKFLOW
+      - END
       description: Enum of action types (notification, assign, update, create, etc.)
     ConditionOperator:
       type: string
@@ -1760,6 +2185,433 @@ components:
             items:
               $ref: '#/components/schemas/Trigger'
       description: Paginated list of Trigger records
+    StepKind:
+      type: string
+      enum:
+      - ACTION
+      - WAIT
+      - IF_ELSE
+      - SPLIT
+      - GOAL
+      - END
+      description: |
+        ACTION runs one ActionType and continues. WAIT holds for a duration, until a date/time, or until a
+        condition is met (with an optional timeout). IF_ELSE evaluates conditions and takes the yes or no
+        branch. SPLIT sends contacts down branches by percentage (A/B paths). GOAL names a condition that,
+        when met anywhere in the workflow, jumps the contact to this step (and records the goal). END
+        finishes the enrolment.
+    WorkflowStep:
+      type: object
+      required:
+      - id
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Stable across edits; enrolments point at it
+        kind:
+          $ref: '#/components/schemas/StepKind'
+        label:
+          type: string
+          maxLength: 128
+        next_step_id:
+          type: string
+          format: uuid
+          description: ACTION, WAIT and GOAL continue here; absent means END
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+          description: |
+            ACTION: per type, e.g. SEND_MESSAGE {template_id, sender_id?}, ADD_TAG {tag}, ADJUST_SCORE {points},
+            SUBSCRIBE_LIST {list_id}, CALL_WEBHOOK {url, secret_id}, NOTIFY {user_id|team_id, message},
+            CREATE_DEAL {stage_id, title}, START_WORKFLOW {workflow_id}.
+        wait:
+          $ref: '#/components/schemas/WaitConfig'
+        conditions:
+          type: object
+          description: IF_ELSE and GOAL; the crm/automation condition tree (AND/OR groups of field/tag/list/engagement/score predicates)
+        yes_step_id:
+          type: string
+          format: uuid
+        no_step_id:
+          type: string
+          format: uuid
+        branches:
+          type: array
+          items:
+            type: object
+            required:
+            - key
+            - percent
+            properties:
+              key:
+                type: string
+              percent:
+                type: integer
+                format: int32
+              step_id:
+                type: string
+                format: uuid
+          description: SPLIT; percents sum to 100
+        position:
+          type: object
+          description: Editor layout hint (x, y); opaque to the runtime
+    WaitConfig:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - DURATION
+          - UNTIL_DATETIME
+          - UNTIL_CONDITION
+          - UNTIL_DATE_FIELD
+        seconds:
+          type: integer
+          format: int64
+          description: DURATION
+        until:
+          type: string
+          format: date-time
+          description: UNTIL_DATETIME
+        conditions:
+          type: object
+          description: UNTIL_CONDITION
+        date_field:
+          type: string
+          description: UNTIL_DATE_FIELD; a contact date field (renewal_date, trial_ends_at, birthday)
+        offset_seconds:
+          type: integer
+          format: int64
+          description: UNTIL_DATE_FIELD; negative sends before the date
+        timeout_seconds:
+          type: integer
+          format: int64
+          description: UNTIL_CONDITION; continue anyway after this long
+        send_window:
+          type: object
+          description: Optional days/hours in the contact's timezone within which the wait may complete
+          properties:
+            days:
+              type: array
+              items:
+                type: string
+                enum:
+                - MON
+                - TUE
+                - WED
+                - THU
+                - FRI
+                - SAT
+                - SUN
+            from_hour:
+              type: integer
+              format: int32
+            to_hour:
+              type: integer
+              format: int32
+    WorkflowSteps:
+      type: object
+      required:
+      - workflow_id
+      - entry_step_id
+      - steps
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        entry_step_id:
+          type: string
+          format: uuid
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+        version:
+          type: integer
+          format: int32
+          readOnly: true
+    StepGraphValidation:
+      type: object
+      required:
+      - ok
+      - problems
+      properties:
+        ok:
+          type: boolean
+        problems:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                enum:
+                - ORPHAN_STEP
+                - DANGLING_NEXT
+                - BRANCH_PERCENT
+                - TEMPLATE_KIND
+                - MISSING_ENTRY
+                - CYCLE_WITHOUT_WAIT
+              step_id:
+                type: string
+                format: uuid
+              message:
+                type: string
+    ReentryRule:
+      type: string
+      enum:
+      - ONCE
+      - MULTIPLE
+      - RESTART
+      description: ONCE enrols a contact at most once ever; MULTIPLE allows a new enrolment after the previous ends; RESTART stops the active enrolment and begins again
+    EnrolmentStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - WAITING
+      - COMPLETED
+      - GOAL_REACHED
+      - STOPPED
+      - FAILED
+    Enrolment:
+      type: object
+      required:
+      - id
+      - workflow_id
+      - contact_id
+      - status
+      - entered_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+          readOnly: true
+        contact_id:
+          type: string
+          format: uuid
+        contact_email:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EnrolmentStatus'
+        current_step_id:
+          type: string
+          format: uuid
+        next_run_at:
+          type: string
+          format: date-time
+          description: When the runtime will next act on this enrolment (WAITING)
+        entered_by:
+          type: string
+          description: TRIGGER, MANUAL, RECIPE or a staff user id
+        goal_step_id:
+          type: string
+          format: uuid
+          readOnly: true
+        history:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/EnrolmentStepRecord'
+        entered_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+    EnrolmentStepRecord:
+      type: object
+      required:
+      - step_id
+      - kind
+      - at
+      - outcome
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/StepKind'
+        label:
+          type: string
+        at:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+          enum:
+          - DONE
+          - BRANCH_YES
+          - BRANCH_NO
+          - SPLIT
+          - WAITED
+          - TIMED_OUT
+          - SKIPPED
+          - FAILED
+        send_id:
+          type: string
+          format: uuid
+          description: crm/outreach send produced by a SEND_MESSAGE step
+        error:
+          type: string
+    EnrolRequest:
+      type: object
+      required:
+      - contact_ids
+      properties:
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 1000
+        start_step_id:
+          type: string
+          format: uuid
+          description: Defaults to the entry step
+    EnrolResult:
+      type: object
+      required:
+      - enrolled
+      - already_active
+      - excluded
+      properties:
+        enrolled:
+          type: integer
+          format: int32
+        already_active:
+          type: integer
+          format: int32
+        excluded:
+          type: integer
+          format: int32
+          description: Unsubscribed or suppressed contacts when the workflow sends messages
+        enrolment_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    WorkflowMap:
+      type: object
+      required:
+      - workflow_id
+      - active
+      - completed
+      - steps
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        active:
+          type: integer
+          format: int64
+        completed:
+          type: integer
+          format: int64
+        goal_reached:
+          type: integer
+          format: int64
+        stopped:
+          type: integer
+          format: int64
+        steps:
+          type: array
+          items:
+            type: object
+            required:
+            - step_id
+            - kind
+            - waiting_now
+            - passed
+            properties:
+              step_id:
+                type: string
+                format: uuid
+              kind:
+                $ref: '#/components/schemas/StepKind'
+              label:
+                type: string
+              waiting_now:
+                type: integer
+                format: int64
+              passed:
+                type: integer
+                format: int64
+              branch_yes:
+                type: integer
+                format: int64
+              branch_no:
+                type: integer
+                format: int64
+              sent:
+                type: integer
+                format: int64
+              opened:
+                type: integer
+                format: int64
+              clicked:
+                type: integer
+                format: int64
+              failed:
+                type: integer
+                format: int64
+    WorkflowRecipe:
+      type: object
+      required:
+      - id
+      - name
+      - category
+      - trigger_type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          enum:
+          - WELCOME
+          - NURTURE
+          - RE_ENGAGEMENT
+          - SALES
+          - POST_PURCHASE
+          - EVENT
+          - INTERNAL
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        step_count:
+          type: integer
+          format: int32
+        needs_templates:
+          type: integer
+          format: int32
+          description: AUTOMATION templates the user must supply or accept defaults for
+    PaginatedEnrolment:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Enrolment'
+      description: Paginated list of Enrolment records
   securitySchemes:
     bearerAuth:
       type: http

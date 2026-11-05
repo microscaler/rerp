@@ -32,7 +32,7 @@ RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship
 - **Rust-level performance** for sub-millisecond latency and bulk operations on 100,000+ records
 - **Self-hosted data sovereignty** with no per-seat pricing, rate limits, or vendor lock-in
 
-The system is organized into **11 functional components** (microservices), each representing a critical dimension of modern CRM.
+The system is organized into **13 functional components** (microservices), each representing a critical dimension of modern CRM.
 
 ---
 
@@ -43,14 +43,16 @@ The system is organized into **11 functional components** (microservices), each 
 | Component | OpenAPI Dir | Paths | Schemas | Description |
 |-----------|-------------|-------|---------|-------------|
 | **Pipeline** | `pipeline/` | 9 | 18 | Lead lifecycle, stages, stages history, won/lost, revenue |
-| **Contacts** | `contacts/` | 7 | 9 | Contact management, contact tree, merge contacts |
+| **Contacts** | `contacts/` | 19 | 21 | Contacts, tags, segments, activity timeline, import/export, merge |
 | **Accounts** | `accounts/` | 6 | 10 | Account hierarchy, company tree, industry classification |
 | **Teams** | `teams/` | 6 | 12 | Team management, member assignment, capacity-based distribution |
-| **Automation** | `automation/` | 14 | 27 | Workflow automation, rules, triggers, execution logs |
+| **Automation** | `automation/` | 27 | 42 | Step-graph workflows (wait, if/else, split, goal), enrolments, triggers, rules, execution logs |
 | **Intelligence** | `intelligence/` | 21 | 29 | Lead scoring (Bayesian PLS), enrichment, data verification |
 | **Engagement** | `engagement/` | 14 | 21 | Subscriptions, renewals, goals, gamification, health scoring |
 | **Livechat** | `livechat/` | 15 | 23 | Chat sessions, messages, agent management, conversion |
-| **Marketing** | `marketing/` | 14 | 26 | UTM tracking, web forms, visitor analytics, event registration |
+| **Marketing** | `marketing/` | 25 | 36 | UTM tracking, form builder, site tracking, custom events, attribution |
+| **Outreach** | `outreach/` | 36 | 50 | Lists & consent, templates, campaigns, sends, events, transactional, senders, public endpoints |
+| **Social** | `social/` | 14 | 18 | Connected accounts, calendar, approval, engagement, social lead capture |
 | **Reporting** | `reporting/` | 17 | 23 | Analytics, dashboards, forecasts, KPI digests |
 | **Platform** | `platform/` | 14 | 27 | Custom fields, webhooks, API keys, audit logs, integrations |
 
@@ -72,12 +74,14 @@ Gateway Layer (openapi.yaml)
     ├── intelligence/← Scoring, enrichment, verification
     ├── engagement/  ← Subscriptions, goals, badges
     ├── livechat/    ← Chat sessions, agents, conversion
-    ├── marketing/   ← UTM, forms, visitors, events
+    ├── marketing/   ← UTM, forms, site tracking, events, attribution
+    ├── outreach/    ← Lists, consent, templates, campaigns, sends
+    ├── social/      ← Accounts, calendar, engagement
     ├── reporting/   ← Analytics, forecasts, digests
     └── platform/    ← Custom fields, webhooks, audit, API keys
     │
     ▼
-Storage Tier (PostgreSQL — 4 DBs: Core, Analytics, Events, Platform)
+Storage Tier (PostgreSQL — 5 DBs: Core, Analytics, Events, Platform, Outreach [outside the tenant DB, ADR 003])
 ```
 
 ---

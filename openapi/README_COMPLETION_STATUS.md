@@ -76,9 +76,6 @@ Each README follows a consistent datasheet format:
 - project/timesheet
 
 ### ✅ Phase 5: Customer-Facing (10/10)
-- marketing/email
-- marketing/automation
-- marketing/social-media
 - website/builder
 - website/ecommerce
 - website/cms

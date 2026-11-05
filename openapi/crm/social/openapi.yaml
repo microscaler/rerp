@@ -1,0 +1,1002 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Social
+  version: v1.0.0
+  description: |
+    Social media publishing for the CRM: connected platform accounts, a content calendar of scheduled
+    posts (with per-platform variants), an approval step, engagement metrics pulled back per post,
+    and social lead capture into crm/pipeline. Moved from the former openapi/marketing/social-media
+    stub; the platform adapters (X, Instagram, Threads, LinkedIn, Facebook) are deployment
+    configuration.
+  x-api-version: CRM Social API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
+  contact:
+    name: RERP API Support
+    url: https://docs.rerp.com/support
+    email: api-support@rerp.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-api-docs:
+    service: social
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+servers:
+- url: http://localhost:10354/api/v1/crm/social
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/social
+  description: Social API
+tags:
+- name: social-accounts
+  description: Connected platform accounts
+- name: social-posts
+  description: Posts, scheduling and approval
+- name: social-calendar
+  description: Calendar view of scheduled and published posts
+- name: social-engagement
+  description: Engagement metrics per post and per account
+- name: social-leads
+  description: Capturing leads from social interactions
+paths:
+  /accounts:
+    get:
+      operationId: list_social_accounts
+      summary: Connected social accounts
+      tags:
+      - social-accounts
+      responses:
+        '200':
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialAccount'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: connect_social_account
+      summary: Connect an account
+      description: Returns the OAuth authorization URL for the platform; the callback completes the connection.
+      tags:
+      - social-accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectSocialAccountRequest'
+      responses:
+        '201':
+          description: Connection started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /accounts/{id}:
+    get:
+      operationId: get_social_account
+      summary: Get an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: disconnect_social_account
+      summary: Disconnect an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Disconnected
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /accounts/{id}/pause:
+    post:
+      operationId: pause_social_account
+      summary: Pause or resume publishing on an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paused
+              properties:
+                paused:
+                  type: boolean
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /posts:
+    get:
+      operationId: list_social_posts
+      summary: List posts
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/PostStatus'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSocialPost'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_social_post
+      summary: Create a post (draft or scheduled)
+      tags:
+      - social-posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialPostRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /posts/{id}:
+    get:
+      operationId: get_social_post
+      summary: Get a post with its per-platform results
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: update_social_post
+      summary: Update a draft or scheduled post
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialPostRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Post already published
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_social_post
+      summary: Delete a draft or scheduled post
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Published posts cannot be deleted here
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /posts/{id}/approve:
+    post:
+      operationId: approve_social_post
+      summary: Approve a post awaiting approval
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /posts/{id}/skip:
+    post:
+      operationId: skip_social_post
+      summary: Skip a scheduled post with a reason
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Skipped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /posts/{id}/publish:
+    post:
+      operationId: publish_social_post_now
+      summary: Publish immediately
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '202':
+          description: Publishing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Account paused or post not approved
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /calendar:
+    get:
+      operationId: get_social_calendar
+      summary: Posts by day for a date range
+      tags:
+      - social-calendar
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Calendar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialCalendar'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /posts/{id}/engagement:
+    get:
+      operationId: get_post_engagement
+      summary: Engagement metrics for a post
+      tags:
+      - social-engagement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Metrics per platform
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Engagement'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /accounts/{id}/engagement:
+    get:
+      operationId: get_account_engagement
+      summary: Engagement over time for an account
+      tags:
+      - social-engagement
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: days
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 30
+      responses:
+        '200':
+          description: Daily series
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountEngagementSeries'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /leads/capture:
+    post:
+      operationId: capture_social_lead
+      summary: Create a lead in crm/pipeline from a social interaction
+      tags:
+      - social-leads
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLeadCaptureRequest'
+      responses:
+        '201':
+          description: Lead created or matched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id:
+                    type: string
+                    format: uuid
+                  matched_existing:
+                    type: boolean
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /audit:
+    get:
+      operationId: list_social_audit
+      summary: Who did what to the feed
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditEntry'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      description: Page number for pagination (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: 'Maximum number of items per page (default: 20, max: 100)'
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+      description: Search query string for filtering resources
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Unique identifier for the resource
+  schemas:
+    Platform:
+      type: string
+      enum:
+      - X
+      - INSTAGRAM
+      - THREADS
+      - LINKEDIN
+      - FACEBOOK
+      - BLUESKY
+      - MASTODON
+    PostStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PENDING_APPROVAL
+      - APPROVED
+      - SCHEDULED
+      - PUBLISHING
+      - PUBLISHED
+      - PARTIAL
+      - FAILED
+      - SKIPPED
+      description: PARTIAL means some platform targets published and others failed
+    SocialAccount:
+      type: object
+      required:
+      - id
+      - platform
+      - handle
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        handle:
+          type: string
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum:
+          - CONNECTING
+          - CONNECTED
+          - PAUSED
+          - TOKEN_EXPIRED
+          - DISCONNECTED
+        authorization_url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Present while CONNECTING
+        paused_reason:
+          type: string
+        followers:
+          type: integer
+          format: int64
+          readOnly: true
+        token_expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    ConnectSocialAccountRequest:
+      type: object
+      required:
+      - platform
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        redirect_uri:
+          type: string
+          format: uri
+    SocialPost:
+      type: object
+      required:
+      - id
+      - status
+      - body
+      - targets
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/PostStatus'
+        body:
+          type: string
+          description: Default text; a target may override it
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+          description: crm/marketing UTM campaign stamped on the link
+        targets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+          default: false
+        approved_by:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+        skip_reason:
+          type: string
+        source:
+          type: string
+          description: Free text naming what generated the post (a person, an automation, an external worker)
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+    PostTarget:
+      type: object
+      required:
+      - account_id
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        body_override:
+          type: string
+        status:
+          $ref: '#/components/schemas/PostStatus'
+        platform_post_id:
+          type: string
+          readOnly: true
+        permalink:
+          type: string
+          format: uri
+          readOnly: true
+        error:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Media:
+      type: object
+      required:
+      - url
+      - kind
+      properties:
+        url:
+          type: string
+          format: uri
+        kind:
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - GIF
+        alt_text:
+          type: string
+    CreateSocialPostRequest:
+      type: object
+      required:
+      - body
+      - targets
+      properties:
+        body:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+        targets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+        source:
+          type: string
+    UpdateSocialPostRequest:
+      type: object
+      properties:
+        body:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+    SocialCalendar:
+      type: object
+      required:
+      - days
+      properties:
+        days:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            - posts
+            properties:
+              date:
+                type: string
+                format: date
+              posts:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SocialPost'
+    Engagement:
+      type: object
+      required:
+      - account_id
+      - platform
+      - fetched_at
+      properties:
+        post_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        impressions:
+          type: integer
+          format: int64
+        likes:
+          type: integer
+          format: int64
+        comments:
+          type: integer
+          format: int64
+        shares:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        saves:
+          type: integer
+          format: int64
+        fetched_at:
+          type: string
+          format: date-time
+    AccountEngagementSeries:
+      type: object
+      required:
+      - account_id
+      - points
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        points:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            properties:
+              date:
+                type: string
+                format: date
+              posts:
+                type: integer
+                format: int32
+              impressions:
+                type: integer
+                format: int64
+              engagements:
+                type: integer
+                format: int64
+              followers:
+                type: integer
+                format: int64
+    SocialLeadCaptureRequest:
+      type: object
+      required:
+      - platform
+      - handle
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        handle:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+          format: email
+        post_id:
+          type: string
+          format: uuid
+          description: The post the interaction came from, when known
+        interaction:
+          type: string
+          enum:
+          - COMMENT
+          - DM
+          - MENTION
+          - FOLLOW
+          - LEAD_FORM
+        text:
+          type: string
+        utm_campaign_id:
+          type: string
+          format: uuid
+    AuditEntry:
+      type: object
+      required:
+      - id
+      - at
+      - actor
+      - action
+      properties:
+        id:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        action:
+          type: string
+          enum:
+          - CREATED
+          - UPDATED
+          - APPROVED
+          - SKIPPED
+          - PUBLISHED
+          - FAILED
+          - PAUSED
+          - RESUMED
+          - CONNECTED
+          - DISCONNECTED
+        post_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        note:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: string
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedSocialPost:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/SocialPost'
+    PaginatedAuditEntry:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AuditEntry'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Social API Reference
+  url: https://docs.rerp.com/crm/social/api-reference

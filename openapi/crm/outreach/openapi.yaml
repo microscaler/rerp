@@ -1,0 +1,2775 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Outreach
+  version: v1.0.0
+  description: |
+    Message delivery for the CRM: lists and subscriptions (consent), message templates, one-time and
+    A/B campaigns, transactional sends, the per-message delivery log and engagement events (delivered,
+    opened, clicked, bounced, complained, unsubscribed), suppression, sender identities, and the public
+    endpoints a recipient touches (open pixel, click redirect, one-click unsubscribe, preference page).
+
+    Channel is a property of the template and the campaign (EMAIL first; SMS and WHATSAPP share the
+    same model and are delivered when a provider adapter exists). Automation (crm/automation) sends
+    through this service via its SEND_MESSAGE action; it never talks to a provider itself.
+
+    Data home (ADR 003): the outreach store sits with the marketing funnel, outside RERP's tenant
+    database, in a Postgres this service owns (a deployment may point it at a managed project or an
+    in-cluster instance). Marketing history, consent and engagement never cross into RERP; only
+    converted customers do. The provider adapter (SES, Postmark, Resend, ...) is deployment
+    configuration, never a property of the data.
+  x-api-version: CRM Outreach API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
+  contact:
+    name: RERP API Support
+    url: https://docs.rerp.com/support
+    email: api-support@rerp.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-api-docs:
+    service: outreach
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+servers:
+- url: http://localhost:10353/api/v1/crm/outreach
+  description: Local development (direct to service, port from port-registry)
+- url: /api/v1/crm/outreach
+  description: Outreach API
+tags:
+- name: lists
+  description: Mailing lists and their subscription state
+- name: subscriptions
+  description: Contact x list subscription state and consent history
+- name: templates
+  description: Message templates (email, SMS, WhatsApp) with merge fields
+- name: campaigns
+  description: One-time and A/B campaigns, their schedule and send
+- name: sends
+  description: Per-recipient delivery log
+- name: events
+  description: Engagement events (delivered, opened, clicked, bounced, complained, unsubscribed)
+- name: transactional
+  description: Application-triggered single sends sharing the suppression list
+- name: suppressions
+  description: Addresses that must never be sent to
+- name: senders
+  description: Sender identities and sending domains (DKIM / DMARC state)
+- name: public
+  description: Unauthenticated endpoints a recipient's mail client or browser touches
+- name: provider-webhooks
+  description: Inbound delivery events from the email/SMS provider
+- name: outreach-reports
+  description: Campaign and list performance
+paths:
+  /lists:
+    get:
+      operationId: list_lists
+      summary: List mailing lists
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Mailing lists with subscriber counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailingList'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_list
+      summary: Create a mailing list
+      tags:
+      - lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMailingListRequest'
+            examples:
+              default:
+                name: Product launch waitlist
+                description: Everyone who asked to be told when the product opens
+                sender_id: 00000000-0000-0000-0000-000000000301
+                double_opt_in: true
+      responses:
+        '201':
+          description: List created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /lists/{id}:
+    get:
+      operationId: get_list
+      summary: Get a mailing list
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: The list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: update_list
+      summary: Update a mailing list
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailingListRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_list
+      summary: Archive a mailing list
+      description: Lists are archived, never hard-deleted; subscription history under them is retained for consent audit.
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Archived
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /lists/{id}/subscriptions:
+    get:
+      operationId: list_list_subscriptions
+      summary: Subscriptions on a list
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SubscriptionStatus'
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubscription'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /subscriptions:
+    post:
+      operationId: subscribe
+      summary: Subscribe a contact to a list
+      description: |
+        Records a subscription with its consent source. With double opt-in on the list the status is PENDING until
+        the confirmation link is followed. Re-subscribing an UNSUBSCRIBED contact requires a fresh consent source
+        (a form submission or an explicit staff action with a note); an automation may not do it.
+      tags:
+      - subscriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        '201':
+          description: Subscription recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '409':
+          description: Address is suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /subscriptions/{id}:
+    get:
+      operationId: get_subscription
+      summary: Get a subscription with its consent history
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /subscriptions/{id}/unsubscribe:
+    post:
+      operationId: unsubscribe
+      summary: Unsubscribe a contact from a list
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnsubscribeRequest'
+      responses:
+        '200':
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /contacts/{id}/subscriptions:
+    get:
+      operationId: list_contact_subscriptions
+      summary: A contact's subscriptions across all lists
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /templates:
+    get:
+      operationId: list_templates
+      summary: List message templates
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: channel
+        in: query
+        schema:
+          $ref: '#/components/schemas/Channel'
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/TemplateKind'
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTemplate'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_template
+      summary: Create a message template
+      tags:
+      - templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+            examples:
+              default:
+                name: 'Onboarding day 7: your first week'
+                channel: EMAIL
+                kind: AUTOMATION
+                subject: 'Day 7: what you have set up so far'
+                preheader: A week in, and three things worth doing next
+                body_format: MARKDOWN
+                body: "Hi {{contact.first_name}},\n\nA week ago you signed up..."
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /templates/{id}:
+    get:
+      operationId: get_template
+      summary: Get a template
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: update_template
+      summary: Update a template (creates a new version)
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_template
+      summary: Archive a template
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Archived
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Template is referenced by a scheduled campaign or active automation
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /templates/{id}/render:
+    post:
+      operationId: render_template
+      summary: Render a template for a contact (preview)
+      description: Merge fields are resolved from the given contact, or from the sample values supplied. Nothing is sent.
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderRequest'
+      responses:
+        '200':
+          description: Rendered message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderedMessage'
+        '400':
+          description: Unresolvable merge field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /templates/{id}/test-send:
+    post:
+      operationId: test_send_template
+      summary: Send a template to a staff address
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSendRequest'
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /merge-fields:
+    get:
+      operationId: list_merge_fields
+      summary: Merge fields available to templates
+      description: Contact fields, custom fields (crm/platform), list and campaign fields, and system links (unsubscribe, preferences, web view).
+      tags:
+      - templates
+      responses:
+        '200':
+          description: Merge fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MergeField'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /campaigns:
+    get:
+      operationId: list_campaigns
+      summary: List campaigns
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/CampaignStatus'
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/CampaignKind'
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaign'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_campaign
+      summary: Create a campaign (draft)
+      tags:
+      - campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /campaigns/{id}:
+    get:
+      operationId: get_campaign
+      summary: Get a campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    put:
+      operationId: update_campaign
+      summary: Update a draft or scheduled campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Campaign is sending or sent
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_campaign
+      summary: Delete a draft campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Only drafts can be deleted; sent campaigns are archived
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /campaigns/{id}/audience:
+    get:
+      operationId: preview_campaign_audience
+      summary: Resolve the campaign's audience now
+      description: Lists minus exclusions minus suppressed minus unsubscribed, filtered by the segment. Returns the count and a sample.
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudiencePreview'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /campaigns/{id}/schedule:
+    post:
+      operationId: schedule_campaign
+      summary: Schedule or send now
+      description: Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present) and moves it to SCHEDULED. Omit send_at to send immediately.
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCampaignRequest'
+      responses:
+        '200':
+          description: Scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignValidation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /campaigns/{id}/cancel:
+    post:
+      operationId: cancel_campaign
+      summary: Cancel a scheduled campaign or stop one mid-send
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Campaign already completed
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /campaigns/{id}/duplicate:
+    post:
+      operationId: duplicate_campaign
+      summary: Copy a campaign as a new draft
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /campaigns/{id}/report:
+    get:
+      operationId: get_campaign_report
+      summary: Campaign performance
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /campaigns/{id}/sends:
+    get:
+      operationId: list_campaign_sends
+      summary: Per-recipient sends for a campaign
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SendStatus'
+      responses:
+        '200':
+          description: Sends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSend'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /sends/{id}:
+    get:
+      operationId: get_send
+      summary: One send with its events
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Send
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /contacts/{id}/sends:
+    get:
+      operationId: list_contact_sends
+      summary: Everything sent to a contact
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Sends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSend'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /events:
+    get:
+      operationId: list_events
+      summary: Engagement events
+      description: Filter by contact, campaign, send or type. The automation service subscribes to these to fire EMAIL_OPENED / EMAIL_CLICKED triggers.
+      tags:
+      - events
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: campaign_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: send_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: query
+        schema:
+          $ref: '#/components/schemas/EventType'
+      - name: since
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageEvent'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /transactional/send:
+    post:
+      operationId: send_transactional
+      summary: Send one message to one recipient from the application
+      description: |
+        For welcome, password, receipt and alert mail. Honors the suppression list and hard bounces but not list
+        subscription state (a transactional message is not marketing). Requires a template of kind TRANSACTIONAL.
+      tags:
+      - transactional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionalSendRequest'
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '422':
+          description: Recipient suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /suppressions:
+    get:
+      operationId: list_suppressions
+      summary: Suppressed addresses
+      tags:
+      - suppressions
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: reason
+        in: query
+        schema:
+          $ref: '#/components/schemas/SuppressionReason'
+      responses:
+        '200':
+          description: Suppressions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSuppression'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_suppression
+      summary: Suppress an address manually
+      tags:
+      - suppressions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSuppressionRequest'
+      responses:
+        '201':
+          description: Suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Suppression'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /suppressions/{id}:
+    delete:
+      operationId: delete_suppression
+      summary: Lift a manual suppression
+      description: Only MANUAL suppressions can be lifted. COMPLAINT and HARD_BOUNCE are permanent.
+      tags:
+      - suppressions
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Lifted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Suppression is permanent
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /senders:
+    get:
+      operationId: list_senders
+      summary: Sender identities
+      tags:
+      - senders
+      responses:
+        '200':
+          description: Senders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sender'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+    post:
+      operationId: create_sender
+      summary: Add a sender identity
+      description: Starts domain verification; the response carries the DNS records (DKIM, SPF, DMARC, return-path) the operator publishes through their DNS tooling.
+      tags:
+      - senders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSenderRequest'
+      responses:
+        '201':
+          description: Sender created, verification pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /senders/{id}:
+    get:
+      operationId: get_sender
+      summary: Sender with verification state
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+    delete:
+      operationId: delete_sender
+      summary: Remove a sender identity
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '409':
+          description: Sender is in use by a list or scheduled campaign
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /senders/{id}/verify:
+    post:
+      operationId: verify_sender
+      summary: Re-check the sender's DNS records
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+  /reports/overview:
+    get:
+      operationId: get_outreach_overview
+      summary: Sends, open and click rates over a period
+      tags:
+      - outreach-reports
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutreachOverview'
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /reports/lists/{id}/growth:
+    get:
+      operationId: get_list_growth
+      summary: Subscriptions and unsubscribes per day for a list
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: days
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 90
+      responses:
+        '200':
+          description: Growth series
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListGrowth'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /public/o/{token}:
+    get:
+      operationId: public_open
+      summary: Open pixel
+      description: Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token is an HMAC of the send id.
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: 1x1 transparent GIF
+          content:
+            image/gif:
+              schema:
+                type: string
+                format: binary
+      security: []
+      x-brrtrouter-impl: true
+  /public/c/{token}:
+    get:
+      operationId: public_click
+      summary: Click redirect
+      description: Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations are never taken from the query string.
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '302':
+          description: Redirect to the original link
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '404':
+          description: Unknown token
+      security: []
+      x-brrtrouter-impl: true
+  /public/u/{token}:
+    get:
+      operationId: public_unsubscribe_page
+      summary: Unsubscribe landing page
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: HTML page confirming the unsubscribe with a link to preferences
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Unknown token
+      security: []
+      x-brrtrouter-impl: true
+    post:
+      operationId: public_unsubscribe_one_click
+      summary: One-click unsubscribe (RFC 8058 List-Unsubscribe-Post)
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                List-Unsubscribe:
+                  type: string
+                  const: One-Click
+      responses:
+        '200':
+          description: Unsubscribed
+        '404':
+          description: Unknown token
+      security: []
+      x-brrtrouter-impl: true
+  /public/p/{token}:
+    get:
+      operationId: public_preferences_get
+      summary: Preference page state
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: The contact's lists and their current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencePage'
+        '404':
+          description: Unknown token
+      security: []
+    post:
+      operationId: public_preferences_update
+      summary: Update list subscriptions from the preference page
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencePage'
+        '400':
+          description: Invalid request
+        '404':
+          description: Unknown token
+      security: []
+      x-brrtrouter-impl: true
+  /public/confirm/{token}:
+    get:
+      operationId: public_confirm_subscription
+      summary: Double opt-in confirmation
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: HTML confirmation page
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Unknown or expired token
+      security: []
+      x-brrtrouter-impl: true
+  /public/view/{token}:
+    get:
+      operationId: public_web_view
+      summary: View the message in a browser
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: Rendered message HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Unknown token
+      security: []
+      x-brrtrouter-impl: true
+  /webhooks/provider/{provider}:
+    post:
+      operationId: ingest_provider_events
+      summary: Inbound delivery events from the provider
+      description: |
+        Verified by the provider's signature scheme (header named per provider). Every event is normalized into a
+        MessageEvent keyed by the provider message id. Idempotent on provider event id. Unknown events are acked and
+        dropped. Deployments should expose this only through a keyless relay (the same shape as the
+        crm-conversions intake in ADR 003), never directly from the provider to the service.
+      tags:
+      - provider-webhooks
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Provider'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Provider-native payload
+      responses:
+        '200':
+          description: Accepted
+        '401':
+          description: Bad signature
+      security: []
+      x-brrtrouter-impl: true
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      description: Page number for pagination (1-indexed)
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: 'Maximum number of items per page (default: 20, max: 100)'
+    Search:
+      name: search
+      in: query
+      schema:
+        type: string
+      description: Search query string for filtering resources
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Unique identifier for the resource
+    Token:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+      description: Opaque signed token minted at send time; names a send (and link index) without exposing ids
+  schemas:
+    Channel:
+      type: string
+      enum:
+      - EMAIL
+      - SMS
+      - WHATSAPP
+      description: Delivery channel. EMAIL is delivered; SMS and WHATSAPP need a provider adapter.
+    Provider:
+      type: string
+      enum:
+      - SES
+      - POSTMARK
+      - RESEND
+      - TWILIO
+      - META
+      description: Provider adapters the service knows how to drive and whose webhooks it can verify
+    TemplateKind:
+      type: string
+      enum:
+      - CAMPAIGN
+      - AUTOMATION
+      - TRANSACTIONAL
+      description: CAMPAIGN and AUTOMATION templates must carry an unsubscribe link; TRANSACTIONAL may not be used by a campaign
+    BodyFormat:
+      type: string
+      enum:
+      - MARKDOWN
+      - MJML
+      - HTML
+      - TEXT
+      description: How the body is authored. MARKDOWN and MJML are compiled to HTML at render; TEXT is for SMS/WhatsApp and the plain-text part
+    SubscriptionStatus:
+      type: string
+      enum:
+      - PENDING
+      - SUBSCRIBED
+      - UNSUBSCRIBED
+      - BOUNCED
+      - COMPLAINED
+      description: PENDING awaits double opt-in; BOUNCED and COMPLAINED are set by delivery events and cannot be re-subscribed by automation
+    ConsentSource:
+      type: string
+      enum:
+      - WEB_FORM
+      - DOUBLE_OPT_IN
+      - IMPORT
+      - STAFF
+      - API
+      - PREFERENCE_PAGE
+      - CHECKOUT
+      description: Where the consent came from; stored on every subscription change
+    CampaignKind:
+      type: string
+      enum:
+      - ONE_TIME
+      - AB_TEST
+      - RSS
+      description: ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates
+    CampaignStatus:
+      type: string
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - SENDING
+      - SENT
+      - CANCELLED
+      - FAILED
+    SendStatus:
+      type: string
+      enum:
+      - QUEUED
+      - SENT
+      - DELIVERED
+      - BOUNCED
+      - FAILED
+      - SUPPRESSED
+      description: The latest delivery state of a send; engagement (opens, clicks) lives in events, not here
+    EventType:
+      type: string
+      enum:
+      - QUEUED
+      - SENT
+      - DELIVERED
+      - DEFERRED
+      - OPENED
+      - CLICKED
+      - SOFT_BOUNCED
+      - HARD_BOUNCED
+      - COMPLAINED
+      - UNSUBSCRIBED
+      - REPLIED
+    SuppressionReason:
+      type: string
+      enum:
+      - HARD_BOUNCE
+      - COMPLAINT
+      - MANUAL
+      - GLOBAL_UNSUBSCRIBE
+    SenderStatus:
+      type: string
+      enum:
+      - PENDING
+      - VERIFIED
+      - FAILED
+    MailingList:
+      type: object
+      required:
+      - id
+      - name
+      - sender_id
+      - double_opt_in
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+          description: Default sender for campaigns to this list
+        double_opt_in:
+          type: boolean
+        confirmation_template_id:
+          type: string
+          format: uuid
+          description: Template used for the double opt-in email; required when double_opt_in is true
+        is_archived:
+          type: boolean
+          default: false
+        subscriber_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: SUBSCRIBED only
+        unsubscribed_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A mailing list. Consent is per list; a contact may be on several.
+    CreateMailingListRequest:
+      type: object
+      required:
+      - name
+      - sender_id
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+        double_opt_in:
+          type: boolean
+          default: false
+        confirmation_template_id:
+          type: string
+          format: uuid
+    UpdateMailingListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+        double_opt_in:
+          type: boolean
+        confirmation_template_id:
+          type: string
+          format: uuid
+    Subscription:
+      type: object
+      required:
+      - id
+      - contact_id
+      - list_id
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
+        list_name:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        consent_source:
+          $ref: '#/components/schemas/ConsentSource'
+        consent_at:
+          type: string
+          format: date-time
+        consent_ip:
+          type: string
+          description: Recorded for WEB_FORM and DOUBLE_OPT_IN consent
+        consent_text:
+          type: string
+          description: The exact consent wording shown at the time
+        form_id:
+          type: string
+          format: uuid
+          description: The crm/marketing form that produced the consent, when WEB_FORM
+        unsubscribed_at:
+          type: string
+          format: date-time
+        unsubscribe_reason:
+          type: string
+        history:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ConsentEvent'
+          description: Every status change, oldest first; never trimmed
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A contact's standing on one list, with the audit trail that justifies sending to them
+    ConsentEvent:
+      type: object
+      required:
+      - at
+      - status
+      - source
+      properties:
+        at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+        actor:
+          type: string
+          description: Staff user id, automation id, or 'contact'
+        note:
+          type: string
+    SubscribeRequest:
+      type: object
+      required:
+      - contact_id
+      - list_id
+      - consent_source
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
+        consent_source:
+          $ref: '#/components/schemas/ConsentSource'
+        consent_ip:
+          type: string
+        consent_text:
+          type: string
+        form_id:
+          type: string
+          format: uuid
+        note:
+          type: string
+          description: Required when consent_source is STAFF
+    UnsubscribeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+    Template:
+      type: object
+      required:
+      - id
+      - name
+      - channel
+      - kind
+      - body_format
+      - body
+      - version
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        channel:
+          $ref: '#/components/schemas/Channel'
+        kind:
+          $ref: '#/components/schemas/TemplateKind'
+        subject:
+          type: string
+          maxLength: 255
+          description: EMAIL only; may contain merge fields
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+          description: Source in body_format; merge fields as {{contact.first_name}}, {{list.name}}, {{links.unsubscribe}}
+        text_body:
+          type: string
+          description: Optional explicit plain-text part; derived from body when absent
+        design:
+          type: object
+          description: Editor state for the block editor (opaque to the service); absent for hand-written bodies
+        version:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Incremented on every update; sends record the version they used
+        merge_fields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Merge fields found in the body at last save
+        is_archived:
+          type: boolean
+          default: false
+        thumbnail_url:
+          type: string
+          format: uri
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A message template. Campaigns and automation steps reference templates by id.
+    CreateTemplateRequest:
+      type: object
+      required:
+      - name
+      - channel
+      - kind
+      - body_format
+      - body
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        channel:
+          $ref: '#/components/schemas/Channel'
+        kind:
+          $ref: '#/components/schemas/TemplateKind'
+        subject:
+          type: string
+          maxLength: 255
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+        text_body:
+          type: string
+        design:
+          type: object
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        subject:
+          type: string
+          maxLength: 255
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+        text_body:
+          type: string
+        design:
+          type: object
+    RenderRequest:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        sample:
+          type: object
+          additionalProperties:
+            type: string
+          description: Merge values to use instead of (or over) the contact's
+    RenderedMessage:
+      type: object
+      required:
+      - html
+      - text
+      properties:
+        subject:
+          type: string
+        preheader:
+          type: string
+        html:
+          type: string
+        text:
+          type: string
+        unresolved:
+          type: array
+          items:
+            type: string
+          description: Merge fields with no value for this contact
+    TestSendRequest:
+      type: object
+      required:
+      - to
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          maxItems: 5
+        contact_id:
+          type: string
+          format: uuid
+          description: Contact whose merge values to use
+    MergeField:
+      type: object
+      required:
+      - key
+      - label
+      - group
+      properties:
+        key:
+          type: string
+          example: contact.first_name
+        label:
+          type: string
+        group:
+          type: string
+          enum:
+          - contact
+          - custom
+          - list
+          - campaign
+          - links
+          - sender
+        sample:
+          type: string
+    Campaign:
+      type: object
+      required:
+      - id
+      - name
+      - kind
+      - channel
+      - status
+      - list_ids
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+          description: Internal name; the subject lives on the template
+        kind:
+          $ref: '#/components/schemas/CampaignKind'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        status:
+          $ref: '#/components/schemas/CampaignStatus'
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+          description: ONE_TIME and RSS
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+          description: AB_TEST only; two to five variants
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+          description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole list
+        utm_campaign_id:
+          type: string
+          format: uuid
+          description: crm/marketing UTM campaign stamped on every tracked link
+        send_at:
+          type: string
+          format: date-time
+        send_in_contact_timezone:
+          type: boolean
+          default: false
+        track_opens:
+          type: boolean
+          default: true
+        track_clicks:
+          type: boolean
+          default: true
+        folder:
+          type: string
+        audience_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Resolved at schedule time
+        sent_count:
+          type: integer
+          format: int64
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: string
+          description: Staff user id
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A broadcast to the resolved audience of one or more lists
+    CampaignVariant:
+      type: object
+      required:
+      - key
+      - template_id
+      properties:
+        key:
+          type: string
+          maxLength: 1
+          example: A
+        template_id:
+          type: string
+          format: uuid
+        sent_count:
+          type: integer
+          format: int64
+          readOnly: true
+        open_rate:
+          type: number
+          format: double
+          readOnly: true
+        click_rate:
+          type: number
+          format: double
+          readOnly: true
+    ABTestConfig:
+      type: object
+      required:
+      - sample_percent
+      - winner_metric
+      - decide_after_minutes
+      properties:
+        sample_percent:
+          type: integer
+          format: int32
+          minimum: 10
+          maximum: 100
+          description: Share of the audience split evenly across variants; the rest get the winner
+        winner_metric:
+          type: string
+          enum:
+          - OPENS
+          - CLICKS
+        decide_after_minutes:
+          type: integer
+          format: int32
+          minimum: 60
+        winner_key:
+          type: string
+          readOnly: true
+    CreateCampaignRequest:
+      type: object
+      required:
+      - name
+      - kind
+      - channel
+      - list_ids
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        kind:
+          $ref: '#/components/schemas/CampaignKind'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+        utm_campaign_id:
+          type: string
+          format: uuid
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        folder:
+          type: string
+    UpdateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+        utm_campaign_id:
+          type: string
+          format: uuid
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        folder:
+          type: string
+    ScheduleCampaignRequest:
+      type: object
+      properties:
+        send_at:
+          type: string
+          format: date-time
+          description: Omit to send now
+        send_in_contact_timezone:
+          type: boolean
+    CampaignValidation:
+      type: object
+      required:
+      - ok
+      - problems
+      properties:
+        ok:
+          type: boolean
+        problems:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                enum:
+                - SENDER_UNVERIFIED
+                - TEMPLATE_MISSING
+                - UNSUBSCRIBE_LINK_MISSING
+                - AUDIENCE_EMPTY
+                - UNRESOLVED_MERGE_FIELD
+                - VARIANTS_INVALID
+              message:
+                type: string
+    AudiencePreview:
+      type: object
+      required:
+      - count
+      properties:
+        count:
+          type: integer
+          format: int64
+        excluded_unsubscribed:
+          type: integer
+          format: int64
+        excluded_suppressed:
+          type: integer
+          format: int64
+        excluded_by_segment:
+          type: integer
+          format: int64
+        sample:
+          type: array
+          items:
+            type: object
+            properties:
+              contact_id:
+                type: string
+                format: uuid
+              email:
+                type: string
+              name:
+                type: string
+    Send:
+      type: object
+      required:
+      - id
+      - contact_id
+      - channel
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        variant_key:
+          type: string
+        workflow_id:
+          type: string
+          format: uuid
+          description: Set when sent by an automation step
+        enrolment_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        template_version:
+          type: integer
+          format: int32
+        channel:
+          $ref: '#/components/schemas/Channel'
+        to:
+          type: string
+          description: Address or number as sent
+        subject:
+          type: string
+        status:
+          $ref: '#/components/schemas/SendStatus'
+        provider:
+          $ref: '#/components/schemas/Provider'
+        provider_message_id:
+          type: string
+        error:
+          type: string
+        opened_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: First open
+        clicked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: First click
+        events:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MessageEvent'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: One message to one recipient
+    MessageEvent:
+      type: object
+      required:
+      - id
+      - send_id
+      - contact_id
+      - type
+      - at
+      properties:
+        id:
+          type: string
+          format: uuid
+        send_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/EventType'
+        at:
+          type: string
+          format: date-time
+        link_url:
+          type: string
+          format: uri
+          description: CLICKED
+        link_index:
+          type: integer
+          format: int32
+        user_agent:
+          type: string
+        ip:
+          type: string
+        bounce_code:
+          type: string
+        provider_event_id:
+          type: string
+          description: Idempotency key for provider webhooks
+    TransactionalSendRequest:
+      type: object
+      required:
+      - template_id
+      - to
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        to:
+          type: string
+          description: Email address or E.164 number
+        contact_id:
+          type: string
+          format: uuid
+          description: Links the send to a contact when known
+        merge:
+          type: object
+          additionalProperties:
+            type: string
+        idempotency_key:
+          type: string
+          maxLength: 128
+          description: Same key within 24h returns the earlier send
+        tag:
+          type: string
+          description: Free-text grouping for reporting (welcome, password_reset, alert_digest)
+    Suppression:
+      type: object
+      required:
+      - id
+      - address
+      - reason
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          type: string
+        channel:
+          $ref: '#/components/schemas/Channel'
+        reason:
+          $ref: '#/components/schemas/SuppressionReason'
+        note:
+          type: string
+        source_send_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateSuppressionRequest:
+      type: object
+      required:
+      - address
+      properties:
+        address:
+          type: string
+        channel:
+          $ref: '#/components/schemas/Channel'
+        note:
+          type: string
+    Sender:
+      type: object
+      required:
+      - id
+      - from_name
+      - from_address
+      - domain
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        from_name:
+          type: string
+          maxLength: 128
+        from_address:
+          type: string
+          format: email
+        reply_to:
+          type: string
+          format: email
+        domain:
+          type: string
+        provider:
+          $ref: '#/components/schemas/Provider'
+        status:
+          $ref: '#/components/schemas/SenderStatus'
+        dns_records:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/DnsRecord'
+        postal_address:
+          type: string
+          description: Physical address printed in the footer (CAN-SPAM)
+        last_checked_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    DnsRecord:
+      type: object
+      required:
+      - purpose
+      - type
+      - name
+      - value
+      - verified
+      properties:
+        purpose:
+          type: string
+          enum:
+          - DKIM
+          - SPF
+          - DMARC
+          - RETURN_PATH
+        type:
+          type: string
+          enum:
+          - TXT
+          - CNAME
+          - MX
+        name:
+          type: string
+        value:
+          type: string
+        verified:
+          type: boolean
+    CreateSenderRequest:
+      type: object
+      required:
+      - from_name
+      - from_address
+      properties:
+        from_name:
+          type: string
+          maxLength: 128
+        from_address:
+          type: string
+          format: email
+        reply_to:
+          type: string
+          format: email
+        provider:
+          $ref: '#/components/schemas/Provider'
+        postal_address:
+          type: string
+    CampaignReport:
+      type: object
+      required:
+      - campaign_id
+      - sent
+      - delivered
+      - opened
+      - clicked
+      - bounced
+      - complained
+      - unsubscribed
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        sent:
+          type: integer
+          format: int64
+        delivered:
+          type: integer
+          format: int64
+        opened:
+          type: integer
+          format: int64
+          description: Unique contacts
+        clicked:
+          type: integer
+          format: int64
+          description: Unique contacts
+        bounced:
+          type: integer
+          format: int64
+        complained:
+          type: integer
+          format: int64
+        unsubscribed:
+          type: integer
+          format: int64
+        open_rate:
+          type: number
+          format: double
+        click_rate:
+          type: number
+          format: double
+        click_to_open_rate:
+          type: number
+          format: double
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+              clicks:
+                type: integer
+                format: int64
+              unique_clicks:
+                type: integer
+                format: int64
+        opens_by_hour:
+          type: array
+          items:
+            type: object
+            properties:
+              hour:
+                type: string
+                format: date-time
+              opens:
+                type: integer
+                format: int64
+              clicks:
+                type: integer
+                format: int64
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        revenue:
+          type: number
+          format: double
+          description: Attributed through crm/marketing campaign revenue when a UTM campaign is set
+    OutreachOverview:
+      type: object
+      required:
+      - campaigns_sent
+      - messages_sent
+      - open_rate
+      - click_rate
+      - total_contacts
+      properties:
+        campaigns_sent:
+          type: integer
+          format: int64
+        messages_sent:
+          type: integer
+          format: int64
+        open_rate:
+          type: number
+          format: double
+        click_rate:
+          type: number
+          format: double
+        bounce_rate:
+          type: number
+          format: double
+        unsubscribe_rate:
+          type: number
+          format: double
+        total_contacts:
+          type: integer
+          format: int64
+        subscribed_contacts:
+          type: integer
+          format: int64
+    ListGrowth:
+      type: object
+      required:
+      - list_id
+      - points
+      properties:
+        list_id:
+          type: string
+          format: uuid
+        points:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            - subscribed
+            - unsubscribed
+            - total
+            properties:
+              date:
+                type: string
+                format: date
+              subscribed:
+                type: integer
+                format: int64
+              unsubscribed:
+                type: integer
+                format: int64
+              total:
+                type: integer
+                format: int64
+    PreferencePage:
+      type: object
+      required:
+      - email_masked
+      - lists
+      properties:
+        email_masked:
+          type: string
+          example: a***e@example.com
+        lists:
+          type: array
+          items:
+            type: object
+            required:
+            - list_id
+            - name
+            - subscribed
+            properties:
+              list_id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              description:
+                type: string
+              subscribed:
+                type: boolean
+    PreferenceUpdate:
+      type: object
+      required:
+      - lists
+      properties:
+        lists:
+          type: array
+          items:
+            type: object
+            required:
+            - list_id
+            - subscribed
+            properties:
+              list_id:
+                type: string
+                format: uuid
+              subscribed:
+                type: boolean
+        unsubscribe_all:
+          type: boolean
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Additional error details
+      description: An error response with code, message, and optional details
+    PaginatedResponse:
+      type: object
+      required:
+      - total
+      - page
+      - limit
+      properties:
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      description: A generic paginated response wrapper with items and pagination metadata
+    PaginatedMailingList:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/MailingList'
+    PaginatedSubscription:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Subscription'
+    PaginatedTemplate:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Template'
+    PaginatedCampaign:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Campaign'
+    PaginatedSend:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Send'
+    PaginatedMessageEvent:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/MessageEvent'
+    PaginatedSuppression:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Suppression'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Outreach API Reference
+  url: https://docs.rerp.com/crm/outreach/api-reference

@@ -87,7 +87,6 @@ openapi/
   - `timesheet/` - Timesheet Tracking
 
 ### Customer-Facing (Phase 5)
-- **marketing/** - Marketing
   - `email/` - Email Marketing
   - `automation/` - Marketing Automation
   - `social-media/` - Social Media Management

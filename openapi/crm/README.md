@@ -2,9 +2,9 @@
 
 ## Overview
 
-RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship management platform. The system is organized into **11 independent microservices**, each with its own OpenAPI specification, generated code, and business logic. No single service failure disables the entire CRM.
+RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship management platform. The system is organized into **13 independent microservices**, each with its own OpenAPI specification, generated code, and business logic. No single service failure disables the entire CRM.
 
-**Architecture:** 11 services, 4 databases, event-driven communication.
+**Architecture:** 13 services, 5 databases, event-driven communication.
 
 ## Architecture
 
@@ -20,7 +20,9 @@ openapi/crm/
 ├── engagement/           # Subscriptions, renewals, MRR/churn, gamification, health scoring
 ├── intelligence/         # Lead scoring, enrichment, verification, ICP mining
 ├── reporting/            # Analytics, dashboards, forecasts, performance metrics
-├── marketing/            # UTM tracking, web forms, visitor analytics, events, surveys
+├── marketing/            # UTM tracking, web forms (builder), site tracking, events, surveys, attribution
+├── outreach/             # Lists & consent, templates, campaigns, sends, engagement events, transactional, senders
+├── social/               # Connected accounts, content calendar, approval, engagement, social lead capture
 ├── platform/             # Custom fields, webhooks, audit log, API keys, integrations
 └── CRM_ANALYSIS/         # Odoo CRM module analysis and design references
 ```
@@ -36,6 +38,7 @@ Each service owns its OpenAPI sub-spec, generated code (gen/), and business logi
 | **crm_core** | pipeline, contacts, accounts, teams | High-frequency transactional operations |
 | **crm_analytics** | automation, reporting, intelligence | Read-heavy analytics and processing |
 | **crm_events** | livechat, marketing | Communication and event capture |
+| **crm_outreach** | outreach, social | Marketing store outside the tenant DB (ADR 003): lists, consent, sends, events, posts |
 | **crm_platform** | platform | Infrastructure and extensibility |
 
 Within each database, services use independent schemas. Cross-service JOINs are possible within the same database; cross-database queries use HTTP calls or async event subscription.
@@ -88,6 +91,31 @@ Within each database, services use independent schemas. Cross-service JOINs are 
   - Capacity-based auto-assignment algorithm
   - Unassigned lead queue
   - Manual assignment triggers
+
+### Marketing Delivery Services (crm_outreach database)
+
+#### Outreach Service
+- **Path**: `crm/outreach/`
+- **Description**: Lists and consent, versioned templates, one-time and A/B campaigns, per-recipient sends and engagement events, transactional mail, suppression, sender identities, and the public open/click/unsubscribe/preference endpoints
+- **API Spec**: [Outreach OpenAPI](./outreach/openapi.yaml) - [README](./outreach/README.md)
+- **Key capabilities**:
+  - Per-list consent with an untrimmed audit trail and double opt-in
+  - Templates (Markdown/MJML/HTML/text) with merge fields and versions
+  - Campaign audience resolution (lists minus exclusions, suppressed, unsubscribed; segment filter)
+  - A/B variants with sample share, winner metric and decision time
+  - Delivery log and normalized provider events; RFC 8058 one-click unsubscribe
+  - Transactional send sharing the suppression list
+  - Provider adapters (SES, Postmark, Resend, Twilio, Meta) as deployment configuration
+
+#### Social Service
+- **Path**: `crm/social/`
+- **Description**: Connected social accounts, content calendar, approval gate, engagement metrics, social lead capture
+- **API Spec**: [Social OpenAPI](./social/openapi.yaml) - [README](./social/README.md)
+- **Key capabilities**:
+  - Posts with per-platform targets and results
+  - Schedule, approve, skip, publish now; pause per account
+  - Engagement per post and per account over time
+  - Comment / DM / mention / lead-form capture into crm/pipeline
 
 ### Analytics & Automation Services (crm_analytics database)
 
