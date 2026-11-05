@@ -514,9 +514,10 @@ paths:
             schema:
               $ref: '#/components/schemas/SendCustomerStatementsRequest'
             example:
-              customer_ids: 550e8400-e29b-41d4-a716-446655440000
-              statement_date: 1000.0
-              delivery_method: bank_transfer
+              customer_ids:
+                - 550e8400-e29b-41d4-a716-446655440000
+              statement_date: 2026-05-31
+              delivery_method: EMAIL
       responses:
         '202':
           description: Customer statement job accepted
@@ -981,18 +982,19 @@ components:
           items:
             type: string
             format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
+          example:
+            - 550e8400-e29b-41d4-a716-446655440000
         statement_date:
           type: string
           format: date
-          example: 1000.0
+          example: 2026-05-31
         delivery_method:
           type: string
           enum:
             - EMAIL
             - LETTER
             - PORTAL
-          example: bank_transfer
+          example: EMAIL
     StatementSendJob:
       type: object
       required:
