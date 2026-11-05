@@ -1208,4 +1208,410 @@ COMMIT;",
             psql_session_query(&guc_x, "SELECT count(*) FROM ar_payment_application_events");
         assert_eq!(foreign_events, "0", "journal is tenant-RLS bounded");
     }
+
+    #[test]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
+    fn live_f2d_receipt_identity_acceptance() {
+        // Epic F2 closer: the identity invoice + credit + receipt +
+        // allocation + outstanding must hold value-for-value across the
+        // READ path (composed open items), the CACHE (overlay rows and the
+        // reconciliation projection), and the immutable EVENTS journal —
+        // through full, partial, and multi-document receipts, over-balance
+        // and over-payment rejections, a reversal, cross-tenant probes,
+        // and idempotent replays.
+        // Distinct run tag so uuid slots never collide with the F2b
+        // scenario sharing this module's process-wide run_hex(): keep the
+        // first five digits and force the sixth to a value that differs
+        // from run_hex()'s own, making identity collision impossible.
+        let hex = run_hex();
+        let run = format!(
+            "{}{}",
+            &hex[..5],
+            if hex.ends_with('f') { 'e' } else { 'f' }
+        );
+        let tenant = format!("ar-f2d-{run}");
+        let other = format!("ar-f2d-x-{run}");
+        let org = Uuid::new_v4();
+        let xorg = Uuid::new_v4();
+        let subject = Uuid::new_v4();
+        let entity = uid("1", &run);
+        let period = uid("8", &run);
+        let doc_a = uid("a", &run); // 500 gross, -100 credit => 400 net
+        let doc_b = uid("b", &run); // 300
+        let doc_c = uid("c", &run); // 60
+        let credit_a = uid("e", &run); // 100 against doc A
+        let entity_x = uid("2", &run);
+        let period_x = uid("9", &run);
+        let doc_x = uid("d", &run); // foreign twin for the same customer
+        let cust = Uuid::new_v4().to_string();
+        let guc = session_guc(&tenant, &subject.to_string(), &org.to_string(), "ar-f2d-a");
+        let guc_x = session_guc(&other, &subject.to_string(), &xorg.to_string(), "ar-f2d-x");
+        let today = Utc::now().date_naive();
+        let day = |offset: i64| {
+            (today + chrono::TimeDelta::days(offset))
+                .format("%Y-%m-%d")
+                .to_string()
+        };
+
+        psql_exec(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+{guc}
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active, created_at, updated_at)
+VALUES ('{entity}', '{tenant}', '{org}', 'F2D Entity', 'USD', true, now(), now());
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
+VALUES ('{period}', '{tenant}', '{entity}', 'FY2026', '2026-01-01', '2026-12-31',
+    'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number, document_type,
+     customer_id, source_system, source_type, source_id, document_date, due_date,
+     currency_code, rounding_minor_units, subtotal, discount_amount, tax_amount,
+     total_amount, posted_at, posted_by, original_document_id)
+VALUES
+    ('{doc_a}', '{tenant}', '{entity}', '{period}', '{tenant}-F2DA',
+     'CUSTOMER_INVOICE', '{cust}', 'app-test', 'fixture', 'a',
+     '2026-02-01', '{day30}', 'USD', 2, 500, 0, 0, 500.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{doc_b}', '{tenant}', '{entity}', '{period}', '{tenant}-F2DB',
+     'CUSTOMER_INVOICE', '{cust}', 'app-test', 'fixture', 'b',
+     '2026-02-02', '{day10}', 'USD', 2, 300, 0, 0, 300.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{doc_c}', '{tenant}', '{entity}', '{period}', '{tenant}-F2DC',
+     'CUSTOMER_INVOICE', '{cust}', 'app-test', 'fixture', 'c',
+     '2026-02-03', '{day45}', 'USD', 2, 60, 0, 0, 60.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{credit_a}', '{tenant}', '{entity}', '{period}', '{tenant}-F2DX',
+     'CUSTOMER_CREDIT_NOTE', '{cust}', 'app-test', 'fixture', 'credit-a',
+     '2026-02-05', '{day20}', 'USD', 2, 100, 0, 0, 100.000000, now(),
+     '{subject}'::uuid, '{doc_a}');
+COMMIT;",
+            day30 = day(30),
+            day10 = day(10),
+            day45 = day(45),
+            day20 = day(20),
+        ));
+        psql_exec(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+{guc_x}
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active, created_at, updated_at)
+VALUES ('{entity_x}', '{other}', '{xorg}', 'F2D Foreign', 'USD', true, now(), now());
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
+VALUES ('{period_x}', '{other}', '{entity_x}', 'FY2026', '2026-01-01', '2026-12-31',
+    'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number, document_type,
+     customer_id, source_system, source_type, source_id, document_date, due_date,
+     currency_code, rounding_minor_units, subtotal, discount_amount, tax_amount,
+     total_amount, posted_at, posted_by, original_document_id)
+VALUES
+    ('{doc_x}', '{other}', '{entity_x}', '{period_x}', '{other}-F2DX',
+     'CUSTOMER_INVOICE', '{cust}', 'app-test', 'fixture', 'x',
+     '2026-02-01', '{day30}', 'USD', 2, 500, 0, 0, 500.000000, now(),
+     '{subject}'::uuid, NULL);
+COMMIT;",
+            day30 = day(30),
+        ));
+
+        let session = session_for(tenant.clone(), subject, org);
+        let foreign = session_for(other.clone(), subject, xorg);
+        let today_str = today.format("%Y-%m-%d").to_string();
+        let pay_key = |key: &str, amount: &str| {
+            crate::http_support::with_ar_transaction(&session, |executor| {
+                crate::payments::create_payment(
+                    executor,
+                    &session,
+                    key,
+                    amount,
+                    "usd",
+                    "cash",
+                    &today_str,
+                    &cust,
+                    Some(&entity),
+                    None,
+                    Some("f2d-acceptance"),
+                    false,
+                )
+            })
+        };
+        let items = |session: &SessionContext, filters: &crate::ledger::ListFilters| {
+            crate::http_support::with_ar_transaction(session, |executor| {
+                crate::ledger::list_open_items(executor, session, filters)
+            })
+        };
+        let item = |id: &str| {
+            crate::http_support::with_ar_transaction(&session, |executor| {
+                crate::ledger::get_open_item(executor, &session, id)
+            })
+        };
+        let default_filters = || crate::ledger::ListFilters {
+            customer_id: Some(Uuid::parse_str(&cust).expect("cust")),
+            ..crate::ledger::ListFilters::default()
+        };
+
+        // Read path BEFORE receipts: A nets 400 (credit already settles it
+        // -> PARTIAL), B and C sit CONFIRMED at gross.
+        let before = items(&session, &default_filters()).expect("open items");
+        assert_eq!(before["total"], 3);
+        let by_id = |payload: &Value, id: &str| {
+            payload["items"]
+                .as_array()
+                .expect("items")
+                .iter()
+                .find(|row| row["id"].as_str() == Some(id))
+                .cloned()
+                .expect("row")
+        };
+        let a_before = by_id(&before, &doc_a);
+        assert_eq!(a_before["original_amount"], "400", "credit-netted original");
+        assert_eq!(a_before["outstanding_amount"], "400");
+        assert_eq!(a_before["status"], "PARTIAL", "credits already settled 100");
+        assert_eq!(by_id(&before, &doc_b)["status"], "CONFIRMED");
+
+        // Full receipt R1: 400 -> A goes PAID and leaves the default view.
+        let r1 = pay_key("f2d-r1", "400").expect("r1");
+        apply(&session, r1["id"].as_str().unwrap(), &doc_a, "400").expect("r1 to A");
+        let a_paid = item(&doc_a).expect("item A");
+        assert_eq!(a_paid["status"], "PAID");
+        assert_eq!(a_paid["outstanding_amount"], "0");
+        assert_eq!(a_paid["payment_history"].as_array().map(Vec::len), Some(1));
+
+        // Partial receipt R2: 100 -> B PARTIAL at 200.
+        let r2 = pay_key("f2d-r2", "100").expect("r2");
+        apply(&session, r2["id"].as_str().unwrap(), &doc_b, "100").expect("r2 to B");
+        let b_partial = item(&doc_b).expect("item B");
+        assert_eq!(b_partial["status"], "PARTIAL");
+        assert_eq!(b_partial["outstanding_amount"], "200");
+
+        // Multi-document receipt R3: 200 -> B (closing it) and 60 -> C.
+        let r3 = pay_key("f2d-r3", "500").expect("r3");
+        apply(&session, r3["id"].as_str().unwrap(), &doc_b, "200").expect("r3 to B");
+        apply(&session, r3["id"].as_str().unwrap(), &doc_c, "60").expect("r3 to C");
+        let after_r3 = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT applied_amount, unapplied_amount FROM ar_payments WHERE id = '{}'",
+                r3["id"].as_str().unwrap()
+            ),
+        );
+        assert_eq!(
+            after_r3, "260.000000|240.000000",
+            "one receipt, two documents"
+        );
+        let after_r3_list = items(&session, &default_filters()).expect("after r3");
+        assert_eq!(after_r3_list["total"], 0, "default view is UNPAID balances");
+        let paid_filter = crate::ledger::ListFilters {
+            status: Some("PAID".to_string()),
+            ..default_filters()
+        };
+        let paid_list = items(&session, &paid_filter).expect("paid list");
+        assert_eq!(paid_list["total"], 3, "A, B, C all settled");
+        let b_history = item(&doc_b).expect("item B");
+        assert_eq!(
+            b_history["payment_history"].as_array().map(Vec::len),
+            Some(2)
+        );
+
+        // Rejections: an over-BALANCE application (capacity 0 on C) and an
+        // over-PAYMENT application (amount beyond R4's unapplied).
+        assert!(
+            matches!(
+                apply(&session, r3["id"].as_str().unwrap(), &doc_c, "240"),
+                Err(ArError::Conflict(message)) if message.contains("outstanding")
+            ),
+            "over-balance is 409"
+        );
+        let r4 = pay_key("f2d-r4", "100").expect("r4");
+        assert!(
+            matches!(
+                apply(&session, r4["id"].as_str().unwrap(), &doc_a, "101"),
+                Err(ArError::Conflict(message)) if message.contains("unapplied")
+            ),
+            "over-payment is 409"
+        );
+
+        // Identity across the three axes, value-for-value:
+        //   original (invoice - credits) == applied + outstanding (cache),
+        //   journal net (APPLIED - REVERSED) == applied (rows),
+        //   per receipt: applied + unapplied == amount.
+        let identity = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT string_agg(right(d.document_number, 4)
+                           || ':' || (d.total_amount - COALESCE(cr.credit, 0))::text
+                           || ':' || o.original_amount::text
+                           || ':' || (COALESCE(ap.app, 0) + o.outstanding_amount)::text
+                           || ':' || o.outstanding_amount::text
+                           || ':' || COALESCE(j.net, 0)::text, ',' ORDER BY d.document_number)
+                   FROM customer_invoices o
+                   JOIN accounting_posted_documents d ON d.id = o.invoice_id
+                   LEFT JOIN (
+                       SELECT original_document_id AS doc, sum(total_amount) AS credit
+                         FROM accounting_posted_documents
+                        WHERE document_type = 'CUSTOMER_CREDIT_NOTE'
+                        GROUP BY 1) cr ON cr.doc = d.id
+                   LEFT JOIN (
+                       SELECT invoice_id, sum(applied_amount) AS app
+                         FROM ar_payment_applications GROUP BY 1) ap ON ap.invoice_id = o.id
+                   LEFT JOIN (
+                       SELECT a.invoice_id,
+                              sum(CASE e.kind WHEN 'APPLIED' THEN e.amount ELSE -e.amount END) AS net
+                         FROM ar_payment_applications a
+                         JOIN ar_payment_application_events e ON e.application_id = a.id
+                        GROUP BY 1) j ON j.invoice_id = o.id
+                  WHERE d.customer_id = '{cust}'
+                    AND d.document_type = 'CUSTOMER_INVOICE'"
+            ),
+        );
+        assert_eq!(
+            identity,
+            "F2DA:400.000000:400.000000:400.000000:0.000000:400.000000,\
+             F2DB:300.000000:300.000000:300.000000:0.000000:300.000000,\
+             F2DC:60.000000:60.000000:60.000000:0.000000:60.000000",
+            "invoice - credit == applied + outstanding; \
+             journal net (APPLIED - REVERSED) == applied"
+        );
+        assert_eq!(
+            psql_session_query(
+                &guc,
+                "SELECT count(*) FROM ar_payments WHERE applied_amount + unapplied_amount <> payment_amount"
+            ),
+            "0",
+            "every receipt balances applied + unapplied"
+        );
+        assert_eq!(
+            psql_session_query(
+                &guc,
+                "SELECT count(*) FROM (
+                     SELECT a.id, sum(CASE e.kind WHEN 'APPLIED' THEN e.amount ELSE -e.amount END) AS net
+                       FROM ar_payment_applications a
+                       JOIN ar_payment_application_events e ON e.application_id = a.id
+                      GROUP BY a.id
+                    HAVING sum(CASE e.kind WHEN 'APPLIED' THEN e.amount ELSE -e.amount END)
+                           IS DISTINCT FROM max(a.applied_amount)) t"
+            ),
+            "0",
+            "journal net equals live allocation rows per pair"
+        );
+        let report = crate::http_support::with_ar_transaction(&session, |executor| {
+            crate::projection::project_settlement_state(
+                executor,
+                &session,
+                Uuid::parse_str(&entity).expect("entity"),
+            )
+        })
+        .expect("projection");
+        assert_eq!(report.documents, 3);
+        assert_eq!(report.refreshed, 0, "cache already agreed with derivation");
+        assert_eq!(
+            report.ar_control_drift, None,
+            "no GL control account seeded here -> honestly not computable \
+             (the F1c projection suite pins zero-drift with journal lines)"
+        );
+
+        // Reversal of R2's allocation returns the 100 to the receipt and
+        // re-opens B; the audit spine keeps both sides of the story.
+        let r2_rows = apps(&session, r2["id"].as_str().unwrap()).expect("r2 rows");
+        let app_b = r2_rows[0]["id"].as_str().unwrap().to_string();
+        let reason = "duplicate bank deposit";
+        let reversed = crate::http_support::with_ar_transaction(&session, |executor| {
+            reverse_payment_application(executor, &session, &app_b, "f2d-rev-1", reason)
+        })
+        .expect("reverse");
+        assert_eq!(reversed["status"], "PENDING", "R2 fully un-applied again");
+        let b_open = item(&doc_b).expect("item B after reverse");
+        assert_eq!(b_open["status"], "PARTIAL");
+        assert_eq!(b_open["outstanding_amount"], "100");
+        assert_eq!(
+            b_open["payment_history"].as_array().map(Vec::len),
+            Some(1),
+            "reversed allocation leaves the history view"
+        );
+        let replay_rev = crate::http_support::with_ar_transaction(&session, |executor| {
+            reverse_payment_application(executor, &session, &app_b, "f2d-rev-1", reason)
+        })
+        .expect("replay reversal");
+        assert_eq!(replay_rev, reversed, "reversal replay is value-for-value");
+        assert!(
+            matches!(
+                crate::http_support::with_ar_transaction(&session, |executor| {
+                    reverse_payment_application(executor, &session, &app_b, "f2d-rev-2", reason)
+                }),
+                Err(ArError::Conflict(_))
+            ),
+            "double reverse is 409"
+        );
+
+        // Identity survives the reversal on all three axes: B row net 200,
+        // outstanding 100; journal net = 100 + 200 - 100 = 200.
+        let identity_after = psql_session_query(
+            &guc,
+            &format!(
+                "SELECT right(d.document_number, 4) || ':' || o.original_amount::text
+                           || ':' || o.outstanding_amount::text || ':' || j.net::text
+                   FROM customer_invoices o
+                   JOIN accounting_posted_documents d ON d.id = o.invoice_id
+                   JOIN (
+                       SELECT a.invoice_id,
+                              sum(CASE e.kind WHEN 'APPLIED' THEN e.amount ELSE -e.amount END) AS net
+                         FROM ar_payment_applications a
+                         JOIN ar_payment_application_events e ON e.application_id = a.id
+                        GROUP BY 1) j ON j.invoice_id = o.id
+                  WHERE d.document_number = '{tenant}-F2DB'"
+            ),
+        );
+        assert_eq!(identity_after, "F2DB:300.000000:100.000000:200.000000");
+        let report2 = crate::http_support::with_ar_transaction(&session, |executor| {
+            crate::projection::project_settlement_state(
+                executor,
+                &session,
+                Uuid::parse_str(&entity).expect("entity"),
+            )
+        })
+        .expect("projection 2");
+        assert_eq!(report2.refreshed, 0, "reversal kept the cache honest");
+        let open_after = items(&session, &default_filters()).expect("after reverse");
+        assert_eq!(open_after["total"], 1, "only B reopened");
+        assert_eq!(by_id(&open_after, &doc_b)["outstanding_amount"], "100");
+
+        // Idempotent receipt replay: stable value-for-value and reflecting
+        // the CURRENT state of the receipt (R1 has been allocated since its
+        // creation, and the replay honestly re-serves that state).
+        let r1_replay = pay_key("f2d-r1", "400").expect("replay r1");
+        assert_eq!(r1_replay["id"], r1["id"]);
+        assert_eq!(
+            r1_replay["status"], "APPLIED",
+            "replay serves current state"
+        );
+        assert!(!r1_replay["applied_at"].is_null());
+        let r1_replay2 = pay_key("f2d-r1", "400").expect("replay r1 again");
+        assert_eq!(r1_replay2, r1_replay, "replays are stable");
+        assert_eq!(
+            psql_session_query(&guc, "SELECT count(*) FROM ar_payments"),
+            "4",
+            "three receipts + R4, replays stored nothing"
+        );
+
+        // Cross-tenant: the foreign org with the SAME customer uuid sees
+        // only its own document, and cannot even probe ours.
+        let foreign_items = items(&foreign, &default_filters()).expect("foreign items");
+        assert_eq!(foreign_items["total"], 1, "only the foreign twin");
+        assert_eq!(foreign_items["items"][0]["id"], doc_x);
+        assert!(item(&doc_a).is_ok(), "sanity: ours visible to us");
+        let foreign_probe = crate::http_support::with_ar_transaction(&foreign, |executor| {
+            crate::ledger::get_open_item(executor, &foreign, &doc_a)
+        });
+        assert!(matches!(foreign_probe, Err(ArError::NotFound)));
+        assert!(
+            matches!(
+                apply(&foreign, r1["id"].as_str().unwrap(), &doc_b, "1"),
+                Err(ArError::NotFound)
+            ),
+            "no allocation into another tenant"
+        );
+    }
 }
