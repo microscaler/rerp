@@ -1039,3 +1039,36 @@ ref-rewritten) the whole accounting suite — including
   scaffold must not be wired; no fake SENDING/COMPLETED); F3c acceptance
   suite. Spec example defects (statement_date 1000.0, delivery_method
   bank_transfer) fixed in F3b's spec commit.
+
+## [2026-11-05] contribute | F3a aging summary live (Epic F3 1/4)
+
+- PR pending (feat/accounting-f3a-aging): GET /reports/aging-summary
+  delivered — fact-derived as-of replay (documents/credit notes by
+  posted_at, applied net from the APPLIED/REVERSED event journal by
+  occurred_at; never overlay_state/cache columns; write_off counts at
+  every as_of, documented). Single (company, base-currency) scope;
+  foreign company in another tenant refused, not substituted.
+- DB constraint learned: accounting_legal_entities is unique per
+  (tenant, org) — multi-entity orgs are multi-TENANT; the
+  company-disambiguation guard stays defensive, live tests prove the
+  silent single-entity default + Policy reject of foreign company.
+- Live proof: journal replay separates an application from its later
+  reversal at an intermediate as_of (row sums cannot); summary ==
+  open-items value-for-value with poisoned overlay cache; EUR/GBP
+  separation; rerun-safe on the disposable DB.
+
+## [2026-11-05] contribute | PR #149 review round: snapshot aging reads, bounded replay
+
+- CodeRabbit round on the F3a aging summary: the aggregate now reads
+  inside ONE REPEATABLE READ transaction via the new lifeguard
+  `with_session_transaction_isolated` (microscaler/lifeguard#236,
+  merged 44a2412) — the level rides on the BEGIN because the pipelined
+  `rls_set_session` is already the transaction's first query. Every
+  explicitly requested level is spelled out, so a server
+  `default_transaction_isolation` cannot override it; the legacy
+  wrapper keeps the byte-identical plain BEGIN.
+- Journal replay is now fetch-bound on every read and the
+  overlay/application IN lists are chunked at 10k ids (16-bit bind
+  limit), with the event bound enforced on the running total.
+- rerp pins lifeguard 44a2412 (lock regenerated with local path
+  patches set aside — git sources only).

@@ -65,22 +65,52 @@ pub fn with_ar_transaction<T>(
     context: &SessionContext,
     operation: impl FnOnce(&ExclusivePrimaryLifeExecutor<'_>) -> Result<T, ArError>,
 ) -> Result<T, ArError> {
+    with_ar_isolated(context, lifeguard::IsolationLevel::ReadCommitted, operation)
+}
+
+/// One-SNAPSHOT read transaction for multi-statement aggregates.
+///
+/// Reports such as the open-items list and the aging summary compose several
+/// queries (documents, credit notes, overlays, applications, events). Under
+/// plain READ COMMITTED each statement sees later commits, so a concurrent
+/// posting/settlement can tear the aggregate (a document missing from one leg
+/// while its payment counts in another). Every leg therefore runs inside one
+/// REPEATABLE READ transaction — the isolation level rides on the `BEGIN`
+/// because the pipelined RLS context call is already the first query.
+pub fn with_ar_snapshot_transaction<T>(
+    context: &SessionContext,
+    operation: impl FnOnce(&ExclusivePrimaryLifeExecutor<'_>) -> Result<T, ArError>,
+) -> Result<T, ArError> {
+    with_ar_isolated(
+        context,
+        lifeguard::IsolationLevel::RepeatableRead,
+        operation,
+    )
+}
+
+fn with_ar_isolated<T>(
+    context: &SessionContext,
+    isolation: lifeguard::IsolationLevel,
+    operation: impl FnOnce(&ExclusivePrimaryLifeExecutor<'_>) -> Result<T, ArError>,
+) -> Result<T, ArError> {
     let database = crate::database::db().map_err(ArError::Database)?;
     let mut domain_error = None;
     let mut output = None;
     let transaction =
         database
             .pool()
-            .with_session_transaction(context, |executor| match operation(executor) {
-                Ok(value) => {
-                    output = Some(value);
-                    Ok(())
-                }
-                Err(error) => {
-                    domain_error = Some(error);
-                    Err(LifeError::Other(
-                        "accounts-receivable read failed; transaction rolled back".to_string(),
-                    ))
+            .with_session_transaction_isolated(context, isolation, |executor| {
+                match operation(executor) {
+                    Ok(value) => {
+                        output = Some(value);
+                        Ok(())
+                    }
+                    Err(error) => {
+                        domain_error = Some(error);
+                        Err(LifeError::Other(
+                            "accounts-receivable read failed; transaction rolled back".to_string(),
+                        ))
+                    }
                 }
             });
     match (transaction, domain_error, output) {

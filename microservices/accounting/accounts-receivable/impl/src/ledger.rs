@@ -25,6 +25,9 @@ use uuid::Uuid;
 use rerp_accounting_accounts_receivable::models::ar_payment_application::{
     ArPaymentApplicationModel, Column as ApplicationColumn, Entity as ApplicationEntity,
 };
+use rerp_accounting_accounts_receivable::models::ar_payment_application_event::{
+    Column as EventColumn, Entity as EventEntity,
+};
 use rerp_accounting_accounts_receivable::models::customer_invoice::{
     Column as OverlayColumn, CustomerInvoiceModel, Entity as OverlayEntity,
 };
@@ -560,6 +563,329 @@ fn application_rows<E: LifeExecutor>(
         .map_err(|error| ArError::Database(error.to_string()))
 }
 
+// ─── Epic F3a: fact-derived, as-of reproducible aging summary ───────────────
+//
+// The summary answers the SAME question as the open-items list — net
+// outstanding per aging bucket — but aggregated, and reproducible for a
+// past `as_of_date`. To be reproducible it reads ONLY posted facts:
+// documents and credit notes posted before the cutoff, and the
+// application EVENT journal (net APPLIED-REVERSED by occurred_at). It
+// never reads the overlay cache columns (`status`, `original_amount`)
+// and never derives from `overlay_state`; reversal rewrites the row's
+// applied amount in place, so only the journal can replay history.
+// `write_off_amount` has no history (manual adjustments carry no
+// effective date), so a write-off counts at EVERY as-of date — stated
+// here so the read is honest about its one non-temporal input.
+
+/// Upper bound for journal events loaded by a single summary read.
+const MAX_AGE_EVENTS: i64 = 100_000;
+/// Upper bound for application rows loaded by a single summary read.
+const MAX_AGE_APPLICATIONS: i64 = 100_000;
+/// `IN`-list chunk size: far below the driver's 16-bit bind-parameter limit.
+const ID_CHUNK: usize = 10_000;
+
+/// Parse the optional `as_of_date` calendar parameter (UTC); absent = today.
+pub(crate) fn parse_as_of_date(value: Option<&str>) -> Result<NaiveDate, ArError> {
+    match value.map(str::trim).filter(|raw| !raw.is_empty()) {
+        None => Ok(Utc::now().date_naive()),
+        Some(raw) => NaiveDate::parse_from_str(raw, "%Y-%m-%d")
+            .map_err(|_| ArError::Validation("as_of_date must be YYYY-MM-DD".to_string())),
+    }
+}
+
+/// Contract query shape: every parameter is an optional string.
+pub fn parse_aging_query(
+    company_id: Option<&str>,
+    customer_id: Option<&str>,
+    as_of_date: Option<&str>,
+) -> Result<(Option<Uuid>, Option<Uuid>, NaiveDate), ArError> {
+    let uuid = |value: &str, field: &str| -> Result<Uuid, ArError> {
+        Uuid::parse_str(value).map_err(|_| ArError::Validation(format!("{field} must be a UUID")))
+    };
+    Ok((
+        company_id
+            .map(|value| uuid(value, "company_id"))
+            .transpose()?,
+        customer_id
+            .map(|value| uuid(value, "customer_id"))
+            .transpose()?,
+        parse_as_of_date(as_of_date)?,
+    ))
+}
+
+/// Bucket accumulator for one (company, currency) scope. Pure arithmetic.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+struct BucketTotals {
+    current: Decimal,
+    one_thirty: Decimal,
+    thirty_one_sixty: Decimal,
+    sixty_one_ninety: Decimal,
+    ninety_plus: Decimal,
+    total: Decimal,
+}
+
+impl BucketTotals {
+    /// `aging_bucket` returns a closed set; the fallback arm only makes a
+    /// stray name land in `90+` while still counting into the total.
+    fn add(&mut self, bucket: &str, amount: Decimal) {
+        match bucket {
+            "CURRENT" => self.current += amount,
+            "1-30" => self.one_thirty += amount,
+            "31-60" => self.thirty_one_sixty += amount,
+            "61-90" => self.sixty_one_ninety += amount,
+            _ => self.ninety_plus += amount,
+        }
+        self.total += amount;
+    }
+}
+
+/// Same shape as `chargeback_documents` plus the as-of cutoff and
+/// currency/customer narrowing — keep the two in lockstep by intent.
+fn as_of_chargeback_documents<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entities: &[Uuid],
+    currency_code: &str,
+    customer_id: Option<Uuid>,
+    posted_before: NaiveDateTime,
+) -> Result<Vec<AccountingPostedDocumentModel>, ArError> {
+    let mut query = DocumentEntity::find()
+        .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(DocumentColumn::LegalEntityId.is_in(legal_entities.to_vec()))
+        .filter(DocumentColumn::Status.eq("POSTED".to_string()))
+        .filter(DocumentColumn::DocumentType.is_in(CHARGEBACK_TYPES))
+        .filter(DocumentColumn::CurrencyCode.eq(currency_code.to_string()))
+        .filter(DocumentColumn::PostedAt.lt(posted_before));
+    if let Some(customer) = customer_id {
+        query = query.filter(DocumentColumn::CustomerId.eq(customer));
+    }
+    let documents = query
+        .limit((MAX_SOURCE_DOCUMENTS + 1) as u64)
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    if documents.len() as i64 > MAX_SOURCE_DOCUMENTS {
+        return Err(ArError::Validation(format!(
+            "aging source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow the scope"
+        )));
+    }
+    Ok(documents)
+}
+
+/// `credit_note_totals` with the same as-of cutoff on the NOTE's posting.
+fn as_of_credit_note_totals<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entities: &[Uuid],
+    document_ids: Vec<Uuid>,
+    posted_before: NaiveDateTime,
+) -> Result<HashMap<Uuid, Decimal>, ArError> {
+    if document_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let notes = DocumentEntity::find()
+        .filter(DocumentColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(DocumentColumn::LegalEntityId.is_in(legal_entities.to_vec()))
+        .filter(DocumentColumn::Status.eq("POSTED".to_string()))
+        .filter(DocumentColumn::DocumentType.eq("CUSTOMER_CREDIT_NOTE".to_string()))
+        .filter(DocumentColumn::OriginalDocumentId.is_in(document_ids))
+        .filter(DocumentColumn::PostedAt.lt(posted_before))
+        .limit((MAX_CREDIT_NOTES + 1) as u64)
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?;
+    if notes.len() as i64 > MAX_CREDIT_NOTES {
+        return Err(ArError::Validation(format!(
+            "linked credit notes exceed the {MAX_CREDIT_NOTES}-row read bound"
+        )));
+    }
+    let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
+    for note in notes {
+        if let Some(original) = note.original_document_id {
+            *totals.entry(original).or_insert(Decimal::ZERO) += note.total_amount;
+        }
+    }
+    Ok(totals)
+}
+
+/// Overlay rows for the write-off facts ONLY (keys and `write_off_amount`);
+/// the cache columns on these rows are deliberately never read here.
+fn aging_overlays<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    legal_entities: &[Uuid],
+    document_ids: Vec<Uuid>,
+) -> Result<Vec<CustomerInvoiceModel>, ArError> {
+    if document_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+    OverlayEntity::find()
+        .filter(OverlayColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(OverlayColumn::LegalEntityId.is_in(legal_entities.to_vec()))
+        .filter(OverlayColumn::InvoiceId.is_in(document_ids))
+        .all(executor)
+        .map_err(|error| ArError::Database(error.to_string()))
+}
+
+/// Net applied per posted document, replayed from the immutable event
+/// journal: +APPLIED, -REVERSED, `occurred_at` before the cutoff. Rows
+/// cannot answer history — reversal zeroes `applied_amount` in place.
+fn as_of_applied_totals<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    overlays: &[CustomerInvoiceModel],
+    occurred_before: NaiveDateTime,
+) -> Result<HashMap<Uuid, Decimal>, ArError> {
+    if overlays.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let overlay_to_document: HashMap<Uuid, Uuid> = overlays
+        .iter()
+        .map(|row| (row.id, row.invoice_id))
+        .collect();
+    // Chunked IN lists: every statement stays far below the driver's 16-bit
+    // bind-parameter limit regardless of how many overlays the scope holds.
+    let mut application_to_document: HashMap<Uuid, Uuid> = HashMap::new();
+    let overlay_ids: Vec<Uuid> = overlay_to_document.keys().copied().collect();
+    for chunk in overlay_ids.chunks(ID_CHUNK) {
+        let applications = ApplicationEntity::find()
+            .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(ApplicationColumn::InvoiceId.is_in(chunk.to_vec()))
+            .limit((MAX_AGE_APPLICATIONS + 1) as u64)
+            .all(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        for row in applications {
+            if let Some(document_id) = overlay_to_document.get(&row.invoice_id) {
+                application_to_document.insert(row.id, *document_id);
+            }
+        }
+        if application_to_document.len() as i64 > MAX_AGE_APPLICATIONS {
+            return Err(ArError::Validation(format!(
+                "application rows exceed the {MAX_AGE_APPLICATIONS}-row read bound; narrow the scope"
+            )));
+        }
+    }
+    if application_to_document.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
+    let mut seen_events: i64 = 0;
+    let application_ids: Vec<Uuid> = application_to_document.keys().copied().collect();
+    for chunk in application_ids.chunks(ID_CHUNK) {
+        // Fetch at most the REMAINING event budget: the database stops scanning
+        // at the LIMIT, so an over-budget history is rejected without ever
+        // materializing more rows than the bound allows.
+        let remaining = MAX_AGE_EVENTS - seen_events;
+        let events = EventEntity::find()
+            .filter(EventColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(EventColumn::ApplicationId.is_in(chunk.to_vec()))
+            .filter(EventColumn::Kind.is_in(["APPLIED".to_string(), "REVERSED".to_string()]))
+            .filter(EventColumn::OccurredAt.lt(occurred_before))
+            .limit((remaining + 1) as u64)
+            .all(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        if events.len() as i64 > remaining {
+            return Err(ArError::Validation(format!(
+                "application events exceed the {MAX_AGE_EVENTS}-row read bound; narrow the scope"
+            )));
+        }
+        seen_events += events.len() as i64;
+        for event in &events {
+            let Some(document_id) = application_to_document.get(&event.application_id) else {
+                continue;
+            };
+            let delta = match event.kind.as_str() {
+                "APPLIED" => event.amount,
+                _ => -event.amount,
+            };
+            *totals.entry(*document_id).or_insert(Decimal::ZERO) += delta;
+        }
+    }
+    Ok(totals)
+}
+
+/// Aggregated open-item balance for one company and its base currency.
+pub fn aging_summary<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    company_id: Option<Uuid>,
+    customer_id: Option<Uuid>,
+    as_of: NaiveDate,
+) -> Result<Value, ArError> {
+    let entities = resolve_scope_entities(executor, session, company_id)?;
+    // One response row can only carry one company and one currency, so an
+    // ambiguous org must say which company (never an arbitrary pick).
+    let company = match company_id {
+        Some(id) => id,
+        None if entities.len() == 1 => entities[0],
+        None => {
+            return Err(ArError::Validation(format!(
+                "company_id is required when the organization has {} active legal entities",
+                entities.len()
+            )))
+        }
+    };
+    let entity = LegalEntityEntity::find()
+        .filter(LegalEntityColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(LegalEntityColumn::Id.eq(company))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .ok_or(ArError::NotFound)?;
+    // Full-day cutoff: everything strictly before the next UTC midnight.
+    let cutoff = as_of
+        .succ_opt()
+        .and_then(|next| next.and_hms_opt(0, 0, 0))
+        .ok_or_else(|| ArError::Validation("as_of_date is out of range".to_string()))?;
+    let base_currency = entity.base_currency;
+    let documents = as_of_chargeback_documents(
+        executor,
+        session,
+        &entities,
+        &base_currency,
+        customer_id,
+        cutoff,
+    )?;
+    let document_ids: Vec<Uuid> = documents.iter().map(|row| row.id).collect();
+    let credits =
+        as_of_credit_note_totals(executor, session, &entities, document_ids.clone(), cutoff)?;
+    let overlays = aging_overlays(executor, session, &entities, document_ids.clone())?;
+    let write_offs: HashMap<Uuid, Decimal> = overlays
+        .iter()
+        .map(|row| {
+            (
+                row.invoice_id,
+                row.write_off_amount.unwrap_or(Decimal::ZERO),
+            )
+        })
+        .collect();
+    let applied = as_of_applied_totals(executor, session, &overlays, cutoff)?;
+
+    let mut totals = BucketTotals::default();
+    for document in &documents {
+        let raw = document.total_amount
+            - credits.get(&document.id).copied().unwrap_or(Decimal::ZERO)
+            - applied.get(&document.id).copied().unwrap_or(Decimal::ZERO)
+            - write_offs
+                .get(&document.id)
+                .copied()
+                .unwrap_or(Decimal::ZERO);
+        if raw <= Decimal::ZERO {
+            // Settled rows leave the balance view, mirroring open items.
+            continue;
+        }
+        totals.add(aging_bucket(document.due_date, as_of), raw);
+    }
+    Ok(json!({
+        "company_id": company.to_string(),
+        "currency_code": base_currency,
+        "as_of_date": as_of.format("%Y-%m-%d").to_string(),
+        "current": money(totals.current),
+        "bucket_1_30": money(totals.one_thirty),
+        "bucket_31_60": money(totals.thirty_one_sixty),
+        "bucket_61_90": money(totals.sixty_one_ninety),
+        "bucket_90_plus": money(totals.ninety_plus),
+        "total_outstanding": money(totals.total),
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -656,6 +982,90 @@ mod tests {
             Some(100)
         )
         .is_ok());
+    }
+
+    #[test]
+    fn bucket_totals_map_closed_bucket_set_and_total() {
+        let mut totals = BucketTotals::default();
+        totals.add("CURRENT", dec("120"));
+        totals.add("1-30", dec("30"));
+        totals.add("31-60", dec("45"));
+        totals.add("61-90", dec("100"));
+        totals.add("90+", dec("7"));
+        assert_eq!(totals.current, dec("120"));
+        assert_eq!(totals.one_thirty, dec("30"));
+        assert_eq!(totals.thirty_one_sixty, dec("45"));
+        assert_eq!(totals.sixty_one_ninety, dec("100"));
+        assert_eq!(totals.ninety_plus, dec("7"));
+        assert_eq!(totals.total, dec("302"));
+    }
+
+    #[test]
+    fn bucket_names_from_aging_bucket_all_land_correctly() {
+        // The summary must bucket EXACTLY like the per-item read axis.
+        let due = NaiveDate::from_ymd_opt(2026, 1, 15).expect("due date");
+        let probes: [(i64, &str); 6] = [
+            (-5, "CURRENT"),
+            (0, "CURRENT"),
+            (1, "1-30"),
+            (31, "31-60"),
+            (62, "61-90"),
+            (500, "90+"),
+        ];
+        for (offset, expected) in probes {
+            let today = due + TimeDelta::days(offset);
+            assert_eq!(aging_bucket(due, today), expected);
+            let mut totals = BucketTotals::default();
+            totals.add(aging_bucket(due, today), dec("10"));
+            match expected {
+                "CURRENT" => assert_eq!(totals.current, dec("10")),
+                "1-30" => assert_eq!(totals.one_thirty, dec("10")),
+                "31-60" => assert_eq!(totals.thirty_one_sixty, dec("10")),
+                "61-90" => assert_eq!(totals.sixty_one_ninety, dec("10")),
+                _ => assert_eq!(totals.ninety_plus, dec("10")),
+            }
+        }
+    }
+
+    #[test]
+    fn parse_aging_query_validates_shapes() {
+        // Bound the default date between reads taken around the call so a UTC
+        // midnight rollover between the clock read and the parse cannot flip
+        // an exact equality.
+        let before = Utc::now().date_naive();
+        let (company, customer, as_of) =
+            parse_aging_query(None, None, None).expect("all-optional defaults");
+        let after = Utc::now().date_naive();
+        assert_eq!(company, None);
+        assert_eq!(customer, None);
+        assert!(as_of >= before && as_of <= after, "default is today");
+
+        let company_text = Uuid::new_v4().to_string();
+        let customer_text = Uuid::new_v4().to_string();
+        let (company, customer, as_of) = parse_aging_query(
+            Some(company_text.as_str()),
+            Some(customer_text.as_str()),
+            Some("2026-08-15"),
+        )
+        .expect("full query");
+        assert_eq!(company, Some(Uuid::parse_str(&company_text).expect("uuid")));
+        assert_eq!(
+            customer,
+            Some(Uuid::parse_str(&customer_text).expect("uuid"))
+        );
+        assert_eq!(as_of, NaiveDate::from_ymd_opt(2026, 8, 15).expect("date"));
+
+        assert!(parse_aging_query(Some("not-a-uuid"), None, None).is_err());
+        assert!(parse_aging_query(None, Some("not-a-uuid"), None).is_err());
+        // The shipped spec example defect shape: a float where a date belongs.
+        assert!(matches!(
+            parse_aging_query(None, None, Some("1000.0")),
+            Err(ArError::Validation(_))
+        ));
+    }
+
+    fn dec(text: &str) -> Decimal {
+        text.parse::<Decimal>().expect("decimal literal")
     }
 
     fn run_hex() -> String {
@@ -903,5 +1313,434 @@ COMMIT;"
             get_open_item(executor, &session, &other_doc.to_string())
         });
         assert!(matches!(cross, Err(ArError::NotFound)));
+    }
+
+    /// CodeQL discipline: constructed SQL goes to psql STDIN, never a file.
+    fn psql_seed_stdin(sql: &str) {
+        use std::io::Write;
+        use std::process::{Command, Stdio};
+        let env =
+            |key: &str, fallback: &str| std::env::var(key).unwrap_or_else(|_| fallback.to_string());
+        let mut child = Command::new("psql")
+            .env("PGHOST", env("DB_HOST", "localhost"))
+            .env("PGPORT", env("DB_PORT", "5432"))
+            .env("PGUSER", env("DB_USER", "rerp"))
+            .env("PGPASSWORD", env("DB_PASS", ""))
+            .env("PGDATABASE", env("DB_NAME", "rerp"))
+            .args(["-v", "ON_ERROR_STOP=1", "-q"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("psql on PATH");
+        child
+            .stdin
+            .take()
+            .expect("psql stdin")
+            .write_all(sql.as_bytes())
+            .expect("pipe seed sql");
+        let output = child.wait_with_output().expect("psql exit");
+        assert!(
+            output.status.success(),
+            "seed failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    fn summary_session(tenant: &str, org: Uuid, subject: Uuid) -> SessionContext {
+        SessionContext {
+            tenant_id: tenant.to_string(),
+            subject_id: subject,
+            organization_id: org,
+            session_id: "ar-f3a-acceptance".to_string(),
+            roles: vec!["billing".to_string()],
+            permissions: vec!["accounting:ledger:read".to_string()],
+            user_type: Some("service".to_string()),
+            org_type: Some("shipper".to_string()),
+        }
+    }
+
+    #[test]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
+    fn live_aging_summary_replays_posted_facts_as_of() {
+        // One org, TWO entities (E1 GBP, E2 EUR): the ambiguous default must
+        // demand company_id, never pick. Within E1: a clean invoice, one
+        // carrying a credit note and an application that was LATER reversed
+        // (row rewritten to 0 in place — only the journal can replay it),
+        // a fully written-off invoice, a document posted after the early
+        // cutoff, and a USD document that must never join the GBP summary.
+        // The write-off invoice's overlay is ALSO a poisoned cache (garbage
+        // status/original_amount): the summary must ignore those columns.
+        let run = run_hex();
+        let tenant = format!("ar-f3a-{run}");
+        let org = Uuid::new_v4();
+        let subject = Uuid::new_v4();
+        let e1 = Uuid::new_v4();
+        let e2 = Uuid::new_v4();
+        let p1 = Uuid::new_v4();
+        let p2 = Uuid::new_v4();
+        let customer = Uuid::new_v4();
+        let stranger = Uuid::new_v4();
+        let doc_p = Uuid::new_v4();
+        let doc_q = Uuid::new_v4();
+        let note_q = Uuid::new_v4();
+        let doc_r = Uuid::new_v4();
+        let doc_t = Uuid::new_v4();
+        let doc_u = Uuid::new_v4();
+        let overlay_q = Uuid::new_v4();
+        let overlay_p = Uuid::new_v4();
+        let overlay_u = Uuid::new_v4();
+        let payment = Uuid::new_v4();
+        let application = Uuid::new_v4();
+        let event_applied = Uuid::new_v4();
+        let event_reversed = Uuid::new_v4();
+        let doc_s2 = Uuid::new_v4();
+        let tenant_b = format!("ar-f3b-{run}");
+
+        psql_seed_stdin(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+SELECT public.rls_set_session('{tenant}', '{subject}'::uuid, '{org}'::uuid,
+    'ar-f3a-test', '[\"billing\"]'::jsonb,
+    '[\"accounting:invoice:write\"]'::jsonb, 'service', 'shipper');
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active,
+     created_at, updated_at)
+VALUES
+    ('{e1}', '{tenant}', '{org}', 'F3A One', 'GBP', true, now(), now());
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state,
+     created_at, updated_at)
+VALUES
+    ('{p1}', '{tenant}', '{e1}', 'FY2026', '2026-01-01', '2026-12-31',
+     'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
+     document_type, customer_id, source_system, source_type, source_id,
+     document_date, due_date, currency_code, rounding_minor_units, subtotal,
+     discount_amount, tax_amount, total_amount, posted_at, posted_by,
+     original_document_id)
+VALUES
+    ('{doc_p}', '{tenant}', '{e1}', '{p1}', '{tenant}-INV-P',
+     'CUSTOMER_INVOICE', '{customer}', 'f3a', 'fixture', 'p',
+     '2026-06-01', '2026-08-31', 'GBP', 2, 100, 0, 0, 100.000000,
+     '2026-06-01 12:00:00', '{subject}'::uuid, NULL),
+    ('{doc_q}', '{tenant}', '{e1}', '{p1}', '{tenant}-INV-Q',
+     'CUSTOMER_INVOICE', '{customer}', 'f3a', 'fixture', 'q',
+     '2026-09-01', '2026-10-31', 'GBP', 2, 200, 0, 0, 200.000000,
+     '2026-09-01 12:00:00', '{subject}'::uuid, NULL),
+    ('{note_q}', '{tenant}', '{e1}', '{p1}', '{tenant}-CRN-Q',
+     'CUSTOMER_CREDIT_NOTE', '{customer}', 'f3a', 'fixture', 'qn',
+     '2026-09-05', '2026-10-31', 'GBP', 2, 20, 0, 0, 20.000000,
+     '2026-09-05 12:00:00', '{subject}'::uuid, '{doc_q}'),
+    ('{doc_r}', '{tenant}', '{e1}', '{p1}', '{tenant}-INV-R',
+     'CUSTOMER_INVOICE', '{customer}', 'f3a', 'fixture', 'r',
+     '2026-06-01', '2026-09-15', 'USD', 2, 500, 0, 0, 500.000000,
+     '2026-06-01 12:00:00', '{subject}'::uuid, NULL),
+    ('{doc_t}', '{tenant}', '{e1}', '{p1}', '{tenant}-INV-T',
+     'CUSTOMER_INVOICE', '{customer}', 'f3a', 'fixture', 't',
+     '2026-10-15', '2026-12-31', 'GBP', 2, 900, 0, 0, 900.000000,
+     '2026-10-15 12:00:00', '{subject}'::uuid, NULL),
+    ('{doc_u}', '{tenant}', '{e1}', '{p1}', '{tenant}-INV-U',
+     'CUSTOMER_INVOICE', '{customer}', 'f3a', 'fixture', 'u',
+     '2026-06-01', '2026-09-30', 'GBP', 2, 60, 0, 0, 60.000000,
+     '2026-06-01 12:00:00', '{subject}'::uuid, NULL);
+INSERT INTO customer_invoices
+    (id, tenant_id, legal_entity_id, invoice_id, customer_id, original_amount,
+     outstanding_amount, currency_code, due_date, terms, updated_at,
+     status, write_off_amount, write_off_date, write_off_reason)
+VALUES
+    ('{overlay_q}', '{tenant}', '{e1}', '{doc_q}', '{customer}',
+     180.000000, 180.000000, 'GBP', '2026-10-31', 'NET_30', now(),
+     'CONFIRMED', NULL, NULL, NULL),
+    ('{overlay_p}', '{tenant}', '{e1}', '{doc_p}', '{customer}',
+     999999.000000, 1.000000, 'GBP', '2026-08-31', 'NET_30', now(),
+     'WRITTEN_OFF', NULL, NULL, NULL),
+    ('{overlay_u}', '{tenant}', '{e1}', '{doc_u}', '{customer}',
+     60.000000, 0.000000, 'GBP', '2026-09-30', 'NET_30', now(),
+     'WRITTEN_OFF', 60.000000, '2026-09-01', 'bad debt');
+INSERT INTO ar_payments
+    (id, tenant_id, legal_entity_id, customer_id, payment_number, payment_date,
+     payment_amount, currency_code, payment_method, status, updated_at)
+VALUES ('{payment}', '{tenant}', '{e1}', '{customer}', '{tenant}-PMT-1',
+     '2026-10-20', 40.000000, 'GBP', 'WIRE', 'RECONCILED', now());
+INSERT INTO ar_payment_applications
+    (id, tenant_id, legal_entity_id, payment_id, invoice_id, applied_amount)
+VALUES ('{application}', '{tenant}', '{e1}', '{payment}', '{overlay_q}',
+     0.000000);
+INSERT INTO ar_payment_application_events
+    (id, tenant_id, legal_entity_id, application_id, kind, amount,
+     occurred_at, reason)
+VALUES
+    ('{event_applied}', '{tenant}', '{e1}', '{application}', 'APPLIED',
+     40.000000, '2026-10-20 10:00:00', 'receipt'),
+    ('{event_reversed}', '{tenant}', '{e1}', '{application}', 'REVERSED',
+     40.000000, '2026-10-25 10:00:00', 'dishonoured');
+COMMIT;
+BEGIN;
+SELECT public.rls_set_session('{tenant_b}',
+    '{subject}'::uuid, '{org}'::uuid, 'ar-f3b-test',
+    '[\"billing\"]'::jsonb, '[\"accounting:invoice:write\"]'::jsonb,
+    'service', 'shipper');
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active,
+     created_at, updated_at)
+VALUES ('{e2}', '{tenant_b}', '{org}', 'F3B One', 'EUR', true, now(), now());
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state,
+     created_at, updated_at)
+VALUES ('{p2}', '{tenant_b}', '{e2}', 'FY2026', '2026-01-01', '2026-12-31',
+     'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
+     document_type, customer_id, source_system, source_type, source_id,
+     document_date, due_date, currency_code, rounding_minor_units, subtotal,
+     discount_amount, tax_amount, total_amount, posted_at, posted_by,
+     original_document_id)
+VALUES
+    ('{doc_s2}', '{tenant_b}', '{e2}', '{p2}', '{tenant_b}-INV-S',
+     'CUSTOMER_INVOICE', '{customer}', 'f3b', 'fixture', 's',
+     '2026-06-01', '2026-09-15', 'EUR', 2, 700, 0, 0, 700.000000,
+     '2026-06-01 12:00:00', '{subject}'::uuid, NULL);
+COMMIT;"
+        ));
+
+        let session = summary_session(&tenant, org, subject);
+
+        let ask = |company: Option<Uuid>, who: Option<Uuid>, when: NaiveDate| {
+            crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
+                aging_summary(executor, &session, company, who, when)
+            })
+        };
+
+        // One entity in this (tenant, org): the default answers silently.
+        let defaulted = ask(None, None, date("2026-11-01")).expect("default");
+        assert_eq!(defaulted["company_id"], e1.to_string());
+        assert_eq!(defaulted["currency_code"], "GBP");
+        // A company that exists in ANOTHER tenant is not this scope's to
+        // report — the read refuses, it never leaks or substitutes.
+        assert!(matches!(
+            ask(Some(e2), None, date("2026-11-01")),
+            Err(ArError::Policy(_))
+        ));
+
+        // Early cutoff: only docP posted; poisoned cache on docP ignored.
+        let early = ask(Some(e1), None, date("2026-08-15")).expect("early");
+        assert_eq!(early["currency_code"], "GBP");
+        assert_eq!(early["current"], "100");
+        assert_eq!(early["total_outstanding"], "100");
+        // Reproducible: same answer for the same as_of, every time.
+        let early_again = ask(Some(e1), None, date("2026-08-15")).expect("early again");
+        assert_eq!(early, early_again);
+
+        // Cutoff BETWEEN the invoice posting (09-01) and its credit note
+        // posting (09-05): the note must not reduce the balance yet.
+        let between = ask(Some(e1), None, date("2026-09-03")).expect("between");
+        assert_eq!(between["current"], "200"); // Q, before its credit note
+        assert_eq!(between["bucket_1_30"], "100"); // P overdue 3d at 09-03
+        assert_eq!(between["total_outstanding"], "300");
+
+        // Journal replay: the application (10-20) counts, its reversal
+        // (10-25) does not — a row-based sum could not tell these apart.
+        let mid = ask(Some(e1), None, date("2026-10-22")).expect("mid");
+        assert_eq!(mid["current"], "1040"); // Q 200-20-40 + T 900
+        assert_eq!(mid["bucket_31_60"], "100"); // P overdue 52d at 10-22
+        assert_eq!(mid["total_outstanding"], "1140");
+
+        // After the reversal: Q reopens to 180 in 1-30; P sits in 61-90.
+        let late = ask(Some(e1), None, date("2026-11-01")).expect("late");
+        assert_eq!(late["current"], "900");
+        assert_eq!(late["bucket_1_30"], "180");
+        assert_eq!(late["bucket_61_90"], "100");
+        assert_eq!(late["total_outstanding"], "1180");
+        assert_eq!(late["bucket_31_60"], "0");
+        assert_eq!(late["bucket_90_plus"], "0");
+        assert_eq!(late["as_of_date"], "2026-11-01");
+        assert_eq!(late["company_id"], e1.to_string());
+
+        // Second company (its own tenant): sees only its EUR document.
+        let session_b = summary_session(&tenant_b, org, subject);
+        let other = crate::http_support::with_ar_snapshot_transaction(&session_b, |executor| {
+            aging_summary(executor, &session_b, None, None, date("2026-11-01"))
+        })
+        .expect("e2 summary");
+        assert_eq!(other["currency_code"], "EUR");
+        assert_eq!(other["bucket_31_60"], "700");
+        assert_eq!(other["total_outstanding"], "700");
+
+        // Customer scope: the same customer's stranger-id sees nothing.
+        let scoped = ask(Some(e1), Some(customer), date("2026-11-01")).expect("scoped");
+        assert_eq!(scoped["total_outstanding"], "1180");
+        let empty = ask(Some(e1), Some(stranger), date("2026-11-01")).expect("empty scope");
+        assert_eq!(empty["total_outstanding"], "0");
+    }
+
+    #[test]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
+    fn live_aging_summary_matches_open_items_axis() {
+        // The epic thesis for the reporting axis: aggregated summary ==
+        // the open-items list (same tenant, same currency), value-for-
+        // value, INCLUDING rows whose overlay cache is garbage.
+        let run = run_hex();
+        let tenant = format!("ar-f3i-{run}");
+        let org = Uuid::new_v4();
+        let subject = Uuid::new_v4();
+        let entity = Uuid::new_v4();
+        let period = Uuid::new_v4();
+        let customer = Uuid::new_v4();
+        let i1 = Uuid::new_v4();
+        let i2 = Uuid::new_v4();
+        let i3 = Uuid::new_v4();
+        let i4 = Uuid::new_v4();
+        let i5 = Uuid::new_v4();
+        let note2 = Uuid::new_v4();
+        let o2 = Uuid::new_v4();
+        let o4 = Uuid::new_v4();
+        let o5 = Uuid::new_v4();
+        let pay2 = Uuid::new_v4();
+        let pay5 = Uuid::new_v4();
+        let app2 = Uuid::new_v4();
+        let app5 = Uuid::new_v4();
+        let event2 = Uuid::new_v4();
+        let event5 = Uuid::new_v4();
+        let today = Utc::now().date_naive();
+        let due_text = |offset: i64| {
+            (today + TimeDelta::days(offset))
+                .format("%Y-%m-%d")
+                .to_string()
+        };
+        let due10 = due_text(10);
+        let due_m15 = due_text(-15);
+        let due_m70 = due_text(-70);
+        let due_m40 = due_text(-40);
+        let due_m5 = due_text(-5);
+
+        psql_seed_stdin(&format!(
+            "BEGIN;
+SET search_path TO rerp, public;
+SELECT public.rls_set_session('{tenant}', '{subject}'::uuid, '{org}'::uuid,
+    'ar-f3i-test', '[\"billing\"]'::jsonb,
+    '[\"accounting:invoice:write\"]'::jsonb, 'service', 'shipper');
+INSERT INTO accounting_legal_entities
+    (id, tenant_id, organization_id, legal_name, base_currency, is_active,
+     created_at, updated_at)
+VALUES ('{entity}', '{tenant}', '{org}', 'F3I One', 'GBP', true,
+        now(), now());
+INSERT INTO accounting_fiscal_periods
+    (id, tenant_id, legal_entity_id, name, start_date, end_date, state,
+     created_at, updated_at)
+VALUES ('{period}', '{tenant}', '{entity}', 'FY2026', '2026-01-01',
+     '2026-12-31', 'OPEN', now(), now());
+INSERT INTO accounting_posted_documents
+    (id, tenant_id, legal_entity_id, fiscal_period_id, document_number,
+     document_type, customer_id, source_system, source_type, source_id,
+     document_date, due_date, currency_code, rounding_minor_units, subtotal,
+     discount_amount, tax_amount, total_amount, posted_at, posted_by,
+     original_document_id)
+VALUES
+    ('{i1}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-1',
+     'CUSTOMER_INVOICE', '{customer}', 'f3i', 'fixture', 'one',
+     '2026-01-05', '{due10}', 'GBP', 2, 100, 0, 20, 120.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{i2}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-2',
+     'CUSTOMER_INVOICE', '{customer}', 'f3i', 'fixture', 'two',
+     '2026-01-06', '{due_m15}', 'GBP', 2, 50, 0, 10, 60.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{note2}', '{tenant}', '{entity}', '{period}', '{tenant}-CRN-2',
+     'CUSTOMER_CREDIT_NOTE', '{customer}', 'f3i', 'fixture', 'n2',
+     '2026-01-07', '{due_m15}', 'GBP', 2, 16, 0, 4, 20.000000, now(),
+     '{subject}'::uuid, '{i2}'),
+    ('{i3}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-3',
+     'CUSTOMER_INVOICE', '{customer}', 'f3i', 'fixture', 'three',
+     '2026-01-08', '{due_m70}', 'USD', 2, 500, 0, 0, 500.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{i4}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-4',
+     'CUSTOMER_INVOICE', '{customer}', 'f3i', 'fixture', 'four',
+     '2026-01-09', '{due_m40}', 'GBP', 2, 45, 0, 0, 45.000000, now(),
+     '{subject}'::uuid, NULL),
+    ('{i5}', '{tenant}', '{entity}', '{period}', '{tenant}-INV-5',
+     'CUSTOMER_INVOICE', '{customer}', 'f3i', 'fixture', 'five',
+     '2026-01-10', '{due_m5}', 'GBP', 2, 80, 0, 0, 80.000000, now(),
+     '{subject}'::uuid, NULL);
+INSERT INTO customer_invoices
+    (id, tenant_id, legal_entity_id, invoice_id, customer_id, original_amount,
+     outstanding_amount, currency_code, due_date, terms, updated_at,
+     status, write_off_amount)
+VALUES
+    ('{o2}', '{tenant}', '{entity}', '{i2}', '{customer}', 40.000000,
+     30.000000, 'GBP', '{due_m15}', 'NET_30', now(), 'CONFIRMED', NULL),
+    ('{o4}', '{tenant}', '{entity}', '{i4}', '{customer}', 999999.000000,
+     1.000000, 'GBP', '{due_m40}', 'NET_30', now(), 'WRITTEN_OFF',
+     NULL),
+    ('{o5}', '{tenant}', '{entity}', '{i5}', '{customer}', 80.000000,
+     0.000000, 'GBP', '{due_m5}', 'NET_30', now(), 'CONFIRMED', NULL);
+INSERT INTO ar_payments
+    (id, tenant_id, legal_entity_id, customer_id, payment_number, payment_date,
+     payment_amount, currency_code, payment_method, status, updated_at)
+VALUES
+    ('{pay2}', '{tenant}', '{entity}', '{customer}', '{tenant}-PMT-2',
+     '2026-01-15', 10.000000, 'GBP', 'WIRE', 'RECONCILED', now()),
+    ('{pay5}', '{tenant}', '{entity}', '{customer}', '{tenant}-PMT-5',
+     '2026-01-15', 80.000000, 'GBP', 'WIRE', 'RECONCILED', now());
+INSERT INTO ar_payment_applications
+    (id, tenant_id, legal_entity_id, payment_id, invoice_id, applied_amount)
+VALUES
+    ('{app2}', '{tenant}', '{entity}', '{pay2}', '{o2}', 10.000000),
+    ('{app5}', '{tenant}', '{entity}', '{pay5}', '{o5}', 80.000000);
+INSERT INTO ar_payment_application_events
+    (id, tenant_id, legal_entity_id, application_id, kind, amount,
+     occurred_at, reason)
+VALUES
+    ('{event2}', '{tenant}', '{entity}', '{app2}', 'APPLIED', 10.000000,
+     now(), 'receipt'),
+    ('{event5}', '{tenant}', '{entity}', '{app5}', 'APPLIED', 80.000000,
+     now(), 'receipt');
+COMMIT;"
+        ));
+
+        let session = summary_session(&tenant, org, subject);
+
+        let summary = crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
+            aging_summary(executor, &session, Some(entity), None, today)
+        })
+        .expect("summary today");
+        assert_eq!(summary["current"], "120");
+        assert_eq!(summary["bucket_1_30"], "30");
+        assert_eq!(summary["bucket_31_60"], "45");
+        assert_eq!(summary["total_outstanding"], "195");
+
+        // Same facts via the per-item axis (GBP only): identical totals.
+        let filters = ListFilters {
+            currency_code: Some("GBP".to_string()),
+            limit: MAX_LIMIT,
+            ..Default::default()
+        };
+        let listed = crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
+            list_open_items(executor, &session, &filters)
+        })
+        .expect("open items GBP");
+        let mut item_sum = Decimal::ZERO;
+        let mut item_current = Decimal::ZERO;
+        let mut item_thirty = Decimal::ZERO;
+        let mut item_sixty = Decimal::ZERO;
+        for row in listed["items"].as_array().expect("items") {
+            let outstanding: Decimal = row["outstanding_amount"]
+                .as_str()
+                .expect("money string")
+                .parse()
+                .expect("decimal");
+            item_sum += outstanding;
+            match row["aging_bucket"].as_str().expect("bucket") {
+                "CURRENT" => item_current += outstanding,
+                "1-30" => item_thirty += outstanding,
+                "31-60" => item_sixty += outstanding,
+                _ => {}
+            }
+        }
+        assert_eq!(listed["total"], 3, "settled + USD rows leave the view");
+        assert_eq!(summary["total_outstanding"], money(item_sum));
+        assert_eq!(summary["current"], money(item_current));
+        assert_eq!(summary["bucket_1_30"], money(item_thirty));
+        assert_eq!(summary["bucket_31_60"], money(item_sixty));
     }
 }
