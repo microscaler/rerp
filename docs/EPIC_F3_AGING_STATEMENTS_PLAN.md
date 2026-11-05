@@ -49,7 +49,7 @@ overlay/projection machinery (PRs #134, #135, #141).
 
 ### F3-plan — this document + BUILDOUT pointer + wiki log (2026-11-05)
 
-### F3a — aging_summary report, fact-derived and as-of reproducible
+### F3a — aging_summary report, fact-derived and as-of reproducible — DONE (PR pending, commit 5ab77d2e)
 - Implement `aging_summary` (read axis, no migration): resolve scope
   (company_id narrows within org, never escapes — read-path rule), reuse
   `chargeback_documents` + `credit_note_totals` with as-of `posted_at`
