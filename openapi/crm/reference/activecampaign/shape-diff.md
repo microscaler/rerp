@@ -211,3 +211,36 @@ date field (subscription date, creation date, custom dates, deal created/updated
 (contact's / account) + N days/weeks/months/years on/before/after + daily/weekdays/weekends + hour · RSS feed +
 timezone + hourly/daily/weekdays/weekends + time · score + threshold above/below · email any/one (+ link any/one,
 list filter) · 1:1 email any / automated / direct · social network. → `WorkflowTrigger.config` per type.
+
+## Deals menu (UI walk, 2026-11-05) → `crm/pipeline`, new `crm/tasks`, `crm/reporting`, `crm/platform`
+
+Walked every entry of the Deals menu (Deals, Tasks, Saved Responses; Manage: Fields, Deal Settings, Connected
+Emails, Task Settings, Calendar, Import/Export Status; Reports: Deal Overview, Deal Owner Overview, Funnel, Sales
+Performance, Task Overview, Deal Forecast). Objects created on the tenant to pull shapes back: task outcomes
+(Reached/positive, No answer/neutral, Not interested/negative), saved response "Trial follow-up", calendar feed
+"Sales tasks".
+
+| Screen | What it holds | Ours |
+|---|---|---|
+| Deals (kanban / list) | per-pipeline board, stage columns with count + value, card fields from stage settings, filters (owner, status, stage, value, custom fields), sort by `dealOrder`, bulk actions (owner, stage, status, tag, delete), "Add deal" (title, contact, account, value, currency, pipeline, stage, owner, custom fields) | `GET /pipelines`, `GET /deals?pipeline_id&stage_id&status&owner_id&q`, `POST /deals/bulk`, `Stage.card_fields`, `Stage.deal_order` |
+| Deal detail | header (title, value, stage pill, status Won/Lost buttons), AI prompts, About panel (pipeline, stage, status, owner, win probability, expected close, custom field groups), tabs Notes / Files / Emails, open tasks, contacts with roles + primary star, recent activity, "Send an email" (connected mailbox) | `Deal` (+`contacts[] {contact_id, role_id, is_primary}`, `win_probability`, `expected_close_date`), `/deals/{id}/notes|files|emails|activity|contacts`, `PATCH /deals/{id}/stage|status` |
+| Tasks | list with tabs (Mine / All / Overdue / Today / Upcoming / Completed), columns type, title, related contact/deal, due, assignee, outcome; "Add task" (type, title, related to, due date + time, assignee, reminder, note, "start automation when added/completed") | `crm/tasks` `Task` (`related_kind`, `reminders[]`, `automation` hook ADDED/COMPLETED), `/tasks/{id}/complete` with `outcome_id`, `/tasks/{id}/reopen` |
+| Saved Responses | categorised templates with merge tags, used from task emails and 1:1 sends | `SavedResponse` (+`category_id`), `/saved-responses/{id}/render` |
+| Manage → Fields | deal custom fields in groups: text, textarea, number, money (currency), date, datetime, dropdown, listbox (multi), required, default, visible on card | `crm/platform` custom fields entity=deal (`FieldType` +MONEY, MULTISELECT, TEXTAREA; `group`, `sequence`, `show_on_card`, `required`, `default_value`) |
+| Manage → Deal Settings | pipelines (name, currency, visibility all users / groups, auto-assign round-robin), stages (name, colour, width, card region 1-5, deal sort), deal roles, win probability (ML on/off, initialised date), deal value brackets for reports | `Pipeline`, `Stage`, `DealRole`, `DealSettings {win_probability_mode, value_brackets[], default_pipeline_id}` |
+| Manage → Connected Emails | per-user mailbox connect (Google / Microsoft OAuth, IMAP), sync since date, only known contacts vs all, log to deals, open/click tracking, signature, share with team | `crm/platform` `Mailbox`, `/mailboxes/oauth/callback`, `/mailboxes/{id}/sync|send|messages` |
+| Manage → Task Settings | task types (ordered, default duration, allowed outcomes), outcomes (label + sentiment), "require outcome when completing" | `TaskType.outcome_ids`, `Outcome.sentiment`, `TaskSettings.require_outcomes`, `/types/reorder` |
+| Manage → Calendar | per-user iCal feed URLs: all tasks / deal tasks / contact tasks, filter by pipeline and assignee, include alerts, regenerate URL | `CalendarFeed {scope, pipeline_ids, assignee_ids, include_alerts, url}`, `/calendars/{id}/regenerate`, `GET /public/calendars/{token}.ics` |
+| Manage → Import/Export Status | list of import/export runs: kind, entity, file, status, rows total/processed/errors, started/finished, download result / error report, cancel | `crm/platform` `Job`, `/jobs`, `/jobs/{id}/errors`, `/jobs/export` |
+| Reports → Deal Overview | totals (open/won/lost count + value, win rate), deal value histogram by bracket, owner table, stage table, deals created over time; filters pipeline / owner / date / currency | `GET /deals/overview` → `DealOverviewReport` |
+| Reports → Deal Owner Overview | one row per owner: created, won, lost, value won, avg value, avg days to close, tasks completed | `GET /deals/owner-overview` |
+| Reports → Funnel | per pipeline: deals entered each stage, % progressing to the next, avg days in stage, lost from stage | `GET /deals/funnel?pipeline_id` → `FunnelStage.progression_pct` |
+| Reports → Sales Performance | matrix of deals by stage per owner, won/lost per owner, period selector | `GET /deals/sales-performance` |
+| Reports → Task Overview | open / overdue / completed per rep and per type, outcome sentiment per rep | `GET /tasks/overview` → `TaskOverviewReport` |
+| Reports → Deal Forecast | expected revenue per month from expected close dates weighted by stage probability (or ML win probability), quota line, forecast vs actual accuracy for past periods | `GET /deals/forecast?basis&granularity&periods` → `DealForecastReport.accuracy[]` |
+
+Behaviour worth keeping: a deal's **status** (Won/Lost) is separate from its **stage**; winning does not move the
+stage. **Win probability** is either the stage's probability or an ML estimate per deal (we expose `basis`).
+**Tasks** complete with an outcome whose sentiment rolls up to the Task Overview; completion can start an automation.
+**Calendar** feeds are signed public URLs, regenerable. **Connected emails** are per user and only log mail to
+known contacts unless widened. Import/export jobs are async and keep per-row errors.

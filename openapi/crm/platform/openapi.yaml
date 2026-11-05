@@ -38,6 +38,11 @@ tags:
   description: Third-party integration configuration
 - name: webhooks
   description: Webhook delivery for entity events
+- name: mailboxes
+  description: 'Connected email accounts (OAuth Google/Microsoft or IMAP/SMTP): two-way sync of 1:1 mail onto contacts and
+    deals, 1:1 sends with tracking'
+- name: jobs
+  description: 'Import / export job status: progress, row counts, per-row errors, result download'
 paths:
   /custom-fields:
     get:
@@ -62,8 +67,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id001
-                    id: 00000000-0000-0000-0000-000000000021
+                  - id: 00000000-0000-0000-0000-000000000021
                     entity: lead
                     name: priority
                     type: string
@@ -99,7 +103,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateCustomFieldRequest'
             examples:
-              default: &id002
+              default:
                 entity: lead
                 name: priority
                 type: string
@@ -113,7 +117,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomField'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000021
+                  entity: lead
+                  name: priority
+                  type: string
+                  required: false
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '403':
@@ -156,7 +167,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomField'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000021
+                  entity: lead
+                  name: priority
+                  type: string
+                  required: false
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '401':
@@ -188,7 +206,11 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
             examples:
-              default: *id002
+              default:
+                entity: lead
+                name: priority
+                type: string
+                required: false
         description: Update a custom field definition
       responses:
         '200':
@@ -198,7 +220,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomField'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000021
+                  entity: lead
+                  name: priority
+                  type: string
+                  required: false
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '404':
@@ -300,7 +329,13 @@ paths:
               examples:
                 default:
                   items:
-                  - *id001
+                  - id: 00000000-0000-0000-0000-000000000021
+                    entity: lead
+                    name: priority
+                    type: string
+                    required: false
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-15T10:30:00Z'
                   total: 1
                   page: 1
                   per_page: 20
@@ -341,8 +376,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id003
-                    id: 00000000-0000-0000-0000-000000000022
+                  - id: 00000000-0000-0000-0000-000000000022
                     url: https://example.com/webhook
                     events:
                     - lead.created
@@ -379,7 +413,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateWebhookRequest'
             examples:
-              default: &id004
+              default:
                 url: https://example.com/webhook
                 events:
                 - lead.created
@@ -394,7 +428,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id003
+                default:
+                  id: 00000000-0000-0000-0000-000000000022
+                  url: https://example.com/webhook
+                  events:
+                  - lead.created
+                  - lead.updated
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -435,7 +477,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id003
+                default:
+                  id: 00000000-0000-0000-0000-000000000022
+                  url: https://example.com/webhook
+                  events:
+                  - lead.created
+                  - lead.updated
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '401':
@@ -467,7 +517,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateWebhookRequest'
             examples:
-              default: *id004
+              default:
+                url: https://example.com/webhook
+                events:
+                - lead.created
+                - lead.updated
+                enabled: true
         description: Update an existing webhook
       responses:
         '200':
@@ -477,7 +532,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
               examples:
-                default: *id003
+                default:
+                  id: 00000000-0000-0000-0000-000000000022
+                  url: https://example.com/webhook
+                  events:
+                  - lead.created
+                  - lead.updated
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '404':
@@ -897,7 +960,7 @@ paths:
           description: Validation result
           content:
             application/json:
-              schema: &id005
+              schema:
                 type: object
                 properties:
                   valid:
@@ -907,8 +970,7 @@ paths:
                   rate_limit_remaining:
                     type: integer
                     format: int32
-                    format: int32
-              examples: &id006
+              examples:
                 default:
                   valid: true
                   user_id: u001
@@ -929,8 +991,23 @@ paths:
           description: POST /auth/validate - Created
           content:
             application/json:
-              schema: *id005
-              examples: *id006
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  scope:
+                    type: object
+                  rate_limit_remaining:
+                    type: integer
+                    format: int32
+              examples:
+                default:
+                  valid: true
+                  user_id: u001
+                  permissions:
+                  - crm:read
+                  - crm:write
         '404':
           description: Not found
         '409':
@@ -958,8 +1035,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id007
-                    id: 00000000-0000-0000-0000-000000000024
+                  - id: 00000000-0000-0000-0000-000000000024
                     name: Slack Integration
                     type: messaging
                     status: connected
@@ -1006,7 +1082,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id007
+                default:
+                  id: 00000000-0000-0000-0000-000000000024
+                  name: Slack Integration
+                  type: messaging
+                  status: connected
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -1105,7 +1187,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
               examples:
-                default: *id007
+                default:
+                  id: 00000000-0000-0000-0000-000000000024
+                  name: Slack Integration
+                  type: messaging
+                  status: connected
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '401':
@@ -1118,6 +1206,531 @@ paths:
       x-operation-id: get_status_by_id
       x-controller: rerp_crm::platform::controller::integrations::id::status
       x-handler-name: integrations_id_status
+  /mailboxes:
+    get:
+      operationId: list_mailboxes
+      summary: List connected mailboxes
+      tags:
+      - mailboxes
+      parameters:
+      - name: user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/MailboxStatus'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Mailboxes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailbox'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Mailboxes the caller owns or that are shared with them.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: list_mailboxes
+    post:
+      operationId: connect_mailbox
+      summary: Connect a mailbox
+      tags:
+      - mailboxes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMailboxRequest'
+      responses:
+        '201':
+          description: Mailbox created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMailboxResponse'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Start an OAuth connection (returns authorize_url) or connect an IMAP/SMTP account directly.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: connect_mailbox
+  /mailboxes/oauth/callback:
+    post:
+      operationId: complete_mailbox_oauth
+      summary: Complete an OAuth connection
+      tags:
+      - mailboxes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthCallbackRequest'
+      responses:
+        '200':
+          description: Mailbox connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Exchange the provider code for tokens; moves the mailbox to CONNECTED and starts the first sync.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: complete_mailbox_oauth
+  /mailboxes/{id}:
+    get:
+      operationId: get_mailbox
+      summary: Get a mailbox
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Mailbox
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Settings and sync state of one mailbox.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: get_mailbox
+    patch:
+      operationId: update_mailbox
+      summary: Update mailbox settings
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailboxRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Sync, tracking, signature, sharing and IMAP settings.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: update_mailbox
+    delete:
+      operationId: disconnect_mailbox
+      summary: Disconnect a mailbox
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '204':
+          description: Disconnected
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Revokes tokens and stops sync; synced messages stay on the timelines.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: disconnect_mailbox
+  /mailboxes/{id}/sync:
+    post:
+      operationId: sync_mailbox
+      summary: Run a sync now
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '202':
+          description: Sync queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Queue an immediate sync; returns the mailbox with status SYNCING.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: sync_mailbox
+  /mailboxes/{id}/messages:
+    get:
+      operationId: list_mailbox_messages
+      summary: List synced messages
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: deal_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: direction
+        in: query
+        schema:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+      - name: since
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailboxMessage'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Messages synced from or sent through this mailbox.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: list_mailbox_messages
+  /mailboxes/{id}/send:
+    post:
+      operationId: send_mailbox_message
+      summary: Send a 1:1 email
+      tags:
+      - mailboxes
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMailboxMessageRequest'
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailboxMessage'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Send (or schedule) a one-to-one email from this mailbox as its user, logged to the contact / deal.
+      x-controller: rerp_crm::platform::controller::mailboxes
+      x-handler-name: send_mailbox_message
+  /jobs:
+    get:
+      operationId: list_jobs
+      summary: List import/export jobs
+      tags:
+      - jobs
+      parameters:
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/JobKind'
+      - name: entity
+        in: query
+        schema:
+          $ref: '#/components/schemas/JobEntity'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/JobStatus'
+      - name: requested_by
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJob'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Newest first. Import/Export Status screen.
+      x-controller: rerp_crm::platform::controller::jobs
+      x-handler-name: list_jobs
+  /jobs/export:
+    post:
+      operationId: start_export
+      summary: Start an export
+      tags:
+      - jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '202':
+          description: Job queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Queue an export of an entity with the given filter/columns; poll /jobs/{id} and download from result_url.
+      x-controller: rerp_crm::platform::controller::jobs
+      x-handler-name: start_export
+  /jobs/{id}:
+    get:
+      operationId: get_job
+      summary: Get a job
+      tags:
+      - jobs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Progress and counts of one job.
+      x-controller: rerp_crm::platform::controller::jobs
+      x-handler-name: get_job
+  /jobs/{id}/cancel:
+    post:
+      operationId: cancel_job
+      summary: Cancel a job
+      tags:
+      - jobs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Cancel a QUEUED or RUNNING job; rows already written stay.
+      x-controller: rerp_crm::platform::controller::jobs
+      x-handler-name: cancel_job
+  /jobs/{id}/errors:
+    get:
+      operationId: list_job_errors
+      summary: List row errors of an import
+      tags:
+      - jobs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJobError'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Per-row errors of a PARTIAL or FAILED import.
+      x-controller: rerp_crm::platform::controller::jobs
+      x-handler-name: list_job_errors
 components:
   parameters:
     Page:
@@ -1196,6 +1809,19 @@ components:
           type: string
           format: date-time
           readOnly: true
+        group:
+          type: string
+          maxLength: 128
+          description: Field group shown as a section on the record (e.g. "Deal information")
+        sequence:
+          type: integer
+          description: Order within the group
+        show_on_card:
+          type: boolean
+          description: 'Deals: show on the kanban card'
+        personalization_tag:
+          type: string
+          description: Merge tag (%FIELD%) usable in templates
       description: A custom field definition for extending entity schemas
     CreateCustomFieldRequest:
       type: object
@@ -1214,6 +1840,8 @@ components:
           - crm.stage
           - crm.team
           - crm.opportunity
+          - crm.deal
+          - crm.task
         name:
           type: string
           maxLength: 128
@@ -1234,6 +1862,19 @@ components:
           default: false
         default_value:
           type: string
+        group:
+          type: string
+          maxLength: 128
+          description: Field group shown as a section on the record (e.g. "Deal information")
+        sequence:
+          type: integer
+          description: Order within the group
+        show_on_card:
+          type: boolean
+          description: 'Deals: show on the kanban card'
+        personalization_tag:
+          type: string
+          description: Merge tag (%FIELD%) usable in templates
       description: Request body for creating a custom field definition
     UpdateCustomFieldRequest:
       type: object
@@ -1252,6 +1893,19 @@ components:
           type: boolean
         default_value:
           type: string
+        group:
+          type: string
+          maxLength: 128
+          description: Field group shown as a section on the record (e.g. "Deal information")
+        sequence:
+          type: integer
+          description: Order within the group
+        show_on_card:
+          type: boolean
+          description: 'Deals: show on the kanban card'
+        personalization_tag:
+          type: string
+          description: Merge tag (%FIELD%) usable in templates
       required:
       - label
       - required
@@ -1548,8 +2202,11 @@ components:
       - SELECT
       - MANY2ONE
       - MANY2MANY
-      description: Enum of custom field types (text, number, date, boolean, select,
-        email, phone)
+      - MONEY
+      - MULTISELECT
+      - TEXTAREA
+      description: Custom field types. MONEY carries a currency in options.currency; SELECT/MULTISELECT (AC dropdown/listbox)
+        list options.values; TEXTAREA is multi-line text.
     AuditAction:
       type: string
       enum:
@@ -1618,8 +2275,7 @@ components:
         limit:
           type: integer
           format: int32
-      description: A generic paginated response wrapper with items and pagination
-        metadata
+      description: A generic paginated response wrapper with items and pagination metadata
     ErrorResponse:
       type: object
       required:
@@ -1697,6 +2353,551 @@ components:
             items:
               $ref: '#/components/schemas/WebhookDeliveryLog'
       description: Paginated list of WebhookDeliveryLog records
+    MailboxProvider:
+      type: string
+      enum:
+      - GOOGLE
+      - MICROSOFT
+      - IMAP
+    MailboxStatus:
+      type: string
+      enum:
+      - AUTHORIZING
+      - CONNECTED
+      - SYNCING
+      - DISCONNECTED
+      - ERROR
+    Mailbox:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          description: Owner; shared mailboxes also list `shared_with_user_ids`
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        status:
+          $ref: '#/components/schemas/MailboxStatus'
+        sync_enabled:
+          type: boolean
+          description: Pull inbound/outbound mail into the CRM
+        sync_since:
+          type: string
+          format: date-time
+          description: 'Only messages after this time are synced (default: connection time)'
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+          description: KNOWN_CONTACTS logs only mail whose counterpart is a CRM contact (default)
+        log_to_deals:
+          type: boolean
+          description: Attach synced mail to the contact's open deals
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        last_sync_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - address
+      - provider
+      - status
+      - sync_enabled
+      description: A connected email account. Tokens and passwords are never returned.
+    ImapConfig:
+      type: object
+      properties:
+        imap_host:
+          type: string
+        imap_port:
+          type: integer
+        smtp_host:
+          type: string
+        smtp_port:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        use_tls:
+          type: boolean
+      required:
+      - imap_host
+      - smtp_host
+      - username
+    ConnectMailboxRequest:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        sync_enabled:
+          type: boolean
+        sync_since:
+          type: string
+          format: date-time
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+        log_to_deals:
+          type: boolean
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        redirect_uri:
+          type: string
+          format: uri
+          description: 'OAuth providers only: where to send the user after consent'
+      required:
+      - provider
+      description: 'IMAP: connects immediately. GOOGLE/MICROSOFT: returns status AUTHORIZING and an `authorize_url` to open.'
+    ConnectMailboxResponse:
+      allOf:
+      - $ref: '#/components/schemas/Mailbox'
+      - type: object
+        properties:
+          authorize_url:
+            type: string
+            format: uri
+            description: Present when the provider needs OAuth consent
+    OAuthCallbackRequest:
+      type: object
+      properties:
+        state:
+          type: string
+        code:
+          type: string
+      required:
+      - state
+      - code
+    UpdateMailboxRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+        sync_enabled:
+          type: boolean
+        sync_since:
+          type: string
+          format: date-time
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+        log_to_deals:
+          type: boolean
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+    MailboxMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        mailbox_id:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        external_id:
+          type: string
+        thread_id:
+          type: string
+        from:
+          type: string
+        to:
+          type: array
+          items:
+            type: string
+        cc:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        snippet:
+          type: string
+        body_html:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        deal_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        opens:
+          type: integer
+        clicks:
+          type: integer
+        replied:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+      required:
+      - id
+      - mailbox_id
+      - direction
+      - from
+      - to
+      - subject
+      - sent_at
+      description: A synced or sent 1:1 message; also surfaces on contact and deal timelines in crm/engagement.
+    MessageAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        size_bytes:
+          type: integer
+        content_type:
+          type: string
+        url:
+          type: string
+          format: uri
+      required:
+      - id
+      - file_name
+    SendMailboxMessageRequest:
+      type: object
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          minItems: 1
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+        bcc:
+          type: array
+          items:
+            type: string
+            format: email
+        subject:
+          type: string
+        html:
+          type: string
+        text:
+          type: string
+        saved_response_id:
+          type: string
+          format: uuid
+          description: Render a crm/tasks saved response (merge tags resolved against contact/deal) instead of html/text
+        contact_id:
+          type: string
+          format: uuid
+        deal_id:
+          type: string
+          format: uuid
+        in_reply_to:
+          type: string
+          format: uuid
+          description: MailboxMessage to reply to (threads it)
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        attachment_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        send_at:
+          type: string
+          format: date-time
+          description: Schedule; omit to send now
+      required:
+      - to
+      - subject
+      description: 'Send from a connected mailbox as the user (not a campaign: no list consent, no unsubscribe footer; logged
+        to the contact/deal timeline).'
+    PaginatedMailbox:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Mailbox'
+    PaginatedMailboxMessage:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/MailboxMessage'
+    JobKind:
+      type: string
+      enum:
+      - IMPORT
+      - EXPORT
+    JobStatus:
+      type: string
+      enum:
+      - QUEUED
+      - RUNNING
+      - SUCCEEDED
+      - PARTIAL
+      - FAILED
+      - CANCELLED
+      description: PARTIAL = finished with some rows in error
+    JobEntity:
+      type: string
+      enum:
+      - CONTACTS
+      - ACCOUNTS
+      - DEALS
+      - TASKS
+      - LISTS
+      - TAGS
+      - CUSTOM_FIELDS
+    JobOptions:
+      type: object
+      properties:
+        mapping:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'Import: source column → field key'
+        dedupe_on:
+          type: string
+          enum:
+          - EMAIL
+          - EXTERNAL_ID
+          - NONE
+        update_existing:
+          type: boolean
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+        owner_id:
+          type: string
+          format: uuid
+        filter:
+          type: object
+          description: 'Export: the saved filter / segment applied'
+        columns:
+          type: array
+          items:
+            type: string
+        format:
+          type: string
+          enum:
+          - CSV
+          - XLSX
+          - JSON
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/JobKind'
+        entity:
+          $ref: '#/components/schemas/JobEntity'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        source:
+          type: string
+          enum:
+          - FILE
+          - INTEGRATION
+          - API
+          - UI
+          description: Where the job was started
+        file_name:
+          type: string
+        integration_id:
+          type: string
+          format: uuid
+        options:
+          $ref: '#/components/schemas/JobOptions'
+        total_rows:
+          type: integer
+        processed_rows:
+          type: integer
+        created_rows:
+          type: integer
+        updated_rows:
+          type: integer
+        skipped_rows:
+          type: integer
+        error_rows:
+          type: integer
+        progress_pct:
+          type: number
+          format: float
+          description: 0-100
+        result_url:
+          type: string
+          format: uri
+          description: Export result / import error report; expires
+        result_expires_at:
+          type: string
+          format: date-time
+        requested_by:
+          type: string
+          format: uuid
+        message:
+          type: string
+        queued_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - kind
+      - entity
+      - status
+      - requested_by
+      - queued_at
+      description: An import or export run. Imports are started by the owning service (POST .../import); exports by POST /jobs/export;
+        both report here.
+    JobError:
+      type: object
+      properties:
+        row:
+          type: integer
+        field:
+          type: string
+        code:
+          type: string
+          examples:
+          - INVALID_EMAIL
+          - DUPLICATE
+          - UNKNOWN_FIELD
+          - REQUIRED
+        message:
+          type: string
+        raw:
+          type: object
+          description: The source row as received
+      required:
+      - row
+      - code
+      - message
+    ExportRequest:
+      type: object
+      properties:
+        entity:
+          $ref: '#/components/schemas/JobEntity'
+        options:
+          $ref: '#/components/schemas/JobOptions'
+        notify_email:
+          type: boolean
+          description: Email the requester a download link when done
+      required:
+      - entity
+    PaginatedJob:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Job'
+    PaginatedJobError:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/JobError'
   securitySchemes:
     bearerAuth:
       type: http

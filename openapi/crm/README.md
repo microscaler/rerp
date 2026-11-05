@@ -35,7 +35,7 @@ Each service owns its OpenAPI sub-spec, generated code (gen/), and business logi
 
 | Database | Services | Responsibility |
 |----------|----------|----------------|
-| **crm_core** | pipeline, contacts, accounts, teams | High-frequency transactional operations |
+| **crm_core** | pipeline, contacts, accounts, teams, tasks | High-frequency transactional operations |
 | **crm_analytics** | automation, reporting, intelligence | Read-heavy analytics and processing |
 | **crm_events** | livechat, marketing | Communication and event capture |
 | **crm_outreach** | outreach, social | Marketing store outside the tenant DB (ADR 003): lists, consent, sends, events, posts |
@@ -53,6 +53,9 @@ Within each database, services use independent schemas. Cross-service JOINs are 
 - **API Spec**: [Pipeline OpenAPI](./pipeline/openapi.yaml)
 - **Key capabilities**:
   - CRUD for leads (qualification mode) and opportunities (pipeline mode)
+  - Multiple pipelines, each with its own ordered stages (probability, colour, rotting days, card fields)
+  - Deals: value/currency, owner, status (OPEN/WON/LOST), contacts with roles and a primary contact, notes, files, activity, emails
+  - Deal roles, deal settings (win-probability mode, value brackets, default pipeline), bulk deal operations
   - Stage transitions with validation and probability tracking
   - Lead conversion (lead → opportunity + contact/account)
   - Duplicate detection by email/phone/name
@@ -91,6 +94,19 @@ Within each database, services use independent schemas. Cross-service JOINs are 
   - Capacity-based auto-assignment algorithm
   - Unassigned lead queue
   - Manual assignment triggers
+
+#### Tasks Service
+- **Path**: `crm/tasks/`
+- **Description**: Calls, emails, meetings and to-dos on contacts, deals and accounts, with task types, outcomes, reminders, calendar feeds and saved responses
+- **API Spec**: [Tasks OpenAPI](./tasks/openapi.yaml)
+- **Key capabilities**:
+  - Task CRUD with due date/time, assignee, reminders, complete/reopen and bulk operations
+  - Task types (ordered, each with its allowed outcomes) and an outcome catalogue (label + POSITIVE/NEUTRAL/NEGATIVE sentiment)
+  - Task settings (require an outcome on completion, default reminders)
+  - Automation hook: a task can start a workflow when it is added or completed; completion fires `TASK_COMPLETED`
+  - Per-user iCal calendar feeds (scope all / deals / contacts, pipeline and assignee filters, signed public URL)
+  - Saved responses (categorised, merge-tag templates) rendered for 1:1 emails and tasks
+  - Task overview numbers feed `crm/reporting` task reports
 
 ### Marketing Delivery Services (crm_outreach database)
 
@@ -135,6 +151,8 @@ Within each database, services use independent schemas. Cross-service JOINs are 
 - **Description**: Business intelligence, dashboards, forecasting, and performance analytics
 - **API Spec**: [Reporting OpenAPI](./reporting/openapi.yaml)
 - **Key capabilities**:
+  - Deal reports: overview (totals, value histogram, owner and stage tables), owner overview, funnel (stage-to-stage progression), sales performance (stage × owner), forecast with accuracy
+  - Task overview (load, completion and outcome sentiment per rep)
   - Pipeline summaries by stage, team, and rep
   - Conversion rate analysis and funnel visualization
   - Lead source effectiveness and attribution
@@ -203,6 +221,8 @@ Within each database, services use independent schemas. Cross-service JOINs are 
 - **Description**: Extensibility platform with custom fields, webhooks, audit logging, API keys, and integrations
 - **API Spec**: [Platform OpenAPI](./platform/openapi.yaml)
 - **Key capabilities**:
+  - Connected mailboxes (OAuth Google/Microsoft or IMAP): two-way sync of 1:1 mail onto contacts and deals, 1:1 sends with open/click tracking
+  - Import/export jobs with progress, row counts, per-row errors and result download
   - Per-entity custom field definitions
   - Webhook delivery with retry and HMAC signing
   - Immutable audit log for all operations
@@ -251,18 +271,21 @@ All OpenAPI specs are in `openapi/crm/`:
 
 | Service | OpenAPI Spec | Tags | Paths | Schemas |
 |---------|-------------|------|-------|---------|
-| Pipeline | [pipeline/openapi.yaml](./pipeline/openapi.yaml) | leads, stages | 9 | 14 |
-| Contacts | [contacts/openapi.yaml](./contacts/openapi.yaml) | contacts | 7 | 6 |
-| Accounts | [accounts/openapi.yaml](./accounts/openapi.yaml) | accounts | 6 | 6 |
-| Teams | [teams/openapi.yaml](./teams/openapi.yaml) | teams, members | 6 | 6 |
-| Automation | [automation/openapi.yaml](./automation/openapi.yaml) | workflows, rules, triggers, actions | 14 | 20 |
-| Livechat | [livechat/openapi.yaml](./livechat/openapi.yaml) | chats, messages, agents | 15 | 16 |
-| Engagement | [engagement/openapi.yaml](./engagement/openapi.yaml) | subscriptions, renewals, goals, badges, health | 14 | 15 |
-| Intelligence | [intelligence/openapi.yaml](./intelligence/openapi.yaml) | scoring, enrichment, verification, mining | 21 | 22 |
-| Reporting | [reporting/openapi.yaml](./reporting/openapi.yaml) | pipeline, conversion, performance, win-loss, forecast, reports | 17 | 13 |
-| Marketing | [marketing/openapi.yaml](./marketing/openapi.yaml) | utm, forms, visitors, campaigns, events, surveys | 14 | 17 |
-| Platform | [platform/openapi.yaml](./platform/openapi.yaml) | custom-fields, webhooks, audit-log, api-keys, integrations | 14 | 19 |
-| **Total** | | **38 tags** | **137** | **154** |
+| Pipeline | [pipeline/openapi.yaml](./pipeline/openapi.yaml) | lead-conversion, lead-deduplication, lead-stages, leads, pipeline-analytics, pipeline-stage, stages, pipelines, deals, deal-roles | 28 | 47 |
+| Contacts | [contacts/openapi.yaml](./contacts/openapi.yaml) | tags, segments, contacts, contacts-accounts, contacts-hierarchy, contacts-leads, contacts-merge, contacts-search | 18 | 22 |
+| Accounts | [accounts/openapi.yaml](./accounts/openapi.yaml) | accounts, accounts-contacts, accounts-hierarchy, accounts-leads, accounts-reporting | 6 | 11 |
+| Teams | [teams/openapi.yaml](./teams/openapi.yaml) | lead-assignment, members, team-members, teams | 6 | 12 |
+| Tasks | [tasks/openapi.yaml](./tasks/openapi.yaml) | tasks, task-types, outcomes, calendars, saved-responses, settings | 21 | 27 |
+| Automation | [automation/openapi.yaml](./automation/openapi.yaml) | enrolments, workflow-steps, actions, automation-execution, rules, triggers, workflows | 31 | 48 |
+| Livechat | [livechat/openapi.yaml](./livechat/openapi.yaml) | agent-metrics, agents, chats, chats-conversion, chats-messages, messages | 15 | 23 |
+| Engagement | [engagement/openapi.yaml](./engagement/openapi.yaml) | badges, engagement-badges, engagement-health, engagement-leaderboard, goals, goals-progress, health, renewals, subscriptions, subscriptions-analytics, subscriptions-renewal | 14 | 21 |
+| Intelligence | [intelligence/openapi.yaml](./intelligence/openapi.yaml) | enrichment, lead-enrichment, lead-mining, lead-queues, lead-scoring, lead-scoring-frequencies, lead-scoring-thresholds, lead-verification, mining, scoring, verification | 21 | 29 |
+| Reporting | [reporting/openapi.yaml](./reporting/openapi.yaml) | conversion, forecast, performance, pipeline, report-analytics, report-forecast, report-performance, report-scheduling, report-time-to-close, report-win-loss, reports, win-loss, deal-reports, task-reports | 23 | 45 |
+| Marketing | [marketing/openapi.yaml](./marketing/openapi.yaml) | campaigns, events, forms, marketing-analytics, marketing-campaigns, marketing-events, marketing-forms, marketing-surveys, surveys, utm, utm-campaigns, utm-mediums, utm-sources, visitors | 24 | 38 |
+| Outreach | [outreach/openapi.yaml](./outreach/openapi.yaml) | lists, subscriptions, templates, campaigns, sends, events, transactional, suppressions, senders, public, provider-webhooks, outreach-reports | 38 | 60 |
+| Social | [social/openapi.yaml](./social/openapi.yaml) | social-accounts, social-posts, social-calendar, social-engagement, social-leads | 13 | 18 |
+| Platform | [platform/openapi.yaml](./platform/openapi.yaml) | api-keys, audit-log, auth, custom-fields, integrations, webhooks, mailboxes, jobs | 25 | 49 |
+| **Total** | | **121 tags** | **283** | **450** |
 
 *The gateway spec (`openapi.yaml`) is auto-generated by brrtrouter-gen from all sub-service specs.*
 

@@ -50,6 +50,10 @@ tags:
   description: Custom report builder and scheduling
 - name: win-loss
   description: Win rate and loss analysis
+- name: deal-reports
+  description: 'Deal reports: overview, owner overview, funnel, sales performance, forecast (crm/pipeline deals)'
+- name: task-reports
+  description: 'Task overview: load, completion and outcome sentiment per rep (crm/tasks)'
 paths:
   /analytics/pipeline-summary:
     get:
@@ -689,8 +693,7 @@ paths:
               examples:
                 default:
                   items:
-                  - &id001
-                    period: monthly
+                  - period: monthly
                     total_value: 420000
                     confidence: 0.75
                   total: 1
@@ -738,7 +741,9 @@ paths:
               examples:
                 default:
                   items:
-                  - *id001
+                  - period: monthly
+                    total_value: 420000
+                    confidence: 0.75
                   total: 1
                   page: 1
                   per_page: 20
@@ -839,7 +844,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ReportBuildRequest'
             examples:
-              default: &id003
+              default:
                 name: Monthly Pipeline Report
                 type: pipeline
                 schedule: monthly
@@ -860,7 +865,7 @@ paths:
                   saved:
                     type: boolean
               examples:
-                default: &id002
+                default:
                   report_id: 00000000-0000-0000-0000-000000000019
                   data:
                     total_opportunities: 50
@@ -889,7 +894,12 @@ paths:
                     type: string
                     format: uuid
               examples:
-                default: *id002
+                default:
+                  report_id: 00000000-0000-0000-0000-000000000019
+                  data:
+                    total_opportunities: 50
+                    total_revenue: 250000
+                  saved: true
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -974,7 +984,10 @@ paths:
             schema:
               $ref: '#/components/schemas/ReportScheduleRequest'
             examples:
-              default: *id003
+              default:
+                name: Monthly Pipeline Report
+                type: pipeline
+                schedule: monthly
         description: Schedule a report to be generated periodically
       responses:
         '201':
@@ -1048,7 +1061,7 @@ paths:
               schema:
                 type: object
               examples:
-                default: &id004
+                default:
                   success: true
                   format: csv
                   file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
@@ -1075,7 +1088,10 @@ paths:
                     type: string
                     format: uuid
               examples:
-                default: *id004
+                default:
+                  success: true
+                  format: csv
+                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -1089,6 +1105,371 @@ paths:
       x-operation-id: post_export
       x-controller: rerp_crm::reporting::controller::reports::export
       x-handler-name: reports_export
+  /deals/overview:
+    get:
+      operationId: get_deal_overview
+      summary: Deal overview report
+      tags:
+      - deal-reports
+      parameters:
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to one pipeline
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - OPEN
+          - WON
+          - LOST
+          - ALL
+        description: Which deals the owner/stage tables count (default ALL)
+      responses:
+        '200':
+          description: Deal overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealOverviewReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Totals, value histogram, owner and stage tables for deals in the window.
+      x-controller: rerp_crm::reporting::controller::deal_reports
+      x-handler-name: get_deal_overview
+  /deals/owner-overview:
+    get:
+      operationId: get_deal_owner_overview
+      summary: Deal owner overview
+      tags:
+      - deal-reports
+      parameters:
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to one pipeline
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Owner overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealOwnerOverviewReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: 'One row per deal owner: created, won, lost, value, average deal value, time to close, tasks completed.'
+      x-controller: rerp_crm::reporting::controller::deal_reports
+      x-handler-name: get_deal_owner_overview
+  /deals/funnel:
+    get:
+      operationId: get_deal_funnel
+      summary: Deal funnel for a pipeline
+      tags:
+      - deal-reports
+      parameters:
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      responses:
+        '200':
+          description: Funnel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealFunnelReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Stage-by-stage progression for one pipeline over the window.
+      x-controller: rerp_crm::reporting::controller::deal_reports
+      x-handler-name: get_deal_funnel
+  /deals/sales-performance:
+    get:
+      operationId: get_sales_performance
+      summary: Sales performance by stage per owner
+      tags:
+      - deal-reports
+      parameters:
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      responses:
+        '200':
+          description: Sales performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPerformanceReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Matrix of open deals per stage per owner, plus won/lost, for one pipeline.
+      x-controller: rerp_crm::reporting::controller::deal_reports
+      x-handler-name: get_sales_performance
+  /deals/forecast:
+    get:
+      operationId: get_deal_forecast
+      summary: Deal forecast with accuracy
+      tags:
+      - deal-reports
+      parameters:
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: basis
+        in: query
+        schema:
+          $ref: '#/components/schemas/ForecastBasis'
+        description: Default STAGE_PROBABILITY
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+        description: Default MONTH
+      - name: periods
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 24
+        description: How many future periods (default 6)
+      - name: include_accuracy
+        in: query
+        schema:
+          type: boolean
+        description: Also return past forecasts vs actuals (default true)
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+      responses:
+        '200':
+          description: Forecast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealForecastReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Expected revenue per period from open deals' expected close dates, weighted by the chosen basis, with historical
+        accuracy.
+      x-controller: rerp_crm::reporting::controller::deal_reports
+      x-handler-name: get_deal_forecast
+  /tasks/overview:
+    get:
+      operationId: get_task_overview
+      summary: Task overview report
+      tags:
+      - task-reports
+      parameters:
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: task_type_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: related_kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Task overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOverviewReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Open/overdue/completed tasks and outcome sentiment per rep and per task type.
+      x-controller: rerp_crm::reporting::controller::task_reports
+      x-handler-name: get_task_overview
 components:
   parameters:
     Page:
@@ -1536,8 +1917,7 @@ components:
         limit:
           type: integer
           format: int32
-      description: A generic paginated response wrapper with items and pagination
-        metadata
+      description: A generic paginated response wrapper with items and pagination metadata
     ErrorResponse:
       type: object
       required:
@@ -1721,6 +2101,494 @@ components:
             items:
               $ref: '#/components/schemas/ForecastAccuracyEntry'
       description: Paginated list of ForecastAccuracyEntry records
+    OwnerRef:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - user_id
+    DealValueBracket:
+      type: object
+      properties:
+        label:
+          type: string
+          examples:
+          - $1k - $5k
+        min:
+          type: number
+          format: double
+        max:
+          oneOf:
+          - type: number
+            format: double
+          - type: 'null'
+          description: null = open-ended top bracket
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+      required:
+      - label
+      - count
+      - value
+      description: One bar of the deal-value histogram. Brackets are tenant settings (default 0-1k, 1k-5k, 5k-25k, 25k+).
+    DealTotals:
+      type: object
+      properties:
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        lost_value:
+          type: number
+          format: double
+        win_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_deal_value:
+          type: number
+          format: double
+        avg_days_to_close:
+          type: number
+          format: float
+      required:
+      - open_count
+      - open_value
+      - won_count
+      - won_value
+      - lost_count
+      - lost_value
+      - win_rate
+    DealOwnerRow:
+      allOf:
+      - $ref: '#/components/schemas/OwnerRef'
+      - $ref: '#/components/schemas/DealTotals'
+      - type: object
+        properties:
+          deals_created:
+            type: integer
+          tasks_completed:
+            type: integer
+          last_activity_at:
+            type: string
+            format: date-time
+      description: One owner's line in the overview / owner-overview tables
+    DealStageRow:
+      type: object
+      properties:
+        stage_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+        weighted_value:
+          type: number
+          format: double
+      required:
+      - stage_id
+      - name
+      - count
+      - value
+    DealOverviewReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        totals:
+          $ref: '#/components/schemas/DealTotals'
+        value_brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealValueBracket'
+        by_owner:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealOwnerRow'
+        by_stage:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        created_per_period:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodCount'
+      required:
+      - currency
+      - totals
+      - value_brackets
+      - by_owner
+      - by_stage
+      description: 'Deal Overview report: totals, deal-value histogram, owner table, stage table, deals created over time.'
+    PeriodCount:
+      type: object
+      properties:
+        period:
+          type: string
+          examples:
+          - 2026-11
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+      required:
+      - period
+      - count
+    DealOwnerOverviewReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealOwnerRow'
+        period:
+          type: string
+      required:
+      - currency
+      - owners
+      description: 'Deal Owner Overview: one row per owner with created/won/lost/value/avg/time-to-close/tasks completed.'
+    FunnelStage:
+      type: object
+      properties:
+        stage_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sequence:
+          type: integer
+        entered:
+          type: integer
+          description: Deals that have ever been in this stage in the window
+        current:
+          type: integer
+          description: Deals in the stage now
+        value:
+          type: number
+          format: double
+        progressed:
+          type: integer
+          description: Entered deals that moved to a later stage or won
+        progression_pct:
+          type: number
+          format: float
+          description: 0-100
+        avg_days_in_stage:
+          type: number
+          format: float
+        lost_from_stage:
+          type: integer
+      required:
+      - stage_id
+      - name
+      - sequence
+      - entered
+      - current
+      - progressed
+      - progression_pct
+    DealFunnelReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStage'
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        overall_conversion_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - pipeline_id
+      - stages
+      - won_count
+      - lost_count
+      - overall_conversion_pct
+      description: 'Funnel report for one pipeline: stage-to-stage progression percentages and time in stage.'
+    SalesPerformanceRow:
+      allOf:
+      - $ref: '#/components/schemas/OwnerRef'
+      - type: object
+        properties:
+          stages:
+            type: array
+            items:
+              $ref: '#/components/schemas/DealStageRow'
+          won_count:
+            type: integer
+          won_value:
+            type: number
+            format: double
+          lost_count:
+            type: integer
+    SalesPerformanceReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        period:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesPerformanceRow'
+      required:
+      - pipeline_id
+      - stages
+      - owners
+      description: 'Sales Performance: deals by stage per owner (matrix), plus won/lost per owner.'
+    ForecastBasis:
+      type: string
+      enum:
+      - STAGE_PROBABILITY
+      - DEAL_PROBABILITY
+      - OPEN_VALUE
+      description: 'How weighted value is computed: stage probability (Stage.probability), per-deal win probability (ML /
+        manual), or unweighted open value'
+    ForecastPeriod:
+      type: object
+      properties:
+        period:
+          type: string
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        weighted_value:
+          type: number
+          format: double
+        won_value:
+          type: number
+          format: double
+        forecast:
+          type: number
+          format: double
+        quota:
+          type: number
+          format: double
+        deals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastDeal'
+      required:
+      - period
+      - open_count
+      - open_value
+      - weighted_value
+      - won_value
+      - forecast
+    ForecastDeal:
+      type: object
+      properties:
+        deal_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+        value:
+          type: number
+          format: double
+        probability:
+          type: number
+          format: float
+          description: 0-100
+        weighted_value:
+          type: number
+          format: double
+        expected_close_date:
+          type: string
+          format: date
+      required:
+      - deal_id
+      - title
+      - value
+      - probability
+      - weighted_value
+    DealForecastReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        basis:
+          $ref: '#/components/schemas/ForecastBasis'
+        granularity:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastPeriod'
+        accuracy:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastAccuracyEntry'
+        generated_at:
+          type: string
+          format: date-time
+      required:
+      - pipeline_id
+      - basis
+      - granularity
+      - periods
+      description: 'Deal Forecast: expected revenue per period bucketed by expected close date and weighted by the chosen
+        basis; `accuracy` compares past forecasts with what closed.'
+    SentimentCounts:
+      type: object
+      properties:
+        positive:
+          type: integer
+        neutral:
+          type: integer
+        negative:
+          type: integer
+      required:
+      - positive
+      - neutral
+      - negative
+    TaskTotals:
+      type: object
+      properties:
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+      required:
+      - open
+      - overdue
+      - completed
+      - completion_rate
+    TaskOwnerRow:
+      allOf:
+      - $ref: '#/components/schemas/OwnerRef'
+      - $ref: '#/components/schemas/TaskTotals'
+      - type: object
+        properties:
+          outcomes:
+            $ref: '#/components/schemas/SentimentCounts'
+    TaskTypeRow:
+      allOf:
+      - type: object
+        properties:
+          task_type_id:
+            type: string
+            format: uuid
+          name:
+            type: string
+        required:
+        - task_type_id
+        - name
+      - $ref: '#/components/schemas/TaskTotals'
+    TaskOutcomeRow:
+      type: object
+      properties:
+        outcome_id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        sentiment:
+          type: string
+          enum:
+          - POSITIVE
+          - NEUTRAL
+          - NEGATIVE
+        count:
+          type: integer
+      required:
+      - outcome_id
+      - label
+      - sentiment
+      - count
+    TaskOverviewReport:
+      type: object
+      properties:
+        totals:
+          $ref: '#/components/schemas/TaskTotals'
+        by_owner:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskOwnerRow'
+        by_type:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskTypeRow'
+        by_outcome:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskOutcomeRow'
+        completed_per_period:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodCount'
+      required:
+      - totals
+      - by_owner
+      - by_type
+      - by_outcome
+      description: 'Task Overview: load and completion per rep and per type, outcome sentiment per rep (crm/tasks outcomes).'
   securitySchemes:
     bearerAuth:
       type: http

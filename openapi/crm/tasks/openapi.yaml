@@ -1,0 +1,2288 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation.
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: Tasks
+  version: v1.0.0
+  description: Tasks service - calls, emails, meetings and to-dos on contacts and deals, with task types, an outcome catalogue
+    (label + sentiment), reminders, a hook that starts a workflow when a task is added or completed, calendar (iCal) feeds
+    and saved responses. Completing a task fires crm/automation TASK_COMPLETED.
+  x-api-version: CRM Tasks API v1.0.0
+  x-crm-api-version: v1.0.0
+  termsOfService: https://rerp.example.com/terms
+  contact:
+    name: RERP API Support
+    url: https://docs.rerp.com/support
+    email: api-support@rerp.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-api-docs:
+    service: tasks
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+servers:
+  - url: http://localhost:10352/api/v1/crm/tasks
+    description: Local development (direct to service, port from port-registry)
+  - url: /api/v1/crm/tasks
+    description: Tasks API
+tags:
+  - name: tasks
+    description: Tasks on contacts and deals
+  - name: task-types
+    description: Task types and their outcomes
+  - name: outcomes
+    description: The outcome catalogue
+  - name: calendars
+    description: iCal feeds of tasks
+  - name: saved-responses
+    description: Reusable 1:1 email responses
+  - name: settings
+    description: Task settings
+paths:
+  /tasks:
+    get:
+      operationId: list_tasks
+      summary: List tasks
+      tags:
+        - tasks
+      parameters:
+        - &id004
+          name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - &id005
+          name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - &id006
+          name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskStatus'
+        - name: related_kind
+          in: query
+          schema:
+            $ref: '#/components/schemas/RelatedKind'
+        - name: related_id
+          in: query
+          schema: &id001
+            type: string
+            format: uuid
+        - name: contact_id
+          in: query
+          schema: *id001
+        - name: deal_id
+          in: query
+          schema: *id001
+        - name: type_id
+          in: query
+          schema: *id001
+        - name: assignee_id
+          in: query
+          schema:
+            type: string
+        - name: outcome_id
+          in: query
+          schema: *id001
+        - name: sentiment
+          in: query
+          schema:
+            $ref: '#/components/schemas/Sentiment'
+        - name: due_from
+          in: query
+          schema: &id002
+            type: string
+            format: date-time
+        - name: due_to
+          in: query
+          schema: *id002
+        - name: overdue
+          in: query
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - due_at
+              - created_at
+              - title
+            default: due_at
+        - name: dir
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTask'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: list_tasks
+    post:
+      operationId: create_task
+      summary: Create a task
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: create_task
+  /tasks/{id}:
+    get:
+      operationId: get_task
+      summary: Get a task
+      tags:
+        - tasks
+      parameters:
+        - &id003
+          name: id
+          in: path
+          required: true
+          schema: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: get_task
+    put:
+      operationId: update_task
+      summary: Replace a task
+      tags:
+        - tasks
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: update_task
+    patch:
+      operationId: patch_task
+      summary: Update part of a task
+      tags:
+        - tasks
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: patch_task
+    delete:
+      operationId: delete_task
+      summary: Delete a task
+      tags:
+        - tasks
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: delete_task
+  /tasks/{id}/complete:
+    post:
+      operationId: complete_task
+      summary: Complete a task with an outcome; fires TASK_COMPLETED and the task's COMPLETED automation hook
+      tags:
+        - tasks
+      description: 422 OUTCOME_REQUIRED when settings.require_outcomes is on and no outcome_id is given; 422 OUTCOME_NOT_ALLOWED
+        when the outcome is not one of the task type's.
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteTaskRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: complete_task
+  /tasks/{id}/reopen:
+    post:
+      operationId: reopen_task
+      summary: Reopen a completed task (clears the outcome)
+      tags:
+        - tasks
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: reopen_task
+  /tasks/bulk:
+    post:
+      operationId: bulk_update_tasks
+      summary: Complete, reassign, reschedule or delete many tasks
+      tags:
+        - tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - task_ids
+                - action
+              properties:
+                task_ids:
+                  type: array
+                  items: *id001
+                action:
+                  type: string
+                  enum:
+                    - COMPLETE
+                    - REASSIGN
+                    - RESCHEDULE
+                    - DELETE
+                outcome_id: *id001
+                assignee_id:
+                  type: string
+                due_at: *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                  skipped:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        task_id: *id001
+                        reason:
+                          type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: bulk_update_tasks
+  /types:
+    get:
+      operationId: list_task_types
+      summary: List task types
+      tags:
+        - task-types
+      parameters:
+        - *id004
+        - *id005
+        - *id006
+        - name: active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: list_task_types
+    post:
+      operationId: create_task_type
+      summary: Create a task type
+      tags:
+        - task-types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskTypeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: create_task_type
+  /types/{id}:
+    get:
+      operationId: get_task_type
+      summary: Get a task type
+      tags:
+        - task-types
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: get_task_type
+    put:
+      operationId: update_task_type
+      summary: Replace a task type
+      tags:
+        - task-types
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: update_task_type
+    patch:
+      operationId: patch_task_type
+      summary: Update part of a task type
+      tags:
+        - task-types
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskTypeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: patch_task_type
+    delete:
+      operationId: delete_task_type
+      summary: Delete a task type
+      tags:
+        - task-types
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: delete_task_type
+  /types/{id}/reorder:
+    post:
+      operationId: reorder_type
+      summary: Move a task type to a position
+      tags:
+        - task-types
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sequence
+              properties:
+                sequence:
+                  type: integer
+                  format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskType'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::task_types
+      x-handler-name: reorder_type
+  /outcomes:
+    get:
+      operationId: list_outcomes
+      summary: List outcomes
+      tags:
+        - outcomes
+      parameters:
+        - *id004
+        - *id005
+        - *id006
+        - name: sentiment
+          in: query
+          schema:
+            $ref: '#/components/schemas/Sentiment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOutcome'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: list_outcomes
+    post:
+      operationId: create_outcome
+      summary: Create a outcome
+      tags:
+        - outcomes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutcomeRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outcome'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: create_outcome
+  /outcomes/{id}:
+    get:
+      operationId: get_outcome
+      summary: Get a outcome
+      tags:
+        - outcomes
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outcome'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: get_outcome
+    put:
+      operationId: update_outcome
+      summary: Replace a outcome
+      tags:
+        - outcomes
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutcomeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outcome'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: update_outcome
+    patch:
+      operationId: patch_outcome
+      summary: Update part of a outcome
+      tags:
+        - outcomes
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutcomeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outcome'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: patch_outcome
+    delete:
+      operationId: delete_outcome
+      summary: Delete a outcome
+      tags:
+        - outcomes
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::outcomes
+      x-handler-name: delete_outcome
+  /settings:
+    get:
+      operationId: get_task_settings
+      summary: Task settings
+      tags:
+        - settings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::settings
+      x-handler-name: get_task_settings
+    put:
+      operationId: update_task_settings
+      summary: Update task settings
+      tags:
+        - settings
+      description: 422 TYPES_WITHOUT_OUTCOMES (listing them) when require_outcomes is turned on while an active type has no
+        outcomes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::settings
+      x-handler-name: update_task_settings
+  /calendars:
+    get:
+      operationId: list_calendar_feeds
+      summary: List calendars
+      tags:
+        - calendars
+      parameters:
+        - *id004
+        - *id005
+        - *id006
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: list_calendar_feeds
+    post:
+      operationId: create_calendar_feed
+      summary: Create a calendar
+      tags:
+        - calendars
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarFeedRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: create_calendar_feed
+  /calendars/{id}:
+    get:
+      operationId: get_calendar_feed
+      summary: Get a calendar
+      tags:
+        - calendars
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: get_calendar_feed
+    put:
+      operationId: update_calendar_feed
+      summary: Replace a calendar
+      tags:
+        - calendars
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarFeedRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: update_calendar_feed
+    patch:
+      operationId: patch_calendar_feed
+      summary: Update part of a calendar
+      tags:
+        - calendars
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarFeedRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: patch_calendar_feed
+    delete:
+      operationId: delete_calendar_feed
+      summary: Delete a calendar
+      tags:
+        - calendars
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: delete_calendar_feed
+  /calendars/{id}/regenerate:
+    post:
+      operationId: regenerate_calendar_token
+      summary: Issue a new token (the old URL stops working)
+      tags:
+        - calendars
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarFeed'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: regenerate_calendar_token
+  /public/calendars/{token}.ics:
+    get:
+      operationId: get_calendar_ics
+      summary: The feed as iCalendar (no auth; the token is the secret). One VEVENT per task with due date/time, the type's
+        default duration, assignee as attendee, related contact/deal in the description, VALARMs from reminders when include_alerts
+      tags:
+        - calendars
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/calendar:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+      x-controller: rerp_crm::tasks::controller::calendars
+      x-handler-name: get_calendar_ics
+  /saved-responses:
+    get:
+      operationId: list_saved_responses
+      summary: List saved_responses
+      tags:
+        - saved-responses
+      parameters:
+        - *id004
+        - *id005
+        - *id006
+        - name: category_id
+          in: query
+          schema: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSavedResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: list_saved_responses
+    post:
+      operationId: create_saved_response
+      summary: Create a saved_response
+      tags:
+        - saved-responses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: create_saved_response
+  /saved-responses/{id}:
+    get:
+      operationId: get_saved_response
+      summary: Get a saved_response
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: get_saved_response
+    put:
+      operationId: update_saved_response
+      summary: Replace a saved_response
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: update_saved_response
+    patch:
+      operationId: patch_saved_response
+      summary: Update part of a saved_response
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: patch_saved_response
+    delete:
+      operationId: delete_saved_response
+      summary: Delete a saved_response
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: delete_saved_response
+  /saved-responses/{id}/render:
+    post:
+      operationId: render_saved_response
+      summary: Render the response for a contact (merge fields resolved), for the 1:1 composer
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contact_id
+              properties:
+                contact_id: *id001
+                deal_id: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subject:
+                    type: string
+                  body:
+                    type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: render_saved_response
+  /saved-response-categories:
+    get:
+      operationId: list_saved_response_categories
+      summary: List saved-response categories
+      tags:
+        - saved-responses
+      parameters:
+        - *id004
+        - *id005
+        - *id006
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSavedResponseCategory'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: list_saved_response_categories
+    post:
+      operationId: create_saved_response_category
+      summary: Create a saved-response category
+      tags:
+        - saved-responses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseCategory'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponseCategory'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: create_saved_response_category
+  /saved-response-categories/{id}:
+    get:
+      operationId: get_saved_response_category
+      summary: Get a saved-response category
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponseCategory'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: get_saved_response_category
+    put:
+      operationId: update_saved_response_category
+      summary: Replace a saved-response category
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseCategory'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponseCategory'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: update_saved_response_category
+    patch:
+      operationId: patch_saved_response_category
+      summary: Update part of a saved-response category
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedResponseCategory'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedResponseCategory'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: patch_saved_response_category
+    delete:
+      operationId: delete_saved_response_category
+      summary: Delete a saved-response category
+      tags:
+        - saved-responses
+      parameters:
+        - *id003
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::saved_responses
+      x-handler-name: delete_saved_response_category
+  /reports/overview:
+    get:
+      operationId: task_overview_report
+      summary: 'The task overview report: totals, series over time, breakdowns by status/type/outcome/sentiment, outcomes
+        by rep'
+      tags:
+        - tasks
+      parameters:
+        - name: related_kind
+          in: query
+          schema:
+            $ref: '#/components/schemas/RelatedKind'
+        - name: type_id
+          in: query
+          schema: *id001
+        - name: outcome_id
+          in: query
+          schema: *id001
+        - name: assignee_id
+          in: query
+          schema:
+            type: string
+        - name: group_id
+          in: query
+          schema: *id001
+        - name: created_from
+          in: query
+          schema: *id002
+        - name: created_to
+          in: query
+          schema: *id002
+        - name: due_from
+          in: query
+          schema: *id002
+        - name: due_to
+          in: query
+          schema: *id002
+        - name: completed_from
+          in: query
+          schema: *id002
+        - name: completed_to
+          in: query
+          schema: *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOverview'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::tasks::controller::tasks
+      x-handler-name: task_overview_report
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: object
+    TaskStatus:
+      type: string
+      enum:
+        - OPEN
+        - COMPLETED
+        - CANCELLED
+    RelatedKind:
+      type: string
+      enum:
+        - CONTACT
+        - DEAL
+        - ACCOUNT
+    Sentiment:
+      type: string
+      enum:
+        - POSITIVE
+        - NEUTRAL
+        - NEGATIVE
+    Reminder:
+      type: object
+      required:
+        - unit
+      description: When to remind the assignee before the due time; AT_DUE sends at the due time
+      properties:
+        id: *id001
+        unit:
+          type: string
+          enum:
+            - AT_DUE
+            - MINUTES
+            - HOURS
+            - DAYS
+        amount:
+          type: integer
+          format: int32
+          minimum: 1
+        channel:
+          type: string
+          enum:
+            - EMAIL
+            - IN_APP
+            - BOTH
+          default: BOTH
+        sent_at: &id007
+          type: string
+          format: date-time
+          readOnly: true
+    AutomationHook:
+      type: object
+      required:
+        - workflow_id
+        - 'on'
+      description: Start a crm/automation workflow for the task's contact when the task is added or completed
+      properties:
+        workflow_id: *id001
+        'on':
+          type: string
+          enum:
+            - ADDED
+            - COMPLETED
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - related_kind
+        - related_id
+        - type_id
+        - status
+        - created_at
+      properties:
+        id: *id001
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        related_kind:
+          $ref: '#/components/schemas/RelatedKind'
+        related_id: *id001
+        contact_id:
+          type: string
+          format: uuid
+          description: The contact the task is on, or the deal's primary contact
+        contact_name:
+          type: string
+          readOnly: true
+        deal_id: *id001
+        deal_title:
+          type: string
+          readOnly: true
+        type_id: *id001
+        type:
+          type: string
+          readOnly: true
+          description: The type's title
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        assignee_id:
+          type: string
+          description: Staff user id; absent = unassigned
+        owner_name:
+          type: string
+          readOnly: true
+        due_at: *id002
+        overdue:
+          type: boolean
+          readOnly: true
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reminder'
+        automation:
+          $ref: '#/components/schemas/AutomationHook'
+        outcome_id: *id001
+        outcome:
+          type: string
+          readOnly: true
+        outcome_sentiment:
+          $ref: '#/components/schemas/Sentiment'
+          readOnly: true
+        completed_at: *id007
+        completed_by:
+          type: string
+          readOnly: true
+          description: A staff user id, or WORKFLOW
+        created_by:
+          type: string
+          readOnly: true
+          description: A staff user id, WORKFLOW, FORM or IMPORT
+        created_at: *id007
+        updated_at: *id007
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - related_kind
+        - related_id
+        - type_id
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        related_kind:
+          $ref: '#/components/schemas/RelatedKind'
+        related_id: *id001
+        type_id: *id001
+        assignee_id:
+          type: string
+        due_at: *id002
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reminder'
+        automation:
+          $ref: '#/components/schemas/AutomationHook'
+        completed:
+          type: boolean
+          default: false
+          description: Create it already complete (needs outcome_id when outcomes are required)
+        outcome_id: *id001
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type_id: *id001
+        assignee_id:
+          type: string
+        due_at: *id002
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reminder'
+        automation:
+          $ref: '#/components/schemas/AutomationHook'
+        related_kind:
+          $ref: '#/components/schemas/RelatedKind'
+        related_id: *id001
+    CompleteTaskRequest:
+      type: object
+      properties:
+        outcome_id:
+          type: string
+          format: uuid
+          description: Required when settings.require_outcomes is true
+        note:
+          type: string
+    TaskType:
+      type: object
+      required:
+        - id
+        - title
+        - active
+      properties:
+        id: *id001
+        title:
+          type: string
+          maxLength: 64
+        default_minutes:
+          type: integer
+          format: int32
+          description: Default duration for calendar feeds
+        outcome_ids:
+          type: array
+          items: *id001
+          description: The outcomes offered for this type, in order (at least one when outcomes are required)
+        outcomes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+          description: Their labels
+        sequence:
+          type: integer
+          format: int32
+        active:
+          type: boolean
+          description: Hidden types keep their history but cannot be picked
+        open_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_at: *id007
+    TaskTypeRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        default_minutes:
+          type: integer
+          format: int32
+        outcome_ids:
+          type: array
+          items: *id001
+        sequence:
+          type: integer
+          format: int32
+        active:
+          type: boolean
+    Outcome:
+      type: object
+      required:
+        - id
+        - label
+        - sentiment
+      description: One entry of the workspace's outcome catalogue; task types pick from it
+      properties:
+        id: *id001
+        label:
+          type: string
+          maxLength: 64
+        sentiment:
+          $ref: '#/components/schemas/Sentiment'
+        used_by_type_ids:
+          type: array
+          items: *id001
+          readOnly: true
+        count_30d:
+          type: integer
+          format: int64
+          readOnly: true
+    OutcomeRequest:
+      type: object
+      required:
+        - label
+        - sentiment
+      properties:
+        label:
+          type: string
+        sentiment:
+          $ref: '#/components/schemas/Sentiment'
+    TaskSettings:
+      type: object
+      properties:
+        require_outcomes:
+          type: boolean
+          default: false
+          description: Completing a task needs an outcome, and every active type needs at least one outcome before this can
+            be turned on
+        default_due_offset_minutes:
+          type: integer
+          format: int32
+          default: 0
+        default_reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reminder'
+    CalendarFeed:
+      type: object
+      required:
+        - id
+        - name
+        - scope
+        - created_at
+      description: An iCal feed of tasks, by scope, pipelines and assignees; the URL carries a token and is served by GET
+        /calendars/{token}.ics
+      properties:
+        id: *id001
+        name:
+          type: string
+          maxLength: 128
+        scope:
+          type: string
+          enum:
+            - ALL
+            - DEALS
+            - CONTACTS
+        pipeline_ids:
+          type: array
+          items: *id001
+          description: 'DEALS/ALL: limit to these pipelines; empty = all'
+        assignee_ids:
+          type: array
+          items:
+            type: string
+          description: Empty = everyone
+        include_alerts:
+          type: boolean
+          default: false
+          description: Add VALARM entries from the tasks' reminders
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        token:
+          type: string
+          readOnly: true
+        created_by:
+          type: string
+          readOnly: true
+        created_at: *id007
+    CalendarFeedRequest:
+      type: object
+      required:
+        - name
+        - scope
+      properties:
+        name:
+          type: string
+        scope:
+          type: string
+          enum:
+            - ALL
+            - DEALS
+            - CONTACTS
+        pipeline_ids:
+          type: array
+          items: *id001
+        assignee_ids:
+          type: array
+          items:
+            type: string
+        include_alerts:
+          type: boolean
+    SavedResponse:
+      type: object
+      required:
+        - id
+        - name
+        - subject
+        - body
+      description: A reusable 1:1 email (subject + body with %MERGE% fields), picked when a user emails a contact or deal
+      properties:
+        id: *id001
+        name:
+          type: string
+          maxLength: 128
+        category_id: *id001
+        category:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          maxLength: 255
+        body:
+          type: string
+          description: HTML with merge fields
+        last_sent_at: *id007
+        last_sent_by:
+          type: string
+          readOnly: true
+        send_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_by:
+          type: string
+          readOnly: true
+        created_at: *id007
+        updated_at: *id007
+    SavedResponseRequest:
+      type: object
+      required:
+        - name
+        - subject
+        - body
+      properties:
+        name:
+          type: string
+        category_id: *id001
+        subject:
+          type: string
+        body:
+          type: string
+    SavedResponseCategory:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id: *id001
+        name:
+          type: string
+          maxLength: 64
+        response_count:
+          type: integer
+          format: int32
+          readOnly: true
+    TaskOverview:
+      type: object
+      description: The task overview report
+      properties:
+        total:
+          type: integer
+          format: int64
+        completed:
+          type: integer
+          format: int64
+        overdue:
+          type: integer
+          format: int64
+        open:
+          type: integer
+          format: int64
+        series:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              open:
+                type: integer
+              completed:
+                type: integer
+              due:
+                type: integer
+              overdue:
+                type: integer
+              completed_late:
+                type: integer
+              completed_on_time:
+                type: integer
+        by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        by_type:
+          type: object
+          additionalProperties:
+            type: integer
+        by_outcome:
+          type: object
+          additionalProperties:
+            type: integer
+        by_sentiment:
+          type: object
+          additionalProperties:
+            type: integer
+        by_owner:
+          type: array
+          items:
+            type: object
+            properties:
+              owner_id:
+                type: string
+              owner_name:
+                type: string
+              positive:
+                type: integer
+              neutral:
+                type: integer
+              negative:
+                type: integer
+              no_outcome:
+                type: integer
+              total:
+                type: integer
+    PaginatedTask:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedTaskType:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskType'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedOutcome:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Outcome'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedCalendarFeed:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarFeed'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedSavedResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedResponse'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedSavedResponseCategory:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedResponseCategory'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Tasks API Reference
+  url: https://docs.rerp.com/crm/tasks/api-reference

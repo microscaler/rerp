@@ -66,9 +66,9 @@
 | Action: format data | — | defer |
 | Action: subscribe / unsubscribe, update field, tag ±, note, score ± | yes | in spec |
 | Action: **convert** (fire a conversion) | — | **add** with conversions entity |
-| Action: **add a task** | `CREATE_TASK` placeholder | **add tasks entity** |
+| Action: **add a task** | `CREATE_TASK` → `crm/tasks` | in spec (2026-11-05) |
 | Action: **archive contact** | — | **add** |
-| Action: add deal, update title/status/owner/value/stage/custom field, deal task/note, deal score, account field | `CREATE_DEAL`, `UPDATE_DEAL_STAGE` | **add the rest** |
+| Action: add deal, update title/status/owner/value/stage/custom field, deal task/note, deal score, account field | `CREATE_DEAL`, `UPDATE_DEAL_*`, `ADD_DEAL_NOTE`, `ADJUST_DEAL_SCORE` | in spec (2026-11-05) |
 
 ### Email
 | AC feature | Our service | Status |
@@ -87,15 +87,16 @@
 ### Deals
 | AC feature | Our service | Status |
 |---|---|---|
-| Deals kanban, pipelines, stages | `crm/pipeline` (single pipeline) | **add multiple pipelines** |
-| **Tasks** (type, due, outcome, owner; on deals and contacts) | — | **add tasks entity** |
-| Saved responses | — | defer |
-| Deal custom fields | `crm/platform` custom fields (entity = deal) | in spec |
-| Deal settings: **deal roles**, win probability (ML) | — | roles **add**; ML defer |
-| Connected emails (reply from the CRM) | — | defer (inbound mail) |
-| Task settings (types, outcomes) | — | with tasks |
-| Calendars | — | defer |
-| Reports: deals overview, **owner**, **funnel**, sales performance, task overview, **forecast** | `crm/reporting` has pipeline/forecast | **add owner + funnel + forecast weighting by stage probability × close date** |
+| Deals kanban, pipelines, stages | `crm/pipeline` `Pipeline`, `Stage.card_fields`, `Deal` | in spec (2026-11-05) |
+| **Tasks** (type, due, outcome, owner; on deals and contacts) | `crm/tasks` | in spec (2026-11-05) |
+| Saved responses | `crm/tasks` `SavedResponse` | in spec (2026-11-05) |
+| Deal custom fields (text, textarea, number, money, date, datetime, dropdown, listbox; groups) | `crm/platform` custom fields (entity = deal) | in spec (`FieldType` MONEY/MULTISELECT/TEXTAREA, `group`, `show_on_card`, 2026-11-05) |
+| Deal settings: **deal roles**, win probability (ML), value brackets | `crm/pipeline` `DealRole`, `DealSettings` | in spec (2026-11-05); ML estimate itself deferred (`basis` chooses) |
+| Connected emails (OAuth/IMAP sync, 1:1 send, tracking) | `crm/platform` `Mailbox` | in spec (2026-11-05) |
+| Task settings (types, outcomes, require outcome) | `crm/tasks` `TaskType`, `Outcome`, `TaskSettings` | in spec (2026-11-05) |
+| Calendars (iCal feeds) | `crm/tasks` `CalendarFeed` | in spec (2026-11-05) |
+| Reports: deals overview, owner, funnel, sales performance, task overview, forecast | `crm/reporting` `/deals/*`, `/tasks/overview` | in spec (2026-11-05) |
+| Import/Export Status | `crm/platform` `Job` | in spec (2026-11-05) |
 
 ### Website
 | AC feature | Our service | Status |
@@ -134,17 +135,17 @@
 | Integrations marketplace | `crm/platform` integrations | defer |
 | **Data manager** (GDPR export / erase) | — | **add jobs** |
 | **Notifications** (which staff get which internal alerts) | — | **add** |
-| Saved responses | — | defer |
+| Saved responses | `crm/tasks` `SavedResponse` | in spec (2026-11-05) |
 
 ## 2. Curated v1 additions (ordered by shape change, then size)
 
 Shape changes:
 1. ~~`crm/automation.Workflow.triggers[]` — several start triggers per workflow.~~ Done 2026-11-05, with the builder's step configs (shape-diff § Automation builder).
-2. `crm/pipeline` — multiple pipelines (`Pipeline` entity; stages belong to a pipeline; deal has `pipeline_id`).
+2. ~~`crm/pipeline` — multiple pipelines (`Pipeline` entity; stages belong to a pipeline; deal has `pipeline_id`).~~ Done 2026-11-05 (shape-diff § Deals menu).
 3. SMS as a first-class channel in `crm/outreach` — adapter contract, consent, keywords, quiet hours.
 
 New entities:
-4. `Task` (`crm/pipeline` or new `crm/tasks`): subject, type, due, owner, outcome, linked contact/deal; `TASK_COMPLETED` trigger; `CREATE_TASK` action.
+4. ~~`Task` (`crm/pipeline` or new `crm/tasks`): subject, type, due, owner, outcome, linked contact/deal; `TASK_COMPLETED` trigger; `CREATE_TASK` action.~~ Done 2026-11-05 as `crm/tasks` (types, outcomes, reminders, calendar feeds, saved responses).
 5. `Conversion` + `BusinessGoal` (`crm/marketing`): name, value, trigger definition, counts; `CONVERT` action; revenue attribution.
 6. `ScoreRule` / `Score` (`crm/intelligence`): named scores (contact, deal), rules with points and decay.
 7. `ListExclusion` (`crm/outreach`).
@@ -165,4 +166,4 @@ The ActiveCampaign trial is configured as a reference tenant by script (`openapi
 
 ## 4. Mock screens still to add
 
-Tasks (list + on contact/deal), Pipelines settings (several pipelines, stages, roles), Conversions & goals, Score rules editor, List exclusions, Bulk edit, Snippets & assets, Brand kit, Postal addresses, Tracking domain, Notifications, GDPR data requests, Site messages (in form builder), SMS campaign variant of the wizard, multi-trigger in the automation builder, Automation messages view, Forecast / funnel / owner reports.
+Tasks (list + on contact/deal, task settings, calendar feeds, saved responses), Pipelines settings (several pipelines, stages, roles, deal settings), Connected emails, Import/Export status, Deal detail (notes/files/emails tabs, contacts with roles), Conversions & goals, Score rules editor, List exclusions, Bulk edit, Snippets & assets, Brand kit, Postal addresses, Tracking domain, Notifications, GDPR data requests, Site messages (in form builder), SMS campaign variant of the wizard, multi-trigger in the automation builder, Automation messages view, Forecast / funnel / owner reports.
