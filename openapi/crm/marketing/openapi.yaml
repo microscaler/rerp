@@ -1989,11 +1989,19 @@ components:
         origin:
           type: string
           format: uri
+          description: A host, a subdomain, or a specific page; `*` is a wildcard in the path
+        include_all_pages:
+          type: boolean
+          default: true
+          description: false tracks only the exact page in `origin`
         name:
           type: string
+        enabled:
+          type: boolean
+          default: true
         tracking_key:
           type: string
-          description: Public key embedded in the snippet; the origin check is the real guard
+          description: Public key embedded in the snippet (one per workspace, shared by every site); the origin check is the real guard
         snippet:
           type: string
           readOnly: true
@@ -2016,6 +2024,10 @@ components:
           type: string
         declared:
           type: boolean
+          description: Whitelisted by a user (events arriving with an undeclared name are stored but flagged)
+        enabled:
+          type: boolean
+          default: true
         count_30d:
           type: integer
           format: int64

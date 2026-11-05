@@ -168,3 +168,15 @@ Walked 2026-11-05; form 1 "Reference: pricing enquiry" (inline, subscribes to Ne
 | "Trigger Automation" (start an automation on submit) | `FORM_SUBMITTED` trigger on a workflow; the form page lists the workflows that use it |
 | Integrate: simple embed (`<div class="_form_1">` + script), full embed (inline CSS + HTML), link (hosted page), Facebook, WordPress; suggested follow-up automations | `GET /forms/{id}/embed` → `{script, html, hosted_url}`; public `POST /public/forms/{id}/submit` |
 | Toast "Your form is saved"; forms auto-save | — |
+
+## Site tracking settings (UI) → `crm/marketing` tracking
+
+Walked 2026-11-05 (`/app/settings/tracking`); tracking enabled, `pricewhisperer.ai` (all pages) whitelisted, event
+tracking enabled with event `trial_activated`, for the dump (`siteTrackingDomains`).
+
+| Theirs | Ours |
+|---|---|
+| Site tracking on/off (workspace-wide); "has not been used recently" warning | `GET/PUT /tracking/settings {site_tracking: bool, event_tracking: bool}`; `TrackedSite.last_event_at` drives the warning |
+| Whitelist: website URL + "include all website pages" (unchecked = that page/subdomain only; `*` wildcard); per-row site-tracking checkbox; remove | `TrackedSite.origin`, `include_all_pages`, `enabled` |
+| Tracking code: one snippet for the account (`setAccount`, `setTrackByDefault true`, `process`) | `GET /tracking/snippet`; one `tracking_key` per workspace |
+| Event tracking on/off; event key (regenerate); whitelisted events (add / remove) | `event_tracking` flag, `event_key` (regenerable), `EventTypeDef.declared/enabled` |
