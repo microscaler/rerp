@@ -5,21 +5,33 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: CRM Outreach
   version: v1.0.0
-  description: |
-    Message delivery for the CRM: lists and subscriptions (consent), message templates, one-time and
+  description: 'Message delivery for the CRM: lists and subscriptions (consent), message templates, one-time and
+
     A/B campaigns, transactional sends, the per-message delivery log and engagement events (delivered,
+
     opened, clicked, bounced, complained, unsubscribed), suppression, sender identities, and the public
+
     endpoints a recipient touches (open pixel, click redirect, one-click unsubscribe, preference page).
 
+
     Channel is a property of the template and the campaign (EMAIL first; SMS and WHATSAPP share the
+
     same model and are delivered when a provider adapter exists). Automation (crm/automation) sends
+
     through this service via its SEND_MESSAGE action; it never talks to a provider itself.
 
-    Data home (ADR 003): the outreach store sits with the marketing funnel, outside RERP's tenant
+
+    Data home (ADR 003): the outreach store sits with the marketing funnel, outside RERP''s tenant
+
     database, in a Postgres this service owns (a deployment may point it at a managed project or an
+
     in-cluster instance). Marketing history, consent and engagement never cross into RERP; only
+
     converted customers do. The provider adapter (SES, Postmark, Resend, ...) is deployment
+
     configuration, never a property of the data.
+
+    '
   x-api-version: CRM Outreach API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -224,10 +236,13 @@ paths:
     post:
       operationId: subscribe
       summary: Subscribe a contact to a list
-      description: |
-        Records a subscription with its consent source. With double opt-in on the list the status is PENDING until
+      description: 'Records a subscription with its consent source. With double opt-in on the list the status is PENDING until
+
         the confirmation link is followed. Re-subscribing an UNSUBSCRIBED contact requires a fresh consent source
+
         (a form submission or an explicit staff action with a note); an automation may not do it.
+
+        '
       tags:
       - subscriptions
       requestBody:
@@ -377,7 +392,10 @@ paths:
                 subject: 'Day 7: what you have set up so far'
                 preheader: A week in, and three things worth doing next
                 body_format: MARKDOWN
-                body: "Hi {{contact.first_name}},\n\nA week ago you signed up..."
+                body: 'Hi {{contact.first_name}},
+
+
+                  A week ago you signed up...'
       responses:
         '201':
           description: Template created
@@ -530,7 +548,8 @@ paths:
     get:
       operationId: list_merge_fields
       summary: Merge fields available to templates
-      description: Contact fields, custom fields (crm/platform), list and campaign fields, and system links (unsubscribe, preferences, web view).
+      description: Contact fields, custom fields (crm/platform), list and campaign fields, and system links (unsubscribe,
+        preferences, web view).
       tags:
       - templates
       responses:
@@ -683,7 +702,8 @@ paths:
     get:
       operationId: preview_campaign_audience
       summary: Resolve the campaign's audience now
-      description: Lists minus exclusions minus suppressed minus unsubscribed, filtered by the segment. Returns the count and a sample.
+      description: Lists minus exclusions minus suppressed minus unsubscribed, filtered by the segment. Returns the count
+        and a sample.
       tags:
       - campaigns
       parameters:
@@ -705,7 +725,8 @@ paths:
     post:
       operationId: schedule_campaign
       summary: Schedule or send now
-      description: Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present) and moves it to SCHEDULED. Omit send_at to send immediately.
+      description: Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present)
+        and moves it to SCHEDULED. Omit send_at to send immediately.
       tags:
       - campaigns
       parameters:
@@ -876,7 +897,8 @@ paths:
     get:
       operationId: list_events
       summary: Engagement events
-      description: Filter by contact, campaign, send or type. The automation service subscribes to these to fire EMAIL_OPENED / EMAIL_CLICKED triggers.
+      description: Filter by contact, campaign, send or type. The automation service subscribes to these to fire EMAIL_OPENED
+        / EMAIL_CLICKED triggers.
       tags:
       - events
       parameters:
@@ -921,9 +943,11 @@ paths:
     post:
       operationId: send_transactional
       summary: Send one message to one recipient from the application
-      description: |
-        For welcome, password, receipt and alert mail. Honors the suppression list and hard bounces but not list
+      description: 'For welcome, password, receipt and alert mail. Honors the suppression list and hard bounces but not list
+
         subscription state (a transactional message is not marketing). Requires a template of kind TRANSACTIONAL.
+
+        '
       tags:
       - transactional
       requestBody:
@@ -1048,7 +1072,8 @@ paths:
     post:
       operationId: create_sender
       summary: Add a sender identity
-      description: Starts domain verification; the response carries the DNS records (DKIM, SPF, DMARC, return-path) the operator publishes through their DNS tooling.
+      description: Starts domain verification; the response carries the DNS records (DKIM, SPF, DMARC, return-path) the operator
+        publishes through their DNS tooling.
       tags:
       - senders
       requestBody:
@@ -1197,7 +1222,8 @@ paths:
     get:
       operationId: public_open
       summary: Open pixel
-      description: Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token is an HMAC of the send id.
+      description: Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token
+        is an HMAC of the send id.
       tags:
       - public
       parameters:
@@ -1216,7 +1242,8 @@ paths:
     get:
       operationId: public_click
       summary: Click redirect
-      description: Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations are never taken from the query string.
+      description: Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations
+        are never taken from the query string.
       tags:
       - public
       parameters:
@@ -1362,11 +1389,16 @@ paths:
     post:
       operationId: ingest_provider_events
       summary: Inbound delivery events from the provider
-      description: |
-        Verified by the provider's signature scheme (header named per provider). Every event is normalized into a
+      description: 'Verified by the provider''s signature scheme (header named per provider). Every event is normalized into
+        a
+
         MessageEvent keyed by the provider message id. Idempotent on provider event id. Unknown events are acked and
+
         dropped. Deployments should expose this only through a keyless relay (the same shape as the
+
         crm-conversions intake in ADR 003), never directly from the provider to the service.
+
+        '
       tags:
       - provider-webhooks
       parameters:
@@ -1389,6 +1421,161 @@ paths:
           description: Bad signature
       security: []
       x-brrtrouter-impl: true
+  /campaigns/{id}/report/contacts:
+    get:
+      operationId: list_campaign_report_contacts
+      summary: Recipients of a campaign by engagement
+      tags:
+      - outreach-reports
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ALL
+          - OPENED
+          - CLICKED
+          - BOUNCED
+          - UNSUBSCRIBED
+          - COMPLAINED
+          - FORWARDED
+          - REPLIED
+          - NOT_OPENED
+      - name: link_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Only contacts who clicked this link
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaignReportContact'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Who opened / clicked / bounced / unsubscribed / forwarded / replied / did not open, with a link filter.
+      x-controller: rerp_crm::outreach::controller::outreach_reports
+      x-handler-name: list_campaign_report_contacts
+  /reports/campaigns:
+    get:
+      operationId: get_campaign_performance
+      summary: All campaigns performance
+      tags:
+      - outreach-reports
+      parameters:
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: folder_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: compare_to
+        in: query
+        schema:
+          type: string
+          enum:
+          - NONE
+          - PERIOD_AVERAGE
+          - CAMPAIGN_TYPE_AVERAGE
+      - name: exclude_unverified_opens
+        in: query
+        schema:
+          type: boolean
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: order
+        in: query
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Campaign performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignPerformanceReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: KPI tiles and per-campaign rows over a window, with period / type comparison and an option to exclude unverified
+        (privacy-prefetch) opens.
+      x-controller: rerp_crm::outreach::controller::outreach_reports
+      x-handler-name: get_campaign_performance
 components:
   parameters:
     Page:
@@ -1463,7 +1650,8 @@ components:
       - MJML
       - HTML
       - TEXT
-      description: How the body is authored. MARKDOWN and MJML are compiled to HTML at render; TEXT is for SMS/WhatsApp and the plain-text part
+      description: How the body is authored. MARKDOWN and MJML are compiled to HTML at render; TEXT is for SMS/WhatsApp and
+        the plain-text part
     SubscriptionStatus:
       type: string
       enum:
@@ -1472,7 +1660,8 @@ components:
       - UNSUBSCRIBED
       - BOUNCED
       - COMPLAINED
-      description: PENDING awaits double opt-in; BOUNCED and COMPLAINED are set by delivery events and cannot be re-subscribed by automation
+      description: PENDING awaits double opt-in; BOUNCED and COMPLAINED are set by delivery events and cannot be re-subscribed
+        by automation
     ConsentSource:
       type: string
       enum:
@@ -1492,11 +1681,15 @@ components:
       - RSS
       - REMINDER
       - RECURRING
-      description: |
-        ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates;
+      description: 'ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates;
+
         REMINDER sends to each contact on/before/after one of their date fields (birthday, renewal, anniversary),
+
         yearly or once (`reminder`); RECURRING sends on a schedule to whoever matches the audience at that moment
+
         (`recurrence`). Auto-responders and drips are workflows (crm/automation), not campaigns.
+
+        '
     CampaignStatus:
       type: string
       enum:
@@ -1966,7 +2159,8 @@ components:
             format: uuid
         segment:
           type: object
-          description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole list
+          description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole
+            list
         audience:
           $ref: '#/components/schemas/CampaignAudience'
         reminder:
@@ -2154,10 +2348,10 @@ components:
         relation:
           type: string
           enum:
-          - ON
+          - true
           - BEFORE
           - AFTER
-          default: ON
+          default: true
         offset_days:
           type: integer
           format: int32
@@ -2690,6 +2884,14 @@ components:
               unique_clicks:
                 type: integer
                 format: int64
+              link_id:
+                type: string
+                format: uuid
+              label:
+                type: string
+              share_pct:
+                type: number
+                format: float
         opens_by_hour:
           type: array
           items:
@@ -2712,6 +2914,109 @@ components:
           type: number
           format: double
           description: Attributed through crm/marketing campaign revenue when a UTM campaign is set
+        total_opens:
+          type: integer
+          format: int64
+          description: All open events (opened = unique contacts)
+        verified_opens:
+          type: integer
+          format: int64
+          description: Opens not attributable to mailbox privacy prefetch (Apple MPP etc.)
+        unverified_opens:
+          type: integer
+          format: int64
+        anonymous_open_rate:
+          type: number
+          format: double
+          description: Share of opens that were machine / privacy prefetches
+        total_clicks:
+          type: integer
+          format: int64
+        forwarded:
+          type: integer
+          format: int64
+        replied:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+          description: Contacts who updated their profile from the email
+        social_shares:
+          type: array
+          items:
+            type: object
+            properties:
+              network:
+                type: string
+              shares:
+                type: integer
+        opens_by_date:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              opens:
+                type: integer
+              clicks:
+                type: integer
+        opens_by_location:
+          type: array
+          items:
+            type: object
+            properties:
+              country:
+                type: string
+              region:
+                type: string
+              city:
+                type: string
+              opens:
+                type: integer
+              clicks:
+                type: integer
+        email_clients:
+          type: array
+          items:
+            type: object
+            properties:
+              client:
+                type: string
+              family:
+                type: string
+                enum:
+                - WEBMAIL
+                - DESKTOP
+                - MOBILE
+                - OTHER
+              opens:
+                type: integer
+              share_pct:
+                type: number
+                format: float
+        audience:
+          type: object
+          properties:
+            list_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+            segment_id:
+              type: string
+              format: uuid
+            size:
+              type: integer
+        sent_at:
+          type: string
+          format: date-time
+        subject:
+          type: string
+        from:
+          type: string
     OutreachOverview:
       type: object
       required:
@@ -2745,6 +3050,12 @@ components:
         subscribed_contacts:
           type: integer
           format: int64
+        click_to_open_rate:
+          type: number
+          format: double
+        anonymous_open_rate:
+          type: number
+          format: double
     ListGrowth:
       type: object
       required:
@@ -2920,6 +3231,143 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Suppression'
+    CampaignReportContact:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - DELIVERED
+          - OPENED
+          - CLICKED
+          - BOUNCED
+          - UNSUBSCRIBED
+          - COMPLAINED
+          - FORWARDED
+          - REPLIED
+          - NOT_OPENED
+        opens:
+          type: integer
+        clicks:
+          type: integer
+        first_open_at:
+          type: string
+          format: date-time
+        last_click_at:
+          type: string
+          format: date-time
+        clicked_link_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        bounce_kind:
+          type: string
+          enum:
+          - HARD
+          - SOFT
+      required:
+      - contact_id
+      - email
+      - status
+    PaginatedCampaignReportContact:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CampaignReportContact'
+    CampaignPerformanceRow:
+      type: object
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        kind:
+          type: string
+        folder_id:
+          type: string
+          format: uuid
+        sent_at:
+          type: string
+          format: date-time
+        sent:
+          type: integer
+        delivered:
+          type: integer
+        unique_opens:
+          type: integer
+        open_rate:
+          type: number
+          format: double
+        unique_clicks:
+          type: integer
+        click_rate:
+          type: number
+          format: double
+        click_to_open_rate:
+          type: number
+          format: double
+        bounces:
+          type: integer
+        bounce_rate:
+          type: number
+          format: double
+        unsubscribes:
+          type: integer
+        unsubscribe_rate:
+          type: number
+          format: double
+        anonymous_open_rate:
+          type: number
+          format: double
+        revenue:
+          type: number
+          format: double
+      required:
+      - campaign_id
+      - name
+      - sent
+    CampaignPerformanceReport:
+      type: object
+      properties:
+        totals:
+          $ref: '#/components/schemas/OutreachOverview'
+        comparison:
+          $ref: '#/components/schemas/OutreachOverview'
+        comparison_basis:
+          type: string
+          enum:
+          - NONE
+          - PERIOD_AVERAGE
+          - CAMPAIGN_TYPE_AVERAGE
+        campaigns:
+          $ref: '#/components/schemas/PaginatedCampaignPerformanceRow'
+      required:
+      - totals
+      - campaigns
+      description: 'All Campaigns Performance: KPI tiles (with an optional comparison baseline) and a sortable per-campaign
+        table.'
+    PaginatedCampaignPerformanceRow:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/CampaignPerformanceRow'
   securitySchemes:
     bearerAuth:
       type: http

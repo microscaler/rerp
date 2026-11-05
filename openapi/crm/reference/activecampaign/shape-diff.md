@@ -244,3 +244,41 @@ stage. **Win probability** is either the stage's probability or an ML estimate p
 **Tasks** complete with an outcome whose sentiment rolls up to the Task Overview; completion can start an automation.
 **Calendar** feeds are signed public URLs, regenerable. **Connected emails** are per user and only log mail to
 known contacts unless widened. Import/export jobs are async and keep per-row errors.
+
+## Reports section (UI walk, 2026-11-05) → `crm/reporting`, `crm/outreach` reports
+
+The Reports area is a left tree of 23 reports in 7 groups plus two standalone pages. Every report has a date-range
+filter and most have a list / tag filter; the newer ones (Contact Performance, All Campaigns Performance, the AI
+dashboard) add "Analyze / Report on …" prompt buttons, Share, Export and "Schedule report".
+
+| Report | What it shows (controls → content) | Ours |
+|---|---|---|
+| Your Dashboard (new) | per-user dashboard of widgets built from a prompt ("Ask for any view of your data … builds a live widget"); each widget: Analyze, Schedule report; defaults: key email metrics (campaigns sent, open rate, click rate, total contacts, last 30 days), contact growth 12 months, most used automations by contacts entered | `Dashboard`, `DashboardWidget {kind, query: WidgetQuery, prompt, schedule}`, `/dashboards/{id}/widgets/{wid}/data` |
+| Automations → All Automations | folder + automation filter; table automation / contacts entered; row expands to "contains N campaigns" + links Overview, Contacts, Goals | `GET /automations` → `AutomationListRow` |
+| Automation → Overview | event-date filter (+ more filters); tiles total contacts, finished + completion rate, emails sent + rate, opens/clicks + rates, revenue; sends/opens/clicks over time; table per campaign (name, last sent, sends, revenue, opens, clicks, rates); Edit / See map links | `GET /automations/{id}/overview` → `AutomationOverviewReport` |
+| Automation → Goals | per goal step: reached, rate (empty state links to the builder) | `GET /automations/{id}/goals` → `AutomationGoalRow {achieved, skipped, waiting, avg_seconds}` |
+| Automation → Contacts | tiles contacts entered, completion rate, completion-rate increase last 30 d, avg time until completion; top performing tags / lists, top completion times; contact list with completion-status filter + search; Export | `GET /automations/{id}/contacts` → `AutomationContactsReport` |
+| Automations → Jump To Tracking | per jump-to (goal) step: progress and analytics (empty until a goal exists) | `GET /automations/jump-to` → `JumpToRow {jumped, passed, jump_rate}` |
+| Sales Engagement → Automated 1:1 Emails | filters automations, sender, email sent date, event date; columns automation, email name, sent, unique opens/rate, unique clicks/rate, unique replies/rate, bounces/rate | `GET /automations/one-to-one-emails` → `OneToOneEmailRow` |
+| Contacts → Contact Performance | tags / lists / date filters, Share; tiles total / active / non-active with vs-previous delta; contact trends chart (daily / weekly / monthly); Lists top 5 and Tags top 5 (total, active, non-active, growth) | `GET /contacts/performance` → `ContactPerformanceReport` |
+| Contacts → Field Breakdown | category (contacts / deals / accounts), field, created-date window → table value / count | `GET /contacts/field-breakdown?entity&field_id` |
+| Contacts → Nearby Contacts | radius + km/mi from an address, list / tag filter | `GET /contacts/nearby?address|lat,lng&radius&unit` |
+| Contacts → Tag Trends | tag + date filters ("filter within 3 months for speed"); tiles tags added, avg per day; line per tag; most-used tags in range and overall; detail table (tag, begin, end, applied in range, avg/day, total contacts) | `GET /contacts/tag-trends` → `TagTrendsReport` |
+| Campaigns → All Campaigns Performance | filters type, folder, lists, search, date range, MPP "exclude unverified opens"; tiles campaigns, emails sent, open rate, click rate, click-to-open, bounces, unsubscribes, **anonymous open rate**; "Compare to" period average / campaign-type average; sortable table with per-row Report; Export | `GET crm/outreach /reports/campaigns` → `CampaignPerformanceReport {totals, comparison, comparison_basis, campaigns[]}`; `OutreachOverview` +`click_to_open_rate`, `anonymous_open_rate` |
+| Campaigns → Email Client Trends | list / tag / date; opens per email client | `GET /email/client-trends` |
+| Campaigns → Predictive Content | tiles total sent, unique clicks, click-to-open; sent / clicks / CTOR by variant; variant detail table with benchmark CTOR | `GET /email/predictive-content` |
+| Campaigns → Open/Read Trends | list / tag / date; opens by weekday, opens by hour | `GET /email/open-trends` → `OpenTrendsReport` |
+| WhatsApp (7) | Overview, By Agent, Agent Availability, By Tag, Details, WhatsApp Button, Message Credits — blank on the trial (channel not connected) | conversation reports belong to `crm/livechat` agent metrics; WhatsApp channel deferred |
+| Website | group is empty on the trial | site tracking reports stay in `crm/marketing` analytics |
+| Deals (6) | see § Deals menu | `/deals/*`, `/tasks/overview` |
+| Marketing Revenue | date range; store revenue, revenue from automation emails, revenue from campaigns, "7 days after they were sent" attribution; top automation emails / top campaigns | `GET /revenue/marketing?attribution_window_days` from crm/marketing conversions with value (no e-commerce store object) |
+| Ecommerce Dashboard | recommendations (segment repeat purchasers, abandoned-cart automation) + store KPIs | deferred (no e-commerce integration) |
+
+Per-campaign report (Campaigns → Report): not reachable on the tenant yet — every campaign is a draft. From the
+product: tiles sent / unique & total opens / clicks / unsubscribes / bounces / forwards / replies / updates /
+social shares / revenue, opens by date, links clicked (table + heat-map on the email), opens by location, email
+clients, and contact lists per outcome (opened, clicked, bounced, unsubscribed, forwarded, replied, did not open).
+Specced as `CampaignReport` +`total_opens`, `verified_opens`/`unverified_opens`, `anonymous_open_rate`,
+`total_clicks`, `forwarded`, `replied`, `updated`, `social_shares`, `opens_by_date`, `opens_by_location`,
+`email_clients`, `audience`, and `GET /campaigns/{id}/report/contacts?status&link_id`. To verify field by field,
+send one campaign to the staff-only list and pull the report back through the API.

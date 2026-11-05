@@ -54,6 +54,20 @@ tags:
   description: 'Deal reports: overview, owner overview, funnel, sales performance, forecast (crm/pipeline deals)'
 - name: task-reports
   description: 'Task overview: load, completion and outcome sentiment per rep (crm/tasks)'
+- name: automation-reports
+  description: 'Automation reports: all automations, per-automation overview / goals / contacts, jump-to tracking, automated
+    1:1 emails'
+- name: contact-reports
+  description: 'Contact reports: performance (active / inactive, trends, top lists and tags), field breakdown, nearby contacts,
+    tag trends'
+- name: email-reports
+  description: 'Email engagement reports across campaigns and automations: client trends, open/read trends by weekday and
+    hour, predictive-content variants'
+- name: revenue-reports
+  description: Marketing revenue attributed to campaigns and automation emails from conversions (crm/marketing) within an
+    attribution window
+- name: dashboards
+  description: Per-user dashboards of widgets (a saved metric query each), with per-widget scheduled email
 paths:
   /analytics/pipeline-summary:
     get:
@@ -1470,6 +1484,1126 @@ paths:
       description: Open/overdue/completed tasks and outcome sentiment per rep and per task type.
       x-controller: rerp_crm::reporting::controller::task_reports
       x-handler-name: get_task_overview
+  /automations:
+    get:
+      operationId: list_automation_reports
+      summary: All automations
+      tags:
+      - automation-reports
+      parameters:
+      - name: folder_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - ALL
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Automations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAutomationListRow'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: One row per automation with contacts entered; filter by folder.
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: list_automation_reports
+  /automations/{id}/overview:
+    get:
+      operationId: get_automation_overview
+      summary: Automation overview
+      tags:
+      - automation-reports
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      responses:
+        '200':
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationOverviewReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: KPI tiles, sends/opens/clicks over time and per-message rows for one automation.
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: get_automation_overview
+  /automations/{id}/goals:
+    get:
+      operationId: get_automation_goals
+      summary: Automation goals
+      tags:
+      - automation-reports
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Goals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationGoalsReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Achieved / skipped / waiting per goal step.
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: get_automation_goals
+  /automations/{id}/contacts:
+    get:
+      operationId: get_automation_contacts
+      summary: Automation contacts
+      tags:
+      - automation-reports
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ANY
+          - ACTIVE
+          - COMPLETED
+          - EXITED
+      - name: q
+        in: query
+        schema:
+          type: string
+        description: Search name / email
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationContactsReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Completion KPIs, top tags / lists, completion-time histogram and the contact list.
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: get_automation_contacts
+  /automations/jump-to:
+    get:
+      operationId: get_jump_to_tracking
+      summary: Jump-to (goal) tracking
+      tags:
+      - automation-reports
+      parameters:
+      - name: workflow_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Jump-to rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJumpToRow'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: 'Every GOAL step across automations: how many contacts jumped to it vs passed it.'
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: get_jump_to_tracking
+  /automations/one-to-one-emails:
+    get:
+      operationId: get_one_to_one_emails
+      summary: Automated 1:1 emails
+      tags:
+      - automation-reports
+      parameters:
+      - name: workflow_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: sender_user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: sent_start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: sent_end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: event_start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: event_end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: 1:1 email rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOneToOneEmailRow'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: SEND_1TO1_EMAIL steps across automations with opens, clicks, replies and bounces.
+      x-controller: rerp_crm::reporting::controller::automation_reports
+      x-handler-name: get_one_to_one_emails
+  /contacts/performance:
+    get:
+      operationId: get_contact_performance
+      summary: Contact performance
+      tags:
+      - contact-reports
+      parameters:
+      - name: tag_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: list_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Contact performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPerformanceReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Total / active / inactive vs previous period, trends, top lists and tags.
+      x-controller: rerp_crm::reporting::controller::contact_reports
+      x-handler-name: get_contact_performance
+  /contacts/field-breakdown:
+    get:
+      operationId: get_field_breakdown
+      summary: Field breakdown
+      tags:
+      - contact-reports
+      parameters:
+      - name: entity
+        in: query
+        schema:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+        required: true
+      - name: field_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Field breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldBreakdownReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Records per value of one field, for records created in the window.
+      x-controller: rerp_crm::reporting::controller::contact_reports
+      x-handler-name: get_field_breakdown
+  /contacts/nearby:
+    get:
+      operationId: get_nearby_contacts
+      summary: Nearby contacts
+      tags:
+      - contact-reports
+      parameters:
+      - name: address
+        in: query
+        schema:
+          type: string
+      - name: lat
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: lng
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: radius
+        in: query
+        schema:
+          type: number
+          format: float
+        required: true
+      - name: unit
+        in: query
+        schema:
+          type: string
+          enum:
+          - KM
+          - MI
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Nearby contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNearbyContact'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Contacts within a radius of an address or point (geocoded from the contact address).
+      x-controller: rerp_crm::reporting::controller::contact_reports
+      x-handler-name: get_nearby_contacts
+  /contacts/tag-trends:
+    get:
+      operationId: get_tag_trends
+      summary: Tag trends
+      tags:
+      - contact-reports
+      parameters:
+      - name: tag_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Tag trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagTrendsReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Tag applications over time; a window of up to 3 months keeps it fast.
+      x-controller: rerp_crm::reporting::controller::contact_reports
+      x-handler-name: get_tag_trends
+  /email/client-trends:
+    get:
+      operationId: get_email_client_trends
+      summary: Email client trends
+      tags:
+      - email-reports
+      parameters:
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Client trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailClientTrendsReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Opens per email client / device family in the window.
+      x-controller: rerp_crm::reporting::controller::email_reports
+      x-handler-name: get_email_client_trends
+  /email/open-trends:
+    get:
+      operationId: get_open_trends
+      summary: Open / read trends
+      tags:
+      - email-reports
+      parameters:
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: timezone
+        in: query
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Open trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenTrendsReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Opens by weekday and by hour of day.
+      x-controller: rerp_crm::reporting::controller::email_reports
+      x-handler-name: get_open_trends
+  /email/predictive-content:
+    get:
+      operationId: get_predictive_content
+      summary: Predictive content variants
+      tags:
+      - email-reports
+      parameters:
+      - name: campaign_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Predictive content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictiveContentReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Sends, clicks and click-to-open per content variant across campaigns.
+      x-controller: rerp_crm::reporting::controller::email_reports
+      x-handler-name: get_predictive_content
+  /revenue/marketing:
+    get:
+      operationId: get_marketing_revenue
+      summary: Marketing revenue
+      tags:
+      - revenue-reports
+      parameters:
+      - name: attribution_window_days
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 90
+        description: Default 7
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Marketing revenue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketingRevenueReport'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Revenue attributed to campaigns and automation messages from conversions within the attribution window.
+      x-controller: rerp_crm::reporting::controller::revenue_reports
+      x-handler-name: get_marketing_revenue
+  /dashboards:
+    get:
+      operationId: list_dashboards
+      summary: List my dashboards
+      tags:
+      - dashboards
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Dashboards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDashboard'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Dashboards of the calling user.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: list_dashboards
+    post:
+      operationId: create_dashboard
+      summary: Create a dashboard
+      tags:
+      - dashboards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: An empty dashboard; add widgets next.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: create_dashboard
+  /dashboards/{id}:
+    get:
+      operationId: get_dashboard
+      summary: Get a dashboard
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Dashboard with its widgets.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: get_dashboard
+    patch:
+      operationId: update_dashboard
+      summary: Rename / set default
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Rename or make default.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: update_dashboard
+    delete:
+      operationId: delete_dashboard
+      summary: Delete a dashboard
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Removes the dashboard and its widgets.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: delete_dashboard
+  /dashboards/{id}/widgets:
+    post:
+      operationId: add_widget
+      summary: Add a widget
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetRequest'
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Add a widget from a metric query (or a natural-language prompt the server turns into one).
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: add_widget
+  /dashboards/{id}/widgets/{widget_id}:
+    patch:
+      operationId: update_widget
+      summary: Update a widget
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Change title, query, size or position.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: update_widget
+    delete:
+      operationId: remove_widget
+      summary: Remove a widget
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      responses:
+        '204':
+          description: Removed
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Remove the widget.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: remove_widget
+  /dashboards/{id}/widgets/{widget_id}/data:
+    get:
+      operationId: get_widget_data
+      summary: Widget data
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      - name: refresh
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WidgetData'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Run the widget query (cached a few minutes).
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: get_widget_data
+  /dashboards/{id}/widgets/{widget_id}/schedule:
+    put:
+      operationId: schedule_widget
+      summary: Email this widget on a schedule
+      tags:
+      - dashboards
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportScheduleRequest'
+      responses:
+        '200':
+          description: Scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '404':
+          description: Resource not found
+        '500':
+          description: Internal server error
+      security:
+      - bearerAuth: []
+      description: Daily / weekly / monthly email of the widget to recipients.
+      x-controller: rerp_crm::reporting::controller::dashboards
+      x-handler-name: schedule_widget
 components:
   parameters:
     Page:
@@ -2589,6 +3723,942 @@ components:
       - by_type
       - by_outcome
       description: 'Task Overview: load and completion per rep and per type, outcome sentiment per rep (crm/tasks outcomes).'
+    Point:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        value:
+          type: number
+          format: double
+      required:
+      - date
+      - value
+    NamedSeries:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+      required:
+      - key
+      - points
+    NameCount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+      required:
+      - name
+      - count
+    AutomationListRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        folder_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        contacts_entered:
+          type: integer
+        contacts_active:
+          type: integer
+        contacts_completed:
+          type: integer
+        message_count:
+          type: integer
+          description: SEND_MESSAGE steps in the graph
+      required:
+      - workflow_id
+      - name
+      - contacts_entered
+    PaginatedAutomationListRow:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AutomationListRow'
+    AutomationMessageRow:
+      type: object
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        last_sent_at:
+          type: string
+          format: date-time
+        sends:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_clicks:
+          type: integer
+        open_rate:
+          type: number
+          format: float
+          description: 0-100
+        click_rate:
+          type: number
+          format: float
+          description: 0-100
+        revenue:
+          type: number
+          format: double
+      required:
+      - step_id
+      - name
+      - sends
+    AutomationOverviewReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contacts_total:
+          type: integer
+        contacts_finished:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        emails_sent:
+          type: integer
+        email_sent_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_opens:
+          type: integer
+        open_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_clicks:
+          type: integer
+        click_rate:
+          type: number
+          format: float
+          description: 0-100
+        revenue:
+          type: number
+          format: double
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationMessageRow'
+      required:
+      - workflow_id
+      - name
+      - contacts_total
+      - contacts_finished
+      - completion_rate
+      - emails_sent
+      - messages
+      description: 'Per-automation overview: tiles, sends/opens/clicks over time (`series` keys sends, opens, clicks), and
+        one row per message step.'
+    AutomationGoalRow:
+      type: object
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contacts_achieved:
+          type: integer
+        contacts_skipped:
+          type: integer
+          description: Passed the goal without meeting it (if_not_met = CONTINUE)
+        contacts_waiting:
+          type: integer
+        achieved_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_seconds_to_achieve:
+          type: integer
+      required:
+      - step_id
+      - name
+      - contacts_achieved
+      - achieved_rate
+    AutomationGoalsReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationGoalRow'
+      required:
+      - workflow_id
+      - goals
+    CompletionBucket:
+      type: object
+      properties:
+        label:
+          type: string
+          examples:
+          - < 1 day
+          - 1-3 days
+        min_seconds:
+          type: integer
+        max_seconds:
+          type: integer
+        count:
+          type: integer
+      required:
+      - label
+      - count
+    AutomationContactRow:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - COMPLETED
+          - EXITED
+          - PAUSED
+        entered_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        current_step_id:
+          type: string
+          format: uuid
+      required:
+      - contact_id
+      - status
+      - entered_at
+    PaginatedAutomationContactRow:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/AutomationContactRow'
+    AutomationContactsReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        contacts_entered:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        completion_rate_change_30d:
+          type: number
+          format: float
+          description: 0-100
+        avg_seconds_to_complete:
+          type: integer
+        top_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        top_lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        completion_times:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompletionBucket'
+        contacts:
+          $ref: '#/components/schemas/PaginatedAutomationContactRow'
+      required:
+      - workflow_id
+      - contacts_entered
+      - completion_rate
+      description: 'Per-automation contacts: completion KPIs, which tags/lists complete best, completion-time histogram, and
+        the contact list (filter by status, search).'
+    JumpToRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+        step_id:
+          type: string
+          format: uuid
+        goal_name:
+          type: string
+        contacts_jumped:
+          type: integer
+        contacts_passed:
+          type: integer
+        jump_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - workflow_id
+      - step_id
+      - goal_name
+      - contacts_jumped
+    PaginatedJumpToRow:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/JumpToRow'
+    OneToOneEmailRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+        step_id:
+          type: string
+          format: uuid
+        email_name:
+          type: string
+        sender_user_id:
+          type: string
+          format: uuid
+        sent:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_clicks:
+          type: integer
+        unique_click_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_replies:
+          type: integer
+        unique_reply_rate:
+          type: number
+          format: float
+          description: 0-100
+        bounces:
+          type: integer
+        bounce_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - workflow_id
+      - step_id
+      - email_name
+      - sent
+    PaginatedOneToOneEmailRow:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/OneToOneEmailRow'
+    ContactCounts:
+      type: object
+      properties:
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+      required:
+      - total
+      - active
+      - inactive
+    ContactGroupRow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+        growth_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - id
+      - name
+      - total
+      - active
+    ContactPerformanceReport:
+      type: object
+      properties:
+        current:
+          $ref: '#/components/schemas/ContactCounts'
+        previous:
+          $ref: '#/components/schemas/ContactCounts'
+        granularity:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+        trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        top_lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactGroupRow'
+        top_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactGroupRow'
+      required:
+      - current
+      - previous
+      - trend
+      - top_lists
+      - top_tags
+      description: Total / active / inactive contacts vs the previous period, trend lines (`trend` keys total, active, inactive)
+        and the top-5 lists and tags.
+    FieldBreakdownReport:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+        field_id:
+          type: string
+          format: uuid
+        field_label:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        blank:
+          type: integer
+      required:
+      - entity
+      - field_id
+      - values
+      description: Count of records per value of one (custom or standard) field.
+    NearbyContact:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        distance:
+          type: number
+          format: float
+      required:
+      - contact_id
+      - distance
+    PaginatedNearbyContact:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/NearbyContact'
+    TagTrendRow:
+      type: object
+      properties:
+        tag_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        first_applied_at:
+          type: string
+          format: date-time
+        last_applied_at:
+          type: string
+          format: date-time
+        applied_in_range:
+          type: integer
+        avg_per_day:
+          type: number
+          format: float
+        total_contacts:
+          type: integer
+      required:
+      - tag_id
+      - name
+      - applied_in_range
+      - total_contacts
+    TagTrendsReport:
+      type: object
+      properties:
+        tags_applied:
+          type: integer
+        avg_per_day:
+          type: number
+          format: float
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        most_used_in_range:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        most_used_overall:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagTrendRow'
+      required:
+      - tags_applied
+      - avg_per_day
+      - series
+      - tags
+      description: Tag applications over time (one series per tag), top tags in range and overall, and a per-tag detail table.
+    EmailClientRow:
+      type: object
+      properties:
+        client:
+          type: string
+          examples:
+          - Gmail
+          - Apple Mail
+          - Outlook
+        family:
+          type: string
+          enum:
+          - WEBMAIL
+          - DESKTOP
+          - MOBILE
+          - OTHER
+        opens:
+          type: integer
+        share_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - client
+      - opens
+    EmailClientTrendsReport:
+      type: object
+      properties:
+        total_opens:
+          type: integer
+        clients:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailClientRow'
+        by_family:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+      required:
+      - total_opens
+      - clients
+    OpenTrendsReport:
+      type: object
+      properties:
+        timezone:
+          type: string
+        by_weekday:
+          type: array
+          items:
+            type: object
+            properties:
+              weekday:
+                type: integer
+                minimum: 0
+                maximum: 6
+                description: 0 = Monday
+              opens:
+                type: integer
+        by_hour:
+          type: array
+          items:
+            type: object
+            properties:
+              hour:
+                type: integer
+                minimum: 0
+                maximum: 23
+              opens:
+                type: integer
+      required:
+      - by_weekday
+      - by_hour
+      description: 'When contacts open mail: counts per weekday and per hour of day, in the chosen timezone.'
+    VariantRow:
+      type: object
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        campaign_name:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+        variant_id:
+          type: string
+          format: uuid
+        variant_name:
+          type: string
+        sent:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_clicks:
+          type: integer
+        click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        benchmark_click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - campaign_id
+      - variant_id
+      - sent
+    PredictiveContentReport:
+      type: object
+      properties:
+        total_sent:
+          type: integer
+        total_unique_clicks:
+          type: integer
+        click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        sent_by_variant:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        clicks_by_variant:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariantRow'
+      required:
+      - total_sent
+      - total_unique_clicks
+      - variants
+    RevenueSourceRow:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - CAMPAIGN
+          - AUTOMATION_MESSAGE
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        revenue:
+          type: number
+          format: double
+        conversions:
+          type: integer
+      required:
+      - kind
+      - id
+      - name
+      - revenue
+    MarketingRevenueReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        attribution_window_days:
+          type: integer
+        total_revenue:
+          type: number
+          format: double
+        from_campaigns:
+          type: number
+          format: double
+        from_automation_messages:
+          type: number
+          format: double
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        top_campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevenueSourceRow'
+        top_automation_messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevenueSourceRow'
+      required:
+      - currency
+      - attribution_window_days
+      - total_revenue
+      - from_campaigns
+      - from_automation_messages
+      description: Revenue from crm/marketing conversions with a value that occurred within `attribution_window_days` of a
+        send, credited to that campaign or automation message (last touch).
+    WidgetQuery:
+      type: object
+      properties:
+        metric:
+          type: string
+          examples:
+          - campaigns_sent
+          - open_rate
+          - click_rate
+          - total_contacts
+          - contacts_growth
+          - automation_entries
+          - tag_count
+          - list_count
+          - deals_won_value
+        dimension:
+          type: string
+          description: Group-by (campaign, tag, list, automation, owner, period…); omit for a single number
+        range:
+          type: string
+          enum:
+          - LAST_7_DAYS
+          - LAST_30_DAYS
+          - LAST_90_DAYS
+          - LAST_12_MONTHS
+          - ALL_TIME
+          - CUSTOM
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        granularity:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+        filters:
+          type: object
+        limit:
+          type: integer
+      required:
+      - metric
+      - range
+    DashboardWidget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        kind:
+          type: string
+          enum:
+          - NUMBER
+          - NUMBERS
+          - LINE
+          - BAR
+          - TABLE
+        query:
+          $ref: '#/components/schemas/WidgetQuery'
+        prompt:
+          type: string
+          description: The natural-language ask the widget was built from, if any
+        position:
+          type: integer
+        width:
+          type: integer
+          enum:
+          - 1
+          - 2
+        schedule:
+          $ref: '#/components/schemas/ReportSchedule'
+        refreshed_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - title
+      - kind
+      - query
+    Dashboard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_default:
+          type: boolean
+        widgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardWidget'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - name
+      - widgets
+    DashboardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        is_default:
+          type: boolean
+    WidgetRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        kind:
+          type: string
+          enum:
+          - NUMBER
+          - NUMBERS
+          - LINE
+          - BAR
+          - TABLE
+        query:
+          $ref: '#/components/schemas/WidgetQuery'
+        prompt:
+          type: string
+        position:
+          type: integer
+        width:
+          type: integer
+          enum:
+          - 1
+          - 2
+    WidgetData:
+      type: object
+      properties:
+        widget_id:
+          type: string
+          format: uuid
+        refreshed_at:
+          type: string
+          format: date-time
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        rows:
+          type: array
+          items:
+            type: object
+      required:
+      - widget_id
+      - refreshed_at
+    PaginatedDashboard:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Dashboard'
   securitySchemes:
     bearerAuth:
       type: http

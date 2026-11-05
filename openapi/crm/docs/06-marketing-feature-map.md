@@ -137,6 +137,19 @@
 | **Notifications** (which staff get which internal alerts) | — | **add** |
 | Saved responses | `crm/tasks` `SavedResponse` | in spec (2026-11-05) |
 
+### Reports
+| AC feature | Our service | Status |
+|---|---|---|
+| Your Dashboard (prompt-built widgets, per-widget schedule) | `crm/reporting` `Dashboard` / `DashboardWidget` | in spec (2026-11-05); prompt → query translation later |
+| Automations: all, overview, goals, contacts, jump-to tracking | `crm/reporting` `/automations/*` | in spec (2026-11-05) |
+| Automated 1:1 emails | `crm/reporting` `/automations/one-to-one-emails` | in spec (2026-11-05) |
+| Contacts: performance, field breakdown, nearby, tag trends | `crm/reporting` `/contacts/*` | in spec (2026-11-05) |
+| All campaigns performance (compare-to, MPP unverified opens, anonymous open rate) | `crm/outreach` `/reports/campaigns` | in spec (2026-11-05) |
+| Per-campaign report (links, geo, clients, contact lists by outcome) | `crm/outreach` `CampaignReport`, `/campaigns/{id}/report/contacts` | in spec; verify after a real send |
+| Email client trends, open/read trends, predictive content | `crm/reporting` `/email/*` | in spec (2026-11-05) |
+| Marketing revenue (7-day attribution) | `crm/reporting` `/revenue/marketing` from conversions | in spec (2026-11-05) |
+| WhatsApp reports (7), Ecommerce dashboard | — | defer (channel / integration not in scope) |
+
 ## 2. Curated v1 additions (ordered by shape change, then size)
 
 Shape changes:
@@ -166,4 +179,4 @@ The ActiveCampaign trial is configured as a reference tenant by script (`openapi
 
 ## 4. Mock screens still to add
 
-Tasks (list + on contact/deal, task settings, calendar feeds, saved responses), Pipelines settings (several pipelines, stages, roles, deal settings), Connected emails, Import/Export status, Deal detail (notes/files/emails tabs, contacts with roles), Conversions & goals, Score rules editor, List exclusions, Bulk edit, Snippets & assets, Brand kit, Postal addresses, Tracking domain, Notifications, GDPR data requests, Site messages (in form builder), SMS campaign variant of the wizard, multi-trigger in the automation builder, Automation messages view, Forecast / funnel / owner reports.
+Tasks (list + on contact/deal, task settings, calendar feeds, saved responses), Pipelines settings (several pipelines, stages, roles, deal settings), Connected emails, Import/Export status, Deal detail (notes/files/emails tabs, contacts with roles), Conversions & goals, Score rules editor, List exclusions, Bulk edit, Snippets & assets, Brand kit, Postal addresses, Tracking domain, Notifications, GDPR data requests, Site messages (in form builder), SMS campaign variant of the wizard, multi-trigger in the automation builder, Automation messages view, Forecast / funnel / owner reports, Automation report (overview / goals / contacts), Contact performance, Tag trends, Open/read + client trends, Marketing revenue, per-user dashboard widgets.
