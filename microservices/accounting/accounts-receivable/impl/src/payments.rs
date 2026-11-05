@@ -118,6 +118,19 @@ fn digest(parts: &[&[u8]]) -> String {
 /// plus the `auto_apply` axis: a key reused with any body difference —
 /// even one normalization would hide, or only `auto_apply` flipped — is a
 /// 409, never a silent replay.
+/// Field presence is hashed SEPARATELY from field value: an omitted
+/// optional must never collide with the same field sent empty.
+const PRESENT: &[u8] = b"\x01";
+const ABSENT: &[u8] = b"\x00";
+
+fn presence(value: Option<&str>) -> &'static [u8] {
+    if value.is_some() {
+        PRESENT
+    } else {
+        ABSENT
+    }
+}
+
 #[allow(clippy::too_many_arguments)] // one flat argument per contract body field
 fn create_fingerprint(
     tenant_id: &str,
@@ -141,8 +154,11 @@ fn create_fingerprint(
         payment_method.as_bytes(),
         payment_date.as_bytes(),
         customer_id.as_bytes(),
+        presence(company_id),
         company_id.unwrap_or("").as_bytes(),
+        presence(reference_number),
         reference_number.unwrap_or("").as_bytes(),
+        presence(notes),
         notes.unwrap_or("").as_bytes(),
         if auto_apply { b"auto-apply" } else { b"" },
     ])
@@ -1058,6 +1074,39 @@ mod tests {
             true,
         );
         assert_ne!(base, with_auto, "auto_apply participates");
+        // An omitted optional is NOT the same body as that field sent empty
+        // (regression from PR #146 second-pass review).
+        let notes_absent = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            Some(" R "),
+            None,
+            false,
+        );
+        assert_ne!(base, notes_absent, "presence hashes separately from value");
+        let reference_absent = create_fingerprint(
+            "t",
+            Uuid::nil(),
+            "10.00",
+            "usd",
+            "cash",
+            "2026-01-01",
+            "c",
+            None,
+            None,
+            Some(""),
+            false,
+        );
+        assert_ne!(
+            base, reference_absent,
+            "presence hashes separately from value"
+        );
     }
 
     // ---- live acceptance (disposable accounting DB, migrations 0001..0009) ----
