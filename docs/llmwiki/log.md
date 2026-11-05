@@ -1056,3 +1056,19 @@ ref-rewritten) the whole accounting suite — including
   reversal at an intermediate as_of (row sums cannot); summary ==
   open-items value-for-value with poisoned overlay cache; EUR/GBP
   separation; rerun-safe on the disposable DB.
+
+## 2026-11-05 — PR #149 review round: snapshot aging reads, bounded replay
+
+- CodeRabbit round on the F3a aging summary: the aggregate now reads
+  inside ONE REPEATABLE READ transaction via the new lifeguard
+  `with_session_transaction_isolated` (microscaler/lifeguard#236,
+  merged 44a2412) — the level rides on the BEGIN because the pipelined
+  `rls_set_session` is already the transaction's first query. Every
+  explicitly requested level is spelled out, so a server
+  `default_transaction_isolation` cannot override it; the legacy
+  wrapper keeps the byte-identical plain BEGIN.
+- Journal replay is now fetch-bound on every read and the
+  overlay/application IN lists are chunked at 10k ids (16-bit bind
+  limit), with the event bound enforced on the running total.
+- rerp pins lifeguard 44a2412 (lock regenerated with local path
+  patches set aside — git sources only).
