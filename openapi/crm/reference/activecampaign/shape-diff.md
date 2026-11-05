@@ -180,3 +180,34 @@ tracking enabled with event `trial_activated`, for the dump (`siteTrackingDomain
 | Whitelist: website URL + "include all website pages" (unchecked = that page/subdomain only; `*` wildcard); per-row site-tracking checkbox; remove | `TrackedSite.origin`, `include_all_pages`, `enabled` |
 | Tracking code: one snippet for the account (`setAccount`, `setTrackByDefault true`, `process`) | `GET /tracking/snippet`; one `tracking_key` per workspace |
 | Event tracking on/off; event key (regenerate); whitelisted events (add / remove) | `event_tracking` flag, `event_key` (regenerable), `EventTypeDef.declared/enabled` |
+
+## Recipes (the automation library) → `crm/automation` recipes
+
+Walked 2026-11-05: library of ~13 industry categories (Software has 20), each recipe a card with description, a
+"Read more" dialog and "Use recipe", plus "Import recipe" from a URL. Importing creates an inactive automation with
+placeholders and opens a **Setup Wizard** ("Step 1/1 Select list"), or "Skip setup". Unbound references render as
+"Related object is unavailable, please make a selection". Every step carries recipe **notes** (badge count); email
+steps show "This campaign is currently in draft" until designed and "An address is needed in order to send this
+email" when the sender has no postal address; the automation cannot be set Active until both are resolved.
+
+Imported for the dump (automations 4-7): Free Trial Email Automation Workflow, Expired Trial Email Automation
+Workflow, Upgrade Incentive and Outreach, Re-engagement Campaign Triggered by "Disengaged" Tag. Their graphs are
+transcribed in `automation/recipes/*.yaml`; the behaviour they imply (goto as join, if/else before each message,
+wait-until with timeout then if/else, tag chaining between automations, conditions evaluated on arrival) is in
+`automation/features/*.feature`.
+
+| Theirs | Ours |
+|---|---|
+| Recipe library by industry; import from URL; AI "generate an automation" | `GET /recipes` (`industry`), `POST /recipes/import`; AI deferred |
+| Placeholders per recipe (list, tag, page URL, message), setup wizard, skip setup | `RecipeParameter`, `instantiate.bindings`, `GET /workflows/{id}/setup`, `PATCH /workflows/{id}/bindings`, `Workflow.unbound_parameters`, validation `UNBOUND_PARAMETER` |
+| Notes on every step and on the trigger | `WorkflowStep.notes[]`, `Workflow.notes[]`, `POST .../notes` |
+| Draft-email and missing-address warnings; Active refused | validation `TEMPLATE_NOT_READY`, `NO_POSTAL_ADDRESS`; activate → 422 |
+| Go to draws a dashed edge to its target; No branch on the right | `GOTO` step; editor hint only |
+
+### Trigger settings forms (one hidden dialog per type, read from the builder page)
+list: any/one · form: any/one · pipeline/stage: pipeline, from stage, to stage · deal status changes to open/won/lost ·
+owner: any / specific (equal / not equal) · tag · field changes: ever / to value · jump-to goal: achieved / skipped ·
+date field (subscription date, creation date, custom dates, deal created/updated/forecast close) + format + timezone
+(contact's / account) + N days/weeks/months/years on/before/after + daily/weekdays/weekends + hour · RSS feed +
+timezone + hourly/daily/weekdays/weekends + time · score + threshold above/below · email any/one (+ link any/one,
+list filter) · 1:1 email any / automated / direct · social network. → `WorkflowTrigger.config` per type.

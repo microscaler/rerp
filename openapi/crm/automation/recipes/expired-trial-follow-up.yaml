@@ -1,0 +1,31 @@
+# Recipe: Expired trial follow-up (reference tenant "Expired Trial Email Automation Workflow"). Chained from
+# free-trial-nurture through the tag it adds at the end.
+id: expired-trial-follow-up
+name: Expired trial follow-up
+category: RE_ENGAGEMENT
+description: >
+  A contact may not buy during the trial for many reasons; do not give up on them. Answers lingering questions
+  and keeps the product in mind over the following weeks, with a final check-in a month later.
+parameters:
+  - { key: expired_tag, kind: TAG, label: Tag that marks an expired trial, required: true }
+triggers:
+  - { type: TAG_ADDED, config: { tag: $expired_tag }, runs: ONCE, notes: [ "Fires when the nurture adds the expired tag, or when your product does." ] }
+reentry: ONCE
+exit_rules: { on_unsubscribe: true }
+entry_step_id: e1
+steps:
+  - { id: e1, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:not_the_end }, next_step_id: w1 }
+  - { id: w1, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e2 }
+  - { id: e2, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:industry_tips }, next_step_id: w2 }
+  - { id: w2, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e3 }
+  - { id: e3, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:leaders }, next_step_id: w3 }
+  - { id: w3, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e4 }
+  - { id: e4, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:customers_say }, next_step_id: w4 }
+  - { id: w4, kind: WAIT, wait: { mode: DURATION, seconds: 2592000 }, next_step_id: e5 }
+  - { id: e5, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:final_check_in }, next_step_id: null }
+templates:
+  not_the_end: { title: "This doesn't have to be the end!", kind: AUTOMATION }
+  industry_tips: { title: Industry tips everyone should know, kind: AUTOMATION }
+  leaders: { title: Articles from industry leaders, kind: AUTOMATION }
+  customers_say: { title: See what our current customers are saying, kind: AUTOMATION }
+  final_check_in: { title: Final check-in, kind: AUTOMATION }

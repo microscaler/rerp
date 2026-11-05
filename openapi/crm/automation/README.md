@@ -64,3 +64,16 @@ Automatically route leads to the right partner or rep based on territory, skills
 ---
 
 *Automate the routine. Empower the sales team. Accelerate revenue.*
+
+## Behaviour (BDD) and recipes
+
+- `features/*.feature` — Gherkin for the automation engine, written from the reference tenant walk of 2026-11-05
+  (shape-diff § Automation builder, § Recipes): enrolment and reentry, wait modes, if/else, split, goal (jump to) and
+  go to, action semantics, lifecycle (readiness, exit rules, pause, stop), recipes with parameters. They are the
+  normative behaviour of this service; they move to `microservices/crm/automation/impl/tests/features/` when the
+  crate is scaffolded and become its cucumber suite.
+- `recipes/*.yaml` — the recipe library in the `WorkflowRecipe.definition` shape: a graph with `$list`,
+  `$tag:<key>`, `$template:<key>`, `$url`, `$condition` placeholders bound at instantiation
+  (`POST /recipes/{id}/instantiate` with `bindings`; `/workflows/{id}/setup` lists what is still unbound). Walked and
+  transcribed so far: free-trial-nurture, expired-trial-follow-up (chained by tag), upgrade-incentive,
+  re-engagement-by-tag.

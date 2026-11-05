@@ -1496,6 +1496,159 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+  /recipes/import:
+    post:
+      operationId: import_workflow_recipe
+      summary: Add a recipe to the workspace's library from a URL or an uploaded definition
+      tags:
+      - workflows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+                definition:
+                  type: object
+      responses:
+        '201':
+          description: Recipe added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRecipe'
+        '400':
+          description: Not a recipe document
+        '401':
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /workflows/{id}/export:
+    get:
+      operationId: export_workflow_recipe
+      summary: The workflow as a recipe document - references replaced by parameters, notes kept
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Recipe document
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /workflows/{id}/setup:
+    get:
+      operationId: get_workflow_setup
+      summary: The setup wizard - the unbound recipe parameters, in order
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Parameters still to bind
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - parameters
+                properties:
+                  parameters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RecipeParameter'
+                  total:
+                    type: integer
+                    format: int32
+                    description: Parameters the recipe has in all, for "Step 1/3"
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
+  /workflows/{id}/bindings:
+    patch:
+      operationId: bind_workflow_parameters
+      summary: Bind recipe parameters; references in triggers and steps are resolved in place
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        '200':
+          description: The workflow with the parameters bound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: A value does not exist or has the wrong kind
+      security:
+      - bearerAuth: []
+  /workflows/{id}/steps/{step_id}/notes:
+    post:
+      operationId: add_step_note
+      summary: Add a note to a step (or to the workflow with step_id "workflow")
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: step_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  maxLength: 2000
+      responses:
+        '201':
+          description: Note added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepNote'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      security:
+      - bearerAuth: []
   /recipes/{id}/instantiate:
     post:
       operationId: instantiate_workflow_recipe
@@ -1513,9 +1666,16 @@ paths:
               properties:
                 name:
                   type: string
+                bindings:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Parameter key -> value; any parameter left out stays unbound (see /workflows/{id}/setup)
                 list_id:
                   type: string
                   format: uuid
+                  deprecated: true
+                  description: Shorthand for bindings.list
       responses:
         '201':
           description: Workflow created from the recipe
@@ -1637,6 +1797,25 @@ components:
             conversion_id:
               type: string
               format: uuid
+        recipe_id:
+          type: string
+          description: The recipe this was instantiated from, if any
+        bindings:
+          type: object
+          additionalProperties:
+            type: string
+          description: Recipe parameter key -> bound value (an id, a tag, a URL, or a JSON condition tree as a string)
+        unbound_parameters:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/RecipeParameter'
+          description: Parameters still to bind; non-empty blocks activation (UNBOUND_PARAMETER)
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepNote'
+          description: Notes on the workflow as a whole (the builder shows them on the trigger block)
         entry_step_id:
           type: string
           format: uuid
@@ -2377,6 +2556,34 @@ components:
         position:
           type: object
           description: Editor layout hint (x, y); opaque to the runtime
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepNote'
+          description: Guidance and comments on the step; recipes ship with them
+        unbound_parameters:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Recipe parameters this step references that are not bound yet (the step cannot run)
+    StepNote:
+      type: object
+      required:
+      - text
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+          maxLength: 2000
+        author:
+          type: string
+          description: A staff user id, or RECIPE
+        created_at:
+          type: string
+          format: date-time
     WaitConfig:
       type: object
       properties:
@@ -2581,6 +2788,11 @@ components:
                 - TEMPLATE_KIND
                 - MISSING_ENTRY
                 - CYCLE_WITHOUT_WAIT
+                - TEMPLATE_NOT_READY
+                - NO_POSTAL_ADDRESS
+                - UNBOUND_PARAMETER
+                - TOO_MANY_RECIPIENTS
+                - GOTO_HAS_NEXT
               step_id:
                 type: string
                 format: uuid
@@ -2623,11 +2835,22 @@ components:
         config:
           type: object
           description: |
-            Per type: SUBSCRIBED_TO_LIST {list_id?} (absent = any list), TAG_ADDED {tag}, FORM_SUBMITTED {form_id?},
-            MESSAGE_OPENED/CLICKED {campaign_id?|template_id?, link_url?}, SITE_VISIT {url_pattern}, CUSTOM_EVENT
-            {event_type, value?}, FIELD_CHANGE {field, to?}, SCORE_CHANGED {score_id, above?|below?}, DATE_FIELD
-            {field, offset_seconds, at_time?}, TIME_BASED {cron, timezone}, DEAL_* {pipeline_id?, stage_id?},
-            TASK_COMPLETED {task_type_id?, outcome?}, RSS_ITEM {feed_url}, WEBHOOK {secret_id}.
+            Per type (absent keys mean "any"):
+            SUBSCRIBED_TO_LIST / UNSUBSCRIBED_FROM_LIST {list_id?}. TAG_ADDED / TAG_REMOVED {tag}. FORM_SUBMITTED
+            {form_id?}. MESSAGE_OPENED / MESSAGE_CLICKED / MESSAGE_REPLIED / MESSAGE_FORWARDED / MESSAGE_SHARED /
+            MESSAGE_BOUNCED {template_id?|campaign_id?, link_url?, list_id?, one_to_one?: ANY|AUTOMATED|DIRECT,
+            network?: FACEBOOK|TWITTER|...}. SITE_VISIT {url_pattern} (`*` wildcard). CUSTOM_EVENT {event_type,
+            value?}. ON_CREATE {}. FIELD_CHANGE {field, to?} ("changes ever" when `to` is absent). ACCOUNT_FIELD_CHANGED
+            {field, to?}. SCORE_CHANGED {score_id, threshold, direction: ABOVE|BELOW}. DATE_FIELD {field (a contact or
+            deal date field, or subscribed_at / created_at), relation: ON|BEFORE|AFTER, offset: {amount, unit:
+            DAYS|WEEKS|MONTHS|YEARS}, days: DAILY|WEEKDAYS|WEEKENDS, hour: 0-23, timezone: CONTACT|WORKSPACE}.
+            TIME_BASED {cron, timezone}. RSS_ITEM {feed_url, cadence: HOURLY|DAILY|WEEKDAYS|WEEKENDS, time, timezone}.
+            DEAL_CREATED / ENTERED_PIPELINE {pipeline_id?}. DEAL_STAGE_CHANGE {pipeline_id, from_stage_id?,
+            to_stage_id?}. DEAL_STATUS_CHANGED {to: OPEN|WON|LOST, pipeline_id?}. DEAL_WON / DEAL_LOST {pipeline_id?}.
+            DEAL_VALUE_CHANGED / DEAL_FIELD_CHANGED {pipeline_id?, field?}. Any DEAL_* also takes {owner: {op:
+            EQ|NEQ, user_id}}. TASK_COMPLETED {task_type_id?, outcome?}. GOAL_REACHED {workflow_id, goal_step_id,
+            outcome: ACHIEVED|SKIPPED}. JUMPED_TO {from_workflow_id?}. FILE_DOWNLOADED {asset_id?}. WEBHOOK
+            {secret_id}. MANUAL {}.
         runs:
           type: string
           enum:
@@ -2645,8 +2868,26 @@ components:
       - WAITING
       - COMPLETED
       - GOAL_REACHED
+      - EXITED
+      - RESTARTED
       - STOPPED
       - FAILED
+      description: |
+        ACTIVE is between steps, WAITING sits in a WAIT or a GOAL with if_not_met WAIT. COMPLETED reached END.
+        EXITED left early (see Enrolment.exit_reason). RESTARTED was ended by a RESTART reentry. STOPPED was ended
+        by a user or STOP_WORKFLOW. FAILED hit an unrecoverable error.
+    ExitReason:
+      type: string
+      enum:
+      - UNSUBSCRIBED
+      - CONVERTED
+      - GOAL_REACHED
+      - DATE_PASSED
+      - ARCHIVED
+      - STOPPED_BY_WORKFLOW
+      - STOPPED_BY_USER
+      - WORKFLOW_ARCHIVED
+      - RESTARTED
     Enrolment:
       type: object
       required:
@@ -2682,7 +2923,22 @@ components:
           description: When the runtime will next act on this enrolment (WAITING)
         entered_by:
           type: string
-          description: TRIGGER, MANUAL, RECIPE or a staff user id
+          description: TRIGGER, MANUAL, SEGMENT, STARTED_BY_WORKFLOW, or a staff user id
+        trigger_id:
+          type: string
+          format: uuid
+          description: The WorkflowTrigger that fired (entered_by TRIGGER)
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_subject:
+          type: string
+          description: What fired it, for the log - the list, tag, form or deal involved
+        exit_reason:
+          $ref: '#/components/schemas/ExitReason'
+        split_paths:
+          type: object
+          readOnly: true
+          description: SPLIT step id -> branch key, fixed on first assignment so a contact keeps its path
         goal_step_id:
           type: string
           format: uuid
@@ -2728,7 +2984,20 @@ components:
           - WAITED
           - TIMED_OUT
           - SKIPPED
+          - ACHIEVED
+          - JUMPED
+          - SUPPRESSED
+          - STEP_REMOVED
           - FAILED
+          description: |
+            ACHIEVED/SKIPPED for a GOAL reached in sequence; JUMPED for a contact pulled to a GOAL from elsewhere;
+            SUPPRESSED for a send withheld for consent; STEP_REMOVED when the step was deleted under the contact.
+        skip_reason:
+          type: string
+          description: SKIPPED/SUPPRESSED detail - NO_OPEN_DEAL, ALREADY_CONVERTED, NOT_SUBSCRIBED, TEMPLATE_NOT_READY ...
+        left_at:
+          type: string
+          format: date-time
         send_id:
           type: string
           format: uuid
@@ -2763,10 +3032,22 @@ components:
         already_active:
           type: integer
           format: int32
+          description: Skipped by the reentry rule (ONCE or MULTIPLE with an active enrolment)
         excluded:
           type: integer
           format: int32
           description: Unsubscribed or suppressed contacts when the workflow sends messages
+        skipped:
+          type: array
+          items:
+            type: object
+            properties:
+              contact_id:
+                type: string
+                format: uuid
+              reason:
+                type: string
+                enum: [ALREADY_ENROLLED, ALREADY_ACTIVE, EXCLUDED, ARCHIVED]
         enrolment_ids:
           type: array
           items:
@@ -2836,6 +3117,43 @@ components:
               failed:
                 type: integer
                 format: int64
+    RecipeParameter:
+      type: object
+      required:
+      - key
+      - kind
+      - label
+      properties:
+        key:
+          type: string
+        kind:
+          type: string
+          enum:
+          - LIST
+          - TAG
+          - TEMPLATE
+          - FORM
+          - URL
+          - FIELD
+          - PIPELINE
+          - STAGE
+          - USER
+          - CONVERSION
+          - SCORE
+          - CONDITION
+          - TEXT
+        label:
+          type: string
+        hint:
+          type: string
+        required:
+          type: boolean
+          default: true
+        used_by_step_ids:
+          type: array
+          items:
+            type: string
+          readOnly: true
     WorkflowRecipe:
       type: object
       required:
@@ -2867,6 +3185,23 @@ components:
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
           deprecated: true
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipeParameter'
+        source_url:
+          type: string
+          format: uri
+          description: Set on a recipe imported from a URL
+        industry:
+          type: string
+          description: Library grouping (Software, E-Commerce, Any ...)
+        definition:
+          type: object
+          description: |
+            The graph as the recipe files hold it (openapi/crm/automation/recipes/*.yaml): triggers, steps, templates,
+            with `$list`, `$tag:<key>`, `$template:<key>`, `$url`, `$condition` placeholders where workspace
+            references go. Returned by GET /recipes/{id}.
         step_count:
           type: integer
           format: int32

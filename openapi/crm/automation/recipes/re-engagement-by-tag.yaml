@@ -1,0 +1,27 @@
+# Recipe: Re-engagement by tag (reference tenant "Re-engagement Campaign Triggered by Disengaged Tag"). A
+# deliverability safeguard: one last message, a week to react, then unsubscribe.
+id: re-engagement-by-tag
+name: Re-engagement by "Disengaged" tag
+category: RE_ENGAGEMENT
+description: >
+  When a contact is tagged as disengaged, send a re-engagement message. If they neither open nor click it within
+  a week, unsubscribe them, keeping deliverability high and sparing people who are no longer interested.
+parameters:
+  - { key: disengaged_tag, kind: TAG, label: Tag that marks a disengaged contact, required: true }
+  - { key: list, kind: LIST, label: List to unsubscribe from, required: true }
+triggers:
+  - { type: TAG_ADDED, config: { tag: $disengaged_tag }, runs: MULTIPLE }
+reentry: MULTIPLE
+exit_rules: { on_unsubscribe: true }
+entry_step_id: e1
+steps:
+  - { id: e1, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:re_engage }, next_step_id: w1 }
+  - { id: w1, kind: WAIT, label: "Wait up to 7 days for a click",
+      wait: { mode: UNTIL_CONDITION, conditions: { all: [ { engagement: CLICKED, template: $template:re_engage } ] }, timeout_seconds: 604800 },
+      next_step_id: c1 }
+  - { id: c1, kind: IF_ELSE, label: "Reacted?",
+      conditions: { any: [ { engagement: CLICKED, template: $template:re_engage }, { engagement: OPENED, template: $template:re_engage } ] },
+      yes_step_id: null, no_step_id: u1 }
+  - { id: u1, kind: ACTION, action_type: UNSUBSCRIBE_LIST, action_config: { list_ids: [ $list ] }, next_step_id: null }
+templates:
+  re_engage: { title: Re-engagement campaign, kind: AUTOMATION }

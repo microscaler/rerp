@@ -1,0 +1,28 @@
+# Recipe: Upgrade incentive and follow-up (reference tenant "Upgrade Incentive and Outreach"). Site tracking on
+# the upgrade page starts it; a conversion check before each message stops it once they upgraded.
+id: upgrade-incentive
+name: Upgrade incentive and follow-up
+category: SALES
+description: >
+  Emails to contacts who viewed your upgrade page but did not upgrade. Ends as soon as they do. Starts a
+  conversation that surfaces pre-purchase hang-ups.
+parameters:
+  - { key: upgrade_page, kind: URL, label: Upgrade page URL, required: true }
+  - { key: upgraded, kind: CONDITION, label: How we know they upgraded, required: true,
+      hint: "A tag, a plan field value, or a recorded conversion; the reference uses an e-commerce order" }
+triggers:
+  - { type: SITE_VISIT, config: { url_pattern: $upgrade_page }, runs: ONCE }
+reentry: ONCE
+exit_rules: { on_unsubscribe: true }
+entry_step_id: w1
+steps:
+  - { id: w1, kind: WAIT, wait: { mode: DURATION, seconds: 86400 }, next_step_id: c1 }
+  - { id: c1, kind: IF_ELSE, label: "Upgraded?", conditions: $upgraded, yes_step_id: null, no_step_id: e1,
+      notes: [ "Give them a day: many upgrade right after visiting. Yes ends the automation." ] }
+  - { id: e1, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:discount }, next_step_id: w2 }
+  - { id: w2, kind: WAIT, wait: { mode: DURATION, seconds: 259200 }, next_step_id: c2 }
+  - { id: c2, kind: IF_ELSE, label: "Upgraded?", conditions: $upgraded, yes_step_id: null, no_step_id: e2 }
+  - { id: e2, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:why_not }, next_step_id: null }
+templates:
+  discount: { title: Upgrade discount, preheader: Take your experience to the next level with this deal, kind: AUTOMATION }
+  why_not: { title: "Why haven't you upgraded yet?", preheader: "This upgrade deal won't be around forever...", kind: AUTOMATION }

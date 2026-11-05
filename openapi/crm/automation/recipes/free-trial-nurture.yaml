@@ -1,0 +1,75 @@
+# Recipe: Free trial nurture. Reverse-engineered from the reference tenant's "Free Trial Email Automation Workflow"
+# (shape-diff § Recipes). References are parameters ($list, $tag:*, $template:*) bound at instantiation.
+id: free-trial-nurture
+name: Free trial nurture
+category: NURTURE
+description: >
+  Offer a free trial to turn a subscriber into a customer: a message series over the trial's lifetime with
+  resources and a path to your team, one branch for people who already use advanced features, and a tag at
+  the end for those who did not convert (which starts the expired-trial follow-up).
+parameters:
+  - { key: list, kind: LIST, label: Select list, required: true, hint: The list a trial signup lands on }
+  - { key: advanced_tag, kind: TAG, label: Tag for contacts who used an advanced feature, required: true }
+  - { key: customer_tag, kind: TAG, label: Tag for converted customers, required: true }
+  - { key: expired_tag, kind: TAG, label: Tag to add when the trial expires, required: true }
+triggers:
+  - type: SUBSCRIBED_TO_LIST
+    config: { list_id: $list }
+    runs: ONCE
+    notes:
+      - The trigger. Change it to the list your trial form subscribes to, or to a tag your product adds on signup.
+reentry: ONCE
+exit_rules: { on_unsubscribe: true, on_conversion: false }
+entry_step_id: e1
+steps:
+  - { id: e1, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:welcome }, next_step_id: w1,
+      notes: [ "Welcome and account information: log-in link, what the trial includes, where to get help." ] }
+  - { id: w1, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e2 }
+  - { id: e2, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:first_steps }, next_step_id: w2 }
+  - { id: w2, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: c1 }
+  - id: c1
+    kind: IF_ELSE
+    label: Has used an advanced feature?
+    conditions: { all: [ { tag: $advanced_tag } ] }
+    yes_step_id: e3
+    no_step_id: e4
+    notes:
+      - This IF/ELSE is an example of a free-trial flow that checks for actions the contact can take and bases the next message on that.
+      - If the contact has used one of your advanced features, the next email goes deeper; if not, they get base explanations.
+      - To build more reactive messaging, add IF/ELSE steps before each message checking milestones you define; otherwise delete this step and keep the yes path.
+  - { id: e3, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:advanced_tips }, next_step_id: w3 }
+  - { id: w3, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e5 }
+  - { id: e4, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:deep_dive }, next_step_id: g1 }
+  - { id: g1, kind: GOTO, goto_step_id: e5 }
+  - { id: e5, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:use_cases }, next_step_id: w5 }
+  - { id: w5, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e6 }
+  - { id: e6, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:blog }, next_step_id: w6 }
+  - { id: w6, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: e7 }
+  - { id: e7, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:community }, next_step_id: w7 }
+  - { id: w7, kind: WAIT, wait: { mode: DURATION, seconds: 86400 }, next_step_id: e8 }
+  - { id: e8, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:benefits }, next_step_id: w8 }
+  - { id: w8, kind: WAIT, wait: { mode: DURATION, seconds: 86400 }, next_step_id: e9 }
+  - { id: e9, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:reviews }, next_step_id: w9 }
+  - { id: w9, kind: WAIT, wait: { mode: DURATION, seconds: 86400 }, next_step_id: e10 }
+  - { id: e10, kind: ACTION, action_type: SEND_MESSAGE, action_config: { template: $template:last_day }, next_step_id: w10 }
+  - { id: w10, kind: WAIT, wait: { mode: DURATION, seconds: 172800 }, next_step_id: c2 }
+  - id: c2
+    kind: IF_ELSE
+    label: Became a customer?
+    conditions: { all: [ { tag: $customer_tag } ] }
+    yes_step_id: null
+    no_step_id: t1
+    notes:
+      - Checks whether the contact converted during the trial. Yes ends the automation; No tags them so the expired-trial follow-up starts.
+  - { id: t1, kind: ACTION, action_type: ADD_TAG, action_config: { tag: $expired_tag }, next_step_id: null }
+templates:
+  welcome: { title: Welcome and account information, kind: AUTOMATION }
+  first_steps: { title: First steps and getting started, kind: AUTOMATION }
+  advanced_tips: { title: Advanced tips, kind: AUTOMATION }
+  deep_dive: { title: Deep dive of advanced features, kind: AUTOMATION }
+  use_cases: { title: Use cases and customer success stories, kind: AUTOMATION }
+  blog: { title: Blog articles, kind: AUTOMATION }
+  community: { title: Invite to community, kind: AUTOMATION }
+  benefits: { title: Benefits of being a customer, kind: AUTOMATION }
+  reviews: { title: Existing customer reviews and testimonies, kind: AUTOMATION }
+  last_day: { title: "Last day of free trial - buy now!", kind: AUTOMATION }
