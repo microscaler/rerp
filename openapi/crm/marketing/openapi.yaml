@@ -1484,9 +1484,41 @@ components:
           readOnly: true
         redirect_url:
           type: string
+          description: Set with on_submit REDIRECT
+        on_submit:
+          type: string
+          enum:
+          - THANK_YOU
+          - REDIRECT
+          default: THANK_YOU
+          description: Show `style.success_message`, or send the visitor to `redirect_url`
         is_active:
           type: boolean
           default: true
+          description: false pauses submissions (the public endpoint answers 410)
+        allow_blank_overwrite:
+          type: boolean
+          default: false
+          description: A submitted blank overwrites an existing field value (otherwise blanks are ignored)
+        block_free_mail:
+          type: boolean
+          default: false
+          description: Refuse personal email providers (gmail, yahoo, outlook ...)
+        blocked_domains:
+          type: array
+          items:
+            type: string
+          description: Refuse these email domains; `*.example.com` blocks subdomains only
+        custom_html:
+          type: string
+          description: When set, the embed renders this markup instead of `fields`
+        workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+          description: Workflows with a FORM_SUBMITTED trigger on this form
         capture_fields:
           type: object
           description: Schema of fields to capture (key-value definitions)
@@ -1754,6 +1786,27 @@ components:
           - NUMBER
           - HIDDEN
           - CONSENT
+          - HEADER
+          - HTML
+          - IMAGE
+          - FULL_NAME
+          - CAPTCHA
+          - SUBSCRIPTION_TOGGLE
+          - LIST_SELECTOR
+          - ACCOUNT_FIELD
+          description: |
+            Input kinds, plus layout blocks (HEADER, HTML, IMAGE) that capture nothing, FULL_NAME (split into
+            first/last on submit), CAPTCHA, SUBSCRIPTION_TOGGLE (subscribe/unsubscribe to `list_ids`),
+            LIST_SELECTOR (the visitor picks from `list_ids`) and ACCOUNT_FIELD (a crm/accounts company field).
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: SUBSCRIPTION_TOGGLE and LIST_SELECTOR
+        content:
+          type: string
+          description: HEADER text, HTML markup, IMAGE url
         required:
           type: boolean
           default: false
@@ -1777,14 +1830,27 @@ components:
           type: string
           enum:
           - SUBSCRIBE_LIST
+          - SUBSCRIBE_SMS_LIST
           - ADD_TAG
           - START_WORKFLOW
           - CREATE_LEAD
+          - EMAIL_RESULTS
           - NOTIFY
           - WEBHOOK
         list_id:
           type: string
           format: uuid
+          description: SUBSCRIBE_LIST / SUBSCRIBE_SMS_LIST (an SMS-channel list; consent is recorded on the contact)
+        pipeline_id:
+          type: string
+          format: uuid
+          description: CREATE_LEAD, with stage_id and user_id (owner)
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: EMAIL_RESULTS recipients
         tag:
           type: string
         workflow_id:

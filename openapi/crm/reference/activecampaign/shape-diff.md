@@ -134,3 +134,37 @@ saved segment". Our `ConditionGroup` (crm/contacts) is a superset: tags, site vi
 Canvas: a note per step (the "1" badge), per-step stats on email steps (sent / open rate / click rate), draft-campaign
 warnings beside email steps, minimap, zoom, export image; a graph-level validity (Active cannot be switched on with an
 undesigned email).
+
+## Campaign editor (UI) → `crm/outreach.Campaign`
+
+Walked 2026-11-05 (`/app/campaigns/new`, campaigns 11 "Reference: date-based renewal reminder" and 13 "Reference:
+split test" left as drafts for the dump).
+
+| Theirs | Ours |
+|---|---|
+| Type picker: Standard (from scratch / template in the designer), Split Testing (test subjects and/or from information; or subjects, from and email content), Automated (hands off to the builder), RSS Triggered, Auto Responder (send after subscribe), Date Based (birthdays, anniversaries, renewals) | `CampaignKind` SINGLE / AB_TEST (`split_content`) / RSS / REMINDER; Automated and Auto Responder are workflows (`WorkflowRecipe`), not campaigns |
+| One page, not a wizard: message (subject, preheader, from name, from email, "use as reply-to"), design (create with email designer / existing), recipients, delivery, tracking, address, archive; header has Save and exit / Test and preview / Send now | Our wizard steps map one to one; `Campaign.reply_to` defaults to from |
+| Recipients: subscribed to list(s) (multi-select, "Select All / None") → send to: all active subscribers of the selected lists, a segment, a tag, or "send using custom conditions"; "Calculate recipients" count; "Translate to a contact's language" (paywalled) | `Campaign.list_ids[]`, `audience {mode: ALL\|SEGMENT\|TAG\|CONDITIONS, segment_id, tag, conditions}`; `POST /campaigns/{id}/audience` returns the count |
+| Date Based delivery: sends on / before / after the contact's `<date field>` (any date or datetime field incl. Subscription Date), yearly / once only | `Campaign.reminder {date_field, relation ON\|BEFORE\|AFTER, offset_days, repeat YEARLY\|ONCE}` |
+| Split test settings: do not determine a winner / determine and send using the winner by best click rate or best open rate after N hours/days/weeks/months; email ratios per variant; at least 2 variants (tabs "Test 1", "+") | `ABTestConfig {variants[], winner_metric CLICKS\|OPENS, decide_after_seconds, auto_send_winner, ratios[]}` |
+| Schedule (optional): Predictive Send (each contact's optimal time within 24 h) or an exact date + time in the workspace timezone | `schedule {mode NOW\|AT\|PREDICTIVE, at, timezone}`; PREDICTIVE deferred |
+| Tracking: open/read tracking (+ "Automate": automations to start when opened), reply tracking, link tracking (+ "Customize": per link enable/disable, automations to start on click, a name for reports), Google Analytics (+ UTM campaign name) | `track_opens`, `track_clicks`, `track_replies`, `links[] {url, tracked, report_name, start_workflow_ids[]}`, `on_open_workflow_ids[]`, `utm {campaign}` |
+| Physical mailing address (required, per list; CAN-SPAM) | `postal_address_id` (per list, overridable per campaign) |
+| Campaign archive: public / private | `public_archive: bool` |
+| Pre-send checklist ("the following areas need to be updated before sending": list, address, subject, design, A/B needs 2 variants) | `GET /campaigns/{id}/readiness` → `[{code, message}]`; `schedule`/`send` refuse while non-empty |
+| AI helpers: "how have similar campaigns performed", "how does my subject line work", "is my email ready to send" | deferred |
+
+## Form builder (UI) → `crm/marketing.Form`
+
+Walked 2026-11-05; form 1 "Reference: pricing enquiry" (inline, subscribes to Newsletter) left for the dump.
+
+| Theirs | Ours |
+|---|---|
+| Create: name; style inline / floating bar / floating box / modal; one or more form actions: subscribe to a list, subscribe to an SMS list, add a tag, add to a deal (pipeline + stage + owner), email results (to addresses); AI "generate a form in seconds" | `Form.layout` INLINE / BAR / BOX / MODAL (+ SITE_MESSAGE); `Form.actions[] {kind: SUBSCRIBE_LIST\|SUBSCRIBE_SMS_LIST\|ADD_TAG\|CREATE_DEAL\|EMAIL_RESULTS, ...}` replaces a single `list_id` |
+| Fields panel: standard (header, HTML and text, full name, first name, last name, email, CAPTCHA, phone, image, subscribe/unsubscribe, list selector), custom contact fields (searchable, "+" creates one), account fields | `Form.fields[] {kind: HEADER\|HTML\|FULL_NAME\|FIRST_NAME\|LAST_NAME\|EMAIL\|CAPTCHA\|PHONE\|IMAGE\|SUBSCRIPTION_TOGGLE\|LIST_SELECTOR\|CUSTOM\|ACCOUNT_FIELD, field_id?, label, placeholder, required, options}` |
+| Style: layout vertical / horizontal; max width; padding; form and page background; borders (colour, stroke, style), corners, shadow; per-field and button styles; fonts | `Form.style` object (opaque JSON, rendered by our embed script) |
+| Options: on submit → show thank-you text or open URL; form actions (edit/remove/add); accepting submissions (pause); allow blank fields to overwrite existing data; block personal email providers; block email domains (comma list, `*.example.com`) | `Form.on_submit {mode: THANK_YOU\|REDIRECT, text, url}`, `Form.status` ACTIVE / PAUSED, `allow_blank_overwrite`, `block_free_mail`, `blocked_domains[]` |
+| Code editor toggle (edit the HTML directly) | `Form.custom_html` (optional; replaces the rendered fields) |
+| "Trigger Automation" (start an automation on submit) | `FORM_SUBMITTED` trigger on a workflow; the form page lists the workflows that use it |
+| Integrate: simple embed (`<div class="_form_1">` + script), full embed (inline CSS + HTML), link (hosted page), Facebook, WordPress; suggested follow-up automations | `GET /forms/{id}/embed` → `{script, html, hosted_url}`; public `POST /public/forms/{id}/submit` |
+| Toast "Your form is saved"; forms auto-save | — |

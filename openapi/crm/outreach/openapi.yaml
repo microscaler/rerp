@@ -1490,7 +1490,13 @@ components:
       - ONE_TIME
       - AB_TEST
       - RSS
-      description: ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates
+      - REMINDER
+      - RECURRING
+      description: |
+        ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates;
+        REMINDER sends to each contact on/before/after one of their date fields (birthday, renewal, anniversary),
+        yearly or once (`reminder`); RECURRING sends on a schedule to whoever matches the audience at that moment
+        (`recurrence`). Auto-responders and drips are workflows (crm/automation), not campaigns.
     CampaignStatus:
       type: string
       enum:
@@ -1961,6 +1967,49 @@ components:
         segment:
           type: object
           description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole list
+        audience:
+          $ref: '#/components/schemas/CampaignAudience'
+        reminder:
+          $ref: '#/components/schemas/ReminderConfig'
+        recurrence:
+          type: object
+          description: RECURRING; {cron, timezone, ends_at?}
+        reply_to:
+          type: string
+          format: email
+          description: Defaults to the sender's address
+        preheader:
+          type: string
+          maxLength: 255
+          description: Overrides the template's preheader for this send
+        track_replies:
+          type: boolean
+          default: false
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackedLink'
+          description: Per-link tracking overrides, filled from the template's links at schedule time
+        on_open_workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Workflows to start when a contact opens
+        postal_address_id:
+          type: string
+          format: uuid
+          description: The footer address; defaults to the first list's
+        public_archive:
+          type: boolean
+          default: false
+          description: Listed on the hosted campaign archive page
+        readiness:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ReadinessProblem'
+          description: What still blocks scheduling (empty when ready)
         utm_campaign_id:
           type: string
           format: uuid
@@ -2039,12 +2088,29 @@ components:
       - winner_metric
       - decide_after_minutes
       properties:
+        test_scope:
+          type: string
+          enum:
+          - SUBJECT_FROM
+          - SUBJECT_FROM_CONTENT
+          default: SUBJECT_FROM
+          description: What differs between variants - subject and/or from only, or the whole message too
         sample_percent:
           type: integer
           format: int32
           minimum: 10
           maximum: 100
-          description: Share of the audience split evenly across variants; the rest get the winner
+          description: Share of the audience split across variants (by `ratios`, evenly when absent); the rest get the winner
+        ratios:
+          type: array
+          items:
+            type: integer
+            format: int32
+          description: Per-variant share of the sample, in variant order; sums to 100
+        decide_winner:
+          type: boolean
+          default: true
+          description: false sends the variants by ratio to everyone and never picks a winner
         winner_metric:
           type: string
           enum:
@@ -2057,6 +2123,95 @@ components:
         winner_key:
           type: string
           readOnly: true
+    CampaignAudience:
+      type: object
+      description: Who, within `list_ids`, receives the campaign
+      properties:
+        mode:
+          type: string
+          enum:
+          - ALL
+          - SEGMENT
+          - TAG
+          - CONDITIONS
+          default: ALL
+        segment_id:
+          type: string
+          format: uuid
+        tag:
+          type: string
+        conditions:
+          type: object
+          description: An inline crm/contacts condition tree
+    ReminderConfig:
+      type: object
+      required:
+      - date_field
+      properties:
+        date_field:
+          type: string
+          description: A contact date or datetime field; `subscribed_at` for the subscription anniversary
+        relation:
+          type: string
+          enum:
+          - ON
+          - BEFORE
+          - AFTER
+          default: ON
+        offset_days:
+          type: integer
+          format: int32
+          default: 0
+        repeat:
+          type: string
+          enum:
+          - YEARLY
+          - ONCE
+          default: YEARLY
+          description: YEARLY matches month and day each year; ONCE matches the full date
+        send_time:
+          type: string
+          description: HH:MM in the workspace timezone (or the contact's with send_in_contact_timezone)
+    TrackedLink:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          format: uri
+        tracked:
+          type: boolean
+          default: true
+        report_name:
+          type: string
+          maxLength: 128
+        start_workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Workflows to start when this link is clicked
+    ReadinessProblem:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NO_LIST
+          - NO_ADDRESS
+          - NO_SUBJECT
+          - NO_DESIGN
+          - NO_SENDER
+          - SENDER_UNVERIFIED
+          - AB_NEEDS_VARIANTS
+          - AUDIENCE_EMPTY
+          - REMINDER_NO_FIELD
+        message:
+          type: string
     CreateCampaignRequest:
       type: object
       required:

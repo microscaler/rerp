@@ -154,8 +154,8 @@ New entities:
 
 New step/trigger/action enum values:
 11. Steps: `GOTO`. Triggers: `MESSAGE_FORWARDED`, `MESSAGE_SHARED`, `FILE_DOWNLOADED`, `ENTERED_PIPELINE`, `DEAL_VALUE_CHANGED`, `DEAL_STATUS_CHANGED`, `DEAL_FIELD_CHANGED`, `ACCOUNT_FIELD_CHANGED`, `TASK_COMPLETED`, `RSS_ITEM`, `JUMPED_TO`. Actions: `SEND_1TO1_EMAIL`, `INTERNAL_NOTIFICATION` (rename of NOTIFY), `CONVERT`, `ARCHIVE_CONTACT`, `UPDATE_DEAL_OWNER`, `UPDATE_DEAL_VALUE`, `UPDATE_DEAL_STATUS`, `UPDATE_DEAL_TITLE`, `UPDATE_DEAL_FIELD`, `ADD_DEAL_NOTE`, `ADJUST_DEAL_SCORE`, `UPDATE_ACCOUNT_FIELD`, `STOP_WORKFLOW` (other workflow).
-12. Campaign action: `resend_to_unopened`.
-13. Form layout: `SITE_MESSAGE`.
+12. Campaign action: `resend_to_unopened`. (2026-11-05: campaign editor walked — `REMINDER`/`RECURRING` kinds, `CampaignAudience`, `ReminderConfig`, `TrackedLink`, readiness, AB `test_scope`/`ratios`/`decide_winner` in spec; shape-diff § Campaign editor.)
+13. Form layout: `SITE_MESSAGE`. (2026-11-05: form builder walked — layout/field kinds, `SUBSCRIBE_SMS_LIST`/`EMAIL_RESULTS` actions, on_submit, submission controls in spec; shape-diff § Form builder.)
 
 Deferred, deliberately: landing-page builder, WhatsApp flows, win-probability ML, predictive content/sending, connected mailboxes and calendars, saved responses, database sync, geo reports, integrations marketplace, "format data".
 
