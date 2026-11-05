@@ -1572,10 +1572,6 @@ components:
       - id
       - name
       - is_active
-      - trigger_type
-      - trigger_config
-      - action_type
-      - action_config
       - sequence
       - created_at
       properties:
@@ -1589,19 +1585,58 @@ components:
           type: string
         is_active:
           type: boolean
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+          description: |
+            Several start triggers per workflow; a contact enters when any one fires (subject to its own `runs`
+            and `segment`). A workflow with no triggers is entered only by enrolment (manual, segment, or
+            START_WORKFLOW from another workflow).
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
+          deprecated: true
+          description: Single-trigger form; `triggers[0]` since the multi-trigger model. Kept for rules-style workflows.
         trigger_config:
           type: object
-          description: Trigger-specific configuration (JSON)
+          deprecated: true
+          description: Trigger-specific configuration (JSON) for `trigger_type`
         action_type:
           $ref: '#/components/schemas/ActionType'
+          description: Single-action form (a rule); graph workflows use `entry_step_id` and /workflows/{id}/steps instead
         action_config:
           type: object
-          description: Action-specific configuration (JSON)
+          description: Action-specific configuration (JSON) for `action_type`
         conditions:
           type: object
           description: Additional AND/OR conditions (JSON)
+        exit_rules:
+          $ref: '#/components/schemas/ExitRules'
+        unsubscribe_scope:
+          type: string
+          enum:
+          - TRIGGER_LISTS
+          - ALL_LISTS
+          - NONE
+          description: |
+            Which lists an unsubscribe link in one of this workflow's messages applies to: the lists named by its
+            triggers and subscribe actions (default), every list, or none (the link is omitted; transactional-like).
+        access_group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: crm/teams groups that may open and edit this workflow; empty means admins only
+        tracking:
+          type: object
+          description: Report this workflow's entries and completions against a business goal and/or a conversion (crm/marketing)
+          properties:
+            goal_id:
+              type: string
+              format: uuid
+            conversion_id:
+              type: string
+              format: uuid
         entry_step_id:
           type: string
           format: uuid
@@ -1647,18 +1682,29 @@ components:
       type: object
       required:
       - name
-      - trigger_type
-      - action_type
-      - action_config
-      - conditions
       properties:
         name:
           type: string
           maxLength: 128
         description:
           type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        exit_rules:
+          $ref: '#/components/schemas/ExitRules'
+        unsubscribe_scope:
+          type: string
+          enum: [TRIGGER_LISTS, ALL_LISTS, NONE]
+        access_group_ids:
+          type: array
+          items: {type: string, format: uuid}
+        reentry:
+          $ref: '#/components/schemas/ReentryRule'
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
+          deprecated: true
         trigger_config:
           type: object
         action_type:
@@ -1681,10 +1727,31 @@ components:
           type: string
         description:
           type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        exit_rules:
+          $ref: '#/components/schemas/ExitRules'
+        unsubscribe_scope:
+          type: string
+          enum: [TRIGGER_LISTS, ALL_LISTS, NONE]
+        access_group_ids:
+          type: array
+          items: {type: string, format: uuid}
+        reentry:
+          $ref: '#/components/schemas/ReentryRule'
+        tracking:
+          type: object
+          properties:
+            goal_id: {type: string, format: uuid}
+            conversion_id: {type: string, format: uuid}
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
+          deprecated: true
         trigger_config:
           type: object
+          deprecated: true
         action_type:
           $ref: '#/components/schemas/ActionType'
         action_config:
@@ -1696,12 +1763,7 @@ components:
           format: int32
         is_active:
           type: boolean
-      required:
-      - name
-      - description
-      - sequence
-      - is_active
-      description: Request body for updating an existing workflow
+      description: Request body for updating an existing workflow (partial; absent fields are unchanged)
     Rule:
       type: object
       required:
@@ -2040,8 +2102,19 @@ components:
       - DEAL_STAGE_CHANGE
       - DEAL_WON
       - DEAL_LOST
+      - DEAL_VALUE_CHANGED
+      - DEAL_STATUS_CHANGED
+      - DEAL_FIELD_CHANGED
+      - ENTERED_PIPELINE
+      - ACCOUNT_FIELD_CHANGED
+      - TASK_COMPLETED
+      - MESSAGE_FORWARDED
+      - MESSAGE_SHARED
+      - FILE_DOWNLOADED
+      - RSS_ITEM
+      - JUMPED_TO
       - GOAL_REACHED
-      description: Enum of trigger types (event-based, schedule-based, webhook-based)
+      description: Enum of trigger types (event-based, schedule-based, webhook-based). JUMPED_TO fires when a contact is moved into this workflow by another workflow's GOTO/START_WORKFLOW.
     ActionType:
       type: string
       enum:
@@ -2065,8 +2138,26 @@ components:
       - ADD_NOTE
       - START_WORKFLOW
       - STOP_WORKFLOW
+      - SEND_1TO1_EMAIL
+      - SEND_TRANSACTIONAL
+      - INTERNAL_NOTIFICATION
+      - CONVERT
+      - ARCHIVE_CONTACT
+      - COMPLETE_TASK
+      - UPDATE_DEAL_OWNER
+      - UPDATE_DEAL_VALUE
+      - UPDATE_DEAL_STATUS
+      - UPDATE_DEAL_TITLE
+      - UPDATE_DEAL_FIELD
+      - ADD_DEAL_NOTE
+      - ADJUST_DEAL_SCORE
+      - UPDATE_ACCOUNT_FIELD
+      - UPDATE_ACCOUNT_OWNER
+      - ADD_ACCOUNT_NOTE
+      - ADD_TO_ACCOUNT
+      - FORMAT_DATA
       - END
-      description: Enum of action types (notification, assign, update, create, etc.)
+      description: Enum of action types. NOTIFY is the older name of INTERNAL_NOTIFICATION; SEND_EMAIL of SEND_MESSAGE. See WorkflowStep.action_config for each type's configuration.
     ConditionOperator:
       type: string
       enum:
@@ -2193,13 +2284,16 @@ components:
       - IF_ELSE
       - SPLIT
       - GOAL
+      - GOTO
       - END
       description: |
-        ACTION runs one ActionType and continues. WAIT holds for a duration, until a date/time, or until a
-        condition is met (with an optional timeout). IF_ELSE evaluates conditions and takes the yes or no
-        branch. SPLIT sends contacts down branches by percentage (A/B paths). GOAL names a condition that,
-        when met anywhere in the workflow, jumps the contact to this step (and records the goal). END
-        finishes the enrolment.
+        ACTION runs one ActionType and continues. WAIT holds for a duration, until a date/time, until a contact
+        date field, or until a condition is met (with an optional timeout). IF_ELSE evaluates conditions and
+        takes the yes or no branch. SPLIT sends contacts down branches evenly, by percentage, as a test with a
+        winning path, or to path A until a date/count. GOAL ("jump to") names a condition that, when met, moves the
+        contact to this step from below it or from anywhere, and records the goal; a contact that reaches it
+        without meeting the condition continues or waits (`goal.if_not_met`). GOTO moves the contact to any other
+        step unconditionally and is terminal for its own branch (nothing follows it). END finishes the enrolment.
     WorkflowStep:
       type: object
       required:
@@ -2224,37 +2318,62 @@ components:
         action_config:
           type: object
           description: |
-            ACTION: per type, e.g. SEND_MESSAGE {template_id, sender_id?}, ADD_TAG {tag}, ADJUST_SCORE {points},
-            SUBSCRIBE_LIST {list_id}, CALL_WEBHOOK {url, secret_id}, NOTIFY {user_id|team_id, message},
-            CREATE_DEAL {stage_id, title}, START_WORKFLOW {workflow_id}.
+            ACTION: per type.
+            SEND_MESSAGE {template_id, sender_id?} (a marketing message; needs list consent). SEND_1TO1_EMAIL
+            {from_user_id, subject, text} (plain text, from a user's mailbox or sender identity with their reply-to).
+            SEND_TRANSACTIONAL {transactional_template_id, variables}. INTERNAL_NOTIFICATION {subject, to[] (up to
+            5 addresses or user ids), from_sender_id?, body, include_contact_link: bool} (staff only, no consent).
+            SUBSCRIBE_LIST / UNSUBSCRIBE_LIST {list_ids[]}. ADD_TAG / REMOVE_TAG {tag}. UPDATE_FIELD {field, value}.
+            ADD_NOTE {text}. ADJUST_SCORE {score_id, points}. CONVERT {conversion_id}. ARCHIVE_CONTACT {}.
+            CREATE_TASK {title, description?, task_type_id, assignee: "OWNER"|user_id, due_after_seconds, deal: bool}
+            (deal: true attaches it to the contact's open deal in `pipeline_id`). COMPLETE_TASK {task_type_id?,
+            outcome?}. CREATE_DEAL {pipeline_id, stage_id, title, value?, owner: "OWNER"|user_id}. UPDATE_DEAL_STAGE
+            {pipeline_id, stage_id}. UPDATE_DEAL_OWNER {user_id}. UPDATE_DEAL_VALUE {value|delta}. UPDATE_DEAL_STATUS
+            {status}. UPDATE_DEAL_TITLE {title}. UPDATE_DEAL_FIELD {field, value}. ADD_DEAL_NOTE {text}.
+            ADJUST_DEAL_SCORE {score_id, points}. UPDATE_ACCOUNT_FIELD {field, value}. UPDATE_ACCOUNT_OWNER
+            {user_id}. ADD_ACCOUNT_NOTE {text}. ADD_TO_ACCOUNT {account_id|"FROM_EMAIL_DOMAIN"}.
+            CALL_WEBHOOK {url, secret_id?}. START_WORKFLOW / STOP_WORKFLOW {workflow_id}.
+            FORMAT_DATA {op: COPY|DATE_ADJUST|EXTRACT|MATH|CAPITALIZE, source_field, target_field, amount?, unit?,
+            extract?: PHONE|URL, operator?: ADD|SUBTRACT|MULTIPLY|DIVIDE, operand?, case?: SENTENCE|TITLE|UPPER|LOWER}.
         wait:
           $ref: '#/components/schemas/WaitConfig'
         conditions:
           type: object
-          description: IF_ELSE and GOAL; the crm/automation condition tree (AND/OR groups of field/tag/list/engagement/score predicates)
+          description: |
+            IF_ELSE and GOAL; the crm/contacts condition tree (AND/OR groups of field / tag / list status / form
+            submitted / engagement / site / deal / score predicates; `{"segment_id": ...}` reuses a saved segment).
         yes_step_id:
           type: string
           format: uuid
         no_step_id:
           type: string
           format: uuid
+        split:
+          $ref: '#/components/schemas/SplitConfig'
         branches:
           type: array
           items:
             type: object
             required:
             - key
-            - percent
             properties:
               key:
                 type: string
+                description: A, B, C ...
               percent:
                 type: integer
                 format: int32
+                description: PERCENT mode; percents sum to 100. Ignored (even) in the other modes.
               step_id:
                 type: string
                 format: uuid
-          description: SPLIT; percents sum to 100
+          description: SPLIT paths, in order; `step_id` absent means the path ends at once
+        goal:
+          $ref: '#/components/schemas/GoalConfig'
+        goto_step_id:
+          type: string
+          format: uuid
+          description: GOTO target; any step of this workflow
         position:
           type: object
           description: Editor layout hint (x, y); opaque to the runtime
@@ -2275,17 +2394,59 @@ components:
         until:
           type: string
           format: date-time
-          description: UNTIL_DATETIME
+          description: UNTIL_DATETIME, an absolute instant
+        until_pattern:
+          type: object
+          description: |
+            UNTIL_DATETIME as a recurring pattern instead of an instant: the next matching day at `time`, where any
+            of month/day/year may be left open ("any month, the 24th, at 08:00"). Evaluated in `timezone`.
+          properties:
+            month:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 12
+            day:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 31
+            year:
+              type: integer
+              format: int32
+            time:
+              type: string
+              description: HH:MM
+            timezone:
+              type: string
+              enum:
+              - CONTACT
+              - WORKSPACE
+              description: The contact's own timezone (falling back to the workspace's) or the workspace's
         conditions:
           type: object
-          description: UNTIL_CONDITION
+          description: UNTIL_CONDITION; the condition tree (see WorkflowStep.conditions)
         date_field:
           type: string
-          description: UNTIL_DATE_FIELD; a contact date field (renewal_date, trial_ends_at, birthday)
+          description: UNTIL_DATE_FIELD; a contact date or datetime field (renewal_date, trial_ends_at, birthday)
+        relation:
+          type: string
+          enum:
+          - ON
+          - BEFORE
+          - AFTER
+          description: UNTIL_DATE_FIELD; with `offset_seconds` as the distance for BEFORE/AFTER
         offset_seconds:
           type: integer
           format: int64
-          description: UNTIL_DATE_FIELD; negative sends before the date
+          description: UNTIL_DATE_FIELD; the distance before/after the field's date (BEFORE and AFTER); negative also means before
+        if_date_passed:
+          type: string
+          enum:
+          - CONTINUE
+          - EXIT
+          default: CONTINUE
+          description: UNTIL_DATE_FIELD; when the target date has already passed as the contact arrives
         timeout_seconds:
           type: integer
           format: int64
@@ -2312,6 +2473,68 @@ components:
             to_hour:
               type: integer
               format: int32
+    SplitConfig:
+      type: object
+      required:
+      - mode
+      properties:
+        mode:
+          type: string
+          enum:
+          - EVEN
+          - PERCENT
+          - TEST
+          - UNTIL
+          description: |
+            EVEN spreads contacts over `branches` equally. PERCENT uses `branches[].percent`. TEST spreads evenly
+            until `test.until_date` or `test.until_count` contacts have been split, then sends everyone down the
+            winning path (the one whose contacts best met `test.winner_conditions`). UNTIL sends everyone to
+            path A until `until_date` or `until_count`, then to path B.
+        test:
+          type: object
+          properties:
+            until_date:
+              type: string
+              format: date
+            until_count:
+              type: integer
+              format: int32
+            winner_conditions:
+              type: object
+              description: The condition tree that defines success (opened, clicked, converted, tag added ...)
+            winner_key:
+              type: string
+              readOnly: true
+              description: Set once the test has decided
+        until_date:
+          type: string
+          format: date
+        until_count:
+          type: integer
+          format: int32
+    GoalConfig:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        scope:
+          type: string
+          enum:
+          - BELOW
+          - ANYWHERE
+          default: BELOW
+          description: Contacts that may jump here when the conditions are met - only those below this step, or anywhere in the workflow
+        if_not_met:
+          type: string
+          enum:
+          - CONTINUE
+          - WAIT
+          default: CONTINUE
+          description: A contact that reaches this step in sequence without meeting the conditions continues past it, or waits here until it does
+        track:
+          type: boolean
+          description: Record a goal event (crm/marketing conversions report) when a contact meets it
     WorkflowSteps:
       type: object
       required:
@@ -2368,8 +2591,53 @@ components:
       enum:
       - ONCE
       - MULTIPLE
+      - CONCURRENT
       - RESTART
-      description: ONCE enrols a contact at most once ever; MULTIPLE allows a new enrolment after the previous ends; RESTART stops the active enrolment and begins again
+      description: |
+        ONCE enrols a contact at most once ever; MULTIPLE allows a new enrolment only after the previous one has
+        exited; CONCURRENT starts a new enrolment every time a trigger fires, even while one is active; RESTART
+        stops the active enrolment and begins again.
+    ExitRules:
+      type: object
+      description: When an enrolment ends early. Reaching END (or the last step) always ends it.
+      properties:
+        on_unsubscribe:
+          type: boolean
+          description: The contact unsubscribes from any message this workflow sent
+        on_conversion:
+          type: boolean
+          description: Any conversion the workflow tracks (`tracking`) is recorded for the contact
+        on_goal_reached:
+          type: boolean
+          description: A GOAL (jump-to) step's conditions are met
+    WorkflowTrigger:
+      type: object
+      required:
+      - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        config:
+          type: object
+          description: |
+            Per type: SUBSCRIBED_TO_LIST {list_id?} (absent = any list), TAG_ADDED {tag}, FORM_SUBMITTED {form_id?},
+            MESSAGE_OPENED/CLICKED {campaign_id?|template_id?, link_url?}, SITE_VISIT {url_pattern}, CUSTOM_EVENT
+            {event_type, value?}, FIELD_CHANGE {field, to?}, SCORE_CHANGED {score_id, above?|below?}, DATE_FIELD
+            {field, offset_seconds, at_time?}, TIME_BASED {cron, timezone}, DEAL_* {pipeline_id?, stage_id?},
+            TASK_COMPLETED {task_type_id?, outcome?}, RSS_ITEM {feed_url}, WEBHOOK {secret_id}.
+        runs:
+          type: string
+          enum:
+          - ONCE
+          - MULTIPLE
+          default: ONCE
+          description: Fire once per contact for this trigger, or every time the event happens (subject to the workflow's reentry rule)
+        segment:
+          type: object
+          description: Optional condition tree; only contacts matching it enter through this trigger
     EnrolmentStatus:
       type: string
       enum:
@@ -2574,7 +2842,6 @@ components:
       - id
       - name
       - category
-      - trigger_type
       properties:
         id:
           type: string
@@ -2593,8 +2860,13 @@ components:
           - POST_PURCHASE
           - EVENT
           - INTERNAL
+        trigger_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/TriggerType'
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
+          deprecated: true
         step_count:
           type: integer
           format: int32

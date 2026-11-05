@@ -73,3 +73,64 @@ Message = sendable content with sender; template = starting layout. Ours merges 
 
 ## Not reachable on the trial / by API
 Forms, site tracking domains, goals, addresses, brandings details, saved responses, calendars: created in the UI; dumped when present.
+
+## Automation builder (UI only; nothing of this is in the v3 API) → `crm/automation`
+
+Walked 2026-11-05 in `/app/builder/1`. Each row is a dialog as the product shows it; "ours" is where it landed in the
+spec that day.
+
+### Workflow-level settings (side panel → Settings)
+| Theirs | Ours |
+|---|---|
+| Description | `Workflow.description` |
+| "Track the progress": add to Business Goal / add Conversion | `Workflow.tracking {goal_id, conversion_id}` |
+| "A contact can enter": only once / any number of times / only after they have exited | `ReentryRule` ONCE / CONCURRENT / MULTIPLE (+ our RESTART) |
+| "Contacts exit when": reach the end (always), unsubscribe from any email in the automation, any tracked conversion occurs | `Workflow.exit_rules {on_unsubscribe, on_conversion, on_goal_reached}` |
+| "If a contact unsubscribes from an email": the lists associated to a trigger or action / all lists | `Workflow.unsubscribe_scope` TRIGGER_LISTS / ALL_LISTS (+ NONE) |
+| "User groups who can access": admin only / groups | `Workflow.access_group_ids[]` |
+| Side panel tabs: Activity logs (per action, AI summaries), Messages (every message in this automation) | activity = enrolment step records; messages = `/templates?kind=AUTOMATION&workflow_id=` |
+| "Add contacts to this automation": specific contacts (test/replay) or a segment (bulk) | `POST /workflows/{id}/enrol {contact_ids[]|segment_id}` exists |
+
+### Start triggers
+| Theirs | Ours |
+|---|---|
+| Several triggers, "Add another start trigger" | `Workflow.triggers[]` |
+| Per trigger: Runs once / multiple times | `WorkflowTrigger.runs` |
+| Per trigger, Advanced: "Segment the contacts entering this automation" (condition tree) | `WorkflowTrigger.segment` |
+| Subscribes to a list: Any list / a list | `config.list_id` absent = any |
+
+### Step dialogs
+| Step | Options | Ours |
+|---|---|---|
+| Wait | (1) a set period: N minutes/hours/days/weeks; (2) until a specific day and/or time: any-or-given month, day, year, time, "in the contact's time zone" or account's; (3) until a custom date field matches: field, on/before/after the field's date, and "if the date has already passed: continue / exit"; (4) until specific conditions are met: condition tree, "from a saved segment", optional "continue if not met within a period" | `WaitConfig.mode` DURATION / UNTIL_DATETIME (`until` or `until_pattern`) / UNTIL_DATE_FIELD (`relation`, `if_date_passed`) / UNTIL_CONDITION (`timeout_seconds`) |
+| If/Else | the same condition tree; yes/no branches | `conditions`, `yes_step_id`, `no_step_id` |
+| Split | Split paths: evenly across N paths, or by percentage. Split test: until a date or until N contacts split, N paths, winner conditions. Split until: everyone to path A until a date or N contacts, then B | `SplitConfig.mode` EVEN / PERCENT / TEST / UNTIL |
+| Go to | pick any action in the automation; adding it **removes every action below it** (terminal for the branch) | `StepKind.GOTO`, `goto_step_id`, no `next_step_id` |
+| Jump To (formerly Goal) | name; conditions; "when this action is below the contact's position / anywhere"; "if the contact does not meet the conditions: continue anyway / wait until met"; add tracking | `StepKind.GOAL` + `GoalConfig {scope, if_not_met, track}` |
+| Start / End another automation | pick automation | `START_WORKFLOW` / `STOP_WORKFLOW {workflow_id}` |
+| Webhook | URL only (payload is the contact) | `CALL_WEBHOOK {url}` |
+| Format data | copy field values; add/remove time from a date field; extract phone numbers or URLs; perform math; capitalize a field | `FORMAT_DATA {op ...}` |
+| AI Actions Library | AI agents as steps | deferred |
+| Send an email | create new (scratch/template) / start from an existing email (past campaign or this automation) / save and design later | `SEND_MESSAGE {template_id}`; "design later" = a step with no template (graph validation TEMPLATE_KIND warns, workflow cannot activate) |
+| Send a direct 1:1 email | plain text through a connected account | `SEND_1TO1_EMAIL` (v1: sender identity + user reply-to) |
+| Send a transactional email | needs a Postmark connection; message settings | `SEND_TRANSACTIONAL` on our own transactional templates |
+| Send an internal notification email | subject (merge fields), send to (up to 5 addresses), from (a verified sender), include "a link to the contact and contact's field values", rich-text body, preview | `INTERNAL_NOTIFICATION {subject, to[], from_sender_id, include_contact_link, body}` |
+| Start a WhatsApp flow / SMS | paywalled on the trial | deferred / SMS via outreach channel |
+| Subscribe / Unsubscribe | one or more lists | `{list_ids[]}` |
+| Convert | pick a conversion (or create one inline) | `CONVERT {conversion_id}` |
+| Update a contact | field values | `UPDATE_FIELD` |
+| Add / remove a tag, add a note | — | exist |
+| Add a task (new) | title, description, task type, assign to (account owner / user), due after N day(s) | `CREATE_TASK` |
+| Adjust a contact score | needs a contact score to exist ("add a score" inline) | `ADJUST_SCORE {score_id, points}` |
+| Archive a contact | — | `ARCHIVE_CONTACT` |
+| CRM: add a deal; update title / status / owner / value / stage / custom field; add a deal task; add a deal note; complete a deal task; adjust a deal score; update an account field; add an account note; update an account owner; add contact to account | `CREATE_DEAL`, `UPDATE_DEAL_*`, `CREATE_TASK {deal: true}`, `ADD_DEAL_NOTE`, `COMPLETE_TASK`, `ADJUST_DEAL_SCORE`, `UPDATE_ACCOUNT_FIELD`, `ADD_ACCOUNT_NOTE`, `UPDATE_ACCOUNT_OWNER`, `ADD_TO_ACCOUNT` |
+
+Condition tree vocabulary on the trial (wait / if-else / jump-to / split-test / trigger segment): contact details
+(email, email domain, first name, last name), contact list status (subscribed, not subscribed, unsubscribed from a
+list), custom contact fields, actions (submitted form), predictive geography / attribution (paywalled). Operators
+shown: Is (+ the usual negations and comparisons per field type). Condition groups AND/OR, and "add conditions from a
+saved segment". Our `ConditionGroup` (crm/contacts) is a superset: tags, site visits, engagement, deals, scores.
+
+Canvas: a note per step (the "1" badge), per-step stats on email steps (sent / open rate / click rate), draft-campaign
+warnings beside email steps, minimap, zoom, export image; a graph-level validity (Active cannot be switched on with an
+undesigned email).

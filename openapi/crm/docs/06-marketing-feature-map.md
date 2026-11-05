@@ -53,7 +53,14 @@
 | Action: **internal notification email** (to staff, no consent) | `NOTIFY` | in spec, make it explicit |
 | Action: start a WhatsApp flow | — | defer |
 | Action: wait, if/else, split | step kinds | in spec |
-| Action: **go to** (jump within graph) | only `GOAL` | **add `GOTO` step** |
+| Action: **go to** (jump within graph; terminal for its branch) | `GOTO` step | in spec (2026-11-05) |
+| Action: **Jump To** (the renamed Goal: scope below/anywhere, continue-or-wait if not met, tracking) | `GOAL` + `GoalConfig` | in spec (2026-11-05) |
+| Action: complete a deal task, add contact to account, account note, account owner | `COMPLETE_TASK`, `ADD_TO_ACCOUNT`, `ADD_ACCOUNT_NOTE`, `UPDATE_ACCOUNT_OWNER` | in spec (2026-11-05) |
+| Action: format data (copy, date ±, extract phone/URL, math, capitalise) | `FORMAT_DATA` | in spec (2026-11-05), was deferred |
+| Workflow settings: entry (once / any / after exit), exit rules (unsubscribe, conversion), unsubscribe scope, access groups, tracking to goal/conversion | `Workflow.reentry/exit_rules/unsubscribe_scope/access_group_ids/tracking` | in spec (2026-11-05) |
+| Trigger: runs once / multiple, segment filter per trigger | `WorkflowTrigger.runs/segment` | in spec (2026-11-05) |
+| Wait: period / specific day-time pattern in contact tz / date field on-before-after with passed-date rule / conditions with timeout | `WaitConfig` | in spec (2026-11-05) |
+| Split: even / percent / test (winner by date or count) / until | `SplitConfig` | in spec (2026-11-05) |
 | Action: start / **end another automation** | `START_WORKFLOW` | **add `STOP_WORKFLOW` target** |
 | Action: webhook | `CALL_WEBHOOK` | in spec |
 | Action: format data | — | defer |
@@ -132,7 +139,7 @@
 ## 2. Curated v1 additions (ordered by shape change, then size)
 
 Shape changes:
-1. `crm/automation.Workflow.triggers[]` — several start triggers per workflow.
+1. ~~`crm/automation.Workflow.triggers[]` — several start triggers per workflow.~~ Done 2026-11-05, with the builder's step configs (shape-diff § Automation builder).
 2. `crm/pipeline` — multiple pipelines (`Pipeline` entity; stages belong to a pipeline; deal has `pipeline_id`).
 3. SMS as a first-class channel in `crm/outreach` — adapter contract, consent, keywords, quiet hours.
 
