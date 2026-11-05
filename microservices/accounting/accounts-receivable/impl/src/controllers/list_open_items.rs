@@ -27,7 +27,7 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         Ok(filters) => filters,
         Err(error) => return crate::http_support::ar_error(error),
     };
-    match crate::http_support::with_ar_transaction(&context, |executor| {
+    match crate::http_support::with_ar_snapshot_transaction(&context, |executor| {
         crate::ledger::list_open_items(executor, &context, &filters)
     }) {
         Ok(items) => HttpJson::new(200, items),

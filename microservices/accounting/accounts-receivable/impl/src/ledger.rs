@@ -579,6 +579,10 @@ fn application_rows<E: LifeExecutor>(
 
 /// Upper bound for journal events loaded by a single summary read.
 const MAX_AGE_EVENTS: i64 = 100_000;
+/// Upper bound for application rows loaded by a single summary read.
+const MAX_AGE_APPLICATIONS: i64 = 100_000;
+/// `IN`-list chunk size: far below the driver's 16-bit bind-parameter limit.
+const ID_CHUNK: usize = 10_000;
 
 /// Parse the optional `as_of_date` calendar parameter (UTC); absent = today.
 pub(crate) fn parse_as_of_date(value: Option<&str>) -> Result<NaiveDate, ArError> {
@@ -737,55 +741,57 @@ fn as_of_applied_totals<E: LifeExecutor>(
         .iter()
         .map(|row| (row.id, row.invoice_id))
         .collect();
-    let applications = ApplicationEntity::find()
-        .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(
-            ApplicationColumn::InvoiceId
-                .is_in(overlay_to_document.keys().copied().collect::<Vec<Uuid>>()),
-        )
-        .all(executor)
-        .map_err(|error| ArError::Database(error.to_string()))?;
-    let application_to_document: HashMap<Uuid, Uuid> = applications
-        .iter()
-        .filter_map(|row| {
-            overlay_to_document
-                .get(&row.invoice_id)
-                .map(|document_id| (row.id, *document_id))
-        })
-        .collect();
+    // Chunked IN lists: every statement stays far below the driver's 16-bit
+    // bind-parameter limit regardless of how many overlays the scope holds.
+    let mut application_to_document: HashMap<Uuid, Uuid> = HashMap::new();
+    let overlay_ids: Vec<Uuid> = overlay_to_document.keys().copied().collect();
+    for chunk in overlay_ids.chunks(ID_CHUNK) {
+        let applications = ApplicationEntity::find()
+            .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(ApplicationColumn::InvoiceId.is_in(chunk.to_vec()))
+            .all(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        for row in applications {
+            if let Some(document_id) = overlay_to_document.get(&row.invoice_id) {
+                application_to_document.insert(row.id, *document_id);
+            }
+        }
+        if application_to_document.len() as i64 > MAX_AGE_APPLICATIONS {
+            return Err(ArError::Validation(format!(
+                "application rows exceed the {MAX_AGE_APPLICATIONS}-row read bound; narrow the scope"
+            )));
+        }
+    }
     if application_to_document.is_empty() {
         return Ok(HashMap::new());
     }
-    let events = EventEntity::find()
-        .filter(EventColumn::TenantId.eq(session.tenant_id.clone()))
-        .filter(
-            EventColumn::ApplicationId.is_in(
-                application_to_document
-                    .keys()
-                    .copied()
-                    .collect::<Vec<Uuid>>(),
-            ),
-        )
-        .filter(EventColumn::Kind.is_in(["APPLIED".to_string(), "REVERSED".to_string()]))
-        .filter(EventColumn::OccurredAt.lt(occurred_before))
-        .limit((MAX_AGE_EVENTS + 1) as u64)
-        .all(executor)
-        .map_err(|error| ArError::Database(error.to_string()))?;
-    if events.len() as i64 > MAX_AGE_EVENTS {
-        return Err(ArError::Validation(format!(
-            "application events exceed the {MAX_AGE_EVENTS}-row read bound; narrow the scope"
-        )));
-    }
     let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
-    for event in &events {
-        let Some(document_id) = application_to_document.get(&event.application_id) else {
-            continue;
-        };
-        let delta = match event.kind.as_str() {
-            "APPLIED" => event.amount,
-            _ => -event.amount,
-        };
-        *totals.entry(*document_id).or_insert(Decimal::ZERO) += delta;
+    let mut seen_events: i64 = 0;
+    let application_ids: Vec<Uuid> = application_to_document.keys().copied().collect();
+    for chunk in application_ids.chunks(ID_CHUNK) {
+        let events = EventEntity::find()
+            .filter(EventColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(EventColumn::ApplicationId.is_in(chunk.to_vec()))
+            .filter(EventColumn::Kind.is_in(["APPLIED".to_string(), "REVERSED".to_string()]))
+            .filter(EventColumn::OccurredAt.lt(occurred_before))
+            .all(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        seen_events += events.len() as i64;
+        if seen_events > MAX_AGE_EVENTS {
+            return Err(ArError::Validation(format!(
+                "application events exceed the {MAX_AGE_EVENTS}-row read bound; narrow the scope"
+            )));
+        }
+        for event in &events {
+            let Some(document_id) = application_to_document.get(&event.application_id) else {
+                continue;
+            };
+            let delta = match event.kind.as_str() {
+                "APPLIED" => event.amount,
+                _ => -event.amount,
+            };
+            *totals.entry(*document_id).or_insert(Decimal::ZERO) += delta;
+        }
     }
     Ok(totals)
 }
@@ -1017,24 +1023,34 @@ mod tests {
 
     #[test]
     fn parse_aging_query_validates_shapes() {
-        let today = Utc::now().date_naive();
+        // Bound the default date between reads taken around the call so a UTC
+        // midnight rollover between the clock read and the parse cannot flip
+        // an exact equality.
+        let before = Utc::now().date_naive();
         let (company, customer, as_of) =
             parse_aging_query(None, None, None).expect("all-optional defaults");
+        let after = Utc::now().date_naive();
         assert_eq!(company, None);
         assert_eq!(customer, None);
-        assert_eq!(as_of, today);
+        assert!(as_of >= before && as_of <= after, "default is today");
 
-        let uuid_text = Uuid::new_v4().to_string();
-        let (company, _customer, as_of) = parse_aging_query(
-            Some(uuid_text.as_str()),
-            Some(uuid_text.as_str()),
+        let company_text = Uuid::new_v4().to_string();
+        let customer_text = Uuid::new_v4().to_string();
+        let (company, customer, as_of) = parse_aging_query(
+            Some(company_text.as_str()),
+            Some(customer_text.as_str()),
             Some("2026-08-15"),
         )
         .expect("full query");
-        assert_eq!(company, Some(Uuid::parse_str(&uuid_text).expect("uuid")));
+        assert_eq!(company, Some(Uuid::parse_str(&company_text).expect("uuid")));
+        assert_eq!(
+            customer,
+            Some(Uuid::parse_str(&customer_text).expect("uuid"))
+        );
         assert_eq!(as_of, NaiveDate::from_ymd_opt(2026, 8, 15).expect("date"));
 
         assert!(parse_aging_query(Some("not-a-uuid"), None, None).is_err());
+        assert!(parse_aging_query(None, Some("not-a-uuid"), None).is_err());
         // The shipped spec example defect shape: a float where a date belongs.
         assert!(matches!(
             parse_aging_query(None, None, Some("1000.0")),
@@ -1486,7 +1502,7 @@ COMMIT;"
         let session = summary_session(&tenant, org, subject);
 
         let ask = |company: Option<Uuid>, who: Option<Uuid>, when: NaiveDate| {
-            crate::http_support::with_ar_transaction(&session, |executor| {
+            crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
                 aging_summary(executor, &session, company, who, when)
             })
         };
@@ -1511,6 +1527,13 @@ COMMIT;"
         let early_again = ask(Some(e1), None, date("2026-08-15")).expect("early again");
         assert_eq!(early, early_again);
 
+        // Cutoff BETWEEN the invoice posting (09-01) and its credit note
+        // posting (09-05): the note must not reduce the balance yet.
+        let between = ask(Some(e1), None, date("2026-09-03")).expect("between");
+        assert_eq!(between["current"], "200"); // Q, before its credit note
+        assert_eq!(between["bucket_1_30"], "100"); // P overdue 3d at 09-03
+        assert_eq!(between["total_outstanding"], "300");
+
         // Journal replay: the application (10-20) counts, its reversal
         // (10-25) does not — a row-based sum could not tell these apart.
         let mid = ask(Some(e1), None, date("2026-10-22")).expect("mid");
@@ -1531,7 +1554,7 @@ COMMIT;"
 
         // Second company (its own tenant): sees only its EUR document.
         let session_b = summary_session(&tenant_b, org, subject);
-        let other = crate::http_support::with_ar_transaction(&session_b, |executor| {
+        let other = crate::http_support::with_ar_snapshot_transaction(&session_b, |executor| {
             aging_summary(executor, &session_b, None, None, date("2026-11-01"))
         })
         .expect("e2 summary");
@@ -1671,7 +1694,7 @@ COMMIT;"
 
         let session = summary_session(&tenant, org, subject);
 
-        let summary = crate::http_support::with_ar_transaction(&session, |executor| {
+        let summary = crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
             aging_summary(executor, &session, Some(entity), None, today)
         })
         .expect("summary today");
@@ -1686,7 +1709,7 @@ COMMIT;"
             limit: MAX_LIMIT,
             ..Default::default()
         };
-        let listed = crate::http_support::with_ar_transaction(&session, |executor| {
+        let listed = crate::http_support::with_ar_snapshot_transaction(&session, |executor| {
             list_open_items(executor, &session, &filters)
         })
         .expect("open items GBP");

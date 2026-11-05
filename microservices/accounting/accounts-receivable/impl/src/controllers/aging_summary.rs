@@ -20,7 +20,7 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         Ok(scope) => scope,
         Err(error) => return crate::http_support::ar_error(error),
     };
-    match crate::http_support::with_ar_transaction(&context, |executor| {
+    match crate::http_support::with_ar_snapshot_transaction(&context, |executor| {
         crate::ledger::aging_summary(executor, &context, company_id, customer_id, as_of)
     }) {
         Ok(summary) => HttpJson::new(200, summary),
