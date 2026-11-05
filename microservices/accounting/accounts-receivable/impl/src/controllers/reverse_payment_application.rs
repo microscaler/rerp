@@ -7,7 +7,7 @@ use serde_json::Value;
 
 #[handler(ReversePaymentApplicationController)]
 pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
-    let context = match crate::http_support::identity_context(request.jwt_claims.as_ref()) {
+    let context = match crate::http_support::identity_write_context(request.jwt_claims.as_ref()) {
         Ok(context) => context,
         Err(response) => return response,
     };

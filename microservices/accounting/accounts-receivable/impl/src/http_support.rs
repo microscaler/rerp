@@ -36,6 +36,31 @@ pub fn identity_context(claims: Option<&Value>) -> Result<SessionContext, HttpJs
     })
 }
 
+/// Identity gate for accounts-receivable mutations (Epic F2 write paths):
+/// authentication alone is not enough — the exact write permission must be
+/// granted, mirroring the GL `identity_write_context` discipline. RLS keeps
+/// the row scope honest; this keeps the PRINCIPAL honest.
+pub fn identity_write_context(claims: Option<&Value>) -> Result<SessionContext, HttpJson<Value>> {
+    let context = identity_context(claims)?;
+    if !can_write_receivables(&context) {
+        return Err(HttpJson::new(
+            403,
+            json!({
+                "code": "insufficient_permission",
+                "message": "The authenticated identity cannot modify accounts receivable"
+            }),
+        ));
+    }
+    Ok(context)
+}
+
+fn can_write_receivables(context: &SessionContext) -> bool {
+    context
+        .permissions
+        .iter()
+        .any(|permission| permission == "accounting:invoice:write")
+}
+
 pub fn with_ar_transaction<T>(
     context: &SessionContext,
     operation: impl FnOnce(&ExclusivePrimaryLifeExecutor<'_>) -> Result<T, ArError>,
@@ -86,4 +111,59 @@ pub fn ar_error(error: ArError) -> HttpJson<Value> {
         }
     };
     HttpJson::new(status, json!({ "code": code, "message": message }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use lifeguard::SessionContext;
+    use uuid::Uuid;
+
+    fn context(permissions: &[&str]) -> SessionContext {
+        SessionContext {
+            tenant_id: "hauliage".to_string(),
+            subject_id: Uuid::nil(),
+            organization_id: Uuid::nil(),
+            session_id: "session-1".to_string(),
+            roles: vec!["billing".to_string()],
+            permissions: permissions.iter().map(|p| (*p).to_string()).collect(),
+            user_type: Some("service".to_string()),
+            org_type: Some("shipper".to_string()),
+        }
+    }
+
+    #[test]
+    fn write_permission_is_exact_and_separate_from_read() {
+        // GL precedent: a read-capable principal cannot mutate receivables.
+        assert!(can_write_receivables(&context(&[
+            "accounting:invoice:write"
+        ])));
+        assert!(!can_write_receivables(&context(&[
+            "accounting:ledger:read"
+        ])));
+        assert!(can_write_receivables(&context(&[
+            "accounting:ledger:read",
+            "accounting:invoice:write"
+        ])));
+        assert!(!can_write_receivables(&context(&[])));
+    }
+
+    #[test]
+    fn claims_without_write_permission_are_rejected() {
+        let claims = serde_json::json!({
+            "sub": "a1000001-0001-4000-8000-000000000004",
+            "user_id": "a1000001-0001-4000-8000-000000000004",
+            "sid": "session-1",
+            "tenant_id": "hauliage",
+            "org_id": "b2000002-0002-4000-8000-000000000002",
+            "user_type": "service",
+            "https://sesame-idam.dev/claims": {
+                "tenant": "hauliage",
+                "roles": ["billing"],
+                "permissions": ["accounting:ledger:read"]
+            }
+        });
+        assert!(identity_write_context(Some(&claims)).is_err());
+        assert!(identity_write_context(None).is_err());
+    }
 }

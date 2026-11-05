@@ -289,7 +289,13 @@ fn last_payment_stamp<E: LifeExecutor>(
         .filter(ApplicationColumn::InvoiceId.eq(overlay_row_id))
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    let latest = rows.into_iter().max_by_key(|row| (row.applied_at, row.id));
+    // Only ACTIVE allocations stamp the cache: reversal keeps the pair
+    // row (applied_amount = 0) with its original applied_at, and a
+    // reversed row must not masquerade as the document's last payment.
+    let latest = rows
+        .into_iter()
+        .filter(|row| row.applied_amount > Decimal::ZERO)
+        .max_by_key(|row| (row.applied_at, row.id));
     Ok(latest.map_or((None, None), |row| {
         (Some(row.applied_at.date()), Some(row.applied_amount))
     }))

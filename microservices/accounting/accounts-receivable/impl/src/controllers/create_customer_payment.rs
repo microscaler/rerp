@@ -7,14 +7,16 @@ use serde_json::Value;
 
 #[handler(CreateCustomerPaymentController)]
 pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
-    let context = match crate::http_support::identity_context(request.jwt_claims.as_ref()) {
+    let context = match crate::http_support::identity_write_context(request.jwt_claims.as_ref()) {
         Ok(context) => context,
         Err(response) => return response,
     };
     let query = &request.data;
-    let auto_apply = query.auto_apply.unwrap_or(false);
     let result = crate::http_support::with_ar_transaction(&context, |executor| {
-        let payment = crate::payments::create_payment(
+        // `auto_apply` rides into the command itself (and into its idempotency
+        // fingerprint): the FIFO pass runs only on a fresh creation, never
+        // on a replay that would silently consume newly opened items.
+        crate::payments::create_payment(
             executor,
             &context,
             &query.idempotency_key,
@@ -26,17 +28,8 @@ pub fn handle(request: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             query.company_id.as_deref(),
             query.reference_number.as_deref(),
             query.notes.as_deref(),
-        )?;
-        if auto_apply {
-            // FIFO allocation over the customer's open items, contract axis.
-            crate::applications::auto_apply_fifo(
-                executor,
-                &context,
-                payment["id"].as_str().unwrap_or_default(),
-            )
-        } else {
-            Ok(payment)
-        }
+            query.auto_apply.unwrap_or(false),
+        )
     });
     match result {
         Ok(payment) => HttpJson::new(201, payment),

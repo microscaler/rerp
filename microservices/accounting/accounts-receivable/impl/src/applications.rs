@@ -294,6 +294,10 @@ pub fn create_payment_application<E: LifeExecutor>(
     let amount = parse_positive_amount(applied_amount, "applied_amount")?;
     let payment = find_payment(executor, session, payment_id)?;
     payment_lock(executor, payment.id)?;
+    // Reload the receipt under the lock: a concurrent allocation on the
+    // same receipt commits first, so the unapplied guard and the totals
+    // write act on committed truth (no lost update on applied/unapplied).
+    let payment = find_payment(executor, session, payment_id)?;
     require_applicable(&payment)?;
     if amount > payment.unapplied_amount {
         return Err(ArError::Conflict(
@@ -387,6 +391,9 @@ pub fn auto_apply_fifo<E: LifeExecutor>(
 ) -> Result<Value, ArError> {
     let payment = find_payment(executor, session, payment_id)?;
     payment_lock(executor, payment.id)?;
+    // Reload under the lock before spending unapplied balance (same rule
+    // as the manual allocation path).
+    let payment = find_payment(executor, session, payment_id)?;
     require_applicable(&payment)?;
     let mut remaining = payment.unapplied_amount;
     if remaining <= Decimal::ZERO {
@@ -430,9 +437,13 @@ pub fn auto_apply_fifo<E: LifeExecutor>(
     } else {
         payment
     };
+    // Stamp derived from stored facts (like the replay path reads them),
+    // never from the in-memory clock: a fresh creation and its idempotent
+    // replay must answer value-for-value.
+    let stamps = crate::payments::last_applied_stamps(executor, session, &[updated.id])?;
     Ok(crate::payments::payment_json_stamped(
         &updated,
-        (allocated > Decimal::ZERO).then_some(now),
+        stamps.get(&updated.id).copied(),
     ))
 }
 
@@ -451,6 +462,25 @@ pub fn reverse_payment_application<E: LifeExecutor>(
 ) -> Result<Value, ArError> {
     let id = parse_uuid(application_id, "id")?;
     let scope = ledger::resolve_scope_entities(executor, session, None)?;
+    // Pre-lock read exists only to resolve scope and locate the payment
+    // to lock; every MUTATED snapshot is reloaded after payment_lock.
+    let row = ApplicationEntity::find()
+        .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+        .filter(ApplicationColumn::Id.eq(id))
+        .find_one(executor)
+        .map_err(|error| ArError::Database(error.to_string()))?
+        .filter(|row| scope.contains(&row.legal_entity_id))
+        .ok_or(ArError::NotFound)?;
+    let fingerprint = crate::payments::reverse_fingerprint(
+        session.tenant_id.as_str(),
+        row.legal_entity_id,
+        id,
+        reason,
+    );
+    payment_lock(executor, row.payment_id)?;
+    // Reload under the lock: a concurrent reversal of THIS row (or of a
+    // sibling row on the same payment) commits before we are allowed to
+    // proceed, so the guard and the totals below act on committed truth.
     let row = ApplicationEntity::find()
         .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(ApplicationColumn::Id.eq(id))
@@ -464,18 +494,15 @@ pub fn reverse_payment_application<E: LifeExecutor>(
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?
         .ok_or(ArError::NotFound)?;
-    let fingerprint = crate::payments::reverse_fingerprint(
-        session.tenant_id.as_str(),
-        row.legal_entity_id,
-        id,
-        reason,
-    );
+    // Idempotency lookup INSIDE the lock: a matching retry that queued on
+    // payment_lock now sees the first request's committed record and
+    // re-serves it, instead of acting on stale snapshots and surfacing a
+    // duplicate-key 409 (or a bogus "already reversed").
     if let Some(record) =
         crate::payments::find_idempotency(executor, session, row.legal_entity_id, idempotency_key)?
     {
         return crate::payments::replay_payment(executor, session, &record, &fingerprint);
     }
-    payment_lock(executor, payment.id)?;
     let overlay = OverlayEntity::find()
         .filter(OverlayColumn::TenantId.eq(session.tenant_id.clone()))
         .filter(OverlayColumn::Id.eq(row.invoice_id))
@@ -587,7 +614,7 @@ mod tests {
     }
 
     // -------------------------------------------------------------------
-    // Live acceptance (disposable DB, migrations 0001..0008, psql on PATH).
+    // Live acceptance (disposable DB, migrations 0001..0009, psql on PATH).
     // Helpers duplicate the payments suite shape so this file is runnable
     // standalone, same as the ledger/projection suites.
     // -------------------------------------------------------------------
@@ -719,6 +746,7 @@ mod tests {
                 Some(entity),
                 None,
                 Some("applications-acceptance"),
+                false,
             )
         })
     }
@@ -741,7 +769,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires the disposable accounting DB (migrations 0001..0008) and psql on PATH; run live tests serially (--test-threads=1)"]
+    #[ignore = "requires the disposable accounting DB (migrations 0001..0009) and psql on PATH; run live tests serially (--test-threads=1)"]
     fn live_applications_allocate_guard_journal_and_fifo() {
         use chrono::TimeDelta;
         // One tenant, one entity: doc A (100, due future) and doc B (60,
