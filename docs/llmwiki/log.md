@@ -1004,3 +1004,26 @@ ref-rewritten) the whole accounting suite — including
   moves nothing, double-reverse + reason-fingerprint 409, foreign 404);
   rerun-safe; clippy + pre-commit clean.
 - Next: F2d receipts identity acceptance suite (epic closer).
+
+## [2026-11-05] contribute | F2d acceptance suite live — Epic F2 complete (Epic F2 4/4)
+
+- PR #147 (feat/accounting-f2d-receipts-identity), tests-only. No contract
+  or impl change: live_f2d_receipt_identity_acceptance pins the epic thesis
+  invoice + credit + receipt + allocation + outstanding value-for-value
+  across read path (composed items), cache (projection refreshed==0,
+  honest drift None without GL account), and events journal (per-pair
+  net(APPLIED-REVERSED)==rows; per-receipt applied+unapplied==amount).
+- Covers full/partial/multi-doc receipts, over-balance + over-payment 409
+  with reason assertions, reversal reopen + replay stability (CURRENT
+  state, not historical snapshot — asserted honestly), cross-tenant
+  invisibility with identical customer uuid; rerun-safe twice; distinct
+  run suffix isolates uuid slots from the sibling F2b scenario.
+- #146 review round (pre-F2d): CodeRabbit 8 findings all valid — reload
+  snapshots AFTER advisory locks (apply/FIFO/reverse — a class missed by
+  #145's review), idempotency lookup inside the lock, write-permission
+  gate on AR mutations, raw+auto_apply+presence in the fingerprint, FIFO
+  inside create (replays never allocate), sequence lock before the
+  idempotency window, 0009 NOT VALID + separate VALIDATE. Merged d89725bb.
+- Epic F2 merged state: contracts + migrations 0007-0009 + live suites
+  (21 units + 8 live, serial). Next per BUILDOUT: Epic F3 (aging +
+  statements) or Epic G; awaiting priority.

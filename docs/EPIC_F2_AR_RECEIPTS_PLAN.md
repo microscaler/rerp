@@ -110,6 +110,13 @@ open items, and the overlay projection/agreement suite this epic builds on.
   across the read path, the cache, and the events journal; over-balance and
   over-payment applications rejected 409; reversal restores balances and leaves
   the audit trail; cross-tenant invisibility; rerun-safe idempotent replay.
+- Delivered as PR #147 (tests-only): `live_f2d_receipt_identity_acceptance`
+  pins per-document identity strings exact (invoice − credit == applied +
+  outstanding == journal net) before and after reversal, projection
+  `refreshed == 0` after every mutation, honest `ar_control_drift = None`
+  without a GL control account, and idempotent replays asserted as stable
+  re-serve of CURRENT state (not a historical snapshot). Suite: 21 units +
+  8 live, serial, rerun-safe. On merge Epic F2 is COMPLETE.
 
 ## Risks carried per PR
 
