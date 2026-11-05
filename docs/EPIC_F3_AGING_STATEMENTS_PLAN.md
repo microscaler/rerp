@@ -50,6 +50,7 @@ overlay/projection machinery (PRs #134, #135, #141).
 ### F3-plan — this document + BUILDOUT pointer + wiki log (2026-11-05)
 
 ### F3a — aging_summary report, fact-derived and as-of reproducible — DONE (PR pending, commit 5ab77d2e)
+- Known exception: `write_off_amount` has no effective date, so a write-off counts at every as-of date. Re-running an earlier `as_of_date` after a later write-off returns a smaller balance.
 - Implement `aging_summary` (read axis, no migration): resolve scope
   (company_id narrows within org, never escapes — read-path rule), reuse
   `chargeback_documents` + `credit_note_totals` with as-of `posted_at`
