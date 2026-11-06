@@ -8,7 +8,9 @@ use brrtrouter_macros::handler;
 #[handler(CreateStageController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
-        color: Some(42),
+        card_fields: Some(vec![]),
+        color: Some("example".to_string()),
+        deal_order: Some("example".to_string()),
         description: Some("example".to_string()),
         fold: Some(true),
         id: "example".to_string(),
@@ -16,8 +18,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         is_won: Some(true),
         lead_count: Some(42),
         name: "example".to_string(),
+        pipeline_id: Some("example".to_string()),
         probability: 42,
         requirements: Some("example".to_string()),
+        rotting_days: Some(42),
         rotting_threshold_days: Some(42),
         sequence: 42,
         team_ids: Some(vec![]),

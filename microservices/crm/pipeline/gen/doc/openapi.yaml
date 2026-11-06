@@ -5,7 +5,8 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: Pipeline
   version: v1.0.0
-  description: Pipeline service — leads, opportunities, stages, lead conversion, pipeline summary.
+  description: Pipeline service - pipelines and stages, deals (contacts with roles, notes, files, activity, 1:1 email), leads
+    (the earlier Odoo-shaped lead model, still served), lead conversion, pipeline summary.
   x-api-version: CRM Pipeline API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -21,91 +22,97 @@ info:
     openapi_version: 3.1.0
     brrtrouter_version: latest
 servers:
-- url: http://localhost:10352/api/v1/crm/pipeline
-  description: Local development (direct to service, port from port-registry)
-- url: /api/v1/crm/pipeline
-  description: Pipeline API
+  - url: http://localhost:10352/api/v1/crm/pipeline
+    description: Local development (direct to service, port from port-registry)
+  - url: /api/v1/crm/pipeline
+    description: Pipeline API
 tags:
-- name: lead-conversion
-  description: Lead-to-contact/account conversion
-- name: lead-deduplication
-  description: Lead duplicate detection and merge
-- name: lead-stages
-  description: Lead stage transitions
-- name: leads
-  description: Lead and opportunity lifecycle
-- name: pipeline-analytics
-  description: Pipeline summary and weighted forecasting
-- name: pipeline-stage
-  description: Pipeline stage definitions
-- name: stages
-  description: Pipeline stage management
+  - name: lead-conversion
+    description: Lead-to-contact/account conversion
+  - name: lead-deduplication
+    description: Lead duplicate detection and merge
+  - name: lead-stages
+    description: Lead stage transitions
+  - name: leads
+    description: Lead and opportunity lifecycle
+  - name: pipeline-analytics
+    description: Pipeline summary and weighted forecasting
+  - name: pipeline-stage
+    description: Pipeline stage definitions
+  - name: stages
+    description: Pipeline stage management
+  - name: pipelines
+    description: Pipelines, their summary and settings
+  - name: deals
+    description: 'Deals: contacts and roles, stage and status, notes, files, activity, 1:1 email'
+  - name: deal-roles
+    description: Roles a contact plays on a deal
 paths:
   /leads:
     get:
       operationId: list_leads
       summary: List leads and opportunities
       tags:
-      - leads
+        - leads
       parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 100
-          default: 20
-      - name: search
-        in: query
-        schema:
-          type: string
-      - name: filter_type
-        in: query
-        schema:
-          type: string
-          enum:
-          - LEAD
-          - OPPORTUNITY
-      - name: filter_stage_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      - name: filter_user_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      - name: filter_team_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      - name: filter_probability_gt
-        in: query
-        schema:
-          type: number
-          format: float
-      - name: filter_active
-        in: query
-        schema:
-          type: boolean
-      - name: filter_won_status
-        in: query
-        schema:
-          type: string
-          enum:
-          - PENDING
-          - WON
-          - LOST
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: filter_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - LEAD
+              - OPPORTUNITY
+        - name: filter_stage_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: filter_probability_gt
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: filter_active
+          in: query
+          schema:
+            type: boolean
+        - name: filter_won_status
+          in: query
+          schema:
+            type: string
+            enum:
+              - PENDING
+              - WON
+              - LOST
       responses:
         '200':
           description: List of leads
@@ -116,20 +123,19 @@ paths:
               examples:
                 default:
                   items:
-                  - &id001
-                    id: 00000000-0000-0000-0000-000000000001
-                    name: John Doe
-                    email: john@example.com
-                    phone: +1-555-0123
-                    company: Acme Corp
-                    status: new
-                    stage: discovery
-                    score: 45
-                    source: website
-                    assigned_to: 00000000-0000-0000-0000-000000000010
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                    properties: {}
+                    - id: 00000000-0000-0000-0000-000000000001
+                      name: John Doe
+                      email: john@example.com
+                      phone: +1-555-0123
+                      company: Acme Corp
+                      status: new
+                      stage: discovery
+                      score: 45
+                      source: website
+                      assigned_to: 00000000-0000-0000-0000-000000000010
+                      created_at: '2024-01-15T10:30:00Z'
+                      updated_at: '2024-01-15T10:30:00Z'
+                      properties: {}
                   total: 1
                   page: 1
                   per_page: 20
@@ -142,7 +148,7 @@ paths:
         '404':
           description: Resource not found
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Get leads associated with a campaign
       x-operation-id: get_leads_list
       x-controller: rerp_crm::pipeline::controller::leads
@@ -151,7 +157,7 @@ paths:
       operationId: create_lead
       summary: Create a new lead or opportunity
       tags:
-      - leads
+        - leads
       requestBody:
         required: true
         content:
@@ -159,7 +165,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateLeadRequest'
             examples:
-              default: &id002
+              default:
                 name: John Doe
                 email: john@example.com
                 phone: +1-555-0123
@@ -174,7 +180,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Lead'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000001
+                  name: John Doe
+                  email: john@example.com
+                  phone: +1-555-0123
+                  company: Acme Corp
+                  status: new
+                  stage: discovery
+                  score: 45
+                  source: website
+                  assigned_to: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+                  properties: {}
         '400':
           description: Invalid request
         '401':
@@ -188,7 +207,7 @@ paths:
         '404':
           description: Not found
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Get leads associated with a campaign
       x-operation-id: post_leads_list
       x-controller: rerp_crm::pipeline::controller::leads
@@ -198,14 +217,14 @@ paths:
       operationId: get_lead
       summary: Get lead by id
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Lead details
@@ -214,7 +233,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Lead'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000001
+                  name: John Doe
+                  email: john@example.com
+                  phone: +1-555-0123
+                  company: Acme Corp
+                  status: new
+                  stage: discovery
+                  score: 45
+                  source: website
+                  assigned_to: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+                  properties: {}
         '404':
           description: Not found
         '401':
@@ -222,7 +254,7 @@ paths:
         '500':
           description: Internal server error
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Get leads by ID
       x-operation-id: get_id_by_id
       x-controller: rerp_crm::pipeline::controller::leads::id
@@ -231,14 +263,14 @@ paths:
       operationId: update_lead
       summary: Update lead fields
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -246,7 +278,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateLeadRequest'
             examples:
-              default: *id002
+              default:
+                name: John Doe
+                email: john@example.com
+                phone: +1-555-0123
+                company: Acme Corp
+                source: website
         description: Update an existing lead
       responses:
         '200':
@@ -256,7 +293,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Lead'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000001
+                  name: John Doe
+                  email: john@example.com
+                  phone: +1-555-0123
+                  company: Acme Corp
+                  status: new
+                  stage: discovery
+                  score: 45
+                  source: website
+                  assigned_to: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+                  properties: {}
         '400':
           description: Invalid request
         '404':
@@ -284,7 +334,7 @@ paths:
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       x-brrtrouter-impl: true
       description: Update leads by ID
       x-operation-id: put_id_by_id
@@ -294,14 +344,14 @@ paths:
       operationId: delete_lead
       summary: Soft-delete lead
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Lead deleted
@@ -322,7 +372,7 @@ paths:
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Delete leads by ID
       x-operation-id: delete_id_by_id
       x-controller: rerp_crm::pipeline::controller::leads::id
@@ -332,14 +382,14 @@ paths:
       operationId: change_stage
       summary: Move lead to a new pipeline stage
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -347,7 +397,7 @@ paths:
             schema:
               $ref: '#/components/schemas/StageChangeRequest'
             examples:
-              default: &id003
+              default:
                 name: Discovery
                 order: 1
                 pipeline_id: 00000000-0000-0000-0000-000000000005
@@ -360,7 +410,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Lead'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000001
+                  name: John Doe
+                  email: john@example.com
+                  phone: +1-555-0123
+                  company: Acme Corp
+                  status: new
+                  stage: discovery
+                  score: 45
+                  source: website
+                  assigned_to: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+                  properties: {}
         '400':
           description: Invalid stage transition
         '404':
@@ -388,7 +451,7 @@ paths:
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       x-brrtrouter-impl: true
       description: Partially update leads by ID
       x-operation-id: patch_stage_by_id
@@ -399,14 +462,14 @@ paths:
       operationId: convert_lead
       summary: 'Convert a lead: it crosses into RERP as a customer'
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         description: Why the lead converted, and the billing details RERP needs
@@ -440,12 +503,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       x-brrtrouter-impl: true
-      description: Marks the lead won and publishes a signed conversion to RERP (ADR 003). Only a converted customer
-        crosses from the marketing funnel; RERP creates the customer (a CRM account) when it pulls the conversion, so
-        the crossing is asynchronous. Converting the same lead again republishes the same conversion and creates nothing
-        new.
+      description: Marks the lead won and publishes a signed conversion to RERP (ADR 003). Only a converted customer crosses
+        from the marketing funnel; RERP creates the customer (a CRM account) when it pulls the conversion, so the crossing
+        is asynchronous. Converting the same lead again republishes the same conversion and creates nothing new.
       x-operation-id: post_leads_convert
       x-controller: rerp_crm::pipeline::controller::leads::id::convert
       x-handler-name: leads_id_convert
@@ -454,7 +516,7 @@ paths:
       operationId: detect_duplicates
       summary: Detect duplicate leads by email/phone/name
       tags:
-      - leads
+        - leads
       requestBody:
         required: true
         content:
@@ -474,8 +536,8 @@ paths:
                   lead_id: 00000000-0000-0000-0000-000000000001
                   duplicates_found: 2
                   duplicate_ids:
-                  - 00000000-0000-0000-0000-000000000030
-                  - 00000000-0000-0000-0000-000000000031
+                    - 00000000-0000-0000-0000-000000000030
+                    - 00000000-0000-0000-0000-000000000031
                   confidence: 0.92
         '400':
           description: Invalid request
@@ -499,8 +561,8 @@ paths:
                 default:
                   is_duplicate: true
                   matches:
-                  - id: 00000000-0000-0000-0000-000000000004
-                    confidence: 0.95
+                    - id: 00000000-0000-0000-0000-000000000004
+                      confidence: 0.95
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '404':
@@ -508,7 +570,7 @@ paths:
         '409':
           description: Conflict - resource conflict or cannot complete action
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Create a new leads
       x-operation-id: post_detect-duplicates
       x-controller: rerp_crm::pipeline::controller::leads::detect-duplicates
@@ -518,14 +580,14 @@ paths:
       operationId: merge_leads
       summary: Merge two leads (keep one, archive other, combine data)
       tags:
-      - leads
+        - leads
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -533,7 +595,12 @@ paths:
             schema:
               $ref: '#/components/schemas/MergeLeadsRequest'
             examples:
-              default: *id002
+              default:
+                name: John Doe
+                email: john@example.com
+                phone: +1-555-0123
+                company: Acme Corp
+                source: website
         description: Merge duplicate leads
       responses:
         '200':
@@ -546,12 +613,12 @@ paths:
                 default:
                   primary_id: 00000000-0000-0000-0000-000000000002
                   merged_from:
-                  - 00000000-0000-0000-0000-000000000032
-                  - 00000000-0000-0000-0000-000000000033
+                    - 00000000-0000-0000-0000-000000000032
+                    - 00000000-0000-0000-0000-000000000033
                   fields_merged:
-                  - email
-                  - phone
-                  - company
+                    - email
+                    - phone
+                    - company
         '400':
           description: Invalid request
         '500':
@@ -582,7 +649,7 @@ paths:
         '409':
           description: Conflict - resource conflict or cannot complete action
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Perform an action on leads
       x-operation-id: post_leads_merge
       x-controller: rerp_crm::pipeline::controller::leads::id::merge
@@ -592,13 +659,13 @@ paths:
       operationId: pipeline_summary
       summary: Get pipeline summary grouped by stage
       tags:
-      - leads
+        - leads
       parameters:
-      - name: team_id
-        in: query
-        schema:
-          type: string
-          format: uuid
+        - name: team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Pipeline summary
@@ -609,14 +676,14 @@ paths:
               examples:
                 default:
                   items:
-                  - total_leads: 150
-                    stage_breakdown:
-                      discovery: 45
-                      qualified: 35
-                      proposal: 25
-                      negotiation: 30
-                    weighted_value: 375000
-                    forecast: 420000
+                    - total_leads: 150
+                      stage_breakdown:
+                        discovery: 45
+                        qualified: 35
+                        proposal: 25
+                        negotiation: 30
+                      weighted_value: 375000
+                      forecast: 420000
                   total: 1
                   page: 1
                   per_page: 20
@@ -629,7 +696,7 @@ paths:
         '500':
           description: Internal server error
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: List all pipeline
       x-operation-id: get_summary
       x-controller: rerp_crm::pipeline::controller::pipeline::summary
@@ -639,28 +706,28 @@ paths:
       operationId: list_stages
       summary: List pipeline stages ordered by sequence
       tags:
-      - stages
+        - stages
       parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        schema:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 100
-          default: 50
-      - name: filter_team_id
-        in: query
-        schema:
-          type: string
-          format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: filter_team_id
+          in: query
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: List of stages
@@ -671,13 +738,12 @@ paths:
               examples:
                 default:
                   items:
-                  - &id004
-                    id: 00000000-0000-0000-0000-000000000004
-                    name: Discovery
-                    order: 1
-                    pipeline_id: 00000000-0000-0000-0000-000000000005
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
+                    - id: 00000000-0000-0000-0000-000000000004
+                      name: Discovery
+                      order: 1
+                      pipeline_id: 00000000-0000-0000-0000-000000000005
+                      created_at: '2024-01-15T10:30:00Z'
+                      updated_at: '2024-01-15T10:30:00Z'
                   total: 1
                   page: 1
                   per_page: 20
@@ -690,7 +756,7 @@ paths:
         '500':
           description: Internal server error
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: List all stages
       x-operation-id: get_stages_list
       x-controller: rerp_crm::pipeline::controller::stages
@@ -699,7 +765,7 @@ paths:
       operationId: create_stage
       summary: Create a new pipeline stage
       tags:
-      - stages
+        - stages
       requestBody:
         required: true
         content:
@@ -707,7 +773,10 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateStageRequest'
             examples:
-              default: *id003
+              default:
+                name: Discovery
+                order: 1
+                pipeline_id: 00000000-0000-0000-0000-000000000005
         description: Create a new pipeline stage
       responses:
         '201':
@@ -717,7 +786,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id004
+                default:
+                  id: 00000000-0000-0000-0000-000000000004
+                  name: Discovery
+                  order: 1
+                  pipeline_id: 00000000-0000-0000-0000-000000000005
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '500':
@@ -731,7 +806,7 @@ paths:
         '404':
           description: Not found
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Create a new stages
       x-operation-id: post_stages_list
       x-controller: rerp_crm::pipeline::controller::stages
@@ -741,14 +816,14 @@ paths:
       operationId: get_stage
       summary: Get stage by id
       tags:
-      - stages
+        - stages
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Stage details
@@ -757,7 +832,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id004
+                default:
+                  id: 00000000-0000-0000-0000-000000000004
+                  name: Discovery
+                  order: 1
+                  pipeline_id: 00000000-0000-0000-0000-000000000005
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '404':
           description: Not found
         '401':
@@ -765,7 +846,7 @@ paths:
         '500':
           description: Internal server error
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Get stages by ID
       x-operation-id: get_id_by_id
       x-controller: rerp_crm::pipeline::controller::stages::id
@@ -774,14 +855,14 @@ paths:
       operationId: update_stage
       summary: Update stage fields
       tags:
-      - stages
+        - stages
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         required: true
         content:
@@ -789,7 +870,10 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateStageRequest'
             examples:
-              default: *id003
+              default:
+                name: Discovery
+                order: 1
+                pipeline_id: 00000000-0000-0000-0000-000000000005
         description: Update a pipeline stage
       responses:
         '200':
@@ -799,7 +883,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Stage'
               examples:
-                default: *id004
+                default:
+                  id: 00000000-0000-0000-0000-000000000004
+                  name: Discovery
+                  order: 1
+                  pipeline_id: 00000000-0000-0000-0000-000000000005
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
         '400':
           description: Invalid request
         '404':
@@ -827,7 +917,7 @@ paths:
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Update stages by ID
       x-operation-id: put_id_by_id
       x-controller: rerp_crm::pipeline::controller::stages::id
@@ -836,14 +926,14 @@ paths:
       operationId: delete_stage
       summary: Delete stage (only if no leads in it)
       tags:
-      - stages
+        - stages
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '204':
           description: Stage deleted
@@ -866,21 +956,1549 @@ paths:
         '401':
           description: Unauthorized - Invalid or missing authentication token
       security:
-      - bearerAuth: []
+        - bearerAuth: []
       description: Delete stages by ID
       x-operation-id: delete_id_by_id
       x-controller: rerp_crm::pipeline::controller::stages::id
       x-handler-name: stages_id
+  /pipelines:
+    get:
+      operationId: list_pipelines
+      summary: List pipelines
+      tags:
+        - pipelines
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPipeline'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: list_pipelines
+    post:
+      operationId: create_pipeline
+      summary: Create a pipeline
+      tags:
+        - pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelineRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: create_pipeline
+  /pipelines/{id}:
+    get:
+      operationId: get_pipeline
+      summary: Get a pipeline
+      tags:
+        - pipelines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: get_pipeline
+    put:
+      operationId: update_pipeline
+      summary: Replace a pipeline
+      tags:
+        - pipelines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelineRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: update_pipeline
+    patch:
+      operationId: patch_pipeline
+      summary: Update part of a pipeline
+      tags:
+        - pipelines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PipelineRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pipeline'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: patch_pipeline
+    delete:
+      operationId: delete_pipeline
+      summary: Delete a pipeline
+      tags:
+        - pipelines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: delete_pipeline
+  /pipelines/{id}/summary:
+    get:
+      operationId: get_pipeline_summary
+      summary: Open deals, value, weighted value, won this month, stalled, per stage
+      tags:
+        - pipelines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineSummary'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: get_pipeline_summary
+  /deals:
+    get:
+      operationId: list_deals
+      summary: List deals
+      tags:
+        - deals
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: pipeline_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: stage_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/DealStatus'
+        - name: owner_id
+          in: query
+          schema:
+            type: string
+        - name: contact_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: company_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: tag_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: stalled
+          in: query
+          schema:
+            type: boolean
+        - name: expected_close_from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: expected_close_to
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: value_min
+          in: query
+          schema:
+            type: number
+        - name: value_max
+          in: query
+          schema:
+            type: number
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - next_task_at
+              - value
+              - created_at
+              - updated_at
+              - expected_close_at
+              - title
+        - name: dir
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDeal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: list_deals
+    post:
+      operationId: create_deal
+      summary: Create a deal
+      tags:
+        - deals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: create_deal
+  /deals/{id}:
+    get:
+      operationId: get_deal
+      summary: Get a deal
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: get_deal
+    put:
+      operationId: update_deal
+      summary: Replace a deal
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDealRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: update_deal
+    patch:
+      operationId: patch_deal
+      summary: Update part of a deal
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDealRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: patch_deal
+    delete:
+      operationId: delete_deal
+      summary: Delete a deal
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: delete_deal
+  /deals/{id}/stage:
+    patch:
+      operationId: change_deal_stage
+      summary: Move a deal to a stage (or another pipeline); fires DEAL_STAGE_CHANGE / ENTERED_PIPELINE
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealStageChangeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: change_deal_stage
+  /deals/{id}/status:
+    patch:
+      operationId: change_deal_status
+      summary: Mark a deal won, lost or open again; WON emits the signed conversion (ADR 003) and fires DEAL_WON
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealStatusChangeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: change_deal_status
+  /deals/{id}/contacts:
+    post:
+      operationId: add_deal_contact
+      summary: Attach a contact with a role; the first one becomes primary
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealContact'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: add_deal_contact
+  /deals/{id}/contacts/{contact_id}:
+    patch:
+      operationId: update_deal_contact
+      summary: Change a contact's role or make it primary
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contact_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealContact'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: update_deal_contact
+    delete:
+      operationId: remove_deal_contact
+      summary: Detach a contact
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contact_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: remove_deal_contact
+  /deals/{id}/notes:
+    get:
+      operationId: list_deal_notes
+      summary: Notes on a deal, newest first
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNote'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: list_deal_notes
+    post:
+      operationId: add_deal_note
+      summary: Add a note
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: add_deal_note
+  /deals/{id}/notes/{note_id}:
+    patch:
+      operationId: update_deal_note
+      summary: Edit or pin a note
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: note_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: update_deal_note
+    delete:
+      operationId: delete_deal_note
+      summary: Delete a note
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: note_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: delete_deal_note
+  /deals/{id}/files:
+    get:
+      operationId: list_deal_files
+      summary: Files on a deal
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAttachment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: list_deal_files
+    post:
+      operationId: upload_deal_file
+      summary: Upload a file (multipart)
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: upload_deal_file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+  /deals/{id}/files/{file_id}:
+    delete:
+      operationId: delete_deal_file
+      summary: Delete a file
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: delete_deal_file
+  /deals/{id}/activity:
+    get:
+      operationId: list_deal_activity
+      summary: 'The deal''s timeline: changes, notes, files, tasks, emails, workflow actions'
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: kind
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityEntry'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: list_deal_activity
+  /deals/{id}/emails:
+    get:
+      operationId: list_deal_emails
+      summary: 1:1 emails on the deal (sent through connected mailboxes, and replies)
+      tags:
+        - deals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDealEmail'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: list_deal_emails
+    post:
+      operationId: send_deal_email
+      summary: Send a 1:1 email from the caller's connected mailbox, optionally from a saved response
+      tags:
+        - deals
+      description: 422 NO_CONNECTED_MAILBOX when the caller has none (crm/platform /mailboxes).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendDealEmailRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealEmail'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: send_deal_email
+  /deals/bulk:
+    post:
+      operationId: bulk_update_deals
+      summary: Move, assign, set status, tag or delete many deals
+      tags:
+        - deals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkDealRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                  skipped:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        deal_id:
+                          type: string
+                          format: uuid
+                        reason:
+                          type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deals
+      x-handler-name: bulk_update_deals
+  /deal-roles:
+    get:
+      operationId: list_deal_roles
+      summary: List deal roles
+      tags:
+        - deal-roles
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDealRole'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: list_deal_roles
+    post:
+      operationId: create_deal_role
+      summary: Create a deal role
+      tags:
+        - deal-roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealRoleRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealRole'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: create_deal_role
+  /deal-roles/{id}:
+    get:
+      operationId: get_deal_role
+      summary: Get a deal role
+      tags:
+        - deal-roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealRole'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: get_deal_role
+    put:
+      operationId: update_deal_role
+      summary: Replace a deal role
+      tags:
+        - deal-roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealRoleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealRole'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: update_deal_role
+    patch:
+      operationId: patch_deal_role
+      summary: Update part of a deal role
+      tags:
+        - deal-roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealRoleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealRole'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: patch_deal_role
+    delete:
+      operationId: delete_deal_role
+      summary: Delete a deal role
+      tags:
+        - deal-roles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::deal_roles
+      x-handler-name: delete_deal_role
+  /settings:
+    get:
+      operationId: get_deal_settings
+      summary: Deal settings and the win-probability readiness per pipeline
+      tags:
+        - pipelines
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: get_deal_settings
+    put:
+      operationId: update_deal_settings
+      summary: Update deal settings
+      tags:
+        - pipelines
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DealSettings'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+      x-controller: rerp_crm::pipeline::controller::pipelines
+      x-handler-name: update_deal_settings
 components:
   schemas:
     Lead:
       type: object
       required:
-      - id
-      - name
-      - type
-      - create_date
-      - active
+        - id
+        - name
+        - type
+        - create_date
+        - active
       properties:
         id:
           type: string
@@ -891,8 +2509,8 @@ components:
         type:
           type: string
           enum:
-          - LEAD
-          - OPPORTUNITY
+            - LEAD
+            - OPPORTUNITY
           description: LEAD = qualification, OPPORTUNITY = pipeline
         email_from:
           type: string
@@ -913,9 +2531,9 @@ components:
         title:
           type: string
           enum:
-          - MR
-          - MRS
-          - MME
+            - MR
+            - MRS
+            - MME
           description: Salutation
         function:
           type: string
@@ -938,10 +2556,10 @@ components:
         priority:
           type: string
           enum:
-          - LOW
-          - NORMAL
-          - HIGH
-          - URGENT
+            - LOW
+            - NORMAL
+            - HIGH
+            - URGENT
         active:
           type: boolean
         is_blacklisted:
@@ -1040,9 +2658,9 @@ components:
         won_status:
           type: string
           enum:
-          - PENDING
-          - WON
-          - LOST
+            - PENDING
+            - WON
+            - LOST
         lost_reason_id:
           type: string
           format: uuid
@@ -1083,7 +2701,7 @@ components:
     CreateLeadRequest:
       type: object
       required:
-      - name
+        - name
       properties:
         name:
           type: string
@@ -1091,8 +2709,8 @@ components:
         type:
           type: string
           enum:
-          - LEAD
-          - OPPORTUNITY
+            - LEAD
+            - OPPORTUNITY
           default: LEAD
         email_from:
           type: string
@@ -1107,9 +2725,9 @@ components:
         title:
           type: string
           enum:
-          - MR
-          - MRS
-          - MME
+            - MR
+            - MRS
+            - MME
         function:
           type: string
         contact_name:
@@ -1126,10 +2744,10 @@ components:
         priority:
           type: string
           enum:
-          - LOW
-          - NORMAL
-          - HIGH
-          - URGENT
+            - LOW
+            - NORMAL
+            - HIGH
+            - URGENT
         stage_id:
           type: string
           format: uuid
@@ -1185,8 +2803,8 @@ components:
         type:
           type: string
           enum:
-          - LEAD
-          - OPPORTUNITY
+            - LEAD
+            - OPPORTUNITY
         email_from:
           type: string
         email:
@@ -1199,9 +2817,9 @@ components:
         title:
           type: string
           enum:
-          - MR
-          - MRS
-          - MME
+            - MR
+            - MRS
+            - MME
         function:
           type: string
         contact_name:
@@ -1218,10 +2836,10 @@ components:
         priority:
           type: string
           enum:
-          - LOW
-          - NORMAL
-          - HIGH
-          - URGENT
+            - LOW
+            - NORMAL
+            - HIGH
+            - URGENT
         active:
           type: boolean
         stage_id:
@@ -1265,17 +2883,14 @@ components:
         lost_reason_id:
           type: string
           format: uuid
-      # Update bodies are partial by design: only the fields being changed are
-      # sent. The original spec required every field, which forced clients to
-      # echo the whole lead on every update.
       description: Request body for updating an existing lead (all fields optional; send only what changes)
     Stage:
       type: object
       required:
-      - id
-      - name
-      - sequence
-      - probability
+        - id
+        - name
+        - sequence
+        - probability
       properties:
         id:
           type: string
@@ -1286,20 +2901,15 @@ components:
         sequence:
           type: integer
           format: int32
-          minimum: 1
-          description: Order in pipeline
         probability:
           type: integer
           format: int32
           minimum: 0
           maximum: 100
-          description: Win probability for this stage
         is_won:
           type: boolean
-          description: Marks final Won stage
         is_lost:
           type: boolean
-          description: Marks a Lost stage
         rotting_threshold_days:
           type: integer
           format: int32
@@ -1315,25 +2925,38 @@ components:
             format: uuid
         fold:
           type: boolean
-          description: Folded in Kanban when no deals
+          description: Collapsed lane on the board
         color:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 16
+          type: string
+          description: '#RRGGBB'
         description:
           type: string
         lead_count:
           type: integer
           format: int32
           readOnly: true
+        pipeline_id:
+          type: string
+          format: uuid
+        rotting_days:
+          type: integer
+          format: int32
+          description: Deals older than this in the stage are flagged stalled
+        card_fields:
+          type: array
+          items:
+            type: string
+          description: 'What the board card shows: title, next_task, owner, contact_company, value, custom:<key> ...'
+        deal_order:
+          type: string
+          description: Default sort of cards in the lane, e.g. next_task asc, value desc
       description: A pipeline stage representing a step in the sales process
     CreateStageRequest:
       type: object
       required:
-      - name
-      - sequence
-      - probability
+        - name
+        - sequence
+        - probability
       properties:
         name:
           type: string
@@ -1405,22 +3028,22 @@ components:
         description:
           type: string
       required:
-      - name
-      - sequence
-      - probability
-      - is_won
-      - is_lost
-      - rotting_threshold_days
-      - requirements
-      - team_ids
-      - fold
-      - color
-      - description
+        - name
+        - sequence
+        - probability
+        - is_won
+        - is_lost
+        - rotting_threshold_days
+        - requirements
+        - team_ids
+        - fold
+        - color
+        - description
       description: Request body for updating an existing stage
     StageChangeRequest:
       type: object
       required:
-      - stage_id
+        - stage_id
       properties:
         stage_id:
           type: string
@@ -1437,15 +3060,15 @@ components:
       type: object
       additionalProperties: false
       required:
-      - reason
-      - reference
-      - customer
+        - reason
+        - reference
+        - customer
       properties:
         reason:
           type: string
           enum:
-          - order
-          - contract
+            - order
+            - contract
           description: An accepted quote or order, or a signed contract. Paid Stripe checkouts convert automatically.
         reference:
           type: string
@@ -1458,10 +3081,10 @@ components:
     ConversionResult:
       type: object
       required:
-      - lead_id
-      - conversion_id
-      - reason
-      - stage
+        - lead_id
+        - conversion_id
+        - reason
+        - stage
       properties:
         lead_id:
           type: string
@@ -1473,8 +3096,8 @@ components:
         reason:
           type: string
           enum:
-          - order
-          - contract
+            - order
+            - contract
         stage:
           type: string
           description: The lead stage after conversion (converted)
@@ -1493,9 +3116,9 @@ components:
         name:
           type: string
       required:
-      - email
-      - phone
-      - name
+        - email
+        - phone
+        - name
       description: Request body for checking lead duplicates by email/phone/name
     DuplicateDetectionResult:
       type: object
@@ -1506,13 +3129,13 @@ components:
             type: string
             format: uuid
       required:
-      - duplicates
+        - duplicates
       description: Result of duplicate detection with matched records
     MergeLeadsRequest:
       type: object
       required:
-      - keep_id
-      - merge_id
+        - keep_id
+        - merge_id
       properties:
         keep_id:
           type: string
@@ -1537,17 +3160,17 @@ components:
           type: integer
           format: int32
       required:
-      - kept_id
-      - merged_id
-      - merged_tag_count
-      - merged_description_additions
+        - kept_id
+        - merged_id
+        - merged_tag_count
+        - merged_description_additions
       description: Result of merging multiple records together
     PaginatedResponse:
       type: object
       required:
-      - total
-      - page
-      - limit
+        - total
+        - page
+        - limit
       properties:
         total:
           type: integer
@@ -1562,8 +3185,8 @@ components:
     ErrorResponse:
       type: object
       required:
-      - code
-      - message
+        - code
+        - message
       properties:
         code:
           type: integer
@@ -1576,17 +3199,13 @@ components:
           type: string
           description: Additional error details
       description: An error response with code, message, and optional details
-    # NOTE: BRRTRouter's generator does not flatten allOf into typed response
-    # structs (it produced an empty Response for list_leads/list_stages), so the
-    # paginated wrappers are declared inline rather than composed from
-    # PaginatedResponse. Keep them inline until the generator supports allOf.
     PaginatedLead:
       type: object
       required:
-      - items
-      - total
-      - page
-      - limit
+        - items
+        - total
+        - page
+        - limit
       properties:
         items:
           type: array
@@ -1605,10 +3224,10 @@ components:
     PaginatedStage:
       type: object
       required:
-      - items
-      - total
-      - page
-      - limit
+        - items
+        - total
+        - page
+        - limit
       properties:
         items:
           type: array
@@ -1627,10 +3246,10 @@ components:
     PaginatedPipelineSummary:
       type: object
       required:
-      - total_opportunities
-      - total_revenue
-      - total_weighted_revenue
-      - stages
+        - total_opportunities
+        - total_revenue
+        - total_weighted_revenue
+        - stages
       properties:
         total_opportunities:
           type: integer
@@ -1668,9 +3287,9 @@ components:
       type: object
       additionalProperties: false
       required:
-      - line1
-      - city
-      - country
+        - line1
+        - city
+        - country
       properties:
         line1:
           type: string
@@ -1701,9 +3320,9 @@ components:
       type: object
       additionalProperties: false
       required:
-      - name
-      - email
-      - address
+        - name
+        - email
+        - address
       properties:
         name:
           type: string
@@ -1733,6 +3352,845 @@ components:
           maxLength: 50
           description: VAT or tax id, when known
       description: The billing details that cross into RERP
+    DealStatus:
+      type: string
+      enum:
+        - OPEN
+        - WON
+        - LOST
+    Pipeline:
+      type: object
+      required:
+        - id
+        - name
+        - currency
+        - created_at
+      description: 'A pipeline (AC: deal group): its own stages, currency, visibility and auto-assignment. Won and Lost are
+        statuses, not stages.'
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+        visibility:
+          type: string
+          enum:
+            - ALL
+            - GROUPS
+          default: ALL
+        group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: crm/teams groups that see it when visibility is GROUPS
+        auto_assign:
+          type: string
+          enum:
+            - 'OFF'
+            - ROUND_ROBIN
+            - BY_STAGE
+          default: 'OFF'
+        auto_assign_user_ids:
+          type: array
+          items:
+            type: string
+        forecast_mode:
+          type: string
+          enum:
+            - STAGE_PROBABILITY
+            - LEARNED
+          default: STAGE_PROBABILITY
+          description: LEARNED needs enough closed deals (win-probability model); until then the service reports NOT_ENOUGH_DATA
+            and falls back
+        sequence:
+          type: integer
+          format: int32
+        open_deals:
+          type: integer
+          format: int64
+          readOnly: true
+        open_value:
+          type: number
+          format: double
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PipelineRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        currency:
+          type: string
+        visibility:
+          type: string
+          enum:
+            - ALL
+            - GROUPS
+        group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        auto_assign:
+          type: string
+          enum:
+            - 'OFF'
+            - ROUND_ROBIN
+            - BY_STAGE
+        auto_assign_user_ids:
+          type: array
+          items:
+            type: string
+        forecast_mode:
+          type: string
+          enum:
+            - STAGE_PROBABILITY
+            - LEARNED
+        sequence:
+          type: integer
+          format: int32
+        clone_stages_from:
+          type: string
+          format: uuid
+          description: Copy another pipeline's stages on create
+    DealContact:
+      type: object
+      required:
+        - contact_id
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          readOnly: true
+        role_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          readOnly: true
+        primary:
+          type: boolean
+          default: false
+    Deal:
+      type: object
+      required:
+        - id
+        - title
+        - pipeline_id
+        - stage_id
+        - status
+        - value
+        - currency
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        pipeline_id:
+          type: string
+          format: uuid
+        pipeline_name:
+          type: string
+          readOnly: true
+        stage_id:
+          type: string
+          format: uuid
+        stage_name:
+          type: string
+          readOnly: true
+        stage_entered_at:
+          type: string
+          format: date-time
+          readOnly: true
+        days_in_stage:
+          type: integer
+          format: int32
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        status_changed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lost_reason:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        probability:
+          type: integer
+          format: int32
+          description: Stage probability, or the learned win probability when the pipeline uses LEARNED
+          readOnly: true
+        weighted_value:
+          type: number
+          format: double
+          readOnly: true
+        owner_id:
+          type: string
+        owner_name:
+          type: string
+          readOnly: true
+        company_id:
+          type: string
+          format: uuid
+          description: crm/contacts company (marketing-side), not the converted crm/accounts record
+        company_name:
+          type: string
+          readOnly: true
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealContact'
+        primary_contact_id:
+          type: string
+          format: uuid
+          readOnly: true
+        source:
+          type: string
+          description: form:<name>, automation:<name>, import, manual, referral ...
+        expected_close_at:
+          type: string
+          format: date
+        next_task_at:
+          type: string
+          format: date-time
+          readOnly: true
+        open_task_count:
+          type: integer
+          format: int32
+          readOnly: true
+        last_activity_at:
+          type: string
+          format: date-time
+          readOnly: true
+        custom_fields:
+          type: object
+          additionalProperties: true
+          description: crm/platform custom fields with entity deal
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        created_by:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateDealRequest:
+      type: object
+      required:
+        - title
+        - pipeline_id
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        pipeline_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+          description: Defaults to the pipeline's first stage
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        owner_id:
+          type: string
+          description: 'Absent: the pipeline''s auto-assignment, else the caller'
+        company_id:
+          type: string
+          format: uuid
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealContact'
+        source:
+          type: string
+        expected_close_at:
+          type: string
+          format: date
+        custom_fields:
+          type: object
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    UpdateDealRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        owner_id:
+          type: string
+        company_id:
+          type: string
+          format: uuid
+        expected_close_at:
+          type: string
+          format: date
+        custom_fields:
+          type: object
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    DealStageChangeRequest:
+      type: object
+      required:
+        - stage_id
+      properties:
+        stage_id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+          description: Move to another pipeline (the stage must belong to it)
+        comment:
+          type: string
+    DealStatusChangeRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        lost_reason:
+          type: string
+        won_value:
+          type: number
+          format: double
+        convert_to_customer:
+          type: boolean
+          default: true
+          description: 'WON: emit the signed conversion to crm/accounts (RERP ADR 003)'
+    DealRole:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+        used_on:
+          type: integer
+          format: int64
+          readOnly: true
+    DealRoleRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+    Note:
+      type: object
+      required:
+        - id
+        - text
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+          maxLength: 10000
+        author:
+          type: string
+          readOnly: true
+          description: A staff user id, or WORKFLOW
+        pinned:
+          type: boolean
+          default: false
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    NoteRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+        pinned:
+          type: boolean
+    Attachment:
+      type: object
+      required:
+        - id
+        - filename
+        - size
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        content_type:
+          type: string
+        size:
+          type: integer
+          format: int64
+        url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Signed, time-limited
+        uploaded_by:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    ActivityEntry:
+      type: object
+      required:
+        - id
+        - kind
+        - at
+      description: One line of a deal's timeline
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+            - CREATED
+            - STAGE_CHANGED
+            - STATUS_CHANGED
+            - VALUE_CHANGED
+            - OWNER_CHANGED
+            - FIELD_CHANGED
+            - CONTACT_ADDED
+            - CONTACT_REMOVED
+            - NOTE_ADDED
+            - FILE_ADDED
+            - TASK_ADDED
+            - TASK_COMPLETED
+            - EMAIL_SENT
+            - EMAIL_RECEIVED
+            - WORKFLOW_ACTION
+        summary:
+          type: string
+        actor:
+          type: string
+          description: A staff user id, WORKFLOW, FORM, IMPORT or CONTACT
+        detail:
+          type: object
+        at:
+          type: string
+          format: date-time
+    DealEmail:
+      type: object
+      required:
+        - id
+        - direction
+        - subject
+        - at
+      description: A 1:1 email on a deal, sent through a connected mailbox (crm/platform) or received by it
+      properties:
+        id:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum:
+            - OUT
+            - IN
+        mailbox_id:
+          type: string
+          format: uuid
+        from:
+          type: string
+        to:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        snippet:
+          type: string
+        body_html:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        saved_response_id:
+          type: string
+          format: uuid
+        opened_at:
+          type: string
+          format: date-time
+          readOnly: true
+        clicked_at:
+          type: string
+          format: date-time
+          readOnly: true
+        replied_at:
+          type: string
+          format: date-time
+          readOnly: true
+        thread_id:
+          type: string
+        at:
+          type: string
+          format: date-time
+    SendDealEmailRequest:
+      type: object
+      required:
+        - to
+        - subject
+        - body_html
+      properties:
+        mailbox_id:
+          type: string
+          format: uuid
+          description: Defaults to the caller's connected mailbox
+        to:
+          type: array
+          items:
+            type: string
+        cc:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        body_html:
+          type: string
+        saved_response_id:
+          type: string
+          format: uuid
+        track_opens:
+          type: boolean
+          default: true
+        track_clicks:
+          type: boolean
+          default: true
+        attachment_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    DealSettings:
+      type: object
+      properties:
+        default_currency:
+          type: string
+        require_expected_close_from_stage_id:
+          type: string
+          format: uuid
+        default_pipeline_id:
+          type: string
+          format: uuid
+        win_probability:
+          type: object
+          readOnly: true
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - READY
+                  - NOT_ENOUGH_DATA
+                  - 'OFF'
+              closed_deals:
+                type: integer
+              required:
+                type: integer
+          description: 'Per pipeline id: whether the learned model can be used'
+    PipelineSummary:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        open:
+          type: integer
+          format: int64
+        open_value:
+          type: number
+          format: double
+        weighted_value:
+          type: number
+          format: double
+        won_this_month:
+          type: integer
+        won_value_this_month:
+          type: number
+          format: double
+        stalled:
+          type: integer
+        stalled_value:
+          type: number
+          format: double
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+                format: uuid
+              stage_name:
+                type: string
+              count:
+                type: integer
+              revenue:
+                type: number
+                format: double
+              weighted_revenue:
+                type: number
+                format: double
+              probability:
+                type: integer
+    BulkDealRequest:
+      type: object
+      required:
+        - deal_ids
+        - action
+      properties:
+        deal_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        action:
+          type: string
+          enum:
+            - MOVE_STAGE
+            - ASSIGN_OWNER
+            - SET_STATUS
+            - ADD_TAG
+            - REMOVE_TAG
+            - DELETE
+        stage_id:
+          type: string
+          format: uuid
+        pipeline_id:
+          type: string
+          format: uuid
+        owner_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/DealStatus'
+        tag_id:
+          type: string
+          format: uuid
+    PaginatedPipeline:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pipeline'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedDeal:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deal'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedDealRole:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealRole'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedNote:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedAttachment:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedActivityEntry:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedDealEmail:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealEmail'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
   parameters:
     Id:
       name: id

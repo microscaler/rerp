@@ -5,6 +5,441 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ActivityEntry {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub actor: Option<String>,
+
+    pub at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<serde_json::Value>,
+
+    pub id: String,
+
+    pub kind: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub summary: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AddDealContactRequest {
+    pub contact_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AddDealContactResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AddDealNoteRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AddDealNoteResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub author: Option<String>,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Attachment {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+
+    pub created_at: String,
+
+    pub filename: String,
+
+    pub id: String,
+
+    pub size: i64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uploaded_by: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BulkDealRequest {
+    pub action: String,
+
+    pub deal_ids: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<DealStatus>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BulkUpdateDealsRequest {
+    pub action: String,
+
+    pub deal_ids: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<DealStatus>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BulkUpdateDealsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub skipped: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChangeDealStageRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    pub stage_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChangeDealStageResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChangeDealStatusRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub convert_to_customer: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ChangeDealStatusResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ChangeStageRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
@@ -244,6 +679,158 @@ pub struct ConvertLeadResponse {
     pub reason: String,
 
     pub stage: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDealRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDealResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDealRoleRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateDealRoleResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub id: String,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_on: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -492,6 +1079,73 @@ pub struct CreateLeadResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePipelineRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clone_stages_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreatePipelineResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    pub created_at: String,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub id: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateStageRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<i32>,
@@ -527,7 +1181,13 @@ pub struct CreateStageRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateStageResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
+    pub card_fields: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deal_order: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -548,10 +1208,16 @@ pub struct CreateStageResponse {
 
     pub name: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
     pub probability: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requirements: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotting_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotting_threshold_days: Option<i32>,
@@ -560,6 +1226,235 @@ pub struct CreateStageResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub team_ids: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Deal {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealContact {
+    pub contact_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealEmail {
+    pub at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body_html: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clicked_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_id: Option<String>,
+
+    pub direction: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mailbox_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opened_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replied_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub saved_response_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub snippet: Option<String>,
+
+    pub subject: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub to: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealRole {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub id: String,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_on: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealRoleRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealSettings {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_expected_close_from_stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_probability: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealStageChangeRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub comment: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    pub stage_id: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum DealStatus {
+    #[default]
+    #[serde(rename = "OPEN")]
+    Open,
+
+    #[serde(rename = "WON")]
+    Won,
+
+    #[serde(rename = "LOST")]
+    Lost,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealStatusChangeRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub convert_to_customer: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_value: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -598,6 +1493,125 @@ pub struct ErrorResponse {
     pub details: Option<String>,
 
     pub message: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetDealResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetDealRoleResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub id: String,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_on: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetDealSettingsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_expected_close_from_stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_probability: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -759,9 +1773,83 @@ pub struct GetLeadResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetPipelineResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    pub created_at: String,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub id: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GetPipelineSummaryResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stages: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stalled: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stalled_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_this_month: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_value_this_month: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetStageResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
+    pub card_fields: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deal_order: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -782,10 +1870,16 @@ pub struct GetStageResponse {
 
     pub name: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
     pub probability: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requirements: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotting_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotting_threshold_days: Option<i32>,
@@ -955,8 +2049,85 @@ pub struct Lead {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealActivityResponse {
+    pub items: Vec<ActivityEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealEmailsResponse {
+    pub items: Vec<DealEmail>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealFilesResponse {
+    pub items: Vec<Attachment>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealNotesResponse {
+    pub items: Vec<Note>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealRolesResponse {
+    pub items: Vec<DealRole>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListDealsResponse {
+    pub items: Vec<Deal>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListLeadsResponse {
     pub items: Vec<Lead>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ListPipelinesResponse {
+    pub items: Vec<Pipeline>,
 
     pub limit: i32,
 
@@ -1006,8 +2177,111 @@ pub struct MergeResult {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Note {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub author: Option<String>,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct NoteRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedActivityEntry {
+    pub items: Vec<ActivityEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedAttachment {
+    pub items: Vec<Attachment>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDeal {
+    pub items: Vec<Deal>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDealEmail {
+    pub items: Vec<DealEmail>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedDealRole {
+    pub items: Vec<DealRole>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PaginatedLead {
     pub items: Vec<Lead>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedNote {
+    pub items: Vec<Note>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PaginatedPipeline {
+    pub items: Vec<Pipeline>,
 
     pub limit: i32,
 
@@ -1048,6 +2322,312 @@ pub struct PaginatedStage {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchDealRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchDealResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchDealRoleRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchDealRoleResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub id: String,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_on: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchPipelineRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clone_stages_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchPipelineResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    pub created_at: String,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub id: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Pipeline {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    pub created_at: String,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub id: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PipelineRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clone_stages_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PipelineSummary {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stages: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stalled: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stalled_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_this_month: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won_value_this_month: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PipelineSummaryResponse {
     pub stages: Vec<serde_json::Value>,
 
@@ -1059,9 +2639,86 @@ pub struct PipelineSummaryResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SendDealEmailRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attachment_ids: Option<Vec<String>>,
+
+    pub body_html: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cc: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mailbox_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub saved_response_id: Option<String>,
+
+    pub subject: String,
+
+    pub to: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_clicks: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_opens: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SendDealEmailResponse {
+    pub at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body_html: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clicked_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_id: Option<String>,
+
+    pub direction: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mailbox_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opened_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replied_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub saved_response_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub snippet: Option<String>,
+
+    pub subject: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub to: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Stage {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
+    pub card_fields: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deal_order: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -1082,10 +2739,16 @@ pub struct Stage {
 
     pub name: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
     pub probability: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requirements: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotting_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotting_threshold_days: Option<i32>,
@@ -1105,6 +2768,315 @@ pub struct StageChangeRequest {
     pub lost_reason_id: Option<String>,
 
     pub stage_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealContactRequest {
+    pub contact_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealContactResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealNoteRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealNoteResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub author: Option<String>,
+
+    pub created_at: String,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pinned: Option<bool>,
+
+    pub text: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub company_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts: Option<Vec<DealContact>>,
+
+    pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_in_stage: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected_close_at: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+
+    pub pipeline_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_entered_at: Option<String>,
+
+    pub stage_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage_name: Option<String>,
+
+    pub status: DealStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_changed_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag_ids: Option<Vec<String>>,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    pub value: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealRoleRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub title: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealRoleResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    pub id: String,
+
+    pub title: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_on: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealSettingsRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_expected_close_from_stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_probability: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateDealSettingsResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_pipeline_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_expected_close_from_stage_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_probability: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1354,6 +3326,73 @@ pub struct UpdateLeadResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePipelineRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clone_stages_from: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdatePipelineResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_assign_user_ids: Option<Vec<String>>,
+
+    pub created_at: String,
+
+    pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forecast_mode: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub group_ids: Option<Vec<String>>,
+
+    pub id: String,
+
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_value: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateStageRequest {
     pub color: i32,
 
@@ -1381,7 +3420,13 @@ pub struct UpdateStageRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateStageResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
+    pub card_fields: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deal_order: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -1402,10 +3447,16 @@ pub struct UpdateStageResponse {
 
     pub name: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_id: Option<String>,
+
     pub probability: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requirements: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotting_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotting_threshold_days: Option<i32>,
@@ -1414,4 +3465,24 @@ pub struct UpdateStageResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub team_ids: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UploadDealFileResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub content_type: Option<String>,
+
+    pub created_at: String,
+
+    pub filename: String,
+
+    pub id: String,
+
+    pub size: i64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uploaded_by: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
 }
