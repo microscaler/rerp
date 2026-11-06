@@ -3,6 +3,62 @@
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
 
+pub mod list_deal_roles;
+
+pub mod create_deal_role;
+
+pub mod get_deal_role;
+
+pub mod update_deal_role;
+
+pub mod delete_deal_role;
+
+pub mod patch_deal_role;
+
+pub mod list_deals;
+
+pub mod create_deal;
+
+pub mod bulk_update_deals;
+
+pub mod get_deal;
+
+pub mod update_deal;
+
+pub mod delete_deal;
+
+pub mod patch_deal;
+
+pub mod list_deal_activity;
+
+pub mod add_deal_contact;
+
+pub mod remove_deal_contact;
+
+pub mod update_deal_contact;
+
+pub mod list_deal_emails;
+
+pub mod send_deal_email;
+
+pub mod list_deal_files;
+
+pub mod upload_deal_file;
+
+pub mod delete_deal_file;
+
+pub mod list_deal_notes;
+
+pub mod add_deal_note;
+
+pub mod delete_deal_note;
+
+pub mod update_deal_note;
+
+pub mod change_deal_stage;
+
+pub mod change_deal_status;
+
 pub mod list_leads;
 
 pub mod create_lead;
@@ -22,6 +78,24 @@ pub mod merge_leads;
 pub mod change_stage;
 
 pub mod pipeline_summary;
+
+pub mod list_pipelines;
+
+pub mod create_pipeline;
+
+pub mod get_pipeline;
+
+pub mod update_pipeline;
+
+pub mod delete_pipeline;
+
+pub mod patch_pipeline;
+
+pub mod get_pipeline_summary;
+
+pub mod get_deal_settings;
+
+pub mod update_deal_settings;
 
 pub mod list_stages;
 

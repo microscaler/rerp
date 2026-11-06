@@ -56,8 +56,16 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "card_fields")]
+    pub card_fields: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
-    pub color: Option<i32>,
+    pub color: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_order")]
+    pub deal_order: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "description")]
@@ -85,12 +93,20 @@ pub struct Response {
     #[serde(rename = "name")]
     pub name: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "pipeline_id")]
+    pub pipeline_id: Option<String>,
+
     #[serde(rename = "probability")]
     pub probability: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "requirements")]
     pub requirements: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "rotting_days")]
+    pub rotting_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "rotting_threshold_days")]

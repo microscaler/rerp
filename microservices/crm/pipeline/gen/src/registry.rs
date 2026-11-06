@@ -18,6 +18,174 @@ use brrtrouter::typed::spawn_typed_with_stack_size_and_name;
 #[allow(dead_code)]
 pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
+        "list_deal_roles",
+        crate::controllers::list_deal_roles::ListDealRolesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_deal_role",
+        crate::controllers::create_deal_role::CreateDealRoleController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_deal_role",
+        crate::controllers::get_deal_role::GetDealRoleController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_deal_role",
+        crate::controllers::update_deal_role::UpdateDealRoleController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_deal_role",
+        crate::controllers::delete_deal_role::DeleteDealRoleController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "patch_deal_role",
+        crate::controllers::patch_deal_role::PatchDealRoleController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_deals",
+        crate::controllers::list_deals::ListDealsController,
+        32768,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_deal",
+        crate::controllers::create_deal::CreateDealController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "bulk_update_deals",
+        crate::controllers::bulk_update_deals::BulkUpdateDealsController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_deal",
+        crate::controllers::get_deal::GetDealController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_deal",
+        crate::controllers::update_deal::UpdateDealController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_deal",
+        crate::controllers::delete_deal::DeleteDealController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "patch_deal",
+        crate::controllers::patch_deal::PatchDealController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_deal_activity",
+        crate::controllers::list_deal_activity::ListDealActivityController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "add_deal_contact",
+        crate::controllers::add_deal_contact::AddDealContactController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "remove_deal_contact",
+        crate::controllers::remove_deal_contact::RemoveDealContactController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_deal_contact",
+        crate::controllers::update_deal_contact::UpdateDealContactController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_deal_emails",
+        crate::controllers::list_deal_emails::ListDealEmailsController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "send_deal_email",
+        crate::controllers::send_deal_email::SendDealEmailController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_deal_files",
+        crate::controllers::list_deal_files::ListDealFilesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "upload_deal_file",
+        crate::controllers::upload_deal_file::UploadDealFileController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_deal_file",
+        crate::controllers::delete_deal_file::DeleteDealFileController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "list_deal_notes",
+        crate::controllers::list_deal_notes::ListDealNotesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "add_deal_note",
+        crate::controllers::add_deal_note::AddDealNoteController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_deal_note",
+        crate::controllers::delete_deal_note::DeleteDealNoteController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_deal_note",
+        crate::controllers::update_deal_note::UpdateDealNoteController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "change_deal_stage",
+        crate::controllers::change_deal_stage::ChangeDealStageController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "change_deal_status",
+        crate::controllers::change_deal_status::ChangeDealStatusController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_leads",
         crate::controllers::list_leads::ListLeadsController,
         24576,
@@ -78,6 +246,60 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "list_pipelines",
+        crate::controllers::list_pipelines::ListPipelinesController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "create_pipeline",
+        crate::controllers::create_pipeline::CreatePipelineController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_pipeline",
+        crate::controllers::get_pipeline::GetPipelineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_pipeline",
+        crate::controllers::update_pipeline::UpdatePipelineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "delete_pipeline",
+        crate::controllers::delete_pipeline::DeletePipelineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "patch_pipeline",
+        crate::controllers::patch_pipeline::PatchPipelineController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_pipeline_summary",
+        crate::controllers::get_pipeline_summary::GetPipelineSummaryController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "get_deal_settings",
+        crate::controllers::get_deal_settings::GetDealSettingsController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
+        "update_deal_settings",
+        crate::controllers::update_deal_settings::UpdateDealSettingsController,
+        16384,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "list_stages",
         crate::controllers::list_stages::ListStagesController,
         20480,
@@ -122,6 +344,230 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
 
     for route in routes {
         match route.handler_name.as_ref() {
+            "list_deal_roles" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deal_roles::ListDealRolesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_deal_role" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_deal_role::CreateDealRoleController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_deal_role" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_deal_role::GetDealRoleController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_deal_role" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_deal_role::UpdateDealRoleController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_deal_role" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_deal_role::DeleteDealRoleController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "patch_deal_role" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::patch_deal_role::PatchDealRoleController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_deals" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deals::ListDealsController,
+                    32768,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_deal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_deal::CreateDealController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "bulk_update_deals" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::bulk_update_deals::BulkUpdateDealsController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_deal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_deal::GetDealController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_deal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_deal::UpdateDealController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_deal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_deal::DeleteDealController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "patch_deal" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::patch_deal::PatchDealController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_deal_activity" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deal_activity::ListDealActivityController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "add_deal_contact" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::add_deal_contact::AddDealContactController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "remove_deal_contact" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::remove_deal_contact::RemoveDealContactController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_deal_contact" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_deal_contact::UpdateDealContactController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_deal_emails" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deal_emails::ListDealEmailsController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "send_deal_email" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::send_deal_email::SendDealEmailController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_deal_files" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deal_files::ListDealFilesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "upload_deal_file" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::upload_deal_file::UploadDealFileController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_deal_file" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_deal_file::DeleteDealFileController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_deal_notes" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_deal_notes::ListDealNotesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "add_deal_note" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::add_deal_note::AddDealNoteController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_deal_note" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_deal_note::DeleteDealNoteController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_deal_note" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_deal_note::UpdateDealNoteController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "change_deal_stage" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::change_deal_stage::ChangeDealStageController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "change_deal_status" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::change_deal_status::ChangeDealStatusController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "list_leads" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_leads::ListLeadsController,
@@ -198,6 +644,78 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::pipeline_summary::PipelineSummaryController,
                     20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "list_pipelines" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::list_pipelines::ListPipelinesController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "create_pipeline" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::create_pipeline::CreatePipelineController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_pipeline" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_pipeline::GetPipelineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_pipeline" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_pipeline::UpdatePipelineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "delete_pipeline" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::delete_pipeline::DeletePipelineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "patch_pipeline" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::patch_pipeline::PatchPipelineController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_pipeline_summary" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_pipeline_summary::GetPipelineSummaryController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "get_deal_settings" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::get_deal_settings::GetDealSettingsController,
+                    16384,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
+            "update_deal_settings" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::update_deal_settings::UpdateDealSettingsController,
+                    16384,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
