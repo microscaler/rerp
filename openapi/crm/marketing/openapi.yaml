@@ -5,7 +5,7 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: CRM Marketing Integration
   version: v1.0.0
-  description: Campaign tracking, web forms, visitor analytics, events, surveys; ad audiences, ad tracking and attribution.
+  description: Campaign tracking, web forms, visitor analytics, events, surveys; ad audiences, ad tracking, attribution and buying.
   x-api-version: CRM Marketing API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -60,6 +60,9 @@ tags:
   description: 'Ad tracking: first-party click capture, link decoration, server-side conversion relay (Meta CAPI, Google offline / enhanced, LinkedIn, TikTok), call touchpoints'
 - name: ad-attribution
   description: 'Ad attribution: journeys, models, spend vs attributed revenue, LTV cohorts'
+- name: ad-buying
+  description: 'Ad buying: one platform-agnostic buy spec pushed through adapters (walled-garden APIs, self-serve DSP APIs, bidder-as-a-service, own OpenRTB bidder), creatives, delivery, recommendations
+    applied'
 paths:
   /utm/campaigns:
     get:
@@ -2592,6 +2595,398 @@ paths:
           description: Unauthorized
         '404':
           description: Not found
+  /ads/adapters:
+    get:
+      operationId: list_ad_adapters
+      summary: The buying adapters this deployment ships, with the capability matrix per platform (audiences, conversions, spend, campaign create / pause / budget / bid, creative upload, placements, frequency
+        caps, deal ids)
+      tags:
+      - ad-buying
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Adapters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdAdapter'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/creatives:
+    get:
+      operationId: list_ad_creatives
+      summary: Creative assets registered for buying (image, video, HTML5, native, text), with per-platform upload status
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - HTML5
+          - NATIVE
+          - TEXT
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Creatives
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdCreative'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_ad_creative
+      summary: Register a creative (asset from the outreach asset store or a URL) and push it to the chosen accounts
+      tags:
+      - ad-buying
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdCreativeRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Creative
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdCreative'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/creatives/{id}:
+    get:
+      operationId: get_ad_creative
+      summary: One creative with its platform ids and review status
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Creative
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdCreative'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    delete:
+      operationId: delete_ad_creative
+      summary: Remove locally; platform copies are archived
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/buys:
+    get:
+      operationId: list_ad_buys
+      summary: 'Campaigns we created through an adapter (not the imported platform campaigns): objective, budget, audience, placements, status, delivery'
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - REVIEW
+          - SCHEDULED
+          - LIVE
+          - PAUSED
+          - ENDED
+          - REJECTED
+          - ERROR
+      - name: purpose
+        in: query
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buys
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_ad_buy
+      summary: Create a campaign (campaign + ad set + ads) on one or more accounts from one platform-agnostic spec; the adapter maps it
+      tags:
+      - ad-buying
+      description: The spec is what every adapter can do; anything an adapter cannot map is reported in `unsupported[]` rather than silently dropped. `audience_id` binds a synced `AdAudience` (and its exclusion);
+        `warm_up_for_campaign_id` ties the buy to the outreach campaign it warms up, which sets the schedule from the send time and the audience's `days_before_send`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdBuyRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Buy; per-account platform ids and review state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/buys/{id}:
+    get:
+      operationId: get_ad_buy
+      summary: One buy with delivery (spend, impressions, reach, frequency) per account
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    patch:
+      operationId: update_ad_buy
+      summary: Change budget, bid, schedule, frequency cap, creatives or status; pushed to every account
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdBuyRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_ad_buy
+      summary: End the buy and archive the platform campaigns
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/buys/{id}/pause:
+    post:
+      operationId: pause_ad_buy
+      summary: Pause on every account
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/buys/{id}/resume:
+    post:
+      operationId: resume_ad_buy
+      summary: Resume on every account
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/buys/{id}/delivery:
+    get:
+      operationId: get_ad_buy_delivery
+      summary: 'Delivery by day and account: spend, impressions, reach, frequency, clicks, plus CRM-attributed outcomes'
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuyDelivery'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/buys/{id}/apply-recommendation:
+    post:
+      operationId: apply_ad_recommendation
+      summary: Apply a scale / cut recommendation (budget change or pause) from the attribution report, with an audit note
+      tags:
+      - ad-buying
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - SCALE
+                  - CUT
+                  - PAUSE
+                budget_change_percent:
+                  type: integer
+                  format: int32
+                note:
+                  type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Buy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdBuy'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
 components:
   parameters:
     Page:
@@ -3543,8 +3938,17 @@ components:
           - TIKTOK
           - MICROSOFT_ADS
           - PINTEREST
+          - REDDIT
+          - AMAZON_DSP
           - DSP_TRADE_DESK
           - DSP_DV360
+          - DSP_STACKADAPT
+          - DSP_ADFORM
+          - DSP_ADMIXER
+          - DSP_SMARTYADS
+          - DSP_EPOM
+          - BIDDER_BEESWAX
+          - OPENRTB
           - LIVERAMP
         name:
           type: string
@@ -3630,8 +4034,17 @@ components:
           - TIKTOK
           - MICROSOFT_ADS
           - PINTEREST
+          - REDDIT
+          - AMAZON_DSP
           - DSP_TRADE_DESK
           - DSP_DV360
+          - DSP_STACKADAPT
+          - DSP_ADFORM
+          - DSP_ADMIXER
+          - DSP_SMARTYADS
+          - DSP_EPOM
+          - BIDDER_BEESWAX
+          - OPENRTB
           - LIVERAMP
         name:
           type: string
@@ -3731,8 +4144,17 @@ components:
           - TIKTOK
           - MICROSOFT_ADS
           - PINTEREST
+          - REDDIT
+          - AMAZON_DSP
           - DSP_TRADE_DESK
           - DSP_DV360
+          - DSP_STACKADAPT
+          - DSP_ADFORM
+          - DSP_ADMIXER
+          - DSP_SMARTYADS
+          - DSP_EPOM
+          - BIDDER_BEESWAX
+          - OPENRTB
           - LIVERAMP
         external_audience_id:
           type: string
@@ -5017,6 +5439,567 @@ components:
               payback_month:
                 type: integer
                 format: int32
+    AdAdapter:
+      type: object
+      required:
+      - platform
+      - kind
+      properties:
+        platform:
+          type: string
+          enum:
+          - META
+          - GOOGLE_ADS
+          - LINKEDIN
+          - X
+          - TIKTOK
+          - MICROSOFT_ADS
+          - PINTEREST
+          - REDDIT
+          - AMAZON_DSP
+          - DSP_TRADE_DESK
+          - DSP_DV360
+          - DSP_STACKADAPT
+          - DSP_ADFORM
+          - DSP_ADMIXER
+          - DSP_SMARTYADS
+          - DSP_EPOM
+          - BIDDER_BEESWAX
+          - OPENRTB
+          - LIVERAMP
+        kind:
+          type: string
+          enum:
+          - WALLED_GARDEN_API
+          - SELF_SERVE_DSP_API
+          - BIDDER_AS_A_SERVICE
+          - OPENRTB_BIDDER
+          - ONBOARDER
+          description: 'WALLED_GARDEN_API: the platform''s own marketing API (Meta, Google Ads, LinkedIn, X, TikTok, Microsoft, Reddit, Pinterest, Amazon). SELF_SERVE_DSP_API: a DSP with an advertiser API
+            (Adform, StackAdapt, Admixer, SmartyAds, Epom white-label). BIDDER_AS_A_SERVICE: our own bidding logic hosted on a bidder (Beeswax). OPENRTB_BIDDER: our own bidder on exchanges. ONBOARDER: audiences
+            only (LiveRamp).'
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUDIENCES
+            - LOOKALIKES
+            - CONVERSIONS
+            - SPEND
+            - CAMPAIGN_CREATE
+            - CAMPAIGN_PAUSE
+            - BUDGET
+            - BID
+            - SCHEDULE
+            - FREQUENCY_CAP
+            - PLACEMENTS
+            - CREATIVE_UPLOAD
+            - DEAL_IDS
+            - GEO
+            - DEVICE
+            - DAYPARTING
+            - CONTEXTUAL
+            - RETARGETING_PIXEL
+        objectives:
+          type: array
+          items:
+            type: string
+        formats:
+          type: array
+          items:
+            type: string
+            enum:
+            - IMAGE
+            - VIDEO
+            - HTML5
+            - NATIVE
+            - TEXT
+            - CAROUSEL
+            - AUDIO
+        identity:
+          type: array
+          items:
+            type: string
+          description: Identifiers the platform matches on (hashed email, phone, MAID, UID2, RampID, cookie)
+        minimums:
+          type: object
+          properties:
+            audience_matched:
+              type: integer
+              format: int64
+            daily_budget:
+              type: number
+              format: double
+            monthly_spend_practical:
+              type: number
+              format: double
+            currency:
+              type: string
+        fee_model:
+          type: string
+          description: Take rate / subscription / none, as known
+        status:
+          type: string
+          enum:
+          - SHIPPED
+          - PLANNED
+          - NOT_PLANNED
+        notes:
+          type: string
+    AdCreative:
+      type: object
+      required:
+      - id
+      - kind
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - HTML5
+          - NATIVE
+          - TEXT
+          - CAROUSEL
+        name:
+          type: string
+        asset_id:
+          type: string
+          format: uuid
+          description: crm/outreach asset
+        url:
+          type: string
+          format: uri
+        width:
+          type: integer
+          format: int32
+        height:
+          type: integer
+          format: int32
+        duration_seconds:
+          type: integer
+          format: int32
+        headline:
+          type: string
+        body:
+          type: string
+        call_to_action:
+          type: string
+        landing_url:
+          type: string
+          format: uri
+          description: Decorated with the link-tag rules at push time
+        brand_kit_applied:
+          type: boolean
+        platforms:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              platform:
+                type: string
+              external_id:
+                type: string
+              review:
+                type: string
+                enum:
+                - PENDING
+                - APPROVED
+                - REJECTED
+              reason:
+                type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateAdCreativeRequest:
+      type: object
+      required:
+      - kind
+      - name
+      properties:
+        kind:
+          type: string
+        name:
+          type: string
+        asset_id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        headline:
+          type: string
+        body:
+          type: string
+        call_to_action:
+          type: string
+        landing_url:
+          type: string
+          format: uri
+        account_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Push to these accounts now
+    AdBuySpec:
+      type: object
+      required:
+      - objective
+      - budget
+      properties:
+        objective:
+          type: string
+          enum:
+          - REACH
+          - AWARENESS
+          - TRAFFIC
+          - LEADS
+          - CONVERSIONS
+          - RETARGETING
+          - WARM_UP
+          description: WARM_UP = REACH with a tight frequency cap and the audience's warm-up window
+        budget:
+          type: object
+          required:
+          - amount
+          - period
+          properties:
+            amount:
+              type: number
+              format: double
+            currency:
+              type: string
+            period:
+              type: string
+              enum:
+              - DAILY
+              - LIFETIME
+            pacing:
+              type: string
+              enum:
+              - EVEN
+              - ASAP
+        bid:
+          type: object
+          properties:
+            strategy:
+              type: string
+              enum:
+              - LOWEST_COST
+              - COST_CAP
+              - BID_CAP
+              - TARGET_CPA
+              - TARGET_ROAS
+              - FIXED_CPM
+            amount:
+              type: number
+              format: double
+            metric:
+              type: string
+              enum:
+              - CPM
+              - CPC
+              - CPA
+        schedule:
+          type: object
+          properties:
+            start_at:
+              type: string
+              format: date-time
+            end_at:
+              type: string
+              format: date-time
+            dayparts:
+              type: array
+              items:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  from_hour:
+                    type: integer
+                    format: int32
+                  to_hour:
+                    type: integer
+                    format: int32
+            timezone:
+              type: string
+        frequency_cap:
+          type: object
+          properties:
+            impressions:
+              type: integer
+              format: int32
+            per_days:
+              type: integer
+              format: int32
+        targeting:
+          type: object
+          properties:
+            audience_id:
+              type: string
+              format: uuid
+              description: A synced AdAudience; its exclusion source is applied too
+            exclude_audience_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+            lookalike:
+              type: boolean
+            geo:
+              type: array
+              items:
+                type: string
+              description: ISO countries / regions / cities as the adapter accepts
+            languages:
+              type: array
+              items:
+                type: string
+            devices:
+              type: array
+              items:
+                type: string
+                enum:
+                - DESKTOP
+                - MOBILE
+                - TABLET
+                - CTV
+            contextual:
+              type: array
+              items:
+                type: string
+            deal_ids:
+              type: array
+              items:
+                type: string
+              description: PMP / guaranteed deal ids on DSPs
+            retarget:
+              type: object
+              properties:
+                site_visitors_days:
+                  type: integer
+                  format: int32
+                email_openers_days:
+                  type: integer
+                  format: int32
+        placements:
+          type: array
+          items:
+            type: string
+          description: 'Adapter vocabulary (e.g. META: feed, stories, reels; GOOGLE_ADS: display, youtube, search; DSP: display, native, video, ctv)'
+        creative_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+          description: Overrides the link-tag rule for this buy
+    AdBuy:
+      type: object
+      required:
+      - id
+      - name
+      - status
+      - spec
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        purpose:
+          type: string
+          enum:
+          - WARM_UP
+          - RETARGET
+          - ACQUISITION
+          - OTHER
+        warm_up_for_campaign_id:
+          type: string
+          format: uuid
+          description: The outreach campaign this buy warms up
+        spec:
+          $ref: '#/components/schemas/AdBuySpec'
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - REVIEW
+          - SCHEDULED
+          - LIVE
+          - PAUSED
+          - ENDED
+          - REJECTED
+          - ERROR
+        accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              platform:
+                type: string
+              external_campaign_id:
+                type: string
+              external_adset_ids:
+                type: array
+                items:
+                  type: string
+              status:
+                type: string
+              review:
+                type: string
+              unsupported:
+                type: array
+                items:
+                  type: string
+                description: Spec fields this adapter could not map
+              spend:
+                type: number
+                format: double
+              impressions:
+                type: integer
+                format: int64
+              reach:
+                type: integer
+                format: int64
+              frequency:
+                type: number
+                format: float
+              clicks:
+                type: integer
+                format: int64
+              last_error:
+                type: string
+        totals:
+          type: object
+          readOnly: true
+          properties:
+            spend:
+              type: number
+              format: double
+            impressions:
+              type: integer
+              format: int64
+            reach:
+              type: integer
+              format: int64
+            clicks:
+              type: integer
+              format: int64
+            attributed_leads:
+              type: integer
+              format: int64
+            attributed_revenue:
+              type: number
+              format: double
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateAdBuyRequest:
+      type: object
+      required:
+      - name
+      - account_ids
+      - spec
+      properties:
+        name:
+          type: string
+        purpose:
+          type: string
+        warm_up_for_campaign_id:
+          type: string
+          format: uuid
+        account_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        spec:
+          $ref: '#/components/schemas/AdBuySpec'
+        launch:
+          type: boolean
+          default: false
+          description: false leaves it in DRAFT for review
+    UpdateAdBuyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        spec:
+          $ref: '#/components/schemas/AdBuySpec'
+        status:
+          type: string
+          enum:
+          - SCHEDULED
+          - LIVE
+          - PAUSED
+          - ENDED
+    AdBuyDelivery:
+      type: object
+      properties:
+        buy_id:
+          type: string
+          format: uuid
+        days:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              account_id:
+                type: string
+                format: uuid
+              platform:
+                type: string
+              spend:
+                type: number
+                format: double
+              impressions:
+                type: integer
+                format: int64
+              reach:
+                type: integer
+                format: int64
+              frequency:
+                type: number
+                format: float
+              clicks:
+                type: integer
+                format: int64
+              attributed_leads:
+                type: integer
+                format: int64
+              attributed_revenue:
+                type: number
+                format: double
   securitySchemes:
     bearerAuth:
       type: http

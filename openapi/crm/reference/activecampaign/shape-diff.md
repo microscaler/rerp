@@ -340,3 +340,9 @@ visitors and UTM entities already there.
 - Platform minimums: Meta serves from ~100 matched, Google Customer Match from ~1,000; `preview` flags it.
 - Match rates to expect: Meta / LinkedIn 50–70% on consumer / work emails respectively, Google 30–60%,
   open-web onboarders 20–40% and falling.
+
+### Buying (added the same day)
+- `AdAdapter` — the capability matrix per platform kind (walled-garden API, self-serve DSP API, bidder-as-a-service, own OpenRTB bidder, onboarder).
+- `AdBuy` / `AdBuySpec` — objective, budget, bid, schedule, frequency cap, targeting (a synced audience + exclusions, geo, devices, contextual, deal ids, retargeting windows), placements, creatives; pushed to one or more accounts, `unsupported[]` per account; delivery pulled per day; `apply-recommendation` turns the attribution report's scale / cut into a budget change with an audit note. `purpose: WARM_UP` + `warm_up_for_campaign_id` schedule the buy from the outreach send time.
+- `AdCreative` — assets from the outreach store, pushed to platforms with review state; landing URLs decorated at push time.
+- Why not an exchange bidder now: docs/07-ad-buying-landscape.md § 2.
