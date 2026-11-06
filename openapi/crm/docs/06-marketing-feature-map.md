@@ -171,6 +171,10 @@ New step/trigger/action enum values:
 12. Campaign action: `resend_to_unopened`. (2026-11-05: campaign editor walked — `REMINDER`/`RECURRING` kinds, `CampaignAudience`, `ReminderConfig`, `TrackedLink`, readiness, AB `test_scope`/`ratios`/`decide_winner` in spec; shape-diff § Campaign editor.)
 13. Form layout: `SITE_MESSAGE`. (2026-11-05: form builder walked — layout/field kinds, `SUBSCRIBE_SMS_LIST`/`EMAIL_RESULTS` actions, on_submit, submission controls in spec; shape-diff § Form builder.)
 
+Beyond ActiveCampaign (2026-11-06):
+14. `crm/marketing` **ad audiences** (`/ads/accounts`, `/ads/audiences`): a segment / list / tag kept in step with a Meta / Google / LinkedIn / X / TikTok / DSP custom audience, hashed server-side, with consent basis, suppression rules, lookalikes and a `WARM_UP` purpose (add N days before a send, remove on click). Automation actions `ADD_TO_AD_AUDIENCE` / `REMOVE_FROM_AD_AUDIENCE`. AC only has the Facebook Custom Audience action.
+15. `crm/marketing` **ad tracking & attribution** (`/ads/settings`, `/ads/clicks`, `/ads/link-tags`, `/ads/conversion-rules`, `/ads/conversions`, `/ads/calls`, `/ads/campaigns`, `/ads/spend`, `/ads/attribution*`, `/ads/contacts/{id}/journey`, `/ads/ltv`): first-party click-id capture with a server-set cookie on the tracking domain, link decoration with the workspace click id and a contact token, server-side conversion relay (Meta CAPI, Google offline / enhanced, LinkedIn, TikTok), spend import, platform-reported vs attributed, custom attribution models, journeys, LTV cohorts, warm-up lift vs holdout. The Hyros-style "print" (cookie + click ids + email + phone + soft fingerprint) joined deterministically. Trigger `AD_CLICKED`.
+
 Deferred, deliberately: landing-page builder, WhatsApp flows, win-probability ML, predictive content/sending, connected mailboxes and calendars, saved responses, database sync, geo reports, integrations marketplace, "format data".
 
 ## 3. Reference tenant

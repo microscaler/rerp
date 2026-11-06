@@ -282,3 +282,61 @@ Specced as `CampaignReport` +`total_opens`, `verified_opens`/`unverified_opens`,
 `total_clicks`, `forwarded`, `replied`, `updated`, `social_shares`, `opens_by_date`, `opens_by_location`,
 `email_clients`, `audience`, and `GET /campaigns/{id}/report/contacts?status&link_id`. To verify field by field,
 send one campaign to the staff-only list and pull the report back through the API.
+
+## Ad audiences, ad tracking and attribution (2026-11-06) → `crm/marketing` `/ads/*`
+
+Not an ActiveCampaign feature (AC stops at a Facebook Custom Audience automation action). Modelled on how
+Hyros-class tools work, specced as part of `crm/marketing` because it reuses the tracked sites, forms,
+visitors and UTM entities already there.
+
+### Audience sync (warming a cold list before the email lands)
+- `AdAccount` — one per connected platform account (Meta, Google Ads, LinkedIn, X, TikTok, Microsoft, Pinterest,
+  DSPs via LiveRamp). OAuth or a secret-service credential; capabilities (audiences, lookalikes, conversions,
+  spend, campaign control); the server-side conversion endpoint it relays to; last match rate.
+- `AdAudience` — a binding from a `source` (segment, list, tag, score band, pipeline stage, static set) to a
+  platform custom audience. Membership is re-evaluated on an interval (`CONTINUOUS`) or once. Identifiers
+  (email, phone, name, postcode, MAID) are normalised and SHA-256 hashed server-side; raw values never leave.
+  `consent_basis` is recorded on the audience and every `AdAudienceMember`; `suppress_on` removes contacts who
+  unsubscribe, get suppressed, are erased, convert, or opt out of tracking. `purpose: WARM_UP` carries the
+  pre-email sequence (days before send, remove on click / open / visit / window end, a frequency-cap hint for
+  the campaign). Lookalike seeds are a flag on the binding. `preview` gives the eligible count, identifier
+  coverage, the expected match rate and whether the audience is under the platform minimum.
+- Automation: `ADD_TO_AD_AUDIENCE` / `REMOVE_FROM_AD_AUDIENCE` actions, so the warm-up is a workflow:
+  add → wait 10 days → send campaign → remove on `MESSAGE_CLICKED`. A holdout (a segment split) feeds
+  `AdAttributionReport.warm_up_lift`: exposed vs holdout open / click / reply rates.
+
+### Tracking: what travels with the ad, the cookie, the script
+1. **Outbound links** are decorated by `AdLinkTagRule`s: `utm_*`, the workspace's own click id `pw_cid`, and a
+   signed `contact_token` on email / SMS links so a click identifies the visitor without any cookie.
+2. **On landing**, the site snippet (`/tracking/sites`) reads the platform click ids (`gclid`, `wbraid`,
+   `gbraid`, `fbclid`, `ttclid`, `li_fat_id`, `msclkid`, `twclid`, `epik`) plus `pw_cid`, UTM and referrer, and
+   posts them to `POST /ads/clicks`. The response sets the first-party visitor cookie (`_pw_vid`) **from the
+   server on the tracking domain** (a CNAME under the customer's registrable domain) so Safari ITP keeps it for
+   the full TTL instead of 7 days; the id is mirrored to localStorage and restored if the cookie is cleared.
+3. **Identification** is deterministic: form submit, email / SMS link token, login, checkout, call — each joins
+   the anonymous visitor (and every earlier touchpoint on that cookie) to the contact. A soft fingerprint
+   (truncated IP, UA, screen, timezone, language) only joins sessions; it is never sent to a platform.
+4. **Consent**: `AdTrackingSettings.consent` — in strict regions the cookie and click ids wait for the CMP
+   signal (TCF / Google Consent Mode); denied consent still allows id-free cookieless pings for modelled
+   attribution. Every click row records which mode applied.
+5. **Conversions go out server-side**: `AdConversionRule` maps CRM events (form, trial activated, deal created /
+   stage / won, payment from the ERP, booked call) to a platform event name on an account, with value source,
+   attribution window, dedupe key and a consent requirement. `POST /ads/conversions` is called by pipeline /
+   outreach / ERP; the relay attaches the stored click id, the hashed identifiers and the cookie id (Meta CAPI,
+   Google offline / enhanced conversions, LinkedIn CAPI, TikTok Events API). This is what feeds the platforms'
+   bidding with the sales their pixel missed.
+6. **Spend** is imported per account / campaign / ad set / ad / day; `AdCampaignRow` puts platform-reported
+   conversions and revenue beside CRM-attributed leads, deals, won revenue, CPL, CAC, ROAS, 90-day LTV and a
+   scale / hold / cut recommendation.
+7. **Attribution** models: first, last, linear, position-based, time-decay, last-paid, and custom weights
+   (first / assists / last) with a window and the touchpoint kinds that may take credit. `ContactJourney` is the
+   ordered touchpoint list with `joined_by` per event (cookie, click id, token, email, phone, fingerprint).
+   `AdLtvReport` gives monthly acquisition cohorts with CAC, cumulative LTV and payback month.
+
+### Legal notes carried into the spec
+- Purchased B2B lists: the lawful basis is per market; `consent_basis: LEGITIMATE_INTEREST` is refused for
+  lists whose consent source is `PURCHASED` in regions configured as strict. Uploading a list to a platform is a
+  second processing purpose and sits with the controller, not the list vendor.
+- Platform minimums: Meta serves from ~100 matched, Google Customer Match from ~1,000; `preview` flags it.
+- Match rates to expect: Meta / LinkedIn 50–70% on consumer / work emails respectively, Google 30–60%,
+  open-web onboarders 20–40% and falling.

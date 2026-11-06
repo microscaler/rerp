@@ -2293,6 +2293,7 @@ components:
       - RSS_ITEM
       - JUMPED_TO
       - GOAL_REACHED
+      - AD_CLICKED
       description: Enum of trigger types (event-based, schedule-based, webhook-based). JUMPED_TO fires when a contact is moved into this workflow by another workflow's GOTO/START_WORKFLOW.
     ActionType:
       type: string
@@ -2328,6 +2329,8 @@ components:
       - UPDATE_DEAL_STATUS
       - UPDATE_DEAL_TITLE
       - UPDATE_DEAL_FIELD
+      - ADD_TO_AD_AUDIENCE
+      - REMOVE_FROM_AD_AUDIENCE
       - ADD_DEAL_NOTE
       - ADJUST_DEAL_SCORE
       - UPDATE_ACCOUNT_FIELD
@@ -2512,6 +2515,8 @@ components:
             ADJUST_DEAL_SCORE {score_id, points}. UPDATE_ACCOUNT_FIELD {field, value}. UPDATE_ACCOUNT_OWNER
             {user_id}. ADD_ACCOUNT_NOTE {text}. ADD_TO_ACCOUNT {account_id|"FROM_EMAIL_DOMAIN"}.
             CALL_WEBHOOK {url, secret_id?}. START_WORKFLOW / STOP_WORKFLOW {workflow_id}.
+            ADD_TO_AD_AUDIENCE / REMOVE_FROM_AD_AUDIENCE {audience_id} (crm/marketing `/ads/audiences`; the
+            warm-up sequence is add → wait N days → send → remove on click).
             FORMAT_DATA {op: COPY|DATE_ADJUST|EXTRACT|MATH|CAPITALIZE, source_field, target_field, amount?, unit?,
             extract?: PHONE|URL, operator?: ADD|SUBTRACT|MULTIPLY|DIVIDE, operand?, case?: SENTENCE|TITLE|UPPER|LOWER}.
         wait:

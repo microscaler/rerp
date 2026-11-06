@@ -5,7 +5,7 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: CRM Marketing Integration
   version: v1.0.0
-  description: Campaign tracking, web forms, visitor analytics, events, and surveys.
+  description: Campaign tracking, web forms, visitor analytics, events, surveys; ad audiences, ad tracking and attribution.
   x-api-version: CRM Marketing API v1.0.0
   x-crm-api-version: v1.0.0
   termsOfService: https://rerp.example.com/terms
@@ -54,6 +54,12 @@ tags:
   description: UTM source definitions
 - name: visitors
   description: Anonymous visitor tracking
+- name: ad-audiences
+  description: 'Ad audiences: connected ad accounts and segments / lists / tags kept in step with platform custom audiences (hashed server-side), warm-up sequences, lookalikes'
+- name: ad-tracking
+  description: 'Ad tracking: first-party click capture, link decoration, server-side conversion relay (Meta CAPI, Google offline / enhanced, LinkedIn, TikTok), call touchpoints'
+- name: ad-attribution
+  description: 'Ad attribution: journeys, models, spend vs attributed revenue, LTV cohorts'
 paths:
   /utm/campaigns:
     get:
@@ -110,7 +116,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateUTMCampaignRequest'
             examples:
-              default: &id002
+              default:
                 name: Q1 Marketing Campaign
                 type: email
         description: Create a new UTM campaign
@@ -122,7 +128,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
               examples:
-                default: &id001
+                default:
                   id: 00000000-0000-0000-0000-000000000017
                   name: Q1 Marketing
                   type: email
@@ -167,7 +173,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000017
+                  name: Q1 Marketing
+                  type: email
+                  status: active
         '404':
           description: Not found
         '401':
@@ -199,7 +209,9 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateUTMCampaignRequest'
             examples:
-              default: *id002
+              default:
+                name: Q1 Marketing Campaign
+                type: email
         description: Update a UTM campaign
       responses:
         '200':
@@ -209,7 +221,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UTMCampaign'
               examples:
-                default: *id001
+                default:
+                  id: 00000000-0000-0000-0000-000000000017
+                  name: Q1 Marketing
+                  type: email
+                  status: active
         '400':
           description: Invalid request
         '404':
@@ -688,7 +704,7 @@ paths:
                     type: string
                     format: uuid
               examples:
-                default: &id003
+                default:
                   visitor_id: v001
                   identified: true
                   email: user@example.com
@@ -709,7 +725,10 @@ paths:
                     type: string
                     format: uuid
               examples:
-                default: *id003
+                default:
+                  visitor_id: v001
+                  identified: true
+                  email: user@example.com
         '401':
           description: Unauthorized - Invalid or missing authentication token
         '400':
@@ -1292,6 +1311,1287 @@ paths:
           description: Unauthorized
       security:
       - bearerAuth: []
+  /ads/accounts:
+    get:
+      operationId: list_ad_accounts
+      summary: Connected ad platforms
+      tags:
+      - ad-audiences
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: connect_ad_account
+      summary: Connect an ad platform account (OAuth or API key)
+      tags:
+      - ad-audiences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectAdAccountRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Account; OAuth flows return `authorize_url` and status AUTHORIZING
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/accounts/{id}:
+    get:
+      operationId: get_ad_account
+      summary: One ad account with its capabilities and last sync
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    patch:
+      operationId: update_ad_account
+      summary: Rename, change the default conversion event names, pause
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdAccountRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: disconnect_ad_account
+      summary: Disconnect; audiences on it stop syncing (platform-side audiences are left in place)
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/accounts/{id}/reconnect:
+    post:
+      operationId: reconnect_ad_account
+      summary: Re-run the OAuth flow after a token expiry
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Account with `authorize_url`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAccount'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/accounts/{id}/import-spend:
+    post:
+      operationId: import_ad_spend
+      summary: Pull spend, impressions and clicks per campaign / ad set / ad for a date range
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from:
+                  type: string
+                  format: date
+                to:
+                  type: string
+                  format: date
+      security:
+      - bearerAuth: []
+      responses:
+        '202':
+          description: Import job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdSpendImport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences:
+    get:
+      operationId: list_ad_audiences
+      summary: Audience bindings (a segment, list or tag kept in step with a platform custom audience)
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - PAUSED
+          - ERROR
+          - BUILDING
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Audiences
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_ad_audience
+      summary: Bind a segment / list / tag to a new or existing platform audience
+      tags:
+      - ad-audiences
+      description: Identifiers are normalised and SHA-256 hashed server-side before leaving the workspace; raw emails and phones never reach the platform. `consent_basis` is recorded on the audience and
+        on every membership row. Contacts that are unsubscribed, suppressed, erased, or match `suppress_on` are removed on the next sync.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdAudienceRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Audience; the first build runs asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences/{id}:
+    get:
+      operationId: get_ad_audience
+      summary: One audience with its stats
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    patch:
+      operationId: update_ad_audience
+      summary: Change source, identifiers, suppression rules, lookalike or mode
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdAudienceRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_ad_audience
+      summary: Stop syncing and, when `delete_remote=true`, delete the platform audience
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: delete_remote
+        in: query
+        schema:
+          type: boolean
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences/{id}/sync:
+    post:
+      operationId: sync_ad_audience
+      summary: Run a sync now (adds, removals, re-hash after an identifier change)
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '202':
+          description: Sync run
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudienceSyncRun'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences/{id}/pause:
+    post:
+      operationId: pause_ad_audience
+      summary: Pause syncing; members stay on the platform
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences/{id}/resume:
+    post:
+      operationId: resume_ad_audience
+      summary: Resume syncing
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudience'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/audiences/{id}/members:
+    get:
+      operationId: list_ad_audience_members
+      summary: 'Membership rows: who is in the platform audience, when they were added / removed and why'
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - ADDED
+          - REMOVED
+          - FAILED
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Members
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdAudienceMember'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/audiences/{id}/runs:
+    get:
+      operationId: list_ad_audience_runs
+      summary: Sync history
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Runs
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdAudienceSyncRun'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/audiences/preview:
+    post:
+      operationId: preview_ad_audience
+      summary: Count the source and estimate the platform match before creating the audience
+      tags:
+      - ad-audiences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdAudienceRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Estimate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAudiencePreview'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/contacts/{id}/audiences:
+    get:
+      operationId: list_contact_ad_audiences
+      summary: The audiences one contact is in (shown on the contact profile)
+      tags:
+      - ad-audiences
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Memberships
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdAudienceMember'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/settings:
+    get:
+      operationId: get_ad_tracking_settings
+      summary: 'Workspace ad-tracking settings: first-party cookie, click-id parameters, link decoration, consent mode'
+      tags:
+      - ad-tracking
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdTrackingSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    put:
+      operationId: update_ad_tracking_settings
+      summary: Replace the settings
+      tags:
+      - ad-tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdTrackingSettings'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdTrackingSettings'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/clicks:
+    post:
+      operationId: record_ad_click
+      summary: 'Public: the site script posts the ad click ids and UTM it found on landing'
+      tags:
+      - ad-tracking
+      description: Called by the tracking snippet (`/tracking/sites`) on every landing that carries a click id (`gclid`, `wbraid`, `gbraid`, `fbclid`, `ttclid`, `li_fat_id`, `msclkid`, `twclid`, `epik`,
+        or the workspace's own `pw_cid`) or UTM parameters. The origin must be an allowed tracked site. When `cookie.server_set` is on, the response carries a `Set-Cookie` for the tracking domain so the
+        id survives ITP's 7-day cap on script-set cookies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdClickRequest'
+      security: []
+      responses:
+        '201':
+          description: Recorded; returns the visitor id and the first-party cookie to set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdClickResult'
+        '400':
+          description: Rejected (origin not allowed, bad payload)
+      x-brrtrouter-impl: true
+    get:
+      operationId: list_ad_clicks
+      summary: Recorded ad clicks
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: platform
+        in: query
+        schema:
+          type: string
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: visitor_id
+        in: query
+        schema:
+          type: string
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Clicks
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdClick'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/clicks/{id}:
+    get:
+      operationId: get_ad_click
+      summary: One click with the touchpoints it started
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Click
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdClick'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/link-tags:
+    get:
+      operationId: list_ad_link_tags
+      summary: Rules that decorate outbound links (emails, SMS, social posts) with `pw_cid` and UTM so later visits join the journey
+      tags:
+      - ad-tracking
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdLinkTagRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_ad_link_tag
+      summary: Add a decoration rule
+      tags:
+      - ad-tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdLinkTagRule'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdLinkTagRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/link-tags/{id}:
+    patch:
+      operationId: update_ad_link_tag
+      summary: Change a rule
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdLinkTagRule'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdLinkTagRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_ad_link_tag
+      summary: Remove a rule
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/conversion-rules:
+    get:
+      operationId: list_conversion_rules
+      summary: Which CRM events are sent to which platform as conversions (Meta CAPI, Google offline / enhanced conversions, LinkedIn CAPI, TikTok Events API)
+      tags:
+      - ad-tracking
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdConversionRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_conversion_rule
+      summary: Add a rule
+      tags:
+      - ad-tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdConversionRule'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConversionRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/conversion-rules/{id}:
+    get:
+      operationId: get_conversion_rule
+      summary: One rule
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConversionRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    patch:
+      operationId: update_conversion_rule
+      summary: Change a rule
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdConversionRule'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConversionRule'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_conversion_rule
+      summary: Remove a rule
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/conversions:
+    get:
+      operationId: list_ad_conversions
+      summary: Conversions sent (or failed) to the platforms
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - QUEUED
+          - SENT
+          - FAILED
+          - SKIPPED_NO_MATCH
+          - SKIPPED_NO_CONSENT
+      - name: event
+        in: query
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Conversions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdConversion'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: record_ad_conversion
+      summary: Record a conversion from another service (pipeline on deal won, outreach on form, the ERP on payment) and relay it per the rules
+      tags:
+      - ad-tracking
+      description: Internal (service-to-service). The contact's stored click ids, hashed identifiers and the first-party cookie id are attached so the platform can match without a browser pixel; `value`
+        defaults from the rule's `value_from`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdConversionRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Conversion rows, one per matching rule
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdConversion'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/conversions/{id}/retry:
+    post:
+      operationId: retry_ad_conversion
+      summary: Resend a failed conversion
+      tags:
+      - ad-tracking
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Conversion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdConversion'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/calls:
+    post:
+      operationId: record_ad_call
+      summary: Record an inbound call (telephony webhook) as a touchpoint; matched to a contact by caller number or by the dynamically inserted number's session
+      tags:
+      - ad-tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdCallRequest'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Call touchpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdTouchpoint'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/campaigns:
+    get:
+      operationId: list_ad_campaigns
+      summary: Platform campaigns / ad sets / ads with imported spend next to CRM-attributed leads, deals and revenue (platform-reported vs attributed)
+      tags:
+      - ad-attribution
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: level
+        in: query
+        schema:
+          type: string
+          enum:
+          - CAMPAIGN
+          - AD_SET
+          - AD
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: model
+        in: query
+        schema:
+          type: string
+        description: Attribution model id or built-in name; default the workspace default
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Rows
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdCampaignRow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/spend:
+    get:
+      operationId: list_ad_spend
+      summary: Imported spend per account and day
+      tags:
+      - ad-attribution
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Spend
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponse'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AdSpendRow'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/attribution/models:
+    get:
+      operationId: list_attribution_models
+      summary: Built-in and custom attribution models
+      tags:
+      - ad-attribution
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AttributionModel'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+    post:
+      operationId: create_attribution_model
+      summary: Add a custom model (weights per position, window, which touchpoint kinds count)
+      tags:
+      - ad-attribution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributionModel'
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: Model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributionModel'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/attribution/models/{id}:
+    patch:
+      operationId: update_attribution_model
+      summary: Change a custom model or make it the default
+      tags:
+      - ad-attribution
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributionModel'
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributionModel'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+    delete:
+      operationId: delete_attribution_model
+      summary: Remove a custom model
+      tags:
+      - ad-attribution
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: OK
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+      x-brrtrouter-impl: true
+  /ads/attribution:
+    get:
+      operationId: get_ad_attribution
+      summary: Revenue, deals and leads by channel / campaign / ad under a model and window, with the ad-platform-reported figures beside them
+      tags:
+      - ad-attribution
+      parameters:
+      - name: model
+        in: query
+        schema:
+          type: string
+      - name: window_days
+        in: query
+        schema:
+          type: integer
+      - name: by
+        in: query
+        schema:
+          type: string
+          enum:
+          - CHANNEL
+          - ACCOUNT
+          - CAMPAIGN
+          - AD_SET
+          - AD
+          - SOURCE_MEDIUM
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAttributionReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/contacts/{id}/journey:
+    get:
+      operationId: get_contact_journey
+      summary: 'Every touchpoint for one contact in order: ad clicks, site visits, form, emails opened / clicked, calls, deal events, payments — with the identifiers that joined them'
+      tags:
+      - ad-attribution
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: model
+        in: query
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Journey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactJourney'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+  /ads/ltv:
+    get:
+      operationId: get_ad_ltv
+      summary: Lifetime value and payback by acquisition channel / campaign, in monthly cohorts
+      tags:
+      - ad-attribution
+      parameters:
+      - name: by
+        in: query
+        schema:
+          type: string
+          enum:
+          - CHANNEL
+          - CAMPAIGN
+          - AD
+      - name: cohort_months
+        in: query
+        schema:
+          type: integer
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: LTV cohorts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdLtvReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
 components:
   parameters:
     Page:
@@ -1794,10 +3094,13 @@ components:
           - SUBSCRIPTION_TOGGLE
           - LIST_SELECTOR
           - ACCOUNT_FIELD
-          description: |
-            Input kinds, plus layout blocks (HEADER, HTML, IMAGE) that capture nothing, FULL_NAME (split into
+          description: 'Input kinds, plus layout blocks (HEADER, HTML, IMAGE) that capture nothing, FULL_NAME (split into
+
             first/last on submit), CAPTCHA, SUBSCRIPTION_TOGGLE (subscribe/unsubscribe to `list_ids`),
+
             LIST_SELECTOR (the visitor picks from `list_ids`) and ACCOUNT_FIELD (a crm/accounts company field).
+
+            '
         list_ids:
           type: array
           items:
@@ -2125,8 +3428,7 @@ components:
         limit:
           type: integer
           format: int32
-      description: A generic paginated response wrapper with items and pagination
-        metadata
+      description: A generic paginated response wrapper with items and pagination metadata
     ErrorResponse:
       type: object
       required:
@@ -2220,6 +3522,1501 @@ components:
             items:
               $ref: '#/components/schemas/CampaignLeadResult'
       description: Paginated list of CampaignLeadResult records
+    AdAccount:
+      type: object
+      required:
+      - id
+      - platform
+      - name
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+          enum:
+          - META
+          - GOOGLE_ADS
+          - LINKEDIN
+          - X
+          - TIKTOK
+          - MICROSOFT_ADS
+          - PINTEREST
+          - DSP_TRADE_DESK
+          - DSP_DV360
+          - LIVERAMP
+        name:
+          type: string
+        external_account_id:
+          type: string
+          description: The platform's own account / ad-account / pixel id
+        status:
+          type: string
+          enum:
+          - AUTHORIZING
+          - CONNECTED
+          - TOKEN_EXPIRED
+          - PAUSED
+          - DISCONNECTED
+          - ERROR
+        authorize_url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Present while AUTHORIZING
+        capabilities:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUDIENCES
+            - LOOKALIKES
+            - CONVERSIONS
+            - SPEND
+            - CAMPAIGN_CONTROL
+          readOnly: true
+        conversion_endpoint:
+          type: string
+          enum:
+          - META_CAPI
+          - GOOGLE_OFFLINE
+          - GOOGLE_ENHANCED
+          - LINKEDIN_CAPI
+          - TIKTOK_EVENTS
+          - MICROSOFT_OFFLINE
+          - NONE
+          description: Which server-side conversion API the account relays to
+        pixel_id:
+          type: string
+          description: Pixel / dataset / tag id used for conversion relay
+        default_currency:
+          type: string
+        match_rate_last:
+          type: number
+          format: float
+          readOnly: true
+          description: Matched ÷ uploaded on the last audience sync, 0–1
+        last_sync_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_spend_import_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_error:
+          type: string
+          readOnly: true
+        connected_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    ConnectAdAccountRequest:
+      type: object
+      required:
+      - platform
+      - name
+      properties:
+        platform:
+          type: string
+          enum:
+          - META
+          - GOOGLE_ADS
+          - LINKEDIN
+          - X
+          - TIKTOK
+          - MICROSOFT_ADS
+          - PINTEREST
+          - DSP_TRADE_DESK
+          - DSP_DV360
+          - LIVERAMP
+        name:
+          type: string
+        external_account_id:
+          type: string
+        auth:
+          type: object
+          description: OAUTH starts the platform flow (response carries `authorize_url`); API_KEY / TOKEN stores the credential in the secrets service, never on the account row
+          properties:
+            kind:
+              type: string
+              enum:
+              - OAUTH
+              - API_KEY
+              - TOKEN
+            secret_id:
+              type: string
+        conversion_endpoint:
+          type: string
+        pixel_id:
+          type: string
+    UpdateAdAccountRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - CONNECTED
+          - PAUSED
+        conversion_endpoint:
+          type: string
+        pixel_id:
+          type: string
+        default_currency:
+          type: string
+    AdAudienceSource:
+      type: object
+      required:
+      - kind
+      properties:
+        kind:
+          type: string
+          enum:
+          - SEGMENT
+          - LIST
+          - TAG
+          - SCORE_BAND
+          - PIPELINE_STAGE
+          - STATIC
+        ref_id:
+          type: string
+          description: Segment / list / score / pipeline id
+        tag:
+          type: string
+        band:
+          type: string
+          enum:
+          - COLD
+          - WARM
+          - HOT
+        stage_id:
+          type: string
+          format: uuid
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: STATIC only
+    AdAudience:
+      type: object
+      required:
+      - id
+      - name
+      - account_id
+      - platform
+      - source
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+          enum:
+          - META
+          - GOOGLE_ADS
+          - LINKEDIN
+          - X
+          - TIKTOK
+          - MICROSOFT_ADS
+          - PINTEREST
+          - DSP_TRADE_DESK
+          - DSP_DV360
+          - LIVERAMP
+        external_audience_id:
+          type: string
+          description: The platform's audience id; created on first sync unless given
+        source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        mode:
+          type: string
+          enum:
+          - CONTINUOUS
+          - ONE_OFF
+          default: CONTINUOUS
+          description: CONTINUOUS re-evaluates the source and pushes adds / removals every `sync_interval_minutes`
+        sync_interval_minutes:
+          type: integer
+          format: int32
+          default: 60
+        identifiers:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMAIL
+            - PHONE
+            - FIRST_NAME
+            - LAST_NAME
+            - POSTCODE
+            - COUNTRY
+            - MAID
+            - EXTERNAL_ID
+          description: Which identifiers are hashed and sent; more identifiers raise the match rate
+        consent_basis:
+          type: string
+          enum:
+          - CONSENT
+          - LEGITIMATE_INTEREST
+          - CONTRACT
+          description: Recorded on every membership; LEGITIMATE_INTEREST is refused for lists whose consent source is PURCHASED in regions configured as strict
+        suppress_on:
+          type: array
+          items:
+            type: string
+            enum:
+            - UNSUBSCRIBED
+            - SUPPRESSED
+            - ERASED
+            - CONVERTED
+            - DEAL_WON
+            - TRACKING_OPTOUT
+            - NO_MARKETING_CONSENT
+          description: Contacts in these states are removed (or never added)
+        exclude_source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        lookalike:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            ratio_percent:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 10
+            country:
+              type: string
+            external_audience_id:
+              type: string
+              readOnly: true
+        purpose:
+          type: string
+          enum:
+          - WARM_UP
+          - RETARGET
+          - EXCLUDE
+          - LOOKALIKE_SEED
+          - OTHER
+          description: 'WARM_UP is the pre-email sequence: add N days before a send, remove on click or after the window'
+        warm_up:
+          type: object
+          properties:
+            days_before_send:
+              type: integer
+              format: int32
+            remove_on:
+              type: string
+              enum:
+              - EMAIL_CLICKED
+              - EMAIL_OPENED
+              - SITE_VISIT
+              - WINDOW_END
+            window_days:
+              type: integer
+              format: int32
+            frequency_cap_hint:
+              type: integer
+              format: int32
+              description: Impressions per person the campaign should cap at (informational; set on the platform)
+        status:
+          type: string
+          enum:
+          - BUILDING
+          - ACTIVE
+          - PAUSED
+          - ERROR
+        stats:
+          type: object
+          readOnly: true
+          properties:
+            source_count:
+              type: integer
+              format: int64
+            eligible:
+              type: integer
+              format: int64
+              description: After suppression
+            uploaded:
+              type: integer
+              format: int64
+            matched:
+              type: integer
+              format: int64
+              description: As reported by the platform (Meta and LinkedIn report a size band; stored as the band midpoint)
+            match_rate:
+              type: number
+              format: float
+            removed_total:
+              type: integer
+              format: int64
+            last_sync_at:
+              type: string
+              format: date-time
+            next_sync_at:
+              type: string
+              format: date-time
+        last_error:
+          type: string
+          readOnly: true
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    CreateAdAudienceRequest:
+      type: object
+      required:
+      - name
+      - account_id
+      - source
+      - consent_basis
+      properties:
+        name:
+          type: string
+        account_id:
+          type: string
+          format: uuid
+        external_audience_id:
+          type: string
+        source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        exclude_source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        mode:
+          type: string
+          enum:
+          - CONTINUOUS
+          - ONE_OFF
+        sync_interval_minutes:
+          type: integer
+          format: int32
+        identifiers:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMAIL
+            - PHONE
+            - FIRST_NAME
+            - LAST_NAME
+            - POSTCODE
+            - COUNTRY
+            - MAID
+            - EXTERNAL_ID
+        consent_basis:
+          type: string
+          enum:
+          - CONSENT
+          - LEGITIMATE_INTEREST
+          - CONTRACT
+        suppress_on:
+          type: array
+          items:
+            type: string
+        lookalike:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            ratio_percent:
+              type: integer
+              format: int32
+            country:
+              type: string
+        purpose:
+          type: string
+        warm_up:
+          type: object
+          properties:
+            days_before_send:
+              type: integer
+              format: int32
+            remove_on:
+              type: string
+            window_days:
+              type: integer
+              format: int32
+            frequency_cap_hint:
+              type: integer
+              format: int32
+    UpdateAdAudienceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        exclude_source:
+          $ref: '#/components/schemas/AdAudienceSource'
+        mode:
+          type: string
+        sync_interval_minutes:
+          type: integer
+          format: int32
+        identifiers:
+          type: array
+          items:
+            type: string
+        suppress_on:
+          type: array
+          items:
+            type: string
+        lookalike:
+          type: object
+        purpose:
+          type: string
+        warm_up:
+          type: object
+    AdAudiencePreview:
+      type: object
+      properties:
+        source_count:
+          type: integer
+          format: int64
+        eligible:
+          type: integer
+          format: int64
+        excluded:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: Counts per suppression reason
+        identifier_coverage:
+          type: object
+          additionalProperties:
+            type: number
+            format: float
+          description: Share of eligible contacts that have each identifier
+        estimated_match_rate:
+          type: number
+          format: float
+          description: From the account's history for this identifier set
+        estimated_matched:
+          type: integer
+          format: int64
+        below_platform_minimum:
+          type: boolean
+          description: Platforms refuse to serve audiences under ~100 (Meta) / 1,000 (Google) matched people
+    AdAudienceMember:
+      type: object
+      required:
+      - contact_id
+      - status
+      properties:
+        audience_id:
+          type: string
+          format: uuid
+        audience_name:
+          type: string
+        platform:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        contact_name:
+          type: string
+        email_hash:
+          type: string
+          description: SHA-256 of the normalised email, hex; what was sent
+        status:
+          type: string
+          enum:
+          - PENDING
+          - ADDED
+          - REMOVED
+          - FAILED
+        matched:
+          type: boolean
+          description: Only known for platforms that report per-record match (LiveRamp); null elsewhere
+        consent_basis:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+        removed_at:
+          type: string
+          format: date-time
+        removed_reason:
+          type: string
+          enum:
+          - LEFT_SOURCE
+          - UNSUBSCRIBED
+          - SUPPRESSED
+          - ERASED
+          - CONVERTED
+          - DEAL_WON
+          - TRACKING_OPTOUT
+          - WARM_UP_DONE
+          - AUDIENCE_DELETED
+        error:
+          type: string
+    AdAudienceSyncRun:
+      type: object
+      required:
+      - id
+      - audience_id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        audience_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+          - FAILED
+        trigger:
+          type: string
+          enum:
+          - SCHEDULE
+          - MANUAL
+          - SOURCE_CHANGED
+          - CREATED
+        added:
+          type: integer
+          format: int64
+        removed:
+          type: integer
+          format: int64
+        failed:
+          type: integer
+          format: int64
+        uploaded_total:
+          type: integer
+          format: int64
+        platform_size:
+          type: integer
+          format: int64
+        started_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+    AdSpendImport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+          - FAILED
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        rows:
+          type: integer
+          format: int64
+        finished_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+    AdTrackingSettings:
+      type: object
+      properties:
+        cookie:
+          type: object
+          description: The first-party visitor cookie set on the tracking domain
+          properties:
+            name:
+              type: string
+              default: _pw_vid
+            ttl_days:
+              type: integer
+              format: int32
+              default: 400
+              description: Chrome caps at 400 days; Safari caps script-set cookies at 7 days, server-set at the full TTL
+            server_set:
+              type: boolean
+              default: true
+              description: Set via `Set-Cookie` from `/ads/clicks` on the tracking domain (CNAME, same registrable domain as the site) so ITP keeps it
+            same_site:
+              type: string
+              enum:
+              - Lax
+              - Strict
+              - None
+              default: Lax
+            localstorage_mirror:
+              type: boolean
+              default: true
+              description: Mirror the id into localStorage and restore the cookie when it is cleared
+        click_id_params:
+          type: array
+          items:
+            type: string
+          default:
+          - gclid
+          - wbraid
+          - gbraid
+          - fbclid
+          - ttclid
+          - li_fat_id
+          - msclkid
+          - twclid
+          - epik
+          - pw_cid
+          description: URL parameters the script captures on landing
+        own_click_id_param:
+          type: string
+          default: pw_cid
+          description: The workspace's own click id, stamped on every outbound link by the link-tag rules
+        capture_utm:
+          type: boolean
+          default: true
+        capture_referrer:
+          type: boolean
+          default: true
+        fingerprint:
+          type: object
+          description: Soft identifiers used only to join sessions, never sent to a platform
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            signals:
+              type: array
+              items:
+                type: string
+                enum:
+                - IP_PREFIX
+                - USER_AGENT
+                - SCREEN
+                - TIMEZONE
+                - LANGUAGE
+            ip_truncation:
+              type: string
+              enum:
+              - NONE
+              - LAST_OCTET
+              - LAST_TWO_OCTETS
+              default: LAST_OCTET
+        identify_on:
+          type: array
+          items:
+            type: string
+            enum:
+            - FORM_SUBMIT
+            - EMAIL_LINK
+            - SMS_LINK
+            - LOGIN
+            - CHECKOUT
+            - CALL
+          description: 'Moments at which the anonymous visitor is joined to a contact (deterministic: email, phone, contact id in the link)'
+        consent:
+          type: object
+          description: Consent-mode behaviour per region
+          properties:
+            mode:
+              type: string
+              enum:
+              - ALWAYS
+              - AFTER_CONSENT
+              - REGION
+              default: REGION
+            strict_regions:
+              type: array
+              items:
+                type: string
+              description: ISO country codes where the cookie and click ids wait for consent (EU/EEA, UK, CH by default)
+            cmp_signal:
+              type: string
+              enum:
+              - TCF
+              - GOOGLE_CONSENT_MODE
+              - CUSTOM
+              - NONE
+              description: Which consent signal the script reads
+            cookieless_pings:
+              type: boolean
+              description: Send consentless, id-free pings (page, source) for modelled attribution when consent is denied
+        link_decoration:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            params:
+              type: array
+              items:
+                type: string
+              description: pw_cid plus utm_* on every tracked outbound link
+            contact_token:
+              type: boolean
+              default: true
+              description: Also carry a signed contact token so an email click identifies the visitor even without a cookie
+        default_attribution_model:
+          type: string
+          default: LAST_TOUCH
+        default_window_days:
+          type: integer
+          format: int32
+          default: 30
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    RecordAdClickRequest:
+      type: object
+      required:
+      - site_key
+      - landing_url
+      properties:
+        site_key:
+          type: string
+        visitor_id:
+          type: string
+          description: Existing cookie id, if any
+        landing_url:
+          type: string
+          format: uri
+        referrer:
+          type: string
+        click_ids:
+          type: object
+          additionalProperties:
+            type: string
+          description: '`{gclid: ..., fbclid: ...}`'
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+        contact_token:
+          type: string
+          description: From a decorated email / SMS link
+        consent:
+          type: object
+          properties:
+            analytics:
+              type: boolean
+            ads:
+              type: boolean
+        fingerprint:
+          type: object
+          additionalProperties:
+            type: string
+        at:
+          type: string
+          format: date-time
+    AdClickResult:
+      type: object
+      properties:
+        click_id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+          description: When the visitor is already identified
+        set_cookie:
+          type: boolean
+        consent_applied:
+          type: string
+          enum:
+          - FULL
+          - ANALYTICS_ONLY
+          - COOKIELESS
+    AdClick:
+      type: object
+      required:
+      - id
+      - at
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        contact_name:
+          type: string
+        platform:
+          type: string
+          description: Derived from the click id or utm_source
+        click_id_param:
+          type: string
+        click_id_value:
+          type: string
+        account_id:
+          type: string
+          format: uuid
+        campaign:
+          type: string
+        ad_set:
+          type: string
+        ad:
+          type: string
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+        landing_url:
+          type: string
+        referrer:
+          type: string
+        consent_applied:
+          type: string
+        touchpoints:
+          type: integer
+          format: int32
+          description: Later events joined to this click
+        at:
+          type: string
+          format: date-time
+    AdLinkTagRule:
+      type: object
+      required:
+      - applies_to
+      properties:
+        id:
+          type: string
+          format: uuid
+        applies_to:
+          type: string
+          enum:
+          - CAMPAIGN_EMAIL
+          - AUTOMATION_EMAIL
+          - TRANSACTIONAL_EMAIL
+          - SMS
+          - SOCIAL_POST
+          - ALL
+        domains:
+          type: array
+          items:
+            type: string
+          description: 'Only decorate links to these domains (default: the workspace''s tracked sites)'
+        utm_source:
+          type: string
+        utm_medium:
+          type: string
+        utm_campaign:
+          type: string
+          description: Template, e.g. `{{campaign.slug}}`
+        utm_content:
+          type: string
+        add_click_id:
+          type: boolean
+          default: true
+        add_contact_token:
+          type: boolean
+          default: true
+        enabled:
+          type: boolean
+          default: true
+    AdConversionRule:
+      type: object
+      required:
+      - event
+      - account_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        event:
+          type: string
+          enum:
+          - FORM_SUBMITTED
+          - CONTACT_CREATED
+          - LEAD_QUALIFIED
+          - TRIAL_ACTIVATED
+          - DEAL_CREATED
+          - DEAL_STAGE_REACHED
+          - DEAL_WON
+          - PAYMENT
+          - SUBSCRIPTION_RENEWED
+          - CALL_BOOKED
+          - CUSTOM_EVENT
+        event_filter:
+          type: object
+          additionalProperties: true
+          description: 'e.g. `{pipeline_id, stage_id}` or `{event_type: ''activated''}`'
+        account_id:
+          type: string
+          format: uuid
+        external_event_name:
+          type: string
+          description: The platform's event name (`Purchase`, `Lead`, a Google conversion action id)
+        value_from:
+          type: string
+          enum:
+          - DEAL_VALUE
+          - PAYMENT_AMOUNT
+          - FIXED
+          - NONE
+        fixed_value:
+          type: number
+          format: double
+        currency:
+          type: string
+        window_days:
+          type: integer
+          format: int32
+          default: 30
+          description: Only relay when an ad click from this account is within the window
+        require_click:
+          type: boolean
+          default: false
+          description: false sends with hashed identifiers even without a stored click id (enhanced / CAPI matching)
+        dedupe_key:
+          type: string
+          enum:
+          - DEAL_ID
+          - PAYMENT_ID
+          - CONTACT_EVENT
+        consent_required:
+          type: boolean
+          default: true
+          description: Skip (SKIPPED_NO_CONSENT) when the contact has no ads consent in a strict region
+        enabled:
+          type: boolean
+          default: true
+        sent_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        failed_30d:
+          type: integer
+          format: int64
+          readOnly: true
+    RecordAdConversionRequest:
+      type: object
+      required:
+      - event
+      - contact_id
+      properties:
+        event:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        deal_id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        properties:
+          type: object
+          additionalProperties: true
+    AdConversion:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        rule_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+        event:
+          type: string
+        external_event_name:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        contact_name:
+          type: string
+        deal_id:
+          type: string
+          format: uuid
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        click_id_param:
+          type: string
+        identifiers_sent:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - SENT
+          - FAILED
+          - SKIPPED_NO_MATCH
+          - SKIPPED_NO_CONSENT
+          - SKIPPED_DUPLICATE
+        platform_response:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        sent_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+    RecordAdCallRequest:
+      type: object
+      required:
+      - caller_number
+      - at
+      properties:
+        caller_number:
+          type: string
+        called_number:
+          type: string
+          description: The dynamically inserted number, which maps back to the session that saw it
+        duration_seconds:
+          type: integer
+          format: int32
+        outcome:
+          type: string
+        recording_url:
+          type: string
+        at:
+          type: string
+          format: date-time
+        provider:
+          type: string
+        external_id:
+          type: string
+    AdTouchpoint:
+      type: object
+      required:
+      - kind
+      - at
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - AD_CLICK
+          - AD_VIEW
+          - SITE_VISIT
+          - FORM_SUBMITTED
+          - EMAIL_SENT
+          - EMAIL_OPENED
+          - EMAIL_CLICKED
+          - SMS_CLICKED
+          - SOCIAL_CLICK
+          - CALL
+          - DEAL_CREATED
+          - DEAL_WON
+          - PAYMENT
+          - EVENT
+        at:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          description: paid-social, paid-search, email, organic, direct, referral, social, call
+        platform:
+          type: string
+        campaign:
+          type: string
+        ad_set:
+          type: string
+        ad:
+          type: string
+        detail:
+          type: string
+        url:
+          type: string
+        value:
+          type: number
+          format: double
+        joined_by:
+          type: string
+          enum:
+          - COOKIE
+          - CLICK_ID
+          - CONTACT_TOKEN
+          - EMAIL
+          - PHONE
+          - FINGERPRINT
+          - LOGIN
+          description: The identifier that attached this event to the contact
+        credit:
+          type: number
+          format: float
+          description: Share of the conversion under the requested model, 0–1
+    ContactJourney:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        contact_name:
+          type: string
+        first_touch:
+          $ref: '#/components/schemas/AdTouchpoint'
+        last_touch:
+          $ref: '#/components/schemas/AdTouchpoint'
+        identifiers:
+          type: object
+          description: 'The ''print'': which identifiers are known and when they were first seen'
+          additionalProperties:
+            type: string
+            format: date-time
+        devices:
+          type: integer
+          format: int32
+        touchpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdTouchpoint'
+        conversions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdConversion'
+        revenue:
+          type: number
+          format: double
+        model:
+          type: string
+    AttributionModel:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - FIRST_TOUCH
+          - LAST_TOUCH
+          - LINEAR
+          - POSITION_BASED
+          - TIME_DECAY
+          - LAST_PAID
+          - CUSTOM
+        weights:
+          type: object
+          description: 'CUSTOM / POSITION_BASED: shares that sum to 1'
+          properties:
+            first:
+              type: number
+              format: float
+            assists:
+              type: number
+              format: float
+            last:
+              type: number
+              format: float
+        half_life_days:
+          type: number
+          format: float
+          description: TIME_DECAY
+        window_days:
+          type: integer
+          format: int32
+        count_kinds:
+          type: array
+          items:
+            type: string
+            enum:
+            - AD_CLICK
+            - AD_VIEW
+            - SITE_VISIT
+            - FORM_SUBMITTED
+            - EMAIL_SENT
+            - EMAIL_OPENED
+            - EMAIL_CLICKED
+            - SMS_CLICKED
+            - SOCIAL_CLICK
+            - CALL
+            - DEAL_CREATED
+            - DEAL_WON
+            - PAYMENT
+            - EVENT
+          description: Which touchpoint kinds can take credit (e.g. exclude EMAIL_OPENED)
+        is_default:
+          type: boolean
+        builtin:
+          type: boolean
+          readOnly: true
+    AdCampaignRow:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+        level:
+          type: string
+        external_id:
+          type: string
+        name:
+          type: string
+        parent_name:
+          type: string
+        status:
+          type: string
+        spend:
+          type: number
+          format: double
+        impressions:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        cpc:
+          type: number
+          format: double
+        platform_reported:
+          type: object
+          properties:
+            conversions:
+              type: integer
+              format: int64
+            revenue:
+              type: number
+              format: double
+            roas:
+              type: number
+              format: float
+        attributed:
+          type: object
+          properties:
+            leads:
+              type: integer
+              format: int64
+            deals:
+              type: integer
+              format: int64
+            won:
+              type: integer
+              format: int64
+            revenue:
+              type: number
+              format: double
+            roas:
+              type: number
+              format: float
+            cpl:
+              type: number
+              format: double
+            cac:
+              type: number
+              format: double
+        ltv_90d:
+          type: number
+          format: double
+        recommendation:
+          type: string
+          enum:
+          - SCALE
+          - HOLD
+          - CUT
+          - INSUFFICIENT_DATA
+    AdSpendRow:
+      type: object
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+        date:
+          type: string
+          format: date
+        campaign:
+          type: string
+        spend:
+          type: number
+          format: double
+        currency:
+          type: string
+        impressions:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        imported_at:
+          type: string
+          format: date-time
+    AdAttributionReport:
+      type: object
+      properties:
+        model:
+          type: string
+        window_days:
+          type: integer
+          format: int32
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        totals:
+          type: object
+          properties:
+            spend:
+              type: number
+              format: double
+            leads:
+              type: integer
+              format: int64
+            deals:
+              type: integer
+              format: int64
+            won:
+              type: integer
+              format: int64
+            revenue:
+              type: number
+              format: double
+            platform_reported_revenue:
+              type: number
+              format: double
+            unattributed_revenue:
+              type: number
+              format: double
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              label:
+                type: string
+              spend:
+                type: number
+                format: double
+              leads:
+                type: integer
+                format: int64
+              deals:
+                type: integer
+                format: int64
+              won:
+                type: integer
+                format: int64
+              revenue:
+                type: number
+                format: double
+              platform_reported_revenue:
+                type: number
+                format: double
+              roas:
+                type: number
+                format: float
+              cac:
+                type: number
+                format: double
+        warm_up_lift:
+          type: object
+          description: Email outcomes for contacts who were in a WARM_UP audience vs the holdout, when a holdout is configured
+          properties:
+            exposed:
+              type: object
+              additionalProperties:
+                type: number
+            holdout:
+              type: object
+              additionalProperties:
+                type: number
+            relative_lift:
+              type: object
+              additionalProperties:
+                type: number
+    AdLtvReport:
+      type: object
+      properties:
+        by:
+          type: string
+        cohorts:
+          type: array
+          items:
+            type: object
+            properties:
+              cohort:
+                type: string
+                description: YYYY-MM of acquisition
+              key:
+                type: string
+              label:
+                type: string
+              customers:
+                type: integer
+                format: int64
+              spend:
+                type: number
+                format: double
+              cac:
+                type: number
+                format: double
+              ltv:
+                type: array
+                items:
+                  type: number
+                  format: double
+                description: Cumulative revenue per customer at month 1..n
+              payback_month:
+                type: integer
+                format: int32
   securitySchemes:
     bearerAuth:
       type: http
