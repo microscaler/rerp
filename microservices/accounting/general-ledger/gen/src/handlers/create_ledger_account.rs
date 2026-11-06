@@ -43,7 +43,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "control_role")]
-    pub control_role: Option<String>,
+    pub control_role: Option<serde_json::Value>,
 
     #[serde(rename = "currency_code")]
     pub currency_code: String,

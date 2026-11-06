@@ -60,10 +60,10 @@ pub struct CreateFiscalPeriodRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateFiscalPeriodResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_at: Option<String>,
+    pub closed_at: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_by: Option<String>,
+    pub closed_by: Option<serde_json::Value>,
 
     pub end_date: String,
 
@@ -100,7 +100,7 @@ pub struct CreateLedgerAccountResponse {
     pub code: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub control_role: Option<String>,
+    pub control_role: Option<serde_json::Value>,
 
     pub currency_code: String,
 
@@ -121,10 +121,10 @@ pub struct ErrorResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FiscalPeriod {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_at: Option<String>,
+    pub closed_at: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_by: Option<String>,
+    pub closed_by: Option<serde_json::Value>,
 
     pub end_date: String,
 
@@ -246,7 +246,7 @@ pub struct JournalEntryResponse {
     pub lines: Vec<JournalEntryLine>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reverses_entry_id: Option<String>,
+    pub reverses_entry_id: Option<serde_json::Value>,
 
     pub total_credit: String,
 
@@ -287,7 +287,7 @@ pub struct LedgerAccount {
     pub code: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub control_role: Option<String>,
+    pub control_role: Option<serde_json::Value>,
 
     pub currency_code: String,
 
@@ -369,7 +369,7 @@ pub struct PostJournalEntryResponse {
     pub lines: Vec<JournalEntryLine>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reverses_entry_id: Option<String>,
+    pub reverses_entry_id: Option<serde_json::Value>,
 
     pub total_credit: String,
 
@@ -400,7 +400,7 @@ pub struct ReverseJournalEntryResponse {
     pub lines: Vec<JournalEntryLine>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reverses_entry_id: Option<String>,
+    pub reverses_entry_id: Option<serde_json::Value>,
 
     pub total_credit: String,
 
@@ -449,10 +449,10 @@ pub struct TransitionFiscalPeriodRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TransitionFiscalPeriodResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_at: Option<String>,
+    pub closed_at: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed_by: Option<String>,
+    pub closed_by: Option<serde_json::Value>,
 
     pub end_date: String,
 
@@ -536,7 +536,7 @@ pub struct UpdateLedgerAccountResponse {
     pub code: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub control_role: Option<String>,
+    pub control_role: Option<serde_json::Value>,
 
     pub currency_code: String,
 

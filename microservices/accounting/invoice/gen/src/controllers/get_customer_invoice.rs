@@ -22,7 +22,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         id: "example".to_string(),
         invoice_date: "example".to_string(),
         lines: vec![],
-        original_document_id: Some("example".to_string()),
+        original_document_id: Some(Default::default()),
         posted_at: "example".to_string(),
         rounding_minor_units: 42,
         source: Default::default(),

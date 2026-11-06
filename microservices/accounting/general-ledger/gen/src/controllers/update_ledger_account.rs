@@ -11,7 +11,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         account_type: "example".to_string(),
         active: true,
         code: "example".to_string(),
-        control_role: Some("example".to_string()),
+        control_role: Some(Default::default()),
         currency_code: "example".to_string(),
         id: "example".to_string(),
         name: "example".to_string(),

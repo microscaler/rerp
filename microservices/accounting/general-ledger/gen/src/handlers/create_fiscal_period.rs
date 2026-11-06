@@ -28,11 +28,11 @@ pub struct Request {
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closed_at")]
-    pub closed_at: Option<String>,
+    pub closed_at: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "closed_by")]
-    pub closed_by: Option<String>,
+    pub closed_by: Option<serde_json::Value>,
 
     #[serde(rename = "end_date")]
     pub end_date: String,

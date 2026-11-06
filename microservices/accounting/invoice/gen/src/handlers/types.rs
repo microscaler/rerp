@@ -151,7 +151,7 @@ pub struct GetCustomerInvoiceResponse {
     pub lines: Vec<PostedInvoiceLine>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_document_id: Option<String>,
+    pub original_document_id: Option<serde_json::Value>,
 
     pub posted_at: String,
 
@@ -283,7 +283,7 @@ pub struct PostedInvoice {
     pub lines: Vec<PostedInvoiceLine>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_document_id: Option<String>,
+    pub original_document_id: Option<serde_json::Value>,
 
     pub posted_at: String,
 
@@ -319,10 +319,10 @@ pub struct PostedInvoiceLine {
     pub tax_amount: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_code: Option<String>,
+    pub tax_code: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_rate_percent: Option<String>,
+    pub tax_rate_percent: Option<serde_json::Value>,
 
     pub total_amount: String,
 
@@ -346,7 +346,7 @@ pub struct PostedInvoiceSummary {
     pub invoice_date: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_document_id: Option<String>,
+    pub original_document_id: Option<serde_json::Value>,
 
     pub posted_at: String,
 
@@ -399,7 +399,7 @@ pub struct RenderOutboxEntry {
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_error: Option<String>,
+    pub last_error: Option<serde_json::Value>,
 
     pub media_type: String,
 

@@ -49,7 +49,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "reverses_entry_id")]
-    pub reverses_entry_id: Option<String>,
+    pub reverses_entry_id: Option<serde_json::Value>,
 
     #[serde(rename = "total_credit")]
     pub total_credit: String,

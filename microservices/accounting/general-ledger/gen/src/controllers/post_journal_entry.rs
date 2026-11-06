@@ -16,7 +16,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
         entry_number: "example".to_string(),
         id: "example".to_string(),
         lines: vec![],
-        reverses_entry_id: Some("example".to_string()),
+        reverses_entry_id: Some(Default::default()),
         total_credit: "example".to_string(),
         total_debit: "example".to_string(),
     })
