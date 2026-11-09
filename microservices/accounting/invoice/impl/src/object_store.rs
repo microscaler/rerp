@@ -224,8 +224,13 @@ impl ObjectStore {
         headers.sort_by(|left, right| left.0.cmp(right.0));
         let canonical_headers = headers
             .iter()
-            .map(|(name, value)| format!("{}:{}\n", name, value.trim()))
-            .collect::<String>();
+            .fold(String::new(), |mut acc, (name, value)| {
+                acc.push_str(name);
+                acc.push(':');
+                acc.push_str(value.trim());
+                acc.push('\n');
+                acc
+            });
         let signed_headers = headers
             .iter()
             .map(|(name, _)| *name)
@@ -275,9 +280,17 @@ impl ObjectStore {
 }
 
 pub fn sha256_hex(bytes: &[u8]) -> String {
-    let digest = Sha256::digest(bytes);
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+    Sha256::digest(bytes)
+        .iter()
+        .fold(String::with_capacity(64), |mut acc, byte| {
+            acc.push(char::from(HEX_DIGITS[usize::from(byte >> 4)]));
+            acc.push(char::from(HEX_DIGITS[usize::from(byte & 0x0f)]));
+            acc
+        })
 }
+
+const HEX_DIGITS: &[u8; 16] = b"0123456789abcdef";
+const HEX_DIGITS_UPPER: &[u8; 16] = b"0123456789ABCDEF";
 
 fn signing_key(secret: &str, date: &str, region: &str) -> Vec<u8> {
     let date_key = hmac(format!("AWS4{secret}").as_bytes(), date.as_bytes());
@@ -286,6 +299,10 @@ fn signing_key(secret: &str, date: &str, region: &str) -> Vec<u8> {
     hmac(&service_key, b"aws4_request")
 }
 
+#[allow(
+    clippy::expect_used,
+    reason = "HMAC-SHA256 accepts keys of any length, so new_from_slice cannot fail"
+)]
 fn hmac(key: &[u8], value: &[u8]) -> Vec<u8> {
     let mut mac = HmacSha256::new_from_slice(key).expect("HMAC accepts keys of any length");
     mac.update(value);
@@ -295,8 +312,11 @@ fn hmac(key: &[u8], value: &[u8]) -> Vec<u8> {
 fn hex(key: &[u8], value: &[u8]) -> String {
     hmac(key, value)
         .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect()
+        .fold(String::new(), |mut acc, byte| {
+            acc.push(char::from(HEX_DIGITS[usize::from(byte >> 4)]));
+            acc.push(char::from(HEX_DIGITS[usize::from(byte & 0x0f)]));
+            acc
+        })
 }
 
 fn percent_encode(value: &str) -> String {
@@ -305,7 +325,9 @@ fn percent_encode(value: &str) -> String {
         if byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.' | b'~') {
             encoded.push(char::from(byte));
         } else {
-            encoded.push_str(&format!("%{byte:02X}"));
+            encoded.push('%');
+            encoded.push(char::from(HEX_DIGITS_UPPER[usize::from(byte >> 4)]));
+            encoded.push(char::from(HEX_DIGITS_UPPER[usize::from(byte & 0x0f)]));
         }
     }
     encoded

@@ -52,3 +52,6 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [build-dependencies]
 lifeguard-migrate = { workspace = true }
+
+[lints]
+workspace = true

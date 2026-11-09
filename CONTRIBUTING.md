@@ -75,8 +75,8 @@ cargo test --workspace
 # Format code
 cargo fmt
 
-# Check linting
-cargo clippy --workspace
+# Check linting (what CI runs; rules in docs/RUST_LINTS.md)
+python3 tooling/scripts/lint_rust.py
 ```
 
 ### 4. Commit Your Changes
@@ -558,7 +558,7 @@ Run Rust workspace commands from `microservices/`:
 
 - ✅ All tests pass: `cd microservices && cargo test --workspace`
 - ✅ Code compiles: `cd microservices && cargo build --workspace`
-- ✅ No warnings: `cd microservices && cargo clippy --workspace -- -D warnings`
+- ✅ No warnings: `python3 tooling/scripts/lint_rust.py` (rules: [docs/RUST_LINTS.md](docs/RUST_LINTS.md))
 - ✅ Formatted: `cd microservices && cargo fmt --check`
 - ✅ Documentation builds: `cd microservices && cargo doc --workspace`
 

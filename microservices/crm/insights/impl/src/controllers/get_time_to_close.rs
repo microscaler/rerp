@@ -23,10 +23,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         by_source: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         by_stage: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         overall_avg_days: 12.5, // TODO: Set from your business logic
     })

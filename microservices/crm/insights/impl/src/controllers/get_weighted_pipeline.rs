@@ -23,10 +23,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         by_team: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         by_user: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
     })
 }

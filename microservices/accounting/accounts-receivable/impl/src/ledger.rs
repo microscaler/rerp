@@ -5,7 +5,7 @@
 //! net of linked credit notes) plus the rebuildable AR overlay's
 //! settlement state (write-offs, payment allocations from F2 onward).
 //! Aging buckets and days-overdue are computed at read time so they can
-//! never drift from `due_date`. The OpenItem id IS the posted document
+//! never drift from `due_date`. The `OpenItem` id IS the posted document
 //! id — stable, derived, and identical in `list` and `get`.
 
 use std::collections::HashMap;
@@ -205,7 +205,10 @@ impl Default for ListFilters {
 }
 
 // One flat argument per contract query parameter (codegen shape).
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn parse_list_filters(
     status: Option<&str>,
     aging_bucket: Option<&str>,
@@ -226,7 +229,7 @@ pub fn parse_list_filters(
         aging_bucket: aging_bucket.map(str::to_string),
         customer_id: customer_id.map(|v| uuid(v, "customer_id")).transpose()?,
         company_id: company_id.map(|v| uuid(v, "company_id")).transpose()?,
-        currency_code: currency_code.map(|v| v.to_uppercase()),
+        currency_code: currency_code.map(str::to_uppercase),
         days_overdue_min: days_overdue_min.map(i64::from),
         days_overdue_max: days_overdue_max.map(i64::from),
         search: search
@@ -247,7 +250,7 @@ pub fn parse_list_filters(
 }
 
 /// The caller's active legal entities within their organization. An
-/// explicit company_id narrows inside the org, never escapes it; an
+/// explicit `company_id` narrows inside the org, never escapes it; an
 /// unscoped read covers ALL org entities — never an arbitrary one when
 /// the org has several.
 pub(crate) fn resolve_scope_entities<E: LifeExecutor>(
@@ -296,7 +299,7 @@ pub(crate) fn chargeback_documents<E: LifeExecutor>(
         .limit((MAX_SOURCE_DOCUMENTS + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if documents.len() as i64 > MAX_SOURCE_DOCUMENTS {
+    if i64::try_from(documents.len()).unwrap_or(i64::MAX) > MAX_SOURCE_DOCUMENTS {
         return Err(ArError::Validation(format!(
             "open-item source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow with currency_code"
         )));
@@ -322,7 +325,7 @@ pub(crate) fn credit_note_totals<E: LifeExecutor>(
         .limit((MAX_CREDIT_NOTES + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if notes.len() as i64 > MAX_CREDIT_NOTES {
+    if i64::try_from(notes.len()).unwrap_or(i64::MAX) > MAX_CREDIT_NOTES {
         return Err(ArError::Validation(format!(
             "linked credit notes exceed the {MAX_CREDIT_NOTES}-row read bound"
         )));
@@ -423,8 +426,7 @@ fn matches_filters(
 
 fn days_from_item(item: &Value, today: NaiveDate) -> i64 {
     NaiveDate::parse_from_str(item["due_date"].as_str().unwrap_or_default(), "%Y-%m-%d")
-        .map(|due| days_overdue(due, today))
-        .unwrap_or(0)
+        .map_or(0, |due| days_overdue(due, today))
 }
 
 pub fn list_open_items<E: LifeExecutor>(
@@ -547,7 +549,7 @@ fn application_rows<E: LifeExecutor>(
             rows.into_iter()
                 // A reversed pair row (applied 0) leaves the history view;
                 // the immutable event journal keeps the full story.
-                .filter(|row| row.applied_amount > rust_decimal::Decimal::ZERO)
+                .filter(|row| row.applied_amount > Decimal::ZERO)
                 .map(|row| {
                     json!({
                         "id": row.id.to_string(),
@@ -663,7 +665,7 @@ fn as_of_chargeback_documents<E: LifeExecutor>(
         .limit((MAX_SOURCE_DOCUMENTS + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if documents.len() as i64 > MAX_SOURCE_DOCUMENTS {
+    if i64::try_from(documents.len()).unwrap_or(i64::MAX) > MAX_SOURCE_DOCUMENTS {
         return Err(ArError::Validation(format!(
             "aging source exceeds the {MAX_SOURCE_DOCUMENTS}-document read bound; narrow the scope"
         )));
@@ -692,7 +694,7 @@ fn as_of_credit_note_totals<E: LifeExecutor>(
         .limit((MAX_CREDIT_NOTES + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if notes.len() as i64 > MAX_CREDIT_NOTES {
+    if i64::try_from(notes.len()).unwrap_or(i64::MAX) > MAX_CREDIT_NOTES {
         return Err(ArError::Validation(format!(
             "linked credit notes exceed the {MAX_CREDIT_NOTES}-row read bound"
         )));
@@ -757,7 +759,7 @@ fn as_of_applied_totals<E: LifeExecutor>(
                 application_to_document.insert(row.id, *document_id);
             }
         }
-        if application_to_document.len() as i64 > MAX_AGE_APPLICATIONS {
+        if i64::try_from(application_to_document.len()).unwrap_or(i64::MAX) > MAX_AGE_APPLICATIONS {
             return Err(ArError::Validation(format!(
                 "application rows exceed the {MAX_AGE_APPLICATIONS}-row read bound; narrow the scope"
             )));
@@ -779,15 +781,15 @@ fn as_of_applied_totals<E: LifeExecutor>(
             .filter(EventColumn::ApplicationId.is_in(chunk.to_vec()))
             .filter(EventColumn::Kind.is_in(["APPLIED".to_string(), "REVERSED".to_string()]))
             .filter(EventColumn::OccurredAt.lt(occurred_before))
-            .limit((remaining + 1) as u64)
+            .limit(u64::try_from(remaining + 1).unwrap_or(0))
             .all(executor)
             .map_err(|error| ArError::Database(error.to_string()))?;
-        if events.len() as i64 > remaining {
+        if i64::try_from(events.len()).unwrap_or(i64::MAX) > remaining {
             return Err(ArError::Validation(format!(
                 "application events exceed the {MAX_AGE_EVENTS}-row read bound; narrow the scope"
             )));
         }
-        seen_events += events.len() as i64;
+        seen_events += i64::try_from(events.len()).unwrap_or(i64::MAX);
         for event in &events {
             let Some(document_id) = application_to_document.get(&event.application_id) else {
                 continue;
@@ -887,6 +889,10 @@ pub fn aging_summary<E: LifeExecutor>(
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::too_many_lines,
+    reason = "live end-to-end scenarios read top to bottom"
+)]
 mod tests {
     use super::*;
     use chrono::TimeDelta;
@@ -1073,9 +1079,8 @@ mod tests {
         TAG.get_or_init(|| {
             let now = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos() as u64)
-                .unwrap_or(0);
-            let mix = (now ^ ((std::process::id() as u64) << 32))
+                .map_or(0, |d| u64::try_from(d.as_nanos()).unwrap_or(u64::MAX));
+            let mix = (now ^ (u64::from(std::process::id()) << 32))
                 .wrapping_mul(0x9E37_79B9_7F4A_7C15)
                 >> 24
                 & 0x00FF_FFFF;
@@ -1108,7 +1113,7 @@ mod tests {
             )
             .env(
                 "PGPASSWORD",
-                std::env::var("DB_PASS").unwrap_or_else(|_| "".into()),
+                std::env::var("DB_PASS").unwrap_or_else(|_| String::new()),
             )
             .env(
                 "PGDATABASE",
@@ -1118,6 +1123,10 @@ mod tests {
             .arg(&path)
             .output()
             .expect("psql on PATH");
+        #[allow(
+            clippy::let_underscore_must_use,
+            reason = "best-effort cleanup of a temporary file"
+        )]
         let _ = std::fs::remove_file(&path);
         assert!(
             output.status.success(),
@@ -1255,7 +1264,7 @@ COMMIT;"
             .as_array()
             .expect("items array")
             .iter()
-            .find(|row| row["invoice_id"] == json!(clean.to_string()))
+            .find(|row| row["invoice_id"] == json!(clean.clone()))
             .expect("clean invoice");
         assert_eq!(clean_row["status"], "CONFIRMED");
         assert_eq!(clean_row["outstanding_amount"], "120");
@@ -1265,7 +1274,7 @@ COMMIT;"
             .as_array()
             .expect("items array")
             .iter()
-            .find(|row| row["invoice_id"] == json!(mixed.to_string()))
+            .find(|row| row["invoice_id"] == json!(mixed.clone()))
             .expect("mixed invoice");
         assert_eq!(mixed_row["status"], "PARTIAL");
         assert_eq!(mixed_row["outstanding_amount"], "30");
@@ -1281,7 +1290,7 @@ COMMIT;"
             .as_array()
             .expect("items array")
             .iter()
-            .find(|row| row["invoice_id"] == json!(lone.to_string()))
+            .find(|row| row["invoice_id"] == json!(lone.clone()))
             .expect("credit-only invoice");
         assert_eq!(lone_row["status"], "PARTIAL");
         assert_eq!(lone_row["outstanding_amount"], "25");
@@ -1298,7 +1307,7 @@ COMMIT;"
         assert_eq!(filtered["total"], 2, "credit-only row is PARTIAL too");
 
         let detail = crate::http_support::with_ar_transaction(&session, |executor| {
-            get_open_item(executor, &session, &mixed.to_string())
+            get_open_item(executor, &session, &mixed.clone())
         })
         .expect("get open item");
         assert_eq!(detail["days_overdue"], 15);
@@ -1310,12 +1319,12 @@ COMMIT;"
 
         // Other tenant's document is invisible under RLS -> NotFound.
         let cross = crate::http_support::with_ar_transaction(&session, |executor| {
-            get_open_item(executor, &session, &other_doc.to_string())
+            get_open_item(executor, &session, &other_doc.clone())
         });
         assert!(matches!(cross, Err(ArError::NotFound)));
     }
 
-    /// CodeQL discipline: constructed SQL goes to psql STDIN, never a file.
+    /// `CodeQL` discipline: constructed SQL goes to psql STDIN, never a file.
     fn psql_seed_stdin(sql: &str) {
         use std::io::Write;
         use std::process::{Command, Stdio};

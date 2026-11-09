@@ -1,3 +1,8 @@
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    reason = "a build script fails the build by panicking"
+)]
 use lifeguard_migrate::build_script::{discover_entities, generate_registry_module};
 use std::env;
 use std::path::PathBuf;

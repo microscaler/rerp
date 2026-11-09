@@ -4,7 +4,7 @@
 //! `customer_invoices` overlay: one row per posted customer document with
 //! the derived status, outstanding cache, terms and dates. The projection
 //! is IDEMPOTENT (re-running with unchanged facts changes nothing) and
-//! LOSSLESS (manual overlay states — WRITTEN_OFF / DISPUTED — are never
+//! LOSSLESS (manual overlay states — `WRITTEN_OFF` / DISPUTED — are never
 //! overwritten; reads already honour them through `derive_status`).
 //! Truth stays in the posted facts: the overlay is a cache-like index,
 //! and every value it stores equals what `ledger::compose_item` derives
@@ -15,7 +15,10 @@
 //! customer documents (invoices and debit notes positive, credit notes
 //! negative). A non-zero drift means postings bypassed the controlled
 //! path or the overlay scope is wrong.
-#![allow(dead_code)]
+#![allow(
+    dead_code,
+    reason = "the runtime consumer arrives with F3; tests exercise the projection today"
+)]
 // The runtime consumer arrives with F3 (aging snapshots read the overlay);
 // until then the live acceptance test in this module is the caller, matching
 // the F1 pattern where derivation is proven by tests before ops expose it.
@@ -127,7 +130,7 @@ pub fn ar_control_drift<E: LifeExecutor>(
         .limit((MAX_JOURNAL_LINES + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if lines.len() as i64 > MAX_JOURNAL_LINES {
+    if i64::try_from(lines.len()).unwrap_or(i64::MAX) > MAX_JOURNAL_LINES {
         return Ok(None);
     }
     let journal_net = lines.iter().fold(Decimal::ZERO, |acc, line| {
@@ -147,7 +150,7 @@ pub fn ar_control_drift<E: LifeExecutor>(
         .limit((MAX_CREDIT_NOTE_DOCS + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if credit_notes.len() as i64 > MAX_CREDIT_NOTE_DOCS {
+    if i64::try_from(credit_notes.len()).unwrap_or(i64::MAX) > MAX_CREDIT_NOTE_DOCS {
         return Ok(None);
     }
     let documents = ledger::chargeback_documents(executor, session, &[legal_entity], None)?;
@@ -184,7 +187,7 @@ fn overlay_projection_lock<E: LifeExecutor>(
 }
 
 /// Rebuild the overlay for one legal entity from the posted facts.
-/// Idempotent; manual WRITTEN_OFF / DISPUTED states are preserved.
+/// Idempotent; manual `WRITTEN_OFF` / DISPUTED states are preserved.
 pub fn project_settlement_state<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -390,6 +393,10 @@ pub(crate) fn refresh_overlay_row<E: LifeExecutor>(
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::too_many_lines,
+    reason = "live end-to-end scenarios read top to bottom"
+)]
 mod tests {
     use super::*;
     use crate::http_support::with_ar_transaction;
@@ -419,11 +426,10 @@ mod tests {
         TAG.get_or_init(|| {
             let now = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos() as u64)
-                .unwrap_or(0);
+                .map_or(0, |d| u64::try_from(d.as_nanos()).unwrap_or(u64::MAX));
             // Salted against the ledger suite's tag: both tests share one
             // binary, and the run tags (hence tenants and ids) must differ.
-            let mix = (now ^ ((std::process::id() as u64) << 32))
+            let mix = (now ^ (u64::from(std::process::id()) << 32))
                 .wrapping_mul(0x9E37_79B9_7F4A_7C15)
                 ^ 0xA5A5_A5A5;
             let mix = (mix >> 24) & 0x00FF_FFFF;
@@ -451,7 +457,7 @@ mod tests {
         )
         .env(
             "PGPASSWORD",
-            std::env::var("DB_PASS").unwrap_or_else(|_| "".into()),
+            std::env::var("DB_PASS").unwrap_or_else(|_| String::new()),
         )
         .env(
             "PGDATABASE",
@@ -460,7 +466,7 @@ mod tests {
         .args(["-v", "ON_ERROR_STOP=1", "-q", "-At"]);
     }
 
-    /// Seeds via STDIN (CodeQL: never write constructed SQL text to a temp
+    /// Seeds via STDIN (`CodeQL`: never write constructed SQL text to a temp
     /// file — that counts as logging sensitive data), same session shape as
     /// the ledger suite: the GUC lives inside the seed transaction.
     fn psql_run(sql: &str) -> (bool, String, String) {
@@ -493,7 +499,10 @@ mod tests {
         assert!(ok, "seed failed: {stderr}");
     }
 
-    #[allow(clippy::too_many_arguments)]
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "one argument per validated contract field, kept explicit"
+    )]
     fn session_guc(tenant: &str, subject: &str, org: &str, app: &str) -> String {
         format!(
             "SELECT public.rls_set_session('{tenant}', '{subject}'::uuid, '{org}'::uuid,

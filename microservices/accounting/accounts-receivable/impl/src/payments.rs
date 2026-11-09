@@ -131,7 +131,10 @@ fn presence(value: Option<&str>) -> &'static [u8] {
     }
 }
 
-#[allow(clippy::too_many_arguments)] // one flat argument per contract body field
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)] // one flat argument per contract body field
 fn create_fingerprint(
     tenant_id: &str,
     legal_entity_id: Uuid,
@@ -203,7 +206,10 @@ pub(crate) fn find_idempotency<E: LifeExecutor>(
 
 /// Journal a completed command for replay. Public so the applications
 /// module records reversals through the same discipline.
-#[allow(clippy::too_many_arguments)] // one flat argument per record fact, slice style
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)] // one flat argument per record fact, slice style
 pub(crate) fn record_completed<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -335,7 +341,10 @@ struct ParsedCreate {
 
 /// Validates the create request into typed fields (defense in depth —
 /// the dispatcher already schema-checks enums and patterns).
-#[allow(clippy::too_many_arguments)] // validated contract fields, kept explicit per slice style
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)] // validated contract fields, kept explicit per slice style
 fn parse_create(
     amount: &str,
     currency_code: &str,
@@ -396,7 +405,8 @@ fn payment_sequence_lock_key(legal_entity_id: Uuid, year: i32) -> i64 {
         hash ^= u64::from(*byte);
         hash = hash.wrapping_mul(FNV_PRIME);
     }
-    hash as i64
+    // Postgres advisory locks take a bigint: reinterpret the 64 hash bits rather than convert the value.
+    i64::from_ne_bytes(hash.to_ne_bytes())
 }
 
 /// Transaction-scoped payment-number serialization, entity+year. Advisory
@@ -452,7 +462,10 @@ fn duplicate_payment_reference<E: LifeExecutor>(
 }
 
 // One flat argument per contract body field (codegen shape).
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn create_payment<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -618,7 +631,10 @@ impl Default for PaymentListFilters {
 }
 
 /// One flat argument per contract query parameter (codegen shape).
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn parse_payment_list_filters(
     status: Option<&str>,
     payment_method: Option<&str>,
@@ -630,7 +646,7 @@ pub fn parse_payment_list_filters(
     page: Option<i32>,
     limit: Option<i32>,
 ) -> Result<PaymentListFilters, ArError> {
-    let status = status.map(|value| value.to_uppercase());
+    let status = status.map(str::to_uppercase);
     if let Some(value) = &status {
         if !STATUS_ENUM.contains(&value.as_str()) {
             return Err(ArError::Validation(format!(
@@ -639,7 +655,7 @@ pub fn parse_payment_list_filters(
             )));
         }
     }
-    let payment_method = payment_method.map(|value| value.to_uppercase());
+    let payment_method = payment_method.map(str::to_uppercase);
     if let Some(value) = &payment_method {
         if !METHOD_ENUM.contains(&value.as_str()) {
             return Err(ArError::Validation(
@@ -745,7 +761,7 @@ pub fn list_payments<E: LifeExecutor>(
         .limit((MAX_PAYMENTS + 1) as u64)
         .all(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    if rows.len() as i64 > MAX_PAYMENTS {
+    if i64::try_from(rows.len()).unwrap_or(i64::MAX) > MAX_PAYMENTS {
         return Err(ArError::Validation(
             "result set exceeds the read bound; narrow the filters".to_string(),
         ));
@@ -804,6 +820,10 @@ pub fn get_payment<E: LifeExecutor>(
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::too_many_lines,
+    reason = "live end-to-end scenarios read top to bottom"
+)]
 mod tests {
     use super::*;
 
@@ -1026,7 +1046,10 @@ mod tests {
             overlay_hash ^= u64::from(*byte);
             overlay_hash = overlay_hash.wrapping_mul(0x0000_0100_0000_01b3);
         }
-        assert_ne!(payment_sequence_lock_key(entity, 2026), overlay_hash as i64);
+        assert_ne!(
+            payment_sequence_lock_key(entity, 2026),
+            i64::from_ne_bytes(overlay_hash.to_ne_bytes())
+        );
     }
 
     #[test]
@@ -1116,11 +1139,10 @@ mod tests {
         TAG.get_or_init(|| {
             let now = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos() as u64)
-                .unwrap_or(0);
+                .map_or(0, |d| u64::try_from(d.as_nanos()).unwrap_or(u64::MAX));
             // Salted against the ledger and projection suites: all three
             // share one binary and the run tags must differ.
-            let mix = (now ^ ((std::process::id() as u64) << 32))
+            let mix = (now ^ (u64::from(std::process::id()) << 32))
                 .wrapping_mul(0x9E37_79B9_7F4A_7C15)
                 ^ 0xD0D0_F00D;
             let mix = (mix >> 24) & 0x00FF_FFFF;
@@ -1148,7 +1170,7 @@ mod tests {
         )
         .env(
             "PGPASSWORD",
-            std::env::var("DB_PASS").unwrap_or_else(|_| "".into()),
+            std::env::var("DB_PASS").unwrap_or_else(|_| String::new()),
         )
         .env(
             "PGDATABASE",
@@ -1157,7 +1179,7 @@ mod tests {
         .args(["-v", "ON_ERROR_STOP=1", "-q", "-At"]);
     }
 
-    /// Seeds via STDIN (CodeQL: never write constructed SQL text to a temp
+    /// Seeds via STDIN (`CodeQL`: never write constructed SQL text to a temp
     /// file); same session shape as the projection suite.
     fn psql_run(sql: &str) -> (bool, String, String) {
         use std::io::Write;
@@ -1217,7 +1239,10 @@ mod tests {
         }
     }
 
-    #[allow(clippy::too_many_arguments)]
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "one argument per validated contract field, kept explicit"
+    )]
     fn create(
         session: &SessionContext,
         amount: &str,

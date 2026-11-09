@@ -4,7 +4,7 @@
 //!
 //!   1. `rerp_crm_conversion::screen`: size, schema with no unknown fields, field checks, and a valid signature by a
 //!      key this service trusts that may sign that kind of conversion: the pipeline's for manual conversions,
-//!      PriceWhisperer billing's for paid Stripe checkouts (billing has re-retrieved the checkout from Stripe; RERP
+//!      `PriceWhisperer` billing's for paid Stripe checkouts (billing has re-retrieved the checkout from Stripe; RERP
 //!      holds no Stripe credential);
 //!   2. the tenant must be one this intake serves;
 //!   3. `accounts::record` writes it once: the conversion id is deterministic, so a replay changes nothing.
@@ -12,7 +12,7 @@
 //! Ack after the write commits, or when the message is not ours to process (logged and dropped). Database failures
 //! nack, so Pub/Sub redelivers with back-off and dead-letters after its attempt limit.
 //!
-//! Env: CRM_CONVERSIONS_SUBSCRIPTION, CRM_CONVERSION_VERIFY_KEYS(_*), CRM_INTAKE_TENANTS.
+//! Env: `CRM_CONVERSIONS_SUBSCRIPTION`, `CRM_CONVERSION_VERIFY_KEYS`(_*), `CRM_INTAKE_TENANTS`.
 
 use lifeguard::SessionContext;
 use rerp_crm_conversion::pubsub::PubSub;
@@ -103,25 +103,29 @@ pub fn session(conversion: &Conversion) -> SessionContext {
     }
 }
 
-/// Start the consumer when CRM_CONVERSIONS_SUBSCRIPTION is set; refuse to start half-configured.
+/// Start the consumer when `CRM_CONVERSIONS_SUBSCRIPTION` is set; refuse to start half-configured.
+#[allow(
+    clippy::disallowed_methods,
+    reason = "the consumer runs on its own OS thread, not a may coroutine"
+)]
 pub fn start_if_enabled() {
     let sub = std::env::var("CRM_CONVERSIONS_SUBSCRIPTION").unwrap_or_default();
     if sub.trim().is_empty() {
-        println!("crm-intake: CRM_CONVERSIONS_SUBSCRIPTION not set; intake disabled");
+        tracing::info!("crm-intake: CRM_CONVERSIONS_SUBSCRIPTION not set; intake disabled");
         return;
     }
     if !sub.starts_with("projects/") || !sub.contains("/subscriptions/") {
-        eprintln!("crm-intake: CRM_CONVERSIONS_SUBSCRIPTION must be projects/<p>/subscriptions/<s>; intake disabled");
+        tracing::warn!("crm-intake: CRM_CONVERSIONS_SUBSCRIPTION must be projects/<p>/subscriptions/<s>; intake disabled");
         return;
     }
     let keys = match Keys::from_env() {
         Ok(k) if !k.is_empty() => k,
         Ok(_) => {
-            eprintln!("crm-intake: CRM_CONVERSION_VERIFY_KEYS is empty; intake disabled");
+            tracing::warn!("crm-intake: CRM_CONVERSION_VERIFY_KEYS is empty; intake disabled");
             return;
         }
         Err(e) => {
-            eprintln!("crm-intake: CRM_CONVERSION_VERIFY_KEYS: {e}; intake disabled");
+            tracing::warn!("crm-intake: CRM_CONVERSION_VERIFY_KEYS: {e}; intake disabled");
             return;
         }
     };
@@ -133,24 +137,24 @@ pub fn start_if_enabled() {
         .map(str::to_string)
         .collect();
     if tenants.is_empty() {
-        eprintln!("crm-intake: CRM_INTAKE_TENANTS is empty; intake disabled");
+        tracing::warn!("crm-intake: CRM_INTAKE_TENANTS is empty; intake disabled");
         return;
     }
     let intake = Intake::new(keys, tenants);
-    let _ = std::thread::Builder::new().name("crm-intake".into()).spawn(move || {
+    let spawned = std::thread::Builder::new().name("crm-intake".into()).spawn(move || {
         let mut pubsub = match PubSub::new() {
             Ok(p) => p,
             Err(e) => {
-                eprintln!("crm-intake: {e}; intake disabled");
+                tracing::warn!("crm-intake: {e}; intake disabled");
                 return;
             }
         };
-        println!("crm-intake: consuming {sub}");
+        tracing::info!("crm-intake: consuming {sub}");
         loop {
             let messages = match pubsub.pull(&sub, 10) {
                 Ok(m) => m,
                 Err(e) => {
-                    eprintln!("crm-intake: pull failed: {e}");
+                    tracing::warn!("crm-intake: pull failed: {e}");
                     std::thread::sleep(Duration::from_secs(5));
                     continue;
                 }
@@ -159,34 +163,36 @@ pub fn start_if_enabled() {
             for m in messages {
                 match intake.handle(&m.data) {
                     Verdict::Done(msg) => {
-                        println!("crm-intake: {msg}");
+                        tracing::info!("crm-intake: {msg}");
                         ack.push(m.ack_id);
                     }
                     Verdict::Drop(msg) => {
-                        eprintln!("crm-intake: dropped: {msg}");
+                        tracing::warn!("crm-intake: dropped: {msg}");
                         ack.push(m.ack_id);
                     }
                     Verdict::Retry(msg) => {
-                        eprintln!("crm-intake: retry (attempt {}): {msg}", m.delivery_attempt);
+                        tracing::warn!("crm-intake: retry (attempt {}): {msg}", m.delivery_attempt);
                         nack.push(m.ack_id);
                     }
                 }
             }
             if let Err(e) = pubsub.ack(&sub, &ack) {
-                eprintln!("crm-intake: ack failed (messages will redeliver; recording is idempotent): {e}");
+                tracing::warn!("crm-intake: ack failed (messages will redeliver; recording is idempotent): {e}");
             }
             if let Err(e) = pubsub.nack(&sub, &nack) {
-                eprintln!("crm-intake: nack failed: {e}");
+                tracing::warn!("crm-intake: nack failed: {e}");
             }
         }
     });
+    if let Err(e) = spawned {
+        tracing::error!(error = %e, "crm-intake: could not start the consumer thread; intake disabled");
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use rerp_crm_conversion::{manual_conversion_id, Address, Customer, Reason, Sealer, VERSION};
-    use serde_json::json;
 
     fn sealer() -> Sealer {
         Sealer::from_seed_b64("k1", "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=").unwrap()

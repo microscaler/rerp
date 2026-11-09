@@ -9,9 +9,15 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_sales_gen::handlers::add_deal_contact::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_sales_gen::handlers::types::DealContact;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_sales_gen::handlers::types::DealStatus;
 
 #[handler(AddDealContactController)]

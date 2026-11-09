@@ -5,8 +5,8 @@
 //! RERP pulls the topic and creates the customer; nothing here holds a RERP credential. The conversion id is
 //! deterministic per lead, so a retry (or converting the same lead again) is the same conversion.
 //!
-//! Env: CRM_CONVERSIONS_TOPIC (projects/<p>/topics/crm-conversions), CRM_CONVERSION_KEY_ID and
-//! CRM_CONVERSION_SIGNING_KEY (base64 Ed25519 seed). Pub/Sub credentials: the pod's Workload Identity.
+//! Env: `CRM_CONVERSIONS_TOPIC` (projects/<p>/topics/crm-conversions), `CRM_CONVERSION_KEY_ID` and
+//! `CRM_CONVERSION_SIGNING_KEY` (base64 Ed25519 seed). Pub/Sub credentials: the pod's Workload Identity.
 
 use chrono::Utc;
 use rerp_crm_conversion::pubsub::PubSub;
@@ -62,9 +62,9 @@ fn clean(value: &str) -> String {
     value.trim().to_string()
 }
 
-fn clean_opt(value: &Option<String>) -> Option<String> {
+fn clean_opt(value: Option<&String>) -> Option<String> {
     value
-        .as_deref()
+        .map(String::as_str)
         .map(str::trim)
         .filter(|v| !v.is_empty())
         .map(str::to_string)
@@ -89,18 +89,18 @@ pub fn build(
         stripe: None,
         customer: Customer {
             name: clean(&customer.name),
-            contact_name: clean_opt(&customer.contact_name),
+            contact_name: clean_opt(customer.contact_name.as_ref()),
             email: clean(&customer.email),
             address: Address {
                 line1: clean(&a.line1),
-                line2: clean_opt(&a.line2),
+                line2: clean_opt(a.line2.as_ref()),
                 city: clean(&a.city),
-                postal_code: clean_opt(&a.postal_code),
-                region: clean_opt(&a.region),
+                postal_code: clean_opt(a.postal_code.as_ref()),
+                region: clean_opt(a.region.as_ref()),
                 country: clean(&a.country).to_ascii_uppercase(),
             },
-            phone: clean_opt(&customer.phone),
-            tax_id: clean_opt(&customer.tax_id),
+            phone: clean_opt(customer.phone.as_ref()),
+            tax_id: clean_opt(customer.tax_id.as_ref()),
         },
         converted_by: Some(staff.subject.clone()),
         converted_at: Utc::now(),
@@ -145,14 +145,17 @@ pub fn publish(conversion: &Conversion) -> Result<String, PublishError> {
     let mut guard = CLIENT
         .get_or_init(|| Mutex::new(None))
         .lock()
-        .unwrap_or_else(|p| p.into_inner());
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     if guard.is_none() {
         *guard = Some(PubSub::new().map_err(PublishError::Unavailable)?);
     }
+    let Some(client) = guard.as_mut() else {
+        return Err(PublishError::Unavailable(
+            "Pub/Sub client not initialised".to_string(),
+        ));
+    };
     let id = conversion.conversion_id.to_string();
-    guard
-        .as_mut()
-        .expect("client initialised above")
+    client
         .publish(
             &topic,
             &bytes,
@@ -174,7 +177,7 @@ mod tests {
     fn customer() -> ConversionCustomer {
         ConversionCustomer {
             name: " Acme Trading Ltd ".into(),
-            contact_name: Some("".into()),
+            contact_name: Some(String::new()),
             email: "accounts@acme.example".into(),
             address: ConversionAddress {
                 line1: "1 High Street".into(),

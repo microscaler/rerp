@@ -9,11 +9,20 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_messaging_gen::handlers::connect_mailbox::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::ImapConfig;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::MailboxProvider;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::MailboxStatus;
 
 #[handler(ConnectMailboxController)]

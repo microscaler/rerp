@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         lost_count: 3, // TODO: Set from your business logic
         lost_reasons: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         period: "Period".to_string(), // TODO: Set from your business logic
         revenue_won: "1250.00".to_string(), // TODO: Set from your business logic

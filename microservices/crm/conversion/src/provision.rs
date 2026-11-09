@@ -1,7 +1,7 @@
 //! One-off: make the pipeline's Ed25519 signing key and store it in Secret Manager (ADR 003).
 //!
 //! Run by a Kubernetes Job with the RERP image itself (`CRM_PROVISION_CONVERSION_KEY=<project>/<secret>`, and
-//! `CRM_PROVISION_CONVERSION_KEY_ID`, default `k1`; `billing*` for PriceWhisperer billing's key), as an
+//! `CRM_PROVISION_CONVERSION_KEY_ID`, default `k1`; `billing*` for `PriceWhisperer` billing's key), as an
 //! identity that may create that secret and add versions but never read one. Stores one JSON value:
 //! `{RERP_CRM_CONVERSION_KEY_ID: "k1", RERP_CRM_CONVERSION_SIGNING_KEY: <base64 seed>,
 //!   RERP_CRM_CONVERSION_VERIFY_KEYS: "k1:<base64 public key>"}`. Idempotent: a secret that already holds an enabled
@@ -90,6 +90,11 @@ fn seed() -> Result<[u8; 32], String> {
 }
 
 /// `spec` is `<project>/<secret>`. Returns what it did.
+#[allow(
+    clippy::print_stdout,
+    clippy::disallowed_methods,
+    reason = "a one-off Kubernetes Job: stdout is its log and it runs on the main thread, not a coroutine"
+)]
 pub fn run(spec: &str) -> Result<String, String> {
     let (project, secret) = spec.split_once('/').ok_or("expected <project>/<secret>")?;
     let wait = std::env::var("WAIT_SECS")
@@ -154,7 +159,7 @@ pub fn run(spec: &str) -> Result<String, String> {
                 &format!("{}?secretId={secret}", sm.base),
                 Some(&body),
             ) {
-                Ok((200, _)) | Ok((409, _)) => break,
+                Ok((200 | 409, _)) => break,
                 Ok((s, v)) if transient(s) => retry(&format!(
                     "creating {secret} answered {s} {}",
                     v["error"]["message"]

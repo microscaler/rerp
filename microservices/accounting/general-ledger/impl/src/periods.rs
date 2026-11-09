@@ -302,6 +302,10 @@ fn record_audit<E: LifeExecutor>(
     Ok(())
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per idempotency record field, kept explicit"
+)]
 fn record_idempotency<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,

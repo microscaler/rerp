@@ -31,3 +31,6 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 arc-swap = { workspace = true }
 tikv-jemallocator = { workspace = true, optional = true }
+
+[lints]
+workspace = true

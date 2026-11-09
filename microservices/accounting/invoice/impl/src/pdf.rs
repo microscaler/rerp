@@ -83,7 +83,7 @@ pub fn render(invoice: &StoredInvoice) -> Vec<u8> {
     }
     let pages = lines
         .chunks(LINES_PER_PAGE)
-        .map(|chunk| chunk.to_vec())
+        .map(<[String]>::to_vec)
         .collect::<Vec<_>>();
     build_pdf(&pages)
 }
@@ -120,10 +120,18 @@ fn pdf_string(value: &str) -> String {
 fn page_stream(lines: &[String], page: usize, total_pages: usize) -> String {
     let mut stream = String::from("BT\n/F1 10 Tf\n12 TL\n50 795 Td\n");
     for line in lines {
+        #[allow(
+            clippy::let_underscore_must_use,
+            reason = "writing to a String cannot fail"
+        )]
         let _ = writeln!(stream, "({}) Tj", pdf_string(line));
         stream.push_str("T*\n");
     }
     stream.push_str("T*\nT*\n");
+    #[allow(
+        clippy::let_underscore_must_use,
+        reason = "writing to a String cannot fail"
+    )]
     let _ = writeln!(stream, "(Page {page} of {total_pages}) Tj");
     stream.push_str("ET\n");
     stream
@@ -146,7 +154,7 @@ fn build_pdf(pages: &[Vec<String>]) -> Vec<u8> {
         let page_id = 4 + index * 2;
         let content_id = page_id + 1;
         let stream = page_stream(
-            pages.get(index).map(Vec::as_slice).unwrap_or(&[]),
+            pages.get(index).map_or(&[][..], Vec::as_slice),
             index + 1,
             page_count,
         );

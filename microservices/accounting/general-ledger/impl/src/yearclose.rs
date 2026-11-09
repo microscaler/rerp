@@ -48,6 +48,10 @@ pub struct YearCloseChange {
     pub created: bool,
 }
 
+#[allow(
+    clippy::too_many_lines,
+    reason = "one transaction: validate, aggregate, post and audit the year close"
+)]
 pub fn close_fiscal_year<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -186,10 +190,11 @@ pub fn close_fiscal_year<E: LifeExecutor>(
     let mut drafts: Vec<JournalDraftLine> = Vec::with_capacity(nets.len() + 1);
     let mut net_income = Decimal::ZERO;
     for (account_id, net) in &nets {
-        let account = accounts
-            .iter()
-            .find(|account| account.id == *account_id)
-            .expect("account present after aggregation");
+        let Some(account) = accounts.iter().find(|account| account.id == *account_id) else {
+            return Err(LedgerError::Database(format!(
+                "account {account_id} aggregated but not loaded"
+            )));
+        };
         let (side, amount) = if *net > Decimal::ZERO {
             ("DEBIT".to_string(), *net)
         } else {
@@ -310,7 +315,7 @@ fn replay_payload<E: LifeExecutor>(
             &entry.entry_number,
             document_number.as_deref(),
             net_income,
-            line_count as usize,
+            usize::try_from(line_count).unwrap_or(0),
         ),
         created: false,
     })

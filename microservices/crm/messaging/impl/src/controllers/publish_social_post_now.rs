@@ -9,11 +9,20 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_messaging_gen::handlers::publish_social_post_now::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::Media;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::PostStatus;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_messaging_gen::handlers::types::PostTarget;
 
 #[handler(PublishSocialPostNowController)]

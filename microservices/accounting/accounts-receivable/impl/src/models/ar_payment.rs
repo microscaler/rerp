@@ -46,13 +46,13 @@ pub struct ArPayment {
     #[column_type = "NUMERIC(19, 6)"]
     pub exchange_rate: rust_decimal::Decimal,
 
-    /// CHECK, WIRE, ACH, CASH, CREDIT_CARD, ...
+    /// CHECK, WIRE, ACH, CASH, `CREDIT_CARD`, ...
     #[column_type = "VARCHAR(50)"]
     pub payment_method: String,
 
     /// External provider reference (authoritative, F2 duplicate guard).
-    /// Partial unique (tenant, legal_entity_id) lands as hand-written
-    /// foundation/0007_ar_receipts.sql — the generator has no partial index.
+    /// Partial unique (tenant, `legal_entity_id`) lands as hand-written
+    /// `foundation/0007_ar_receipts.sql` — the generator has no partial index.
     #[column_type = "VARCHAR(100)"]
     pub payment_reference: Option<String>,
 

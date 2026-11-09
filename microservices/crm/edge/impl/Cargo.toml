@@ -31,3 +31,6 @@ chrono = { workspace = true }
 uuid = { workspace = true }
 rust_decimal = { workspace = true }
 tikv-jemallocator = { workspace = true, optional = true }
+
+[lints]
+workspace = true

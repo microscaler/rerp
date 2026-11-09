@@ -1,7 +1,7 @@
 // BRRTRouter: user-owned
-//! Claim-based authorization for crm-pipeline (US_31_04, #135).
+//! Claim-based authorization for crm-pipeline (`US_31_04`, #135).
 //!
-//! BRRTRouter's jwks provider verifies signature/exp/iss/aud before a
+//! `BRRTRouter`'s jwks provider verifies signature/exp/iss/aud before a
 //! request reaches a handler, but verification alone admits ANY active
 //! sesame tenant (hauliage users included). These guards add the
 //! authorization layer on top of it:
@@ -25,7 +25,7 @@
 use brrtrouter::typed::HttpJson;
 use serde_json::{json, Value};
 
-/// Sesame's default claims namespace (used when SESAME_CLAIMS_NAMESPACE is unset).
+/// Sesame's default claims namespace (used when `SESAME_CLAIMS_NAMESPACE` is unset).
 const DEFAULT_CLAIMS_NAMESPACE: &str = "https://sesame-idam.dev/claims";
 const REQUIRED_TENANT: &str = "pricewhisperer";
 const ROLE_EDITOR: &str = "crm.editor";
@@ -111,7 +111,13 @@ pub fn require_viewer(claims: Option<&Value>) -> Result<(), HttpJson<Value>> {
 }
 
 /// Mutation access: `crm.editor` only, tenant `pricewhisperer`. Accounts change only through conversions today.
-#[cfg_attr(not(test), allow(dead_code))]
+#[cfg_attr(
+    not(test),
+    allow(
+        dead_code,
+        reason = "no mutation endpoint yet: accounts change only through conversions"
+    )
+)]
 pub fn require_editor(claims: Option<&Value>) -> Result<(), HttpJson<Value>> {
     require(claims, &[ROLE_EDITOR])
 }
@@ -162,7 +168,10 @@ mod tests {
             )),
             "https://sesame-idam.pricewhisperer.ai/claims"
         );
-        assert_eq!(namespace_from(Some("".into())), DEFAULT_CLAIMS_NAMESPACE);
+        assert_eq!(
+            namespace_from(Some(String::new())),
+            DEFAULT_CLAIMS_NAMESPACE
+        );
         assert_eq!(namespace_from(None), DEFAULT_CLAIMS_NAMESPACE);
     }
 

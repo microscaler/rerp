@@ -9,13 +9,25 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_automation_gen::handlers::jump_enrolment::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_automation_gen::handlers::types::EnrolmentStatus;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_automation_gen::handlers::types::EnrolmentStepRecord;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_automation_gen::handlers::types::ExitReason;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_automation_gen::handlers::types::TriggerType;
 
 #[handler(JumpEnrolmentController)]

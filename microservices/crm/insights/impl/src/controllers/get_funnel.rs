@@ -25,7 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         avg_days_to_close: None, // TODO: Set from your business logic
         items: None,             // TODO: Set from your business logic
         stages: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         win_rate: None,          // TODO: Set from your business logic
     })

@@ -22,7 +22,7 @@ use rerp_entities::accounting::foundation::posted_document::{
     Column as DocumentColumn, Entity as DocumentEntity,
 };
 
-use crate::accounts::{find_idempotency, hex_digest, SOURCE_SYSTEM};
+use crate::accounts::{find_idempotency, hex_digest};
 use crate::journals::{
     allocate_identifiers, check_totals_within_numeric_range, lock_and_revalidate_period,
     parse_amount, persist_posting, JournalDraftLine,

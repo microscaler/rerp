@@ -9,11 +9,20 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_acquisition_gen::handlers::update_form::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_acquisition_gen::handlers::types::FormAction;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_acquisition_gen::handlers::types::FormFieldDef;
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_acquisition_gen::handlers::types::FormStyle;
 
 #[handler(UpdateFormController)]
@@ -35,7 +44,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         api_endpoint: None,          // TODO: Set from your business logic
         block_free_mail: None,       // TODO: Set from your business logic
         blocked_domains: None,       // TODO: Set from your business logic
-        capture_fields: serde_json::from_str::<serde_json::Value>(r#"{}"#)
+        capture_fields: serde_json::from_str::<serde_json::Value>(r"{}")
             .unwrap_or(serde_json::Value::Null), // TODO: Set from your business logic
         consent_required: None,      // TODO: Set from your business logic
         consent_text: None,          // TODO: Set from your business logic

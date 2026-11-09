@@ -43,7 +43,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         Ok(id) => id,
         Err(PublishError::Invalid(message)) => return fail(400, &message),
         Err(PublishError::Unavailable(message)) => {
-            eprintln!("convert_lead {lead}: not published: {message}");
+            tracing::error!(%lead, %message, "convert_lead: not published");
             return fail(
                 503,
                 "the conversion could not be published; nothing was changed, try again",
@@ -69,7 +69,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
     };
     if let Err(error) = crate::supabase::write_state(&data.id, Some("converted"), Some(&note)) {
         // Published but not marked: converting again republishes the same conversion, which RERP ignores.
-        eprintln!("convert_lead {lead}: published {message_id} but marking failed: {error}");
+        tracing::error!(%lead, %message_id, %error, "convert_lead: published but marking failed");
         return fail(502, "the conversion was published but the lead could not be marked; convert again to finish");
     }
     HttpJson::new(

@@ -16,13 +16,13 @@ pub fn with_caller<T>(
     let context = crate::identity::from_validated_claims(claims)
         .map_err(|_| fail(403, "the authenticated identity context is incomplete"))?;
     let db = crate::database::db().map_err(|e| {
-        eprintln!("accounts: database unavailable: {e}");
+        tracing::error!(error = %e, "accounts: database unavailable");
         fail(503, "the customer database is unavailable")
     })?;
     db.pool()
         .with_session_transaction(&context, operation)
         .map_err(|e| {
-            eprintln!("accounts: query failed: {e}");
+            tracing::error!(error = %e, "accounts: query failed");
             fail(500, "the customer query failed")
         })
 }

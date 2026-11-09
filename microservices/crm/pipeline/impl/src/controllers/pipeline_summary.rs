@@ -10,6 +10,10 @@ use rerp_crm_pipeline_gen::handlers::pipeline_summary::Request;
 use serde_json::{json, Value};
 
 #[handler(PipelineSummaryController)]
+#[allow(
+    clippy::float_arithmetic,
+    reason = "pipeline's contract carries revenue as a JSON number; sales (CRM-SAL) replaces it with decimal strings"
+)]
 pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
     if let Err(denied) = crate::auth::require_viewer(req.jwt_claims.as_ref()) {
         return denied;
@@ -31,7 +35,7 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
                 .filter(|l| l.stage_id.as_deref() == Some(def.id))
                 .collect();
             let revenue: f64 = in_stage.iter().filter_map(|l| l.expected_revenue).sum();
-            let weighted = revenue * (def.probability as f64) / 100.0;
+            let weighted = revenue * f64::from(def.probability) / 100.0;
             total_revenue += revenue;
             total_weighted += weighted;
             json!({

@@ -1,0 +1,21 @@
+# Clippy configuration for the RERP microservices workspace.
+#
+# Lint levels live in Cargo.toml under [workspace.lints]; hand-written crates (impl/, the CRM runtime and conversion,
+# accounting core and entities) opt in with `[lints] workspace = true`. Generated crates (gen/) keep clippy's defaults
+# and are fixed in BRRTRouter's templates, never by hand. CI runs clippy with -D warnings, so a warning here fails CI.
+
+# Tests may unwrap, expect, panic, print and index: a failing test should fail loudly. Production code may not.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+allow-print-in-tests = true
+allow-indexing-slicing-in-tests = true
+allow-dbg-in-tests = true
+
+# Handlers run on may coroutines. A call that blocks the OS thread stalls every coroutine scheduled on it, so these
+# are banned; code that really runs on its own OS thread says so with an allow and a reason.
+disallowed-methods = [
+    { path = "std::thread::sleep", reason = "blocks the may worker thread; use may::coroutine::sleep" },
+]
+
+too-many-lines-threshold = 150

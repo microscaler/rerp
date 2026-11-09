@@ -7,7 +7,6 @@
 //! calendar year), so JE numbers are collision-free across services.
 
 use chrono::{Datelike, NaiveDate, NaiveDateTime, Utc};
-use lifeguard::active_model::ActiveModelTrait;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, SessionContext};
 use rust_decimal::Decimal;
 use serde_json::{json, Value};
@@ -45,7 +44,7 @@ const SOURCE_TYPE_REVERSAL: &str = "manual_journal_reversal";
 const DOCUMENT_TYPE_MANUAL: &str = "MANUAL_JOURNAL";
 const DOCUMENT_TYPE_REVERSAL: &str = "MANUAL_JOURNAL_REVERSAL";
 /// Manual journal entries have no counterparty; the schema keeps
-/// customer_id NOT NULL and this is the documented sentinel (no FK).
+/// `customer_id` NOT NULL and this is the documented sentinel (no FK).
 const NO_COUNTERPARTY: Uuid = Uuid::from_u128(0);
 
 pub struct JournalChange {
@@ -440,7 +439,10 @@ fn sequence_lock_key(legal_entity_id: Uuid, year: i32) -> i64 {
     i64::from_be_bytes(hash.to_be_bytes())
 }
 
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub(crate) fn persist_posting<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,

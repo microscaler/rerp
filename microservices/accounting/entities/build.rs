@@ -1,3 +1,8 @@
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    reason = "a build script fails the build by panicking"
+)]
 //! Build script for entity registry generation
 //!
 //! This build script discovers all Lifeguard entities in the source directory
@@ -24,7 +29,7 @@ fn main() {
             entities
         }
         Err(e) => {
-            println!("cargo:warning=Failed to discover entities: {}", e);
+            println!("cargo:warning=Failed to discover entities: {e}");
             return;
         }
     };
@@ -36,12 +41,12 @@ fn main() {
     match build_script::generate_registry_module(&entities, &registry_path) {
         Ok(()) => {
             println!(
-                "cargo:warning=Generated entity registry at {:?}",
-                registry_path
+                "cargo:warning=Generated entity registry at {}",
+                registry_path.display()
             );
         }
         Err(e) => {
-            println!("cargo:warning=Failed to generate registry: {}", e);
+            println!("cargo:warning=Failed to generate registry: {e}");
         }
     }
 }

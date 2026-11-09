@@ -14,9 +14,10 @@ fn non_empty_env(key: &str) -> Option<String> {
 
 fn build_executor() -> Result<PooledLifeExecutor, String> {
     let host = std::env::var("DB_HOST").unwrap_or_else(|_| {
-        std::env::var("KUBERNETES_SERVICE_HOST")
-            .map(|_| "postgres.data.svc.cluster.local".to_string())
-            .unwrap_or_else(|_| "localhost".to_string())
+        std::env::var("KUBERNETES_SERVICE_HOST").map_or_else(
+            |_| "localhost".to_string(),
+            |_| "postgres.data.svc.cluster.local".to_string(),
+        )
     });
     let port = std::env::var("DB_PORT").unwrap_or_else(|_| "5432".to_string());
     let user = std::env::var("DB_USER").unwrap_or_else(|_| "rerp".to_string());
@@ -31,7 +32,7 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
         // and honours backslash escapes inside single quotes: quote and
         // escape so passwords with spaces/backslashes connect verbatim.
         let escaped = password.replace('\\', "\\\\").replace('\'', "\\'");
-        url.push_str(&format!(" password='{escaped}'"));
+        url = format!("{url} password='{escaped}'");
     }
     let config = DatabaseConfig {
         url,
@@ -44,9 +45,9 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
     };
     let pool = LifeguardPool::from_database_config(&config, Vec::new(), 0)
         .map_err(|error| format!("database pool initialization failed: {error}"))?;
-    println!(
-        "[startup] Lifeguard pool ready for postgresql://{user}@{host}:{port}/{database} (primary slots={})",
-        pool.primary_pool_size()
+    tracing::info!(
+        primary_slots = pool.primary_pool_size(),
+        "Lifeguard pool ready for postgresql://{user}@{host}:{port}/{database}"
     );
     Ok(PooledLifeExecutor::new(Arc::new(pool)))
 }

@@ -13,6 +13,7 @@ python3 openapi/crm/tools/check_specs.py
 python3 openapi/crm/tools/data_model.py --models          # data-model stories: the service reports nothing
 cd microservices && cargo fmt --all -- --check
 cargo clippy -p <crate> --all-targets -- -D warnings && cargo test -p <crate>
+cd .. && python3 tooling/scripts/lint_rust.py --no-check   # every opted-in crate; new crates must opt in
 ```
 
 For data-model stories also: `microservices/crm/scripts/crm-db.sh reset && crm-db.sh up && crm-db.sh apply <service>`
@@ -27,6 +28,7 @@ twice, then the RLS test from the story.
 | Workspace | Every query runs under the context's transaction; no `workspace_id` taken from the body |
 | Roles | `require_role` with exactly the operation's `x-required-role` |
 | Errors | Shared `ErrorResponse` with the reasons the story names; no 500 for a user error |
+| Lint exceptions | `git diff main...hermes/crm \| grep 'allow('`: each new `allow` sits on the smallest item, its reason holds, and it does not hide a real problem ([RUST_LINTS](../RUST_LINTS.md)) |
 | Events | Published only through the outbox; names match `x-events` |
 | Coroutines | No blocking calls in handlers (`std::thread::sleep`, `reqwest::blocking`, `std::net` DNS) |
 | Personal data | No emails, names or IPs logged above debug |

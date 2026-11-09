@@ -43,3 +43,6 @@ may_postgres = { git = "https://github.com/microscaler/may_postgres.git", branch
 
 [build-dependencies]
 lifeguard-migrate = { workspace = true }
+
+[lints]
+workspace = true

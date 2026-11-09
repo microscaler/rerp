@@ -6,7 +6,7 @@
 //! - Work: `docs/crm/stories/` (stories CRM-INT-*).
 //!
 //! `controllers/` (in the binary) adapt the generated transport types to `services/`; `services/` own the use cases;
-//! `models/` own the LifeModels; `validators/` hold rules the contract and the database cannot express.
+//! `models/` own the `LifeModels`; `validators/` hold rules the contract and the database cannot express.
 
 pub mod models;
 pub mod services;

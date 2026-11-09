@@ -14,9 +14,10 @@ fn non_empty_env(key: &str) -> Option<String> {
 
 fn build_executor() -> Result<PooledLifeExecutor, String> {
     let host = std::env::var("DB_HOST").unwrap_or_else(|_| {
-        std::env::var("KUBERNETES_SERVICE_HOST")
-            .map(|_| "postgres.data.svc.cluster.local".to_string())
-            .unwrap_or_else(|_| "localhost".to_string())
+        std::env::var("KUBERNETES_SERVICE_HOST").map_or_else(
+            |_| "localhost".to_string(),
+            |_| "postgres.data.svc.cluster.local".to_string(),
+        )
     });
     let port = std::env::var("DB_PORT").unwrap_or_else(|_| "5432".to_string());
     let user = std::env::var("DB_USER").unwrap_or_else(|_| "rerp".to_string());
@@ -27,12 +28,12 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
 
     let mut url = format!("host={host} port={port} user={user} dbname={database}");
     if !password.is_empty() {
-        url.push_str(&format!(" password={password}"));
+        url = format!("{url} password={password}");
     }
     // TLS, libpq names: DB_SSLMODE (disable | prefer | require | verify-ca | verify-full) and DB_SSLROOTCERT.
     for (key, param) in [("DB_SSLMODE", "sslmode"), ("DB_SSLROOTCERT", "sslrootcert")] {
         if let Some(value) = non_empty_env(key) {
-            url.push_str(&format!(" {param}={value}"));
+            url = format!("{url} {param}={value}");
         }
     }
     let config = DatabaseConfig {
@@ -46,9 +47,9 @@ fn build_executor() -> Result<PooledLifeExecutor, String> {
     };
     let pool = LifeguardPool::from_database_config(&config, Vec::new(), 0)
         .map_err(|error| format!("database pool initialization failed: {error}"))?;
-    println!(
-        "[startup] Lifeguard pool ready for postgresql://{user}@{host}:{port}/{database} (primary slots={})",
-        pool.primary_pool_size()
+    tracing::info!(
+        primary_slots = pool.primary_pool_size(),
+        "Lifeguard pool ready for postgresql://{user}@{host}:{port}/{database}"
     );
     Ok(PooledLifeExecutor::new(Arc::new(pool)))
 }

@@ -26,6 +26,18 @@
       "superseded_by": []
     },
     {
+      "id": "POL-003",
+      "scope": "microservices.rust-lints",
+      "path": "docs/RUST_LINTS.md",
+      "kind": "policy",
+      "status": "ACTIVE",
+      "authority": "normative",
+      "owner": "RERP maintainers",
+      "last_reviewed": "2026-11-09",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
       "id": "ADR-001",
       "scope": "accounting.runtime-boundary",
       "path": "docs/adrs/001-accounting-runtime-boundary.md",

@@ -106,7 +106,7 @@ pub fn ledger_error(error: LedgerError) -> HttpJson<Value> {
         ),
         LedgerError::Conflict(code, message) => (409, code.as_str(), message.clone()),
         LedgerError::Database(_) => {
-            eprintln!("General Ledger database failure: {error}");
+            tracing::error!(%error, "general ledger database failure");
             (
                 500,
                 "accounting_persistence_error",

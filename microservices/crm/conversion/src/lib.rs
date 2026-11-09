@@ -8,7 +8,7 @@
 //! ```
 //!
 //! The signature covers the payload string's exact bytes, so nothing is re-serialised before checking. Every conversion
-//! is signed, and a key's id says what it may sign: `billing*` keys (PriceWhisperer billing, which has re-retrieved
+//! is signed, and a key's id says what it may sign: `billing*` keys (`PriceWhisperer` billing, which has re-retrieved
 //! the checkout from Stripe) sign paid Stripe checkouts only; every other key (the CRM pipeline) signs manual
 //! conversions only. Everything here is pure: screening needs nothing but the bytes and the public keys.
 
@@ -181,7 +181,7 @@ fn check_len(field: &str, value: &str, min: usize, max: usize) -> Result<(), Rej
             "{field} must be {min}..={max} characters"
         )));
     }
-    if value.chars().any(|c| c.is_control()) {
+    if value.chars().any(char::is_control) {
         return Err(Reject::Invalid(format!(
             "{field} contains control characters"
         )));
@@ -189,7 +189,7 @@ fn check_len(field: &str, value: &str, min: usize, max: usize) -> Result<(), Rej
     Ok(())
 }
 
-fn check_opt(field: &str, value: &Option<String>, max: usize) -> Result<(), Reject> {
+fn check_opt(field: &str, value: Option<&String>, max: usize) -> Result<(), Reject> {
     match value {
         Some(v) => check_len(field, v, 1, max),
         None => Ok(()),
@@ -234,22 +234,22 @@ impl Conversion {
         check_len("reference", &self.reference, 1, 200)?;
         let c = &self.customer;
         check_len("customer.name", &c.name, 1, 200)?;
-        check_opt("customer.contact_name", &c.contact_name, 200)?;
+        check_opt("customer.contact_name", c.contact_name.as_ref(), 200)?;
         check_email(&c.email)?;
-        check_opt("customer.phone", &c.phone, 40)?;
-        check_opt("customer.tax_id", &c.tax_id, 50)?;
+        check_opt("customer.phone", c.phone.as_ref(), 40)?;
+        check_opt("customer.tax_id", c.tax_id.as_ref(), 50)?;
         let a = &c.address;
         check_len("address.line1", &a.line1, 1, 200)?;
-        check_opt("address.line2", &a.line2, 200)?;
+        check_opt("address.line2", a.line2.as_ref(), 200)?;
         check_len("address.city", &a.city, 1, 100)?;
-        check_opt("address.postal_code", &a.postal_code, 20)?;
-        check_opt("address.region", &a.region, 100)?;
+        check_opt("address.postal_code", a.postal_code.as_ref(), 20)?;
+        check_opt("address.region", a.region.as_ref(), 100)?;
         if a.country.len() != 2 || !a.country.chars().all(|ch| ch.is_ascii_uppercase()) {
             return Err(Reject::Invalid(
                 "address.country must be ISO 3166-1 alpha-2".into(),
             ));
         }
-        check_opt("converted_by", &self.converted_by, 200)?;
+        check_opt("converted_by", self.converted_by.as_ref(), 200)?;
         if self.reason.is_manual() {
             let Some(lead) = self.funnel_lead_id else {
                 return Err(Reject::Invalid(
@@ -622,7 +622,7 @@ mod tests {
         );
     }
 
-    /// The payload PriceWhisperer billing writes (its own serialiser; no shared crate) must screen here unchanged.
+    /// The payload `PriceWhisperer` billing writes (its own serialiser; no shared crate) must screen here unchanged.
     /// Keep in step with billing's conversions.rs test of the same name.
     #[test]
     fn billings_wire_format_screens() {
@@ -653,7 +653,7 @@ mod tests {
 
     const BILLING_FIXTURE: &str = r#"{"version":1,"conversion_id":"CONV","tenant_id":"pricewhisperer","organization_id":"00000000-0000-4000-8000-000000000001","reason":"stripe_checkout","reference":"cs_test_abc","stripe":{"customer_id":"cus_abc","checkout_session_id":"cs_test_abc"},"customer":{"name":"Ada Trading Ltd","contact_name":"Ada Lovelace","email":"ada@example.com","phone":"+359881234567","address":{"line1":"1 High Street","city":"Sofia","postal_code":"1000","country":"BG"},"tax_id":"BG123456789"},"converted_at":"2026-10-23T08:00:00Z"}"#;
 
-    /// The ids PriceWhisperer billing computes on its own (its conversions.rs tests assert the same literals).
+    /// The ids `PriceWhisperer` billing computes on its own (its conversions.rs tests assert the same literals).
     #[test]
     fn ids_billing_also_computes() {
         assert_eq!(

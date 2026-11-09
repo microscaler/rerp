@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     ApiResponse::Ok(Response {
         assigned_count: 3, // TODO: Set from your business logic
         details: vec![
-            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
+            serde_json::from_str::<serde_json::Value>(r"{}").unwrap_or(serde_json::Value::Null)
         ], // TODO: Set from your business logic
         failed_count: 3,   // TODO: Set from your business logic
     })

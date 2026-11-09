@@ -26,8 +26,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         created_at: "2026-11-05T16:00:00Z".to_string(), // TODO: Set from your business logic
         deal_id: None,                                  // TODO: Set from your business logic
         id: "2e459265-db4e-592e-aa0a-de7b7189dc8e".to_string(), // TODO: Set from your business logic
-        pinned: None,         // TODO: Set from your business logic
-        text: "".to_string(), // TODO: Set from your business logic
-        updated_at: None,     // TODO: Set from your business logic
+        pinned: None,        // TODO: Set from your business logic
+        text: String::new(), // TODO: Set from your business logic
+        updated_at: None,    // TODO: Set from your business logic
     })
 }

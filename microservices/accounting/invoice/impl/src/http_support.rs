@@ -69,7 +69,7 @@ pub fn posting_error(error: PostingError) -> HttpJson<Value> {
             "The accounting resource was not found".to_string(),
         ),
         PostingError::Unavailable(_) => {
-            eprintln!("invoice runtime dependency unavailable: {error}");
+            tracing::error!(%error, "invoice runtime dependency unavailable");
             (
                 503,
                 "document_storage_unavailable",
@@ -77,7 +77,7 @@ pub fn posting_error(error: PostingError) -> HttpJson<Value> {
             )
         }
         PostingError::Database(_) => {
-            eprintln!("invoice runtime database failure: {error}");
+            tracing::error!(%error, "invoice runtime database failure");
             (
                 500,
                 "accounting_persistence_error",

@@ -9,7 +9,10 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_acquisition_gen::handlers::get_campaign_leads::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_acquisition_gen::handlers::types::CampaignLeadResult;
 
 #[handler(GetCampaignLeadsController)]

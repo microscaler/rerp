@@ -463,8 +463,7 @@ mod tests {
             original_line_number: 1,
             quantity: dec!(1.5),
         }])
-        .err()
-        .expect("remaining quantity is 1");
+        .expect_err("remaining quantity is 1");
         assert!(matches!(
             error,
             AccountingError::OverCredit { line_number: 1, requested, remaining }
@@ -482,8 +481,7 @@ mod tests {
                 quantity: dec!(0.6),
             },
         ])
-        .err()
-        .expect("merged 1.2 exceeds remaining 1");
+        .expect_err("merged 1.2 exceeds remaining 1");
         assert!(matches!(error, AccountingError::OverCredit { .. }));
     }
 
@@ -496,7 +494,7 @@ mod tests {
             &fixture.instruction(),
         )
         .expect("valid posting");
-        let build = |quantity: rust_decimal::Decimal| {
+        let build = |quantity: Decimal| {
             partial_credit_customer_invoice(
                 &fixture.context,
                 &PostingIdentifiers {

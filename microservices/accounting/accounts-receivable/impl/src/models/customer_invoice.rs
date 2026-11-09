@@ -50,12 +50,12 @@ pub struct CustomerInvoice {
     pub due_date: chrono::NaiveDate,
 
     /// Payment terms derived from the document/due-date gap at projection
-    /// time: NET_15, NET_30, NET_45, NET_60, DUE_ON_RECEIPT or CUSTOM.
+    /// time: `NET_15`, `NET_30`, `NET_45`, `NET_60`, `DUE_ON_RECEIPT` or CUSTOM.
     #[column_type = "VARCHAR(20)"]
     pub terms: String,
 
     /// AR settlement status (not the posted-document status): DRAFT,
-    /// CONFIRMED, PARTIAL, PAID, WRITTEN_OFF, DISPUTED.
+    /// CONFIRMED, PARTIAL, PAID, `WRITTEN_OFF`, DISPUTED.
     #[default_value = "'CONFIRMED'"]
     #[column_type = "VARCHAR(20)"]
     pub status: String,

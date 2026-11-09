@@ -11,6 +11,14 @@
 //! `rerp` role; `psql` must be on PATH. These live tests share one
 //! database and must run serially: `cargo test -- --ignored
 //! --test-threads=1`.
+#![allow(
+    clippy::expect_used,
+    clippy::panic,
+    clippy::let_underscore_must_use,
+    clippy::disallowed_methods,
+    clippy::cast_possible_truncation,
+    reason = "integration test harness: helpers fail the test by panicking, clean up best-effort and run on OS threads"
+)]
 
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -38,9 +46,8 @@ fn run_hex() -> String {
     TAG.get_or_init(|| {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_nanos() as u64)
-            .unwrap_or(0);
-        let mix = (now ^ ((std::process::id() as u64) << 32)).wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            .map_or(0, |d| u64::try_from(d.as_nanos()).unwrap_or(u64::MAX));
+        let mix = (now ^ (u64::from(std::process::id()) << 32)).wrapping_mul(0x9E37_79B9_7F4A_7C15)
             >> 24
             & 0x00FF_FFFF;
         format!("{mix:06x}")
@@ -77,11 +84,9 @@ fn run_psql(session_sql: &str, body_sql: &str) -> (bool, String, String) {
 /// psql must succeed; returns stdout.
 fn psql(session_sql: &str, body_sql: &str) -> String {
     let (ok, stdout, stderr) = run_psql(session_sql, body_sql);
-    if !ok {
-        // Failure context only: psql's stderr already carries the failing
-        // statement's file and line; the SQL text itself is not echoed.
-        panic!("psql failed unexpectedly: stderr: {stderr}");
-    }
+    // Failure context only: psql's stderr already carries the failing
+    // statement's file and line; the SQL text itself is not echoed.
+    assert!(ok, "psql failed unexpectedly: stderr: {stderr}");
     stdout
 }
 
@@ -90,9 +95,7 @@ fn psql(session_sql: &str, body_sql: &str) -> String {
 /// A syntax error or unrelated violation fails this assertion.
 fn psql_fails_with(session_sql: &str, body_sql: &str, needle: &str) {
     let (ok, stdout, stderr) = run_psql(session_sql, body_sql);
-    if ok {
-        panic!("psql unexpectedly succeeded: stdout: {stdout}");
-    }
+    assert!(!ok, "psql unexpectedly succeeded: stdout: {stdout}");
     assert!(
         stderr.contains(needle),
         "expected rejection containing {needle:?}, got: {stderr}"

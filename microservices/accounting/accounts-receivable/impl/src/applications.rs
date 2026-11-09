@@ -177,48 +177,45 @@ fn apply_to_document<E: LifeExecutor>(
         .filter(ApplicationColumn::InvoiceId.eq(overlay.id))
         .find_one(executor)
         .map_err(|error| ArError::Database(error.to_string()))?;
-    let stored = match existing {
-        Some(row) => {
-            let mut changes = ArPaymentApplicationRecord::new();
-            changes
-                .set_id(row.id)
-                .set_applied_amount(row.applied_amount + amount)
-                .set_applied_at(now)
-                .set_updated_at(now);
-            changes
-                .update(executor)
-                .map_err(|error| ArError::Database(error.to_string()))?;
-            ApplicationEntity::find()
-                .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
-                .filter(ApplicationColumn::Id.eq(row.id))
-                .find_one(executor)
-                .map_err(|error| ArError::Database(error.to_string()))?
-                .ok_or_else(|| ArError::Database("application vanished after update".to_string()))?
-        }
-        None => {
-            let mut record = ArPaymentApplicationRecord::new();
-            record
-                .set_id(Uuid::new_v4())
-                .set_tenant_id(session.tenant_id.clone())
-                .set_legal_entity_id(payment.legal_entity_id)
-                .set_payment_id(payment.id)
-                .set_invoice_id(overlay.id)
-                .set_applied_amount(amount)
-                .set_applied_at(now)
-                .set_created_at(now)
-                .set_updated_at(now)
-                .set_applied_by(Some(session.subject_id));
-            record
-                .insert(executor)
-                .map_err(|error| ArError::Database(error.to_string()))?;
-            ApplicationEntity::find()
-                .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
-                .filter(ApplicationColumn::PaymentId.eq(payment.id))
-                .filter(ApplicationColumn::InvoiceId.eq(overlay.id))
-                .find_one(executor)
-                .map_err(|error| ArError::Database(error.to_string()))?
-                .ok_or_else(|| ArError::Database("application vanished after insert".to_string()))?
-        }
+    let stored = if let Some(row) = existing {
+        let mut changes = ArPaymentApplicationRecord::new();
+        changes
+            .set_id(row.id)
+            .set_applied_amount(row.applied_amount + amount)
+            .set_applied_at(now)
+            .set_updated_at(now);
+        changes
+            .update(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        ApplicationEntity::find()
+            .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(ApplicationColumn::Id.eq(row.id))
+            .find_one(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?
+            .ok_or_else(|| ArError::Database("application vanished after update".to_string()))?
+    } else {
+        let mut record = ArPaymentApplicationRecord::new();
+        record
+            .set_id(Uuid::new_v4())
+            .set_tenant_id(session.tenant_id.clone())
+            .set_legal_entity_id(payment.legal_entity_id)
+            .set_payment_id(payment.id)
+            .set_invoice_id(overlay.id)
+            .set_applied_amount(amount)
+            .set_applied_at(now)
+            .set_created_at(now)
+            .set_updated_at(now)
+            .set_applied_by(Some(session.subject_id));
+        record
+            .insert(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?;
+        ApplicationEntity::find()
+            .filter(ApplicationColumn::TenantId.eq(session.tenant_id.clone()))
+            .filter(ApplicationColumn::PaymentId.eq(payment.id))
+            .filter(ApplicationColumn::InvoiceId.eq(overlay.id))
+            .find_one(executor)
+            .map_err(|error| ArError::Database(error.to_string()))?
+            .ok_or_else(|| ArError::Database("application vanished after insert".to_string()))?
     };
     let mut event = ArPaymentApplicationEventRecord::new();
     event
@@ -383,7 +380,7 @@ pub fn list_payment_applications<E: LifeExecutor>(
 }
 
 /// Contract `auto_apply`: FIFO over the customer's open items, oldest
-/// due_date first, until the payment's unapplied balance is exhausted.
+/// `due_date` first, until the payment's unapplied balance is exhausted.
 pub fn auto_apply_fifo<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -565,6 +562,10 @@ pub fn reverse_payment_application<E: LifeExecutor>(
 }
 
 #[cfg(test)]
+#[allow(
+    clippy::too_many_lines,
+    reason = "live end-to-end scenarios read top to bottom"
+)]
 mod tests {
     use super::*;
 
@@ -624,9 +625,8 @@ mod tests {
         TAG.get_or_init(|| {
             let now = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos() as u64)
-                .unwrap_or(0);
-            let mix = (now ^ ((std::process::id() as u64) << 32))
+                .map_or(0, |d| u64::try_from(d.as_nanos()).unwrap_or(u64::MAX));
+            let mix = (now ^ (u64::from(std::process::id()) << 32))
                 .wrapping_mul(0x9E37_79B9_7F4A_7C15)
                 >> 24
                 & 0x00FF_FFFF;
@@ -654,7 +654,7 @@ mod tests {
         )
         .env(
             "PGPASSWORD",
-            std::env::var("DB_PASS").unwrap_or_else(|_| "".into()),
+            std::env::var("DB_PASS").unwrap_or_else(|_| String::new()),
         )
         .env(
             "PGDATABASE",
@@ -663,7 +663,7 @@ mod tests {
         .args(["-v", "ON_ERROR_STOP=1", "-q", "-At"]);
     }
 
-    /// Seeds via STDIN (CodeQL: never write constructed SQL to a temp file).
+    /// Seeds via STDIN (`CodeQL`: never write constructed SQL to a temp file).
     fn psql_run(sql: &str) -> (bool, String, String) {
         use std::io::Write;
         use std::process::Stdio;
@@ -1338,19 +1338,19 @@ COMMIT;",
                 )
             })
         };
-        let items = |session: &SessionContext, filters: &crate::ledger::ListFilters| {
+        let items = |session: &SessionContext, filters: &ledger::ListFilters| {
             crate::http_support::with_ar_transaction(session, |executor| {
-                crate::ledger::list_open_items(executor, session, filters)
+                ledger::list_open_items(executor, session, filters)
             })
         };
         let item = |id: &str| {
             crate::http_support::with_ar_transaction(&session, |executor| {
-                crate::ledger::get_open_item(executor, &session, id)
+                ledger::get_open_item(executor, &session, id)
             })
         };
-        let default_filters = || crate::ledger::ListFilters {
+        let default_filters = || ledger::ListFilters {
             customer_id: Some(Uuid::parse_str(&cust).expect("cust")),
-            ..crate::ledger::ListFilters::default()
+            ..ledger::ListFilters::default()
         };
 
         // Read path BEFORE receipts: A nets 400 (credit already settles it
@@ -1404,7 +1404,7 @@ COMMIT;",
         );
         let after_r3_list = items(&session, &default_filters()).expect("after r3");
         assert_eq!(after_r3_list["total"], 0, "default view is UNPAID balances");
-        let paid_filter = crate::ledger::ListFilters {
+        let paid_filter = ledger::ListFilters {
             status: Some("PAID".to_string()),
             ..default_filters()
         };
@@ -1603,7 +1603,7 @@ COMMIT;",
         assert_eq!(foreign_items["items"][0]["id"], doc_x);
         assert!(item(&doc_a).is_ok(), "sanity: ours visible to us");
         let foreign_probe = crate::http_support::with_ar_transaction(&foreign, |executor| {
-            crate::ledger::get_open_item(executor, &foreign, &doc_a)
+            ledger::get_open_item(executor, &foreign, &doc_a)
         });
         assert!(matches!(foreign_probe, Err(ArError::NotFound)));
         assert!(

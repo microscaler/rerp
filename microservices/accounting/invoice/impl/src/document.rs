@@ -98,8 +98,10 @@ fn materialize(
             {
                 // The queue must not silently swallow its own bookkeeping
                 // failures; the lease makes the strand reclaimable anyway.
-                eprintln!(
-                    "[render-outbox] failure record for {id} failed: {failure_note}; instruction stays reclaimable"
+                tracing::error!(
+                    instruction = %id,
+                    error = %failure_note,
+                    "render-outbox failure record failed; instruction stays reclaimable"
                 );
             }
         }
@@ -169,8 +171,10 @@ fn materialize(
                     crate::outbox::record_failure(executor, id, &note)
                 })
             {
-                eprintln!(
-                    "[render-outbox] failure record for {id} failed: {record_error}; instruction stays reclaimable"
+                tracing::error!(
+                    instruction = %id,
+                    error = %record_error,
+                    "render-outbox failure record failed; instruction stays reclaimable"
                 );
             }
         }
@@ -194,7 +198,9 @@ fn compatible(
     checksum: &str,
     size: usize,
 ) -> Result<AccountingDocumentArtifactModel, PostingError> {
-    if artifact.sha256 == checksum && artifact.size_bytes == size as i64 {
+    if artifact.sha256 == checksum
+        && i64::try_from(size).is_ok_and(|size| artifact.size_bytes == size)
+    {
         Ok(artifact)
     } else {
         Err(PostingError::Database(
@@ -256,6 +262,8 @@ mod tests {
         let key = object_key(&invoice, &"a".repeat(64));
         assert!(!key.contains("private-tenant-name"));
         assert!(!key.contains("secret"));
-        assert!(key.ends_with(".pdf"));
+        assert!(std::path::Path::new(&key)
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("pdf")));
     }
 }

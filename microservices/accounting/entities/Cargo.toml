@@ -27,3 +27,6 @@ sea-query = { version = "1.0.0-rc.29", features = ["with-json"] }
 [lib]
 name = "rerp_entities"
 path = "src/lib.rs"
+
+[lints]
+workspace = true

@@ -314,7 +314,7 @@ pub fn credit_customer_invoice(
         .iter()
         .enumerate()
         .map(|(index, line)| JournalLine {
-            line_number: (index + 1) as u32,
+            line_number: u32::try_from(index + 1).unwrap_or(u32::MAX),
             account_id: line.account_id,
             description: credit_note_description.clone(),
             side: match line.side {
@@ -380,7 +380,10 @@ pub struct CreditLineSelection {
 /// rejected with [`AccountingError::OverCredit`]. Selected original line
 /// numbers are preserved on the credit note lines so the creditable
 /// balance remains computable.
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn partial_credit_customer_invoice(
     context: &PostingContext,
     identifiers: &PostingIdentifiers,
@@ -468,7 +471,7 @@ pub fn partial_credit_customer_invoice(
             JournalSide::Credit => JournalSide::Debit,
         };
         if line.account_id == instruction.receivable_account_id {
-            line.description = credit_note_description.clone();
+            line.description.clone_from(&credit_note_description);
         }
     }
     let debit = plan.journal.total_credit;
@@ -498,7 +501,10 @@ pub fn partial_credit_customer_invoice(
 /// A selection must round to a positive charge at the invoice precision:
 /// a positive quantity priced to zero is rejected as an invalid journal
 /// line, exactly as for an invoice line.
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn debit_customer_invoice(
     context: &PostingContext,
     identifiers: &PostingIdentifiers,
@@ -570,7 +576,7 @@ pub fn debit_customer_invoice(
     }
     for line in &mut plan.journal.lines {
         if line.account_id == instruction.receivable_account_id {
-            line.description = debit_note_description.clone();
+            line.description.clone_from(&debit_note_description);
         }
     }
     plan.request_fingerprint = debit_fingerprint(context, &idempotency_key, &plan.invoice, reason);
@@ -684,8 +690,14 @@ fn partial_credit_fingerprint(
         );
         hash_part(&mut hasher, part.as_bytes());
     }
-    let digest = hasher.finalize();
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+    hasher
+        .finalize()
+        .iter()
+        .fold(String::with_capacity(64), |mut acc, byte| {
+            acc.push(char::from(HEX_DIGITS[usize::from(byte >> 4)]));
+            acc.push(char::from(HEX_DIGITS[usize::from(byte & 0x0f)]));
+            acc
+        })
 }
 
 fn debit_fingerprint(
@@ -771,7 +783,7 @@ fn calculate_line(
     let total_amount = rounding.round(net_amount + tax_amount);
 
     Ok(InvoiceLineSnapshot {
-        line_number: line_number as u32,
+        line_number: u32::try_from(line_number).unwrap_or(u32::MAX),
         description: input.description.clone(),
         quantity: input.quantity,
         unit_price: input.unit_price,
@@ -805,7 +817,7 @@ fn customer_invoice_journal(
 
     for invoice_line in &invoice.lines {
         lines.push(JournalLine {
-            line_number: (lines.len() + 1) as u32,
+            line_number: u32::try_from(lines.len() + 1).unwrap_or(u32::MAX),
             account_id: invoice_line.revenue_account_id,
             description: invoice_line.description.clone(),
             side: JournalSide::Credit,
@@ -814,7 +826,7 @@ fn customer_invoice_journal(
         if invoice_line.tax_amount > Decimal::ZERO {
             if let Some(account_id) = invoice_line.tax_liability_account_id {
                 lines.push(JournalLine {
-                    line_number: (lines.len() + 1) as u32,
+                    line_number: u32::try_from(lines.len() + 1).unwrap_or(u32::MAX),
                     account_id,
                     description: format!("Tax: {}", invoice_line.description),
                     side: JournalSide::Credit,
@@ -883,3 +895,5 @@ fn hex_digest(bytes: &[u8]) -> String {
     }
     output
 }
+
+const HEX_DIGITS: &[u8; 16] = b"0123456789abcdef";

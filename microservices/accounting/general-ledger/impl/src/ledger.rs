@@ -1,6 +1,6 @@
 //! Tenant-safe read model over the canonical accounting foundation.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use chrono::NaiveDate;
 use lifeguard::{ColumnTrait, LifeExecutor, LifeModelTrait, Order, SessionContext};
@@ -136,7 +136,7 @@ pub fn list_accounts<E: LifeExecutor>(
     }
     let accounts = query
         .order_by(AccountColumn::Code, Order::Asc)
-        .limit(limit as u64)
+        .limit(u64::from(limit.unsigned_abs()))
         .all(executor)
         .map_err(|error| LedgerError::Database(error.to_string()))?;
 
@@ -192,7 +192,7 @@ pub fn list_fiscal_periods<E: LifeExecutor>(
     }
     let periods = query
         .order_by(PeriodColumn::StartDate, Order::Desc)
-        .limit(limit as u64)
+        .limit(u64::from(limit.unsigned_abs()))
         .all(executor)
         .map_err(|error| LedgerError::Database(error.to_string()))?;
 
@@ -250,7 +250,10 @@ pub fn get_journal_entry<E: LifeExecutor>(
 
 pub const ACCOUNT_TYPES: [&str; 5] = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
 
-#[allow(clippy::too_many_arguments)]
+#[allow(
+    clippy::too_many_arguments,
+    reason = "one argument per validated contract field, kept explicit"
+)]
 pub fn get_trial_balance<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
@@ -323,13 +326,10 @@ pub fn get_trial_balance<E: LifeExecutor>(
         None => accounts.clone(),
     };
     let reported: Vec<AccountingJournalLineModel> = if account_type_filter.is_some() {
-        let scoped: HashMap<_, _> = reported_accounts
-            .iter()
-            .map(|account| (account.id, ()))
-            .collect();
+        let scoped: HashSet<_> = reported_accounts.iter().map(|account| account.id).collect();
         lines
             .iter()
-            .filter(|line| scoped.contains_key(&line.account_id))
+            .filter(|line| scoped.contains(&line.account_id))
             .cloned()
             .collect()
     } else {
@@ -499,12 +499,12 @@ fn derive_trial_balance(
 ) -> Result<DerivedTrialBalance, LedgerError> {
     let accounts_by_id = accounts
         .iter()
-        .map(|account| (account.id, ()))
-        .collect::<HashMap<_, _>>();
+        .map(|account| account.id)
+        .collect::<HashSet<_>>();
     let mut balances = BTreeMap::<Uuid, (Decimal, Decimal)>::new();
     let (total_debit, total_credit) = line_totals(lines)?;
     for line in lines {
-        if !accounts_by_id.contains_key(&line.account_id) {
+        if !accounts_by_id.contains(&line.account_id) {
             return Err(LedgerError::Database(format!(
                 "journal line references account {} outside the requested currency book",
                 line.account_id
@@ -665,11 +665,11 @@ mod tests {
     #[test]
     fn zero_accounts_are_optional() {
         let account = account("1100", "DEBIT");
-        assert!(
+        assert_eq!(
             derive_trial_balance(std::slice::from_ref(&account), &[], false)
                 .expect("empty balance")
-                .lines
-                .is_empty()
+                .lines,
+            [] as [Value; 0]
         );
         assert_eq!(
             derive_trial_balance(&[account], &[], true)
@@ -739,7 +739,7 @@ mod tests {
     fn account_type_slice_reports_only_that_dimension() {
         let cash = typed_account("1100", "DEBIT", "ASSET");
         let revenue = typed_account("4000", "CREDIT", "REVENUE");
-        let all_lines = vec![
+        let all_lines = [
             line(cash.id, "DEBIT", 100, 1),
             line(revenue.id, "CREDIT", 100, 2),
         ];

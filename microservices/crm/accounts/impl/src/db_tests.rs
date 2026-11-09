@@ -81,7 +81,7 @@ fn run<T>(
 }
 
 #[test]
-#[ignore]
+#[ignore = "needs the CRM accounts database (DB_HOST)"]
 fn db_conversions_create_once_link_and_stay_tenant_scoped() {
     let db = crate::database::db().expect("database");
     crate::schema::ensure(db).expect("schema");

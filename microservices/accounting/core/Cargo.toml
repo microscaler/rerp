@@ -19,3 +19,6 @@ rust_decimal_macros = "1.33"
 [lib]
 name = "rerp_accounting_core"
 path = "src/lib.rs"
+
+[lints]
+workspace = true

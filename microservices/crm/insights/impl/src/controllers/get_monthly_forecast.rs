@@ -9,7 +9,10 @@ use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
 use brrtrouter_macros::handler;
 use rerp_crm_insights_gen::handlers::get_monthly_forecast::{Request, Response};
 
-#[allow(unused_imports)]
+#[allow(
+    unused_imports,
+    reason = "generated stub imports every schema type the handler may need"
+)]
 use rerp_crm_insights_gen::handlers::types::ForecastEntry;
 
 #[handler(GetMonthlyForecastController)]
@@ -26,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         accuracy_last_3_months: None, // TODO: Set from your business logic
-        items: vec![serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2026-11","open_deals":14,"period":"Period","pipeline_value":188400,"target":200000,"variance":"1250.00","weighted":96100,"weighted_pipeline":"1250.00","won":55200})).unwrap_or_default(), serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2026-12","open_deals":12,"period":"Period","pipeline_value":141200,"target":180000,"variance":"1250.00","weighted":61800,"weighted_pipeline":"1250.00","won":0})).unwrap_or_default(), serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2027-01","open_deals":9,"period":"Period","pipeline_value":82700,"target":150000,"variance":"1250.00","weighted":24300,"weighted_pipeline":"1250.00","won":0})).unwrap_or_default()], // TODO: Set from your business logic
+        items: vec![serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2026-11","open_deals":14,"period":"Period","pipeline_value":188_400,"target":200_000,"variance":"1250.00","weighted":96_100,"weighted_pipeline":"1250.00","won":55_200})).unwrap_or_default(), serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2026-12","open_deals":12,"period":"Period","pipeline_value":141_200,"target":180_000,"variance":"1250.00","weighted":61_800,"weighted_pipeline":"1250.00","won":0})).unwrap_or_default(), serde_json::from_value::<ForecastEntry>(serde_json::json!({"actual_close_revenue":"1250.00","confidence":12.5,"expected_close_revenue":"1250.00","month":"2027-01","open_deals":9,"period":"Period","pipeline_value":82_700,"target":150_000,"variance":"1250.00","weighted":24_300,"weighted_pipeline":"1250.00","won":0})).unwrap_or_default()], // TODO: Set from your business logic
         limit: 25, // TODO: Set from your business logic
         no_close_date: None, // TODO: Set from your business logic
         page: 1, // TODO: Set from your business logic

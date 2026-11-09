@@ -1,6 +1,6 @@
-//! Supabase marketing-DB access over PostgREST.
+//! Supabase marketing-DB access over `PostgREST`.
 //!
-//! The just-enough CRM reads the PriceWhisperer marketing database (Supabase
+//! The just-enough CRM reads the `PriceWhisperer` marketing database (Supabase
 //! project `marketing`) directly over its REST API. Leads are a live view of
 //! two website tables — `email_captures` (waiting-list signups) and
 //! `contact_messages` (contact form) — joined with `email_addresses`,
@@ -8,7 +8,7 @@
 //! CRM owns: the `crm_lead_state` table, keyed by the source row's UUID.
 //!
 //! All HTTP goes through the coroutine-native `may_minihttp` client (rustls);
-//! tokio-based clients cannot run inside a `may` service. The service_role
+//! tokio-based clients cannot run inside a `may` service. The `service_role`
 //! key comes from the environment (k8s Secret) and never reaches a browser.
 
 use http_legacy::Method;
@@ -102,12 +102,11 @@ fn plan_monthly_usd(code: &str) -> f64 {
     match code {
         "trader" => 149.0,
         "professional" => 299.0,
-        "desk" => 499.0,
+        "desk" | "enterprise" => 499.0,
         // Retired tier codes kept for historical rows.
         "starter" => 49.0,
         "growth" => 99.0,
         "pro" => 199.0,
-        "enterprise" => 499.0,
         _ => 0.0,
     }
 }
@@ -296,7 +295,7 @@ fn apply_state(lead: &mut Lead, state: Option<&Value>) {
     lead.stage_id = Some(def.id.to_string());
     lead.stage_name = Some(def.name.to_string());
     lead.stage_probability = Some(def.probability);
-    lead.probability = Some(def.probability as f64);
+    lead.probability = Some(f64::from(def.probability));
     lead.won_status = Some(
         if def.is_won {
             "WON"
@@ -320,6 +319,10 @@ fn apply_state(lead: &mut Lead, state: Option<&Value>) {
     }
 }
 
+#[allow(
+    clippy::float_arithmetic,
+    reason = "pipeline's contract carries revenue as a JSON number; sales (CRM-SAL) replaces it with decimal strings"
+)]
 fn capture_to_lead(row: &Value, state: Option<&Value>) -> Lead {
     let id = s(row, "id").unwrap_or_default();
     let email = nested_s(row, "email_addresses", "email").unwrap_or_default();
@@ -458,7 +461,7 @@ pub fn write_state(lead_id: &str, stage: Option<&str>, note: Option<&str>) -> Re
     let existing = sb.get(&format!(
         "/rest/v1/crm_lead_state?select=lead_id&lead_id=eq.{enc}"
     ))?;
-    let exists = existing.as_array().map(|a| !a.is_empty()).unwrap_or(false);
+    let exists = existing.as_array().is_some_and(|a| !a.is_empty());
     let mut body = json!({ "updated_at": chrono::Utc::now().to_rfc3339() });
     if let Some(stg) = stage {
         body["stage"] = json!(stage_by_code(stg).code);

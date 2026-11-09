@@ -11,11 +11,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
         return denied;
     }
     let data = req.data;
-    let def = match crate::supabase::stage_by_id(&data.stage_id) {
-        Some(def) => def,
-        None => {
-            return HttpJson::new(400, json!({ "code": 400, "message": "unknown stage_id" }));
-        }
+    let Some(def) = crate::supabase::stage_by_id(&data.stage_id) else {
+        return HttpJson::new(400, json!({ "code": 400, "message": "unknown stage_id" }));
     };
     // The won stage is reached only by converting (ADR 003): the customer's billing details must cross to RERP.
     if def.is_won {

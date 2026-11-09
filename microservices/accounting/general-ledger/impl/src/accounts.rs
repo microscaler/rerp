@@ -4,7 +4,7 @@
 //! entity resolved from the session, fingerprint-gated idempotency in the
 //! same transaction, and an append-only audit fact. Control accounts
 //! (AR/AP/bank/tax/retained-earnings roles) are system-managed; the request
-//! carries no control_role, so this path can never assign or reassign one.
+//! carries no `control_role`, so this path can never assign or reassign one.
 
 use chrono::Utc;
 use lifeguard::active_model::ActiveModelTrait;
@@ -246,7 +246,7 @@ pub(crate) fn hex_digest(bytes: &[u8]) -> String {
 }
 
 /// Apply a chart-of-accounts mutation (Epic D1b). Identity fields
-/// (code, normal_side) and control roles are contractually absent from
+/// (code, `normal_side`) and control roles are contractually absent from
 /// the request; control accounts are wholly system-managed; type/currency
 /// freeze once journal lines exist.
 pub fn update_ledger_account<E: LifeExecutor>(

@@ -132,7 +132,42 @@ default-members = [
 version = "0.1.23"
 edition = "2021"
 
+
+# Lints for hand-written crates (opt in with `[lints] workspace = true`; generated gen/ crates do not). CI runs clippy
+# with -D warnings. Policy: docs/RUST_LINTS.md; tests are relaxed in clippy.toml;
+# the gate is tooling/scripts/lint_rust.py.
+[workspace.lints.rust]
+rust_2018_idioms = { level = "warn", priority = -1 }
+unused_qualifications = "warn"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# Pedantic lints that do not fit this codebase.
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+needless_pass_by_value = "allow" # BRRTRouter fixes the handler signature: handle(req: TypedHandlerRequest<Request>)
+pub_underscore_fields = "allow" # emitted by Lifeguard's LifeModel derive, not by our code
+similar_names = "allow" # flags ordinary pairs such as router/routes and due_m5/due_p5
+items_after_statements = "allow" # a const or static next to its only use reads better than one hoisted to the top
+default_trait_access = "allow" # `Default::default()` as an argument is named by the parameter's type
+# Restriction lints we hold production code to.
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+dbg_macro = "warn"
+float_arithmetic = "warn" # money is rust_decimal::Decimal; f64 arithmetic loses cents
+let_underscore_must_use = "warn"
+allow_attributes_without_reason = "warn"
+undocumented_unsafe_blocks = "warn"
+print_stdout = "warn" # use tracing
+print_stderr = "warn"
+
 [workspace.dependencies]
+tracing = "0.1"
 # Release builds (CI, the buildpack) use these git revisions: the same revs PriceWhisperer pins. Local dev
 # overrides them with sibling checkouts from [workspace.metadata.local-deps] below (RERP_LOCAL_DEPS=1, which Tilt sets).
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)

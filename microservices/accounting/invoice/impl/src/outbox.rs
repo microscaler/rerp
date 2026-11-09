@@ -25,7 +25,7 @@ pub const STATUS_PENDING: &str = "PENDING";
 pub const STATUS_IN_PROGRESS: &str = "IN_PROGRESS";
 pub const STATUS_DONE: &str = "DONE";
 const MAX_ERROR_CHARS: usize = 480;
-/// A crashed claimant must not strand an instruction forever: IN_PROGRESS
+/// A crashed claimant must not strand an instruction forever: `IN_PROGRESS`
 /// rows become reclaimable once their lease expires.
 pub const CLAIM_LEASE_SECONDS: i64 = 300;
 
@@ -66,13 +66,13 @@ pub fn stored_from_render_model(model: &Value) -> Result<StoredInvoice, PostingE
 
 /// True when an instruction may be (re)attempted. A DONE instruction with
 /// a missing artifact is legitimately re-claimable (self-heal). A
-/// stranded IN_PROGRESS instruction becomes reclaimable once its lease
+/// stranded `IN_PROGRESS` instruction becomes reclaimable once its lease
 /// expires (crashed claimant, lost failure write).
 pub fn claimable(status: &str, lease_expired: bool) -> bool {
     status != STATUS_IN_PROGRESS || lease_expired
 }
 
-/// Pure lease decision: IN_PROGRESS rows whose `updated_at` is older than
+/// Pure lease decision: `IN_PROGRESS` rows whose `updated_at` is older than
 /// the lease may be reclaimed.
 pub fn lease_expired(updated_at: chrono::NaiveDateTime, now: chrono::NaiveDateTime) -> bool {
     (now - updated_at).num_seconds() > CLAIM_LEASE_SECONDS
@@ -285,8 +285,8 @@ impl OutboxListFilter {
             document_id: document_id
                 .map(|value| crate::posting::parse_uuid(value, "document_id"))
                 .transpose()?,
-            page: page as u32,
-            limit: limit as u32,
+            page: page.unsigned_abs(),
+            limit: limit.unsigned_abs(),
         })
     }
 }
@@ -317,7 +317,8 @@ pub fn list_outbox<E: LifeExecutor>(
         .all(executor)
         .map_err(database)?;
     let items: Vec<Value> = entries.iter().map(entry_json).collect();
-    let shown = i64::from(filter.page - 1) * i64::from(filter.limit) + items.len() as i64;
+    let shown = i64::from(filter.page - 1) * i64::from(filter.limit)
+        + i64::try_from(items.len()).unwrap_or(i64::MAX);
     Ok(json!({
         "items": items,
         "page": filter.page,
@@ -385,13 +386,10 @@ mod tests {
 
     #[test]
     fn render_model_reports_missing_or_invalid_snapshot() {
-        let error = stored_from_render_model(&json!({}))
-            .err()
-            .expect("missing snapshot is an error");
+        let error = stored_from_render_model(&json!({})).expect_err("missing snapshot is an error");
         assert!(error.to_string().contains("no snapshot"));
         let error = stored_from_render_model(&json!({"snapshot": {}}))
-            .err()
-            .expect("invalid snapshot is an error");
+            .expect_err("invalid snapshot is an error");
         assert!(error.to_string().contains("render model snapshot"));
     }
 

@@ -167,7 +167,8 @@ impl PubSub {
             let delivery_attempt = m
                 .get("deliveryAttempt")
                 .and_then(Value::as_u64)
-                .unwrap_or(1) as u32;
+                .and_then(|n| u32::try_from(n).ok())
+                .unwrap_or(1);
             if !ack_id.is_empty() {
                 out.push(Received {
                     ack_id,

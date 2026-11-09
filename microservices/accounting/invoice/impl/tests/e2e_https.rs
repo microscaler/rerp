@@ -15,10 +15,18 @@
 //! Requires a disposable PostgreSQL database with the RERP foundation
 //! migrations applied and `psql` on PATH (same requirement class as the
 //! `tests/sql` acceptance harness); the fixture tenant `e2e-https` is seeded
-//! here via the app's own `rls_set_session` contract. Environment: DB_HOST /
-//! DB_PORT / DB_USER / DB_PASS / DB_NAME as for the service binary.
+//! here via the app's own `rls_set_session` contract. Environment: `DB_HOST` /
+//! `DB_PORT` / `DB_USER` / `DB_PASS` / `DB_NAME` as for the service binary.
 //!
 //! Run: `cargo test -p rerp_accounting_invoice --test e2e_https -- --ignored`
+#![allow(
+    clippy::expect_used,
+    clippy::panic,
+    clippy::let_underscore_must_use,
+    clippy::disallowed_methods,
+    clippy::cast_possible_truncation,
+    reason = "integration test harness: helpers fail the test by panicking, clean up best-effort and run on OS threads"
+)]
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
@@ -237,33 +245,28 @@ fn seed_fixture(today: chrono::NaiveDate) {
     let year = today.year();
     let sql = format!(
         "BEGIN;
-SELECT public.rls_set_session('{tenant}', '{subject}'::uuid, '{org}'::uuid,
+SELECT public.rls_set_session('{TENANT}', '{SUBJECT}'::uuid, '{ORGANIZATION}'::uuid,
     'e2e-https-seed', '[\"billing\"]'::jsonb,
     '[\"accounting:invoice:write\"]'::jsonb, 'service', 'shipper');
 INSERT INTO rerp.accounting_legal_entities
     (id, tenant_id, organization_id, legal_name, base_currency, is_active, created_at, updated_at)
-VALUES ('{le}', '{tenant}', '{org}', 'E2E HTTPS Test Legal Entity', 'GBP', true, now(), now())
+VALUES ('{LEGAL_ENTITY}', '{TENANT}', '{ORGANIZATION}', 'E2E HTTPS Test Legal Entity', 'GBP', true, now(), now())
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_fiscal_periods
     (id, tenant_id, legal_entity_id, name, start_date, end_date, state, created_at, updated_at)
-SELECT 'e8000000-0000-4000-8000-{year:012}', '{tenant}', '{le}', 'FY{year}',
+SELECT 'e8000000-0000-4000-8000-{year:012}', '{TENANT}', '{LEGAL_ENTITY}', 'FY{year}',
        '{year}-01-01', '{year}-12-31', 'OPEN', now(), now()
 WHERE NOT EXISTS (SELECT 1 FROM rerp.accounting_fiscal_periods
-                  WHERE tenant_id = '{tenant}' AND legal_entity_id = '{le}' AND name = 'FY{year}')
+                  WHERE tenant_id = '{TENANT}' AND legal_entity_id = '{LEGAL_ENTITY}' AND name = 'FY{year}')
 ON CONFLICT (id) DO NOTHING;
 INSERT INTO rerp.accounting_accounts
     (id, tenant_id, legal_entity_id, code, name, account_type, normal_side, control_role, currency_code, is_active, created_at, updated_at)
 VALUES
-    ('e5000000-0000-4000-8000-0000000000e5', '{tenant}', '{le}', 'E2E-AR',  'E2E AR',       'ASSET',    'DEBIT',  'ACCOUNTS_RECEIVABLE', 'GBP', true, now(), now()),
-    ('e6000000-0000-4000-8000-0000000000e6', '{tenant}', '{le}', 'E2E-REV', 'E2E Revenue',  'REVENUE',  'CREDIT', 'REVENUE',             'GBP', true, now(), now()),
-    ('e7000000-0000-4000-8000-0000000000e7', '{tenant}', '{le}', 'E2E-VAT', 'E2E VAT',      'LIABILITY','CREDIT', 'TAX_PAYABLE',         'GBP', true, now(), now())
+    ('e5000000-0000-4000-8000-0000000000e5', '{TENANT}', '{LEGAL_ENTITY}', 'E2E-AR',  'E2E AR',       'ASSET',    'DEBIT',  'ACCOUNTS_RECEIVABLE', 'GBP', true, now(), now()),
+    ('e6000000-0000-4000-8000-0000000000e6', '{TENANT}', '{LEGAL_ENTITY}', 'E2E-REV', 'E2E Revenue',  'REVENUE',  'CREDIT', 'REVENUE',             'GBP', true, now(), now()),
+    ('e7000000-0000-4000-8000-0000000000e7', '{TENANT}', '{LEGAL_ENTITY}', 'E2E-VAT', 'E2E VAT',      'LIABILITY','CREDIT', 'TAX_PAYABLE',         'GBP', true, now(), now())
 ON CONFLICT (id) DO NOTHING;
-COMMIT;",
-        tenant = TENANT,
-        subject = SUBJECT,
-        org = ORGANIZATION,
-        le = LEGAL_ENTITY,
-        year = year
+COMMIT;"
     );
     let mut script = std::env::temp_dir();
     // Unique per process: concurrent runs must not truncate each other's
@@ -281,7 +284,11 @@ COMMIT;",
         .status()
         .expect("psql on PATH");
     let _ = std::fs::remove_file(&script);
-    assert!(status.success(), "fixture seed failed: {script:?}");
+    assert!(
+        status.success(),
+        "fixture seed failed: {}",
+        script.display()
+    );
 }
 
 /// Per-run tag for idempotency keys and source ids: a rerun against the
@@ -612,6 +619,8 @@ fn live_https_consumer_full_journey() {
 
     // The may_minihttp client performs coroutine I/O: run the journey inside
     // one coroutine with a client-sized stack (mirrors the crate's own tests).
+    // SAFETY: the coroutine owns everything it uses (moved in), touches no thread-local state and gets a 2 MiB
+    // stack, ample for the TLS client.
     let outcome = unsafe {
         CoroutineBuilder::new()
             .stack_size(2 * 1024 * 1024)

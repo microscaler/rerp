@@ -14,8 +14,8 @@ fn text(value: &str) -> Param {
     Param::from(value.to_string())
 }
 
-fn opt(value: &Option<String>) -> Param {
-    Param::from(value.clone())
+fn opt(value: Option<&String>) -> Param {
+    Param::from(value.cloned())
 }
 
 /// What recording a conversion did.
@@ -54,43 +54,44 @@ pub fn record<E: LifeExecutor>(executor: &E, screened: &Screened) -> Result<Reco
          ((funnel_lead_id IS NOT NULL AND funnel_lead_id = $2::text::uuid) OR \
           (stripe_customer_id IS NOT NULL AND stripe_customer_id = $3::text)) \
          ORDER BY created_at LIMIT 1",
-        &Values(vec![text(tenant), opt(&lead), opt(&stripe_customer)]),
+        &Values(vec![
+            text(tenant),
+            opt(lead.as_ref()),
+            opt(stripe_customer.as_ref()),
+        ]),
     )?;
-    let (account, outcome) = match existing.first() {
-        Some(row) => {
-            let id = uuid_of(&row.get::<_, String>(0))?;
-            (id, Recorded::Linked(id))
-        }
-        None => {
-            let id = Uuid::new_v4();
-            let cu = &c.customer;
-            let a = &cu.address;
-            executor.execute_values(
-                "INSERT INTO crm_accounts (id, tenant_id, organization_id, name, contact_name, email, street, street2, \
-                 city, zip, region, country_code, tax_id, funnel_lead_id, stripe_customer_id, phone) \
-                 VALUES ($1::text::uuid, $2::text, $3::text::uuid, $4::text, $5::text, $6::text, $7::text, $8::text, \
-                 $9::text, $10::text, $11::text, $12::text, $13::text, $14::text::uuid, $15::text, $16::text)",
-                &Values(vec![
-                    text(&id.to_string()),
-                    text(tenant),
-                    text(&c.organization_id.to_string()),
-                    text(&cu.name),
-                    opt(&cu.contact_name),
-                    text(&cu.email),
-                    text(&a.line1),
-                    opt(&a.line2),
-                    text(&a.city),
-                    opt(&a.postal_code),
-                    opt(&a.region),
-                    text(&a.country),
-                    opt(&cu.tax_id),
-                    opt(&lead),
-                    opt(&stripe_customer),
-                    opt(&cu.phone),
-                ]),
-            )?;
-            (id, Recorded::Created(id))
-        }
+    let (account, outcome) = if let Some(row) = existing.first() {
+        let id = uuid_of(&row.get::<_, String>(0))?;
+        (id, Recorded::Linked(id))
+    } else {
+        let id = Uuid::new_v4();
+        let cu = &c.customer;
+        let a = &cu.address;
+        executor.execute_values(
+            "INSERT INTO crm_accounts (id, tenant_id, organization_id, name, contact_name, email, street, street2, \
+             city, zip, region, country_code, tax_id, funnel_lead_id, stripe_customer_id, phone) \
+             VALUES ($1::text::uuid, $2::text, $3::text::uuid, $4::text, $5::text, $6::text, $7::text, $8::text, \
+             $9::text, $10::text, $11::text, $12::text, $13::text, $14::text::uuid, $15::text, $16::text)",
+            &Values(vec![
+                text(&id.to_string()),
+                text(tenant),
+                text(&c.organization_id.to_string()),
+                text(&cu.name),
+                opt(cu.contact_name.as_ref()),
+                text(&cu.email),
+                text(&a.line1),
+                opt(a.line2.as_ref()),
+                text(&a.city),
+                opt(a.postal_code.as_ref()),
+                opt(a.region.as_ref()),
+                text(&a.country),
+                opt(cu.tax_id.as_ref()),
+                opt(lead.as_ref()),
+                opt(stripe_customer.as_ref()),
+                opt(cu.phone.as_ref()),
+            ]),
+        )?;
+        (id, Recorded::Created(id))
     };
 
     let payload = serde_json::to_string(c).map_err(|e| LifeError::Other(e.to_string()))?;
@@ -105,11 +106,11 @@ pub fn record<E: LifeExecutor>(executor: &E, screened: &Screened) -> Result<Reco
             text(&account.to_string()),
             text(c.reason.as_str()),
             text(&c.reference),
-            opt(&lead),
-            opt(&stripe_customer),
-            opt(&c.converted_by),
+            opt(lead.as_ref()),
+            opt(stripe_customer.as_ref()),
+            opt(c.converted_by.as_ref()),
             text(&c.converted_at.to_rfc3339()),
-            opt(&screened.signed_by),
+            opt(screened.signed_by.as_ref()),
             text(&payload),
         ]),
     )?;
@@ -196,7 +197,7 @@ pub fn list<E: LifeExecutor>(
     let total: i64 = executor
         .query_one_values(
             &format!("SELECT count(*) FROM crm_accounts a WHERE {filter}"),
-            &Values(vec![opt(&pattern), opt(&active_text)]),
+            &Values(vec![opt(pattern.as_ref()), opt(active_text.as_ref())]),
         )?
         .get(0);
     let offset = (i64::from(page) - 1) * i64::from(limit);
@@ -206,14 +207,14 @@ pub fn list<E: LifeExecutor>(
              ORDER BY lower(a.name), a.id LIMIT $3::text::bigint OFFSET $4::text::bigint"
         ),
         &Values(vec![
-            opt(&pattern),
-            opt(&active_text),
+            opt(pattern.as_ref()),
+            opt(active_text.as_ref()),
             text(&limit.to_string()),
             text(&offset.to_string()),
         ]),
     )?;
     let items: Vec<Value> = rows.iter().map(account_json).collect();
-    let shown = offset + items.len() as i64;
+    let shown = offset + i64::try_from(items.len()).unwrap_or(i64::MAX);
     Ok(
         json!({ "items": items, "total": total, "page": page, "limit": limit, "has_more": shown < total }),
     )

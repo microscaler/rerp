@@ -108,22 +108,19 @@ pub fn ensure<E: LifeExecutor>(executor: &E) -> Result<usize, String> {
     Ok(applied)
 }
 
-/// At startup: apply the schema when a database is configured (DB_HOST set). Failure is logged, not fatal: reads answer
+/// At startup: apply the schema when a database is configured (`DB_HOST` set). Failure is logged, not fatal: reads answer
 /// 503 and the intake retries until the database is right.
 pub fn ensure_at_startup() {
-    if std::env::var("DB_HOST")
-        .map(|h| h.trim().is_empty())
-        .unwrap_or(true)
-    {
-        println!("[schema] DB_HOST not set; customer schema not applied");
+    if std::env::var("DB_HOST").map_or(true, |h| h.trim().is_empty()) {
+        tracing::warn!("DB_HOST not set; customer schema not applied");
         return;
     }
     match crate::database::db()
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.clone())
         .and_then(ensure)
     {
-        Ok(n) => println!("[schema] customer schema ensured ({n} statements)"),
-        Err(e) => eprintln!("[schema][error] customer schema not applied: {e}"),
+        Ok(n) => tracing::info!(statements = n, "customer schema ensured"),
+        Err(e) => tracing::error!(error = %e, "customer schema not applied"),
     }
 }
 

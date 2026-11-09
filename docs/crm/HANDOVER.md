@@ -78,7 +78,11 @@ cargo test -p <crate>
 - Never add a dependency that is not already in `microservices/Cargo.toml` `[workspace.dependencies]` without listing
   it in your report under **Needs approval**.
 - Never commit secrets, tokens or real customer data. Seeds use `*.example` addresses.
-- Never disable a test, a lint or a check to make it pass.
+- Never disable a test, a lint or a check to make it pass. The lints are in
+  [docs/RUST_LINTS.md](../RUST_LINTS.md); in production code that means no `unwrap`, `expect`, `panic!`, `println!`,
+  `eprintln!`, float arithmetic or `as` casts. Log with `tracing`, convert with `try_from`, return errors. If an
+  exception is truly needed, write `#[allow(clippy::<lint>, reason = "...")]` on the smallest item and list it in your
+  report.
 
 ## Report template (`docs/crm/reports/<story-id>.md`)
 

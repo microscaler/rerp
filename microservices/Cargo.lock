@@ -3838,6 +3838,7 @@ dependencies = [
  "sesame-idam-client",
  "sha2 0.11.1",
  "tikv-jemallocator",
+ "tracing",
  "uuid",
 ]
 
@@ -4286,6 +4287,7 @@ dependencies = [
  "sesame-idam-client",
  "sha2 0.11.1",
  "tikv-jemallocator",
+ "tracing",
  "uuid",
 ]
 
@@ -4343,6 +4345,7 @@ dependencies = [
  "sesame-idam-client",
  "sha2 0.11.1",
  "tikv-jemallocator",
+ "tracing",
  "url",
  "uuid",
 ]
@@ -4551,6 +4554,7 @@ dependencies = [
  "serde_yaml",
  "sesame-idam-client",
  "tikv-jemallocator",
+ "tracing",
  "uuid",
 ]
 
@@ -4905,6 +4909,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tikv-jemallocator",
+ "tracing",
  "uuid",
 ]
 

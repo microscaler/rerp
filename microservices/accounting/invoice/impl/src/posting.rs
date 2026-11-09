@@ -38,8 +38,7 @@ use rerp_entities::accounting::foundation::legal_entity::{
     AccountingLegalEntityModel, Column as LegalEntityColumn, Entity as LegalEntityEntity,
 };
 use rerp_entities::accounting::foundation::posted_document::{
-    AccountingPostedDocument, AccountingPostedDocumentRecord, Column as DocumentColumn,
-    Entity as DocumentEntity,
+    AccountingPostedDocumentRecord, Column as DocumentColumn, Entity as DocumentEntity,
 };
 use rerp_entities::accounting::foundation::posted_document_line::{
     AccountingPostedDocumentLineModel, AccountingPostedDocumentLineRecord,
@@ -427,9 +426,10 @@ fn resolve_open_period<E: LifeExecutor>(
         "open fiscal period",
     )?;
     if locked.state != "OPEN" && locked.state != "REOPENED" {
-        eprintln!(
-            "[gl-posting] period {} transitioned to {} concurrently; posting rejected",
-            locked.id, locked.state
+        tracing::warn!(
+            period = %locked.id,
+            state = %locked.state,
+            "fiscal period transitioned concurrently; posting rejected"
         );
         return Err(PostingError::Conflict);
     }
@@ -438,10 +438,7 @@ fn resolve_open_period<E: LifeExecutor>(
 
 /// Must match `general_ledger::journals::period_posting_lock` exactly: the
 /// two services share one Postgres and must contend on one lock key.
-fn period_posting_lock<E: LifeExecutor>(
-    executor: &E,
-    period_id: uuid::Uuid,
-) -> Result<(), PostingError> {
+fn period_posting_lock<E: LifeExecutor>(executor: &E, period_id: Uuid) -> Result<(), PostingError> {
     const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
     const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
     let mut hash = FNV_OFFSET;
@@ -620,7 +617,7 @@ fn persist_plan<E: LifeExecutor>(
             .set_tenant_id(invoice.tenant_id.clone())
             .set_legal_entity_id(invoice.legal_entity_id)
             .set_document_id(invoice.id)
-            .set_line_number(line.line_number as i32)
+            .set_line_number(i32::try_from(line.line_number).unwrap_or(i32::MAX))
             .set_description(line.description.clone())
             .set_quantity(line.quantity)
             .set_unit_price(line.unit_price)
@@ -663,7 +660,7 @@ fn persist_plan<E: LifeExecutor>(
             .set_tenant_id(journal.tenant_id.clone())
             .set_legal_entity_id(journal.legal_entity_id)
             .set_journal_entry_id(journal.id)
-            .set_line_number(line.line_number as i32)
+            .set_line_number(i32::try_from(line.line_number).unwrap_or(i32::MAX))
             .set_account_id(line.account_id)
             .set_side(journal_side_name(line.side).to_string())
             .set_amount(line.amount)
@@ -797,8 +794,8 @@ impl InvoiceListFilter {
             document_type,
             invoice_date_from,
             invoice_date_to,
-            page: page as u32,
-            limit: limit as u32,
+            page: page.unsigned_abs(),
+            limit: limit.unsigned_abs(),
         })
     }
 }
@@ -835,7 +832,8 @@ pub fn list_invoices<E: LifeExecutor>(
         .limit(u64::from(filter.limit))
         .all(executor)
         .map_err(|error| PostingError::Database(error.to_string()))?;
-    let shown = i64::from(filter.page - 1) * i64::from(filter.limit) + documents.len() as i64;
+    let shown = i64::from(filter.page - 1) * i64::from(filter.limit)
+        + i64::try_from(documents.len()).unwrap_or(i64::MAX);
     Ok(json!({
         "items": documents.iter().map(|document| json!({
             "id": document.id,
@@ -1018,7 +1016,7 @@ fn parse_credit_selections(
                 )));
             }
             Ok(CreditLineSelection {
-                original_line_number: line.original_line_number as u32,
+                original_line_number: line.original_line_number.unsigned_abs(),
                 quantity: parse_decimal(
                     &line.quantity,
                     &format!("lines[{}].quantity", index + 1),
@@ -1043,7 +1041,7 @@ fn parse_debit_selections(
                 )));
             }
             Ok(CreditLineSelection {
-                original_line_number: line.original_line_number as u32,
+                original_line_number: line.original_line_number.unsigned_abs(),
                 quantity: parse_decimal(
                     &line.quantity,
                     &format!("lines[{}].quantity", index + 1),
@@ -1058,7 +1056,7 @@ fn parse_debit_selections(
 /// (full or partial) linked to the original document. Debit notes link the
 /// SAME way but are additional charges, not consumption: the fold must
 /// filter to credit-note documents or a debit would silently shrink the
-/// creditable balance and reject valid credits with OverCredit.
+/// creditable balance and reject valid credits with `OverCredit`.
 fn credited_quantities<E: LifeExecutor>(
     executor: &E,
     original_document_id: Uuid,
@@ -1092,7 +1090,9 @@ fn fold_credited_quantities(
     let mut credited: std::collections::BTreeMap<u32, Decimal> = Default::default();
     for (line_number, quantity) in entries {
         if *line_number >= 1 {
-            *credited.entry(*line_number as u32).or_insert(Decimal::ZERO) += *quantity;
+            *credited
+                .entry(line_number.unsigned_abs())
+                .or_insert(Decimal::ZERO) += *quantity;
         }
     }
     credited

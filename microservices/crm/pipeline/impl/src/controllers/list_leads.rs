@@ -12,13 +12,11 @@ fn matches_search(lead: &Lead, needle: &str) -> bool {
         || lead
             .email_normalized
             .as_deref()
-            .map(|e| e.contains(&n))
-            .unwrap_or(false)
+            .is_some_and(|e| e.contains(&n))
         || lead
             .company_name
             .as_deref()
-            .map(|c| c.to_lowercase().contains(&n))
-            .unwrap_or(false)
+            .is_some_and(|c| c.to_lowercase().contains(&n))
 }
 
 #[handler(ListLeadsController)]
@@ -53,11 +51,11 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
     let total = filtered.len();
     let page = data.page.unwrap_or(1).max(1);
     let limit = data.limit.unwrap_or(50).clamp(1, 100);
-    let start = ((page - 1) * limit) as usize;
+    let start = usize::try_from((page - 1) * limit).unwrap_or(0);
     let items: Vec<&Lead> = filtered
         .into_iter()
         .skip(start)
-        .take(limit as usize)
+        .take(usize::try_from(limit).unwrap_or(0))
         .collect();
 
     HttpJson::new(

@@ -1,7 +1,7 @@
 //! Bank Account entity
 //!
 //! Bank account information for synchronization and reconciliation.
-//! Links to banks master table via bank_id foreign key.
+//! Links to banks master table via `bank_id` foreign key.
 
 use lifeguard_derive::LifeModel;
 use serde_json::Value;

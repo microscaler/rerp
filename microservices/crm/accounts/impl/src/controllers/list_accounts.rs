@@ -32,8 +32,8 @@ pub fn handle(req: TypedHandlerRequest<Request>) -> HttpJson<Value> {
             executor,
             search,
             data.filter_active,
-            page as u32,
-            limit as u32,
+            page.unsigned_abs(),
+            limit.unsigned_abs(),
         )
     }) {
         Ok(page) => HttpJson::new(200, page),

@@ -132,7 +132,7 @@ pub fn ar_error(error: ArError) -> HttpJson<Value> {
         ArError::NotFound => (404, "NOT_FOUND", "Resource not found".to_string()),
         ArError::Conflict(_) => (409, "CONFLICT", error.to_string()),
         ArError::Database(_) => {
-            eprintln!("accounts-receivable runtime database failure: {error}");
+            tracing::error!(%error, "accounts-receivable runtime database failure");
             (
                 500,
                 "SERVER_ERROR",
