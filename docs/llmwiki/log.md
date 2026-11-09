@@ -1072,3 +1072,16 @@ ref-rewritten) the whole accounting suite — including
   limit), with the event bound enforced on the running total.
 - rerp pins lifeguard 44a2412 (lock regenerated with local path
   patches set aside — git sources only).
+
+## [2026-11-09] contribute | CRM story slice 1: CRM-RT-01 request context and errors
+
+- `rerp_crm_runtime` now carries the shared `RequestContext`
+  (claims + `X-Workspace-Id` + role, 403 `workspace_forbidden`
+  fail-closed, `system()` for workers), `ApiError` rendered as the
+  contract `ErrorResponse`, `MembershipSource` with static and 60 s
+  cached implementations, and `workspace_guard_sql()` for RLS
+  transactions. First story done from `docs/crm/stories/` under the
+  HANDOVER/SUPERVISION process; report in `docs/crm/reports/`.
+- Legacy `openapi/crm/{accounts,pipeline,...}` specs keep the old
+  `{code, message}` error body — the AC-3 contract test is scoped to
+  the nine story services by design.
